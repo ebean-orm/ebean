@@ -39,6 +39,7 @@ public class ScalarTypeLocalTimeWithNanos extends ScalarTypeLocalTime {
   @Override
   public LocalTime toBeanType(Object value) {
     if (value instanceof LocalTime) return (LocalTime) value;
+    if (value == null) return null;
     return LocalTime.ofNanoOfDay(BasicTypeConverter.toLong(value));
   }
 

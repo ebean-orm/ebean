@@ -321,7 +321,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<EUncle> query = Ebean.find(EUncle.class)
       .fetch("parent", "more");
 
-    Ebean.getDefaultServer().findSingleAttributeList(query, null);
+    query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select t1.more from rawinherit_uncle t0 join rawinherit_parent t1 on t1.id = t0.parent_id");
   }
@@ -353,6 +353,21 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .select("customer")
       .orderBy().desc("customer");
+
+    query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select distinct t0.customer_id from contact t0 order by t0.customer_id desc");
+  }
+
+  @Test
+  public void distinctWithOrderByPkWithId() {
+
+    ResetBasicData.reset();
+
+    Query<Contact> query = Ebean.find(Contact.class)
+      .setDistinct(true)
+      .select("customer.id")
+      .orderBy().desc("customer.id");
 
     query.findSingleAttributeList();
 

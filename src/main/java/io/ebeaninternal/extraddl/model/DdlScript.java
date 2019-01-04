@@ -39,7 +39,8 @@ public class DdlScript {
   protected String platforms;
   @XmlAttribute(name = "drop")
   protected boolean drop;
-
+  @XmlAttribute(name = "init")
+  protected boolean init;
   /**
    * Gets the value of the value property.
    *
@@ -114,4 +115,17 @@ public class DdlScript {
     this.drop = drop;
   }
 
+  /**
+   * Return if this a init script.
+   */
+  public boolean isInit() {
+    return init;
+  }
+
+  /**
+   * Sets that this is a init script.
+   */
+  public void setInit(boolean init) {
+    this.init = init;
+  }
 }

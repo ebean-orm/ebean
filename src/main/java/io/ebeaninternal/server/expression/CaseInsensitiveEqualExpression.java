@@ -8,8 +8,11 @@ import java.io.IOException;
 
 class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
-  CaseInsensitiveEqualExpression(String propertyName, Object value) {
+  private boolean not;
+
+  CaseInsensitiveEqualExpression(String propertyName, Object value, boolean not) {
     super(propertyName, value);
+    this.not = not;
   }
 
   /**
@@ -21,7 +24,11 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIEqualTo(propName, val());
+    if (not) {
+      context.writeINotEqualTo(propName, val());
+    } else {
+      context.writeIEqualTo(propName, val());
+    }
   }
 
   @Override
@@ -45,13 +52,20 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
     if (prop != null && prop.isDbEncrypted()) {
       pname = prop.getBeanProperty().getDecryptProperty(propName);
     }
-
-    request.append("lower(").append(pname).append(") =? ");
+    if (not) {
+      request.append("lower(").append(pname).append(") !=? ");
+    } else {
+      request.append("lower(").append(pname).append(") =? ");
+    }
   }
 
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("Ieq[").append(propName).append("]");
+    if (not) {
+      builder.append("Ine[").append(propName).append("]");
+    } else {
+      builder.append("Ieq[").append(propName).append("]");
+    }
   }
 
   @Override

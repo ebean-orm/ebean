@@ -15,7 +15,7 @@ create table migtest_ckey_detail (
 create sequence migtest_ckey_detail_seq;
 
 create table migtest_ckey_parent (
-  one_key                       number(127) not null,
+  one_key                       number(10) not null,
   two_key                       varchar2(127) not null,
   name                          varchar2(255),
   version                       number(10) not null,
@@ -85,6 +85,14 @@ create table migtest_e_basic (
 );
 create sequence migtest_e_basic_seq;
 
+create table migtest_e_enum (
+  id                            number(10) not null,
+  test_status                   varchar2(1),
+  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
+  constraint pk_migtest_e_enum primary key (id)
+);
+create sequence migtest_e_enum_seq;
+
 create table migtest_e_history (
   id                            number(10) not null,
   test_string                   varchar2(255),
@@ -95,9 +103,40 @@ create sequence migtest_e_history_seq;
 create table migtest_e_history2 (
   id                            number(10) not null,
   test_string                   varchar2(255),
+  obsolete_string1              varchar2(255),
+  obsolete_string2              varchar2(255),
   constraint pk_migtest_e_history2 primary key (id)
 );
 create sequence migtest_e_history2_seq;
+
+create table migtest_e_history3 (
+  id                            number(10) not null,
+  test_string                   varchar2(255),
+  constraint pk_migtest_e_history3 primary key (id)
+);
+create sequence migtest_e_history3_seq;
+
+create table migtest_e_history4 (
+  id                            number(10) not null,
+  test_number                   number(10),
+  constraint pk_migtest_e_history4 primary key (id)
+);
+create sequence migtest_e_history4_seq;
+
+create table migtest_e_history5 (
+  id                            number(10) not null,
+  test_number                   number(10),
+  constraint pk_migtest_e_history5 primary key (id)
+);
+create sequence migtest_e_history5_seq;
+
+create table migtest_e_history6 (
+  id                            number(10) not null,
+  test_number1                  number(10),
+  test_number2                  number(10) not null,
+  constraint pk_migtest_e_history6 primary key (id)
+);
+create sequence migtest_e_history6_seq;
 
 create table migtest_e_ref (
   id                            number(10) not null,

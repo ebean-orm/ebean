@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.server.type.DataReader;
 
 import java.sql.SQLException;
 
@@ -9,14 +10,41 @@ import java.sql.SQLException;
  */
 final class AssocOneHelpEmbedded extends AssocOneHelp {
 
-  public AssocOneHelpEmbedded(BeanPropertyAssocOne<?> property) {
+  AssocOneHelpEmbedded(BeanPropertyAssocOne<?> property) {
     super(property);
   }
 
   @Override
   void loadIgnore(DbReadContext ctx) {
-    for (int i = 0; i < property.embeddedProps.length; i++) {
-      property.embeddedProps[i].loadIgnore(ctx);
+    for (BeanProperty property : property.embeddedProps) {
+      property.loadIgnore(ctx);
+    }
+  }
+
+  @Override
+  Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    Object dbVal = read(reader);
+    if (bean != null) {
+      property.setValue(bean, dbVal);
+    }
+    return dbVal;
+  }
+
+  @Override
+  Object read(DataReader reader) throws SQLException {
+
+    EntityBean embeddedBean = property.targetDescriptor.createEntityBean();
+    boolean notNull = false;
+    for (BeanProperty property : property.embeddedProps) {
+      Object value = property.readSet(reader, embeddedBean);
+      if (value != null) {
+        notNull = true;
+      }
+    }
+    if (notNull) {
+      return embeddedBean;
+    } else {
+      return null;
     }
   }
 
@@ -39,8 +67,8 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
     EntityBean embeddedBean = property.targetDescriptor.createEntityBean();
 
     boolean notNull = false;
-    for (int i = 0; i < property.embeddedProps.length; i++) {
-      Object value = property.embeddedProps[i].readSet(ctx, embeddedBean);
+    for (BeanProperty property : property.embeddedProps) {
+      Object value = property.readSet(ctx, embeddedBean);
       if (value != null) {
         notNull = true;
       }
@@ -55,8 +83,8 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
 
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    for (int i = 0; i < property.embeddedProps.length; i++) {
-      property.embeddedProps[i].appendSelect(ctx, subQuery);
+    for (BeanProperty property : property.embeddedProps) {
+      property.appendSelect(ctx, subQuery);
     }
   }
 }

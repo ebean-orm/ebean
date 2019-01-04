@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -47,6 +47,7 @@ public class ForeignKey {
   protected String onDelete;
   @XmlAttribute(name = "onUpdate")
   protected String onUpdate;
+
   /**
    * Gets the value of the name property.
    *

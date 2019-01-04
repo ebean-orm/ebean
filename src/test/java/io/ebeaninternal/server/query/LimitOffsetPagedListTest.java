@@ -1,19 +1,19 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.BaseTestCase;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import org.tests.model.basic.Order;
 import org.junit.Test;
+import org.tests.model.basic.Order;
 
 import static org.junit.Assert.assertEquals;
 
-public class LimitOffsetPagedListTest {
+public class LimitOffsetPagedListTest extends BaseTestCase {
 
-  private EbeanServer server = Ebean.getDefaultServer();
+  private SpiEbeanServer server = spiEbeanServer();
 
   @Test
-  public void getPageIndex_when_firstRowsZero() throws Exception {
+  public void getPageIndex_when_firstRowsZero() {
     assertEquals(limit(0, 10).getPageIndex(), 0);
   }
 
@@ -28,12 +28,12 @@ public class LimitOffsetPagedListTest {
   }
 
   @Test
-  public void getPageIndex_when_1_10() throws Exception {
+  public void getPageIndex_when_1_10() {
     assertEquals(limit(1, 10).getPageIndex(), 1);
   }
 
   @Test
-  public void getPageIndex_when_9_10() throws Exception {
+  public void getPageIndex_when_9_10() {
     assertEquals(limit(1, 10).getPageIndex(), 1);
   }
 

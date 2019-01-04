@@ -17,7 +17,9 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
+import io.ebeaninternal.dbmigration.migration.Sql;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,23 @@ public class ModelContainer {
 
   private final PendingDrops pendingDrops = new PendingDrops();
 
+  private final List<MTable> partitionedTables = new ArrayList<>();
+
   public ModelContainer() {
+  }
+
+  /**
+   * Return true if the model contains tables that are partitioned.
+   */
+  public boolean isTablePartitioning() {
+    return !partitionedTables.isEmpty();
+  }
+
+  /**
+   * Return the list of partitioned tables.
+   */
+  public List<MTable> getPartitionedTables() {
+    return partitionedTables;
   }
 
   /**
@@ -143,6 +161,8 @@ public class ModelContainer {
         applyChange((AlterForeignKey) change);
       } else if (change instanceof AddTableComment) {
         applyChange((AddTableComment) change);
+      } else if (change instanceof Sql) {
+        // do nothing
       } else {
         throw new IllegalArgumentException("No rule for " + change);
       }
@@ -164,13 +184,12 @@ public class ModelContainer {
   /**
    * Unset the withHistory flag on the associated base table.
    */
-  private void applyChange(DropHistoryTable change) {
+  protected void applyChange(DropHistoryTable change) {
 
     MTable table = tables.get(change.getBaseTable());
-    if (table == null) {
-      throw new IllegalStateException("Table [" + change.getBaseTable() + "] does not exist in model?");
+    if (table != null) {
+      table.setWithHistory(false);
     }
-    table.setWithHistory(false);
   }
 
   private void applyChange(AddUniqueConstraint change) {
@@ -221,19 +240,14 @@ public class ModelContainer {
     if (tables.containsKey(tableName)) {
       throw new IllegalStateException("Table [" + tableName + "] already exists in model?");
     }
-    MTable table = new MTable(createTable);
-    tables.put(tableName, table);
+    tables.put(tableName, new MTable(createTable));
   }
 
   /**
    * Apply a DropTable change to the model.
    */
   protected void applyChange(DropTable dropTable) {
-    String tableName = dropTable.getName();
-    if (!tables.containsKey(tableName)) {
-      throw new IllegalStateException("Table [" + tableName + "] does not exists in model?");
-    }
-    tables.remove(tableName);
+    tables.remove(dropTable.getName());
   }
 
   /**
@@ -244,21 +258,15 @@ public class ModelContainer {
     if (indexes.containsKey(indexName)) {
       throw new IllegalStateException("Index [" + indexName + "] already exists in model?");
     }
-    MIndex index = new MIndex(createIndex);
-    indexes.put(createIndex.getIndexName(), index);
+    indexes.put(createIndex.getIndexName(), new MIndex(createIndex));
   }
 
   /**
    * Apply a DropTable change to the model.
    */
   protected void applyChange(DropIndex dropIndex) {
-    String name = dropIndex.getIndexName();
-    if (!indexes.containsKey(name)) {
-      throw new IllegalStateException("Index [" + name + "] does not exist in model?");
-    }
-    indexes.remove(name);
+    indexes.remove(dropIndex.getIndexName());
   }
-
 
   /**
    * Apply a AddColumn change to the model.
@@ -297,6 +305,9 @@ public class ModelContainer {
    * Add a table (typically from reading EbeanServer meta data).
    */
   public MTable addTable(MTable table) {
+    if (table.isPartitioned()) {
+      partitionedTables.add(table);
+    }
     return tables.put(table.getName(), table);
   }
 

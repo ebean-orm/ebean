@@ -8,6 +8,9 @@ import io.ebeaninternal.server.persist.BatchPostExecute;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.persist.PersistExecute;
 
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
+
 /**
  * Wraps all the objects used to persist a bean.
  */
@@ -17,7 +20,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     INSERT(EVT_INSERT),
     UPDATE(EVT_UPDATE),
     DELETE(EVT_DELETE),
-    SOFT_DELETE(EVT_SOFT_DELETE),
+    DELETE_SOFT(EVT_DELETE_SOFT),
     DELETE_PERMANENT(EVT_DELETE_PERMANENT),
     UPDATESQL(EVT_UPDATESQL),
     CALLABLESQL(EVT_CALLABLESQL);
@@ -92,7 +95,14 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    * Return true if this persist request should use JDBC batch.
    */
   public boolean isBatchThisRequest() {
-    return transaction.isBatchThisRequest(type);
+    return transaction.isBatchThisRequest();
+  }
+
+  /**
+   * Translate the SQLException into a specific exception given the platform.
+   */
+  public PersistenceException translateSqlException(SQLException e) {
+    return transaction.translate(e.getMessage(), e);
   }
 
   /**

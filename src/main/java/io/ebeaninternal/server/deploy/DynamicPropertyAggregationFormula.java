@@ -1,9 +1,11 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.server.query.SqlBeanLoad;
+import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 
 /**
  * Dynamic property based on aggregation (max, min, avg, count).
@@ -34,6 +36,15 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   @Override
   public boolean isAggregation() {
     return aggregate;
+  }
+
+  @Override
+  public Object read(DataReader dataReader) throws SQLException {
+    try {
+      return scalarType.read(dataReader);
+    } catch (Exception e) {
+      throw new PersistenceException("Error loading on " + fullName, e);
+    }
   }
 
   @Override

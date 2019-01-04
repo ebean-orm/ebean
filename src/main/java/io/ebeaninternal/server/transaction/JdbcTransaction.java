@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
@@ -14,7 +13,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.lib.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -55,6 +53,9 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   protected final String id;
 
+  private final boolean logSql;
+  private final boolean logSummary;
+
   /**
    * The user defined label to group execution statistics.
    */
@@ -76,6 +77,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   protected boolean active;
 
   protected boolean rollbackOnly;
+
+  protected boolean nestedUseSavepoint;
 
   /**
    * The underlying Connection.
@@ -113,11 +116,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   protected Boolean updateAllLoadedProperties;
 
-  protected PersistBatch oldBatchMode;
+  protected boolean oldBatchMode;
 
-  protected PersistBatch batchMode;
+  protected boolean batchMode;
 
-  protected PersistBatch batchOnCascadeMode;
+  protected boolean batchOnCascadeMode;
 
   protected int batchSize = -1;
 
@@ -182,6 +185,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   protected ProfileLocation profileLocation;
 
   protected final long startNanos;
+  private final long startMillis;
 
   /**
    * Create a new JdbcTransaction.
@@ -198,11 +202,17 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.startNanos = System.nanoTime();
 
       if (manager == null) {
+        this.startMillis = System.currentTimeMillis();
+        this.logSql = false;
+        this.logSummary = false;
         this.skipCacheAfterWrite = true;
-        this.batchMode = PersistBatch.NONE;
-        this.batchOnCascadeMode = PersistBatch.NONE;
+        this.batchMode = false;
+        this.batchOnCascadeMode = false;
         this.onQueryOnly = OnQueryOnly.ROLLBACK;
       } else {
+        this.startMillis = manager.clockNowMillis();
+        this.logSql = manager.isLogSql();
+        this.logSummary = manager.isLogSummary();
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
         this.batchMode = manager.getPersistBatch();
         this.batchOnCascadeMode = manager.getPersistBatchOnCascade();
@@ -224,6 +234,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public String getLabel() {
     return label;
+  }
+
+  @Override
+  public long getStartMillis() {
+    return startMillis;
   }
 
   @Override
@@ -556,32 +571,24 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    this.batchMode = (batchMode) ? PersistBatch.ALL : PersistBatch.NONE;
-  }
-
-  @Override
-  public void setBatch(PersistBatch batchMode) {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.batchMode = batchMode;
   }
 
   @Override
-  public PersistBatch getBatch() {
+  public boolean isBatchMode() {
     return batchMode;
   }
 
   @Override
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+  public void setBatchOnCascade(boolean batchMode) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    this.batchOnCascadeMode = batchOnCascadeMode;
+    this.batchOnCascadeMode = batchMode;
   }
 
   @Override
-  public PersistBatch getBatchOnCascade() {
+  public boolean isBatchOnCascade() {
     return batchOnCascadeMode;
   }
 
@@ -640,36 +647,18 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * this request should be executed immediately.
    */
   @Override
-  public boolean isBatchThisRequest(PersistRequest.Type type) {
+  public boolean isBatchThisRequest() {
     if (!batchOnCascadeSet && !explicit && depth <= 0) {
       // implicit transaction, no gain by batching where depth <= 0
       return false;
     }
-    return isBatch(batchMode, type);
-  }
-
-  /**
-   * Return true if JDBC batch should be used on cascade persist.
-   */
-  private boolean isBatchOnCascade(PersistRequest.Type type) {
-    return isBatch(batchOnCascadeMode, type);
-  }
-
-  private boolean isBatch(PersistBatch batch, PersistRequest.Type type) {
-    switch (batch) {
-      case ALL:
-        return true;
-      case INSERT:
-        return type == PersistRequest.Type.INSERT;
-      default:
-        return false;
-    }
+    return batchMode;
   }
 
   @Override
   public void checkBatchEscalationOnCollection() {
-    if (batchMode == PersistBatch.NONE && batchOnCascadeMode != PersistBatch.NONE) {
-      batchMode = batchOnCascadeMode;
+    if (!batchMode && batchOnCascadeMode) {
+      batchMode = true;
       batchOnCascadeSet = true;
     }
   }
@@ -679,7 +668,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (batchOnCascadeSet) {
       batchFlushReset();
       // restore the previous batch mode of NONE
-      batchMode = PersistBatch.NONE;
+      batchMode = false;
     }
   }
 
@@ -736,15 +725,15 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request) {
 
-    if (isBatch(batchMode, request.getType())) {
+    if (batchMode) {
       // already batching (at top level)
       return false;
     }
 
-    if (isBatchOnCascade(request.getType())) {
+    if (batchOnCascadeMode) {
       // escalate up to batch mode for this request (and cascade)
-      oldBatchMode = batchMode;
-      batchMode = PersistBatch.ALL;
+      oldBatchMode = false;
+      batchMode = true;
       batchFlushReset();
       // skip using jdbc batch for the top level bean (no gain there)
       request.setSkipBatchForTopLevel();
@@ -844,7 +833,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   public TransactionEvent getEvent() {
     queryOnly = false;
     if (event == null) {
-      event = new TransactionEvent();
+      event = new TransactionEvent(startMillis);
     }
     return event;
   }
@@ -859,22 +848,22 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public boolean isLogSql() {
-    return TransactionManager.SQL_LOGGER.isDebugEnabled();
+    return logSql;
   }
 
   @Override
   public boolean isLogSummary() {
-    return TransactionManager.SUM_LOGGER.isDebugEnabled();
+    return logSummary;
   }
 
   @Override
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.debug(Str.add(logPrefix, msg));
+    manager.log().sql().debug(Str.add(logPrefix, msg));
   }
 
   @Override
   public void logSummary(String msg) {
-    TransactionManager.SUM_LOGGER.debug(Str.add(logPrefix, msg));
+    manager.log().sum().debug(Str.add(logPrefix, msg));
   }
 
   /**
@@ -1041,7 +1030,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       // the event has been sent to the transaction manager
       // for postCommit processing (l2 cache updates etc)
       // start a new transaction event
-      event = new TransactionEvent();
+      event = new TransactionEvent(startMillis);
 
     } catch (Exception e) {
       doRollback(e);
@@ -1115,6 +1104,16 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public void setRollbackOnly() {
     this.rollbackOnly = true;
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return nestedUseSavepoint;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+    this.nestedUseSavepoint = true;
   }
 
   /**

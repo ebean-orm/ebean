@@ -17,7 +17,7 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
   @Ignore
   @Test
-  public void test() throws InterruptedException {
+  public void test() {
 
     ResetBasicData.reset();
 

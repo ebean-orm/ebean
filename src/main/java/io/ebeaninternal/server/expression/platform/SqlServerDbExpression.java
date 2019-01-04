@@ -8,10 +8,6 @@ import io.ebeaninternal.server.expression.Op;
  */
 public class SqlServerDbExpression extends BaseDbExpression {
 
-  SqlServerDbExpression(String concatOperator) {
-    super(concatOperator);
-  }
-
   @Override
   public void json(final SpiExpressionRequest request, final String propName,
                    final String path, final Op operator, final Object value) {

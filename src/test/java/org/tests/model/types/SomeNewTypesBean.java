@@ -6,10 +6,13 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.Period;
 import java.time.Year;
@@ -39,6 +42,9 @@ public class SomeNewTypesBean {
   @Column(name = "yr_mth")
   YearMonth yearMonth;
 
+  @Column(name = "month_day")
+  MonthDay monthDay;
+
   LocalDate localDate;
 
   LocalDateTime localDateTime;
@@ -46,6 +52,8 @@ public class SomeNewTypesBean {
   OffsetDateTime offsetDateTime;
 
   ZonedDateTime zonedDateTime;
+
+  LocalTime localTime;
 
   Instant instant;
 
@@ -56,6 +64,8 @@ public class SomeNewTypesBean {
   Path path;
 
   Period period;
+
+  Duration duration;
 
   public Long getId() {
     return id;
@@ -105,6 +115,14 @@ public class SomeNewTypesBean {
     this.yearMonth = yearMonth;
   }
 
+  public MonthDay getMonthDay() {
+    return monthDay;
+  }
+
+  public void setMonthDay(MonthDay monthDay) {
+    this.monthDay = monthDay;
+  }
+
   public LocalDate getLocalDate() {
     return localDate;
   }
@@ -135,6 +153,14 @@ public class SomeNewTypesBean {
 
   public void setZonedDateTime(ZonedDateTime zonedDateTime) {
     this.zonedDateTime = zonedDateTime;
+  }
+
+  public LocalTime getLocalTime() {
+    return localTime;
+  }
+
+  public void setLocalTime(LocalTime localTime) {
+    this.localTime = localTime;
   }
 
   public Instant getInstant() {
@@ -175,5 +201,13 @@ public class SomeNewTypesBean {
 
   public void setPeriod(Period period) {
     this.period = period;
+  }
+
+  public Duration getDuration() {
+    return duration;
+  }
+
+  public void setDuration(Duration duration) {
+    this.duration = duration;
   }
 }

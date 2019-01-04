@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.dto;
 
 import io.ebean.meta.MetricType;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.QueryPlanMetric;
 import io.ebeaninternal.api.SpiDtoQuery;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.QueryPlanMetric;
 
 /**
  * Request to map a resultSet columns for a query into a DTO bean.

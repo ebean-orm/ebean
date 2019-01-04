@@ -6,6 +6,8 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -48,6 +50,22 @@ abstract class MergeNode {
       return children.get(path);
     }
     return null;
+  }
+
+  /**
+   * Return the outline beans as a map keyed by Id values.
+   */
+  Map<Object, EntityBean> toMap(Collection outlines) {
+
+    Map<Object, EntityBean> outlineMap = new HashMap<>();
+    if (outlines != null) {
+      for (Object out : outlines) {
+        EntityBean outlineBean = (EntityBean) out;
+        Object outlineId = targetDescriptor.getId(outlineBean);
+        outlineMap.put(outlineId, outlineBean);
+      }
+    }
+    return outlineMap;
   }
 
   /**

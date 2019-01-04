@@ -18,7 +18,7 @@ public class TestManyToOneAsOne extends BaseTestCase {
 
   @Transactional(batchSize = 20)
   @Test
-  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE}) // probably due the use of sequences - Empl has already an ID and Addr refers to it.
+  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE, Platform.HANA}) // probably due the use of sequences - Empl has already an ID and Addr refers to it.
   public void test_when_jdbcBatch() {
     runInserts();
   }

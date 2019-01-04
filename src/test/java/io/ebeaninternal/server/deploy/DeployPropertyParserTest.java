@@ -1,8 +1,11 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.tests.model.basic.Address;
+import org.tests.model.basic.BWithQIdent;
 import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,6 +16,8 @@ public class DeployPropertyParserTest extends BaseTestCase {
   private final BeanDescriptor<Customer> descriptor = getBeanDescriptor(Customer.class);
 
   private final BeanDescriptor<Address> addressBeanDescriptor = getBeanDescriptor(Address.class);
+
+  private final BeanDescriptor<BWithQIdent> bWithQIdentDescriptor = getBeanDescriptor(BWithQIdent.class);
 
   @Test
   public void from_prefix_expect_unchanged() {
@@ -50,6 +55,31 @@ public class DeployPropertyParserTest extends BaseTestCase {
   }
 
   @Test
+  public void withExplicitQuote_all_platforms() {
+    assertThat(withQuoteParser().parse("t0.`CODE` like ?")).isEqualTo("t0.`CODE` like ?");
+    assertThat(withQuoteParser().parse("t0.[CODE] like ?")).isEqualTo("t0.[CODE] like ?");
+    assertThat(withQuoteParser().parse("t0.\"CODE\" like ?")).isEqualTo("t0.\"CODE\" like ?");
+  }
+
+  @Test
+  @ForPlatform(value = {Platform.H2, Platform.POSTGRES})
+  public void withQuote_when_match_h2() {
+    assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}\"Name\" like ?");
+  }
+
+  @Test
+  @ForPlatform(value = Platform.SQLSERVER)
+  public void withQuote_when_match_sqlserver() {
+    assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}[Name] like ?");
+  }
+
+  @Test
+  @ForPlatform(value = Platform.MYSQL)
+  public void withQuote_when_match_mysql() {
+    assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}`Name` like ?");
+  }
+
+  @Test
   public void unknown_path() {
     assertThat(parser().parse(" foo ")).isEqualTo(" foo ");
   }
@@ -60,6 +90,10 @@ public class DeployPropertyParserTest extends BaseTestCase {
 
   private DeployPropertyParser addressParser() {
     return addressBeanDescriptor.parser();
+  }
+
+  private DeployPropertyParser withQuoteParser() {
+    return bWithQIdentDescriptor.parser();
   }
 
 }

@@ -34,6 +34,7 @@ public class TestTransactionTryResources extends BaseTestCase {
 
     Document document = Document.find.asDraft(doc.getId());
     assertThat(document).isNotNull();
+    assertThat(document.isDraft()).isTrue();
 
     // cleanup
     Ebean.delete(document);

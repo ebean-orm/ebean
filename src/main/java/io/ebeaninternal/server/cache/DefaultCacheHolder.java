@@ -1,8 +1,11 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.CacheQueryTuning;
+import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
@@ -33,22 +36,14 @@ class DefaultCacheHolder {
 
   private final CurrentTenantProvider tenantProvider;
 
-  DefaultCacheHolder(CacheManagerOptions builder) {
-    this(builder.getCacheFactory(), builder.getBeanDefault(), builder.getQueryDefault(), builder.getCurrentTenantProvider());
-  }
+  private final QueryCacheEntryValidate queryCacheEntryValidate;
 
-  /**
-   * Create with a cache factory and default cache options.
-   *
-   * @param cacheFactory the factory for creating the cache
-   * @param beanDefault  the default options for tuning bean caches
-   * @param queryDefault the default options for tuning query caches
-   */
-  DefaultCacheHolder(ServerCacheFactory cacheFactory, ServerCacheOptions beanDefault, ServerCacheOptions queryDefault, CurrentTenantProvider tenantProvider) {
-    this.cacheFactory = cacheFactory;
-    this.beanDefault = beanDefault;
-    this.queryDefault = queryDefault;
-    this.tenantProvider = tenantProvider;
+  DefaultCacheHolder(CacheManagerOptions builder) {
+    this.cacheFactory = builder.getCacheFactory();
+    this.beanDefault = builder.getBeanDefault();
+    this.queryDefault = builder.getQueryDefault();
+    this.tenantProvider = builder.getCurrentTenantProvider();
+    this.queryCacheEntryValidate = builder.getQueryCacheEntryValidate();
   }
 
   ServerCache getCache(Class<?> beanType, String cacheKey, ServerCacheType type) {
@@ -76,7 +71,7 @@ class DefaultCacheHolder {
         collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
       }
     }
-    return cacheFactory.createCache(type, key, tenantProvider, options);
+    return cacheFactory.createCache(new ServerCacheConfig(type, key, options, tenantProvider, queryCacheEntryValidate));
   }
 
   void clearAll() {
@@ -129,11 +124,15 @@ class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
+
+    Cache cache = cls.getAnnotation(Cache.class);
+    boolean nearCache = (cache != null && cache.nearCache());
+
     CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
     if (tuning != null) {
-      return new ServerCacheOptions(tuning).applyDefaults(beanDefault);
+      return new ServerCacheOptions(nearCache, tuning).applyDefaults(beanDefault);
     }
-    return beanDefault.copy();
+    return beanDefault.copy(nearCache);
   }
 
 }

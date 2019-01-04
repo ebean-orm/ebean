@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
 import io.ebean.util.StringHelper;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.io.IOException;
 
@@ -35,6 +35,9 @@ public class TestTextJsonInsertUpdate extends BaseTestCase {
     String j2 = "{\"id\":" + c0.getId() + ",\"name\":\"ModIns\",\"status\":\"ACTIVE\"}";
     Customer c2 = jsonContext.toBean(Customer.class, j2);
     Ebean.update(c2);
+
+    // cleanup
+    Ebean.delete(Customer.class, c0.getId());
 
   }
 }

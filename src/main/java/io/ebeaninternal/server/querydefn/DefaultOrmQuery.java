@@ -7,6 +7,7 @@ import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -20,6 +21,8 @@ import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.QueryType;
 import io.ebean.RawSql;
+import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.ObjectGraphNode;
@@ -142,12 +145,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Set to true by a user wanting a DISTINCT query (id property must be excluded).
    */
   private boolean distinct;
-
-  /**
-   * Set to true internally by Ebean when it needs the DISTINCT keyword added to the query (id
-   * property still expected).
-   */
-  private boolean sqlDistinct;
 
   /**
    * Set to true if this is a future fetch using background threads.
@@ -280,6 +277,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.beanType = desc.getBeanType();
     this.server = server;
     this.orderById = server.getServerConfig().isDefaultOrderById();
+    this.disableLazyLoading = server.getServerConfig().isDisableLazyLoading();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
   }
@@ -291,6 +289,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return server.findDto(dtoClass, this);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return new DefaultUpdateQuery<>(this);
   }
 
   @Override
@@ -763,10 +766,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
-    copy.sqlDistinct = sqlDistinct;
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.label = label;
+    copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
@@ -906,13 +910,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setForUpdate(boolean forUpdate) {
-    this.forUpdate = (forUpdate) ? ForUpdate.BASE : null;
-    this.useBeanCache = CacheMode.OFF;
-    return this;
-  }
-
-  @Override
   public DefaultOrmQuery<T> forUpdate() {
     return setForUpdateWithMode(ForUpdate.BASE);
   }
@@ -1048,7 +1045,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     if (isNativeSql()) {
-      queryPlanKey = new NativeSqlQueryPlanKey(nativeSql + "-" + firstRow + "-" + maxRows);
+      queryPlanKey = new NativeSqlQueryPlanKey(type.ordinal() + nativeSql + "-" + firstRow + "-" + maxRows);
     } else {
       queryPlanKey = new OrmQueryPlanKey(planDescription(), maxRows, firstRow, rawSql);
     }
@@ -1081,9 +1078,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     if (distinct) {
       sb.append(",dist:");
-    }
-    if (sqlDistinct) {
-      sb.append(",sqlD:");
     }
     if (disableLazyLoading) {
       sb.append(",disLazy:");
@@ -1276,8 +1270,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public boolean isBeanCacheReload() {
-    return CacheMode.PUT == useBeanCache;
+  public boolean isForceHitDatabase() {
+    return forUpdate != null || CacheMode.PUT == useBeanCache;
   }
 
   @Override
@@ -1330,6 +1324,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public DefaultOrmQuery<T> select(FetchGroup fetchGroup) {
+    this.detail = ((SpiFetchGroup)fetchGroup).detail();
+    return this;
+  }
+
+  @Override
   public DefaultOrmQuery<T> fetch(String property) {
     return fetch(property, null, null);
   }
@@ -1376,8 +1376,18 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return server.delete(this, transaction);
+  }
+
+  @Override
   public int update() {
     return server.update(this, null);
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return server.update(this, transaction);
   }
 
   @Override
@@ -1613,28 +1623,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isCountDistinct() {
     return countDistinctOrder != null;
-  }
-
-  /**
-   * Return true if this query uses SQL DISTINCT either explicitly by the user or internally defined
-   * by ebean.
-   */
-  @Override
-  public boolean isDistinctQuery() {
-    return distinct || sqlDistinct;
-  }
-
-  @Override
-  public boolean isSqlDistinct() {
-    return sqlDistinct;
-  }
-
-  /**
-   * Internally set to use SQL DISTINCT on the query but still have id property included.
-   */
-  @Override
-  public void setSqlDistinct(boolean sqlDistinct) {
-    this.sqlDistinct = sqlDistinct;
   }
 
   @Override

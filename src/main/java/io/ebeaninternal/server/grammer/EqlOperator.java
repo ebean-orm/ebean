@@ -5,6 +5,7 @@ enum EqlOperator {
   EQ,
   IEQ,
   NE,
+  INE,
   LT,
   LTE,
   GT,

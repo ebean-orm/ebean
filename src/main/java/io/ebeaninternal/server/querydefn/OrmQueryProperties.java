@@ -4,13 +4,13 @@ import io.ebean.ExpressionFactory;
 import io.ebean.FetchConfig;
 import io.ebean.OrderBy;
 import io.ebean.Query;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
-import io.ebean.util.SplitName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class OrmQueryProperties implements Serializable {
    * Construct for root so path (and parentPath) are null.
    */
   public OrmQueryProperties() {
-    this((String) null);
+    this(null);
   }
 
   /**
@@ -148,27 +148,31 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Copy constructor.
    */
-  private OrmQueryProperties(OrmQueryProperties source) {
-
+  private OrmQueryProperties(OrmQueryProperties source, FetchConfig sourceFetchConfig) {
+    this.fetchConfig = sourceFetchConfig;
     this.parentPath = source.parentPath;
     this.path = source.path;
     this.rawProperties = source.rawProperties;
     this.trimmedProperties = source.trimmedProperties;
     this.cache = source.cache;
     this.readOnly = source.readOnly;
-    this.fetchConfig = source.fetchConfig;
     this.filterMany = source.filterMany;
+    this.markForQueryJoin = source.markForQueryJoin;
     this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
-    if (includedBeanJoin != null) {
-      this.includedBeanJoin = new HashSet<>(source.includedBeanJoin);
-    }
   }
 
   /**
    * Creates a copy of the OrmQueryProperties.
    */
   public OrmQueryProperties copy() {
-    return new OrmQueryProperties(this);
+    return new OrmQueryProperties(this, this.fetchConfig);
+  }
+
+  /**
+   * Create a copy with the given fetch config.
+   */
+  public OrmQueryProperties copy(FetchConfig fetchConfig) {
+    return new OrmQueryProperties(this, fetchConfig);
   }
 
   /**

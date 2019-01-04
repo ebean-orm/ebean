@@ -7,6 +7,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.deploy.IntersectionBuilder;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
@@ -63,8 +64,11 @@ public class ImportedIdEmbedded implements ImportedId {
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
 
+    boolean update = request.isUpdate();
     for (ImportedIdSimple anImported : imported) {
-      request.appendColumn(anImported.localDbColumn);
+      if (anImported.isInclude(update)) {
+        request.appendColumn(anImported.localDbColumn);
+      }
     }
   }
 
@@ -99,30 +103,28 @@ public class ImportedIdEmbedded implements ImportedId {
   @Override
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 
-    Object embeddedId = null;
+    Object embeddedId = (bean == null) ? null : foreignAssocOne.getValue(bean);
 
-    if (bean != null) {
-      embeddedId = foreignAssocOne.getValue(bean);
-    }
-
+    boolean update = request.isUpdate();
     if (embeddedId == null) {
       for (ImportedIdSimple anImported : imported) {
-        if (anImported.owner.isUpdateable()) {
+        if (anImported.isInclude(update)) {
           request.bind(null, anImported.foreignProperty);
         }
       }
+      // return anything non-null to skip a derived relationship update
+      return Object.class;
 
     } else {
       EntityBean embedded = (EntityBean) embeddedId;
       for (ImportedIdSimple anImported : imported) {
-        if (anImported.owner.isUpdateable()) {
+        if (anImported.isInclude(update)) {
           Object scalarValue = anImported.foreignProperty.getValue(embedded);
           request.bind(scalarValue, anImported.foreignProperty);
         }
       }
+      return embedded;
     }
-    // hmmm, not worrying about this just yet
-    return null;
   }
 
   @Override
@@ -130,15 +132,31 @@ public class ImportedIdEmbedded implements ImportedId {
 
     EntityBean embeddedId = (EntityBean) foreignAssocOne.getValue(other);
     if (embeddedId == null) {
-      String msg = "Foreign Key value null?";
-      throw new PersistenceException(msg);
+      throw new PersistenceException("Foreign Key value null?");
     }
-
     for (ImportedIdSimple anImported : imported) {
       Object scalarValue = anImported.foreignProperty.getValue(embeddedId);
       row.put(anImported.localDbColumn, scalarValue);
     }
+  }
 
+  @Override
+  public void buildImport(IntersectionBuilder row) {
+    for (ImportedIdSimple importedScalar : imported) {
+      row.addColumn(importedScalar.localDbColumn);
+    }
+  }
+
+  @Override
+  public void bindImport(SqlUpdate sql, EntityBean other) {
+    EntityBean embeddedId = (EntityBean) foreignAssocOne.getValue(other);
+    if (embeddedId == null) {
+      throw new PersistenceException("Foreign Key value null?");
+    }
+    for (ImportedIdSimple anImported : imported) {
+      Object scalarValue = anImported.foreignProperty.getValue(embeddedId);
+      sql.setNextParameter(scalarValue);
+    }
   }
 
   /**

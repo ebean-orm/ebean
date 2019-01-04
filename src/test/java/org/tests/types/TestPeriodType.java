@@ -2,8 +2,8 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.types.SomePeriodBean;
 import org.junit.Test;
+import org.tests.model.types.SomePeriodBean;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -52,7 +52,7 @@ public class TestPeriodType extends BaseTestCase {
     // ... and can use LocalDate to bind
     anniversaryList = Ebean.find(SomePeriodBean.class)
       .where()
-      .gt("anniversary", LocalDate.of(2000, 4, 22))
+      .gt("anniversary", MonthDay.of(4, 22))
       .findList();
 
     assertEquals(1, anniversaryList.size());

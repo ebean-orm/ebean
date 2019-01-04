@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.Pairs;
+import io.ebean.Pairs.Entry;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -15,11 +16,9 @@ class InPairsExpression extends AbstractExpression {
 
   private final boolean not;
 
-  private final Pairs pairs;
-
   private final String property0, property1;
 
-  private final List<Pairs.Entry> entries;
+  private List<Pairs.Entry> entries;
 
   private boolean multiValueSupported;
 
@@ -31,9 +30,9 @@ class InPairsExpression extends AbstractExpression {
 
   InPairsExpression(Pairs pairs, boolean not) {
     super(pairs.getProperty0());
-    this.pairs = pairs;
     this.property0 = pairs.getProperty0();
     this.property1 = pairs.getProperty1();
+    // the entries might be modified on cache hit.
     this.entries = pairs.getEntries();
     this.not = not;
     this.separator = pairs.getConcatSeparator();
@@ -42,7 +41,15 @@ class InPairsExpression extends AbstractExpression {
 
   @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
-    return !not && data.matchInPairs(pairs);
+    if (not) {
+      return false;
+    }
+    List<Entry> copy = data.matchInPairs(property0, property1, entries);
+    if (copy == null) {
+      return false;
+    }
+    entries = copy;
+    return true;
   }
 
   @Override
@@ -92,14 +99,7 @@ class InPairsExpression extends AbstractExpression {
       return;
     }
 
-    String concat = request.getDbPlatformHandler().getConcatOperator();
-
-    String concatFormula = "(" + property0 + concat + "'" + separator + "'" + concat + property1;
-    if (suffix != null && !suffix.isEmpty()) {
-      concatFormula += concat + "'" + suffix + "'";
-    }
-    concatFormula += ")";
-    request.append(concatFormula);
+    request.append(request.getDbPlatformHandler().concat(property0, separator, property1, suffix));
     request.appendInExpression(not, concatBindValues);
   }
 

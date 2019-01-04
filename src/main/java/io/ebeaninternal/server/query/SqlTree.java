@@ -3,6 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.api.SpiQuery;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -62,6 +63,13 @@ class SqlTree {
     this.manyProperty = manyProperty;
     this.includes = includes;
     this.includeJoins = includeJoins;
+  }
+
+  /**
+   * Return true if the query mandates SQL Distinct due to ToMany inclusion.
+   */
+  boolean isSqlDistinct() {
+    return rootNode.isSqlDistinct();
   }
 
   /**
@@ -158,5 +166,18 @@ class SqlTree {
    */
   boolean hasMany() {
     return manyProperty != null || rootNode.hasMany();
+  }
+
+  boolean isSingleProperty() {
+    return rootNode.isSingleProperty();
+  }
+
+  /**
+   * Return the tables that are joined in this query.
+   */
+  Set<String> dependentTables() {
+    Set<String> tables = new LinkedHashSet<>();
+    rootNode.dependentTables(tables);
+    return tables;
   }
 }

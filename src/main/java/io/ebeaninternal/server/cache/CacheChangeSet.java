@@ -3,6 +3,7 @@ package io.ebeaninternal.server.cache;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -17,22 +18,30 @@ public class CacheChangeSet {
 
   private final List<CacheChange> entries = new ArrayList<>();
 
+  private final Set<String> touchedTables = new HashSet<>();
+
   private final Set<BeanDescriptor<?>> queryCaches = new HashSet<>();
+
+  private final Set<BeanDescriptor<?>> beanCaches = new HashSet<>();
+
+  private final Map<BeanDescriptor<?>, CacheChangeBeanRemove> beanRemoveMap = new HashMap<>();
 
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
 
-  /**
-   * Set of "base tables" modified used to invalidate entities based on views.
-   */
-  private final Set<String> viewInvalidation = new HashSet<>();
-
-  private final boolean viewEntityInvalidation;
+  private final long modificationTimestamp;
 
   /**
    * Construct specifying if we also need to process invalidation for entities based on views.
    */
-  public CacheChangeSet(boolean viewEntityInvalidation) {
-    this.viewEntityInvalidation = viewEntityInvalidation;
+  public CacheChangeSet(long modificationTimestamp) {
+    this.modificationTimestamp = modificationTimestamp;
+  }
+
+  /**
+   * Return the touched tables.
+   */
+  public Set<String> touchedTables() {
+    return touchedTables;
   }
 
   /**
@@ -40,9 +49,12 @@ public class CacheChangeSet {
    * <p>
    * Return the set of table changes to process invalidation for entities based on views.
    */
-  public Set<String> apply() {
+  public void apply() {
     for (BeanDescriptor<?> entry : queryCaches) {
       entry.clearQueryCache();
+    }
+    for (BeanDescriptor<?> entry : beanCaches) {
+      entry.clearBeanCache();
     }
     for (CacheChange entry : entries) {
       entry.apply();
@@ -50,7 +62,23 @@ public class CacheChangeSet {
     for (CacheChange entry : manyChangeMap.values()) {
       entry.apply();
     }
-    return viewInvalidation;
+    for (CacheChange entry : beanRemoveMap.values()) {
+      entry.apply();
+    }
+  }
+
+  /**
+   * Add an entry to clear a query cache.
+   */
+  public void addInvalidate(BeanDescriptor<?> descriptor) {
+    touchedTables.add(descriptor.getBaseTable());
+  }
+
+  /**
+   * Add invalidation on a set of tables.
+   */
+  public void addInvalidate(Set<String> tables) {
+    touchedTables.addAll(tables);
   }
 
   /**
@@ -58,6 +86,13 @@ public class CacheChangeSet {
    */
   public void addClearQuery(BeanDescriptor<?> descriptor) {
     queryCaches.add(descriptor);
+  }
+
+  /**
+   * Add an entry to clear a bean cache.
+   */
+  public void addClearBean(BeanDescriptor<?> descriptor) {
+    beanCaches.add(descriptor);
   }
 
   /**
@@ -85,36 +120,48 @@ public class CacheChangeSet {
    * On bean insert register table for view based entity invalidation.
    */
   public void addBeanInsert(String baseTable) {
-    if (viewEntityInvalidation) {
-      viewInvalidation.add(baseTable);
-    }
+    touchedTables.add(baseTable);
   }
 
   /**
    * Remove a bean from the cache.
    */
   public <T> void addBeanRemove(BeanDescriptor<T> desc, Object id) {
-    entries.add(new CacheChangeBeanRemove(desc, id));
-    if (viewEntityInvalidation) {
-      viewInvalidation.add(desc.getBaseTable());
+    CacheChangeBeanRemove entry = beanRemoveMap.get(desc);
+    if (entry != null) {
+      entry.addId(id);
+    } else {
+      beanRemoveMap.put(desc, new CacheChangeBeanRemove(id, desc));
+      touchedTables.add(desc.getBaseTable());
+    }
+  }
+
+  /**
+   * Remove a bean from the cache.
+   */
+  public <T> void addBeanRemoveMany(BeanDescriptor<T> desc, Collection<Object> ids) {
+    CacheChangeBeanRemove entry = beanRemoveMap.get(desc);
+    if (entry != null) {
+      entry.addIds(ids);
+    } else {
+      beanRemoveMap.put(desc, new CacheChangeBeanRemove(desc, ids));
+      touchedTables.add(desc.getBaseTable());
     }
   }
 
   /**
    * Update a bean entry.
    */
-  public <T> void addBeanUpdate(BeanDescriptor<T> desc, Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
-    entries.add(new CacheChangeBeanUpdate(desc, id, changes, updateNaturalKey, version));
-    if (viewEntityInvalidation) {
-      viewInvalidation.add(desc.getBaseTable());
-    }
+  public <T> void addBeanUpdate(BeanDescriptor<T> desc, String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+    touchedTables.add(desc.getBaseTable());
+    entries.add(new CacheChangeBeanUpdate(desc, key, changes, updateNaturalKey, version));
   }
 
   /**
    * Update a natural key.
    */
-  public <T> void addNaturalKeyPut(BeanDescriptor<T> desc, Object id, Object val) {
-    entries.add(new CacheChangeNaturalKeyPut(desc, id, val));
+  public <T> void addNaturalKeyPut(BeanDescriptor<T> desc, String key, String val) {
+    entries.add(new CacheChangeNaturalKeyPut(desc, key, val));
   }
 
   /**
@@ -123,6 +170,13 @@ public class CacheChangeSet {
   private ManyChange many(BeanDescriptor<?> desc, String manyProperty) {
     ManyKey key = new ManyKey(desc, manyProperty);
     return manyChangeMap.computeIfAbsent(key, ManyChange::new);
+  }
+
+  /**
+   * Return the modification timestamp for these changes.
+   */
+  public long modificationTimestamp() {
+    return modificationTimestamp;
   }
 
   /**

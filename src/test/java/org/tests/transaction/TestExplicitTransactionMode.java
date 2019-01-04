@@ -9,9 +9,9 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.properties.PropertiesLoader;
-import org.avaje.datasource.DataSourceConfig;
-import org.avaje.datasource.DataSourcePool;
-import org.avaje.datasource.pool.ConnectionPool;
+import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourcePool;
+import io.ebean.datasource.pool.ConnectionPool;
 import org.junit.Test;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
@@ -62,7 +62,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     System.clearProperty("ebean.ignoreExtraDdl");
 
     Query<UTMaster> query = ebeanServer.find(UTMaster.class);
-    List<UTMaster> details = ebeanServer.findList(query, null);
+    List<UTMaster> details = query.findList();
     assertEquals(0, details.size());
 
     UTMaster bean0 = new UTMaster("one0");
@@ -91,7 +91,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
 
         // not visible in other transaction
         Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-        details = ebeanServer.findList(query2, otherTxn);
+        details = ebeanServer.extended().findList(query2, otherTxn);
         assertEquals(0, details.size());
 
         ebeanServer.save(bean3);
@@ -104,7 +104,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
 
       // commit as expected
       Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.findList(query3, otherTxn);
+      details = ebeanServer.extended().findList(query3, otherTxn);
       assertEquals(3, details.size());
     }
   }

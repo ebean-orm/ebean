@@ -23,6 +23,7 @@ public interface Transaction extends AutoCloseable {
    * This returns the current transaction for the 'default server'.  If you are using
    * multiple EbeanServer's then use {@link EbeanServer#currentTransaction()}.
    * </p>
+   *
    * @see Ebean#currentTransaction()
    * @see EbeanServer#currentTransaction()
    */
@@ -83,7 +84,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This is similar to commit() but leaves the transaction "Active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -99,7 +100,7 @@ public interface Transaction extends AutoCloseable {
    * This performs commit and completes the transaction closing underlying resources and
    * marking the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -116,7 +117,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This performs rollback, closes underlying resources and marks the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Call rollback on the underlying JDBC connection</li>
    * <li>Trigger any registered TransactionCallbacks</li>
@@ -137,6 +138,18 @@ public interface Transaction extends AutoCloseable {
   void rollback(Throwable e) throws PersistenceException;
 
   /**
+   * Set when we want nested transactions to use Savepoint's.
+   * <p>
+   * This means that for a nested transaction:
+   * <ul>
+   * <li>begin transaction maps to creating a savepoint</li>
+   * <li>commit transaction maps to releasing a savepoint</li>
+   * <li>rollback transaction maps to rollback a savepoint</li>
+   * </ul>
+   */
+  void setNestedUseSavepoint();
+
+  /**
    * Mark the transaction for rollback only.
    */
   void setRollbackOnly();
@@ -150,7 +163,6 @@ public interface Transaction extends AutoCloseable {
    * If the transaction is active then perform rollback. Otherwise do nothing.
    */
   void end();
-
 
   /**
    * Synonym for end() to support AutoClosable.
@@ -227,7 +239,7 @@ public interface Transaction extends AutoCloseable {
    * Refer to {@link ServerConfig#setSkipCacheAfterWrite(boolean)} for configuring the default behavior
    * for using the L2 bean cache in transactions spanning multiple query/persist requests.
    * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   // assume Customer has L2 bean caching enabled ...
@@ -309,7 +321,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * Example: batch processing executing every 3 rows
    * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    * String data = "This is a simple test of the batch processing"
@@ -347,24 +359,12 @@ public interface Transaction extends AutoCloseable {
   void setBatchMode(boolean useBatch);
 
   /**
-   * The JDBC batch mode to use for this transaction.
-   * <p>
-   * If this is NONE then JDBC batch can still be used for each request - save(), insert(), update() or delete()
-   * and this would be useful if the request cascades to detail beans.
-   * </p>
-   *
-   * @param persistBatchMode the batch mode to use for this transaction
-   * @see io.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
-   */
-  void setBatch(PersistBatch persistBatchMode);
-
-  /**
    * Return the batch mode at the transaction level.
    */
-  PersistBatch getBatch();
+  boolean isBatchMode();
 
   /**
-   * Set the JDBC batch mode to use for a save() or delete() request.
+   * Set the JDBC batch mode to use for a save() or delete() when cascading to children.
    * <p>
    * This only takes effect when batch mode on the transaction has not already meant that
    * JDBC batch mode is being used.
@@ -373,16 +373,19 @@ public interface Transaction extends AutoCloseable {
    * This is useful when the single save() or delete() cascades. For example, inserting a 'master' cascades
    * and inserts a collection of 'detail' beans. The detail beans can be inserted using JDBC batch.
    * </p>
+   * <p>
+   * This is effectively already turned on for all platforms apart from older Sql Server.
+   * </p>
    *
-   * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
+   * @param batchMode the batch mode to use per save(), insert(), update() or delete()
    * @see io.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
    */
-  void setBatchOnCascade(PersistBatch batchOnCascadeMode);
+  void setBatchOnCascade(boolean batchMode);
 
   /**
-   * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
+   * Return the batch mode at the request level.
    */
-  PersistBatch getBatchOnCascade();
+  boolean isBatchOnCascade();
 
   /**
    * Specify the number of statements before a batch is flushed automatically.

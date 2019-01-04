@@ -59,25 +59,14 @@ class ManifestReader {
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);
       while (resources.hasMoreElements()) {
-        InputStream is = resources.nextElement().openStream();
-        try {
+        try (InputStream is = resources.nextElement().openStream()) {
           read(new Manifest(is));
-        } finally {
-          close(is);
         }
       }
     } catch (IOException e) {
       logger.warn("Error reading " + resourcePath + " manifest resources", e);
     }
     return packageSet;
-  }
-
-  private void close(InputStream is) {
-    try {
-      is.close();
-    } catch (IOException e) {
-      logger.warn("Error closing manifest InputStream", e);
-    }
   }
 
   /**

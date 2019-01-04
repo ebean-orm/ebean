@@ -171,4 +171,9 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    * Set profile location for "find all" if not set.
    */
   void profileLocationAll();
+
+  /**
+   * Return true if delete by statement is allowed for this type given cascade rules etc.
+   */
+  boolean isDeleteByStatement();
 }

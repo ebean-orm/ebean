@@ -18,6 +18,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.type.DataEncryptSupport;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeArray;
+import io.ebeaninternal.server.type.ScalarTypeWrapper;
 import io.ebeaninternal.server.type.SimpleAesEncryptor;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
@@ -116,8 +117,8 @@ public class DeployUtil {
       throw new IllegalArgumentException("Class [" + enumType + "] is Not a Enum?");
     }
     try {
-	    Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
-	    EnumType type = enumerated != null ? enumerated.value() : null;
+      Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
+      EnumType type = enumerated != null ? enumerated.value() : null;
       ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
       prop.setScalarType(scalarType);
       prop.setDbType(scalarType.getJdbcType());
@@ -238,10 +239,9 @@ public class DeployUtil {
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
 
-    Class<?> type = prop.getPropertyType();
-    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType, dbLength, prop.getGenericType());
+    ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for JSON type [" + type + "] [" + dbType + "]");
+      throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
     }
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
@@ -278,19 +278,25 @@ public class DeployUtil {
    */
   public void setLobType(DeployBeanProperty prop) {
 
-    // is String or byte[] ? used to determine if its a CLOB or BLOB
-    Class<?> type = prop.getPropertyType();
+    ScalarType<?> scalarType = prop.getScalarType();
 
-    // this also sets the lob flag on DeployBeanProperty
-    int lobType = isClobType(type) ? dbCLOBType : dbBLOBType;
+    if (scalarType instanceof ScalarTypeWrapper) {
+      int lobType = scalarType.getJdbcType() == Types.VARCHAR ? dbCLOBType : dbBLOBType;
+      prop.setDbType(lobType);
+    } else {
+      // is String or byte[] ? used to determine if its a CLOB or BLOB
+      Class<?> type = prop.getPropertyType();
+      // this also sets the lob flag on DeployBeanProperty
+      int lobType = isClobType(type) ? dbCLOBType : dbBLOBType;
 
-    ScalarType<?> scalarType = typeManager.getScalarType(type, lobType);
-    if (scalarType == null) {
-      // this should never occur actually
-      throw new RuntimeException("No ScalarType for LOB type [" + type + "] [" + lobType + "]");
+      scalarType = typeManager.getScalarType(type, lobType);
+      if (scalarType == null) {
+        // this should never occur actually
+        throw new RuntimeException("No ScalarType for LOB type [" + type + "] [" + lobType + "]");
+      }
+      prop.setDbType(lobType);
+      prop.setScalarType(scalarType);
     }
-    prop.setDbType(lobType);
-    prop.setScalarType(scalarType);
   }
 
   private boolean isClobType(Class<?> type) {

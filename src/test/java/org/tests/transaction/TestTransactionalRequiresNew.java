@@ -2,7 +2,9 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.EbeanServer;
 import io.ebean.Transaction;
+import io.ebean.TxScope;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
 import org.junit.Test;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -66,5 +69,64 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
     }
   }
 
+  @Test
+  public void testDifferentCreation1() {
+    EbeanServer server = server();
+    try(Transaction txn = server.beginTransaction()) {
+      String txnName = txn.toString();
+      Ebean.beginTransaction(TxScope.requiresNew());
+      try {
+        Ebean.commitTransaction();
+      } finally {
+        Ebean.endTransaction();
+      }
+      assertThat(txn.toString()).isEqualTo(txnName);
+    }
+  }
+
+  @Test
+  public void testDifferentCreation2() {
+    EbeanServer server = server();
+    try (Transaction txn = server.beginTransaction()) {
+      String txnName = txn.toString();
+      server.beginTransaction(TxScope.requiresNew());
+      try {
+        server.commitTransaction();
+      } finally {
+        server.endTransaction();
+      }
+      assertThat(txn.toString()).isEqualTo(txnName);
+    }
+  }
+
+  @Test
+  public void testDifferentCreation3() {
+    EbeanServer server = server();
+    try (Transaction txn = server.beginTransaction()) {
+      String txnName = txn.toString();
+      Transaction txn2 = Ebean.beginTransaction(TxScope.requiresNew());
+      try {
+        txn2.commit();
+      } finally {
+        txn2.end();
+      }
+      assertThat(txn.toString()).isEqualTo(txnName);
+    }
+  }
+
+  @Test
+  public void testDifferentCreation4() {
+    EbeanServer server = server();
+    try (Transaction txn = server.beginTransaction()) {
+      String txnName = txn.toString();
+      server.beginTransaction(TxScope.requiresNew());
+      try {
+        Transaction.current().commitAndContinue();
+      } finally {
+        Transaction.current().end();
+      }
+      assertThat(txn.toString()).isEqualTo(txnName);
+    }
+  }
 
 }

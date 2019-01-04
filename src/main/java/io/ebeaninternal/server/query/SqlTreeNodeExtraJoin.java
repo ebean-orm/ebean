@@ -11,6 +11,7 @@ import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The purpose is to add an extra join to the query.
@@ -37,6 +38,11 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
     this.assocBeanProperty = assocBeanProperty;
     this.pathContainsMany = pathContainsMany;
     this.manyJoin = assocBeanProperty instanceof STreePropertyAssocMany;
+  }
+
+  @Override
+  public boolean isSingleProperty() {
+    return false;
   }
 
   @Override
@@ -70,7 +76,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
-  public ScalarType<?> getSingleAttributeScalarType() {
+  public ScalarType<?> getSingleAttributeReader() {
     throw new IllegalStateException("No expected");
   }
 
@@ -93,6 +99,16 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       children = new ArrayList<>();
     }
     children.add(child);
+  }
+
+  @Override
+  public void dependentTables(Set<String> tables) {
+    tables.add(assocBeanProperty.target().getBaseTable(SpiQuery.TemporalMode.CURRENT));
+    if (children != null) {
+      for (SqlTreeNode child : children) {
+        child.dependentTables(tables);
+      }
+    }
   }
 
   @Override

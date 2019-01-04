@@ -3,6 +3,9 @@ package io.ebeaninternal.server.grammer;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiQuery;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -81,11 +84,29 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  public void where_ine() {
+
+    Query<Customer> query = parse("where name ine 'Rob'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) !=?");
+  }
+
+  @Test
   public void where_ieq_reverse() {
 
     Query<Customer> query = parse("where 'Rob' ieq name");
     query.findList();
     assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
+  }
+
+  @Test
+  public void where_ine_reverse() {
+
+    Query<Customer> query = parse("where 'Rob' ine name");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) !=?");
   }
 
   @Test
@@ -127,6 +148,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.HANA) // The HANA JDBC driver checks the field length on binding and rejects 'NEW'
   public void where_or1() {
 
     Query<Customer> query = parse("where name = 'Rob' or (status = 'NEW' and smallnote is null)");
@@ -136,6 +158,17 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  @ForPlatform(Platform.HANA)
+  public void where_or1_hana() {
+
+    Query<Customer> query = parse("where name = 'Rob' or (status = 'N' and smallnote is null)");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
+  }
+
+  @Test
+  @IgnorePlatform(Platform.HANA) // The HANA JDBC driver checks the field length on binding and rejects 'NEW'
   public void where_or2() {
 
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
@@ -145,6 +178,17 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  @ForPlatform(Platform.HANA)
+  public void where_or2_hana() {
+
+    Query<Customer> query = parse("where (name = 'Rob' or status = 'N') and smallnote is null");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
+  }
+
+  @Test
+  @IgnorePlatform(Platform.HANA) // The HANA JDBC driver checks the field length on binding and rejects 'NEW'
   public void test_simplifyExpressions() {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
@@ -156,6 +200,23 @@ public class EqlParserTest extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
 
     query = parse("where not (((name = 'Rob') and (status = 'NEW')))");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+  }
+
+  @Test
+  @ForPlatform(Platform.HANA)
+  public void test_simplifyExpressions_hana() {
+
+    Query<Customer> query = parse("where not (name = 'Rob' and status = 'N')");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+
+    query = parse("where not ((name = 'Rob' and status = 'N'))");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+
+    query = parse("where not (((name = 'Rob') and (status = 'N')))");
     query.findList();
     assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
   }

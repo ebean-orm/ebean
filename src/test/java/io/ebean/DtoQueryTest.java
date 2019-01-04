@@ -1,5 +1,7 @@
 package io.ebean;
 
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
 import org.ebeantest.LoggedSqlCollector;
@@ -8,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.ResetBasicData;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,6 +100,64 @@ public class DtoQueryTest extends BaseTestCase {
     assertThat(empty).isNull();
   }
 
+
+  @ForPlatform(Platform.POSTGRES)
+  @Test
+  public void dto_bindList_usingPostrgesAnyWithPositionedParameter() {
+
+    ResetBasicData.reset();
+
+    List<Integer> ids = Arrays.asList(1, 2);
+
+    List<DCust> list = server().findDto(DCust.class, "select id, name from o_customer where id = any(?)")
+      .setParameter(1, ids)
+      .findList();
+
+    assertThat(list).isNotEmpty();
+
+    list = server().findDto(DCust.class, "select id, name from o_customer where id in (:idList)")
+      .setParameter("idList", ids)
+      .findList();
+
+    assertThat(list).isNotEmpty();
+  }
+
+  @ForPlatform(Platform.POSTGRES)
+  @Test
+  public void sql_bindListParam_usingPostrgesAnyWithPositionedParameter() {
+
+    ResetBasicData.reset();
+
+    List<Integer> ids = Arrays.asList(1, 2);
+
+    List<SqlRow> list = server().createSqlQuery("select id, name from o_customer where id = any(?)")
+      .setParameter(1, ids)
+      .findList();
+
+    assertThat(list).isNotEmpty();
+
+    list = server().createSqlQuery("select id, name from o_customer where id in (:idList)")
+      .setParameter("idList", ids)
+      .findList();
+
+    assertThat(list).isNotEmpty();
+  }
+
+  @ForPlatform(Platform.POSTGRES)
+  @Test
+  public void sqlUpdate_bindListParam_usingPostrgesAnyWithPositionedParameter() {
+
+    ResetBasicData.reset();
+
+    List<Integer> ids = Arrays.asList(999999999, 999999998);
+
+    int rows = server().createSqlUpdate("update o_customer set name = ? where id = any(?)")
+      .setParameter(1, "Junk")
+      .setParameter(2, ids)
+      .execute();
+
+    assertThat(rows).isEqualTo(0);
+  }
 
   @Test
   public void dto_queryPlanHits() {

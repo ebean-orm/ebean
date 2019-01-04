@@ -138,9 +138,12 @@ class CQueryBuilder {
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSql(null, request, predicates, sqlTree).getSql();
     sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
-    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-    sql = aliasReplace(sql, alias);
+    sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
+  }
+
+  private String alias(String rootTableAlias) {
+    return (rootTableAlias == null) ? "t0" : rootTableAlias;
   }
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
@@ -160,8 +163,7 @@ class CQueryBuilder {
     // wrap as - update table set ... where id in (select id ...)
     String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
     sql = updateClause + " " + request.getBeanDescriptor().getWhereIdInSql() + "in (" + sql + ")";
-    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-    sql = aliasReplace(sql, alias);
+    sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
   }
 
@@ -209,7 +211,12 @@ class CQueryBuilder {
    */
   <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
 
-    request.getQuery().setSelectId();
+    SpiQuery<T> query = request.getQuery();
+    query.setSelectId();
+    BeanDescriptor<T> desc = request.getBeanDescriptor();
+    if (!query.isIncludeSoftDeletes() && desc.isSoftDelete()) {
+      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+    }
     return buildFetchAttributeQuery(request);
   }
 
@@ -217,7 +224,7 @@ class CQueryBuilder {
    * Return the history support if this query needs it (is a 'as of' type query).
    */
   <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
-    return query.getTemporalMode() != SpiQuery.TemporalMode.CURRENT ? historySupport : null;
+    return query.getTemporalMode().isHistory() ? historySupport : null;
   }
 
   /**
@@ -241,10 +248,14 @@ class CQueryBuilder {
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
 
-    if (manyWhereJoins.isFormulaWithJoin()) {
-      query.select(manyWhereJoins.getFormulaProperties());
-    } else {
-      query.setSelectId();
+    boolean countDistinct = query.isDistinct();
+    if (!countDistinct) {
+      // minimise select clause for standard count
+      if (manyWhereJoins.isFormulaWithJoin()) {
+        query.select(manyWhereJoins.getFormulaProperties());
+      } else {
+        query.setSelectId();
+      }
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -263,23 +274,30 @@ class CQueryBuilder {
     }
 
     boolean hasMany = sqlTree.hasMany();
-    String sqlSelect = "select count(*)";
-    if (hasMany) {
-      // need to count distinct id's ...
-      query.setSqlDistinct(true);
-      sqlSelect = null;
+
+    String sqlSelect = null;
+    if (countDistinct) {
+      if (sqlTree.isSingleProperty()) {
+        request.setInlineCountDistinct();
+      }
+    } else if (!hasMany) {
+      sqlSelect = "select count(*)";
     }
 
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
-    if (hasMany || query.isRawSql()) {
-      int pos = sql.lastIndexOf(" order by "); // remove order by - mssql does not accept order by in subqueries
-      if (pos != -1) {
-        sql = sql.substring(0, pos);
-      }
-      sql = "select count(*) from ( " + sql + ")";
-      if (selectCountWithAlias) {
-        sql += " as c";
+
+    if (!request.isInlineCountDistinct()) {
+      if (countDistinct) {
+        sql = wrapSelectCount(sql);
+
+      } else if (hasMany || query.isRawSql()) {
+        // remove order by - mssql does not accept order by in subqueries
+        int pos = sql.lastIndexOf(" order by ");
+        if (pos != -1) {
+          sql = sql.substring(0, pos);
+        }
+        sql = wrapSelectCount(sql);
       }
     }
 
@@ -288,6 +306,14 @@ class CQueryBuilder {
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(queryPlan, request, predicates);
+  }
+
+  private String wrapSelectCount(String sql) {
+    sql = "select count(*) from ( " + sql + ")";
+    if (selectCountWithAlias) {
+      sql += " as c";
+    }
+    return sql;
   }
 
   /**
@@ -393,7 +419,9 @@ class CQueryBuilder {
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     try {
-      PreparedStatement statement = connection.prepareStatement(sql);
+      // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
+      // statement here by specifying ResultSet.CONCUR_UPDATABLE
+      PreparedStatement statement = connection.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
       predicates.bind(statement, connection);
 
       ResultSet resultSet = statement.executeQuery();
@@ -523,6 +551,7 @@ class CQueryBuilder {
       return rawSqlHandler.buildSql(request, predicates, query.getRawSql().getSql());
     }
 
+    boolean distinct = query.isDistinct() || select.isSqlDistinct();
     boolean useSqlLimiter = false;
     StringBuilder sb = new StringBuilder(500);
     String dbOrderBy = predicates.getDbOrderBy();
@@ -535,7 +564,10 @@ class CQueryBuilder {
 
       if (!useSqlLimiter) {
         sb.append("select ");
-        if (query.isDistinctQuery()) {
+        if (distinct) {
+          if (request.isInlineCountDistinct()) {
+            sb.append("count(");
+          }
           sb.append("distinct ");
           String distinctOn = select.getDistinctOn();
           if (distinctOn != null) {
@@ -551,7 +583,10 @@ class CQueryBuilder {
       } else {
         sb.append(select.getSelectSql());
       }
-      if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
+      if (request.isInlineCountDistinct()) {
+        sb.append(")");
+      }
+      if (distinct && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
         sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
       }
@@ -653,7 +688,7 @@ class CQueryBuilder {
 
     if (useSqlLimiter) {
       // use LIMIT/OFFSET, ROW_NUMBER() or rownum type SQL query limitation
-      SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform);
+      SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform, distinct);
       return sqlLimiter.limit(r);
 
     } else {

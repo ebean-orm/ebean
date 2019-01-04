@@ -7,7 +7,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
@@ -102,6 +101,11 @@ public interface SpiTransaction extends Transaction {
   String getId();
 
   /**
+   * Return the start timestamp for the transaction (JVM side).
+   */
+  long getStartMillis();
+
+  /**
    * Return true if this transaction has updateAllLoadedProperties set.
    * If null is returned the server default is used (set on ServerConfig).
    */
@@ -179,7 +183,7 @@ public interface SpiTransaction extends Transaction {
    * Return true if this request should be batched. Conversely returns false
    * if this request should be executed immediately.
    */
-  boolean isBatchThisRequest(PersistRequest.Type type);
+  boolean isBatchThisRequest();
 
   /**
    * Return the BatchControl used to batch up persist requests.
@@ -319,4 +323,9 @@ public interface SpiTransaction extends Transaction {
    * Return the profile location for this transaction.
    */
   ProfileLocation getProfileLocation();
+
+  /**
+   * Return true when nested transactions should create Savepoints.
+   */
+  boolean isNestedUseSavepoint();
 }

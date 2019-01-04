@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -55,11 +56,10 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     }
   }
 
-  public BeanFkeyProperty create(String expression, boolean containsMany) {
+  public BeanFkeyProperty create(String expression, boolean pathContainsMany) {
     int len = expression.length() - name.length() - 1;
     String prefix = expression.substring(0, len);
-
-    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany);
+    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany || pathContainsMany);
   }
 
   /**
@@ -76,6 +76,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   @Override
   public boolean isLocalEncrypted() {
     return false;
+  }
+
+  @Override
+  public Object localEncrypt(Object value) {
+    throw new IllegalArgumentException("Should not get here?");
   }
 
   @Override
@@ -218,6 +223,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
 
   @Override
   public Object pathGetNested(Object bean) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  @Override
+  public Property getProperty() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 

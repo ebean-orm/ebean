@@ -7,8 +7,9 @@ import io.ebean.annotation.Platform;
 import org.junit.Test;
 
 import java.sql.Timestamp;
+import java.util.List;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestHistoryExclude extends BaseTestCase {
 
@@ -26,6 +27,38 @@ public class TestHistoryExclude extends BaseTestCase {
       link.getDocs().add(docB);
       link.save();
     }
+  }
+
+  @Test
+  public void testSoftDelete_includeSoftDeletes_findList() {
+
+    HeLink l = new HeLink("two", "boo");
+    Ebean.save(l);
+
+    Ebean.delete(l);
+
+    List<HeLink> list = Ebean.find(HeLink.class)
+      .setIncludeSoftDeletes()
+      .findList();
+
+    assertThat(list).isNotEmpty();
+  }
+
+  @Test
+  public void testSoftDelete_includeSoftDeletes_findOne() {
+
+    HeLink l = new HeLink("three", "boo2");
+    Ebean.save(l);
+
+    Ebean.delete(l);
+
+    HeLink found = Ebean.find(HeLink.class)
+      .setId(l.getId())
+      .setIncludeSoftDeletes()
+      .findOne();
+
+    assertThat(found).isNotNull();
+    assertThat(found.getName()).isEqualTo("three");
   }
 
   @Test

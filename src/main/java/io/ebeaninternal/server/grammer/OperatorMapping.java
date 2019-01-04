@@ -13,6 +13,7 @@ class OperatorMapping {
     map.put("ieq", EqlOperator.IEQ);
 
     map.put("ne", EqlOperator.NE);
+    map.put("ine", EqlOperator.INE);
     map.put("<>", EqlOperator.NE);
     map.put("!=", EqlOperator.NE);
 

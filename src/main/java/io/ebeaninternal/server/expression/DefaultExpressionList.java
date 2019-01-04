@@ -2,9 +2,11 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -15,6 +17,8 @@ import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -295,6 +299,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return query.asDto(dtoClass);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return query.asUpdate();
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return query.setIncludeSoftDeletes();
   }
@@ -350,8 +364,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return query.delete(transaction);
+  }
+
+  @Override
   public int update() {
     return query.update();
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return query.update(transaction);
   }
 
   @Override
@@ -455,6 +479,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return query.select(fetchGroup);
+  }
+
+  @Override
   public Query<T> setDistinct(boolean distinct) {
     return query.setDistinct(distinct);
   }
@@ -494,6 +523,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.setUseQueryCache(useCache);
   }
 
+  @Override
   public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
     return query.setCountDistinct(orderBy);
   }
@@ -706,6 +736,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    add(expr.bitwiseAnd(propertyName, flags, 0));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
     add(expr.bitwiseAll(propertyName, flags));
     return this;
@@ -726,6 +762,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> ieq(String propertyName, String value) {
     add(expr.ieq(propertyName, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> ine(String propertyName, String value) {
+    add(expr.ine(propertyName, value));
     return this;
   }
 

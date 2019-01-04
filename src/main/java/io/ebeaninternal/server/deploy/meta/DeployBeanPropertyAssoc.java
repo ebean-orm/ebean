@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.BeanTable;
+import io.ebeaninternal.server.deploy.PropertyForeignKey;
 
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
@@ -16,7 +17,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   /**
    * Persist settings.
    */
-  protected final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
+  final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
 
   /**
    * The join table information.
@@ -41,6 +42,8 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   private String docStoreDoc;
 
   private int fetchPreference = 1000;
+
+  private PropertyForeignKey foreignKey;
 
   /**
    * Construct the property.
@@ -117,6 +120,13 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
     return cascadeInfo;
   }
 
+  public void setForeignKey(PropertyForeignKey foreignKey) {
+    this.foreignKey = foreignKey;
+  }
+
+  public PropertyForeignKey getForeignKey() {
+    return foreignKey;
+  }
 
   /**
    * Return the mappedBy deployment attribute.

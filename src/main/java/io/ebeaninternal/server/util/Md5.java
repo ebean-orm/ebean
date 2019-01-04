@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class Md5 {
@@ -11,7 +12,7 @@ public class Md5 {
 
     try {
       MessageDigest md = MessageDigest.getInstance("MD5");
-      byte[] digest = md.digest(content.getBytes("UTF-8"));
+      byte[] digest = md.digest(content.getBytes(StandardCharsets.UTF_8));
       return digestToHex(digest);
     } catch (Exception e) {
       throw new RuntimeException("MD5 hashing failed", e);

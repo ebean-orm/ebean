@@ -142,7 +142,7 @@ public class BatchedBeanHolder {
         return inserts.size();
 
       case UPDATE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         if (updates == null) {
           updates = new ArrayList<>();
         }

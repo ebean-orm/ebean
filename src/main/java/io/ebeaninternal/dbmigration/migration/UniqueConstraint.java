@@ -9,15 +9,17 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="columnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="oneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="nullableColumns" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -30,16 +32,13 @@ public class UniqueConstraint {
 
   @XmlAttribute(name = "name", required = true)
   protected String name;
-
   @XmlAttribute(name = "columnNames", required = true)
   protected String columnNames;
-
-  @XmlAttribute(name = "oneToOne", required = false)
+  @XmlAttribute(name = "oneToOne")
   protected Boolean oneToOne;
-
-  @XmlAttribute(name = "nullableColumns", required = true)
+  @XmlAttribute(name = "nullableColumns")
   protected String nullableColumns;
-  
+
   /**
    * Gets the value of the name property.
    *
@@ -79,23 +78,25 @@ public class UniqueConstraint {
   public void setColumnNames(String value) {
     this.columnNames = value;
   }
-  
+
   /**
    * Gets the value of the oneToOne property.
    *
-   * @return true if oneToOne was set
+   * @return possible object is
+   * {@link Boolean }
    */
-  public boolean isOneToOne() {
-    return Boolean.TRUE.equals(oneToOne);
+  public Boolean isOneToOne() {
+    return oneToOne;
   }
-  
+
   /**
    * Sets the value of the oneToOne property.
    *
-   * @param value boolean
+   * @param value allowed object is
+   *              {@link Boolean }
    */
-  public void setOneToOne(boolean oneToOne) {
-    this.oneToOne = oneToOne;
+  public void setOneToOne(Boolean value) {
+    this.oneToOne = value;
   }
 
   /**

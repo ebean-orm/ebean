@@ -4,6 +4,7 @@ import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
+import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanTable;
@@ -116,6 +117,10 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setFetchPreference(fetchPreference.value());
     }
 
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
+    if (nonNull != null) {
+      prop.setNullable(false);
+    }
     if (validationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
@@ -128,6 +133,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
     for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
+      if (beanTable == null) {
+        throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
+      }
       prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
       if (!joinColumn.updatable()) {
         prop.setDbUpdateable(false);
@@ -142,6 +150,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       for (JoinColumn joinColumn : joinTable.joinColumns()) {
+        if (beanTable == null) {
+          throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
+        }
         prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
         if (!joinColumn.updatable()) {
           prop.setDbUpdateable(false);
@@ -184,13 +195,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
   }
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered?";
+    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation? See https://ebean.io/docs/trouble-shooting#not-registered";
   }
 
   private BeanTable beanTable(DeployBeanPropertyAssoc<?> prop) {
     BeanTable assoc = factory.getBeanTable(prop.getPropertyType());
     if (assoc == null) {
-      throw new RuntimeException(errorMsgMissingBeanTable(prop.getPropertyType(), prop.getFullBeanName()));
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(prop.getPropertyType(), prop.getFullBeanName()));
     }
     return assoc;
   }
@@ -219,6 +230,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
       prop.setOrphanRemoval(propAnn.orphanRemoval());
+    } else if (propAnn.orphanRemoval()) {
+      prop.setOrphanRemoval(true);
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());

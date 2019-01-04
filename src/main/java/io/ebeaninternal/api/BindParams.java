@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 
 import java.io.Serializable;
@@ -154,6 +155,10 @@ public class BindParams implements Serializable {
   public void setParameter(int position, Object value) {
 
     Param p = getParam(position);
+    if (value instanceof Collection) {
+      // use of postgres ANY with positioned parameter
+      value = new MultiValueWrapper((Collection)value);
+    }
     p.setInValue(value);
   }
 

@@ -70,6 +70,8 @@ public final class SqlTreeBuilder {
 
   private SqlTreeNode rootNode;
 
+  private boolean sqlDistinct;
+
   /**
    * Construct for RawSql query.
    */
@@ -110,7 +112,7 @@ public final class SqlTreeBuilder {
     this.queryDetail = query.getDetail();
 
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getBaseTableAlias());
+    this.alias = new SqlTreeAlias(request.getBaseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
 
     String fromForUpdate = builder.fromForUpdate(query);
@@ -172,7 +174,7 @@ public final class SqlTreeBuilder {
 
   private String buildDistinctOn() {
 
-    if (rawSql || !distinctOnPlatform || !query.isSqlDistinct() || Type.COUNT == query.getType()) {
+    if (rawSql || !distinctOnPlatform || !sqlDistinct || Type.COUNT == query.getType()) {
       return null;
     }
     ctx.startGroupBy();
@@ -273,7 +275,7 @@ public final class SqlTreeBuilder {
 
     if (prefix == null && !rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
-        query.setSqlDistinct(true);
+        sqlDistinct = true;
       }
       addManyWhereJoins(myJoinList);
     }
@@ -310,7 +312,7 @@ public final class SqlTreeBuilder {
       // Optional many property for lazy loading query
       STreePropertyAssocMany lazyLoadMany = (query == null) ? null : query.getLazyLoadMany();
       boolean withId = !rawNoId && !subQuery && (query == null || query.isWithId());
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad);
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct);
 
     } else if (prop instanceof STreePropertyAssocMany) {
       return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, temporalMode, disableLazyLoad);
@@ -361,7 +363,7 @@ public final class SqlTreeBuilder {
           // as we are now going to join to the many then we need
           // to add the distinct to the sql query to stop duplicate
           // rows...
-          query.setSqlDistinct(true);
+          sqlDistinct = true;
         }
       }
     }
@@ -412,16 +414,18 @@ public final class SqlTreeBuilder {
       if (!selectProps.containsProperty(baseName)) {
         STreeProperty p = desc.findPropertyWithDynamic(baseName);
         if (p == null) {
-          logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
-
-        } else if (p.isEmbedded()) {
-          // add the embedded bean (and effectively
-          // all its properties)
+          // maybe dynamic formula with schema prefix
+          p = desc.findPropertyWithDynamic(propName);
+          if (p != null) {
+            selectProps.add(p);
+          } else {
+            logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+          }
+        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.getName()))) {
+          // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
-
         } else {
-          String m = "property [" + p.getFullBeanName() + "] expected to be an embedded bean for query - excluding it.";
-          logger.error(m);
+          logger.error("property [" + p.getFullBeanName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
         }
       }
 
@@ -492,8 +496,11 @@ public final class SqlTreeBuilder {
 
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
-      if (queryProps != null && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())) {
-        // if it is a joined bean... then don't add the property
+      if (queryProps != null
+          && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+          && propertyAssocOne.hasForeignKey()
+          && !propertyAssocOne.isFormula()) {
+        // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {
         selectProps.add(propertyAssocOne);

@@ -31,20 +31,23 @@ public class MigrationModel {
   /**
    * Read all the migrations returning the model with all
    * the migrations applied in version order.
+   *
+   * @param dbinitMigration If true we don't apply model changes, migration is from scratch.
    */
-  public ModelContainer read() {
+  public ModelContainer read(boolean dbinitMigration) {
 
-    readMigrations();
+    readMigrations(dbinitMigration);
     return model;
   }
 
-  private void readMigrations() {
+  private void readMigrations(boolean dbinitMigration) {
 
     // find all the migration xml files
     File[] xmlFiles = modelDirectory.listFiles(pathname -> pathname.getName().toLowerCase().endsWith(modelSuffix));
-
+    if (xmlFiles == null || xmlFiles.length == 0) {
+      return;
+    }
     List<MigrationResource> resources = new ArrayList<>(xmlFiles.length);
-
     for (File xmlFile : xmlFiles) {
       resources.add(new MigrationResource(xmlFile, createVersion(xmlFile)));
     }
@@ -52,9 +55,11 @@ public class MigrationModel {
     // sort into version order before applying
     Collections.sort(resources);
 
-    for (MigrationResource migrationResource : resources) {
-      logger.debug("read {}", migrationResource);
-      model.apply(migrationResource.read(), migrationResource.getVersion());
+    if (!dbinitMigration) {
+      for (MigrationResource migrationResource : resources) {
+        logger.debug("read {}", migrationResource);
+        model.apply(migrationResource.read(), migrationResource.getVersion());
+      }
     }
 
     // remember the last version

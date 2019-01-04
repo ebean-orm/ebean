@@ -123,7 +123,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   private void initClear() {
     synchronized (this) {
       if (map == null) {
-        if (modifyListening) {
+        if (!disableLazyLoad && modifyListening) {
           lazyLoadCollection(true);
         } else {
           map = new LinkedHashMap<>();
@@ -135,7 +135,11 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   private void init() {
     synchronized (this) {
       if (map == null) {
-        lazyLoadCollection(false);
+        if (disableLazyLoad) {
+          map = new LinkedHashMap<>();
+        } else {
+          lazyLoadCollection(false);
+        }
       }
     }
   }
@@ -273,14 +277,16 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     checkReadOnly();
     init();
     if (modifyListening) {
-      Object oldBean = map.put(key, value);
+      E oldBean = map.put(key, value);
       if (value != oldBean) {
         // register the add of the new and the removal of the old
         modifyAddition(value);
         modifyRemoval(oldBean);
       }
+      return oldBean;
+    } else {
+      return map.put(key, value);
     }
-    return map.put(key, value);
   }
 
   @Override
@@ -295,8 +301,9 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
           modifyRemoval(oldBean);
         }
       }
+    } else {
+      map.putAll(puts);
     }
-    map.putAll(puts);
   }
 
   @Override

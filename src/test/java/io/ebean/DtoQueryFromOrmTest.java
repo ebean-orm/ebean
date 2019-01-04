@@ -43,17 +43,13 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     resetAllMetrics();
 
-    String[] prefix = {"Bl", "B", "Red", "jim"};
+    String[] prefix = { "Bl", "B", "Red", "jim" };
 
     for (String val : prefix) {
       List<ContactDto> list = Ebean.find(Contact.class)
-        .select("email, concat(lastName,', ',firstName) as fullName")
-        .where().istartsWith("concat(lastName,', ',firstName)", val)
-        .orderBy().asc("lastName")
-        .setMaxRows(10)
-        .asDto(ContactDto.class)
-        .setLabel("prefixLoop")
-        .findList();
+          .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where()
+          .istartsWith(concat("lastName", ", ", "firstName"), val).orderBy().asc("lastName").setMaxRows(10)
+          .asDto(ContactDto.class).setLabel("prefixLoop").findList();
 
       System.out.println("List:" + list);
     }
@@ -77,14 +73,10 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    DtoQuery<ContactDto> query =
-      Ebean.find(Contact.class)
+    DtoQuery<ContactDto> query = Ebean.find(Contact.class)
         // we must explicitly add the id property for DTO query (if we want it)
-        .select("id, email, concat(lastName,', ',firstName) as fullName")
-        .where().isNotNull("email").isNotNull("lastName")
-        .orderBy().asc("lastName")
-        .asDto(ContactDto.class)
-        .setLabel("explicitId")
+        .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
+        .isNotNull("lastName").orderBy().asc("lastName").asDto(ContactDto.class).setLabel("explicitId")
         .setRelaxedMode();
 
     List<ContactDto> dtos = query.findList();
@@ -98,7 +90,8 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+    assertThat(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+        + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
   }
 
   @Test
@@ -108,12 +101,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    DtoQuery<ContactDto> query =
-      Ebean.find(Contact.class)
-        .select("email, concat(lastName,', ',firstName) as fullName")
-        .where().isNotNull("email").isNotNull("lastName")
-        .orderBy().asc("lastName")
-        .asDto(ContactDto.class);
+    DtoQuery<ContactDto> query = Ebean.find(Contact.class)
+        .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
+        .isNotNull("lastName").orderBy().asc("lastName").asDto(ContactDto.class);
 
     List<ContactDto> dtos = query.findList();
 
@@ -126,9 +116,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.email, concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+    assertThat(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+        + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
   }
-
 
   @Test
   public void example() {
@@ -137,15 +127,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<ContactDto> contactDtos
-      = Ebean.find(Contact.class)
-      .setLabel("emailFullName")
-      .select("email, concat(lastName,', ',firstName) as fullName")
-      .where().isNotNull("email").isNotNull("lastName")
-      .orderBy().asc("lastName")
-      .setMaxRows(10)
-      .asDto(ContactDto.class)
-      .findList();
+    List<ContactDto> contactDtos = Ebean.find(Contact.class).setLabel("emailFullName")
+        .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
+        .isNotNull("lastName").orderBy().asc("lastName").setMaxRows(10).asDto(ContactDto.class).findList();
 
     assertThat(contactDtos).isNotEmpty();
 
@@ -158,10 +142,12 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("select top 10 t0.email, concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+      assertThat(sql.get(0)).contains("select top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+          + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
 
     } else {
-      assertThat(sql.get(0)).contains("select t0.email, concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+      assertThat(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+          + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
     }
   }
 
@@ -172,14 +158,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<ContactDto> contactDtos
-      = Ebean.find(Contact.class)
-      .select("id, email, concat(lastName,', ',firstName) as fullName")
-      .where().isNotNull("email").isNotNull("lastName")
-      .orderBy().asc("lastName")
-      .setMaxRows(10)
-      .asDto(ContactDto.class)
-      .findList();
+    List<ContactDto> contactDtos = Ebean.find(Contact.class)
+        .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
+        .isNotNull("lastName").orderBy().asc("lastName").setMaxRows(10).asDto(ContactDto.class).findList();
 
     assertThat(contactDtos).isNotEmpty();
 
@@ -192,9 +173,12 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("select top 10 t0.id, t0.email, concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+      assertThat(sql.get(0)).contains("select top 10 t0.id, t0.email, "
+          + concat("t0.last_name", ", ", "t0.first_name")
+          + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
     } else {
-      assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+      assertThat(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+          + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
     }
   }
 
@@ -205,15 +189,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<ContactDto> contactDtos
-      = Ebean.find(Contact.class)
-      .select("concat(lastName,', ',firstName) as fullName")
-      .where().isNotNull("lastName")
-      .orderBy().asc("lastName")
-      .asDto(ContactDto.class)
-      .setFirstRow(2)
-      .setMaxRows(5)
-      .findList();
+    List<ContactDto> contactDtos = Ebean.find(Contact.class)
+        .select(concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("lastName").orderBy()
+        .asc("lastName").asDto(ContactDto.class).setFirstRow(2).setMaxRows(5).findList();
 
     assertThat(contactDtos).isNotEmpty();
 
@@ -225,9 +203,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select concat(t0.last_name,', ',t0.first_name) fullName from contact t0 where");
+    assertThat(sql.get(0))
+        .contains("select " + concat("t0.last_name", ", ", "t0.first_name") + " fullName from contact t0 where");
   }
-
 
   @Test
   public void example_aggregate() {
@@ -236,14 +214,9 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<ContactTotals> contactDtos
-      = Ebean.find(Contact.class)
-      .select("lastName, count(*) as totalCount")
-      .where().isNotNull("lastName")
-      .having().gt("count(*)", 1)
-      .orderBy().desc("count(*)")
-      .asDto(ContactTotals.class)
-      .findList();
+    List<ContactTotals> contactDtos = Ebean.find(Contact.class).select("lastName, count(*) as totalCount").where()
+        .isNotNull("lastName").having().gt("count(*)", 1).orderBy().desc("count(*)").asDto(ContactTotals.class)
+        .findList();
 
     assertThat(contactDtos).isNotEmpty();
 
@@ -253,7 +226,19 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null  group by t0.last_name having count(*) > ?");
+    assertThat(sql.get(0)).contains(
+        "select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null  group by t0.last_name having count(*) > ?");
+  }
+
+  @Test
+  public void toDto_fromExpressionList() {
+
+    ResetBasicData.reset();
+
+    List<ContactTotals> contactDtos = Ebean.find(Contact.class).select("lastName, count(*) as totalCount").where()
+        .isNotNull("lastName").asDto(ContactTotals.class).findList();
+
+    assertThat(contactDtos).isNotEmpty();
   }
 
   public static class ContactTotals {

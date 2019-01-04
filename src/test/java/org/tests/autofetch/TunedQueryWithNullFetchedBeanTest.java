@@ -6,12 +6,12 @@ import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Address;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 import java.util.Set;
@@ -63,5 +63,7 @@ public class TunedQueryWithNullFetchedBeanTest extends BaseTestCase {
     // assert only one query executed
     List<String> loggedSql = LoggedSqlCollector.stop();
     Assert.assertEquals(1, loggedSql.size());
+
+    Ebean.delete(newCustomer);
   }
 }

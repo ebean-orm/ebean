@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 /**
@@ -94,6 +95,43 @@ public interface DbMigration {
   void setStrictMode(boolean strictMode);
 
   /**
+   * Set to true to include a generated header comment in the DDL script.
+   */
+  void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment);
+
+  /**
+   * Set this to false to exclude the builtin support for table partitioning (with @DbPartition).
+   */
+  void setIncludeBuiltInPartitioning(boolean includeBuiltInPartitioning);
+
+  /**
+   * Set the header that is included in the generated DDL script.
+   */
+  void setHeader(String header);
+
+  /**
+   * Set the prefix for the version. Set this to "V" for use with Flyway.
+   */
+  void setApplyPrefix(String applyPrefix);
+
+  /**
+   * Set the version of the migration to be generated.
+   */
+  void setVersion(String version);
+
+  /**
+   * Set the name of the migration to be generated.
+   */
+  void setName(String name);
+
+  /**
+   * Generate a migration for the version specified that contains pending drops.
+   *
+   * @param generatePendingDrop The version of a prior migration that holds pending drops.
+   */
+  void setGeneratePendingDrop(String generatePendingDrop);
+
+  /**
    * Add an additional platform to write the migration DDL.
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms
@@ -111,7 +149,12 @@ public interface DbMigration {
   void addDatabasePlatform(DatabasePlatform databasePlatform, String prefix);
 
   /**
-   * Generate the next migration xml file and associated apply and rollback sql scripts.
+   * Return the list of versions that contain pending drops.
+   */
+  List<String> getPendingDrops();
+
+  /**
+   * Generate the next migration sql script and associated model xml.
    * <p>
    * This does not run the migration or ddl scripts but just generates them.
    * </p>
@@ -143,4 +186,15 @@ public interface DbMigration {
    * @return the version of the generated migration or null
    */
   String generateMigration() throws IOException;
+
+  /**
+   * Generate an "init" migration which has all changes.
+   * <p>
+   * An "init" migration can only be executed and used on a database that has had no
+   * prior migrations run on it.
+   * </p>
+   * @return the version of the generated migration
+   */
+  String generateInitMigration() throws IOException;
+
 }

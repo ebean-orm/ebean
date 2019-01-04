@@ -2,7 +2,9 @@ package io.ebean;
 
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.config.ServerConfig;
+import io.ebean.datasource.DataSourceConfigurationException;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
@@ -160,6 +162,15 @@ public final class Ebean {
             defaultServer = getWithCreate(defaultName.trim());
           }
         }
+      } catch (BeanNotEnhancedException e) {
+        throw e;
+
+      } catch (DataSourceConfigurationException e) {
+        String msg = "Configuration error creating DataSource for the default EbeanServer." +
+          " This typically means a missing application-test.yaml or missing ebean-test-config dependency." +
+          " See https://ebean.io/docs/trouble-shooting#datasource";
+        throw new DataSourceConfigurationException(msg, e);
+
       } catch (Throwable e) {
         logger.error("Error trying to create the default EbeanServer", e);
         throw new RuntimeException(e);
@@ -636,6 +647,15 @@ public final class Ebean {
    */
   public static void updateAll(Collection<?> beans) throws OptimisticLockException {
     serverMgr.getDefaultServer().updateAll(beans);
+  }
+
+  /**
+   * Merge the bean using the default merge options.
+   *
+   * @param bean The bean to merge
+   */
+  public static void merge(Object bean) {
+    serverMgr.getDefaultServer().merge(bean);
   }
 
   /**

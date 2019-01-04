@@ -121,6 +121,46 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
+   * Return the underlying query as an UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -159,12 +199,32 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
+   * Execute as a delete query deleting the 'root level' beans that match the predicates
+   * in the query.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of rows that were deleted.
+   */
+  int delete(Transaction transaction);
+
+  /**
    * Execute as a update query.
    *
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
   int update();
+
+  /**
+   * Execute as a update query with the given transaction.
+   *
+   * @return the number of rows that were updated.
+   * @see UpdateQuery
+   */
+  int update(Transaction transaction);
 
   /**
    * Execute the query iterating over the results.
@@ -403,6 +463,11 @@ public interface ExpressionList<T> {
    * @see Query#select(String)
    */
   Query<T> select(String properties);
+
+  /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup<T> fetchGroup);
 
   /**
    * Set whether this query uses DISTINCT.
@@ -717,6 +782,12 @@ public interface ExpressionList<T> {
   ExpressionList<T> ieq(String propertyName, String value);
 
   /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  ExpressionList<T> ine(String propertyName, String value);
+
+  /**
    * Between - property between the two given values.
    */
   ExpressionList<T> between(String propertyName, Object value1, Object value2);
@@ -1022,6 +1093,20 @@ public interface ExpressionList<T> {
    * @param flags        The flags we are looking for
    */
   ExpressionList<T> bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add expression for the given bit flags to be NOT set.
+   * <p>
+   * <pre>{@code
+   *
+   * where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseNot(String propertyName, long flags);
 
   /**
    * Add bitwise AND expression of the given bit flags to compare with the match/mask.

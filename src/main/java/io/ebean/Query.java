@@ -245,6 +245,38 @@ public interface Query<T> {
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Convert the query to a UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
@@ -396,6 +428,11 @@ public interface Query<T> {
    * @param fetchProperties the properties to fetch for this bean (* = all properties).
    */
   Query<T> select(String fetchProperties);
+
+  /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup<T> fetchGroup);
 
   /**
    * Specify a path to fetch eagerly including specific properties.
@@ -602,8 +639,6 @@ public interface Query<T> {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   *
-   * @see EbeanServer#findIds(Query, Transaction)
    */
   @Nonnull
   <A> List<A> findIds();
@@ -633,15 +668,13 @@ public interface Query<T> {
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id");
    *
-   *  QueryIterator<Customer> it = query.findIterate();
-   *  try {
+   *  // use try with resources to ensure QueryIterator is closed
+   *
+   *  try (QueryIterator<Customer> it = query.findIterate()) {
    *    while (it.hasNext()) {
    *      Customer customer = it.next();
    *      // do something with customer ...
    *    }
-   *  } finally {
-   *    // close the underlying resources
-   *    it.close();
    *  }
    *
    * }</pre>
@@ -740,8 +773,6 @@ public interface Query<T> {
    *     .findList();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findList(Query, Transaction)
    */
   @Nonnull
   List<T> findList();
@@ -759,8 +790,6 @@ public interface Query<T> {
    *     .findSet();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findSet(Query, Transaction)
    */
   @Nonnull
   Set<T> findSet();
@@ -782,8 +811,6 @@ public interface Query<T> {
    *     .findMap();
    *
    * }</pre>
-   *
-   * @see EbeanServer#findMap(Query, Transaction)
    */
   @Nonnull
   <K> Map<K, T> findMap();
@@ -928,9 +955,29 @@ public interface Query<T> {
   int delete();
 
   /**
+   * Execute as a delete query returning the number of rows deleted using the given transaction.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of beans/rows that were deleted.
+   */
+  int delete(Transaction transaction);
+
+  /**
    * Execute the UpdateQuery returning the number of rows updated.
+   *
+   * @return the number of beans/rows updated.
    */
   int update();
+
+  /**
+   * Execute the UpdateQuery returning the number of rows updated using the given transaction.
+   *
+   * @return the number of beans/rows updated.
+   */
+  int update(Transaction transaction);
 
   /**
    * Return the count of entities this query should return.
@@ -1312,7 +1359,6 @@ public interface Query<T> {
    *   count:1 orderStatus:COMPLETE
    *
    * }</pre>
-   *
    */
   Query<T> setCountDistinct(CountDistinctOrder orderBy);
 
@@ -1487,15 +1533,6 @@ public interface Query<T> {
    * </p>
    */
   String getGeneratedSql();
-
-  /**
-   * Deprecated - migrate to forUpdate().
-   *
-   * executed the select with "for update" which should lock the record
-   * "on read"
-   */
-  @Deprecated
-  Query<T> setForUpdate(boolean forUpdate);
 
   /**
    * Execute using "for update" clause which results in the DB locking the record.

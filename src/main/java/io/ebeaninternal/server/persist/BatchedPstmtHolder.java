@@ -3,6 +3,7 @@ package io.ebeaninternal.server.persist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -38,6 +39,15 @@ public class BatchedPstmtHolder {
    * This will return null if no matching PreparedStatement is found.
    */
   public PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) {
+    BatchedPstmt batchedPstmt = getBatchedPstmt(stmtKey, postExecute);
+    return (batchedPstmt == null) ? null : batchedPstmt.getStatement();
+  }
+
+  /**
+   * Return the BatchedPstmt that holds the batched statement.
+   */
+  public BatchedPstmt getBatchedPstmt(String stmtKey, BatchPostExecute postExecute) {
+
     BatchedPstmt bs = stmtMap.get(stmtKey);
     if (bs == null) {
       // the PreparedStatement has need been created
@@ -52,7 +62,7 @@ public class BatchedPstmtHolder {
     if (bsSize > maxSize) {
       maxSize = bsSize;
     }
-    return bs.getStatement();
+    return bs;
   }
 
   /**
@@ -74,6 +84,19 @@ public class BatchedPstmtHolder {
   }
 
   /**
+   * Execute one of the batched statements returning the row counts.
+   */
+  public int[] execute(String key, boolean getGeneratedKeys) throws SQLException {
+
+    BatchedPstmt batchedPstmt = stmtMap.remove(key);
+    if (batchedPstmt == null) {
+      throw new PersistenceException("No batched statement found for key " + key);
+    }
+    batchedPstmt.executeBatch(getGeneratedKeys);
+    return batchedPstmt.getResults();
+  }
+
+  /**
    * Execute all batched PreparedStatements.
    *
    * @param getGeneratedKeys if true try to get generated keys for inserts
@@ -87,7 +110,15 @@ public class BatchedPstmtHolder {
     // but still need to close PreparedStatements.
     boolean isError = false;
 
-    for (BatchedPstmt bs : stmtMap.values()) {
+    // if there are Listeners/Controllers that interact with the database,
+    // the flush may get called recursively in executeBatch/postExecute.
+    // which leads that we process stmtMap.values() twice in the loop.
+    // So we copy the values, that we want to flush and clear it immediately.
+    BatchedPstmt[] values = stmtMap.values().toArray(new BatchedPstmt[stmtMap.values().size()]);
+    clear();
+
+    // this loop
+    for (BatchedPstmt bs : values) {
       try {
         if (!isError) {
           bs.executeBatch(getGeneratedKeys);
@@ -116,8 +147,6 @@ public class BatchedPstmtHolder {
       }
     }
 
-    // clear the batch cache
-    clear();
 
     if (firstError != null) {
       String msg = "Error when batch flush on sql: " + errorSql;

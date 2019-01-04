@@ -2,10 +2,11 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.junit.Test;
 import org.tests.model.basic.OCachedBean;
 import org.tests.model.basic.OCachedBeanChild;
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test class testing deleting/invalidating of cached beans
@@ -27,7 +28,7 @@ public class TestCacheDelete extends BaseTestCase {
     Ebean.save(parentBean);
 
     // confirm there are 2 children loaded from the parent
-    Assert.assertEquals(2, Ebean.find(OCachedBean.class, parentBean.getId()).getChildren().size());
+    assertEquals(2, Ebean.find(OCachedBean.class, parentBean.getId()).getChildren().size());
 
     // ensure cache has been populated
     Ebean.find(OCachedBeanChild.class, child.getId());
@@ -39,6 +40,6 @@ public class TestCacheDelete extends BaseTestCase {
     awaitL2Cache();
 
     OCachedBean beanFromCache = Ebean.find(OCachedBean.class, parentBean.getId());
-    Assert.assertEquals(1, beanFromCache.getChildren().size());
+    assertEquals(1, beanFromCache.getChildren().size());
   }
 }

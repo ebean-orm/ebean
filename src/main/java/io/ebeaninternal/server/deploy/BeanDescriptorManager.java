@@ -6,6 +6,7 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.NamingConvention;
@@ -20,11 +21,13 @@ import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
@@ -387,6 +390,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       return asOfTableMap;
 
+    } catch (BeanNotEnhancedException e) {
+      throw e;
+
     } catch (RuntimeException e) {
       logger.error("Error in deployment", e);
       throw e;
@@ -394,12 +400,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private void readXmlMapping(List<XmEbean> mappings) {
-    ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-
-    for (XmEbean mapping : mappings) {
-      List<XmEntity> entityDeploy = mapping.getEntity();
-      for (XmEntity deploy : entityDeploy) {
-        readEntityMapping(classLoader, deploy);
+    if (mappings != null) {
+      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
+      for (XmEbean mapping : mappings) {
+        List<XmEntity> entityDeploy = mapping.getEntity();
+        for (XmEntity deploy : entityDeploy) {
+          readEntityMapping(classLoader, deploy);
+        }
       }
     }
   }
@@ -446,24 +453,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
-   * For SQL based modifications we need to invalidate appropriate parts of the
-   * cache.
+   * For SQL based modifications we need to invalidate appropriate parts of the cache.
    */
-  public void cacheNotify(TransactionEventTable.TableIUD tableIUD) {
+  public void cacheNotify(TransactionEventTable.TableIUD tableIUD, CacheChangeSet changeSet) {
 
     String tableName = tableIUD.getTableName().toLowerCase();
     List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
     if (normalBeanTypes != null) {
       // 'normal' entity beans based on a "base table"
       for (BeanDescriptor<?> normalBeanType : normalBeanTypes) {
-        normalBeanType.cacheHandleBulkUpdate(tableIUD);
+        normalBeanType.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
     List<BeanDescriptor<?>> viewBeans = tableToViewDescMap.get(tableName);
     if (viewBeans != null) {
       // entity beans based on a "view"
       for (BeanDescriptor<?> viewBean : viewBeans) {
-        viewBean.cacheHandleBulkUpdate(tableIUD);
+        viewBean.cachePersistTableIUD(tableIUD, changeSet);
       }
     }
   }
@@ -637,7 +643,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return a BeanTable for an ElementCollection.
    */
-  public BeanTable getCollectionBeanTable(String fullTableName, Class<?> targetType) {
+  public BeanTable createCollectionBeanTable(String fullTableName, Class<?> targetType) {
     return new BeanTable(this, fullTableName, targetType);
   }
 
@@ -1009,7 +1015,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * into the order_id column on the order_lines table).
    * </p>
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private void makeUnidirectional(DeployBeanPropertyAssocMany<?> oneToMany) {
 
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
@@ -1368,9 +1373,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         desc.setIdType(IdType.EXTERNAL);
         return;
       }
-      // use the default. IDENTITY or SEQUENCE.
-      desc.setIdType(dbIdentity.getIdType());
-      desc.setIdTypePlatformDefault();
+      if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
+        // use IDENTITY or SEQUENCE based on platform
+        desc.setIdType(dbIdentity.getIdType());
+        desc.setIdTypePlatformDefault();
+      } else {
+        // externally/application supplied Id values
+        desc.setIdType(IdType.EXTERNAL);
+        return;
+      }
     }
 
     if (desc.getBaseTable() == null) {
@@ -1380,27 +1391,30 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     if (IdType.IDENTITY == desc.getIdType()) {
-      // used when getGeneratedKeys is not supported (SQL Server 2000)
+      // used when getGeneratedKeys is not supported (SQL Server 2000, SAP Hana)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
-      desc.setSelectLastInsertedId(selectLastInsertedId);
+      String selectLastInsertedIdDraft = (!desc.isDraftable()) ? selectLastInsertedId : dbIdentity.getSelectLastInsertedId(desc.getDraftTable());
+      desc.setSelectLastInsertedId(selectLastInsertedId, selectLastInsertedIdDraft);
       return;
     }
 
-    String seqName = desc.getIdGeneratorName();
-    if (seqName != null) {
-      logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
-    } else {
-      String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
-      // use namingConvention to define sequence name
-      seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
-    }
+    if (IdType.SEQUENCE == desc.getIdType()) {
+      String seqName = desc.getIdGeneratorName();
+      if (seqName != null) {
+        logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
+      } else {
+        String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
+        // use namingConvention to define sequence name
+        seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
+      }
 
-    if (databasePlatform.isSequenceBatchMode()) {
-      // use sequence next step 1 as we are going to batch fetch them instead
-      desc.setSequenceAllocationSize(1);
+      if (databasePlatform.isSequenceBatchMode()) {
+        // use sequence next step 1 as we are going to batch fetch them instead
+        desc.setSequenceAllocationSize(1);
+      }
+      int stepSize = desc.getSequenceAllocationSize();
+      desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
-    int stepSize = desc.getSequenceAllocationSize();
-    desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
@@ -1461,7 +1475,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         if (isPersistentField(prop)) {
           throw new IllegalStateException(
             "If you are running in an IDE with enhancement plugin try a Build -> Rebuild Project to recompile and enhance all entity beans. " +
-            "Error - property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
+              "Error - property " + propName + " not found in " + reflectProps + " for type " + desc.getBeanType());
         }
 
       } else {
@@ -1544,7 +1558,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Class<?> beanClass = desc.getBeanType();
 
     if (!hasEntityBeanInterface(beanClass)) {
-      throw new IllegalStateException("Bean " + beanClass + " is not enhanced?");
+      String msg = "Bean " + beanClass + " is not enhanced? Check packages specified in ebean.mf. If you are running in IDEA or " +
+        "Eclipse check that the enhancement plugin is installed. See https://ebean.io/docs/trouble-shooting#not-enhanced";
+      throw new BeanNotEnhancedException(msg);
     }
 
     // the bean already implements EntityBean
@@ -1573,7 +1589,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // ok to stop and treat just the same as Object.class
         return;
       }
-      throw new IllegalStateException("Super type " + superclass + " is not enhanced?");
+      throw new BeanNotEnhancedException("Super type " + superclass + " is not enhanced? Check the packages specified in ebean.mf See https://ebean.io/docs/trouble-shooting#not-enhanced");
     }
 
     // recursively continue up the inheritance hierarchy
@@ -1637,28 +1653,47 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Create a BeanDescriptor for an ElementCollection target.
    */
-  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType) {
+  public <A> BeanDescriptor<A> createElementDescriptor(DeployBeanDescriptor<A> elementDescriptor, ManyType manyType, boolean scalar) {
 
     ElementHelp elementHelp = elementHelper(manyType);
     if (manyType.isMap()) {
-      return new BeanDescriptorElementMap<>(this, elementDescriptor, elementHelp);
+      if (scalar) {
+        return new BeanDescriptorElementScalarMap<>(this, elementDescriptor, elementHelp);
+      } else {
+        return new BeanDescriptorElementEmbeddedMap<>(this, elementDescriptor, elementHelp);
+      }
     }
-    return new BeanDescriptorElement<>(this, elementDescriptor, elementHelp);
+    if (scalar) {
+      return new BeanDescriptorElementScalar<>(this, elementDescriptor, elementHelp);
+    } else {
+      return new BeanDescriptorElementEmbedded<>(this, elementDescriptor, elementHelp);
+    }
   }
 
   private ElementHelp elementHelper(ManyType manyType) {
     switch (manyType) {
-      case LIST: return new ElementHelpList();
-      case SET: return new ElementHelpSet();
-      case MAP: return new ElementHelpMap();
+      case LIST:
+        return new ElementHelpList();
+      case SET:
+        return new ElementHelpSet();
+      case MAP:
+        return new ElementHelpMap();
       default:
-        throw new IllegalStateException("manyType unexpected "+manyType);
+        throw new IllegalStateException("manyType unexpected " + manyType);
     }
   }
 
   public void visitMetrics(MetricVisitor visitor) {
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
       desc.visitMetrics(visitor);
+    }
+  }
+
+  public void collectQueryPlans(QueryPlanRequest request) {
+    for (BeanDescriptor<?> desc : immutableDescriptorList) {
+      if (request.includeType(desc.getBeanType())) {
+        desc.collectQueryPlans(request);
+      }
     }
   }
 

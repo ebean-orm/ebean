@@ -24,9 +24,6 @@ public class ModelBuildElementTable {
 
     VisitAllUsing.visitOne(targetDescriptor, new ModelBuildPropertyVisitor(ctx, table, targetDescriptor));
 
-    ctx.fkeyBuilder(table)
-      .addForeignKey(manyProp.getBeanDescriptor(), manyProp.getTableJoin(), true);
-
     ctx.addTable(table);
   }
 

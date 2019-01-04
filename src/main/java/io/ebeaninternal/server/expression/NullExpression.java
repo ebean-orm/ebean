@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
 
 import java.io.IOException;
 
@@ -40,6 +40,9 @@ class NullExpression extends AbstractExpression {
       propertyPath = SplitName.split(propName)[0];
       propertyContainsMany(propertyPath, desc, manyWhereJoin);
     } else {
+      if (elProperty != null && elProperty.containsMany() && !notNull) {
+        manyWhereJoin.setRequireOuterJoins(true);
+      }
       propertyContainsMany(propName, desc, manyWhereJoin);
     }
   }

@@ -1,6 +1,9 @@
 package io.ebeaninternal.dbmigration.model;
 
 
+import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
+import io.ebeaninternal.dbmigration.migration.DropIndex;
+import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.Test;
@@ -12,17 +15,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelContainerTest {
 
   @Test
-  public void apply_when_noPendingDrops_then_emptyPending() throws Exception {
+  public void apply_when_noPendingDrops_then_emptyPending() {
 
     ModelContainer container = new ModelContainer();
     container.apply(mig("1.0.model.xml"), ver("1.1"));
-
     assertThat(container.getPendingDrops()).isEmpty();
   }
 
 
   @Test
-  public void apply_when_pendingDrops_then_registeredHistoryTable() throws Exception {
+  public void apply_when_pendingDrops_then_registeredHistoryTable() {
 
     ModelContainer base = container_1_1();
 
@@ -36,7 +38,7 @@ public class ModelContainerTest {
 
 
   @Test
-  public void apply_when_pendingDropsApplied_then_droppedTableNotInHistory() throws Exception {
+  public void apply_when_pendingDropsApplied_then_droppedTableNotInHistory() {
 
     ModelContainer container = container_1_1();
     container.apply(mig("1.1_2__drops.model.xml"), ver("1.1_2"));
@@ -50,7 +52,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void apply_when_apply_partial_pendingDrops_then_some_remainder() throws Exception {
+  public void apply_when_apply_partial_pendingDrops_then_some_remainder() {
 
     ModelContainer container = container_2_1();
     container.apply(mig("2.2__drops.model.xml"), ver("2.2"));
@@ -64,6 +66,45 @@ public class ModelContainerTest {
 
     assertThat(historyColumns).contains("zong", "boom", "baz", "bar");
     assertThat(normalColumns).doesNotContain("zing", "zong", "boom", "baz", "bar");
+  }
+
+  @Test
+  public void apply_sql() {
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("3.0__rawSql.model.xml"), ver("3.0"));
+    assertThat(container.getPendingDrops()).isEmpty();
+  }
+
+  @Test
+  public void apply_alterForeignKey() {
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("4.0__alterForeignKey.model.xml"), ver("4.0"));
+    assertThat(container.getPendingDrops()).isEmpty();
+  }
+
+  @Test
+  public void apply_dropTable_when_notInModel_then_ok() {
+
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("5.0__dropTable.model.xml"), ver("5.0"));
+    assertThat(container.getTables()).isEmpty();
+  }
+
+  @Test
+  public void apply_drop_when_notInModel_then_ok() {
+
+    ModelContainer container = new ModelContainer();
+    DropTable dropTable = new DropTable();
+    dropTable.setName("DoesNotExist");
+    container.applyChange(dropTable);
+
+    DropIndex dropIndex = new DropIndex();
+    dropIndex.setIndexName("DoesNotExist");
+    container.applyChange(dropIndex);
+
+    DropHistoryTable dropHistoryTable = new DropHistoryTable();
+    dropHistoryTable.setBaseTable("DoesNotExist");
+    container.applyChange(dropHistoryTable);
   }
 
   private ModelContainer container_2_1() {

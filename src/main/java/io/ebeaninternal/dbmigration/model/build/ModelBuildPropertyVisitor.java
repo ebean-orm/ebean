@@ -192,7 +192,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDbMigrationInfos(p.getDbMigrationInfos());
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
-        if (p.hasForeignKey()) {
+        if (p.hasForeignKey() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
           // single references column (put it on the column)
           String refTable = importedProperty.getBeanDescriptor().getBaseTable();
           if (refTable == null) {
@@ -251,18 +251,19 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         col.setIdentity(true);
       }
       TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
-      if (primaryKeyJoin != null) {
+      if (primaryKeyJoin != null && !table.isPartitioned()) {
         TableJoinColumn[] columns = primaryKeyJoin.columns();
         col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
         col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());
-      col.setDbMigrationInfos(p.getDbMigrationInfos());
       if (!p.isNullable() || p.isDDLNotNull()) {
         col.setNotnull(true);
       }
     }
+
+    col.setDbMigrationInfos(p.getDbMigrationInfos());
 
     if (p.isUnique() && !p.isId()) {
       col.setUnique(determineUniqueConstraintName(col.getName()));

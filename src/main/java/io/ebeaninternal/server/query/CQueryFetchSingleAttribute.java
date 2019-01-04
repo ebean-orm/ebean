@@ -1,14 +1,14 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.util.JdbcClose;
 import io.ebean.CountedValue;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarDataReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base compiled query request for single attribute queries.
@@ -59,7 +60,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
   private int rowCount;
 
-  private final ScalarType<?> scalarType;
+  private final ScalarDataReader<?> reader;
 
   private final boolean containsCounts;
 
@@ -76,7 +77,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
     this.containsCounts = containsCounts;
-    this.scalarType = queryPlan.getSingleAttributeScalarType();
+    this.reader = queryPlan.getSingleAttributeScalarType();
     query.setGeneratedSql(sql);
   }
 
@@ -105,7 +106,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
       List<Object> result = new ArrayList<>();
       while (dataReader.next()) {
-        Object value = scalarType.read(dataReader);
+        Object value = reader.read(dataReader);
         if (containsCounts) {
           value = new CountedValue<>(value, dataReader.getLong());
         }
@@ -116,7 +117,9 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
-      queryPlan.executionTime(rowCount, executionTimeMicros, null);
+      if (queryPlan.executionTime(rowCount, executionTimeMicros, null)) {
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
+      }
       getTransaction().profileEvent(this);
 
       return result;
@@ -187,5 +190,9 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
     getTransaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), rowCount, query.getProfileId());
+  }
+
+  Set<String> getDependentTables() {
+    return queryPlan.getDependentTables();
   }
 }

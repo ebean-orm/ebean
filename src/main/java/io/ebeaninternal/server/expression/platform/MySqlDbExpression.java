@@ -5,8 +5,4 @@ package io.ebeaninternal.server.expression.platform;
  */
 class MySqlDbExpression extends BasicDbExpression {
 
-  MySqlDbExpression(String concatOperator) {
-    super(concatOperator);
-  }
-
 }

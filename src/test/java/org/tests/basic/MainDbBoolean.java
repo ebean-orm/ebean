@@ -6,11 +6,11 @@ import io.ebean.Query;
 import io.ebean.SqlRow;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.datasource.DataSourceConfig;
+import org.junit.Assert;
 import org.tests.model.basic.TOne;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.avaje.datasource.DataSourceConfig;
-import org.junit.Assert;
 
 import java.util.List;
 

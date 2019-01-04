@@ -2,20 +2,23 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
+import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
+import io.ebean.meta.QueryPlanRequest;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.TimedMetric;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarDataReader;
 import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Represents a query for a given SQL statement.
@@ -47,6 +52,8 @@ import java.sql.SQLException;
 public class CQueryPlan {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
+
+  public static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
 
@@ -88,6 +95,10 @@ public class CQueryPlan {
    */
   private volatile String auditQueryHash;
 
+  private final Set<String> dependentTables;
+
+  private final CQueryBindCapture bindCapture;
+
   /**
    * Create a query plan based on a OrmQueryRequest.
    */
@@ -110,6 +121,8 @@ public class CQueryPlan {
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.dependentTables = sqlTree.dependentTables();
+    this.bindCapture = initBindCapture(server.getServerConfig(), query);
   }
 
   /**
@@ -134,6 +147,16 @@ public class CQueryPlan {
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
+    this.bindCapture = initBindCapture(server.getServerConfig(), query);
+  }
+
+  private CQueryBindCapture initBindCapture(ServerConfig serverConfig, SpiQuery<?> query) {
+    if (serverConfig.isCollectQueryPlans() && !query.getType().isUpdate()) {
+      return new CQueryBindCapture(this, PlatformQueryPlan.getLogger(serverConfig.getDatabasePlatform().getPlatform()));
+    } else {
+      return null;
+    }
   }
 
   private String location() {
@@ -152,6 +175,10 @@ public class CQueryPlan {
 
   public Class<?> getBeanType() {
     return beanType;
+  }
+
+  public Set<String> getDependentTables() {
+    return dependentTables;
   }
 
   public ProfileLocation getProfileLocation() {
@@ -175,6 +202,16 @@ public class CQueryPlan {
    */
   DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
+    if (encryptedProps != null) {
+      for (STreeProperty encryptedProp : encryptedProps) {
+        dataBind.setString(encryptedProp.getEncryptKeyAsString());
+      }
+    }
+    return dataBind;
+  }
+
+  private DataBindCapture bindCapture() throws SQLException {
+    DataBindCapture dataBind = DataBindCapture.of(dataTimeZone);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
         dataBind.setString(encryptedProp.getEncryptKeyAsString());
@@ -253,13 +290,15 @@ public class CQueryPlan {
   /**
    * Register an execution time against this query plan;
    */
-  void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
+  boolean executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
 
     stats.add(loadedBeanCount, timeMicros, objectGraphNode);
     if (objectGraphNode != null) {
       // collect stats based on objectGraphNode for lazy loading reporting
       server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
     }
+
+    return bindCapture != null && bindCapture.collectFor(timeMicros);
   }
 
   /**
@@ -276,8 +315,8 @@ public class CQueryPlan {
     return stats.getLastQueryTime();
   }
 
-  ScalarType<?> getSingleAttributeScalarType() {
-    return sqlTree.getRootNode().getSingleAttributeScalarType();
+  ScalarDataReader<?> getSingleAttributeScalarType() {
+    return sqlTree.getRootNode().getSingleAttributeReader();
   }
 
   /**
@@ -289,5 +328,23 @@ public class CQueryPlan {
 
   public TimedMetric createTimedMetric() {
     return MetricFactory.get().createTimedMetric(MetricType.ORM, label);
+  }
+
+  void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
+    try {
+      DataBindCapture capture = bindCapture();
+      predicates.bind(capture);
+      bindCapture.setBind(capture.bindCapture(), executionTimeMicros);
+
+    } catch (SQLException e) {
+      logger.error("Error capturing bind values", e);
+    }
+  }
+
+  public void collectQueryPlan(QueryPlanRequest request) {
+
+    if (!getSql().equals(RESULT_SET_BASED_RAW_SQL) && bindCapture != null) {
+      bindCapture.collectQueryPlan(request);
+    }
   }
 }

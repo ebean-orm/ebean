@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebeaninternal.server.cluster.BinaryMessage;
-import io.ebeaninternal.server.cluster.BinaryMessageList;
+import io.ebeaninternal.api.BinaryReadContext;
+import io.ebeaninternal.api.BinaryWritable;
+import io.ebeaninternal.api.BinaryWriteContext;
 
-import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Cache events broadcast across the cluster.
  */
-public class RemoteCacheEvent {
+public class RemoteCacheEvent implements BinaryWritable {
 
   private boolean clearAll;
 
@@ -53,10 +53,10 @@ public class RemoteCacheEvent {
 
   @Override
   public String toString() {
-    return "clearAll:" + clearAll + " caches:" + clearCaches;
+    return "CacheEvent[ clearAll:" + clearAll + " caches:" + clearCaches + "]";
   }
 
-  public static RemoteCacheEvent readBinaryMessage(DataInput dataInput) throws IOException {
+  public static RemoteCacheEvent readBinaryMessage(BinaryReadContext dataInput) throws IOException {
 
     boolean clearAll = dataInput.readBoolean();
     int size = dataInput.readInt();
@@ -72,13 +72,9 @@ public class RemoteCacheEvent {
     return new RemoteCacheEvent(clearAll, clearCache);
   }
 
-  public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
-
-    int bufferSize = (clearCaches == null) ? 0 : clearCaches.size() * 30;
-
-    BinaryMessage msg = new BinaryMessage(bufferSize + 10);
-    DataOutputStream os = msg.getOs();
-    os.writeInt(BinaryMessage.TYPE_CACHE);
+  @Override
+  public void writeBinary(BinaryWriteContext out) throws IOException {
+    DataOutputStream os = out.start(TYPE_CACHE);
     os.writeBoolean(clearAll);
     if (clearCaches == null) {
       os.writeInt(0);
@@ -88,7 +84,5 @@ public class RemoteCacheEvent {
         os.writeUTF(cacheName);
       }
     }
-    msgList.add(msg);
-
   }
 }
