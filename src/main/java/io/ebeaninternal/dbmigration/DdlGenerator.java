@@ -107,6 +107,11 @@ public class DdlGenerator {
         try {
           runCreateSql(connection);
         } catch (PersistenceException e) {
+          // TODO: Can we check if we have already executed the 'createSql'
+          // Unfortunately, we have no 'db_migration' table. Maybe we can
+          // parse the first statement and check if the table exists.
+          // For now, we just log the exception, so we can start an application
+          // multiple times without error
           log.info("Could not run create script. possible already created", e);
         }
       } else {

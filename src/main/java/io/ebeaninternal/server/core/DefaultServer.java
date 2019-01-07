@@ -48,6 +48,7 @@ import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryEvent;
 import io.ebean.config.SlowQueryListener;
+import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
@@ -460,7 +461,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
-    if (initDatabase && serverConfig.getTenantMode().isDdlEnabled()) {
+    if (initDatabase && TenantMode.DB != serverConfig.getTenantMode()) {
       initDatabase();
     }
   }
