@@ -12,6 +12,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -41,6 +42,36 @@ public class TestQueryFilterMany extends BaseTestCase {
     // Currently this does not include the query filter
     Ebean.refreshMany(customer, "orders");
 
+  }
+
+  @Test
+  public void test_with_findOne() {
+
+    ResetBasicData.reset();
+
+    Customer customer = Ebean.find(Customer.class)
+      .setMaxRows(1)
+      .orderBy().asc("id")
+      .fetch("orders")
+      .filterMany("orders").raw("1 = 0")
+      .findOne();
+
+    assertThat(customer).isNotNull();
+  }
+
+  @Test
+  public void test_with_findOneOrEmpty() {
+
+    ResetBasicData.reset();
+
+    Optional<Customer> customer = Ebean.find(Customer.class)
+      .setMaxRows(1)
+      .orderBy().asc("id")
+      .fetch("orders")
+      .filterMany("orders").raw("1 = 0")
+      .findOneOrEmpty();
+
+    assertThat(customer).isPresent();
   }
 
   @Test
