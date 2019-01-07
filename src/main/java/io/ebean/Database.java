@@ -1582,6 +1582,12 @@ public interface Database {
   <T> Set<String> validateQuery(Query<T> query);
 
   /**
+  * Runs the DbMigration or DDL manually. This is normally executed on startup, as long as
+  * serverConfig.initDatabase is set to true.
+  */
+  void initDatabase();
+
+  /**
    * Truncate all the given tables.
    */
   void truncate(String... tables);

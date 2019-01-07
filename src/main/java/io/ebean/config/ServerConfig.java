@@ -268,6 +268,8 @@ public class ServerConfig {
 
   private String ddlSeedSql;
 
+  private boolean initDatabase = true;
+
   /**
    * When true L2 bean cache use is skipped after a write has occurred on a transaction.
    */
@@ -2222,6 +2224,20 @@ public class ServerConfig {
   }
 
   /**
+   * Set to false, if you do not want to init database on startup (required to bring up server with datasource down)
+   */
+  public void setInitDatabase(boolean initDatabase) {
+    this.initDatabase = initDatabase;
+  }
+
+  /**
+   * Return TRUE, if database should be initialized on startup.
+   */
+  public boolean isInitDatabase() {
+    return initDatabase;
+  }
+
+  /**
    * Return true if the DDL should be generated.
    */
   public boolean isDdlGenerate() {
@@ -3019,6 +3035,8 @@ public class ServerConfig {
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
+
+    initDatabase = p.getBoolean("initDatabase", initDatabase);
 
     // read tenant-configuration from config:
     // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION

@@ -10,6 +10,7 @@ import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.datasource.DataSourceAlertFactory;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourceFactory;
+import io.ebean.datasource.DataSourcePool;
 import io.ebean.datasource.DataSourcePoolListener;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;

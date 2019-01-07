@@ -195,6 +195,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final ScriptRunner scriptRunner;
 
+  private final boolean initDatabase;
+
   private final ExpressionFactory expressionFactory;
 
   private final SpiBackgroundExecutor backgroundExecutor;
@@ -302,6 +304,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
     this.scriptRunner = new DScriptRunner(this);
+    this.initDatabase = serverConfig.isInitDatabase();
 
     configureServerPlugins();
 
@@ -329,14 +332,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public void initDatabase() {
+    if (!serverConfig.isDocStoreOnly()) { // CHECKME: Should we double check doc-store mode here?
+      ddlGenerator.runDdl(); // normally either ddlRun or migration should be configured (or docstore?)
+      serverConfig.runDbMigration(getDataSource());
+    }
+  }
+
   /**
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
 
-    if (!serverConfig.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
-    }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
@@ -445,6 +453,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Run any initialisation required before registering with the ClusterManager.
    */
   public void initialise() {
+    if (!serverConfig.isDocStoreOnly()) {
+      ddlGenerator.generateDdl();
+    }
+
     if (encryptKeyManager != null) {
       encryptKeyManager.initialise();
     }
@@ -455,8 +467,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
-    if (TenantMode.DB != serverConfig.getTenantMode()) {
-      serverConfig.runDbMigration(serverConfig.getDataSource());
+    if (initDatabase && TenantMode.DB != serverConfig.getTenantMode()) {
+      initDatabase();
     }
   }
 
