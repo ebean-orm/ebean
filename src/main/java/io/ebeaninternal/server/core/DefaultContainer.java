@@ -114,8 +114,9 @@ public class DefaultContainer implements SpiContainer {
       } else {
         setDataSource(serverConfig);
         if (isDataSorceOffline(serverConfig)) {
-          // datasource is set to offline
+          // datasource is set to offline & down
           online = false;
+          down = true;
 
         } else if (isDatasourceDown(serverConfig)) {
           // If the datasouce is down, this does not neccessary mean, that we are in

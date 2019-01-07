@@ -103,8 +103,16 @@ public class DdlGenerator {
         createSchemaIfRequired(connection);
       }
       runInitSql(connection);
-      runDropSql(connection);
-      runCreateSql(connection);
+      if (createOnly) {
+        try {
+          runCreateSql(connection);
+        } catch (PersistenceException e) {
+          log.info("Could not run create script. possible already created", e);
+        }
+      } else {
+        runDropSql(connection);
+        runCreateSql(connection);
+      }
       runSeedSql(connection);
     } catch (IOException e) {
       throw new RuntimeException("Error reading drop/create script from file system", e);
@@ -156,19 +164,17 @@ public class DdlGenerator {
   }
 
   protected void runDropSql(Connection connection) throws IOException {
-    if (!createOnly) {
-      if (extraDdl && jaxbPresent) {
-        String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
-        if (extraApply != null) {
-          runScript(connection, false, extraApply, "extra-ddl");
-        }
+    if (extraDdl && jaxbPresent) {
+      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
+      if (extraApply != null) {
+        runScript(connection, false, extraApply, "extra-ddl");
       }
-
-      if (dropAllContent == null) {
-        dropAllContent = readFile(getDropFileName());
-      }
-      runScript(connection, true, dropAllContent, getDropFileName());
     }
+
+    if (dropAllContent == null) {
+      dropAllContent = readFile(getDropFileName());
+    }
+    runScript(connection, true, dropAllContent, getDropFileName());
   }
 
   protected void runCreateSql(Connection connection) throws IOException {
