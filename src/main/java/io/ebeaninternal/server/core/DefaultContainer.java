@@ -96,7 +96,6 @@ public class DefaultContainer implements SpiContainer {
       BootupClasses bootupClasses = getBootupClasses(serverConfig);
 
       boolean online = true;
-      boolean down = false;
 
       TenantMode tenantMode = serverConfig.getTenantMode();
 
@@ -116,16 +115,6 @@ public class DefaultContainer implements SpiContainer {
         if (isDataSorceOffline(serverConfig)) {
           // datasource is set to offline & down
           online = false;
-          down = true;
-
-        } else if (isDatasourceDown(serverConfig)) {
-          // If the datasouce is down, this does not neccessary mean, that we are in
-          // offline mode. We expect, that the DS will come up later, so we have to
-          // register cache manager and so on and wait until the db comes up.
-          // Unfortunately, we cannot run DDL scripts or perform any auto-detections
-          // so we do not start the ebean server. This must be done by the caller
-          // on demand or when a DataSourceAlert.dataSourceUp occurs.
-          down = true;
 
         } else if (!tenantMode.isDynamicDataSource()) {
           checkDataSource(serverConfig);
@@ -134,7 +123,7 @@ public class DefaultContainer implements SpiContainer {
       }
 
       // determine database platform (Oracle etc)
-      setDatabasePlatform(serverConfig, down);
+      setDatabasePlatform(serverConfig);
       if (serverConfig.getDbEncrypt() != null) {
         // use a configured DbEncrypt rather than the platform default
         serverConfig.getDatabasePlatform().setDbEncrypt(serverConfig.getDbEncrypt());
@@ -163,11 +152,8 @@ public class DefaultContainer implements SpiContainer {
             clusterManager.registerServer(server);
           }
         }
-
         // start any services after registering with clusterManager
-        if (!down) {
-          server.start();
-        }
+        server.start();
       }
       DbOffline.reset();
       return server;
@@ -222,18 +208,10 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Set the DatabasePlatform if it has not already been set.
    */
-  private void setDatabasePlatform(ServerConfig config, boolean down) {
+  private void setDatabasePlatform(ServerConfig config) {
 
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
-      if (config.getDatabasePlatformName() == null) {
-        if (down) {
-          throw new IllegalStateException("Could not determine DatabasePlatform because datasource is down.");
-        }
-        if (config.getTenantMode().isDynamicDataSource()) {
-          throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
-        }
-      }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
       config.setDatabasePlatform(platform);
@@ -335,20 +313,6 @@ public class DefaultContainer implements SpiContainer {
   }
 
   /**
-   * Checks if the datasource is (temporary) down. This means not neccessary, that we are offline!
-   */
-  private boolean isDatasourceDown(ServerConfig serverConfig) {
-    DataSource ds = serverConfig.getDataSource();
-    if (ds instanceof DataSourcePool) {
-      if (!((DataSourcePool)ds).isDataSourceUp()) {
-        logger.warn("DataSource [{}] is down.", serverConfig.getName(), ((DataSourcePool)ds).getDataSourceDownReason());
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Check the autoCommit and Transaction Isolation levels of the DataSource.
    * <p>
    * If autoCommit is true this could be a real problem.
@@ -359,8 +323,15 @@ public class DefaultContainer implements SpiContainer {
    * </p>
    */
   private void checkDataSource(ServerConfig serverConfig) {
+    DataSource ds = serverConfig.getDataSource();
+    if (ds instanceof DataSourcePool) {
+      if (!((DataSourcePool)ds).isDataSourceUp()) {
+        logger.warn("DataSource [{}] is down - cannot check autoCommit.", serverConfig.getName(), ((DataSourcePool)ds).getDataSourceDownReason());
+        return;
+      }
+    }
 
-    try (Connection connection = serverConfig.getDataSource().getConnection()) {
+    try (Connection connection = ds.getConnection()) {
       if (!serverConfig.isAutoCommitMode() && connection.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }

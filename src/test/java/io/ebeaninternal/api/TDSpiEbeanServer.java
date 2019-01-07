@@ -986,17 +986,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public boolean isStarted() {
-    return false;
-  }
-
-  @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void runDbMigration() {
+  public void initDatabase() {
 
   }
 

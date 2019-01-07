@@ -1566,19 +1566,9 @@ public interface EbeanServer {
   <T> Set<String> validateQuery(Query<T> query);
 
   /**
-   * Starts the server manually. e.g. if DataSource were not up.
+   * Runs the DbMigration or DDL manually. This is normally executed on startup, as long as
+   * serverConfig.initDatabase is set to true.
    */
-  void start();
-
-  /**
-   * Returns true, if the server is successfully started. May return false, if datasource was not up.
-   */
-  boolean isStarted();
-
-  /**
-   * Runs the DbMigration manually. This is normally executed on startup, but may be neccessary for
-   * multi-tenant apps.
-   */
-  void runDbMigration();
+  void initDatabase();
 
 }

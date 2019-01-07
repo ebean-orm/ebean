@@ -60,6 +60,11 @@ public class DatabasePlatformFactory {
       if (serverConfig.getDataSourceConfig().isOffline()) {
         throw new PersistenceException("You must specify a DatabasePlatformName when you are offline");
       }
+
+      if (serverConfig.getTenantMode().isDynamicDataSource()) {
+        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "
+          + serverConfig.getTenantMode());
+      }
       // guess using meta data from driver
       return byDataSource(serverConfig.getDataSource());
 

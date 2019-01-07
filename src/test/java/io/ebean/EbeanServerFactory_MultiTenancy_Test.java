@@ -11,8 +11,6 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertTrue;
-
 import javax.sql.DataSource;
 
 public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
@@ -45,8 +43,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     // and we want to explicitly specify the Database platform
     config.setDatabasePlatform(new PostgresPlatform());
 
-    EbeanServer server = EbeanServerFactory.create(config);
-    assertTrue(server.isStarted());
+    EbeanServerFactory.create(config);
   }
 
   /**
@@ -82,8 +79,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     //config.setDdlRun(false);
     config.setDatabasePlatform(new PostgresPlatform());
 
-    EbeanServer server = EbeanServerFactory.create(config);
-    assertTrue(server.isStarted());
+    EbeanServerFactory.create(config);
   }
 
 
@@ -114,8 +110,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());
 
-    EbeanServer server = EbeanServerFactory.create(config);
-    assertTrue(server.isStarted());
+    EbeanServerFactory.create(config);
   }
 
   /**
@@ -145,7 +140,6 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());
 
-    EbeanServer server = EbeanServerFactory.create(config);
-    assertTrue(server.isStarted());
+    EbeanServerFactory.create(config);
   }
 }
