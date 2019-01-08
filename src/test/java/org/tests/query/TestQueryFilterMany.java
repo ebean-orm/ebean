@@ -75,6 +75,31 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  public void test_filterMany_with_isNotEmpty() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .fetch("orders")
+      .filterMany("orders").raw("1=0")
+      .where().isNotEmpty("orders")
+      .query();
+
+    List<Customer> list = query.findList();
+    for (Customer customer : list) {
+      assertThat(customer.getOrders()).isEmpty();
+    }
+
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
+    assertThat(sqlList.get(0)).contains("where exists (select 1 from o_order x where x.kcustomer_id = t0.id)");
+    assertThat(sqlList.get(1)).contains("and 1=0");
+  }
+
+
+  @Test
   public void test_filterMany_in_findCount() {
 
     ResetBasicData.reset();
