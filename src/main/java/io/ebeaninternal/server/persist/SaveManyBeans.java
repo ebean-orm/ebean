@@ -87,7 +87,7 @@ class SaveManyBeans extends SaveManyBase {
     if (!many.isManyToMany()) {
       return true;
     }
-    return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
+    return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().rootName());
   }
 
   private boolean isModifyListenMode() {
