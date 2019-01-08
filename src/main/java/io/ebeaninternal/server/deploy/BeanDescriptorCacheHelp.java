@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -700,7 +701,56 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   /**
-   * Returns true if it managed to populate/load the bean from the cache.
+   * Load a batch of entities from L2 bean cache checking the lazy loaded property is loaded.
+   */
+  Set<EntityBeanIntercept> beanCacheLoadAll(List<EntityBeanIntercept> list, PersistenceContext context, int lazyLoadProperty, String propertyName) {
+
+    Map<Object, EntityBeanIntercept> ebis = new HashMap<>();
+    for (EntityBeanIntercept ebi : list) {
+      ebis.put(desc.cacheKeyForBean(ebi.getOwner()), ebi);
+    }
+
+
+    Map<Object, Object> hits = getBeanCache().getAll(ebis.keySet());
+
+    if (beanLog.isTraceEnabled()) {
+      beanLog.trace("   LOAD ALL {}({}) - got hits ({})", cacheName, ebis.keySet(), hits.size());
+    }
+
+    Set<EntityBeanIntercept> loaded = new HashSet<>();
+
+    Iterator<Map.Entry<Object, Object>> iterator = hits.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<Object, Object> hit = iterator.next();
+
+      Object key = hit.getKey();
+      EntityBeanIntercept ebi = ebis.remove(key);
+      CachedBeanData cacheData = (CachedBeanData) hit.getValue();
+
+      if (lazyLoadProperty > -1 && !cacheData.isLoaded(propertyName)) {
+        if (beanLog.isTraceEnabled()) {
+          beanLog.trace("   LOAD {}({}) - cache miss on property({})", cacheName, key, propertyName);
+        }
+        iterator.remove();
+
+      } else {
+        CachedBeanDataToBean.load(desc, ebi.getOwner(), cacheData, context);
+        loaded.add(ebi);
+        if (beanLog.isDebugEnabled()) {
+          beanLog.debug("   LOAD {}({}) - hit", cacheName, key);
+        }
+      }
+    }
+
+    if (!ebis.isEmpty() && beanLog.isTraceEnabled()) {
+      beanLog.trace("   LOAD {}({}) - cache miss", cacheName, ebis.keySet());
+    }
+
+    return loaded;
+  }
+
+  /**
+   * Returns true if it managed to populate/load the single bean from the cache.
    */
   boolean beanCacheLoad(EntityBean bean, EntityBeanIntercept ebi, String key, PersistenceContext context) {
 

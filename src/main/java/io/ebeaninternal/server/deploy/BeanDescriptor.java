@@ -1502,19 +1502,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Returns true if it managed to populate/load the bean from the cache.
+   * Hit the bean cache trying to load a list/batch of entities.
+   * Return the set of entities that were successfully loaded from L2 cache.
    */
-  public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {
-    return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
+  public Set<EntityBeanIntercept> cacheBeanLoadAll(List<EntityBeanIntercept> list, PersistenceContext persistenceContext, int lazyLoadProperty, String propertyName) {
+    return cacheHelp.beanCacheLoadAll(list, persistenceContext, lazyLoadProperty, propertyName);
   }
 
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
-  public boolean cacheBeanLoad(EntityBeanIntercept ebi, PersistenceContext context) {
-    EntityBean bean = ebi.getOwner();
-    Object id = getId(bean);
-    return cacheBeanLoad(bean, ebi, id, context);
+  public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {
+    return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
   /**

@@ -13,6 +13,7 @@ import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Default implementation of LoadBeanContext.
@@ -174,22 +175,19 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         return;
       }
 
-      if (context.hitCache && context.desc.cacheBeanLoad(ebi, persistenceContext)) {
-        // successfully hit the L2 cache so don't invoke DB lazy loading
-        list.remove(ebi);
-        return;
-      }
-
       if (context.hitCache) {
-        // check each of the beans in the batch to see if they are in the L2 cache.
-        // bean successfully loaded from L2 cache so remove from batch load
-        list.removeIf(batchEbi -> batchEbi != ebi && context.desc.cacheBeanLoad(batchEbi, persistenceContext));
+        Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(list, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
+
+        list.removeAll(hits);
+        if (list.isEmpty() || hits.contains(ebi)) {
+          // successfully hit the L2 cache so don't invoke DB lazy loading
+          return;
+        }
       }
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi.getLazyLoadProperty(), context.hitCache);
       context.desc.getEbeanServer().loadBean(req);
     }
-
   }
 
 }
