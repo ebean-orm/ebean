@@ -8,6 +8,8 @@ class BeanDescriptorInitContext {
   private final Map<String, String> draftTables;
   private final String asOfViewSuffix;
 
+  private String embeddedPrefix;
+
   BeanDescriptorInitContext(Map<String, String> withHistoryTables, Map<String, String> draftTables, String asOfViewSuffix) {
     this.withHistoryTables = withHistoryTables;
     this.draftTables = draftTables;
@@ -28,5 +30,13 @@ class BeanDescriptorInitContext {
 
   void addDraftIntersection(String intersectionPublishTable, String intersectionDraftTable) {
     draftTables.put(intersectionPublishTable, intersectionDraftTable);
+  }
+
+  public void setEmbeddedPrefix(String embeddedPrefix) {
+    this.embeddedPrefix = embeddedPrefix;
+  }
+
+  public String getEmbeddedPrefix() {
+    return embeddedPrefix;
   }
 }
