@@ -869,6 +869,32 @@ public interface Query<T> {
   boolean isCountDistinct();
 
   /**
+   * Execute the query returning true if a row is found.
+   * <p>
+   * The query is executed using max rows of 1 and will only select the id property.
+   * This method is really just a convenient way to optimise a query to perform a
+   * 'does a row exist in the db' check.
+   * </p>
+   *
+   * <h2>Example:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = query().where().eq("email", "rob@foo.com").exists();
+   *
+   * }</pre>
+   *
+   * <h2>Example using a query bean:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = new QContact().email.equalTo("rob@foo.com").exists();
+   *
+   * }</pre>
+   *
+   * @return True if the query finds a matching row in the database
+   */
+  boolean exists();
+
+  /**
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>

@@ -633,6 +633,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+    return false;
+  }
+
+  @Override
   public <T> T find(Class<T> beanType, Object uid) {
     return null;
   }

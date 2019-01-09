@@ -1399,6 +1399,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public boolean exists() {
+    return server.exists(this, null);
+  }
+
+  @Override
   public int findCount() {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify

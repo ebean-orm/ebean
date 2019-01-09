@@ -100,6 +100,11 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
+  public boolean exists() {
+    return rootQuery.exists();
+  }
+
+  @Override
   public ExpressionList<T> having() {
     throw new PersistenceException(notAllowedMessage);
   }

@@ -444,6 +444,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public boolean exists() {
+    return query.exists();
+  }
+
+  @Override
   public T findOne() {
     return query.findOne();
   }
