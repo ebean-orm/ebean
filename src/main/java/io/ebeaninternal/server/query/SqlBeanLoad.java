@@ -6,8 +6,6 @@ import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 
-import javax.persistence.PersistenceException;
-
 /**
  * Controls the loading of property data into a bean.
  * <p>
@@ -88,8 +86,9 @@ public class SqlBeanLoad {
       return dbVal;
 
     } catch (Exception e) {
-      String msg = "Error loading on " + prop.getFullBeanName();
-      throw new PersistenceException(msg, e);
+      bean._ebean_getIntercept().setLoadError(prop.getPropertyIndex(), e);
+      ctx.handleLoadError(bean, prop, prop.getFullBeanName(), e);
+      return prop.getValue(bean);
     }
   }
 

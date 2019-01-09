@@ -98,6 +98,8 @@ public final class EntityBeanIntercept implements Serializable {
 
   private Object[] origValues;
 
+  private Exception[] loadErrors;
+
   private int lazyLoadProperty = -1;
 
   private Object ownerId;
@@ -1114,5 +1116,37 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setSortOrder(int sortOrder) {
     this.sortOrder = sortOrder;
+  }
+
+  /**
+   * Set the load error that happened on this property.
+   */
+  public void setLoadError(int propertyIndex, Exception t) {
+    if (loadErrors == null) {
+      loadErrors = new Exception[owner._ebean_getPropertyNames().length];
+    }
+    loadErrors[propertyIndex] = t;
+    flags[propertyIndex] |= FLAG_LOADED_PROP;
+  }
+
+  /**
+   * Returns the loadErrors.
+   */
+  public Map<String, Exception> getLoadErrors() {
+    if (loadErrors == null) {
+      return null;
+    }
+    Map<String, Exception> ret = null;
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      Exception loadError = loadErrors[i];
+      if (loadError != null) {
+        if (ret == null) {
+          ret = new LinkedHashMap<>();
+        }
+        ret.put(getProperty(i), loadError);
+      }
+    }
+    return ret;
   }
 }
