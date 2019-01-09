@@ -235,6 +235,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private String rootTableAlias;
 
+  private String baseTable;
+
   /**
    * The node of the bean or collection that fired lazy loading. Not null if profiling is on and
    * this query is for lazy loading. Used to hook back a lazy loading query to the "original" query
@@ -764,6 +766,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.profilingListener = profilingListener;
     copy.profileLocation = profileLocation;
 
+    copy.baseTable = baseTable;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
     copy.timeout = timeout;
@@ -1081,6 +1084,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     if (disableLazyLoading) {
       sb.append(",disLazy:");
+    }
+    if (baseTable != null) {
+      sb.append(",baseTable:").append(baseTable);
     }
     if (rootTableAlias != null) {
       sb.append(",root:").append(rootTableAlias);
@@ -1856,6 +1862,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     synchronized (this) {
       this.cancelableQuery = cancelableQuery;
     }
+  }
+
+  @Override
+  public Query<T> setBaseTable(String baseTable) {
+    this.baseTable = baseTable;
+    return this;
+  }
+
+  @Override
+  public String getBaseTable() {
+    return baseTable;
   }
 
   @Override

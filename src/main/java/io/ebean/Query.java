@@ -1597,6 +1597,15 @@ public interface Query<T> {
   Query<T> alias(String alias);
 
   /**
+   * Set the base table to use for this query.
+   * <p>
+   * Typically this is used when a table has partitioning and we wish to specify a specific
+   * partition/table to query against.
+   * </p>
+   */
+  Query<T> setBaseTable(String baseTable);
+
+  /**
    * Return the type of beans being queried.
    */
   Class<T> getBeanType();

@@ -821,6 +821,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isCancelled();
 
   /**
+   * Return the base table to use if user defined on the query.
+   */
+  String getBaseTable();
+
+  /**
    * Return root table alias set by {@link #alias(String)} command.
    */
   String getAlias();
