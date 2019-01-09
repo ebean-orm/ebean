@@ -114,10 +114,10 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     beanTable = source.beanTable;
     mappedBy = source.mappedBy;
     docStoreDoc = source.docStoreDoc;
-    tableJoin = source.tableJoin;
     targetType = source.targetType;
     cascadeInfo = source.cascadeInfo;
     fetchPreference = source.fetchPreference;
+    tableJoin = source.tableJoin.withOverrideColumn(override.getDbColumn());
   }
 
   /**

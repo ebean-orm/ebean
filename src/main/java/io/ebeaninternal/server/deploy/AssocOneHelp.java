@@ -17,9 +17,16 @@ abstract class AssocOneHelp {
 
   protected final BeanDescriptor<?> target;
 
+  private final String path;
+
   AssocOneHelp(BeanPropertyAssocOne<?> property) {
+    this(property, null);
+  }
+
+  AssocOneHelp(BeanPropertyAssocOne<?> property, String embeddedPrefix) {
     this.property = property;
     this.target = property.targetDescriptor;
+    this.path = (embeddedPrefix == null) ? property.name : embeddedPrefix + "." + property.name;
   }
 
   /**
@@ -67,7 +74,7 @@ abstract class AssocOneHelp {
     boolean disableLazyLoading = ctx.isDisableLazyLoading();
     Object ref = target.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
     if (!disableLazyLoading) {
-      ctx.register(property.name, ((EntityBean) ref)._ebean_getIntercept());
+      ctx.register(path, ((EntityBean) ref)._ebean_getIntercept());
     }
     return ref;
   }

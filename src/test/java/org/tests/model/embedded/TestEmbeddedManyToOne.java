@@ -29,7 +29,12 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
 
     assertThat(val).isSameAs(nz);
 
-
     Ebean.save(perAddr);
+
+    EPerAddr found = Ebean.find(EPerAddr.class, perAddr.getId());
+
+    assertThat(found.getAddress().getCountry().getCode()).isEqualTo("NZ");
+    assertThat(found.getAddress().getCountry().getName()).startsWith("New");
+
   }
 }

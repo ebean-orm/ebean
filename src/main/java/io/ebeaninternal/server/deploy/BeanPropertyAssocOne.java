@@ -109,17 +109,19 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void initialise(BeanDescriptorInitContext initContext) {
     super.initialise(initContext);
-    initialiseAssocOne();
+    initialiseAssocOne(initContext.getEmbeddedPrefix());
     if (embedded) {
       // initialise ManyToOne importedId
+      initContext.setEmbeddedPrefix(name);
       for (BeanProperty embeddedProp : embeddedProps) {
         embeddedProp.initialise(initContext);
       }
+      initContext.setEmbeddedPrefix(null);
     }
   }
 
-  private void initialiseAssocOne() {
-    localHelp = createHelp(embedded, oneToOneExported);
+  private void initialiseAssocOne(String embeddedPrefix) {
+    localHelp = createHelp(embedded, oneToOneExported, embeddedPrefix);
 
     if (!isTransient) {
       //noinspection StatementWithEmptyBody
@@ -687,7 +689,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
-  private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported) {
+  private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported, String embeddedPrefix) {
     if (embedded) {
       return new AssocOneHelpEmbedded(this);
     } else if (oneToOneExported) {
@@ -696,7 +698,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (targetInheritInfo != null) {
         return new AssocOneHelpRefInherit(this);
       } else {
-        return new AssocOneHelpRefSimple(this);
+        return new AssocOneHelpRefSimple(this, embeddedPrefix);
       }
     }
   }
