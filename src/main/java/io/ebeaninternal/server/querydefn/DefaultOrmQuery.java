@@ -47,6 +47,7 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.expression.SimpleExpression;
@@ -79,7 +80,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private final Class<T> beanType;
 
-  private final BeanDescriptor<T> beanDescriptor;
+  private final BeanDescriptor<T> rootBeanDescriptor;
+
+  private BeanDescriptor<T> beanDescriptor;
 
   private final SpiEbeanServer server;
 
@@ -276,6 +279,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
+    this.rootBeanDescriptor = desc;
     this.beanType = desc.getBeanType();
     this.server = server;
     this.orderById = server.getServerConfig().isDefaultOrderById();
@@ -1639,6 +1643,25 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Class<T> getBeanType() {
     return beanType;
+  }
+
+  @Override
+  public Class<? extends T> getInheritType() {
+    return beanDescriptor.getBeanType();
+  }
+
+  @Override
+  public Query<T> setInheritType(Class<? extends T> type) {
+    if (type == beanType) {
+      return this;
+    }
+    InheritInfo inheritInfo = rootBeanDescriptor.getInheritInfo();
+    inheritInfo = inheritInfo == null ? null : inheritInfo.readType(type);
+    if (inheritInfo == null) {
+      throw new IllegalArgumentException("Given type " + type + " is not a subtype of " + beanType);
+    }
+    beanDescriptor = (BeanDescriptor<T>) rootBeanDescriptor.getBeanDescriptor(type);
+    return this;
   }
 
   @Override
