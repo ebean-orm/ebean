@@ -2,6 +2,10 @@ package org.tests.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+import io.ebean.text.TextException;
+
 import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.PlainBean;
 import org.ebeantest.LoggedSqlCollector;
@@ -10,6 +14,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -164,5 +169,34 @@ public class TestDbJson_List extends BaseTestCase {
 
     String asJson = Ebean.json().toJson(found);
     assertNotNull(asJson);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void find_corrupt_json() {
+
+
+    EBasicJsonList bean = new EBasicJsonList();
+
+    PlainBean plainBean = new PlainBean();
+    plainBean.setName("Blubb");
+    bean.getBeanMap().put("bla", plainBean );
+
+    Ebean.save(bean);
+
+    Ebean.update(EBasicJsonList.class)
+    .set("beanMap", "blabla")
+    .where().eq("id", bean.getId())
+    .update();
+
+
+    bean = Ebean.find(EBasicJsonList.class, bean.getId());
+    Map<String, Exception> errors = server().getBeanState(bean).getLoadErrors();
+
+    assertThat(errors).containsKey("beanMap").hasSize(1);
+    assertThat(errors.values().iterator().next())
+      .isInstanceOf(TextException.class)
+      .hasMessageContaining("blabla");
+    //assertThat(bean.getBeanMap().get("bla").getName()).isEqualTo("Blubb");
   }
 }

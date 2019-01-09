@@ -30,9 +30,15 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
+import io.ebean.plugin.LoadErrorHandler;
 import io.ebean.util.StringHelper;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -520,6 +526,10 @@ public class ServerConfig {
    * When true we do not need explicit GeneratedValue mapping.
    */
   private boolean idGeneratorAutomatic = true;
+
+  private LoadErrorHandler loadErrorHandler = (bean, prop, fullName, e) -> {
+    throw new PersistenceException("Error loading on " + fullName, e);
+  };
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -3006,6 +3016,13 @@ public class ServerConfig {
 
     String mappingsProp = p.get("mappingLocations", null);
     mappingLocations = getSearchList(mappingsProp, mappingLocations);
+
+    if (!p.getBoolean("failOnLoadError", true)) {
+      Logger logger = LoggerFactory.getLogger("io.ebean.SQL");
+      loadErrorHandler = (bean, prop, fullName, e) -> {
+        logger.error("Error loading on {}", fullName, e);
+      };
+    }
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
@@ -3263,6 +3280,20 @@ public class ServerConfig {
    */
   public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
     this.idGeneratorAutomatic = idGeneratorAutomatic;
+  }
+
+  /**
+   * Returns the load error handler.
+   */
+  public LoadErrorHandler getLoadErrorHandler() {
+    return loadErrorHandler;
+  }
+
+  /**
+   * Sets the loadErrorHandler.
+   */
+  public void setLoadErrorHandler(LoadErrorHandler loadErrorHandler) {
+    this.loadErrorHandler = loadErrorHandler;
   }
 
   /**

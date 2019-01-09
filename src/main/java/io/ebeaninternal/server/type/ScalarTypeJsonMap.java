@@ -175,7 +175,7 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
       // return a modify aware map
       return EJson.parseObject(value, true);
     } catch (IOException e) {
-      throw new TextException(e);
+      throw new TextException("Failed to parse JSON [{}] as Object", value, e);
     }
   }
 

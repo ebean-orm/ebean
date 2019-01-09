@@ -3,6 +3,7 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -145,7 +146,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
     try {
       return EJson.parseList(value, false);
     } catch (IOException e) {
-      throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
+      throw new TextException("Failed to parse JSON [{}] as List", value, e);
     }
   }
 
