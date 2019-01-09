@@ -54,6 +54,7 @@ public abstract class AnnotationParser extends AnnotationBase {
     } else {
       prop.setId();
       prop.setEmbedded();
+      info.setEmbeddedId(prop);
     }
   }
 

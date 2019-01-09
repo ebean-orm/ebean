@@ -132,6 +132,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
+      info.setEmbeddedId(prop);
     }
 
     DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
