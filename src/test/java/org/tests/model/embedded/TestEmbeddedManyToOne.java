@@ -22,6 +22,8 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
 
     BeanType<EAddr> embType = Ebean.getDefaultServer().getPluginApi().getBeanType(EAddr.class);
 
+    Ebean.getDefaultServer().getServerCacheManager().clearAll();
+
     Country nz = Ebean.getReference(Country.class, "NZ");
 
     EAddr addr = new EAddr("Foo", "Bar", nz);
