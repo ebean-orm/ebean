@@ -815,6 +815,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return pstmt;
   }
 
+  @Override
+  public void handleLoadError(String fullName, Exception e) {
+    query.handleLoadError(fullName, e);
+  }
+
   public Set<String> getDependentTables() {
     return queryPlan.getDependentTables();
   }

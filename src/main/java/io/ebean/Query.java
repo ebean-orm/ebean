@@ -373,6 +373,27 @@ public interface Query<T> {
   Query<T> setAutoTune(boolean autoTune);
 
   /**
+   * Execute the query allowing properties with invalid JSON to be collected and not fail the query.
+   * <pre>{@code
+   *
+   *   // fetch a bean with JSON content
+   *   EBasicJsonList bean= Ebean.find(EBasicJsonList.class)
+   *       .setId(42)
+   *       .setAllowLoadErrors()  // collect errors into bean state if we have invalid JSON
+   *       .findOne();
+   *
+   *
+   *   // get the invalid JSON errors from the bean state
+   *   Map<String, Exception> errors = server().getBeanState(bean).getLoadErrors();
+   *
+   *   // If this map is not empty tell we have invalid JSON
+   *   // and should try and fix the JSON content or inform the user
+   *
+   * }</pre>
+   */
+  Query<T> setAllowLoadErrors();
+
+  /**
    * Set the default lazy loading batch size to use.
    * <p>
    * When lazy loading is invoked on beans loaded by this query then this sets the
@@ -867,6 +888,32 @@ public interface Query<T> {
    * Return true if this is countDistinct query.
    */
   boolean isCountDistinct();
+
+  /**
+   * Execute the query returning true if a row is found.
+   * <p>
+   * The query is executed using max rows of 1 and will only select the id property.
+   * This method is really just a convenient way to optimise a query to perform a
+   * 'does a row exist in the db' check.
+   * </p>
+   *
+   * <h2>Example:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = query().where().eq("email", "rob@foo.com").exists();
+   *
+   * }</pre>
+   *
+   * <h2>Example using a query bean:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = new QContact().email.equalTo("rob@foo.com").exists();
+   *
+   * }</pre>
+   *
+   * @return True if the query finds a matching row in the database
+   */
+  boolean exists();
 
   /**
    * Execute the query returning either a single bean or null (if no matching
@@ -1571,9 +1618,28 @@ public interface Query<T> {
   Query<T> alias(String alias);
 
   /**
+   * Set the base table to use for this query.
+   * <p>
+   * Typically this is used when a table has partitioning and we wish to specify a specific
+   * partition/table to query against.
+   * </p>
+   */
+  Query<T> setBaseTable(String baseTable);
+
+  /**
    * Return the type of beans being queried.
    */
   Class<T> getBeanType();
+
+  /**
+   * Sets the inherit type. Must be a subtype of getBeanType
+   */
+  Query<T> setInheritType(Class<? extends T> type);
+
+  /**
+   * Returns the inherit type. This is normally the same as getBeanType() returns as long as no other type is set.
+   */
+  Class<? extends T> getInheritType();
 
   /**
    * Return the type of query being executed.

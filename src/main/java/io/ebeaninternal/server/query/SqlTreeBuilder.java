@@ -312,7 +312,12 @@ public final class SqlTreeBuilder {
       // Optional many property for lazy loading query
       STreePropertyAssocMany lazyLoadMany = (query == null) ? null : query.getLazyLoadMany();
       boolean withId = !rawNoId && !subQuery && (query == null || query.isWithId());
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct);
+
+      String baseTable = (query == null) ? null : query.getBaseTable();
+      if (baseTable == null) {
+        baseTable = desc.getBaseTable(temporalMode);
+      }
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
       return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, temporalMode, disableLazyLoad);
@@ -497,9 +502,9 @@ public final class SqlTreeBuilder {
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
       if (queryProps != null
-          && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
-          && propertyAssocOne.hasForeignKey()
-          && !propertyAssocOne.isFormula()) {
+        && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+        && propertyAssocOne.hasForeignKey()
+        && !propertyAssocOne.isFormula()) {
         // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {

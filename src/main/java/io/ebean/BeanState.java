@@ -3,6 +3,8 @@ package io.ebean;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 /**
  * Provides access to the internal state of an entity bean.
  */
@@ -111,4 +113,10 @@ public interface BeanState {
    * Reset the bean putting it into NEW state such that a save() results in an insert.
    */
   void resetForInsert();
+
+  /**
+   * Returns a map with load erros.
+   */
+  @Nullable
+  Map<String, Exception> getLoadErrors();
 }
