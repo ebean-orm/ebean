@@ -55,7 +55,10 @@ public class DeleteOnShutdownTempFileProvider implements TempFileProvider {
   public void shutdown() {
     synchronized (tempFiles) {
       for (String path : tempFiles) {
-        if (new File(path).delete()) {
+        File file = new File(path);
+        if (!file.exists()) {
+          logger.trace("already deleted by application {}", path);
+        } else if (file.delete()) {
           logger.trace("deleted {}", path);
         } else {
           logger.warn("could not delete {}", path);
