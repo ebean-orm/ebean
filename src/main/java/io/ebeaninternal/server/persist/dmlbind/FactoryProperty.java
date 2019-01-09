@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.persist.dml.DmlMode;
 
 /**
@@ -14,14 +15,14 @@ public class FactoryProperty {
 
   private final boolean bindEncryptDataFirst;
 
-  public FactoryProperty(boolean bindEncryptDataFirst) {
+  FactoryProperty(boolean bindEncryptDataFirst) {
     this.bindEncryptDataFirst = bindEncryptDataFirst;
   }
 
   /**
    * Create a Bindable for the property given the mode and withLobs flag.
    */
-  public Bindable create(BeanProperty prop, DmlMode mode, boolean withLobs) {
+  public Bindable create(BeanProperty prop, DmlMode mode, boolean withLobs, boolean allowManyToOne) {
 
     if (DmlMode.INSERT == mode && !prop.isDbInsertable()) {
       return null;
@@ -30,15 +31,18 @@ public class FactoryProperty {
       return null;
     }
 
-    if (prop.isLob()) {
-      if (!withLobs) {
-        // Lob exclusion
-        return null;
-      } else {
-        return prop.isDbEncrypted() ? new BindableEncryptedProperty(prop, bindEncryptDataFirst) : new BindableProperty(prop);
-      }
+    if (prop.isLob() && !withLobs) {
+      // Lob exclusion
+      return null;
+    }
+    if (prop.isDbEncrypted()){
+      return new BindableEncryptedProperty(prop, bindEncryptDataFirst);
     }
 
-    return prop.isDbEncrypted() ? new BindableEncryptedProperty(prop, bindEncryptDataFirst) : new BindableProperty(prop);
+    if (allowManyToOne && prop instanceof BeanPropertyAssocOne) {
+      return  new BindableAssocOne((BeanPropertyAssocOne<?>)prop);
+    }
+
+    return new BindableProperty(prop);
   }
 }
