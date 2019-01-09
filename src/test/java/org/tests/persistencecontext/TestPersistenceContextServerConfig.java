@@ -32,10 +32,10 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
 
   static EbeanServer create() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
 
     ServerConfig config = new ServerConfig();
     config.setName("withPCQuery");
+    config.setDdlExtra(false);
 
     Properties properties = new Properties();
     properties.setProperty("datasource.withPCQuery.username", "sa");

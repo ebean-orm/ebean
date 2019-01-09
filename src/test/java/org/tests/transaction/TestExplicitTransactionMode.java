@@ -42,8 +42,6 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     assertTrue(connection.getAutoCommit());
     connection.close();
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
     config.setName("h2autocommit2");
     config.loadFromProperties();
@@ -56,10 +54,9 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     config.addClass(UTDetail.class);
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
 
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
-
-    System.clearProperty("ebean.ignoreExtraDdl");
 
     Query<UTMaster> query = ebeanServer.find(UTMaster.class);
     List<UTMaster> details = query.findList();
