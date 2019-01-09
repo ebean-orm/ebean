@@ -373,6 +373,27 @@ public interface Query<T> {
   Query<T> setAutoTune(boolean autoTune);
 
   /**
+   * Execute the query allowing properties with invalid JSON to be collected and not fail the query.
+   * <pre>{@code
+   *
+   *   // fetch a bean with JSON content
+   *   EBasicJsonList bean= Ebean.find(EBasicJsonList.class)
+   *       .setId(42)
+   *       .setAllowLoadErrors()  // collect errors into bean state if we have invalid JSON
+   *       .findOne();
+   *
+   *
+   *   // get the invalid JSON errors from the bean state
+   *   Map<String, Exception> errors = server().getBeanState(bean).getLoadErrors();
+   *
+   *   // If this map is not empty tell we have invalid JSON
+   *   // and should try and fix the JSON content or inform the user
+   *
+   * }</pre>
+   */
+  Query<T> setAllowLoadErrors();
+
+  /**
    * Set the default lazy loading batch size to use.
    * <p>
    * When lazy loading is invoked on beans loaded by this query then this sets the

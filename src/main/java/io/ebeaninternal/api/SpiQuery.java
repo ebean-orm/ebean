@@ -8,7 +8,6 @@ import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.bean.CallStack;
-import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
@@ -16,7 +15,6 @@ import io.ebean.plugin.BeanType;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.query.CancelableQuery;
@@ -855,5 +853,5 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Handles load errors.
    */
-  void handleLoadError(EntityBean bean, BeanProperty prop, String fullName, Exception e);
+  void handleLoadError(String fullName, Exception e);
 }

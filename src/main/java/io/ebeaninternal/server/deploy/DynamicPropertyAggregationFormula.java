@@ -52,9 +52,8 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
     Object value;
     try {
       value = scalarType.read(sqlBeanLoad.ctx().getDataReader());
-
     } catch (Exception e) {
-      sqlBeanLoad.ctx().handleLoadError(null, asTarget, fullName, e);
+      sqlBeanLoad.ctx().handleLoadError(fullName, e);
       return;
     }
     if (asTarget != null) {
