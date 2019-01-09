@@ -93,10 +93,29 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  /**
+   * Copy constructor for ManyToOne inside Embeddable.
+   */
+  public BeanPropertyAssocOne(BeanPropertyAssocOne source, BeanPropertyOverride override) {
+    super(source, override);
+    primaryKeyExport = source.primaryKeyExport;
+    oneToOne = source.oneToOne;
+    oneToOneExported = source.oneToOneExported;
+    orphanRemoval = source.orphanRemoval;
+    embeddedProps = null;
+    embeddedPropsMap = null;
+  }
+
   @Override
   public void initialise(BeanDescriptorInitContext initContext) {
     super.initialise(initContext);
     initialiseAssocOne();
+    if (embedded) {
+      // initialise ManyToOne importedId
+      for (BeanProperty embeddedProp : embeddedProps) {
+        embeddedProp.initialise(initContext);
+      }
+    }
   }
 
   private void initialiseAssocOne() {

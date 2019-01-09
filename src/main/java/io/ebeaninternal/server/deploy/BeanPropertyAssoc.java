@@ -105,6 +105,22 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   /**
+   * Copy constructor for ManyToOne inside Embeddable.
+   */
+  public BeanPropertyAssoc(BeanPropertyAssoc source, BeanPropertyOverride override) {
+    super(source, override);
+    foreignKey = source.foreignKey;
+    extraWhere = source.extraWhere;
+    beanTable = source.beanTable;
+    mappedBy = source.mappedBy;
+    docStoreDoc = source.docStoreDoc;
+    tableJoin = source.tableJoin;
+    targetType = source.targetType;
+    cascadeInfo = source.cascadeInfo;
+    fetchPreference = source.fetchPreference;
+  }
+
+  /**
    * Initialise post construction.
    */
   @Override
