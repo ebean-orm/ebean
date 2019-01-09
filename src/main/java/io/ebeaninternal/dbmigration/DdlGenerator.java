@@ -169,19 +169,10 @@ public class DdlGenerator {
   }
 
   protected void runDropSql(Connection connection) throws IOException {
-<<<<<<< HEAD
     if (extraDdl && jaxbPresent) {
       String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
       if (extraApply != null) {
         runScript(connection, false, extraApply, "extra-ddl");
-=======
-    if (!createOnly) {
-      if (extraDdl && jaxbPresent) {
-        String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
-        if (extraApply != null) {
-          runScript(connection, false, extraApply, "extra-ddl");
-        }
->>>>>>> ebean/master
       }
     }
 
