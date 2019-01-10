@@ -897,17 +897,22 @@ public interface Query<T> {
    * 'does a row exist in the db' check.
    * </p>
    *
-   * <h2>Example:</h2>
-   * <pre>{@code
-   *
-   *   boolean userExists = query().where().eq("email", "rob@foo.com").exists();
-   *
-   * }</pre>
-   *
    * <h2>Example using a query bean:</h2>
    * <pre>{@code
    *
-   *   boolean userExists = new QContact().email.equalTo("rob@foo.com").exists();
+   *   boolean userExists =
+   *     new QContact()
+   *       .email.equalTo("rob@foo.com")
+   *       .exists();
+   *
+   * }</pre>
+   *
+   * <h2>Example:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = query()
+   *     .where().eq("email", "rob@foo.com")
+   *     .exists();
    *
    * }</pre>
    *
@@ -1623,6 +1628,14 @@ public interface Query<T> {
    * Typically this is used when a table has partitioning and we wish to specify a specific
    * partition/table to query against.
    * </p>
+   * <pre>{@code
+   *
+   *   QOrder()
+   *   .setBaseTable("order_2019_05")
+   *   .status.equalTo(Status.NEW)
+   *   .findList();
+   *
+   * }</pre>
    */
   Query<T> setBaseTable(String baseTable);
 
