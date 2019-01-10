@@ -1632,7 +1632,19 @@ public interface Query<T> {
   Class<T> getBeanType();
 
   /**
-   * Sets the inherit type. Must be a subtype of getBeanType
+   * Restrict the query to only return subtypes of the given inherit type.
+   *
+   * <pre>{@code
+   *
+   *   List<Animal> animals =
+   *     new QAnimal()
+   *       .name.startsWith("Fluffy")
+   *       .setInheritType(Cat.class)
+   *       .findList();
+   *
+   * }</pre>
+   *
+   * @param type An inheritance subtype of the
    */
   Query<T> setInheritType(Class<? extends T> type);
 
