@@ -244,8 +244,7 @@ public interface Transaction extends AutoCloseable {
    *
    *   // assume Customer has L2 bean caching enabled ...
    *
-   *   Transaction transaction = Ebean.beginTransaction();
-   *   try {
+   *   try (Transaction transaction = ebeanServer.beginTransaction()) {
    *
    *     // this uses L2 bean cache as the transaction
    *     // ... is considered "query only" at this point
@@ -253,7 +252,7 @@ public interface Transaction extends AutoCloseable {
    *
    *     // transaction no longer "query only" once
    *     // ... a bean has been saved etc
-   *     Ebean.save(someBean);
+   *     someBean.save();
    *
    *     // will NOT use L2 bean cache as the transaction
    *     // ... is no longer considered "query only"
@@ -273,8 +272,7 @@ public interface Transaction extends AutoCloseable {
    *     Customer.find.byId(99); // skips l2 bean cache
    *
    *
-   *   } finally {
-   *     transaction.end();
+   *     transaction.commit();
    *   }
    *
    * }</pre>
@@ -338,20 +336,17 @@ public interface Transaction extends AutoCloseable {
    * // inserts into a table called sp_test
    * cs.addModification("sp_test", true, false, false);
    *
-   * Transaction txn = ebeanServer.beginTransaction();
-   * txn.setBatchMode(true);
-   * txn.setBatchSize(3);
-   * try {
+   * try (Transaction txn = ebeanServer.beginTransaction()) {
+   *   txn.setBatchMode(true);
+   *   txn.setBatchSize(3);
+   *
    *   for (int i = 0; i < da.length;) {
    *     cs.setParameter(1, da[i]);
    *     ebeanServer.execute(cs);
    *   }
    *
-   *   // NB: commit implicitly flushes
+   *   // Note: commit implicitly flushes
    *   txn.commit();
-   *
-   * } finally {
-   *   txn.end();
    * }
    *
    * }</pre>

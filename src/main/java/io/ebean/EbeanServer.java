@@ -570,7 +570,7 @@ public interface EbeanServer {
    *       txn.setBatchGetGeneratedKeys(false);
    *
    *       // explicitly flush the JDBC batch buffer
-   *       txn.flushBatch();
+   *       txn.flush();
    *
    *       ...
    *
@@ -688,8 +688,6 @@ public interface EbeanServer {
    *   }
    *
    * }</pre>
-   * <p>
-   * </p>
    */
   void endTransaction();
 
@@ -963,7 +961,7 @@ public interface EbeanServer {
    * updateSql.getRowCount().
    * <p>
    * If you wish to execute a Sql Select natively then you should use the
-   * FindByNativeSql object.
+   * SqlQuery object or DtoQuery.
    * </p>
    * <p>
    * Note that the table modification information is automatically deduced and
@@ -1330,9 +1328,8 @@ public interface EbeanServer {
    *        u1.setName("u1 mod");
    *        u2.setName("u2 mod");
    *
-   *        ebeanServer.save(u1);
-   *        ebeanServer.save(u2);
-   *
+   *        u1.save();
+   *        u2.save();
    *    });
    *
    * }</pre>
