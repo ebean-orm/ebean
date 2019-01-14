@@ -327,14 +327,16 @@ public final class BatchControl {
       return maxDepth + 1;
     }
 
+    int parentMaxDepth = -1;
+
     for (BeanPropertyAssocOne<?> parent : imported) {
       BatchedBeanHolder parentBatch = beanHoldMap.get(parent.getTargetDescriptor().rootName());
       if (parentBatch != null) {
         // deeper that the parent
-        return parentBatch.getOrder() + 1;
+        parentMaxDepth = Math.max(parentMaxDepth, parentBatch.getOrder() + 1);
       }
     }
-    return -1;
+    return parentMaxDepth;
   }
 
   /**
