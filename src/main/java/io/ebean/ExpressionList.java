@@ -316,7 +316,7 @@ public interface ExpressionList<T> {
 
   /**
    * Execute the query returning a list of values for a single property.
-   * <p>
+   *
    * <h3>Example 1:</h3>
    * <pre>{@code
    *
@@ -327,7 +327,7 @@ public interface ExpressionList<T> {
    *      .findSingleAttributeList();
    *
    * }</pre>
-   * <p>
+   *
    * <h3>Example 2:</h3>
    * <pre>{@code
    *
@@ -349,7 +349,6 @@ public interface ExpressionList<T> {
 
   /**
    * Execute a query returning a single value of a single property/column.
-   * <p>
    * <pre>{@code
    *
    *  String name =
@@ -434,7 +433,6 @@ public interface ExpressionList<T> {
    * If maxRows is not set on the query prior to calling findPagedList() then a
    * PersistenceException is thrown.
    * </p>
-   * <p>
    * <pre>{@code
    *
    *  PagedList<Order> pagedList = Ebean.find(Order.class)
@@ -573,7 +571,6 @@ public interface ExpressionList<T> {
 
   /**
    * Extended version for setDistinct in conjunction with "findSingleAttributeList";
-   * <p>
    * <pre>{@code
    *
    *  List<CountedValue<Order.Status>> orderStatusCount =
@@ -683,7 +680,6 @@ public interface ExpressionList<T> {
 
   /**
    * Equal to expression for the value at the given path in the JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonEqualTo("content", "path.other", 34)
@@ -698,7 +694,6 @@ public interface ExpressionList<T> {
 
   /**
    * Not Equal to - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonNotEqualTo("content", "path.other", 34)
@@ -713,7 +708,6 @@ public interface ExpressionList<T> {
 
   /**
    * Greater than - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonGreaterThan("content", "path.other", 34)
@@ -724,7 +718,6 @@ public interface ExpressionList<T> {
 
   /**
    * Greater than or equal to - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonGreaterOrEqual("content", "path.other", 34)
@@ -735,7 +728,6 @@ public interface ExpressionList<T> {
 
   /**
    * Less than - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonLessThan("content", "path.other", 34)
@@ -746,7 +738,6 @@ public interface ExpressionList<T> {
 
   /**
    * Less than or equal to - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonLessOrEqualTo("content", "path.other", 34)
@@ -757,7 +748,6 @@ public interface ExpressionList<T> {
 
   /**
    * Between - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonBetween("content", "orderDate", lowerDateTime, upperDateTime)
@@ -771,7 +761,6 @@ public interface ExpressionList<T> {
    * <p>
    * This returns the list so that add() can be chained.
    * </p>
-   * <p>
    * <pre>{@code
    *
    * Query<Customer> query = Ebean.find(Customer.class);
@@ -868,7 +857,6 @@ public interface ExpressionList<T> {
    * To get control over the options you can create an ExampleExpression and set
    * those options such as case insensitive etc.
    * </p>
-   * <p>
    * <pre>{@code
    *
    * // create an example bean and set the properties
@@ -877,7 +865,7 @@ public interface ExpressionList<T> {
    * example.setName("Rob%");
    * example.setNotes("%something%");
    *
-   * List&lt;Customer&gt; list = Ebean.find(Customer.class).where()
+   * List<Customer> list = Ebean.find(Customer.class).where()
    *     // pass the bean into the where() clause
    *     .exampleLike(example)
    *     // you can add other expressions to the same query
@@ -886,7 +874,7 @@ public interface ExpressionList<T> {
    * }</pre>
    * <p>
    * Similarly you can create an ExampleExpression
-   * <p>
+   * </p>
    * <pre>{@code
    *
    * Customer example = new Customer();
@@ -1108,7 +1096,6 @@ public interface ExpressionList<T> {
 
   /**
    * Add expression for ALL of the given bit flags to be set.
-   * <p>
    * <pre>{@code
    *
    * where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
@@ -1122,7 +1109,6 @@ public interface ExpressionList<T> {
 
   /**
    * Add expression for the given bit flags to be NOT set.
-   * <p>
    * <pre>{@code
    *
    * where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
@@ -1173,6 +1159,13 @@ public interface ExpressionList<T> {
    *   raw("add_days(orderDate, 10) < ?", someDate)
    *
    * }</pre>
+   *
+   * <h4>Subquery example:</h4>
+   * <pre>{@code
+   *
+   *   .raw("t0.customer_id in (select customer_id from customer_group where group_id = any(?::uuid[]))", groupIds)
+   *
+   * }</pre>
    */
   ExpressionList<T> raw(String raw, Object value);
 
@@ -1197,10 +1190,16 @@ public interface ExpressionList<T> {
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
-   * <p>
    * <pre>{@code
    *
    *   raw("orderQty < shipQty")
+   *
+   * }</pre>
+   *
+   * <h4>Subquery example:</h4>
+   * <pre>{@code
+   *
+   *   .raw("t0.customer_id in (select customer_id from customer_group where group_id = any(?::uuid[]))", groupIds)
    *
    * }</pre>
    */
@@ -1276,12 +1275,10 @@ public interface ExpressionList<T> {
    * typically you only explicitly need to use the and() junction
    * when it is nested inside an or() or not() junction.
    * </p>
-   * <p>
    * <pre>{@code
    *
    *  // Example: Nested and()
    *
-   *  Ebean.find(Customer.class)
    *    .where()
    *    .or()
    *      .and() // nested and
@@ -1302,16 +1299,27 @@ public interface ExpressionList<T> {
    * Return a list of expressions that will be joined by OR's.
    * This is exactly the same as disjunction();
    * <p>
-   * <p>
    * Use endOr() or endJunction() to end the OR junction.
    * </p>
-   * <p>
+   *
+   * <pre>{@code
+   *
+   *  // Example: (status active OR anniversary is null)
+   *
+   *    .where()
+   *    .or()
+   *      .eq("status", Customer.Status.ACTIVE)
+   *      .isNull("anniversary")
+   *    .orderBy().asc("name")
+   *    .findList();
+   *
+   * }</pre>
+   *
    * <pre>{@code
    *
    *  // Example: Use or() to join
    *  // two nested and() expressions
    *
-   *  Ebean.find(Customer.class)
    *    .where()
    *    .or()
    *      .and()
@@ -1335,8 +1343,8 @@ public interface ExpressionList<T> {
    * Use endNot() or endJunction() to end expressions being added to the
    * NOT expression list.
    * </p>
-   * <p>
-   * <pre>@{code
+   *
+   * <pre>{@code
    *
    *    .where()
    *      .not()
@@ -1345,12 +1353,11 @@ public interface ExpressionList<T> {
    *        .endNot()
    *
    * }</pre>
-   * <p>
-   * <pre>@{code
+   *
+   * <pre>{@code
    *
    * // Example: nested not()
    *
-   * Ebean.find(Customer.class)
    *   .where()
    *     .eq("status", Customer.Status.ACTIVE)
    *     .not()
