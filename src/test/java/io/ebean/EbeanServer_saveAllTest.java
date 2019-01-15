@@ -58,8 +58,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     EbeanServer server = Ebean.getDefaultServer();
 
-    Transaction transaction = server.beginTransaction();
-    try {
+    try (Transaction transaction = server.beginTransaction()) {
       transaction.setBatchMode(true);
       LoggedSqlCollector.start();
 
@@ -86,9 +85,6 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
       // and we have our SQL from jdbc batch flush
       assertThat(LoggedSqlCollector.stop()).isNotEmpty();
-
-    } finally {
-      transaction.end();
     }
 
   }
@@ -121,12 +117,9 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    Transaction txn = server.beginTransaction();
-    try {
+    try (Transaction txn = server.beginTransaction()) {
       server.saveAll(someBeans, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
 
     // assert
@@ -142,12 +135,10 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    txn = server.beginTransaction();
-    try {
+
+    try (Transaction txn = server.beginTransaction()) {
       server.updateAll(someBeans, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
     loggedSql = LoggedSqlCollector.stop();
     for (String updateSql : loggedSql) {
@@ -157,18 +148,14 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    txn = server.beginTransaction();
-    try {
+    try (Transaction txn = server.beginTransaction()) {
       server.deleteAll(someBeans, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
     loggedSql = LoggedSqlCollector.stop();
     for (String updateSql : loggedSql) {
       assertThat(updateSql).contains("delete from e_basicver where id=? ");
     }
-
   }
 
 
