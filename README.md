@@ -1,8 +1,11 @@
+[![Build Status](https://travis-ci.org/ebean-orm/ebean.svg?branch=master)](https://travis-ci.org/ebean-orm/ebean)
+[![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
+
 # Need help?
 Post questions or issues to the Ebean google group - https://groups.google.com/forum/#!forum/ebean
 
 # Documentation
-Goto [https://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Website")
+Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 
 ## Maven cental links:
@@ -10,8 +13,7 @@ Goto [https://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Web
 
 [Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")
 
-## Current versions
-* [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean) - ebean
+## Other versions
 * [![Maven Central : ebean-agent](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent) - ebean-agent
 * [![Maven Central : ebean-maven-plugin](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin) - ebean-maven-plugin
 
