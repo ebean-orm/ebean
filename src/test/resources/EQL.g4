@@ -109,6 +109,7 @@ conditional_primary
 any_expression
    : comparison_expression
    | like_expression
+   | inrange_expression
    | between_expression
    | propertyBetween_expression
    | in_expression
@@ -130,6 +131,10 @@ in_value
 
 between_expression
    : PATH_VARIABLE 'between' value_expression 'and' value_expression
+   ;
+
+inrange_expression
+   : PATH_VARIABLE 'inrange' value_expression 'to' value_expression
    ;
 
 propertyBetween_expression
@@ -181,7 +186,7 @@ comparison_operator
    | '<'  | 'lt'
    | '<=' | 'le' | 'lte'
    | '<>' | '!=' | 'ne'
-   | 'ieq' 
+   | 'ieq'
    | 'ine'
    ;
 

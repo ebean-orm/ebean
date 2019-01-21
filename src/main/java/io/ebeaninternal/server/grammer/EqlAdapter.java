@@ -192,6 +192,17 @@ class EqlAdapter<T> extends EQLBaseListener {
   }
 
   @Override
+  public void enterInrange_expression(EQLParser.Inrange_expressionContext ctx) {
+    checkChildren(ctx, 5);
+    String path = getLeftHandSidePath(ctx);
+    EqlOperator op = getOperator(ctx);
+    if (op != EqlOperator.INRANGE) {
+      throw new IllegalStateException("Expecting INRANGE operator but got " + op);
+    }
+    helper.addInRange(path, child(ctx, 2), child(ctx, 4));
+  }
+
+  @Override
   public void enterBetween_expression(EQLParser.Between_expressionContext ctx) {
 
     checkChildren(ctx, 5);

@@ -275,6 +275,26 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  public void where_inrange() {
+
+    Query<Customer> query = parse("where name inrange 'As' to 'B'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name >= ? and t0.name < ?) ");
+  }
+
+  @Test
+  public void where_inrange_withNamedParams() {
+
+    Query<Customer> query = parse("where name inrange :one to :two");
+    query.setParameter("one", "a");
+    query.setParameter("two", "b");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name >= ? and t0.name < ?)");
+  }
+
+  @Test
   public void where_between() {
 
     Query<Customer> query = parse("where name between 'As' and 'B'");
