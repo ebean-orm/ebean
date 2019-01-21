@@ -795,6 +795,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
+    add(expr.inRange(propertyName, value1, value2));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> between(String propertyName, Object value1, Object value2) {
     add(expr.between(propertyName, value1, value2));
     return this;

@@ -217,8 +217,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Between - property between the two given values.
    */
   @Override
-  public Expression between(String propertyName, Object value1, Object value2) {
+  public Expression inRange(String propertyName, Object value1, Object value2) {
+    return new InRangeExpression(propertyName, value1, value2);
+  }
 
+  /**
+   * Between - property between the two given values.
+   */
+  @Override
+  public Expression between(String propertyName, Object value1, Object value2) {
     return new BetweenExpression(propertyName, value1, value2);
   }
 
@@ -227,7 +234,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression betweenProperties(String lowProperty, String highProperty, Object value) {
-
     return new BetweenPropertyExpression(lowProperty, highProperty, value);
   }
 
@@ -236,7 +242,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression gt(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.GT, value);
   }
 
@@ -246,7 +251,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression ge(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.GT_EQ, value);
   }
 
@@ -255,7 +259,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression lt(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.LT, value);
   }
 
@@ -264,7 +267,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression le(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.LT_EQ, value);
   }
 
@@ -273,7 +275,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression isNull(String propertyName) {
-
     return new NullExpression(propertyName, false);
   }
 
@@ -282,7 +283,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression isNotNull(String propertyName) {
-
     return new NullExpression(propertyName, true);
   }
 

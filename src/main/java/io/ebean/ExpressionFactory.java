@@ -150,6 +150,14 @@ public interface ExpressionFactory {
   Expression ineObject(String propertyName, Object value);
 
   /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  Expression inRange(String propertyName, Object value1, Object value2);
+
+  /**
    * Between - property between the two given values.
    */
   Expression between(String propertyName, Object value1, Object value2);

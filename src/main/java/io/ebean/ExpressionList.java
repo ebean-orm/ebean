@@ -803,8 +803,16 @@ public interface ExpressionList<T> {
   ExpressionList<T> ine(String propertyName, String value);
 
   /**
-   * Between - property between the two given values.
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
    */
+  ExpressionList<T> inRange(String propertyName, Object value1, Object value2);
+
+    /**
+     * Between - property between the two given values.
+     */
   ExpressionList<T> between(String propertyName, Object value1, Object value2);
 
   /**

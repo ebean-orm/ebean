@@ -281,6 +281,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
+    return exprList.inRange(propertyName, value1, value2);
+  }
+
+  @Override
   public ExpressionList<T> between(String propertyName, Object value1, Object value2) {
     return exprList.between(propertyName, value1, value2);
   }

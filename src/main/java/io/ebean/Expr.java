@@ -65,6 +65,17 @@ public class Expr {
   }
 
   /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  public static Expression inRange(String propertyName, Object value1, Object value2) {
+
+    return Ebean.getExpressionFactory().inRange(propertyName, value1, value2);
+  }
+
+  /**
    * Between - property between the two given values.
    */
   public static Expression between(String propertyName, Object value1, Object value2) {
