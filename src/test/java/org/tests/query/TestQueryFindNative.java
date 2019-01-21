@@ -3,6 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
+import org.assertj.core.util.Lists;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
@@ -15,6 +16,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryFindNative extends BaseTestCase {
 
+  @Test
+  public void test_in_bindCount() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    String sql = "select id,first_name from contact where id in(:ids)";
+    Ebean.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2, 3)).findList();
+    Ebean.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2)).findList();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(2);
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("(?,?,?)");
+      assertThat(loggedSql.get(1)).contains("(?,?)");
+    }
+  }
 
   @Test
   public void findCount() {
