@@ -18,7 +18,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanCollectionHelp;
 import io.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -236,7 +235,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
-  private BeanCollectionHelp<T> createHelp(OrmQueryRequest<T> request) {
+  private CQueryCollectionAdd<T> createHelp(OrmQueryRequest<T> request) {
     if (request.isFindById()) {
       return null;
     } else {

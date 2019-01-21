@@ -2,10 +2,11 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.Map;
 
@@ -34,6 +35,20 @@ public class TestQueryFindMapTypedKey extends BaseTestCase {
       .findMap();
 
     assertNotNull(map);
+  }
+
+  @Test
+  public void test_manyToOneId() {
+
+    ResetBasicData.reset();
+
+    Map<Object, Order> orderMap = Ebean.find(Order.class)
+      .where().eq("status", Order.Status.NEW)
+      .setMapKey("customer.id")
+      .findMap();
+
+    assertThat(orderMap).isNotEmpty();
+    assertThat(orderMap.keySet()).contains(1, 2);
 
   }
 }

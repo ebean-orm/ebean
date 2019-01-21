@@ -25,16 +25,6 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   private final BeanProperty beanProperty;
 
   /**
-   * When created for a given query that will return a map.
-   */
-  BeanMapHelp(BeanDescriptor<T> targetDescriptor, String mapKey) {
-    this.targetDescriptor = targetDescriptor;
-    this.beanProperty = targetDescriptor.getBeanProperty(mapKey);
-    this.many = null;
-    this.propertyName = null;
-  }
-
-  /**
    * When help is attached to a specific many property.
    */
   BeanMapHelp(BeanPropertyAssocMany<T> many) {
