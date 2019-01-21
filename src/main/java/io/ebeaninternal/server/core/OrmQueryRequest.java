@@ -118,7 +118,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   @Override
   public boolean isDeleteByStatement() {
-    return beanDescriptor.isDeleteByStatement();
+    return !transaction.isPersistCascade() || beanDescriptor.isDeleteByStatement();
   }
 
   @Override

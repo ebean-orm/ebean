@@ -4,16 +4,16 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
+import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.BBookmarkUser;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -124,6 +124,23 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     // and note this is the easiest option
     Ebean.delete(Contact.class, 7000);
+  }
+
+  @Test
+  public void queryDelete_withTransactionNoCascade() {
+
+    LoggedSqlCollector.start();
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setPersistCascade(false);
+
+      Ebean.find(Contact.class).where().eq("id", 7001).delete();
+
+      transaction.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("delete from contact where id = ?");
   }
 
   @Test
