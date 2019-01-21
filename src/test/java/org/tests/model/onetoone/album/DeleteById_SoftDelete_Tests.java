@@ -61,7 +61,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update cover set deleted=? where id=?; --bind(false");
+    assertThat(sql.get(0)).contains("update cover set deleted=? where id=?; -- bind(false");
 
     Cover findAgain = Ebean.find(Cover.class, cover.getId());
     assertNotNull(findAgain);
@@ -215,7 +215,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     Ebean.deleteAll(beans);
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
       assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
     }
@@ -236,7 +236,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     server.deleteAll(beans);
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
       assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
     }
@@ -263,7 +263,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
       assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
     }
@@ -284,7 +284,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     server.deleteAllPermanent(beans);
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("delete from cover where id=?");
   }
 
@@ -306,7 +306,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("delete from cover where id=?");
   }
 

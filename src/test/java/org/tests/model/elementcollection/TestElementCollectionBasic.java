@@ -114,7 +114,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(1);
+    assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("update ec_person");
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
@@ -160,10 +160,10 @@ public class TestElementCollectionBasic extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertThat(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
-    assertThat(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
-    assertThat(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    assertThat(sql.get(2)).contains("delete from ec_person_phone where owner_id=?");
+    assertThat(sql.get(3)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
 

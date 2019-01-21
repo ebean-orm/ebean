@@ -24,6 +24,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 
   private static final int[] GENERATED_KEY_COLUMNS = new int[]{1};
+  private static final int BATCHED_FIRST = 1;
+  private static final int BATCHED = 2;
 
   /**
    * The originating request.
@@ -48,6 +50,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   protected BatchedPstmt batchedPstmt;
 
   protected String sql;
+
+  private short batchedStatus;
 
   protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
     this.now = System.currentTimeMillis();
@@ -150,8 +154,20 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   protected void logSql(String sql) {
     if (logLevelSql) {
-      sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
-      transaction.logSql(sql);
+      switch (batchedStatus) {
+        case BATCHED_FIRST: {
+          transaction.logSql(sql);
+          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          return;
+        }
+        case BATCHED: {
+          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          return;
+        }
+        default: {
+          transaction.logSql(Str.add(sql, "; -- bind(", bindLog.toString(), ")"));
+        }
+      }
     }
   }
 
@@ -250,9 +266,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
     batchedPstmt = batch.getBatchedPstmt(sql, request);
     if (batchedPstmt != null) {
+      batchedStatus = BATCHED;
       return batchedPstmt.getStatement();
     }
 
+    batchedStatus = BATCHED_FIRST;
     PreparedStatement stmt = getPstmt(t, sql, genKeys);
 
     batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);

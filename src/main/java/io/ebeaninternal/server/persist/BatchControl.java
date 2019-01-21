@@ -267,8 +267,8 @@ public final class BatchControl {
       if (transaction.isLogSummary()) {
         transaction.logSummary("BatchControl flush " + Arrays.toString(bsArray));
       }
-      for (BatchedBeanHolder aBsArray : bsArray) {
-        aBsArray.executeNow();
+      for (BatchedBeanHolder beanHolder : bsArray) {
+        beanHolder.executeNow();
       }
 
       if (resetTop) {

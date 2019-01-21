@@ -23,10 +23,9 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
-    for (String insertSql : loggedSql) {
-      assertThat(insertSql).contains("insert into e_basicver (");
-      assertThat(insertSql).contains("name, description, other, last_update) values (");
-    }
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
+    assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
 
     for (EBasicVer someBean : someBeans) {
       someBean.setName(someBean.getName() + "-mod");
@@ -37,20 +36,17 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     Ebean.updateAll(someBeans);
 
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("update e_basicver set name=?, last_update=? where id=? ");
-    }
 
+    assertThat(loggedSql).hasSize(3);
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, last_update=? where id=? ");
 
     // act
     LoggedSqlCollector.start();
     Ebean.deleteAll(someBeans);
 
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("delete from e_basicver where id=? ");
-    }
-
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
 
   @Test
@@ -124,10 +120,9 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
-    for (String insertSql : loggedSql) {
-      assertThat(insertSql).contains("insert into e_basicver (");
-      assertThat(insertSql).contains("name, description, other, last_update) values (");
-    }
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
+    assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
 
     for (EBasicVer someBean : someBeans) {
       someBean.setName(someBean.getName() + "-mod");
@@ -141,10 +136,8 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
       txn.commit();
     }
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("update e_basicver set name=?, last_update=? where id=? ");
-    }
-
+    assertThat(loggedSql).hasSize(3);
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, last_update=? where id=? ");
 
     // act
     LoggedSqlCollector.start();
@@ -153,9 +146,8 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
       txn.commit();
     }
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("delete from e_basicver where id=? ");
-    }
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
 
 

@@ -279,11 +279,9 @@ public class TestMergeCustomer extends BaseTestCase {
     assertThat(sql.get(5)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
     if (isPersistBatchOnCascade()) {
       assertThat(sql.get(6)).contains("insert into mcontact");
-      assertThat(sql.get(7)).contains("insert into mcontact");
-      assertThat(sql.get(8)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
-      assertThat(sql.get(11)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
-    }
-    else {
+      assertThat(sql.get(7)).contains("-- bind(");
+      assertThat(sql.get(9)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
+    } else {
       assertThat(sql.get(6)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
       assertThat(sql.get(7)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
       assertThat(sql.get(10)).contains("insert into mcontact");
@@ -327,14 +325,12 @@ public class TestMergeCustomer extends BaseTestCase {
 
     if (isPersistBatchOnCascade()) {
       assertThat(sql.get(8)).contains("insert into mcontact");
-      assertThat(sql.get(9)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
-  
-      assertThat(sql.get(13)).contains("update mcontact_message set title=?, subject=?, notes=?, version=?, contact_id=? where id=? and version=?");
-    }
-    else {
+      assertThat(sql.get(10)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
+      assertThat(sql.get(15)).contains("update mcontact_message set title=?, subject=?, notes=?, version=?, contact_id=? where id=? and version=?");
+    } else {
       assertThat(sql.get(8)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
       assertThat(sql.get(9)).contains("update mcontact_message set title=?, subject=?, notes=?, version=?, contact_id=? where id=? and version=?");
-      
+
       assertThat(sql.get(sql.size()-1)).contains("insert into mcontact");
     }
 
