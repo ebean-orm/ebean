@@ -43,8 +43,11 @@ import java.util.List;
  */
 class CQueryBuilder {
 
-  protected final String tableAliasPlaceHolder;
-  protected final String columnAliasPrefix;
+  private static final String DELETE = "Delete";
+  private static final String UPDATE = "Update";
+
+  final String tableAliasPlaceHolder;
+  final String columnAliasPrefix;
 
   private final SqlLimiter sqlLimiter;
 
@@ -98,8 +101,9 @@ class CQueryBuilder {
   /**
    * Build the delete query.
    */
-  <T> CQueryUpdate buildUpdateQuery(String type, OrmQueryRequest<T> request) {
+  <T> CQueryUpdate buildUpdateQuery(boolean deleteRequest, OrmQueryRequest<T> request) {
 
+    String type = (deleteRequest) ? DELETE : UPDATE;
     SpiQuery<T> query = request.getQuery();
     String rootTableAlias = query.getAlias();
     query.setDelete();
@@ -117,7 +121,7 @@ class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates);
 
     String sql;
-    if (type.equals("Delete")) {
+    if (deleteRequest) {
       sql = buildDeleteSql(request, rootTableAlias, predicates, sqlTree);
     } else {
       sql = buildUpdateSql(request, rootTableAlias, predicates, sqlTree);

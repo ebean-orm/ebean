@@ -118,7 +118,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   @Override
   public boolean isDeleteByStatement() {
-    return !transaction.isPersistCascade() || beanDescriptor.isDeleteByStatement();
+    if (!transaction.isPersistCascade() || beanDescriptor.isDeleteByStatement()) {
+      // plain delete by query
+      return true;
+    } else {
+      // delete by ids due to cascading delete needs
+      queryPlanKey = query.setDeleteByIdsPlan();
+      return false;
+    }
   }
 
   @Override

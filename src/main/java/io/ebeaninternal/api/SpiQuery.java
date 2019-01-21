@@ -440,6 +440,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   void setDelete();
 
   /**
+   * Set the query to be delete by ids due to cascading delete.
+   */
+  CQueryPlanKey setDeleteByIdsPlan();
+
+  /**
    * Set the query to select the id property only.
    */
   void setSelectId();

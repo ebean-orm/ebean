@@ -679,6 +679,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     setSelectId();
   }
 
+  @Override
+  public CQueryPlanKey setDeleteByIdsPlan() {
+    // re-build plan for cascading via delete by ids
+    queryPlanKey = queryPlanKey.withDeleteByIds();
+    return queryPlanKey;
+  }
+
   /**
    * Set the select clause to select the Id property.
    */
