@@ -446,6 +446,10 @@ public final class DefaultPersister implements Persister {
   public void insert(EntityBean bean, Transaction t) {
 
     PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.INSERT);
+    if (req.isReference()) {
+      // skip insert on reference bean
+      return;
+    }
     try {
       req.initTransIfRequiredWithBatchCascade();
       insert(req);
