@@ -404,7 +404,7 @@ public class EqlParserTest extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address");
-    assertThat(sql.get(1)).contains("select t0.customer_id, t0.id, t0.email from contact t0 where (t0.customer_id) in");
+    assertThat(sql.get(1)).contains("select t0.customer_id, t0.id, t0.email from contact t0 where (t0.customer_id)");
   }
 
   @Test
