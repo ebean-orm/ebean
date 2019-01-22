@@ -4,7 +4,9 @@ import io.ebean.Model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import java.util.List;
 
 @Entity
 public class DMachine extends Model {
@@ -16,6 +18,9 @@ public class DMachine extends Model {
 
   @Version
   long version;
+
+  @OneToMany(mappedBy = "machine")
+  List<DMachineStats> machineStats;
 
   public DMachine(String name) {
     this.name = name;
@@ -43,5 +48,13 @@ public class DMachine extends Model {
 
   public void setVersion(long version) {
     this.version = version;
+  }
+
+  public List<DMachineStats> getMachineStats() {
+    return machineStats;
+  }
+
+  public void setMachineStats(List<DMachineStats> machineStats) {
+    this.machineStats = machineStats;
   }
 }
