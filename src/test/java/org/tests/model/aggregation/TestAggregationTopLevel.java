@@ -106,7 +106,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   public void groupBy_machine_dynamicFormula_withJoin() {
 
     Query<DMachineStats> query = Ebean.find(DMachineStats.class)
-      .select("machine, sum(totalKms), sum(hours)")
+      .select("sum(totalKms), sum(hours)")
       .fetch("machine", "name")
       .where().gt("date", LocalDate.now().minusDays(10))
       .having().gt("sum(hours)", 2)
@@ -123,10 +123,31 @@ public class TestAggregationTopLevel extends BaseTestCase {
   }
 
   @Test
+  public void groupBy_machine_dynamicFormula_withJoin2() {
+
+    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+      .select("date, sum(totalKms), sum(hours)")
+      .fetch("machine", "name")
+      .where().gt("date", LocalDate.now().minusDays(10))
+      .having().gt("sum(hours)", 2)
+      .query();
+
+    LoggedSqlCollector.start();
+
+    List<DMachineStats> result = query.findList();
+    assertThat(result).isNotEmpty();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id  where t0.date > ?  group by t0.date, t1.id, t1.name having sum(t0.hours) > ?");
+  }
+
+
+  @Test
   public void groupBy_machine_dynamicFormula_withQueryJoin() {
 
     Query<DMachineStats> query = Ebean.find(DMachineStats.class)
-      .select("machine, sum(totalKms), sum(hours)")
+      .select("sum(totalKms), sum(hours)")
       .fetchQuery("machine", "name")
       .where().gt("date", LocalDate.now().minusDays(10))
       .having().gt("sum(hours)", 2)
@@ -140,7 +161,29 @@ public class TestAggregationTopLevel extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
 
-    assertThat(sql.get(0)).contains("select t0.machine_id, sum(t0.total_kms), sum(t0.hours) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id having sum(t0.hours) > ?");
+    assertThat(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.date > ?  group by t0.machine_id having sum(t0.hours) > ?");
+    assertThat(sql.get(1)).contains("select t0.id, t0.name from dmachine t0 where t0.id");
+  }
+
+  @Test
+  public void groupBy_machine_dynamicFormula_withQueryJoin2() {
+
+    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+      .select("date, sum(totalKms), sum(hours)")
+      .fetchQuery("machine", "name")
+      .where().gt("date", LocalDate.now().minusDays(10))
+      .having().gt("sum(hours)", 2)
+      .query();
+
+    LoggedSqlCollector.start();
+
+    List<DMachineStats> result = query.findList();
+    assertThat(result).isNotEmpty();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+
+    assertThat(sql.get(0)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.date > ?  group by t0.date, t0.machine_id having sum(t0.hours) > ?");
     assertThat(sql.get(1)).contains("select t0.id, t0.name from dmachine t0 where t0.id");
   }
 
