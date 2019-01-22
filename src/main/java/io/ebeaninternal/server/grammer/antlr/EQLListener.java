@@ -18,6 +18,16 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitSelect_statement(EQLParser.Select_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#select_properties}.
+	 * @param ctx the parse tree
+	 */
+	void enterSelect_properties(EQLParser.Select_propertiesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#select_properties}.
+	 * @param ctx the parse tree
+	 */
+	void exitSelect_properties(EQLParser.Select_propertiesContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#select_clause}.
 	 * @param ctx the parse tree
 	 */
@@ -147,6 +157,16 @@ public interface EQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFetch_property_group(EQLParser.Fetch_property_groupContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_path_path}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_path_path(EQLParser.Fetch_path_pathContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_path_path}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_path_path(EQLParser.Fetch_path_pathContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link EQLParser#fetch_property}.
 	 * @param ctx the parse tree

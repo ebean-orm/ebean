@@ -4,8 +4,13 @@ select_statement
    : select_clause? fetch_clause* where_clause? orderby_clause? limit_clause? EOF
    ;
 
+select_properties
+   : '(' fetch_property_group ')'
+   | fetch_property_group
+   ;
+
 select_clause
-   : 'select' distinct? '(' fetch_property_group ')'
+   : 'select' distinct? select_properties
    ;
 
 distinct
@@ -47,7 +52,7 @@ offset_clause
    ;
 
 fetch_path
-   : 'fetch' fetch_option? PATH_VARIABLE fetch_property_set?
+   : 'fetch' fetch_option? fetch_path_path fetch_property_set?
    ;
 
 fetch_property_set
@@ -58,10 +63,16 @@ fetch_property_group
    : fetch_property (',' fetch_property)*
    ;
 
+fetch_path_path
+   : PATH_VARIABLE
+   | QUOTED_PATH_VARIABLE
+   ;
+
 fetch_property
    : PATH_VARIABLE
    | fetch_query_hint
    | fetch_lazy_hint
+   | PROP_FORMULA
    ;
 
 fetch_query_hint
@@ -208,6 +219,18 @@ INPUT_VARIABLE
 
 PATH_VARIABLE
    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '.')*
+   ;
+
+QUOTED_PATH_VARIABLE
+   : ('`')(PATH_VARIABLE)('`')
+   ;
+
+PROP_FORMULA
+   : 'sum(' PATH_VARIABLE ')'
+   | 'max(' PATH_VARIABLE ')'
+   | 'min(' PATH_VARIABLE ')'
+   | 'avg(' PATH_VARIABLE ')'
+   | 'count(' PATH_VARIABLE ')'
    ;
 
 BOOLEAN_LITERAL

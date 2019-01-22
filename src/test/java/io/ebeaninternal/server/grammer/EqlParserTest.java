@@ -7,8 +7,10 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiQuery;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
@@ -221,14 +223,13 @@ public class EqlParserTest extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
   }
 
-
   @Test
   public void where_in() {
 
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
-    platformAssertIn(query.getGeneratedSql(),"where t0.name");
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
@@ -239,7 +240,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    platformAssertIn(query.getGeneratedSql(),"where t0.name");
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
@@ -250,7 +251,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    platformAssertIn(query.getGeneratedSql(),"where t0.name");
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
@@ -261,7 +262,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "Bar");
     query.findList();
 
-    platformAssertIn(query.getGeneratedSql(),"where t0.name");
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
@@ -271,7 +272,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
 
-    platformAssertIn(query.getGeneratedSql(),"where t0.name");
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
@@ -331,6 +332,79 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("where  ? between t0.name and t0.smallnote");
+  }
+
+  @Test
+  public void selectFetch_basic() {
+
+    Query<Customer> query = parse("select name fetch billingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.line_2, t1.city, t1.cretime, t1.updtime, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+  }
+
+  @Test
+  public void selectFetch_basic2() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("select name, status fetch billingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id, t0.name, t0.status, t1.id, t1.line_1, t1.line_2, t1.city, t1.cretime, t1.updtime, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+  }
+
+  @Test
+  public void selectFetch_withProperties() {
+
+    Query<Customer> query = parse("select name fetch billingAddress (line1, city) ");
+    query.findList();
+
+    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+  }
+
+  @Test
+  public void selectFetchFetchLimit() {
+
+    Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch shippingAddress (line1) limit 10");
+    query.findList();
+
+    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_address t2 on t2.id = t0.shipping_address_id  order by t0.id");
+  }
+
+  @Test
+  public void selectFetchFetchMany() {
+
+    Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts");
+    query.findList();
+
+    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.first_name, t2.last_name, t2.phone, t2.mobile, t2.email, t2.cretime, t2.updtime, t2.customer_id, t2.group_id from o_customer t0");
+  }
+
+
+  @Test
+  public void selectFetchFetchManyProperties() {
+
+    Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts (email)");
+    query.findList();
+
+    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.email from o_customer t0");
+  }
+
+  @Test
+  public void selectFetchFetchManyPropertiesLimit() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts (email) limit 10");
+    query.findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address");
+    assertThat(sql.get(1)).contains("select t0.customer_id, t0.id, t0.email from contact t0 where (t0.customer_id) in");
   }
 
   @Test
@@ -438,6 +512,58 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select (name)");
     query.findList();
     assertThat(sqlOf(query, 1)).contains("select t0.id, t0.name from o_customer t0");
+
+    Query<Customer> query2 = parse("select name");
+    query2.findList();
+    assertThat(sqlOf(query2, 1)).contains("select t0.id, t0.name from o_customer t0");
+  }
+
+  @Test
+  public void select_sum() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("select (sum(id))");
+    query.findSingleAttribute();
+    assertThat(sqlOf(query, 1)).contains("select sum(t0.id) from o_customer t0");
+  }
+
+  @Test
+  public void select_max() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("select (max(cretime))");
+    query.findSingleAttribute();
+    assertThat(sqlOf(query, 1)).contains("select max(t0.cretime) from o_customer t0");
+
+    Query<Customer> query2 = parse("select max(cretime)");
+    query2.findSingleAttribute();
+    assertThat(sqlOf(query2, 1)).contains("select max(t0.cretime) from o_customer t0");
+  }
+
+  @Test
+  public void select_agg() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("select status, max(cretime)");
+    List<Customer> customers = query.findList();
+
+    assertThat(customers).isNotEmpty();
+    assertThat(sqlOf(query, 1)).contains("select t0.status, max(t0.cretime) from o_customer t0 group by t0.status");
+  }
+
+  @Test
+  public void select_agg_sum() {
+
+    ResetBasicData.reset();
+
+    Query<OrderDetail> query = Ebean.createQuery(OrderDetail.class, "select sum(orderQty) fetch `order` (id)");
+    List<OrderDetail> details = query.findList();
+
+    assertThat(details).isNotEmpty();
+    assertThat(sqlOf(query, 1)).contains("select sum(t0.order_qty), t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id  group by t1.id");
   }
 
   @Test

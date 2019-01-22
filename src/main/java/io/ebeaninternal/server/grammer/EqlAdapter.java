@@ -99,13 +99,13 @@ class EqlAdapter<T> extends EQLBaseListener {
   @Override
   public void enterSelect_clause(EQLParser.Select_clauseContext ctx) {
 
-    checkChildren(ctx, 4);
+    // with or without surrounding ( and )
+    int childCount = ctx.getChildCount();
+    String clause = trimParenthesis(child(ctx, childCount - 1));
     if (DISTINCT.equals(child(ctx, 1))) {
       query.setDistinct(true);
-      query.select(child(ctx, 3));
-    } else {
-      query.select(child(ctx, 2));
     }
+    query.select(clause);
   }
 
   @Override
@@ -113,22 +113,44 @@ class EqlAdapter<T> extends EQLBaseListener {
 
     int childCount = ctx.getChildCount();
     checkChildren(ctx, 2);
-    String path = child(ctx, 1);
 
-    int noPropertiesLength = 2;
+    String maybePath = child(ctx, 1);
+    FetchConfig fetchConfig = ParseFetchConfig.parse(maybePath);
 
-    FetchConfig fetchConfig = ParseFetchConfig.parse(path);
-    if (fetchConfig != null) {
-      noPropertiesLength = 3;
-      path = child(ctx, 2);
+    int propsIndex = 2;
+
+    String path;
+    if (fetchConfig == null) {
+      path = trimQuotes(maybePath);
+    } else {
+      propsIndex = 3;
+      path = trimQuotes(child(ctx, 2));
     }
-    if (childCount == noPropertiesLength) {
+
+    if (childCount == propsIndex) {
       query.fetch(path, fetchConfig);
 
     } else {
-      String fetchProperties = trimParenthesis(ctx.getChild(noPropertiesLength).getText());
-      query.fetch(path, fetchProperties, fetchConfig);
+      String properties = trimParenthesis(ctx.getChild(propsIndex).getText());
+      query.fetch(path, properties, fetchConfig);
     }
+  }
+
+  /**
+   * Trim leading '(' and trailing ')'
+   */
+  private String trimParenthesis(String text) {
+    if (text.charAt(0) == '(') {
+      return text.substring(1, text.length() - 1);
+    }
+    return text;
+  }
+
+  private String trimQuotes(String path) {
+    if (path.charAt(0) == '\'' || path.charAt(0) == '`') {
+      return path.substring(1, path.length() - 1);
+    }
+    return path;
   }
 
   @Override
@@ -175,15 +197,6 @@ class EqlAdapter<T> extends EQLBaseListener {
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("Error parsing limit or offset parameter - not an integer", e);
     }
-  }
-
-  /**
-   * Trim leading '(' and trailing ')'
-   */
-  private String trimParenthesis(String text) {
-    text = text.substring(1);
-    text = text.substring(0, text.length() - 1);
-    return text;
   }
 
   private String getLeftHandSidePath(ParserRuleContext ctx) {
@@ -399,7 +412,7 @@ class EqlAdapter<T> extends EQLBaseListener {
    */
   private void checkChildren(ParserRuleContext ctx, int min) {
     if (ctx.getChildCount() < min) {
-      throw new IllegalStateException("expecting " + min + " children for comparison? " + ctx);
+      throw new IllegalStateException("expecting " + min + " children for comparison but got " + ctx.getChildCount());
     }
   }
 

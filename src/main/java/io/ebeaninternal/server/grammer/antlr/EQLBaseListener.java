@@ -28,6 +28,18 @@ public class EQLBaseListener implements EQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSelect_properties(EQLParser.Select_propertiesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelect_properties(EQLParser.Select_propertiesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSelect_clause(EQLParser.Select_clauseContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -179,6 +191,18 @@ public class EQLBaseListener implements EQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFetch_property_group(EQLParser.Fetch_property_groupContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFetch_path_path(EQLParser.Fetch_path_pathContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFetch_path_path(EQLParser.Fetch_path_pathContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
