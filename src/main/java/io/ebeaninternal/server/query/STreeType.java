@@ -120,7 +120,7 @@ public interface STreeType {
   /**
    * Find and return property allowing for dynamic formula properties.
    */
-  STreeProperty findPropertyWithDynamic(String baseName);
+  STreeProperty findPropertyWithDynamic(String baseName, String path);
 
   /**
    * Return an extra join if the property path requires it.

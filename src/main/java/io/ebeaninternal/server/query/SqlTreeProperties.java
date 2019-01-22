@@ -92,6 +92,10 @@ public class SqlTreeProperties {
     return aggregation;
   }
 
+  public void checkAggregation() {
+    aggregationJoin();
+  }
+
   /**
    * Return the property to join for aggregation.
    */
