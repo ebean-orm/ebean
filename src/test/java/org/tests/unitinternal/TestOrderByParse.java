@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.OrderBy;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -14,6 +15,16 @@ import static org.junit.Assert.assertTrue;
  * Test the OrderBy object and especially its parsing.
  */
 public class TestOrderByParse extends BaseTestCase {
+
+  @Test
+  public void testParseRaw() {
+
+    OrderBy<Object> o1 = new OrderBy<>("case when status='N' then 1 when status='F' then 2 else 99 end");
+    assertEquals(1, o1.getProperties().size());
+    assertTrue(o1.getProperties().get(0).isAscending());
+    assertThat(o1.toStringFormat()).isEqualTo("case when status='N' then 1 when status='F' then 2 else 99 end");
+    assertThat(o1.getProperties().get(0).getProperty()).isEqualTo("case when status='N' then 1 when status='F' then 2 else 99 end");
+  }
 
   @Test
   public void testParsingOne() {
