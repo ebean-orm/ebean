@@ -4,6 +4,7 @@ import io.ebean.Model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import java.util.List;
@@ -12,18 +13,30 @@ import java.util.List;
 public class DMachine extends Model {
 
   @Id
-  long id;
+  private long id;
 
-  String name;
+  private String name;
+
+  @ManyToOne
+  private final DOrg organisation;
 
   @Version
-  long version;
+  private long version;
 
   @OneToMany(mappedBy = "machine")
-  List<DMachineStats> machineStats;
+  private List<DMachineStats> machineStats;
 
-  public DMachine(String name) {
+  @OneToMany(mappedBy = "machine")
+  private List<DMachineAuxUseAgg> auxUseAggs;
+
+  public DMachine(DOrg organisation, String name) {
+    this.organisation = organisation;
     this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 
   public long getId() {
@@ -42,6 +55,10 @@ public class DMachine extends Model {
     this.name = name;
   }
 
+  public DOrg getOrganisation() {
+    return organisation;
+  }
+
   public long getVersion() {
     return version;
   }
@@ -56,5 +73,13 @@ public class DMachine extends Model {
 
   public void setMachineStats(List<DMachineStats> machineStats) {
     this.machineStats = machineStats;
+  }
+
+  public List<DMachineAuxUseAgg> getAuxUseAggs() {
+    return auxUseAggs;
+  }
+
+  public void setAuxUseAggs(List<DMachineAuxUseAgg> auxUseAggs) {
+    this.auxUseAggs = auxUseAggs;
   }
 }

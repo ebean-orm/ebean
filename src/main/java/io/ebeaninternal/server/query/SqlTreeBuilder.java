@@ -273,7 +273,10 @@ public final class SqlTreeBuilder {
     OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
     SqlTreeProperties props = getBaseSelect(desc, queryProps);
 
-    if (prefix == null && !rawSql) {
+    if (prefix != null) {
+      // check for aggregation on a fetch
+      props.checkAggregation();
+    } else if (!rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
         sqlDistinct = true;
       }
@@ -417,10 +420,10 @@ public final class SqlTreeBuilder {
 
       // make sure we only included the base/embedded bean once
       if (!selectProps.containsProperty(baseName)) {
-        STreeProperty p = desc.findPropertyWithDynamic(baseName);
+        STreeProperty p = desc.findPropertyWithDynamic(baseName, null);
         if (p == null) {
           // maybe dynamic formula with schema prefix
-          p = desc.findPropertyWithDynamic(propName);
+          p = desc.findPropertyWithDynamic(propName, null);
           if (p != null) {
             selectProps.add(p);
           } else {
@@ -437,7 +440,7 @@ public final class SqlTreeBuilder {
     } else {
       // find the property including searching the
       // sub class hierarchy if required
-      STreeProperty p = desc.findPropertyWithDynamic(propName);
+      STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
         logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
         p = desc.findProperty("id");

@@ -200,27 +200,62 @@ public class TestAggregationTopLevel extends BaseTestCase {
     assertThat(result).isNotEmpty();
   }
 
-//  @Test
-//  public void groupBy_in_fetchClause() {
-//
-//    Query<DMachine> query = Ebean.find(DMachine.class)
-//      .select("name")
-//      .fetch("machineStats", "date, max(rate), sum(totalKms)")
-//      .where().gt("machineStats.date", LocalDate.now().minusDays(10))
-//      .having().gt("sum(machineStats.totalKms)", 1)
-//      .query();
-//
-//    List<DMachine> result = query.findList();
-//    assertThat(sqlOf(query)).contains("select distinct t0.id, t0.name, t1.date, max(t1.rate), sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where date > ?  group by t0.id, t0.name, t1.date having sum(t1.total_kms) > ?  order by t0.id");
-//    assertThat(result).isNotEmpty();
-//  }
+  @Test
+  public void groupBy_in_fetchClause_singleRowInMany() {
+
+    LoggedSqlCollector.start();
+
+    Query<DMachine> query = Ebean.find(DMachine.class)
+      .select("name")
+      .fetch("machineStats", "sum(totalKms)")
+      .where().eq("name", "Machine0")
+      .query();
+
+    List<DMachine> result = query.findList();
+    assertThat(result).isNotEmpty();
+    assertThat(result.get(0).getMachineStats().get(0).getTotalKms()).isNotNull();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+
+    assertThat(sqlOf(query)).contains("select t0.id, t0.name, sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where t0.name = ?  group by t0.id, t0.name order by t0.id");
+  }
+
+  @Test
+  public void groupBy_in_fetchClause_multipleRowsInMany() {
+
+    LoggedSqlCollector.start();
+
+    Query<DMachine> query = Ebean.find(DMachine.class)
+      .select("name")
+      .fetch("machineStats", "date, max(rate), sum(totalKms)")
+      .where().eq("name", "Machine0")
+      .query();
+
+    List<DMachine> result = query.findList();
+    assertThat(result).isNotEmpty();
+    assertThat(result.get(0).getMachineStats().size()).isGreaterThan(1); // expect 8 as grouped by date
+
+    DMachineStats firstStat = result.get(0).getMachineStats().get(0);
+    assertThat(firstStat.getTotalKms()).isNotNull();
+    assertThat(firstStat.getRate()).isNotNull();
+    assertThat(firstStat.getDate()).isNotNull();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+
+    assertThat(sqlOf(query)).contains("select t0.id, t0.name, t1.date, max(t1.rate), sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where t0.name = ?  group by t0.id, t0.name, t1.date order by t0.id");
+  }
+
 
   public static void loadData() {
 
     List<DMachine> machines = new ArrayList<>();
+    DOrg org = new DOrg("other");
+    org.save();
 
     for (int i = 0; i < 5; i++) {
-      machines.add(new DMachine("Machine"+i));
+      machines.add(new DMachine(org, "Machine" + i));
     }
 
     Ebean.saveAll(machines);
