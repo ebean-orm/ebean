@@ -4,11 +4,11 @@ import io.ebean.Expression;
 import io.ebean.Junction;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 
@@ -140,7 +140,7 @@ abstract class LogicExpression implements SpiExpression {
     expOne.addSql(request);
     request.append(conjunction ? AND : OR);
     expTwo.addSql(request);
-    request.append(") ");
+    request.append(")");
   }
 
   @Override

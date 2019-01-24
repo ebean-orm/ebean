@@ -62,7 +62,7 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
       assertThat(sqlOf(query, 1)).contains(expectedSql);
 
     } else {
-      String expectedSql = "select distinct t0.id, t0.name, t0.description, t0.version from uuone t0 left join uutwo u1 on u1.master_id = t0.id  where (t0.name = ?  or u1.name = ? ) ";
+      String expectedSql = "select distinct t0.id, t0.name, t0.description, t0.version from uuone t0 left join uutwo u1 on u1.master_id = t0.id  where (t0.name = ? or u1.name = ?)";
       assertThat(sqlOf(query, 1)).contains(expectedSql);
     }
 

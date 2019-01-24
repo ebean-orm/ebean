@@ -154,7 +154,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertEquals(2, sql.size());
-    assertThat(sql.get(1)).contains("and (t0.status = ?  or t0.order_date = ?");
+    assertThat(sql.get(1)).contains("and (t0.status = ? or t0.order_date = ?");
   }
 
   @Test

@@ -63,7 +63,7 @@ public class TestAggregationMany extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.name, t1.name, sum(t1.use_secs), sum(t1.fuel) from dmachine t0 left join d_machine_aux_use t1 on t1.machine_id = t0.id  where t0.organisation_id = ?  group by t0.id, t0.name, t1.name order by t0.id");
+    assertThat(sql.get(0)).contains("select t0.id, t0.name, t1.name, sum(t1.use_secs), sum(t1.fuel) from dmachine t0 left join d_machine_aux_use t1 on t1.machine_id = t0.id  where t0.organisation_id = ? group by t0.id, t0.name, t1.name order by t0.id");
   }
 
   @Test
@@ -89,6 +89,6 @@ public class TestAggregationMany extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.name, sum(t1.use_secs), sum(t1.fuel) from dmachine t0 left join d_machine_aux_use t1 on t1.machine_id = t0.id  where t0.organisation_id = ?  group by t0.id, t0.name order by t0.id");
+    assertThat(sql.get(0)).contains("select t0.id, t0.name, sum(t1.use_secs), sum(t1.fuel) from dmachine t0 left join d_machine_aux_use t1 on t1.machine_id = t0.id  where t0.organisation_id = ? group by t0.id, t0.name order by t0.id");
   }
 }

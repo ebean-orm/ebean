@@ -8,18 +8,18 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class BetweenExpressionTest extends BaseExpressionTest {
 
   @Test
-  public void addSql() throws Exception {
+  public void addSql() {
 
     DefaultExpressionRequest expReq = newExpressionRequest();
 
     BetweenExpression exp = new BetweenExpression("startDate", 1, 2);
     exp.addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("startDate between  ? and ? ");
+    assertThat(expReq.getSql()).isEqualTo("startDate between ? and ?");
   }
 
   @Test
-  public void copyForPlanKey_isSameInstance() throws Exception {
+  public void copyForPlanKey_isSameInstance() {
 
     BetweenExpression exp = new BetweenExpression("startDate", 1, 2);
     SpiExpression other = exp.copyForPlanKey();
@@ -28,7 +28,7 @@ public class BetweenExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void isSameByPlan_when_properties_match() throws Exception {
+  public void isSameByPlan_when_properties_match() {
 
     BetweenExpression exp0 = new BetweenExpression("startDate", 1, 2);
     BetweenExpression exp1 = new BetweenExpression("startDate", 3, 4);
@@ -38,7 +38,7 @@ public class BetweenExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void isSameByPlan_when_properties_do_not_match() throws Exception {
+  public void isSameByPlan_when_properties_do_not_match() {
 
     BetweenExpression exp0 = new BetweenExpression("startDate", 1, 2);
     BetweenExpression exp1 = new BetweenExpression("endDate", 1, 2);
@@ -48,7 +48,7 @@ public class BetweenExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void isSameByBind_when_values_do_not_match() throws Exception {
+  public void isSameByBind_when_values_do_not_match() {
 
     BetweenExpression exp0 = new BetweenExpression("startDate", 1, 2);
     BetweenExpression exp1 = new BetweenExpression("startDate", 1, 3);
@@ -58,7 +58,7 @@ public class BetweenExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void isSameByBind_when_values_match() throws Exception {
+  public void isSameByBind_when_values_match() {
 
     BetweenExpression exp0 = new BetweenExpression("startDate", 1, 2);
     BetweenExpression exp1 = new BetweenExpression("startDate", 1, 2);

@@ -82,7 +82,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name ieq 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) = ?");
   }
 
   @Test
@@ -91,7 +91,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name ine 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) !=?");
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) != ?");
   }
 
   @Test
@@ -99,7 +99,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where 'Rob' ieq name");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) = ?");
   }
 
   @Test
@@ -108,7 +108,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where 'Rob' ine name");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) !=?");
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) != ?");
   }
 
   @Test
@@ -156,7 +156,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name = 'Rob' or (status = 'NEW' and smallnote is null)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
+    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or (t0.status = ? and t0.smallnote is null))");
   }
 
   @Test
@@ -176,7 +176,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
+    assertThat(query.getGeneratedSql()).contains("where ((t0.name = ? or t0.status = ?) and t0.smallnote is null)");
   }
 
   @Test
@@ -195,15 +195,15 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not ((name = 'Rob' and status = 'NEW'))");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not (((name = 'Rob') and (status = 'NEW')))");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ? and t0.status = ?)");
   }
 
   @Test
@@ -281,7 +281,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name inrange 'As' to 'B'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name >= ? and t0.name < ?) ");
+    assertThat(query.getGeneratedSql()).contains("where (t0.name >= ? and t0.name < ?)");
   }
 
   @Test
@@ -301,7 +301,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name between 'As' and 'B'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name between  ? and ? ");
+    assertThat(query.getGeneratedSql()).contains("where t0.name between ? and ?");
   }
 
   @Test
@@ -312,7 +312,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "b");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name between  ? and ? ");
+    assertThat(query.getGeneratedSql()).contains("where t0.name between ? and ?");
   }
 
   @Test

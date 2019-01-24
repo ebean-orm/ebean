@@ -15,7 +15,7 @@ public class InRangeExpressionTest extends BaseExpressionTest {
     InRangeExpression exp = new InRangeExpression("startDate", 1, 2);
     exp.addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("(startDate >= ? and startDate < ?) ");
+    assertThat(expReq.getSql()).isEqualTo("(startDate >= ? and startDate < ?)");
   }
 
   @Test

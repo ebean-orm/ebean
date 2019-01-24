@@ -38,7 +38,7 @@ class InRangeExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append("(").append(propName).append(" >= ? and ").append(propName).append(" < ?) ");
+    request.append("(").append(propName).append(" >= ? and ").append(propName).append(" < ?)");
   }
 
   @Override

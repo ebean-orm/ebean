@@ -85,7 +85,7 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
     }
     request.append(" in (");
     request.append(sql);
-    request.append(") ");
+    request.append(")");
   }
 
   @Override

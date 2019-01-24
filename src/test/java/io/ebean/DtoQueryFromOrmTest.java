@@ -91,7 +91,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
-        + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+        + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 
   @Test
@@ -117,7 +117,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
-        + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+        + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 
   @Test
@@ -147,7 +147,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     } else {
       assertThat(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
-          + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+          + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     }
   }
 
@@ -178,7 +178,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
           + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
     } else {
       assertThat(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
-          + " fullName from contact t0 where t0.email is not null  and t0.last_name is not null  order by t0.last_name");
+          + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     }
   }
 
@@ -227,7 +227,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).contains(
-        "select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null  group by t0.last_name having count(*) > ?");
+        "select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null group by t0.last_name having count(*) > ?");
   }
 
   @Test

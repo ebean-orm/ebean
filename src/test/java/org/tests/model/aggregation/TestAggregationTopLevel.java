@@ -43,7 +43,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStatsAgg> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, sum(t0.total_kms), sum(cost) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id, t0.date having sum(cost) > ?");
+    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, sum(t0.total_kms), sum(cost) from d_machine_stats t0 where t0.date > ? group by t0.machine_id, t0.date having sum(cost) > ?");
     assertThat(result).isNotEmpty();
   }
 
@@ -56,7 +56,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStatsAgg> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.machine_id, sum(t0.total_kms), sum(cost) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id");
+    assertThat(sqlOf(query)).contains("select t0.machine_id, sum(t0.total_kms), sum(cost) from d_machine_stats t0 where t0.date > ? group by t0.machine_id");
     assertThat(result).isNotEmpty();
   }
 
@@ -70,7 +70,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStatsAgg> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), max(t0.rate), sum(cost), max(t0.total_kms) from d_machine_stats t0 where t0.date > ?  group by t0.date having sum(t0.hours) > ?");
+    assertThat(sqlOf(query)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), max(t0.rate), sum(cost), max(t0.total_kms) from d_machine_stats t0 where t0.date > ? group by t0.date having sum(t0.hours) > ?");
     assertThat(result).isNotEmpty();
   }
 
@@ -84,7 +84,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStats> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, sum(t0.total_kms), sum(t0.hours) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id, t0.date having sum(t0.hours) > ?");
+    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, sum(t0.total_kms), sum(t0.hours) from d_machine_stats t0 where t0.date > ? group by t0.machine_id, t0.date having sum(t0.hours) > ?");
     assertThat(result).isNotEmpty();
   }
 
@@ -98,7 +98,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStats> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.machine_id, sum(t0.total_kms) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id having sum(t0.hours) > ?");
+    assertThat(sqlOf(query)).contains("select t0.machine_id, sum(t0.total_kms) from d_machine_stats t0 where t0.date > ? group by t0.machine_id having sum(t0.hours) > ?");
     assertThat(result).isNotEmpty();
   }
 
@@ -119,7 +119,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id  where t0.date > ?  group by t1.id, t1.name having sum(t0.hours) > ?");
+    assertThat(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id  where t0.date > ? group by t1.id, t1.name having sum(t0.hours) > ?");
   }
 
   @Test
@@ -139,7 +139,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id  where t0.date > ?  group by t0.date, t1.id, t1.name having sum(t0.hours) > ?");
+    assertThat(sql.get(0)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id  where t0.date > ? group by t0.date, t1.id, t1.name having sum(t0.hours) > ?");
   }
 
 
@@ -161,7 +161,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
 
-    assertThat(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.date > ?  group by t0.machine_id having sum(t0.hours) > ?");
+    assertThat(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.date > ? group by t0.machine_id having sum(t0.hours) > ?");
     assertThat(sql.get(1)).contains("select t0.id, t0.name from dmachine t0 where t0.id");
   }
 
@@ -183,7 +183,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
 
-    assertThat(sql.get(0)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.date > ?  group by t0.date, t0.machine_id having sum(t0.hours) > ?");
+    assertThat(sql.get(0)).contains("select t0.date, sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.date > ? group by t0.date, t0.machine_id having sum(t0.hours) > ?");
     assertThat(sql.get(1)).contains("select t0.id, t0.name from dmachine t0 where t0.id");
   }
 
@@ -196,7 +196,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStats> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, max(t0.rate) from d_machine_stats t0 where t0.date > ?  group by t0.machine_id, t0.date");
+    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.date, max(t0.rate) from d_machine_stats t0 where t0.date > ? group by t0.machine_id, t0.date");
     assertThat(result).isNotEmpty();
   }
 
@@ -218,7 +218,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
 
-    assertThat(sqlOf(query)).contains("select t0.id, t0.name, sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where t0.name = ?  group by t0.id, t0.name order by t0.id");
+    assertThat(sqlOf(query)).contains("select t0.id, t0.name, sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where t0.name = ? group by t0.id, t0.name order by t0.id");
   }
 
   @Test
@@ -244,7 +244,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
 
-    assertThat(sqlOf(query)).contains("select t0.id, t0.name, t1.date, max(t1.rate), sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where t0.name = ?  group by t0.id, t0.name, t1.date order by t0.id");
+    assertThat(sqlOf(query)).contains("select t0.id, t0.name, t1.date, max(t1.rate), sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id  where t0.name = ? group by t0.id, t0.name, t1.date order by t0.id");
   }
 
 

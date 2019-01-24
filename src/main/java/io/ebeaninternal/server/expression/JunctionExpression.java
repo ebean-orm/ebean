@@ -192,7 +192,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
         }
         item.addSql(request);
       }
-      request.append(") ");
+      request.append(")");
     }
   }
 

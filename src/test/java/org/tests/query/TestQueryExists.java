@@ -28,7 +28,7 @@ public class TestQueryExists extends BaseTestCase {
 
     String sql = sqlOf(query);
     if (isH2() || isPostgres()) {
-      assertThat(sql).contains("select t0.id from o_order t0 where t0.id > ?  limit 1");
+      assertThat(sql).contains("select t0.id from o_order t0 where t0.id > ? limit 1");
     }
 
     assertThat(Ebean.find(Order.class).where().gt("id", 1).exists()).isTrue();

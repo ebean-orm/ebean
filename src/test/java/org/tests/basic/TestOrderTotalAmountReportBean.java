@@ -5,10 +5,10 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import org.tests.model.basic.OrderAggregate;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.OrderAggregate;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
@@ -128,7 +128,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
       .findList();
 
     assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount, max(order_qty*unit_price) as maxAmount from o_order_detail");
-    assertThat(query.getGeneratedSql()).contains("from o_order_detail  where order_id > ?  group by order_id  having count(*) > ?   order by sum(order_qty*unit_price) desc");
+    assertThat(query.getGeneratedSql()).contains("from o_order_detail  where order_id > ? group by order_id  having count(*) > ?  order by sum(order_qty*unit_price) desc");
     assertNotNull(list);
   }
 
@@ -147,7 +147,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
       .findList();
 
     assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
-    assertThat(query.getGeneratedSql()).contains("from o_order_detail where id > ?  and order_id is not null  group by order_id  having sum(order_qty*unit_price) < ?   order by sum(order_qty*unit_price) desc");
+    assertThat(query.getGeneratedSql()).contains("from o_order_detail where id > ?  and order_id is not null group by order_id  having sum(order_qty*unit_price) < ?  order by sum(order_qty*unit_price) desc");
     assertNotNull(list);
   }
 }
