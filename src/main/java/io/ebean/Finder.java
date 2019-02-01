@@ -2,7 +2,6 @@ package io.ebean;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.List;
 
 /**
@@ -112,26 +111,26 @@ public class Finder<I, T> {
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
    */
-  public EbeanServer db() {
-    return Ebean.getServer(serverName);
+  public Database db() {
+    return DB.byName(serverName);
   }
 
   /**
-   * Return typically a different EbeanServer to the default.
+   * Return typically a different Database to the default.
    * <p>
-   * This is equivalent to {@link Ebean#getServer(String)}
+   * This is equivalent to {@link DB#byName(String)}
    *
-   * @param server The name of the EbeanServer. If this is null then the default EbeanServer is
+   * @param server The name of the Database. If this is null then the default EbeanServer is
    *               returned.
    */
-  public EbeanServer db(String server) {
-    return Ebean.getServer(server);
+  public Database db(String server) {
+    return DB.byName(server);
   }
 
   /**
    * Creates an entity reference for this ID.
    * <p>
-   * Equivalent to {@link EbeanServer#getReference(Class, Object)}
+   * Equivalent to {@link Database#getReference(Class, Object)}
    */
   @Nonnull
   public T ref(I id) {
@@ -141,7 +140,7 @@ public class Finder<I, T> {
   /**
    * Retrieves an entity by ID.
    * <p>
-   * Equivalent to {@link EbeanServer#find(Class, Object)}
+   * Equivalent to {@link Database#find(Class, Object)}
    */
   @Nullable
   public T byId(I id) {
@@ -151,7 +150,7 @@ public class Finder<I, T> {
   /**
    * Delete a bean by Id.
    * <p>
-   * Equivalent to {@link EbeanServer#delete(Class, Object)}
+   * Equivalent to {@link Database#delete(Class, Object)}
    */
   public void deleteById(I id) {
     db().delete(type, id);
@@ -181,7 +180,7 @@ public class Finder<I, T> {
    * }</pre>
    *
    * <p>
-   * Equivalent to {@link EbeanServer#update(Class)}
+   * Equivalent to {@link Database#update(Class)}
    */
   public UpdateQuery<T> update() {
     return db().update(type);
@@ -190,7 +189,7 @@ public class Finder<I, T> {
   /**
    * Creates a query.
    * <p>
-   * Equivalent to {@link EbeanServer#find(Class)}
+   * Equivalent to {@link Database#find(Class)}
    */
   public Query<T> query() {
     return db().find(type);
