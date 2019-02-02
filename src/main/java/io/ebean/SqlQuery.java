@@ -196,6 +196,31 @@ public interface SqlQuery extends Serializable {
   SqlQuery setParameter(String name, Object value);
 
   /**
+   * Set one of more positioned parameters.
+   * <p>
+   * This is a convenient alternative to multiple calls setParameter().
+   *
+   * <pre>{@code
+   *
+   *   String sql = "select id, name from customer where name like ? and status = ?";
+   *
+   *   Ebean.createSqlQuery(sql)
+   *       .setParams("Rob", Status.NEW)
+   *       .findList();
+   *
+   *
+   *   // is the same as ...
+   *
+   *   Ebean.createSqlQuery(sql)
+   *       .setParameter(1, "Rob")
+   *       .setParameter(2, "Status.NEW)
+   *       .findList();
+   *
+   * }</pre>
+   */
+  SqlQuery setParams(Object... values);
+
+  /**
    * The same as bind for positioned parameters.
    */
   SqlQuery setParameter(int position, Object value);

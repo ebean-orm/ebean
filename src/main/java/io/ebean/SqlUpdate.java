@@ -218,6 +218,33 @@ public interface SqlUpdate {
   SqlUpdate setTimeout(int secs);
 
   /**
+   * Set one of more positioned parameters.
+   * <p>
+   * This is a convenient alternative to multiple calls setParameter().
+   *
+   * <pre>{@code
+   *
+   *   String sql = "insert into audit_log (id, name, version) values (?,?,?)";
+   *
+   *   Ebean.createSqlUpdate(sql)
+   *       .setParams(UUID.randomUUID(), "Hello", 1)
+   *       .executeNow();
+   *
+   *
+   *   // is the same as ...
+   *
+   *   Ebean.createSqlUpdate(sql)
+   *       .setParameter(1, UUID.randomUUID())
+   *       .setParameter(2, "Hello")
+   *       .setParameter(3, 1)
+   *       .executeNow();
+   *
+   * }</pre>
+   *
+   */
+  SqlUpdate setParams(Object... values);
+
+  /**
    * Set the next positioned parameter.
    *
    * @param value The value to bind
