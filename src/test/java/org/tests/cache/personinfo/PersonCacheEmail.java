@@ -5,12 +5,14 @@ import io.ebean.annotation.Cache;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 
 @Entity
 @Cache
 public class PersonCacheEmail {
 
   @Id
+  @Size(max=128)
   private String id;
 
   @ManyToOne
