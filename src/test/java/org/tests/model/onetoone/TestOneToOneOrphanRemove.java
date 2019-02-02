@@ -2,6 +2,9 @@ package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -12,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestOneToOneOrphanRemove extends BaseTestCase {
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void base() {
 
     OtoCust jack = new OtoCust("Jack");
