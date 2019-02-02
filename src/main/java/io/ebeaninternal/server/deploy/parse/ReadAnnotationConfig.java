@@ -15,6 +15,7 @@ class ReadAnnotationConfig {
   private final boolean eagerFetchLobs;
   private final boolean javaxValidationAnnotations;
   private final boolean jacksonAnnotations;
+  private final boolean idGeneratorAutomatic;
 
   ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, ServerConfig serverConfig) {
 
@@ -23,6 +24,7 @@ class ReadAnnotationConfig {
     this.versionsBetweenSuffix = versionsBetweenSuffix;
     this.disableL2Cache = serverConfig.isDisableL2Cache();
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
+    this.idGeneratorAutomatic = serverConfig.isIdGeneratorAutomatic();
 
     this.javaxValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJavaxValidationAnnotationsPresent();
     this.jacksonAnnotations = generatedPropFactory.getClassLoadConfig().isJacksonAnnotationsPresent();
@@ -46,6 +48,10 @@ class ReadAnnotationConfig {
 
   boolean isEagerFetchLobs() {
     return eagerFetchLobs;
+  }
+
+  public boolean isIdGeneratorAutomatic() {
+    return idGeneratorAutomatic;
   }
 
   boolean isJavaxValidationAnnotations() {
