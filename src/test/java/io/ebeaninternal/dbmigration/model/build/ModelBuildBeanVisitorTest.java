@@ -2,14 +2,14 @@ package io.ebeaninternal.dbmigration.model.build;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.config.DbConstraintNaming;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
-import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +19,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
   @Test
   public void test() {
 
-    SpiEbeanServer defaultServer = (SpiEbeanServer) Ebean.getDefaultServer();
+    SpiEbeanServer defaultServer = (SpiEbeanServer) DB.getDefault();
 
     ModelContainer model = new ModelContainer();
 

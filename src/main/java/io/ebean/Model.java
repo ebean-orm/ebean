@@ -76,15 +76,14 @@ import io.ebean.bean.EntityBean;
 public abstract class Model {
 
   /**
-   * Return the underlying 'default' EbeanServer.
+   * Return the underlying 'default' Database.
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
    * <p>
    * Example:
    * <pre>{@code
    *
-   * Transaction transaction = Customer.db().beginTransaction();
-   * try {
+   * try (Transaction transaction = Customer.db().beginTransaction()) {
    *
    *   // turn off cascade persist for this transaction
    *   transaction.setPersistCascade(false);
@@ -104,26 +103,21 @@ public abstract class Model {
    *
    *   transaction.commit();
    *
-   * } finally {
-   *   transaction.end();
    * }
    *
    * }</pre>
    */
-  public static EbeanServer db() {
-    return Ebean.getDefaultServer();
+  public static Database db() {
+    return DB.getDefault();
   }
 
   /**
-   * Return a named EbeanServer that is typically different to the default server.
-   * <p>
-   * If you are using multiple databases then each database has a name and maps to a single
-   * EbeanServer. You can use this method to get an EbeanServer for another database.
+   * Return a named Database that is typically different to the default database.
    *
-   * @param server The name of the EbeanServer. If this is null then the default EbeanServer is returned.
+   * @param server The name of the Database. If this is null then the default Database is returned.
    */
-  public static EbeanServer db(String server) {
-    return Ebean.getServer(server);
+  public static Database db(String server) {
+    return DB.byName(server);
   }
 
   /**
@@ -146,7 +140,7 @@ public abstract class Model {
    *
    * }</pre>
    *
-   * @see EbeanServer#markAsDirty(Object)
+   * @see Database#markAsDirty(Object)
    */
   public void markAsDirty() {
     db().markAsDirty(this);
@@ -182,7 +176,7 @@ public abstract class Model {
    * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
    * insert or an update based on that.
    *
-   * @see EbeanServer#save(Object)
+   * @see Database#save(Object)
    */
   public void save() {
     db().save(this);
@@ -202,7 +196,7 @@ public abstract class Model {
   /**
    * Update this entity.
    *
-   * @see EbeanServer#update(Object)
+   * @see Database#update(Object)
    */
   public void update() {
     db().update(this);
@@ -211,7 +205,7 @@ public abstract class Model {
   /**
    * Insert this entity.
    *
-   * @see EbeanServer#insert(Object)
+   * @see Database#insert(Object)
    */
   public void insert() {
     db().insert(this);
@@ -232,7 +226,7 @@ public abstract class Model {
    * deleted. Note that, if JDBC batch mode is used then this always returns true.
    * </p>
    *
-   * @see EbeanServer#delete(Object)
+   * @see Database#delete(Object)
    */
   public boolean delete() {
     return db().delete(this);
@@ -245,7 +239,7 @@ public abstract class Model {
    * want to perform a hard/permanent delete.
    * </p>
    *
-   * @see EbeanServer#deletePermanent(Object)
+   * @see Database#deletePermanent(Object)
    */
   public boolean deletePermanent() {
     return db().deletePermanent(this);
@@ -275,7 +269,7 @@ public abstract class Model {
   /**
    * Refreshes this entity from the database.
    *
-   * @see EbeanServer#refresh(Object)
+   * @see Database#refresh(Object)
    */
   public void refresh() {
     db().refresh(this);

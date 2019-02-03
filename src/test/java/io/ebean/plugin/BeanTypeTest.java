@@ -1,12 +1,13 @@
 package io.ebean.plugin;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import org.junit.Test;
 import org.tests.inheritance.Stockforecast;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Customer;
@@ -15,60 +16,61 @@ import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.Person;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.Vehicle;
-import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class BeanTypeTest {
 
-  static EbeanServer server = Ebean.getDefaultServer();
+  static Database db = DB.getDefault();
 
   <T> BeanType<T> beanType(Class<T> cls) {
-    return server.getPluginApi().getBeanType(cls);
+    return db.getPluginApi().getBeanType(cls);
   }
 
   @Test
-  public void getBeanType() throws Exception {
+  public void getBeanType() {
     assertThat(beanType(Order.class).getBeanType()).isEqualTo(Order.class);
   }
 
   @Test
-  public void getTypeAtPath_when_ManyToOne() throws Exception {
+  public void getTypeAtPath_when_ManyToOne() {
     BeanType<Order> orderType = beanType(Order.class);
     BeanType<?> customerType = orderType.getBeanTypeAtPath("customer");
     assertThat(customerType.getBeanType()).isEqualTo(Customer.class);
   }
 
   @Test
-  public void getTypeAtPath_when_OneToMany() throws Exception {
+  public void getTypeAtPath_when_OneToMany() {
     BeanType<Order> orderType = beanType(Order.class);
     BeanType<?> detailsType = orderType.getBeanTypeAtPath("details");
     assertThat(detailsType.getBeanType()).isEqualTo(OrderDetail.class);
   }
 
   @Test
-  public void getTypeAtPath_when_nested() throws Exception {
+  public void getTypeAtPath_when_nested() {
     BeanType<Order> orderType = beanType(Order.class);
     BeanType<?> productType = orderType.getBeanTypeAtPath("details.product");
     assertThat(productType.getBeanType()).isEqualTo(Product.class);
   }
 
   @Test(expected = RuntimeException.class)
-  public void getTypeAtPath_when_simpleType() throws Exception {
+  public void getTypeAtPath_when_simpleType() {
 
     beanType(Order.class).getBeanTypeAtPath("status");
   }
 
   @Test
-  public void createBean() throws Exception {
+  public void createBean() {
 
     assertThat(beanType(Order.class).createBean()).isNotNull();
   }
 
   @Test
-  public void property() throws Exception {
+  public void property() {
 
     Order order = new Order();
     order.setStatus(Order.Status.APPROVED);
@@ -78,13 +80,13 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void getBaseTable() throws Exception {
+  public void getBaseTable() {
 
     assertThat(beanType(Order.class).getBaseTable()).isEqualTo("o_order");
   }
 
   @Test
-  public void beanId_and_getBeanId() throws Exception {
+  public void beanId_and_getBeanId() {
 
     Order order = new Order();
     order.setId(42);
@@ -97,7 +99,7 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void setBeanId() throws Exception {
+  public void setBeanId() {
 
     Order order = new Order();
     beanType(Order.class).setBeanId(order, 42);
@@ -106,7 +108,7 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void isDocStoreIndex() throws Exception {
+  public void isDocStoreIndex() {
 
     assertThat(beanType(Order.class).isDocStoreMapped()).isFalse();
     assertThat(beanType(Person.class).isDocStoreMapped()).isFalse();
@@ -116,7 +118,7 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void docStore_getEmbedded() throws Exception {
+  public void docStore_getEmbedded() {
 
     BeanDocType<Order> orderDocType = beanType(Order.class).docStore();
     FetchPath customer = orderDocType.getEmbedded("customer");
@@ -125,7 +127,7 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void docStore_getEmbeddedManyRoot() throws Exception {
+  public void docStore_getEmbeddedManyRoot() {
 
     BeanDocType<Order> orderDocType = beanType(Order.class).docStore();
 
@@ -139,28 +141,28 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void getDocStoreQueueId() throws Exception {
+  public void getDocStoreQueueId() {
 
     assertThat(beanType(Order.class).getDocStoreQueueId()).isEqualTo("order");
     assertThat(beanType(Customer.class).getDocStoreQueueId()).isEqualTo("customer");
   }
 
   @Test
-  public void getDocStoreIndexType() throws Exception {
+  public void getDocStoreIndexType() {
 
     assertThat(beanType(Order.class).docStore().getIndexType()).isEqualTo("order");
     assertThat(beanType(Customer.class).docStore().getIndexType()).isEqualTo("customer");
   }
 
   @Test
-  public void getDocStoreIndexName() throws Exception {
+  public void getDocStoreIndexName() {
 
     assertThat(beanType(Order.class).docStore().getIndexType()).isEqualTo("order");
     assertThat(beanType(Customer.class).docStore().getIndexType()).isEqualTo("customer");
   }
 
   @Test
-  public void docStoreNested() throws Exception {
+  public void docStoreNested() {
 
     FetchPath parse = PathProperties.parse("id,name");
 
@@ -169,9 +171,9 @@ public class BeanTypeTest {
   }
 
   @Test
-  public void docStoreApplyPath() throws Exception {
+  public void docStoreApplyPath() {
 
-    SpiQuery<Order> orderQuery = (SpiQuery<Order>) server.find(Order.class);
+    SpiQuery<Order> orderQuery = (SpiQuery<Order>) db.find(Order.class);
     beanType(Order.class).docStore().applyPath(orderQuery);
 
     OrmQueryDetail detail = orderQuery.getDetail();
@@ -228,13 +230,13 @@ public class BeanTypeTest {
 
   @Test
   public void addInheritanceWhere_when_leaf() {
-    Query<Vehicle> query = server.find(Vehicle.class);
+    Query<Vehicle> query = db.find(Vehicle.class);
     beanType(Car.class).addInheritanceWhere(query);
   }
 
   @Test
   public void addInheritanceWhere_when_root() {
-    Query<Vehicle> query = server.find(Vehicle.class);
+    Query<Vehicle> query = db.find(Vehicle.class);
     beanType(Vehicle.class).addInheritanceWhere(query);
   }
 
