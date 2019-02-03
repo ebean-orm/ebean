@@ -452,24 +452,40 @@ public interface Database {
   <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
 
   /**
-   * Create a SqlQuery for executing native sql
-   * query statements.
+   * Look to execute a native sql query that does not returns beans but instead
+   * returns SqlRow or direct access to ResultSet (see {@link SqlQuery#findList(RowMapper)}.
+   *
    * <p>
-   * Note that you can use raw SQL with entity beans, refer to the SqlSelect
-   * annotation for examples.
+   * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
    * </p>
+   * <p>
+   * Refer to {@link #findNative(Class, String)} for native sql queries returning entity beans.
+   * </p>
+   */
+  SqlQuery sqlQuery(String sql);
+
+  /**
+   * This is an alias for {@link #sqlQuery(String)}.
    */
   SqlQuery createSqlQuery(String sql);
 
   /**
-   * Create a sql update for executing native dml statements.
+   * Look to execute a native sql insert update or delete statement.
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
    * be native to the database and contain database table and column names.
    * </p>
+   *
    * <p>
    * See {@link SqlUpdate} for example usage.
    * </p>
+   *
+   * @return The SqlUpdate instance to set parameters and execute
+   */
+  SqlUpdate sqlUpdate(String sql);
+
+  /**
+   * This is an alias for {@link #sqlUpdate(String)}.
    */
   SqlUpdate createSqlUpdate(String sql);
 

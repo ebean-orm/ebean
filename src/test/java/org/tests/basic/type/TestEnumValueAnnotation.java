@@ -1,15 +1,15 @@
 package org.tests.basic.type;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
 import org.tests.model.basic.EBasicEnumId;
 import org.tests.model.basic.EBasicEnumInt;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.Optional;
 
@@ -25,26 +25,25 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     b.setName("Banana");
     b.setStatus(Status.NEW);
 
-    Ebean.save(b);
+    DB.save(b);
 
-    SqlQuery q = Ebean.createSqlQuery("select * from e_basic where id = :id");
-    q.setParameter("id", b.getId());
+    SqlRow sqlRow = DB.createSqlQuery("select * from e_basic where id = :id")
+      .setParameter("id", b.getId())
+      .findOne();
 
-    SqlRow sqlRow = q.findOne();
     String strStatus = sqlRow.getString("status");
-
     assertEquals("N", strStatus);
 
     EBasic b2 = new EBasic();
     b2.setName("Apple");
     b2.setStatus(Status.NEW);
 
-    Ebean.save(b2);
+    DB.save(b2);
 
-    EBasic b3 = Ebean.find(EBasic.class, b2.getId());
+    EBasic b3 = DB.find(EBasic.class, b2.getId());
     b3.setName("Orange");
 
-    Ebean.save(b3);
+    DB.save(b3);
   }
 
   @Test
@@ -53,9 +52,9 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     b.setName("Banana");
     b.setStatus(EBasicEnumId.Status.NEW);
 
-    Ebean.save(b);
+    DB.save(b);
 
-    SqlQuery q = Ebean.createSqlQuery("select * from e_basic_enum_id where status = :status");
+    SqlQuery q = DB.createSqlQuery("select * from e_basic_enum_id where status = :status");
     q.setParameter("status", b.getStatus());
 
     SqlRow sqlRow = q.findOne();
@@ -64,7 +63,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     assertEquals("N", strStatus);
 
     try {
-      b = Ebean.find(EBasicEnumId.class, b.getStatus());
+      b = DB.find(EBasicEnumId.class, b.getStatus());
     } catch (java.lang.IllegalArgumentException iae) {
       Assert.fail("The use of an enum as id should work : " + iae.getLocalizedMessage());
     }
@@ -79,9 +78,9 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     b.setName("Banana");
     b.setStatus(EBasicEnumInt.Status.NEW);
 
-    Ebean.save(b);
+    DB.save(b);
 
-    SqlQuery q = Ebean.createSqlQuery("select * from e_basic_eni where id = :id");
+    SqlQuery q = DB.createSqlQuery("select * from e_basic_eni where id = :id");
     q.setParameter("id", b.getId());
 
     Optional<SqlRow> sqlRow = q.findOneOrEmpty();
@@ -91,7 +90,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     });
 
 
-    EBasicEnumInt b2 = Ebean.find(EBasicEnumInt.class)
+    EBasicEnumInt b2 = DB.find(EBasicEnumInt.class)
       .where().eq("id", b.getId())
       .eq("status", EBasicEnumInt.Status.NEW)
       .findOne();

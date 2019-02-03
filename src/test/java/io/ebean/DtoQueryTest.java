@@ -130,7 +130,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     List<Integer> ids = Arrays.asList(1, 2);
 
-    List<SqlRow> list = server().createSqlQuery("select id, name from o_customer where id = any(?)")
+    List<SqlRow> list = DB.sqlQuery("select id, name from o_customer where id = any(?)")
       .setParameter(1, ids)
       .findList();
 

@@ -702,29 +702,49 @@ public class DB {
   }
 
   /**
-   * Create a SqlQuery for executing native sql
-   * query statements.
+   * Look to execute a native sql query that does not returns beans but instead
+   * returns SqlRow or direct access to ResultSet (see {@link SqlQuery#findList(RowMapper)}.
+   *
    * <p>
-   * Note that you can use raw SQL with entity beans, refer to the SqlSelect
-   * annotation for examples.
+   * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
+   * </p>
+   * <p>
+   * Refer to {@link #findNative(Class, String)} for native sql queries returning entity beans.
    * </p>
    */
-  public static SqlQuery createSqlQuery(String sql) {
-    return getDefault().createSqlQuery(sql);
+  public static SqlQuery sqlQuery(String sql) {
+    return getDefault().sqlQuery(sql);
   }
 
   /**
-   * Create a sql update for executing native dml statements.
+   * This is an alias for {@link #sqlQuery(String)}.
+   */
+  public static SqlQuery createSqlQuery(String sql) {
+    return sqlQuery(sql);
+  }
+
+  /**
+   * Look to execute a native sql insert update or delete statement.
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
    * be native to the database and contain database table and column names.
    * </p>
+   *
    * <p>
    * See {@link SqlUpdate} for example usage.
    * </p>
+   *
+   * @return The SqlUpdate instance to set parameters and execute
+   */
+  public static SqlUpdate sqlUpdate(String sql) {
+    return getDefault().sqlUpdate(sql);
+  }
+
+  /**
+   * This is an alias for {@link #sqlUpdate(String)}.
    */
   public static SqlUpdate createSqlUpdate(String sql) {
-    return getDefault().createSqlUpdate(sql);
+    return sqlUpdate(sql);
   }
 
   /**
