@@ -203,6 +203,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void noflushWhenIdIsLoaded() {
 
     EbeanServer server = Ebean.getDefaultServer();

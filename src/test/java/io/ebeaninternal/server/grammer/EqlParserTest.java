@@ -364,6 +364,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void selectFetchFetchLimit() {
 
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch shippingAddress (line1) limit 10");
@@ -392,6 +393,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void selectFetchFetchManyPropertiesLimit() {
 
     ResetBasicData.reset();
