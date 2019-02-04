@@ -206,9 +206,9 @@ class InExpression extends AbstractExpression {
   @Override
   public <F extends QueryDsl<?,F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
    if (not) {
-     target.notIn(propName, bindValues);
+     target.notIn(propName, sourceValues);
    } else {
-     target.in(propName, bindValues);
+     target.in(propName, sourceValues);
    }
   }
 }
