@@ -9,6 +9,7 @@ import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * A SQL Update Delete or Insert statement that can be executed. For the times
@@ -65,6 +66,8 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
    * Helper to add positioned parameters in order.
    */
   private int addPos;
+
+  private int bindExpansion;
 
   private boolean getGeneratedKeys;
 
@@ -253,21 +256,46 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
+  private SqlUpdate setParamWithBindExpansion(int position, Collection values, String bindLiteral) {
+
+    StringBuilder sqlExpand = new StringBuilder(values.size() * 2);
+    int offset = 0;
+    for (Object val : values) {
+      if (offset > 0) {
+        sqlExpand.append(",");
+      }
+      sqlExpand.append("?");
+      bindParams.setParameter(position + offset++, val);
+    }
+    bindExpansion += offset;
+    generatedSql = generatedSql.replace(bindLiteral, sqlExpand.toString());
+    return this;
+  }
+
   @Override
   public SqlUpdate setParameter(int position, Object value) {
-    bindParams.setParameter(position, value);
+
+    if (value instanceof Collection) {
+      String bindLiteral = "?" + position;
+      int pos = sql.indexOf(bindLiteral);
+      if (pos > -1) {
+        return setParamWithBindExpansion(position, (Collection) value, bindLiteral);
+      }
+    }
+
+    bindParams.setParameter(bindExpansion + position, value);
     return this;
   }
 
   @Override
   public SqlUpdate setNull(int position, int jdbcType) {
-    bindParams.setNullParameter(position, jdbcType);
+    bindParams.setNullParameter(bindExpansion + position, jdbcType);
     return this;
   }
 
   @Override
   public SqlUpdate setNullParameter(int position, int jdbcType) {
-    bindParams.setNullParameter(position, jdbcType);
+    bindParams.setNullParameter(bindExpansion + position, jdbcType);
     return this;
   }
 
