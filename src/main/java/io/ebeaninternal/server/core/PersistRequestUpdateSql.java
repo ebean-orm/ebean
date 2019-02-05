@@ -3,6 +3,7 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.PersistExecute;
 
 /**
@@ -56,6 +57,25 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   public int addBatch() {
     this.addBatch = true;
     return executeOrQueue();
+  }
+
+  /**
+   * Execute using jdbc batch.
+   */
+  public void executeAddBatch() {
+    this.addBatch = true;
+    persistExecute.executeSqlUpdate(this);
+  }
+
+  /**
+   * Add this request to BatchControl to flush later.
+   */
+  public void addToFlushQueue(boolean early) {
+    BatchControl control = transaction.getBatchControl();
+    if (control == null) {
+      control = persistExecute.createBatchControl(transaction);
+    }
+    control.addToFlushQueue(this, early);
   }
 
   @Override

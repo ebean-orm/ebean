@@ -104,6 +104,11 @@ public interface Persister {
   void visitMetrics(MetricVisitor visitor);
 
   /**
+   * Execute or queue the update.
+   */
+  void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue);
+
+  /**
    * Add the statement to JDBC batch for later execution via executeBatch.
    */
   void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction);

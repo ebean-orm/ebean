@@ -1,43 +1,107 @@
 package org.tests.sp;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
+import io.ebean.Transaction;
+import org.junit.Test;
 import org.tests.sp.model.car.Car;
 import org.tests.sp.model.car.Wheel;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class TestManyToManySaveTwice extends BaseTestCase {
+
+  @Test
+  public void insertBatch() {
+
+    delete();
+
+    Wheel w0 = new Wheel("wx0");
+    Wheel w1 = new Wheel("wx1");
+
+    List<Wheel> wheels = new LinkedList<>();
+    wheels.add(w0);
+    wheels.add(w1);
+
+    DB.saveAll(wheels);
+
+    Car c0 = new Car("cx0");
+    c0.getWheels().add(w0);
+    c0.getWheels().add(w1);
+
+    Car c1 = new Car("cx1");
+    c1.getWheels().add(w1);
+
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      DB.save(c0);
+      DB.save(c1);
+
+      transaction.commit();
+    }
+  }
+
+
+  @Test
+  public void insertBasic() {
+
+    delete();
+
+    Wheel w0 = new Wheel("wx0");
+    Wheel w1 = new Wheel("wx1");
+
+    List<Wheel> wheels = new LinkedList<>();
+    wheels.add(w0);
+    wheels.add(w1);
+
+    DB.saveAll(wheels);
+
+    Car c0 = new Car("cx0");
+    c0.getWheels().add(w0);
+    c0.getWheels().add(w1);
+
+    Car c1 = new Car("cx1");
+    c1.getWheels().add(w1);
+
+    DB.save(c0);
+    DB.save(c1);
+  }
 
   @Test
   public void testInsertCarTwice() {
 
-    Ebean.createSqlUpdate("delete from sp_car_car_wheels").execute();
-    Ebean.createSqlUpdate("delete from sp_car_wheel").execute();
-    Ebean.createSqlUpdate("delete from sp_car_car").execute();
+    delete();
 
     List<Wheel> wheels = new LinkedList<>();
-    wheels.add(new Wheel());
-    wheels.add(new Wheel());
-    wheels.add(new Wheel());
-    wheels.add(new Wheel());
+    wheels.add(new Wheel("w0"));
+    wheels.add(new Wheel("w1"));
+    wheels.add(new Wheel("w2"));
+    wheels.add(new Wheel("w3"));
 
-    Car c = new Car();
+    Car c = new Car("c1");
     c.setWheels(wheels);
 
-    Ebean.save(c); // NOTE 1ST SAVE
+    DB.save(c); // NOTE 1ST SAVE
+    assertNotNull(c.getId());
 
-    Assert.assertFalse("No ID assigned!", c.getId() == null);
-
-    Ebean.save(c); // NOTE 2ND SAVE
+    DB.save(c); // NOTE 2ND SAVE
 
     List<Car> allCars = Ebean.find(Car.class).findList();
-    Assert.assertEquals("Inserted 1 car, received more/less!", 1, allCars.size());
+    assertEquals(1, allCars.size());
 
     List<Wheel> allWheels = Ebean.find(Wheel.class).findList();
-    Assert.assertEquals("Inserted 4 wheels, received more/less!", 4, allWheels.size());
+    assertEquals(4, allWheels.size());
+  }
+
+  private void delete() {
+    DB.sqlUpdate("delete from sp_car_car_wheels").execute();
+    DB.sqlUpdate("delete from sp_car_wheel").execute();
+    DB.sqlUpdate("delete from sp_car_car").execute();
   }
 }

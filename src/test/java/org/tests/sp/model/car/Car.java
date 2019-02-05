@@ -16,9 +16,19 @@ public class Car extends IdEntity {
 
   private static final long serialVersionUID = 2579148859565507940L;
 
+  private final String name;
+
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "sp_car_car_wheels", joinColumns = {@JoinColumn(name = "car")}, inverseJoinColumns = {@JoinColumn(name = "wheel")})
   private List<Wheel> wheels;
+
+  public Car(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
 
   public List<Wheel> getWheels() {
     return wheels;

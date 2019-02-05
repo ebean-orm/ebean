@@ -141,12 +141,24 @@ public final class DefaultPersister implements Persister {
     }
   }
 
+  @Override
+  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue) {
+    if (queue) {
+      addToFlushQueue(update, t, false);
+    } else {
+      executeSqlUpdate(update, t);
+    }
+  }
+
+  private void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, boolean early) {
+    new PersistRequestUpdateSql(server, update, t, persistExecute).addToFlushQueue(early);
+  }
+
   /**
    * Execute the updateSql.
    */
   @Override
   public int executeSqlUpdate(SqlUpdate updSql, Transaction t) {
-
     return executeOrQueue(new PersistRequestUpdateSql(server, (SpiSqlUpdate) updSql, (SpiTransaction) t, persistExecute));
   }
 
@@ -958,12 +970,19 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  void deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
+  void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
 
-    // delete all intersection rows for this bean
+    SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
+    if (queue) {
+      addToFlushQueue(sqlDelete, t, true);
+    } else {
+      executeSqlUpdate(sqlDelete, t);
+    }
+  }
+
+  private SpiSqlUpdate deleteAllIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, boolean publish) {
     IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean, publish);
-    SqlUpdate sqlDelete = intRow.createDeleteChildren(server);
-    executeSqlUpdate(sqlDelete, t);
+    return intRow.createDeleteChildren(server);
   }
 
   /**
@@ -1012,7 +1031,7 @@ public final class DefaultPersister implements Persister {
       if (many.hasJoinTable()) {
         if (deleteMode.isHard()) {
           // delete associated rows from intersection table (but not during soft delete)
-          deleteAssocManyIntersection(parentBean, many, t, request.isPublish());
+          deleteManyIntersection(parentBean, many, t, request.isPublish(), false);
         }
       } else {
 

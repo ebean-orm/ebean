@@ -34,14 +34,15 @@ public class TestOneToManyJoinTableInheritance extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
 
-    assertThat(sql).hasSize(11);
+    assertThat(sql).hasSize(8);
     assertThat(sql.get(0)).contains("insert into class_super ");
-    assertThat(sql.get(2)).contains("insert into monkey ");
-    assertThat(sql.get(2)).contains("insert into monkey ");
-    assertThat(sql.get(5)).contains("insert into class_super_monkey ");
-    assertThat(sql.get(6)).contains("insert into class_super ");
-    assertThat(sql.get(8)).contains("insert into monkey ");
-    assertThat(sql.get(10)).contains("insert into class_super_monkey ");
+    assertThat(sql.get(1)).contains("-- bind(ClassA)");
+    assertThat(sql.get(2)).contains("-- bind(ClassB)");
+    assertThat(sql.get(3)).contains("insert into monkey ");
+    assertThat(sql.get(4)).contains("-- bind(Sim");
+    assertThat(sql.get(5)).contains("-- bind(Tim");
+    assertThat(sql.get(6)).contains("-- bind(Uim");
+    assertThat(sql.get(7)).contains("insert into class_super_monkey (class_super_sid, monkey_mid) values (?, ?)");
 
     ClassA dbA = Ebean.find(ClassA.class, 1);
     ClassB dbB = Ebean.find(ClassB.class, 2);

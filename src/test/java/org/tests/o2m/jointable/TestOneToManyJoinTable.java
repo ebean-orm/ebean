@@ -47,12 +47,11 @@ public class TestOneToManyJoinTable extends BaseTestCase {
       assertThat(sql.get(1)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
     }
 
-    int intersectionRows = Ebean.createSqlQuery("select count(*) as total from troop_monkey where troop_pid = ?")
+    long intersectionRows = Ebean.createSqlQuery("select count(*) as total from troop_monkey where troop_pid = ?")
       .setParameter(1, troop.getPid())
-      .findOne()
-      .getInteger("total");
+      .findSingleLong();
 
-    assertThat(intersectionRows).isEqualTo(2);
+    assertThat(intersectionRows).isEqualTo(2L);
 
     LoggedSqlCollector.current();
     JtTroop fetchTroop = Ebean.find(JtTroop.class)

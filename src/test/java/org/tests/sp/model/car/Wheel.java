@@ -11,4 +11,13 @@ public class Wheel extends IdEntity {
 
   private static final long serialVersionUID = 2399600193947163469L;
 
+  private String name;
+
+  public Wheel(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
 }
