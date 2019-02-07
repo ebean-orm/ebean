@@ -36,9 +36,14 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   private final BindParams bindParams;
 
   /**
-   * The sql update or delete statement.
+   * The original sql update or delete statement.
    */
-  private final String sql;
+  private final String origSql;
+
+  /**
+   * The sql taking into account bind parameter expansion.
+   */
+  private String baseSql;
 
   /**
    * The actual sql with named parameters converted.
@@ -92,7 +97,8 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
    */
   public DefaultSqlUpdate(SpiEbeanServer server, String sql, BindParams bindParams) {
     this.server = server;
-    this.sql = sql;
+    this.origSql = sql;
+    this.baseSql = sql;
     this.bindParams = bindParams;
   }
 
@@ -224,11 +230,21 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   @Override
   public void setGeneratedSql(String generatedSql) {
     this.generatedSql = generatedSql;
+    this.baseSql = origSql;
+    if (bindExpansion > 0) {
+      bindParams.reset();
+      bindExpansion = 0;
+    }
   }
 
   @Override
   public String getSql() {
-    return sql;
+    return origSql;
+  }
+
+  @Override
+  public String getBaseSql() {
+    return baseSql;
   }
 
   @Override
@@ -259,6 +275,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   private SqlUpdate setParamWithBindExpansion(int position, Collection values, String bindLiteral) {
 
     StringBuilder sqlExpand = new StringBuilder(values.size() * 2);
+    position = position + bindExpansion;
     int offset = 0;
     for (Object val : values) {
       if (offset > 0) {
@@ -267,8 +284,8 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
       sqlExpand.append("?");
       bindParams.setParameter(position + offset++, val);
     }
-    bindExpansion += offset;
-    generatedSql = generatedSql.replace(bindLiteral, sqlExpand.toString());
+    bindExpansion += (offset - 1);
+    baseSql = baseSql.replace(bindLiteral, sqlExpand.toString());
     return this;
   }
 
@@ -277,7 +294,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 
     if (value instanceof Collection) {
       String bindLiteral = "?" + position;
-      int pos = sql.indexOf(bindLiteral);
+      int pos = baseSql.indexOf(bindLiteral);
       if (pos > -1) {
         return setParamWithBindExpansion(position, (Collection) value, bindLiteral);
       }
