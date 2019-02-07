@@ -104,7 +104,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setBatchMode(true);
 
-      upd.setParams(asList(9991), asList("Foo"), asList("Bar"));
+      upd.setParams(asList(9991), asList("Foo"), asList(9994));
       upd.execute();
 
       upd.setParams(asList(9991, 9992), asList("Foo", "Bar"), asList(1,2,3,4));
