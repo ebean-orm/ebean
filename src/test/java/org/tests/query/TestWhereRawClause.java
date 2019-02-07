@@ -6,16 +6,16 @@ import io.ebean.Expr;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestWhereRawClause extends BaseTestCase {
@@ -50,6 +50,35 @@ public class TestWhereRawClause extends BaseTestCase {
 
   }
 
+  @Test
+  public void testRaw_bindExpansion_subquery() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .where()
+      .raw("id in (select c.id from o_customer c where c.name in (?1))", asList("Rob", "Fiona", "Jack"))
+      .query();
+
+    List<Customer> list = query.findList();
+    assertThat(list).isNotEmpty();
+    assertThat(sqlOf(query)).contains(" t0.id in (select c.id from o_customer c where c.name in (?,?,?))");
+  }
+
+  @Test
+  public void testRaw_bindExpansion() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .where()
+      .raw("name in (?1)", asList("Rob", "Fiona", "Jack"))
+      .query();
+
+    List<Customer> list = query.findList();
+    assertThat(list).isNotEmpty();
+    assertThat(sqlOf(query)).contains(" t0.name in (?,?,?)");
+  }
 
   @Test
   @ForPlatform(Platform.POSTGRES)
@@ -57,13 +86,9 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<String> names = new ArrayList<>();
-    names.add("Rob");
-    names.add("Fiona");
-
     List<Customer> list = Ebean.find(Customer.class)
       .where()
-      .raw("name = any(?)", names)
+      .raw("name = any(?)", asList("Rob", "Fiona", "Jack"))
       .findList();
 
     assertThat(list).isNotEmpty();

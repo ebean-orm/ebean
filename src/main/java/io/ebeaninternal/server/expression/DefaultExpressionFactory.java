@@ -529,7 +529,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression raw(String raw, Object value) {
-    return new RawExpression(raw, new Object[]{value});
+    return RawExpressionBuilder.buildSingle(raw, value);
   }
 
   /**
@@ -541,7 +541,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression raw(String raw, Object[] values) {
-    return new RawExpression(raw, values);
+    return RawExpressionBuilder.build(raw, values);
   }
 
   /**
