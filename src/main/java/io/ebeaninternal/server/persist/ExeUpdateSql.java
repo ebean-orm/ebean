@@ -87,13 +87,11 @@ class ExeUpdateSql {
     SpiSqlUpdate updateSql = request.getUpdateSql();
     SpiTransaction t = request.getTransaction();
 
-    String sql = updateSql.getSql();
-
     BindParams bindParams = updateSql.getBindParams();
 
     // process named parameters if required
+    String sql = updateSql.getBaseSql();
     sql = BindParamsParser.parse(bindParams, sql);
-    updateSql.setGeneratedSql(sql);
 
     PreparedStatement pstmt;
     if (batchThisRequest) {
@@ -112,6 +110,7 @@ class ExeUpdateSql {
     }
 
     request.setBindLog(bindLog);
+    updateSql.setGeneratedSql(sql);
 
     // derive the statement type (for TransactionEvent)
     parseUpdate(sql, request);

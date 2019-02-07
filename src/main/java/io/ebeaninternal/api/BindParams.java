@@ -41,6 +41,14 @@ public class BindParams implements Serializable {
   public BindParams() {
   }
 
+  /**
+   * Reset positioned parameters (usually due to bind parameter expansion).
+   */
+  public void reset() {
+    bindHash = null;
+    positionedParameters.clear();
+  }
+
   public int queryBindHash() {
     int hc = namedParameters.hashCode();
     for (Param positionedParameter : positionedParameters) {
