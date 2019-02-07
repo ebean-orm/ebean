@@ -95,15 +95,10 @@ class ExeUpdateSql {
     sql = BindParamsParser.parse(bindParams, sql);
     updateSql.setGeneratedSql(sql);
 
-    boolean logSql = request.isLogSql();
-
     PreparedStatement pstmt;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmt(t, logSql, sql, request);
+      pstmt = pstmtFactory.getPstmt(t, request.isLogSql(), sql, request);
     } else {
-      if (logSql) {
-        t.logSql(TrimLogSql.trim(sql));
-      }
       pstmt = pstmtFactory.getPstmt(t, sql, request.isGetGeneratedKeys());
     }
 
@@ -120,6 +115,9 @@ class ExeUpdateSql {
 
     // derive the statement type (for TransactionEvent)
     parseUpdate(sql, request);
+    if (batchThisRequest) {
+      request.logSqlBatchBind();
+    }
     return pstmt;
   }
 
@@ -127,16 +125,16 @@ class ExeUpdateSql {
   private void determineType(String word1, String word2, String word3, PersistRequestUpdateSql request) {
 
     if (word1.equalsIgnoreCase("UPDATE")) {
-      request.setType(SqlType.SQL_UPDATE, word2, "UpdateSql");
+      request.setType(SqlType.SQL_UPDATE, word2);
 
     } else if (word1.equalsIgnoreCase("DELETE")) {
-      request.setType(SqlType.SQL_DELETE, word3, "DeleteSql");
+      request.setType(SqlType.SQL_DELETE, word3);
 
     } else if (word1.equalsIgnoreCase("INSERT")) {
-      request.setType(SqlType.SQL_INSERT, word3, "InsertSql");
+      request.setType(SqlType.SQL_INSERT, word3);
 
     } else {
-      request.setType(SqlType.SQL_UNKNOWN, null, "UnknownSql");
+      request.setType(SqlType.SQL_UNKNOWN, null);
     }
   }
 
@@ -160,7 +158,7 @@ class ExeUpdateSql {
     if (spaceCount < 2) {
       // unknown so no automatic L2 cache invalidation performed (so it should instead)
       // be done explicitly via the server.externalModification() method
-      request.setType(SqlType.SQL_UNKNOWN, null, "UnknownSql");
+      request.setType(SqlType.SQL_UNKNOWN, null);
 
     } else {
       // try to determine if it is insert, update or delete and the table involved

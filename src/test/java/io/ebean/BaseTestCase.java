@@ -94,6 +94,16 @@ public abstract class BaseTestCase {
     return trimSql(query.getGeneratedSql(), columns);
   }
 
+  protected void assertSqlBind(List<String> sql, int i) {
+    assertThat(sql.get(i)).contains("-- bind");
+  }
+
+  protected void assertSqlBind(List<String> sql, int from, int to) {
+    for (int i = from; i <= to; i++) {
+      assertThat(sql.get(i)).contains("-- bind");
+    }
+  }
+
   protected String trimSql(String sql) {
 
     if (sql.contains(" c1,")) {

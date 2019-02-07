@@ -15,14 +15,16 @@ public class Str {
     // determine a decent buffer size
     int len = 16 + s0.length() + s1.length();
     for (String arg1 : args) {
-      len += arg1.length();
+      len += (arg1 == null) ? 0 : arg1.length();
     }
 
     // append all the strings into the buffer
     StringBuilder sb = new StringBuilder(len);
     sb.append(s0).append(s1);
     for (String arg : args) {
-      sb.append(arg);
+      if (arg != null) {
+        sb.append(arg);
+      }
     }
     return sb.toString();
   }

@@ -38,10 +38,11 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(1);
+      assertThat(sql).hasSize(3);
       assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
-    }
-    else {
+      assertSqlBind(sql, 1, 2);
+
+    } else {
       assertThat(sql).hasSize(2);
       assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
       assertThat(sql.get(1)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
@@ -96,12 +97,14 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     //Collections.sort(sql);
 
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(8);
+      assertThat(sql).hasSize(13);
       assertThat(sql.get(0)).contains("insert into trainer ");
       assertThat(sql.get(1)).contains("insert into monkey ");
+      assertSqlBind(sql, 2, 4);
       assertThat(sql.get(5)).contains("update monkey set name=?, food_preference=?, version=? where mid=? and version=?");
       assertThat(sql.get(6)).contains("-- bind(");
       assertThat(sql.get(7)).contains("insert into trainer_monkey ");
+      assertSqlBind(sql, 8, 12);
 
     } else {
       assertThat(sql).hasSize(10);

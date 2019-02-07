@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.meta.MetaTimedMetric;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.idkeys.db.AuditLog;
@@ -42,19 +43,55 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
   @Test
   public void testExecute_inTransaction_withBatch() {
 
+    LoggedSqlCollector.start();
+
     try (Transaction transaction = Ebean.beginTransaction()) {
       transaction.setBatchMode(true);
 
-      int row = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
-        .setParameter(1, 999999)
-        .execute();
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999);
 
+      int row = sqlUpdate.execute();
       // update statement using JDBC batch so not executed yet
       assertThat(row).isEqualTo(-1);
+
+      sqlUpdate.setParameter(1, 999998);
+      sqlUpdate.execute();
 
       transaction.commit();
     }
 
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("update audit_log set description = description where id = ?");
+    assertSqlBind(sql, 1, 2);
+  }
+
+  @Test
+  public void testExecute_inTransaction_withoutBatch() {
+
+    LoggedSqlCollector.start();
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setBatchMode(false);
+
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999);
+
+      int row0 = sqlUpdate.execute();
+      assertThat(row0).isEqualTo(0);
+
+      sqlUpdate.setParameter(1, 999998);
+      int row1 = sqlUpdate.execute();
+      assertThat(row1).isEqualTo(0);
+
+      transaction.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("update audit_log set description = description where id = ?; -- bind(999999)");
+    assertThat(sql.get(1)).contains("update audit_log set description = description where id = ?; -- bind(999998)");
   }
 
   @Test

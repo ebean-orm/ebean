@@ -3,15 +3,21 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.util.List;
+
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
 
   @Test
   public void test() {
+
+    LoggedSqlCollector.start();
 
     SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (:ids)");
 
@@ -24,6 +30,8 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     sqlUpdate.execute();
     assertEquals("delete from o_customer where id in (?,?)", sqlUpdate.getGeneratedSql());
 
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
   }
 
 
