@@ -97,6 +97,8 @@ class Loader {
       if (fileName != null) {
         loadWithExtensionCheck(fileName);
       }
+    } else {
+        loadWithExtensionCheck(fileName);
     }
   }
 
