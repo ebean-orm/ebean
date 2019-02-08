@@ -281,6 +281,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value) {
+    return exprList.inRangeWith(lowProperty, highProperty, value);
+  }
+
+  @Override
   public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
     return exprList.inRange(propertyName, value1, value2);
   }
@@ -598,6 +603,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> gtOrNull(String propertyName, Object value) {
+    return exprList.gtOrNull(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> having() {
     throw new IllegalStateException("having() not allowed on Junction expression list");
   }
@@ -730,6 +740,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> lt(String propertyName, Object value) {
     return exprList.lt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> ltOrNull(String propertyName, Object value) {
+    return exprList.ltOrNull(propertyName, value);
   }
 
   @Override

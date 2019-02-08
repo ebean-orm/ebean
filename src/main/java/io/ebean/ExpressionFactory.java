@@ -158,6 +158,25 @@ public interface ExpressionFactory {
   Expression inRange(String propertyName, Object value1, Object value2);
 
   /**
+   * Value in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .startDate.inRangeWith(endDate, now)
+   *
+   *    // which equates to
+   *    startDate <= now and (endDate > now or endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   * The most common use of this could be called "effective dating" where 2 date or
+   * timestamp columns represent the date range in which
+   */
+  Expression inRangeWith(String lowProperty, String highProperty, Object value);
+
+  /**
    * Between - property between the two given values.
    */
   Expression between(String propertyName, Object value1, Object value2);
@@ -166,6 +185,14 @@ public interface ExpressionFactory {
    * Between - value between two given properties.
    */
   Expression betweenProperties(String lowProperty, String highProperty, Object value);
+
+  /**
+   * Greater Than Or Null - property greater than the given value or null.
+   * <p>
+   * A convenient expression combining GT and Is Null.  Most often useful for range
+   * expressions where the top range value is nullable.
+   */
+  Expression gtOrNull(String propertyName, Object value);
 
   /**
    * Greater Than - property greater than the given value.
@@ -177,6 +204,14 @@ public interface ExpressionFactory {
    * value.
    */
   Expression ge(String propertyName, Object value);
+
+  /**
+   * Less Than or Null - property less than the given value or null.
+   * <p>
+   * A convenient expression combining LT and Is Null.  Most often useful for range
+   * expressions where the bottom range value is nullable.
+   */
+  Expression ltOrNull(String propertyName, Object value);
 
   /**
    * Less Than - property less than the given value.

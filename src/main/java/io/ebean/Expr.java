@@ -71,7 +71,6 @@ public class Expr {
    * </p>
    */
   public static Expression inRange(String propertyName, Object value1, Object value2) {
-
     return Ebean.getExpressionFactory().inRange(propertyName, value1, value2);
   }
 
@@ -79,7 +78,6 @@ public class Expr {
    * Between - property between the two given values.
    */
   public static Expression between(String propertyName, Object value1, Object value2) {
-
     return Ebean.getExpressionFactory().between(propertyName, value1, value2);
   }
 
@@ -87,7 +85,6 @@ public class Expr {
    * Between - value between two given properties.
    */
   public static Expression between(String lowProperty, String highProperty, Object value) {
-
     return Ebean.getExpressionFactory().betweenProperties(lowProperty, highProperty, value);
   }
 

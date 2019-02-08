@@ -221,6 +221,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new InRangeExpression(propertyName, value1, value2);
   }
 
+  @Override
+  public Expression inRangeWith(String lowProperty, String highProperty, Object value) {
+    return and(le(lowProperty, value), gtOrNull(highProperty, value));
+  }
+
   /**
    * Between - property between the two given values.
    */
@@ -246,12 +251,28 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
+   * Greater Than or null - property greater than the given value or null.
+   */
+  @Override
+  public Expression gtOrNull(String propertyName, Object value) {
+    return or(gt(propertyName, value), isNull(propertyName));
+  }
+
+  /**
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
    */
   @Override
   public Expression ge(String propertyName, Object value) {
     return new SimpleExpression(propertyName, Op.GT_EQ, value);
+  }
+
+  /**
+   * Less Than or null - property less than the given value or null.
+   */
+  @Override
+  public Expression ltOrNull(String propertyName, Object value) {
+    return or(lt(propertyName, value), isNull(propertyName));
   }
 
   /**

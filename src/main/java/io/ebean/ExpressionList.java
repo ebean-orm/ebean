@@ -803,6 +803,25 @@ public interface ExpressionList<T> {
   ExpressionList<T> ine(String propertyName, String value);
 
   /**
+   * Value in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .startDate.inRangeWith(endDate, now)
+   *
+   *    // which equates to
+   *    startDate <= now and (endDate > now or endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   * The most common use of this could be called "effective dating" where 2 date or
+   * timestamp columns represent the date range in which
+   */
+  ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value);
+
+  /**
    * In Range - property >= value1 and property < value2.
    * <p>
    * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
@@ -826,6 +845,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> gt(String propertyName, Object value);
 
   /**
+   * Greater Than or Null - property greater than the given value or null.
+   */
+  ExpressionList<T> gtOrNull(String propertyName, Object value);
+
+  /**
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
    */
@@ -835,6 +859,11 @@ public interface ExpressionList<T> {
    * Less Than - property less than the given value.
    */
   ExpressionList<T> lt(String propertyName, Object value);
+
+  /**
+   * Less Than or Null - property less than the given value or null.
+   */
+  ExpressionList<T> ltOrNull(String propertyName, Object value);
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.
