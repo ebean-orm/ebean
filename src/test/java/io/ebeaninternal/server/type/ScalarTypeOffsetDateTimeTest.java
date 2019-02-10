@@ -61,7 +61,7 @@ public class ScalarTypeOffsetDateTimeTest {
   @Test
   public void testJson() throws Exception {
 
-    OffsetDateTime now = OffsetDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now().withNano(123_000_000); // jdk11 workaround
 
     JsonTester<OffsetDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
