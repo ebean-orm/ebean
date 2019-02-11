@@ -247,7 +247,7 @@ public class SaveManyBeans extends SaveManyBase {
     if (request.isQueueManyIntersection()) {
       // queue/delay until bean persist request is flushed
       this.deleteMissing = deleteMissingChildren;
-      request.setManyIntersection(this);
+      request.addManyIntersection(this);
     } else {
       saveAssocManyIntersection(deleteMissingChildren, false);
     }
