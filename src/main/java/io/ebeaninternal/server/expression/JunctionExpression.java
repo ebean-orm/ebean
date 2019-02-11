@@ -316,6 +316,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> eqOrNull(String propertyName, Object value) {
+    return exprList.eqOrNull(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> exampleLike(Object example) {
     return exprList.exampleLike(example);
   }

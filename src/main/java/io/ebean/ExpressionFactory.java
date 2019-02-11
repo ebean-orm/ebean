@@ -123,6 +123,11 @@ public interface ExpressionFactory {
   Expression eq(String propertyName, Object value);
 
   /**
+   * Equal To or Null - property equal to the given value or null.
+   */
+  Expression eqOrNull(String propertyName, Object value);
+
+  /**
    * Not Equal To - property not equal to the given value.
    */
   Expression ne(String propertyName, Object value);

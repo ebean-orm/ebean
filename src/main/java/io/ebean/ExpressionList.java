@@ -786,6 +786,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> eq(String propertyName, Object value);
 
   /**
+   * Equal To or Null - property is equal to a given value or null.
+   */
+  ExpressionList<T> eqOrNull(String propertyName, Object value);
+
+  /**
    * Not Equal To - property not equal to the given value.
    */
   ExpressionList<T> ne(String propertyName, Object value);

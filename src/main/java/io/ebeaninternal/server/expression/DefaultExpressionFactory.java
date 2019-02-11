@@ -162,6 +162,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new SimpleExpression(propertyName, Op.EQ, value);
   }
 
+  @Override
+  public Expression eqOrNull(String propertyName, Object value) {
+    return or(eq(propertyName, value), isNull(propertyName));
+  }
+
   /**
    * Not Equal To - property not equal to the given value.
    */

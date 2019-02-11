@@ -31,6 +31,22 @@ public class TestQueryWhereInRange extends BaseTestCase {
   }
 
   @Test
+  public void eqOrNull() {
+
+    ResetBasicData.reset();
+
+    LocalDate today = LocalDate.now();
+
+    Query<Order> query = DB.find(Order.class)
+      .where().eqOrNull("orderDate", today)
+      .query();
+
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.order_date = ? or t0.order_date is null)");
+  }
+
+  @Test
   public void gtOrNull() {
 
     ResetBasicData.reset();
