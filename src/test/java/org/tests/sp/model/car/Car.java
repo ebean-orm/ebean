@@ -22,6 +22,10 @@ public class Car extends IdEntity {
   @JoinTable(name = "sp_car_car_wheels", joinColumns = {@JoinColumn(name = "car")}, inverseJoinColumns = {@JoinColumn(name = "wheel")})
   private List<Wheel> wheels;
 
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "sp_car_car_doors", joinColumns = {@JoinColumn(name = "car")}, inverseJoinColumns = {@JoinColumn(name = "door")})
+  private List<Door> doors;
+
   public Car(String name) {
     this.name = name;
   }
@@ -36,5 +40,13 @@ public class Car extends IdEntity {
 
   public void setWheels(List<Wheel> wheels) {
     this.wheels = wheels;
+  }
+
+  public List<Door> getDoors() {
+    return doors;
+  }
+
+  public void setDoors(List<Door> doors) {
+    this.doors = doors;
   }
 }
