@@ -187,7 +187,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Many to many intersection table changes that are held for later batch processing.
    */
-  private SaveManyBeans saveManyIntersection;
+  private List<SaveManyBeans> saveManyIntersections;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -965,8 +965,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void saveQueuedManyIntersection() {
-    if (saveManyIntersection != null) {
-      saveManyIntersection.saveIntersectionBatch();
+    if (saveManyIntersections != null) {
+      saveManyIntersections.forEach(SaveManyBeans::saveIntersectionBatch);
     }
   }
 
@@ -1479,7 +1479,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * The intersection table updates to the batch executed later on postExecute.
    */
-  public void setManyIntersection(SaveManyBeans saveManyIntersection) {
-    this.saveManyIntersection = saveManyIntersection;
+  public void addManyIntersection(SaveManyBeans saveManyIntersection) {
+    if (this.saveManyIntersections == null) {
+      this.saveManyIntersections = new ArrayList<>();
+    }
+    this.saveManyIntersections.add(saveManyIntersection);
   }
 }
