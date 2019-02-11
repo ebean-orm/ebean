@@ -19,6 +19,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
   @Test
   public void test() {
 
+    eventLog();
     LoggedSqlCollector.start();
 
     EcPerson person = new EcPerson("Fiona021");
