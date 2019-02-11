@@ -23,14 +23,14 @@ public class TestInsertCheckUnique extends BaseTestCase {
     server().beginTransaction();
     try {
       Document doc1 = new Document();
-      doc1.setTitle("ThisIsAUniqueKey");
+      doc1.setTitle("AUniqueKey_duplicateCheck");
       doc1.setBody("one");
 
       assertThat(server().checkUniqueness(doc1)).isEmpty();
       doc1.save();
 
       Document doc2 = new Document();
-      doc2.setTitle("ThisIsAUniqueKey");
+      doc2.setTitle("AUniqueKey_duplicateCheck");
       doc2.setBody("clashes with doc1");
 
       assertThat(server().checkUniqueness(doc2)).isEmpty();
