@@ -1,6 +1,8 @@
 package org.tests.insert;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.Transaction;
 import io.ebean.plugin.Property;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,80 +16,74 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
   @Before
   public void clearDb() {
-    server().find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
-    server().find(Document.class).asDraft().where().isNull("title").delete();
+    DB.find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
+    DB.find(Document.class).asDraft().where().isNull("title").delete();
   }
 
   @Test
   public void insert_duplicateKey() {
-    server().beginTransaction();
-    try {
+
+    try (Transaction transaction = DB.beginTransaction()) {
       Document doc1 = new Document();
       doc1.setTitle("AUniqueKey_duplicateCheck");
       doc1.setBody("one");
 
-      assertThat(server().checkUniqueness(doc1)).isEmpty();
+      assertThat(DB.checkUniqueness(doc1)).isEmpty();
       doc1.save();
 
       Document doc2 = new Document();
       doc2.setTitle("AUniqueKey_duplicateCheck");
       doc2.setBody("clashes with doc1");
 
-      assertThat(server().checkUniqueness(doc2)).isEmpty();
+      assertThat(DB.checkUniqueness(doc2)).isEmpty();
 
-      server().publish(doc1.getClass(), doc1.getId());
+      DB.getDefault().publish(doc1.getClass(), doc1.getId());
 
-      assertThat(server().checkUniqueness(doc2).toString()).contains("title");
-    } finally {
-      server().endTransaction();
+      assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
     }
   }
 
   @Test
   public void insert_duplicateNull() {
-    server().beginTransaction();
-    try {
+    try (Transaction transaction = DB.beginTransaction()) {
       Document doc1 = new Document();
       doc1.setTitle(null);
       doc1.setBody("one");
 
-      assertThat(server().checkUniqueness(doc1)).isEmpty();
+      assertThat(DB.checkUniqueness(doc1)).isEmpty();
       doc1.save();
 
       Document doc2 = new Document();
       doc2.setTitle(null);
       doc2.setBody("clashes with doc1");
 
-      assertThat(server().checkUniqueness(doc2)).isEmpty();
+      assertThat(DB.checkUniqueness(doc2)).isEmpty();
 
-      server().publish(doc1.getClass(), doc1.getId());
+      DB.getDefault().publish(doc1.getClass(), doc1.getId());
 
-      assertThat(server().checkUniqueness(doc2)).isEmpty();
+      assertThat(DB.checkUniqueness(doc2)).isEmpty();
 
       doc2.save();
-      server().publish(doc2.getClass(), doc2.getId());
-    } finally {
-      server().endTransaction();
+      DB.getDefault().publish(doc2.getClass(), doc2.getId());
     }
   }
 
   @Test
   public void example() {
 
-    server().beginTransaction();
-    try {
+    try (Transaction transaction = DB.beginTransaction()) {
       Document doc1 = new Document();
       doc1.setTitle("One flew over the cuckoo's nest");
       doc1.setBody("one");
       doc1.save();
 
-      server().publish(doc1.getClass(), doc1.getId());
+      DB.getDefault().publish(doc1.getClass(), doc1.getId());
 
       Document doc2 = new Document();
       doc2.setTitle("One flew over the cuckoo's nest");
       doc2.setBody("clashes with doc1");
 
-      Set<Property> properties = server().checkUniqueness(doc2);
+      Set<Property> properties = DB.checkUniqueness(doc2);
       if (properties.isEmpty()) {
         // it is unique ... carry on
       } else {
@@ -110,9 +106,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
       }
 
 
-      assertThat(server().checkUniqueness(doc2).toString()).contains("title");
-    } finally {
-      server().endTransaction();
+      assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
     }
   }
 }
