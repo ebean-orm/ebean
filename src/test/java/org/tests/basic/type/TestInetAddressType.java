@@ -3,6 +3,8 @@ package org.tests.basic.type;
 import io.ebean.Ebean;
 import io.ebean.TransactionalTestCase;
 
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.tests.model.basic.EWithInetAddr;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,6 +20,7 @@ public class TestInetAddressType extends TransactionalTestCase {
     insertUpdateDeleteFind("120.12.12.56");
   }
 
+  @IgnorePlatform(Platform.POSTGRES)
   @Test
   public void testIp6() throws UnknownHostException {
 

@@ -128,7 +128,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> dateType = new ScalarTypeDate();
 
-  private final ScalarType<?> inetAddressType = new ScalarTypeInetAddress();
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
@@ -975,8 +974,13 @@ public final class DefaultTypeManager implements TypeManager {
       addType(UUID.class, uuidType);
     }
 
+    if (postgres) { // && config.is
+      addType(InetAddress.class, new ScalarTypeInetAddressPostgres());
+    } else {
+      addType(InetAddress.class, new ScalarTypeInetAddress());
+    }
+
     addType(File.class, fileType);
-    addType(InetAddress.class, inetAddressType);
     addType(Locale.class, localeType);
     addType(Currency.class, currencyType);
     addType(TimeZone.class, timeZoneType);
