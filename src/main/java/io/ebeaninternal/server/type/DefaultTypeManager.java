@@ -14,6 +14,8 @@ import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.types.Cdir;
+import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.dbmigration.DbOffline;
@@ -974,10 +976,18 @@ public final class DefaultTypeManager implements TypeManager {
       addType(UUID.class, uuidType);
     }
 
-    if (postgres) { // && config.is
+    if (offlineMigrationGeneration || (postgres && !config.getPlatformConfig().isDatabaseInetAddressVarchar())) {
       addType(InetAddress.class, new ScalarTypeInetAddressPostgres());
     } else {
       addType(InetAddress.class, new ScalarTypeInetAddress());
+    }
+
+    if (offlineMigrationGeneration || postgres) {
+      addType(Cdir.class, new ScalarTypeCdir.Postgres());
+      addType(Inet.class, new ScalarTypeInet.Postgres());
+    } else {
+      addType(Cdir.class, new ScalarTypeCdir.Varchar());
+      addType(Inet.class, new ScalarTypeInet.Varchar());
     }
 
     addType(File.class, fileType);

@@ -37,18 +37,18 @@ public class ScalarTypeInetAddressPostgres extends ScalarTypeBaseVarchar<InetAdd
 
   @Override
   public String convertToDbString(InetAddress beanValue) {
-    return ConvertInetAddresses.toUriString(beanValue);
+    return formatValue(beanValue);
   }
 
   @Override
   public String formatValue(InetAddress v) {
-    return ConvertInetAddresses.toUriString(v);
+    return ConvertInetAddresses.toHostAddress(v);
   }
 
   @Override
   public InetAddress parse(String value) {
     try {
-      return ConvertInetAddresses.forUriString(value);
+      return ConvertInetAddresses.fromHost(value);
     } catch (IllegalArgumentException e) {
       throw new TextException("Error with InetAddresses [{}]", value, e);
     }
