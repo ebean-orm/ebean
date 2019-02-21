@@ -40,6 +40,9 @@ public interface ExtraDbTypes {
    */
   int JSONBlob = 5005;
 
+  int INET = 5020;
+  int CDIR = 5021;
+
   /**
    * Geo Point
    */
