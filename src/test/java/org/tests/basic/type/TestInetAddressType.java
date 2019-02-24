@@ -9,6 +9,8 @@ import org.tests.model.basic.EWithInetAddr;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -30,6 +32,57 @@ public class TestInetAddressType extends TransactionalTestCase {
     } else {
       insertUpdateDeleteFind("2001:db8:85a3:0:0:8a2e:370:7334", "2001:db8:85a3:0:0:8a2e:370:7334");
     }
+  }
+
+  @Test
+  public void test_inet_queryIn() {
+
+    List<Inet> addrs = Inet.listOf("120.12.12.56", "120.12.12.57");
+
+    DB.find(EWithInetAddr.class)
+      .where()
+      .in("inet2", addrs)
+      .findList();
+  }
+
+  @Test
+  public void test_inetAdress_queryIn() throws UnknownHostException {
+
+    List<InetAddress> addrs = new ArrayList<>();
+    addrs.add(InetAddress.getByName("120.12.12.56"));
+    addrs.add(InetAddress.getByName("120.12.12.57"));
+
+    DB.find(EWithInetAddr.class)
+      .where()
+      .in("inetAddress", addrs)
+      .findList();
+  }
+
+  @Test
+  public void test_inet_queryEq() {
+
+    DB.find(EWithInetAddr.class)
+      .where()
+      .eq("inet2", new Inet("120.12.12.58"))
+      .findList();
+  }
+
+  @Test
+  public void test_inet4address_queryEq() throws UnknownHostException {
+
+    DB.find(EWithInetAddr.class)
+      .where()
+      .eq("inetAddress", InetAddress.getByName("120.12.12.58"))
+      .findList();
+  }
+
+  @Test
+  public void test_inet6address_queryEq() throws UnknownHostException {
+
+    DB.find(EWithInetAddr.class)
+      .where()
+      .eq("inetAddress", InetAddress.getByName("2001:db8:85a3:0:0:8a2e:370:7334"))
+      .findList();
   }
 
   private void insertUpdateDeleteFind(String ipAddress, String expected) throws UnknownHostException {

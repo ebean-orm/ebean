@@ -39,6 +39,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
@@ -977,9 +979,9 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     if (offlineMigrationGeneration || (postgres && !config.getPlatformConfig().isDatabaseInetAddressVarchar())) {
-      addType(InetAddress.class, new ScalarTypeInetAddressPostgres());
+      addInetAddressType(new ScalarTypeInetAddressPostgres());
     } else {
-      addType(InetAddress.class, new ScalarTypeInetAddress());
+      addInetAddressType(new ScalarTypeInetAddress());
     }
 
     if (offlineMigrationGeneration || postgres) {
@@ -1075,6 +1077,12 @@ public final class DefaultTypeManager implements TypeManager {
     ScalarType<?> timestampType = new ScalarTypeTimestamp(mode);
     addType(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
+  }
+
+  private void addInetAddressType(ScalarType scalarType) {
+    addType(InetAddress.class, scalarType);
+    addType(Inet4Address.class, scalarType);
+    addType(Inet6Address.class, scalarType);
   }
 
 }

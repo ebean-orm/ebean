@@ -11,8 +11,8 @@ import java.sql.Types;
  */
 public abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
 
-  ScalarTypeInet() {
-    super(Inet.class, false, ExtraDbTypes.INET);
+  ScalarTypeInet(int jdbcType) {
+    super(Inet.class, false, jdbcType);
   }
 
   @Override
@@ -43,6 +43,10 @@ public abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
    */
   public static class Varchar extends ScalarTypeInet {
 
+    Varchar() {
+      super(Types.VARCHAR);
+    }
+
     @Override
     public void bind(DataBind b, Inet value) throws SQLException {
       if (value == null) {
@@ -57,6 +61,10 @@ public abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
    * Inet to Postgres INET.
    */
   public static class Postgres extends ScalarTypeInet {
+
+    Postgres() {
+      super(ExtraDbTypes.INET);
+    }
 
     @Override
     public void bind(DataBind b, Inet value) throws SQLException {
