@@ -251,6 +251,43 @@ public class Expr {
   }
 
   /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   * <p>
+   * Without this we typically need to code an <code>if</code> block to only add
+   * the IN predicate if the collection is not empty like:
+   * </p>
+   *
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   if (ids != null && !ids.isEmpty()) {
+   *     query.where().in("customer.id", ids);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .inOrEmpty("customer.id", ids)
+   *     .findList();
+   *
+   * }</pre>
+   */
+  public static Expression inOrEmpty(String propertyName, Collection<?> values) {
+    return Ebean.getExpressionFactory().inOrEmpty(propertyName, values);
+  }
+
+  /**
    * Id Equal to - ID property is equal to the value.
    */
   public static Expression idEq(Object value) {

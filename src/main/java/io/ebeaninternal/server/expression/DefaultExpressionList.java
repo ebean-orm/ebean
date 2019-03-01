@@ -913,6 +913,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> inOrEmpty(String propertyName, Collection<?> values) {
+    add(expr.inOrEmpty(propertyName, values));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> in(String propertyName, Object... values) {
     add(expr.in(propertyName, values));
     return this;

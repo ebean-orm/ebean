@@ -456,6 +456,16 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   */
+  @Override
+  public Expression inOrEmpty(String propertyName, Collection<?> values) {
+    return new InExpression(propertyName, values, false, true);
+  }
+
+  /**
    * In - property has a value in the array of values.
    */
   @Override
