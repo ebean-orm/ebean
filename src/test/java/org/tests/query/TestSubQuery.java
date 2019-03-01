@@ -1,14 +1,14 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.Vehicle;
 import org.tests.model.basic.VehicleDriver;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,10 @@ public class TestSubQuery extends BaseTestCase {
     productIds.add(4);
     productIds.add(5);
 
-    Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()
+    Query<Order> sq = DB.find(Order.class).select("id").where()
       .in("details.product.id", productIds).query();
 
-    Ebean.find(Order.class).where().in("id", sq).findList();
+    DB.find(Order.class).where().in("id", sq).findList();
   }
 
   @Test
@@ -41,19 +41,19 @@ public class TestSubQuery extends BaseTestCase {
     List<Integer> productIds = new ArrayList<>();
     productIds.add(3);
 
-    Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()
+    Query<Order> sq = DB.createQuery(Order.class).select("id").where()
       .isIn("details.product.id", productIds).query();
 
-    Ebean.find(Order.class).where().isIn("id", sq).findList();
+    DB.find(Order.class).where().isIn("id", sq).findList();
   }
 
   public void testCompositeKey() {
     ResetBasicData.reset();
 
-    Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class).select("id.oneKey")
+    Query<CKeyParent> sq = DB.createQuery(CKeyParent.class).select("id.oneKey")
       .setAutoTune(false).where().query();
 
-    Query<CKeyParent> pq = Ebean.find(CKeyParent.class).where().in("id.oneKey", sq).query();
+    Query<CKeyParent> pq = DB.find(CKeyParent.class).where().in("id.oneKey", sq).query();
 
     pq.findList();
 
@@ -93,10 +93,10 @@ public class TestSubQuery extends BaseTestCase {
   public void testInheritance2() {
     ResetBasicData.reset();
 
-    Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle")
+    Query<VehicleDriver> sq = DB.createQuery(VehicleDriver.class).select("vehicle")
       .setAutoTune(false).where().query();
 
-    Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
+    Query<Vehicle> pq = DB.find(Vehicle.class).where().in("id", sq).query();
 
     pq.findList();
 
@@ -118,10 +118,10 @@ public class TestSubQuery extends BaseTestCase {
   public void testInheritance3() {
     ResetBasicData.reset();
 
-    Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle")
+    Query<VehicleDriver> sq = DB.createQuery(VehicleDriver.class).select("vehicle")
       .setAutoTune(false).where().eq("vehicle.licenseNumber", "abc").query();
 
-    Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
+    Query<Vehicle> pq = DB.find(Vehicle.class).where().in("id", sq).query();
 
     pq.findList();
 
@@ -139,10 +139,10 @@ public class TestSubQuery extends BaseTestCase {
   public void testInheritance4() {
     ResetBasicData.reset();
 
-    Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle.id")
+    Query<VehicleDriver> sq = DB.createQuery(VehicleDriver.class).select("vehicle.id")
       .setAutoTune(false).where().query();
 
-    Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
+    Query<Vehicle> pq = DB.find(Vehicle.class).where().in("id", sq).query();
 
     pq.findList();
 
