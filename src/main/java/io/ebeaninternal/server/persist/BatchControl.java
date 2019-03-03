@@ -69,6 +69,7 @@ public final class BatchControl {
    * Size of the largest buffer.
    */
   private int bufferMax;
+  private int topCounter;
 
   private Queue earlyQueue;
   private Queue lateQueue;
@@ -246,6 +247,7 @@ public final class BatchControl {
     pstmtHolder.clear();
     beanHoldMap.clear();
     maxDepth = 0;
+    topCounter = 0;
   }
 
   private void flushBuffer(boolean resetTop) throws BatchedSqlException {
@@ -319,10 +321,8 @@ public final class BatchControl {
         if (maybe != -1) {
           beanDepth = maybe;
         } else {
-          // we can't be certain of the relative ordering for this type so
-          // flush and reset the batch as we are changing the type of our top level
-          // bean so just keep it simple and flush and reset the top
-          flushReset();
+          // additional "top level" bean type ordered by save() order
+          beanDepth += ++topCounter;
         }
       }
 
