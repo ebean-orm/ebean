@@ -1342,7 +1342,7 @@ public interface ExpressionList<T> {
    * @param raw The raw expression that is typically a subquery
    * @param values The values which is typically a list or set of id values.
    */
-  ExpressionList<T> rawOrEmpty(String raw, Collection<Object> values);
+  ExpressionList<T> rawOrEmpty(String raw, Collection<?> values);
 
   /**
    * Add a match expression.

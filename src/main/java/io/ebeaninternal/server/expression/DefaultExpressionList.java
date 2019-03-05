@@ -1077,7 +1077,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> rawOrEmpty(String raw, Collection<Object> values) {
+  public ExpressionList<T> rawOrEmpty(String raw, Collection<?> values) {
     if (notEmpty(values)) {
       add(expr.raw(raw, values));
     }

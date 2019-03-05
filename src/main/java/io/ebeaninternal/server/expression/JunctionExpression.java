@@ -808,7 +808,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public ExpressionList<T> rawOrEmpty(String raw, Collection<Object> values) {
+  public ExpressionList<T> rawOrEmpty(String raw, Collection<?> values) {
     return exprList.rawOrEmpty(raw, values);
   }
 

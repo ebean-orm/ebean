@@ -72,10 +72,12 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    List<String> vals = asList("Rob", "Fiona", "Jack");
+
     Query<Customer> query = Ebean.find(Customer.class)
       .select("name")
       .where()
-      .rawOrEmpty("id in (select c.id from o_customer c where c.name in (?1))", asList("Rob", "Fiona", "Jack"))
+      .rawOrEmpty("id in (select c.id from o_customer c where c.name in (?1))", vals)
       .query();
 
     List<Customer> list = query.findList();
