@@ -1283,6 +1283,68 @@ public interface ExpressionList<T> {
   ExpressionList<T> raw(String raw);
 
   /**
+   * Only add the raw expression if the values is not null or empty.
+   * <p>
+   * This is a pure convenience expression to make it nicer to deal with the pattern where we use
+   * raw() expression with a subquery and only want to add the subquery predicate when the collection
+   * of values is not empty.
+   * </p>
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   // common pattern - we can use rawOrEmpty() instead
+   *   if (orderIds != null && !orderIds.isEmpty()) {
+   *     query.where().raw("t0.customer_id in (select o.customer_id from orders o where o.id in (?1))", orderIds);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using rawOrEmpty()</h3>
+   * Note that in the example below we use the <code>?1</code> bind parameter to get  "parameter expansion"
+   * for each element in the collection.
+   *
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     // only add the expression if orderIds is not empty
+   *     .rawOrEmpty("t0.customer_id in (select o.customer_id from orders o where o.id in (?1))", orderIds);
+   *     .findList();
+   *
+   * }</pre>
+   *
+   * <h3>Postgres ANY</h3>
+   * With Postgres we would often use the SQL <code>ANY</code> expression and array parameter binding
+   * rather than <code>IN</code>.
+   *
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .rawOrEmpty("t0.customer_id in (select o.customer_id from orders o where o.id = any(?))", orderIds);
+   *     .findList();
+   *
+   * }</pre>
+   * <p>
+   *   Note that we need to cast the Postgres array for UUID types like:
+   * </p>
+   * <pre>{@code
+   *
+   *   " ... = any(?::uuid[])"
+   *
+   * }</pre>
+   *
+   * @param raw The raw expression that is typically a subquery
+   * @param values The values which is typically a list or set of id values.
+   */
+  ExpressionList<T> rawOrEmpty(String raw, Collection<Object> values);
+
+  /**
    * Add a match expression.
    *
    * @param propertyName The property name for the match

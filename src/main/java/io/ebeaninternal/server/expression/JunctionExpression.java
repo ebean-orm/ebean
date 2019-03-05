@@ -808,6 +808,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> rawOrEmpty(String raw, Collection<Object> values) {
+    return exprList.rawOrEmpty(raw, values);
+  }
+
+  @Override
   public ExpressionList<T> raw(String raw) {
     return exprList.raw(raw);
   }

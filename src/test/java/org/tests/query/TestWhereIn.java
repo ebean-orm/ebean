@@ -53,7 +53,7 @@ public class TestWhereIn extends BaseTestCase {
       .where().inOrEmpty("customer.billingAddress.id", new ArrayList<>()).query();
 
     query.findList();
-    assertThat(sqlOf(query)).isEqualTo("select t0.id from o_order t0 where 1=1");
+    assertThat(sqlOf(query)).isEqualTo("select t0.id from o_order t0");
   }
 
   @Test
@@ -79,9 +79,8 @@ public class TestWhereIn extends BaseTestCase {
       .where().inOrEmpty("code", null).query();
 
     query.findList();
-    assertThat(sqlOf(query)).contains("where 1=1");
+    assertThat(sqlOf(query)).isEqualTo("select t0.code, t0.name from o_country t0");
   }
-
 
   @Test
   public void testInOrEmpty_when_empty() {
@@ -92,7 +91,7 @@ public class TestWhereIn extends BaseTestCase {
       .where().inOrEmpty("code", new ArrayList<>()).query();
 
     query.findList();
-    assertThat(sqlOf(query)).contains("where 1=1");
+    assertThat(sqlOf(query)).isEqualTo("select t0.code, t0.name from o_country t0");
   }
 
   @Test
