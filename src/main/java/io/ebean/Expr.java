@@ -17,23 +17,12 @@ import java.util.Map;
  * server. It is actually a short cut for using the ExpressionFactory of the
  * 'default' EbeanServer.
  * <p>
- * See also {@link Ebean#getExpressionFactory()}
+ * See also {@link DB#getExpressionFactory()}
  * </p>
  * <p>
  * Creates standard common expressions for using in a Query Where or Having
  * clause.
  * </p>
- * <pre>{@code
- *
- * // Example: Using an Expr.or() method
- * Query<Order> query = Ebean.createQuery(Order.class);
- * query.where(
- *     Expr.or(Expr.eq("status", Order.NEW),
- *             Expr.gt("orderDate", lastWeek));
- *
- * List<Order> list = query.findList();
- * ...
- * }</pre>
  *
  * @see Query#where()
  */

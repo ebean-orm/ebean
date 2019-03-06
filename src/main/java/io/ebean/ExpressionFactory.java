@@ -30,9 +30,9 @@ import java.util.Map;
  *     Expr.or(Expr.eq("status", Order.Status.NEW),
  *             Expr.gt("orderDate", lastWeek));
  *
- * Query<Order> query = Ebean.createQuery(Order.class);
- * query.where().add(newOrLastWeek);
- * List<Order> list = query.findList();
+ * List<Order> list = DB.find(Order.class)
+ *   .where().add(newOrLastWeek)
+ *   .findList();
  * ...
  * }</pre>
  *

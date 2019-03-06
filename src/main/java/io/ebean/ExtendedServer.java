@@ -272,7 +272,7 @@ public interface ExtendedServer {
    * <p>
    * <pre>{@code
    *
-   *  PagedList<Order> pagedList = Ebean.find(Order.class)
+   *  PagedList<Order> pagedList = DB.find(Order.class)
    *       .setFirstRow(50)
    *       .setMaxRows(20)
    *       .findPagedList();
@@ -341,7 +341,7 @@ public interface ExtendedServer {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .orderBy().asc("name")
    *      .findSingleAttributeList();
@@ -351,7 +351,7 @@ public interface ExtendedServer {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)

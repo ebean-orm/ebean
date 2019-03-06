@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
  * <pre>{@code
  *
  *  // create a query to find all orders
- * Query<Order> query = Ebean.find(Order.class);
+ * Query<Order> query = DB.find(Order.class);
  *
  *  // execute the query in a background thread
  *  // immediately returning the futureList

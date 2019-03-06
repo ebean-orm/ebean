@@ -17,11 +17,11 @@ import java.sql.SQLException;
  *
  * String sql = "{call sp_order_mod(?,?)}";
  *
- * CallableSql cs = Ebean.createCallableSql(sql);
+ * CallableSql cs = DB.createCallableSql(sql);
  * cs.setParameter(1, "turbo");
  * cs.registerOut(2, Types.INTEGER);
  *
- * Ebean.execute(cs);
+ * DB.execute(cs);
  *
  * // read the out parameter
  * Integer returnValue = (Integer) cs.getObject(2);
@@ -38,7 +38,7 @@ import java.sql.SQLException;
  *
  * String sql = "{call sp_insert_order(?,?)}";
  *
- * CallableSql cs = Ebean.createCallableSql(sql);
+ * CallableSql cs = DB.createCallableSql(sql);
  *
  * // Inform Ebean this stored procedure inserts into the
  * // oe_order table and inserts + updates the oe_order_detail table.
@@ -46,35 +46,33 @@ import java.sql.SQLException;
  * cs.addModification("oe_order", true, false, false);
  * cs.addModification("oe_order_detail", true, true, false);
  *
- * Transaction t = Ebean.startTransaction();
  *
- * // execute using JDBC batching 10 statements at a time
- * t.setBatchMode(true);
- * t.setBatchSize(10);
- * try {
+ * try (Transaction t = DB.beginTransaction()) {
+ *
+ *   // execute using JDBC batching 10 statements at a time
+ *   t.setBatchMode(true);
+ *   t.setBatchSize(10);
+ *
  *   cs.setParameter(1, "Was");
  *   cs.setParameter(2, "Banana");
- *   Ebean.execute(cs);
+ *   DB.execute(cs);
  *
  *   cs.setParameter(1, "Here");
  *   cs.setParameter(2, "Kumera");
- *   Ebean.execute(cs);
+ *   DB.execute(cs);
  *
  *   cs.setParameter(1, "More");
  *   cs.setParameter(2, "Apple");
- *   Ebean.execute(cs);
+ *   DB.execute(cs);
  *
- *   // Ebean.externalModification("oe_order",true,false,false);
- *   // Ebean.externalModification("oe_order_detail",true,true,false);
- *   Ebean.commitTransaction();
+ *   // DB.externalModification("oe_order",true,false,false);
+ *   // DB.externalModification("oe_order_detail",true,true,false);
+ *   t.commit();
  *
- * } finally {
- *   Ebean.endTransaction();
  * }
  * }</pre>
  *
  * @see SqlUpdate
- * @see Ebean#execute(CallableSql)
  */
 public interface CallableSql {
 
@@ -173,7 +171,7 @@ public interface CallableSql {
    * Add table modification information to the TransactionEvent.
    * <p>
    * This would be similar to using the
-   * <code>Ebean.externalModification()</code> method. It may be easier and make
+   * <code>DB.externalModification()</code> method. It may be easier and make
    * more sense to set it here with the CallableSql.
    * </p>
    * <p>

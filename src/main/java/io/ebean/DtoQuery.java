@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  *   String sql = "select id, name from customer where name like :name and status_code = :status";
  *
  *   List<CustomerDto> beans =
- *     Ebean.findDto(CustomerDto.class, sql)
+ *     DB.findDto(CustomerDto.class, sql)
  *     .setParameter("name", "Acme%")
  *     .setParameter("status", "ACTIVE")
  *     .findList();

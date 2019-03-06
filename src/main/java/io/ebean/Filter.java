@@ -25,14 +25,14 @@ import java.util.Set;
  * // get a list of entities (query execution statistics in this case)
  *
  * List<MetaQueryStatistic> list =
- *     Ebean.find(MetaQueryStatistic.class).findList();
+ *     DB.find(MetaQueryStatistic.class).findList();
  *
  * long nowMinus24Hrs = System.currentTimeMillis() - 24 * (1000 * 60 * 60);
  *
  * // sort and filter the list returning a filtered list...
  *
  * List<MetaQueryStatistic> filteredList =
- *     Ebean.filter(MetaQueryStatistic.class)
+ *     DB.filter(MetaQueryStatistic.class)
  *         .sort("avgTimeMicros desc")
  *         .gt("executionCount", 0)
  *         .gt("lastQueryTime", nowMinus24Hrs)
@@ -63,12 +63,12 @@ import java.util.Set;
  * // get a list of entities (query execution statistics)
  *
  * List<Order> orders =
- *     Ebean.find(Order.class).findList();
+ *     DB.find(Order.class).findList();
  *
  * // Apply a filter...
  *
  * List<Order> filteredOrders =
- *     Ebean.filter(Order.class)
+ *     DB.filter(Order.class)
  *         .startsWith("customer.name", "Rob")
  *         .eq("customer.shippingAddress.city", "Auckland")
  *         .filter(orders);

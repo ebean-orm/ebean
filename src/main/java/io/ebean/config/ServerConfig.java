@@ -2328,8 +2328,7 @@ public class ServerConfig {
    *
    *   // assume Customer has L2 bean caching enabled ...
    *
-   *   Transaction transaction = Ebean.beginTransaction();
-   *   try {
+   *   try (Transaction transaction = DB.beginTransaction()) {
    *
    *     // this uses L2 bean cache as the transaction
    *     // ... is considered "query only" at this point
@@ -2337,7 +2336,7 @@ public class ServerConfig {
    *
    *     // transaction no longer "query only" once
    *     // ... a bean has been saved etc
-   *     Ebean.save(someBean);
+   *     DB.save(someBean);
    *
    *     // will NOT use L2 bean cache as the transaction
    *     // ... is no longer considered "query only"
@@ -2356,9 +2355,6 @@ public class ServerConfig {
    *     transaction.setSkipCache(true);
    *     Customer.find.byId(99); // skips l2 bean cache
    *
-   *
-   *   } finally {
-   *     transaction.end();
    *   }
    *
    * }</pre>

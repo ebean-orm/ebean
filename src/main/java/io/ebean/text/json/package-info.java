@@ -10,7 +10,7 @@
  * <pre>{@code
  *  // find some customers ...
  *
- * List<Customer> list = Ebean.find(Customer.class)
+ * List<Customer> list = DB.find(Customer.class)
  *     .select("id, name, status, shippingAddress")
  *     .fetch("billingAddress","line1, city")
  *     .fetch("billingAddress.country", "*")
@@ -18,7 +18,7 @@
  *     .order().desc("id")
  *     .findList();
  *
- * JsonContext json = Ebean.json();
+ * JsonContext json = DB.json();
  *
  *  // output as a JSON string
  * String jsonOutput = json.toJson(list);

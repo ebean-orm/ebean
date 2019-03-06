@@ -321,7 +321,7 @@ public interface ExpressionList<T> {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .orderBy().asc("name")
    *      .findSingleAttributeList();
@@ -332,7 +332,7 @@ public interface ExpressionList<T> {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
@@ -352,7 +352,7 @@ public interface ExpressionList<T> {
    * <pre>{@code
    *
    *  String name =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .where().eq("id", 42)
    *      .findSingleAttribute();
@@ -435,7 +435,7 @@ public interface ExpressionList<T> {
    * </p>
    * <pre>{@code
    *
-   *  PagedList<Order> pagedList = Ebean.find(Order.class)
+   *  PagedList<Order> pagedList = DB.find(Order.class)
    *       .setFirstRow(50)
    *       .setMaxRows(20)
    *       .findPagedList();
@@ -502,7 +502,7 @@ public interface ExpressionList<T> {
    * <pre>{@code
    *
    *   List<Customer> customers =
-   *       Ebean.find(Customer.class)
+   *       DB.find(Customer.class)
    *          .setDistinct(true)
    *          .select("name")     // only select the customer name
    *          .findList();
@@ -575,7 +575,7 @@ public interface ExpressionList<T> {
    *
    *  List<CountedValue<Order.Status>> orderStatusCount =
    *
-   *     Ebean.find(Order.class)
+   *     DB.find(Order.class)
    *      .select("status")
    *      .where()
    *      .gt("orderDate", LocalDate.now().minusMonths(3))
@@ -758,20 +758,6 @@ public interface ExpressionList<T> {
 
   /**
    * Add an Expression to the list.
-   * <p>
-   * This returns the list so that add() can be chained.
-   * </p>
-   * <pre>{@code
-   *
-   * Query<Customer> query = Ebean.find(Customer.class);
-   * query.where()
-   *     .like("name","Rob%")
-   *     .eq("status", Customer.ACTIVE);
-   *
-   * List<Customer> list = query.findList();
-   * ...
-   *
-   * }</pre>
    */
   ExpressionList<T> add(Expression expr);
 
@@ -907,11 +893,10 @@ public interface ExpressionList<T> {
    * example.setName("Rob%");
    * example.setNotes("%something%");
    *
-   * List<Customer> list = Ebean.find(Customer.class).where()
-   *     // pass the bean into the where() clause
-   *     .exampleLike(example)
-   *     // you can add other expressions to the same query
-   *     .gt("id", 2).findList();
+   * List<Customer> list =
+   *   DB.find(Customer.class)
+   *     .where().exampleLike(example)
+   *     .findList();
    *
    * }</pre>
    * <p>
@@ -926,7 +911,7 @@ public interface ExpressionList<T> {
    * // create a ExampleExpression with more control
    * ExampleExpression qbe = new ExampleExpression(example, true, LikeType.EQUAL_TO).includeZeros();
    *
-   * List<Customer> list = Ebean.find(Customer.class).where().add(qbe).findList();
+   * List<Customer> list = DB.find(Customer.class).where().add(qbe).findList();
    *
    * }</pre>
    */

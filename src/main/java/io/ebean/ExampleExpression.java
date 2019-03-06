@@ -22,8 +22,8 @@ package io.ebean;
  * example.setName("Rob%");
  * example.setNotes("%something%");
  *
- * List&lt;Customer&gt; list =
- *     Ebean.find(Customer.class)
+ * List<Customer> list =
+ *     DB.find(Customer.class)
  *         .where()
  *         // pass the bean into the where() clause
  *         .exampleLike(example)
@@ -46,7 +46,7 @@ package io.ebean;
  *     .includeZeros();
  *
  * List<Customer> list =
- *     Ebean.find(Customer.class)
+ *     DB.find(Customer.class)
  *         .where()
  *         .add(qbe)
  *         .findList();

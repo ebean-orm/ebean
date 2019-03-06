@@ -377,7 +377,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *   // fetch a bean with JSON content
-   *   EBasicJsonList bean= Ebean.find(EBasicJsonList.class)
+   *   EBasicJsonList bean= DB.find(EBasicJsonList.class)
    *       .setId(42)
    *       .setAllowLoadErrors()  // collect errors into bean state if we have invalid JSON
    *       .findOne();
@@ -843,7 +843,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .orderBy().asc("name")
    *      .findSingleAttributeList();
@@ -854,7 +854,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
@@ -875,7 +875,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  String name =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .where().eq("id", 42)
    *      .findSingleAttribute();
@@ -1089,7 +1089,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  PagedList<Order> pagedList = Ebean.find(Order.class)
+   *  PagedList<Order> pagedList = DB.find(Order.class)
    *       .setFirstRow(50)
    *       .setMaxRows(20)
    *       .findPagedList();
@@ -1375,7 +1375,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *   List<Customer> customers =
-   *       Ebean.find(Customer.class)
+   *       DB.find(Customer.class)
    *          .setDistinct(true)
    *          .select("name")
    *          .findList();
@@ -1391,7 +1391,7 @@ public interface Query<T> {
    *
    *  List<CountedValue<Order.Status>> orderStatusCount =
    *
-   *     Ebean.find(Order.class)
+   *     DB.find(Order.class)
    *      .select("status")
    *      .where()
    *      .gt("orderDate", LocalDate.now().minusMonths(3))
