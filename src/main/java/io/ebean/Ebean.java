@@ -24,97 +24,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This Ebean object is effectively a singleton that holds a map of registered
- * {@link EbeanServer}s. It additionally provides a convenient way to use the
- * 'default' EbeanServer.
+ * Ebean is a registry of {@link Database} by name. Ebean has now been renamed to {@link DB}.
  * <p>
- * If you are using a Dependency Injection framework such as
- * <strong>Spring</strong> or <strong>Guice</strong> you will probably
- * <strong>NOT</strong> use this Ebean singleton object. Instead you will
- * configure and construct EbeanServer instances using {@link ServerConfig} and
- * {@link EbeanServerFactory} and inject those EbeanServer instances into your
- * data access objects.
- * </p>
+ * Ebean is effectively this is an alias for {@link DB} which is the new and improved name for Ebean.
  * <p>
- * In documentation "Ebean singleton" refers to this object.
- * </p>
- * <ul>
- * <li>There is one EbeanServer per Database (javax.sql.DataSource).</li>
- * <li>EbeanServers can be 'registered' with the Ebean singleton (put into its
- * map). Registered EbeanServer's can later be retrieved via
- * {@link #getServer(String)}.</li>
- * <li>One EbeanServer can be referred to as the 'default' EbeanServer. For
- * convenience, the Ebean singleton (this object) provides methods such as
- * {@link #find(Class)} that proxy through to the 'default' EbeanServer. This
- * can be useful for applications that use a single database.</li>
- * </ul>
- * <p>
- * For developer convenience Ebean has static methods that proxy through to the
- * methods on the <em>'default'</em> EbeanServer. These methods are provided for
- * developers who are mostly using a single database. Many developers will be
- * able to use the methods on Ebean rather than get a EbeanServer.
- * </p>
- * <p>
- * EbeanServers can be created and used without ever needing or using the Ebean
- * singleton. Refer to {@link ServerConfig#setRegister(boolean)}.
- * </p>
- * <p>
- * You can either programmatically create/register EbeanServers via
- * {@link EbeanServerFactory} or they can automatically be created and
- * registered when you first use the Ebean singleton. When EbeanServers are
- * created automatically they are configured using information in the
- * ebean.properties file.
- * </p>
- * <pre>{@code
- *
- *   // fetch shipped orders (and also their customer)
- *   List<Order> list = Ebean.find(Order.class)
- * 	  .fetch("customer")
- * 	  .where()
- * 	  .eq("status.code", Order.Status.SHIPPED)
- * 	  .findList();
- *
- *   // read/use the order list ...
- *   for (Order order : list) {
- * 	   Customer customer = order.getCustomer();
- * 	   ...
- *   }
- *
- * }</pre>
- * <pre>{@code
- *
- *   // fetch order 10, modify and save
- *   Order order = Ebean.find(Order.class, 10);
- *
- *   OrderStatus shipped = Ebean.getReference(OrderStatus.class,"SHIPPED");
- *   order.setStatus(shipped);
- *   order.setShippedDate(shippedDate);
- *   ...
- *
- *   // implicitly creates a transaction and commits
- *   Ebean.save(order);
- *
- * }</pre>
- * <p>
- * When you have multiple databases and need access to a specific one the
- * {@link #getServer(String)} method provides access to the EbeanServer for that
- * specific database.
- * </p>
- * <pre>{@code
- *
- *   // Get access to the Human Resources EbeanServer/Database
- *   EbeanServer hrDb = Ebean.getServer("hr");
- *
- *   // fetch contact 3 from the HR database
- *   Contact contact = hrDb.find(Contact.class, 3);
- *
- *   contact.setName("I'm going to change");
- *   ...
- *
- *   // save the contact back to the HR database
- *   hrDb.save(contact);
- *
- * }</pre>
+ * The preference is to use DB and Database rather than Ebean and EbeanServer.
  */
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);

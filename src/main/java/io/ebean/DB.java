@@ -17,6 +17,50 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+/**
+ * DB is a registry of {@link Database} by name.
+ * <p>
+ * DB additionally provides a convenient way to use the 'default' Database.
+ * <p>
+ *   <h3>Default database</h3>
+ *   <p>
+ *     One of the Database instances can be registered as the "default database"
+ *     and can be obtained using <code>DB.getDefault()</code>
+ *   </p>
+ * <pre>{@code
+ *
+ * Database database = DB.getDefault();
+ *
+ * }</pre>
+ *
+ * <h3>Named database</h3>
+ * <p>
+ *   Multiple database instances can be registered with DB and we can obtain them
+ *   using <code>DB.byName()</code>
+ * </p>
+ * <pre>{@code
+ *
+ * Database hrDatabase = DB.byName("hr");
+ *
+ * }</pre>
+ *
+ * <h3>Convenience methods</h3>
+ * <p>
+ *   DB has methods like {@link #find(Class)} and {@link #save(Object)} which are
+ *   just convenience for using the default database.
+ * </p>
+ *
+ * <pre>{@code
+ *
+ *   // fetch using the default database
+ *   Order order = DB.find(Order.class, 10);
+ *
+ *   // is the same as
+ *   Database database = DB.getDefault();
+ *   Order order = database.find(Order.class, 10);
+ *
+ * }</pre>
+ */
 public class DB {
 
   /**
