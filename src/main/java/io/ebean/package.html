@@ -12,21 +12,29 @@ Core API (see <a href="Database.html">Database</a>, <a href="DB.html">DB</a> and
 </p>
 
 <pre>{@code
-// EXAMPLE 1: Simple fetch.
-//========================
 
-// fetch order 10
+// Example find by id
+
 Order order = DB.find(Order.class, 10);
 
 
+// Example save
 
-// EXAMPLE 2: Fetch an Object with associations
-//=============================================
+Customer customer = DB.getReference(Customer.class, 42);
 
-// fetch Customer 7 including their billing and shipping addresses
-Customer customer =
-	DB.find(Customer.class)
-		.setId(7)
+Order newOrder = new Order();
+newOrder.setStatus(Order.Status.NEW);
+newOrder.setCustomer(customer);
+...
+
+DB.save(newOrder);
+
+
+// Example: Eagerly fetching associations
+
+// fetch Customer 42 including their billing and shipping addresses
+Customer customer = DB.find(Customer.class)
+		.setId(42)
 		.fetch("billingAddress")
 		.fetch("shippingAddress")
 		.findOne();
@@ -34,40 +42,6 @@ Customer customer =
 Address billAddr = customer.getBillingAddress();
 Address shipAddr = customer.getShippingAddress();
 
-
-
-
-// EXAMPLE 3: Create and save an Order
-//=====================================
-
-// get a Customer reference so we don't hit the database
-Customer customer = DB.getReference(Customer.class, 7);
-
-// create a new Order object
-Order newOrder = new Order();
-newOrder.setStatus(Order.Status.NEW);
-newOrder.setCustomer(customer);
-...
-
-
-DB.save(newOrder);
-
-
-
-// EXAMPLE 4: Use another database
-//=================================
-
-// Get access to the Human Resources EbeanServer/Database
-Database hrDatabase = DB.byName("HR");
-
-
-Contact contact = hrDatabase.find(Contact.class, 42);
-
-contact.setStatus(Contact.Status.INACTIVE);
-...
-
-// save the contact back to the HR database
-hrDatabase.save(contact);
 }</pre>
 
 </Body>

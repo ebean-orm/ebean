@@ -22,11 +22,11 @@ import java.util.concurrent.Callable;
  * <p>
  * DB additionally provides a convenient way to use the 'default' Database.
  * <p>
- *   <h3>Default database</h3>
- *   <p>
- *     One of the Database instances can be registered as the "default database"
- *     and can be obtained using <code>DB.getDefault()</code>
- *   </p>
+ * <h3>Default database</h3>
+ * <p>
+ * One of the Database instances can be registered as the "default database"
+ * and can be obtained using <code>DB.getDefault()</code>
+ * </p>
  * <pre>{@code
  *
  * Database database = DB.getDefault();
@@ -35,8 +35,8 @@ import java.util.concurrent.Callable;
  *
  * <h3>Named database</h3>
  * <p>
- *   Multiple database instances can be registered with DB and we can obtain them
- *   using <code>DB.byName()</code>
+ * Multiple database instances can be registered with DB and we can obtain them
+ * using <code>DB.byName()</code>
  * </p>
  * <pre>{@code
  *
@@ -46,22 +46,28 @@ import java.util.concurrent.Callable;
  *
  * <h3>Convenience methods</h3>
  * <p>
- *   DB has methods like {@link #find(Class)} and {@link #save(Object)} which are
- *   just convenience for using the default database.
+ * DB has methods like {@link #find(Class)} and {@link #save(Object)} which are
+ * just convenience for using the default database.
  * </p>
  *
  * <pre>{@code
  *
- *   // fetch using the default database
- *   Order order = DB.find(Order.class, 10);
+ * // fetch using the default database
+ * Order order = DB.find(Order.class, 10);
  *
- *   // is the same as
- *   Database database = DB.getDefault();
- *   Order order = database.find(Order.class, 10);
+ * // is the same as
+ * Database database = DB.getDefault();
+ * Order order = database.find(Order.class, 10);
  *
  * }</pre>
  */
 public class DB {
+
+  /**
+   * Hide constructor.
+   */
+  private DB() {
+  }
 
   /**
    * Return the default database.
@@ -150,22 +156,21 @@ public class DB {
    * </p>
    * <pre>{@code
    *
-   *   try (Transaction txn = DB.beginTransaction()) {
-   * 	   Order order = DB.find(Order.class,10); ...
+   *   try (Transaction transaction = DB.beginTransaction()) {
    *
-   * 	   DB.save(order);
+   *     Order order = DB.find(Order.class, 42);
+   *     order.setStatus(Status.COMPLETE);
+   *     order.save();
    *
-   * 	   txn.commit();
+   *     transaction.commit();
    *   }
    *
    * }</pre>
    * <p>
-   * If you want to externalise the transaction management then you should be
-   * able to do this via Database. Specifically with Database you can pass
-   * the transaction to the various find() and save() execute() methods. This
-   * gives you the ability to create the transactions yourself externally from
-   * Ebean and pass those transactions through to the various methods available
-   * on Database.
+   * If we want to externalise the transaction management then we do this via Database.
+   * With Database we can pass the transaction to the various find(), save() and execute()
+   * methods. This gives us the ability to create the transactions externally from Ebean
+   * and use the transaction explicitly via the various methods available on Database.
    * </p>
    */
   public static Transaction beginTransaction() {
@@ -194,29 +199,24 @@ public class DB {
    * // suspend it until this transaction ends
    *
    * try (Transaction txn = DB.beginTransaction(TxScope.requiresNew())) {
-   *
    *   ...
    *
    *   // commit the transaction
    *   txn.commit();
    * }
-   *
    * }</pre>
+   *
    * <h3>REQUIRED example:</h3>
    * <pre>{@code
-   *
    * // start a new transaction if there is not a current transaction
    *
    * try (Transaction txn = DB.beginTransaction(TxScope.required())) {
-   *
    *   ...
    *
    *   // commit the transaction if it was created or
    *   // do nothing if there was already a current transaction
    *   txn.commit();
-   *
    * }
-   *
    * }</pre>
    */
   public static Transaction beginTransaction(TxScope scope) {
@@ -334,18 +334,6 @@ public class DB {
    * specify a cascade of CascadeType.ALL or CascadeType.PERSIST on the
    * OneToMany, OneToOne or ManyToMany annotation.
    * </p>
-   * <p>
-   * In this example below the details property has a CascadeType.ALL set so
-   * saving an order will also save all its details.
-   * </p>
-   * <pre>{@code
-   *   public class Order { ...
-   *
-   * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-   * 	   List<OrderDetail> details;
-   * 	   ...
-   *   }
-   * }</pre>
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
    * set the 'parent' object to the 'detail' object. In the example below in
@@ -1087,15 +1075,15 @@ public class DB {
    * </p>
    * <pre>{@code
    *
-   *   // set specific transactional scope settings
-   *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
+   * // set specific transactional scope settings
+   * TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   DB.execute(scope, new TxRunnable() {
-   * 	   public void run() {
-   * 		   User u1 = DB.find(User.class, 1);
-   * 		   ...
-   * 	   }
-   *   });
+   * DB.execute(scope, new TxRunnable() {
+   *   public void run() {
+   * 	   User u1 = DB.find(User.class, 1);
+   *     ...
+   *   }
+   * });
    *
    * }</pre>
    */
@@ -1111,19 +1099,17 @@ public class DB {
    * </p>
    * <pre>{@code
    *
-   *   DB.execute(() -> {
+   * DB.execute(() -> {
    *
-   *       User u1 = DB.find(User.class, 1);
-   *       User u2 = DB.find(User.class, 2);
+   *   User u1 = DB.find(User.class, 1);
+   *   User u2 = DB.find(User.class, 2);
    *
-   *       u1.setName("u1 mod");
-   *       u2.setName("u2 mod");
+   *   u1.setName("u1 mod");
+   *   u2.setName("u2 mod");
    *
-   *       DB.save(u1);
-   *       DB.save(u2);
-   *
-   *   });
-   *
+   *   DB.save(u1);
+   *   DB.save(u2);
+   * });
    * }</pre>
    */
   public static void execute(Runnable r) {
@@ -1138,17 +1124,16 @@ public class DB {
    * </p>
    * <pre>{@code
    *
-   *   // set specific transactional scope settings
-   *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
+   * // set specific transactional scope settings
+   * TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   DB.executeCall(scope, new Callable<String>() {
-   * 	   public String call() {
-   * 		   User u1 = DB.find(User.class, 1);
-   * 		   ...
-   * 		   return u1.getEmail();
-   * 	   }
-   *   });
-   *
+   * DB.executeCall(scope, new Callable<String>() {
+   *   public String call() {
+   * 	   User u1 = DB.find(User.class, 1);
+   * 		 ...
+   * 		 return u1.getEmail();
+   *   }
+   * });
    * }</pre>
    */
   public static <T> T executeCall(TxScope scope, Callable<T> c) {
@@ -1167,21 +1152,19 @@ public class DB {
    * </p>
    * <pre>{@code
    *
-   *   DB.executeCall(() -> {
+   * DB.executeCall(() -> {
    *
-   *       User u1 = DB.find(User.class, 1);
-   *       User u2 = DB.find(User.class, 2);
+   *   User u1 = DB.find(User.class, 1);
+   *   User u2 = DB.find(User.class, 2);
    *
-   *       u1.setName("u1 mod");
-   *       u2.setName("u2 mod");
+   *   u1.setName("u1 mod");
+   *   u2.setName("u2 mod");
    *
-   *       DB.save(u1);
-   *       DB.save(u2);
+   *   DB.save(u1);
+   *   DB.save(u2);
    *
-   *       return u1.getEmail();
-   *
-   *   });
-   *
+   *   return u1.getEmail();
+   * });
    * }</pre>
    */
   public static <T> T executeCall(Callable<T> c) {
@@ -1219,7 +1202,6 @@ public class DB {
    * @param deletes   true if rows on the table where deleted
    */
   public static void externalModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-
     getDefault().externalModification(tableName, inserts, updates, deletes);
   }
 
