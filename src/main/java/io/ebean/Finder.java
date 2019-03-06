@@ -93,7 +93,7 @@ public class Finder<I, T> {
   }
 
   /**
-   * Create with the type of the entity bean and specific server name.
+   * Create with the type of the entity bean and specific database name.
    */
   public Finder(Class<T> type, String databaseName) {
     this.type = type;
