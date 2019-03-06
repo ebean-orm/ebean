@@ -13,8 +13,7 @@ import java.util.List;
  * </p>
  * <h3>Testing</h3>
  * <p>
- * For testing the mocki-ebean project has the ability to replace the finder implementation
- * <p>
+ * For testing the mocki-ebean project has the ability to replace the finder implementation.
  * </p>
  * <pre>{@code
  *
@@ -24,7 +23,7 @@ import java.util.List;
  *     super(Customer.class);
  *   }
  *
- *   // Add your customer finder methods ...
+ *   // Add finder methods ...
  *
  *   public Customer byName(String name) {
  *     return query().eq("name", name).findOne();
@@ -45,6 +44,15 @@ import java.util.List;
  *   ...
  *
  * }</pre>
+ * <p>
+ *  When the Finder is registered as a field on Customer it can then be used like:
+ * </p>
+ * <pre>{@code
+ *
+ *   Customer rob = Customer.find.byName("Rob");
+ *
+ * }</pre>
+ *
  */
 public class Finder<I, T> {
 
@@ -54,9 +62,9 @@ public class Finder<I, T> {
   private final Class<T> type;
 
   /**
-   * The name of the EbeanServer, null for the default server.
+   * The name of the database this finder will use, null for the default database.
    */
-  private final String serverName;
+  private final String _$dbName;
 
   /**
    * Create with the type of the entity bean.
@@ -81,15 +89,15 @@ public class Finder<I, T> {
    */
   public Finder(Class<T> type) {
     this.type = type;
-    this.serverName = null;
+    this._$dbName = null;
   }
 
   /**
    * Create with the type of the entity bean and specific server name.
    */
-  public Finder(Class<T> type, String serverName) {
+  public Finder(Class<T> type, String databaseName) {
     this.type = type;
-    this.serverName = serverName;
+    this._$dbName = databaseName;
   }
 
   /**
@@ -107,12 +115,10 @@ public class Finder<I, T> {
   }
 
   /**
-   * Return the underlying 'default' EbeanServer.
-   * <p>
-   * This provides full access to the API such as explicit transaction demarcation etc.
+   * Return the Database this finder will use.
    */
   public Database db() {
-    return DB.byName(serverName);
+    return DB.byName(_$dbName);
   }
 
   /**
@@ -120,11 +126,10 @@ public class Finder<I, T> {
    * <p>
    * This is equivalent to {@link DB#byName(String)}
    *
-   * @param server The name of the Database. If this is null then the default EbeanServer is
-   *               returned.
+   * @param databaseName The name of the Database. If this is null then the default database is returned.
    */
-  public Database db(String server) {
-    return DB.byName(server);
+  public Database db(String databaseName) {
+    return DB.byName(databaseName);
   }
 
   /**
