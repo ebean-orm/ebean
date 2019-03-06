@@ -244,7 +244,7 @@ public interface Transaction extends AutoCloseable {
    *
    *   // assume Customer has L2 bean caching enabled ...
    *
-   *   try (Transaction transaction = ebeanServer.beginTransaction()) {
+   *   try (Transaction transaction = DB.beginTransaction()) {
    *
    *     // this uses L2 bean cache as the transaction
    *     // ... is considered "query only" at this point
@@ -366,13 +366,13 @@ public interface Transaction extends AutoCloseable {
    * // inserts into a table called sp_test
    * cs.addModification("sp_test", true, false, false);
    *
-   * try (Transaction txn = ebeanServer.beginTransaction()) {
+   * try (Transaction txn = DB.beginTransaction()) {
    *   txn.setBatchMode(true);
    *   txn.setBatchSize(10);
    *
    *   for (int i = 0; i < da.length;) {
    *     cs.setParameter(1, da[i]);
-   *     ebeanServer.execute(cs);
+   *     DB.execute(cs);
    *   }
    *
    *   // Note: commit implicitly flushes

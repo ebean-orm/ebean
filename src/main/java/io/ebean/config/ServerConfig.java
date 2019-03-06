@@ -2422,7 +2422,7 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
+   * Return true if query statistics should be collected by ObjectGraphNode.
    */
   public boolean isCollectQueryStatsByNode() {
     return collectQueryStatsByNode;

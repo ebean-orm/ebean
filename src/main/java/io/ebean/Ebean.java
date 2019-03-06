@@ -631,7 +631,8 @@ public final class Ebean {
    *   Customer customer = new Customer();
    *   customer.setId(7);
    *   customer.setName("ModifiedNameNoOCC");
-   *   ebeanServer.update(customer);
+   *
+   *   DB.update(customer);
    *
    * }</pre>
    *
@@ -1131,10 +1132,9 @@ public final class Ebean {
    *
    *   String sql = "select c.id, c.name from customer c where c.name like ? order by c.name";
    *
-   *   Query<Customer> query = ebeanServer.findNative(Customer.class, sql);
-   *   query.setParameter(1, "Rob%");
-   *
-   *   List<Customer> customers = query.findList();
+   *   List<Customer> customers = DB.findNative(Customer.class, sql)
+   *     .setParameter(1, "Rob%")
+   *     .findList()
    *
    * }</pre>
    *

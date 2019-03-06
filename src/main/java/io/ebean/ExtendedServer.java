@@ -121,7 +121,7 @@ public interface ExtendedServer {
    * <p>
    * <pre>{@code
    *
-   *     ebeanServer.find(Order.class)
+   *     DB.find(Order.class)
    *       .where().eq("status", Order.Status.NEW)
    *       .order().asc("id")
    *       .findEach((Order order) -> {
@@ -155,7 +155,7 @@ public interface ExtendedServer {
    * <p>
    * <pre>{@code
    *
-   *     ebeanServer.find(Order.class)
+   *     DB.find(Order.class)
    *       .where().eq("status", Order.Status.NEW)
    *       .order().asc("id")
    *       .findEachWhile((Order order) -> {
@@ -194,8 +194,7 @@ public interface ExtendedServer {
    * <p>
    * <pre>{@code
    *
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .where().ilike("name", "rob%")
    *     .findList();
    *
@@ -301,8 +300,7 @@ public interface ExtendedServer {
    * <p>
    * <pre>{@code
    *
-   * Set<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * Set<Customer> customers = DB.find(Customer.class)
    *     .where().ilike("name", "rob%")
    *     .findSet();
    *

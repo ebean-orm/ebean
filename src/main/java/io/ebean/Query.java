@@ -19,10 +19,7 @@ import java.util.function.Predicate;
  * <p>
  * <pre>{@code
  *
- * List<Order> orderList =
- *   ebeanServer.find(Order.class)
- *     .fetch("customer")
- *     .fetch("details")
+ * List<Order> orderList = DB.find(Order.class)
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
@@ -38,29 +35,14 @@ import java.util.function.Predicate;
  * <pre>{@code
  *
  * String oql =
- *   	+" fetch customer "
- *   	+" fetch details "
  *   	+" where customer.name like :custName and orderDate > :minOrderDate "
  *   	+" order by customer.id, id desc "
  *   	+" limit 50 ";
  *
- * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
- * query.setParameter("custName", "Rob%");
- * query.setParameter("minOrderDate", lastWeek);
- *
- * List<Order> orderList = query.findList();
- * ...
- * }</pre>
- * <p>
- * Example: Using a named query called "with.cust.and.details"
- * </p>
- * <pre>{@code
- *
- * Query<Order> query = ebeanServer.createNamedQuery(Order.class,"with.cust.and.details");
- * query.setParameter("custName", "Rob%");
- * query.setParameter("minOrderDate", lastWeek);
- *
- * List<Order> orderList = query.findList();
+ * List<Order> orderList = DB.createQuery(Order.class, oql)
+ *   .setParameter("custName", "Rob%")
+ *   .setParameter("minOrderDate", lastWeek)
+ *   .findList();
  * ...
  * }</pre>
  * <h3>AutoTune</h3>
@@ -436,8 +418,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     // Only fetch the customer id, name and status.
    *     // This is described as a "Partial Object"
    *     .select("name, status")
@@ -465,8 +446,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // query orders...
-   * List<Order> orders =
-   *     ebeanServer.find(Order.class)
+   * List<Order> orders = DB.find(Order.class)
    *       // fetch the customer...
    *       // ... getting the customers name and phone number
    *       .fetch("customer", "name, phoneNumber")
@@ -481,8 +461,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .select("name, status")
    *     .fetch("contacts", "firstName,lastName,email")
    *     .findList();
@@ -551,8 +530,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .select("name, status")
    *     .fetch("contacts", "firstName,lastName,email", new FetchConfig().lazy(10))
    *     .findList();
@@ -573,8 +551,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     // eager fetch the contacts
    *     .fetch("contacts")
    *     .findList();
@@ -637,8 +614,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     // lazy fetch contacts with a batch size of 100
    *     .fetch("contacts", new FetchConfig().lazy(100))
    *     .findList();
@@ -684,8 +660,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  Query<Customer> query =
-   *    ebeanServer.find(Customer.class)
+   *  Query<Customer> query = DB.find(Customer.class)
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id");
    *
@@ -732,7 +707,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  ebeanServer.find(Customer.class)
+   *  DB.find(Customer.class)
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
    *     .findEach((Customer customer) -> {
@@ -761,7 +736,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  ebeanServer.find(Customer.class)
+   *  DB.find(Customer.class)
    *     .fetch("contacts", new FetchConfig().query(2))
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
@@ -788,8 +763,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .where().ilike("name", "rob%")
    *     .findList();
    *
@@ -805,8 +779,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * Set<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * Set<Customer> customers = DB.find(Customer.class)
    *     .where().ilike("name", "rob%")
    *     .findSet();
    *
@@ -826,8 +799,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * Map<String, Product> map =
-   *   ebeanServer.find(Product.class)
+   * Map<String, Product> map = DB.find(Product.class)
    *     .setMapKey("sku")
    *     .findMap();
    *
@@ -934,8 +906,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // assuming the sku of products is unique...
-   * Product product =
-   *     ebeanServer.find(Product.class)
+   * Product product = DB.find(Product.class)
    *         .where().eq("sku", "aa113")
    *         .findOne();
    * ...
@@ -947,8 +918,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // Fetch order 1 and additionally fetch join its order details...
-   * Order order =
-   *     ebeanServer.find(Order.class)
+   * Order order = DB.find(Order.class)
    *       .setId(1)
    *       .fetch("details")
    *       .findOne();
@@ -1114,11 +1084,9 @@ public interface Query<T> {
    * // a query with a named parameter
    * String oql = "find order where status = :orderStatus";
    *
-   * Query<Order> query = ebeanServer.find(Order.class, oql);
-   *
-   * // bind the named parameter
-   * query.bind("orderStatus", OrderStatus.NEW);
-   * List<Order> list = query.findList();
+   * List<Order> list = DB.find(Order.class, oql)
+   *   .setParameter("orderStatus", OrderStatus.NEW)
+   *   .findList();
    *
    * }</pre>
    *
@@ -1136,12 +1104,9 @@ public interface Query<T> {
    * // a query with a positioned parameter
    * String oql = "where status = ? order by id desc";
    *
-   * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
-   *
-   * // bind the parameter
-   * query.setParameter(1, OrderStatus.NEW);
-   *
-   * List<Order> list = query.findList();
+   * List<Order> list = DB.createQuery(Order.class, oql)
+   *   .setParameter(1, OrderStatus.NEW)
+   *   .findList();
    *
    * }</pre>
    *
@@ -1158,8 +1123,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * Order order =
-   *     ebeanServer.find(Order.class)
+   * Order order = DB.find(Order.class)
    *     .setId(1)
    *     .fetch("details")
    *     .findOne();
@@ -1180,8 +1144,7 @@ public interface Query<T> {
    * Add a single Expression to the where clause returning the query.
    * <pre>{@code
    *
-   * List<Order> newOrders =
-   *     ebeanServer.find(Order.class)
+   * List<Order> newOrders = DB.find(Order.class)
    * 		.where().eq("status", Order.NEW)
    * 		.findList();
    * ...
@@ -1196,8 +1159,7 @@ public interface Query<T> {
    * where clause.
    * <pre>{@code
    *
-   * List<Order> orders =
-   *     ebeanServer.find(Order.class)
+   * List<Order> orders = DB.find(Order.class)
    *     .where()
    *       .eq("status", Order.NEW)
    *       .ilike("customer.name","rob%")
@@ -1243,10 +1205,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * List<Customer> list =
-   *     ebeanServer.find(Customer.class)
-   *     // .fetch("orders", new FetchConfig().lazy())
-   *     // .fetch("orders", new FetchConfig().query())
+   * List<Customer> list = DB.find(Customer.class)
    *     .fetch("orders")
    *     .where().ilike("name", "rob%")
    *     .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
@@ -1260,8 +1219,7 @@ public interface Query<T> {
    * </p>
    *
    * @param propertyName the name of the many property that you want to have a filter on.
-   * @return the expression list that you add filter expressions for the many
-   * to.
+   * @return the expression list that you add filter expressions for the many to.
    */
   ExpressionList<T> filterMany(String propertyName);
 
@@ -1447,10 +1405,8 @@ public interface Query<T> {
    *
    * // Assuming sku is unique for products...
    *
-   * Map<String,Product> productMap =
-   *     ebeanServer.find(Product.class)
-   *     // use sku for keys...
-   *     .setMapKey("sku")
+   * Map<String,Product> productMap = DB.find(Product.class)
+   *     .setMapKey("sku")  // sku map keys...
    *     .findMap();
    *
    * }</pre>
