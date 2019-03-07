@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * The extended API for EbeanServer.
+ * The extended API for Database.
  * <p>
  * This provides the finder methods that take an explicit transaction rather than obtaining
  * the transaction from the usual mechanism (which is ThreadLocal based).
@@ -26,7 +26,7 @@ import java.util.function.Predicate;
  * the transaction to use.
  * </p>
  * <p>
- * Note that in all cases the transaction supplied can be null and in this case the EbeanServer
+ * Note that in all cases the transaction supplied can be null and in this case the Database
  * will use the normal mechanism to obtain the transaction to use.
  * </p>
  */
@@ -411,7 +411,7 @@ public interface ExtendedServer {
   /**
    * Execute the update query returning the number of rows updated.
    * <p>
-   * The update query must be created using {@link EbeanServer#update(Class)}.
+   * The update query must be created using {@link Database#update(Class)}.
    * </p>
    *
    * @param query       the update query to execute

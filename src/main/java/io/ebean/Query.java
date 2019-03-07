@@ -634,7 +634,7 @@ public interface Query<T> {
   /**
    * Execute the query returning the list of Id's.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    */
   @Nonnull
@@ -656,7 +656,7 @@ public interface Query<T> {
    * the jdbc statement and resultSet are closed at the end of the iteration.
    * </p>
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <pre>{@code
    *
@@ -759,7 +759,7 @@ public interface Query<T> {
   /**
    * Execute the query returning the list of objects.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <pre>{@code
    *
@@ -775,7 +775,7 @@ public interface Query<T> {
   /**
    * Execute the query returning the set of objects.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <pre>{@code
    *
@@ -791,7 +791,7 @@ public interface Query<T> {
   /**
    * Execute the query returning a map of the objects.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <p>
    * You can use setMapKey() so specify the property values to be used as keys

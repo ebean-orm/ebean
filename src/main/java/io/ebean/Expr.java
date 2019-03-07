@@ -13,9 +13,8 @@ import java.util.Map;
  * {@link Query#where()}.
  * </p>
  * <p>
- * This provides a convenient way to create expressions for the 'Default'
- * server. It is actually a short cut for using the ExpressionFactory of the
- * 'default' EbeanServer.
+ * This provides a convenient way to create expressions for the default
+ * database.
  * <p>
  * See also {@link DB#getExpressionFactory()}
  * </p>

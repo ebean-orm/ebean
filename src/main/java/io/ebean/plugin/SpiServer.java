@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import java.util.List;
 
 /**
- * Extensions to EbeanServer API made available to plugins.
+ * Extensions to Database API made available to plugins.
  */
 public interface SpiServer extends EbeanServer {
 
@@ -43,12 +43,12 @@ public interface SpiServer extends EbeanServer {
   BeanType<?> getBeanTypeForQueueId(String queueId);
 
   /**
-   * Return the associated DataSource for this EbeanServer instance.
+   * Return the associated DataSource for this Database instance.
    */
   DataSource getDataSource();
 
   /**
-   * Return the associated read only DataSource for this EbeanServer instance (can be null).
+   * Return the associated read only DataSource for this Database instance (can be null).
    */
   DataSource getReadOnlyDataSource();
 

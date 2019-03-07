@@ -20,8 +20,7 @@ public interface Transaction extends AutoCloseable {
    * This is the same as <code>DB.currentTransaction()</code>
    * </p>
    * <p>
-   * This returns the current transaction for the 'default server'.  If you are using
-   * multiple EbeanServer's then use {@link DB#currentTransaction()}.
+   * This returns the current transaction for the default database.
    * </p>
    *
    * @see DB#currentTransaction()

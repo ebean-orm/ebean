@@ -102,7 +102,7 @@ public interface BeanState {
   /**
    * Advanced - Used to programmatically build a partially or fully loaded
    * entity bean. First create an entity bean via
-   * {@link EbeanServer#createEntityBean(Class)}, then populate its properties
+   * {@link Database#createEntityBean(Class)}, then populate its properties
    * and then call this method specifying which properties where loaded or null
    * for a fully loaded entity bean.
    */

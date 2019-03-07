@@ -4,7 +4,7 @@ import io.ebean.EbeanServer;
 import io.ebean.config.ServerConfig;
 
 /**
- * Creates the EbeanServer implementations. This is used internally by the EbeanServerFactory and is not currently
+ * Creates the Database implementations. This is used internally by the EbeanServerFactory and is not currently
  * exposed as public API.
  */
 public interface SpiContainer {

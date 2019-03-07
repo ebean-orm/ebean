@@ -3,7 +3,7 @@ package io.ebean.config;
 import java.util.Properties;
 
 /**
- * Configuration for the container that holds the EbeanServer instances.
+ * Configuration for the container that holds the Database instances.
  * <p>
  * Provides configuration for cluster communication (if clustering is used). The cluster communication is
  * used to invalidate appropriate parts of the L2 cache across the cluster.

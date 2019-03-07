@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 /**
- * Defines the AutoTune behaviour for a EbeanServer.
+ * Defines the AutoTune behaviour for a Database.
  */
 public class AutoTuneConfig {
 

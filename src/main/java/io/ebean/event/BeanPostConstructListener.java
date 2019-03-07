@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 
 /**
  * Fired after a bean is constructed, but not yet loaded from database.
@@ -9,7 +9,7 @@ import io.ebean.EbeanServer;
  * properties will get unload. Use {@link BeanPostLoad} instead.
  * <p>
  * it's intended to do some dependency-injection here.
- * If you plan to use this feature you should use {@link EbeanServer#createEntityBean(Class)}
+ * If you plan to use this feature you should use {@link Database#createEntityBean(Class)}
  * to create new beans.
  * </p>
  */
@@ -32,7 +32,7 @@ public interface BeanPostConstructListener {
   void postConstruct(Object bean);
 
   /**
-   * Called after {@link EbeanServer#createEntityBean(Class)}. Only for new beans.
+   * Called after {@link Database#createEntityBean(Class)}. Only for new beans.
    * intended to set default values here.
    */
   void postCreate(Object bean);

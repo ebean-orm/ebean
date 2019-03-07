@@ -11,15 +11,15 @@ import io.ebean.bean.EntityBean;
  * Ebean users.
  * <p>
  * Note that there is a ebean-mocker project that enables you to use Mockito or similar
- * tools to still mock out the underlying 'default EbeanServer' for testing purposes.
+ * tools to still mock out the underlying 'default Database' for testing purposes.
  * <p>
  * You may choose not use this Model mapped superclass if you don't like the 'Active Record' style
  * or if you believe it 'pollutes' your entity beans.
  * <p>
- * You can use Dependency Injection like Guice or Spring to construct and wire a EbeanServer instance
+ * You can use Dependency Injection like Guice or Spring to construct and wire a Database instance
  * and have that same instance used with this Model and Finder. The way that works is that when the
- * DI container creates the EbeanServer instance it can be registered with the Ebean singleton. In this
- * way the EbeanServer instance can be injected as per normal Guice / Spring dependency injection and
+ * DI container creates the Database instance it can be registered with DB. In this
+ * way the Database instance can be injected as per normal Guice / Spring dependency injection and
  * that same instance also used to support the Model and Finder active record style.
  * <p>
  * If you choose to use the Model mapped superclass you will probably also chose to additionally add

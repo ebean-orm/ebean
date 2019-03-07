@@ -55,7 +55,7 @@ public class DatabaseFactory {
   }
 
   /**
-   * Shutdown gracefully all EbeanServers cleaning up any resources as required.
+   * Shutdown gracefully all Database instances cleaning up any resources as required.
    * <p>
    * This is typically invoked via JVM shutdown hook and not explicitly called.
    * </p>

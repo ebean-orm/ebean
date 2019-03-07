@@ -3,7 +3,7 @@ package io.ebean.meta;
 import java.util.List;
 
 /**
- * Provides access to the meta data in EbeanServer such as query execution statistics.
+ * Provides access to the meta data in Database such as query execution statistics.
  */
 public interface MetaInfoManager {
 

@@ -38,13 +38,12 @@ public final class Ebean {
   }
 
   /**
-   * Manages creation and cache of EbeanServers.
+   * Manages creation and cache of Databases.
    */
   private static final Ebean.ServerManager serverMgr = new Ebean.ServerManager();
 
   /**
-   * Helper class for managing fast and safe access and creation of
-   * EbeanServers.
+   * Helper class for managing fast and safe access and creation of Databases.
    */
   private static final class ServerManager {
 
@@ -61,7 +60,7 @@ public final class Ebean {
     private final Object monitor = new Object();
 
     /**
-     * The 'default' EbeanServer.
+     * The 'default' Database.
      */
     private EbeanServer defaultServer;
 
@@ -80,20 +79,20 @@ public final class Ebean {
         throw e;
 
       } catch (DataSourceConfigurationException e) {
-        String msg = "Configuration error creating DataSource for the default EbeanServer." +
+        String msg = "Configuration error creating DataSource for the default Database." +
           " This typically means a missing application-test.yaml or missing ebean-test-config dependency." +
           " See https://ebean.io/docs/trouble-shooting#datasource";
         throw new DataSourceConfigurationException(msg, e);
 
       } catch (Throwable e) {
-        logger.error("Error trying to create the default EbeanServer", e);
+        logger.error("Error trying to create the default Database", e);
         throw new RuntimeException(e);
       }
     }
 
     private EbeanServer getDefaultServer() {
       if (defaultServer == null) {
-        String msg = "The default EbeanServer has not been defined?";
+        String msg = "The default Database has not been defined?";
         msg += " This is normally set via the ebean.datasource.default property.";
         msg += " Otherwise it should be registered programmatically via registerServer()";
         throw new PersistenceException(msg);
@@ -115,7 +114,7 @@ public final class Ebean {
     }
 
     /**
-     * Synchronized read, create and put of EbeanServers.
+     * Synchronized read, create and put of Databases.
      */
     private EbeanServer getWithCreate(String name) {
 
@@ -154,7 +153,7 @@ public final class Ebean {
   }
 
   /**
-   * Get the EbeanServer for a given DataSource. If name is null this will
+   * Get the Database for a given DataSource. If name is null this will
    * return the 'default' EbeanServer.
    * <p>
    * This is provided to access EbeanServer for databases other than the
