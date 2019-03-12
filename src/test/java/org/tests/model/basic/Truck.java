@@ -26,7 +26,7 @@ public class Truck extends Vehicle {
       this.value = value;
     }
 
-    @DbEnumValue
+    @DbEnumValue(length = 3)
     public String value() {
       return value;
     }

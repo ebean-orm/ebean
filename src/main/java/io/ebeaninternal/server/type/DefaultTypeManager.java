@@ -663,10 +663,9 @@ public final class DefaultTypeManager implements TypeManager {
       DbEnumValue dbValue = AnnotationUtil.findAnnotation(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, method, integerValues);
+        return createEnumScalarTypeDbValue(enumType, method, integerValues, dbValue.length());
       }
     }
-
 
     // look for EnumValue annotations instead
     return createEnumScalarType2(enumType);
@@ -678,7 +677,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Return null if the EnumValue annotations are not present/used.
    * </p>
    */
-  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
+  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length) {
 
     Map<String, String> nameValueMap = new LinkedHashMap<>();
 
@@ -696,7 +695,7 @@ public final class DefaultTypeManager implements TypeManager {
       return null;
     }
 
-    return createEnumScalarType(enumType, nameValueMap, integerType, 0);
+    return createEnumScalarType(enumType, nameValueMap, integerType, length);
   }
 
   /**
