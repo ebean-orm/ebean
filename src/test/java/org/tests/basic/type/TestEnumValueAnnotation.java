@@ -27,7 +27,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
 
     DB.save(b);
 
-    SqlRow sqlRow = DB.createSqlQuery("select * from e_basic where id = :id")
+    SqlRow sqlRow = DB.sqlQuery("select * from e_basic where id = :id")
       .setParameter("id", b.getId())
       .findOne();
 
@@ -54,7 +54,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
 
     DB.save(b);
 
-    SqlQuery q = DB.createSqlQuery("select * from e_basic_enum_id where status = :status");
+    SqlQuery q = DB.sqlQuery("select * from e_basic_enum_id where status = :status");
     q.setParameter("status", b.getStatus());
 
     SqlRow sqlRow = q.findOne();
@@ -80,7 +80,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
 
     DB.save(b);
 
-    SqlQuery q = DB.createSqlQuery("select * from e_basic_eni where id = :id");
+    SqlQuery q = DB.sqlQuery("select * from e_basic_eni where id = :id");
     q.setParameter("id", b.getId());
 
     Optional<SqlRow> sqlRow = q.findOneOrEmpty();

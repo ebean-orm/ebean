@@ -24,7 +24,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
   @AfterClass
   public static void reportStats() {
-    BasicMetricVisitor basic = Ebean.getDefaultServer().getMetaInfoManager().visitBasic();
+    BasicMetricVisitor basic = DB.getDefault().getMetaInfoManager().visitBasic();
     for (MetaQueryMetric metric : basic.getDtoQueryMetrics()) {
       System.out.println(metric);
     }
