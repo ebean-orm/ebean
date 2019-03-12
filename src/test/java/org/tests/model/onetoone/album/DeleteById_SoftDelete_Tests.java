@@ -1,8 +1,7 @@
 package org.tests.model.onetoone.album;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -24,7 +23,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.delete(Cover.class, cover.getId());
+    DB.delete(Cover.class, cover.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -43,12 +42,12 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     Cover cover = new Cover("b1");
     cover.save();
 
-    Ebean.delete(Cover.class, cover.getId());
+    DB.delete(Cover.class, cover.getId());
 
-    Cover findWhenSoft = Ebean.find(Cover.class, cover.getId());
+    Cover findWhenSoft = DB.find(Cover.class, cover.getId());
     assertNull(findWhenSoft);
 
-    Cover cover1 = Ebean.find(Cover.class)
+    Cover cover1 = DB.find(Cover.class)
       .setIncludeSoftDeletes()
       .setId(cover.getId())
       .findOne();
@@ -63,7 +62,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("update cover set deleted=? where id=?; -- bind(false");
 
-    Cover findAgain = Ebean.find(Cover.class, cover.getId());
+    Cover findAgain = DB.find(Cover.class, cover.getId());
     assertNotNull(findAgain);
 
     cover.deletePermanent();
@@ -77,7 +76,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.getDefaultServer().delete(Cover.class, cover.getId(), null);
+    DB.getDefault().delete(Cover.class, cover.getId(), null);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -97,7 +96,7 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.getDefaultServer().deletePermanent(Cover.class, cover.getId(), null);
+    DB.getDefault().deletePermanent(Cover.class, cover.getId(), null);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -107,13 +106,12 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAllById_when_softDelete() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    server.deleteAll(Cover.class, ids(beans));
+    DB.deleteAll(Cover.class, ids(beans));
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -127,18 +125,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAllById_when_softDelete_withTransaction() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    Transaction transaction = server.beginTransaction();
-    try {
-      server.deleteAll(Cover.class, ids(beans), transaction);
-      server.commitTransaction();
-    } finally {
-      server.endTransaction();
+    try (Transaction transaction = DB.beginTransaction()) {
+      DB.getDefault().deleteAll(Cover.class, ids(beans), transaction);
+      transaction.commit();
     }
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -154,11 +148,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   public void ebean_deleteAllPermanentById_when_softDelete() {
 
     List<Cover> beans = beans(2);
-    Ebean.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    Ebean.deleteAllPermanent(Cover.class, ids(beans));
+    DB.deleteAllPermanent(Cover.class, ids(beans));
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -168,13 +162,12 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAllPermanentById_when_softDelete() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    server.deleteAllPermanent(Cover.class, ids(beans));
+    DB.deleteAllPermanent(Cover.class, ids(beans));
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -185,18 +178,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAllPermanentById_when_softDelete_withTransaction() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    Transaction transaction = server.beginTransaction();
-    try {
-      server.deleteAllPermanent(Cover.class, ids(beans), transaction);
-      server.commitTransaction();
-    } finally {
-      server.endTransaction();
+    try (Transaction transaction = DB.beginTransaction()) {
+      DB.getDefault().deleteAllPermanent(Cover.class, ids(beans), transaction);
+      transaction.commit();
     }
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -208,18 +197,17 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   public void ebean_deleteAll_when_softDelete() {
 
     List<Cover> beans = beans(2);
-    Ebean.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    Ebean.deleteAll(beans);
+    DB.deleteAll(beans);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
-    }
-    else {
+      assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
+    } else {
       assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
     }
   }
@@ -227,18 +215,17 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAll_when_softDelete() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    server.deleteAll(beans);
+    DB.deleteAll(beans);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
+      assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
     }
     else {
       assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -248,24 +235,20 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAll_when_softDelete_withTransaction() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    Transaction transaction = server.beginTransaction();
-    try {
-      server.deleteAll(beans, transaction);
-      server.commitTransaction();
-    } finally {
-      server.endTransaction();
+    try (Transaction transaction = DB.beginTransaction()) {
+      DB.getDefault().deleteAll(beans, transaction);
+      transaction.commit();
     }
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("update cover set s3_url=?, deleted=? where id=?");
+      assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
     }
     else {
       assertThat(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -275,13 +258,12 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAllPermanent_when_softDelete() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    server.deleteAllPermanent(beans);
+    DB.deleteAllPermanent(beans);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
@@ -291,18 +273,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   @Test
   public void deleteAllPermanent_when_softDelete_withTransaction() {
 
-    EbeanServer server = Ebean.getDefaultServer();
     List<Cover> beans = beans(2);
-    server.saveAll(beans);
+    DB.saveAll(beans);
 
     LoggedSqlCollector.start();
 
-    Transaction transaction = server.beginTransaction();
-    try {
-      server.deleteAllPermanent(beans, transaction);
-      server.commitTransaction();
-    } finally {
-      server.endTransaction();
+    try (Transaction transaction = DB.beginTransaction()) {
+      DB.getDefault().deleteAllPermanent(beans, transaction);
+      transaction.commit();
     }
 
     List<String> sql = LoggedSqlCollector.stop();

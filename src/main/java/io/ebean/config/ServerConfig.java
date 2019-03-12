@@ -350,7 +350,7 @@ public class ServerConfig {
   /**
    * Behaviour of updates in JDBC batch to by default include all properties.
    */
-  private boolean updateAllPropertiesInBatch = true;
+  private boolean updateAllPropertiesInBatch;
 
   /**
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
