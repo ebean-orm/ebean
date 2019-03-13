@@ -276,6 +276,7 @@ public class BaseTableDdl implements TableDdl {
     }
 
     apply.newLine().append(")");
+    addTableStorageEngine(apply, createTable);
     addTableCommentInline(apply, createTable);
     if (partitionMode != null) {
       platformDdl.addTablePartition(apply, partitionMode, createTable.getPartitionColumn());
@@ -325,6 +326,18 @@ public class BaseTableDdl implements TableDdl {
         if (!StringHelper.isNull(column.getComment())) {
           platformDdl.addColumnComment(apply, createTable.getName(), column.getName(), column.getComment());
         }
+      }
+    }
+  }
+
+  /**
+   * Add the table storage engine clause.
+   */
+  private void addTableStorageEngine(DdlBuffer apply, CreateTable createTable) throws IOException {
+    if (platformDdl.isIncludeStorageEngine()) {
+      String storageEngine = createTable.getStorageEngine();
+      if (!StringHelper.isNull(storageEngine)) {
+        platformDdl.tableStorageEngine(apply, storageEngine);
       }
     }
   }

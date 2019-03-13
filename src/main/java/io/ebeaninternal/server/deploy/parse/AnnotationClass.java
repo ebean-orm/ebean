@@ -10,6 +10,7 @@ import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
+import io.ebean.annotation.StorageEngine;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
@@ -152,6 +153,11 @@ public class AnnotationClass extends AnnotationParser {
       for (UniqueConstraint c : uniqueConstraints) {
         descriptor.addIndex(new IndexDefinition(c.columnNames()));
       }
+    }
+
+    StorageEngine storage = AnnotationUtil.findAnnotationRecursive(cls, StorageEngine.class);
+    if (storage != null) {
+      descriptor.setStorageEngine(storage.value());
     }
 
     DbPartition partition = AnnotationUtil.findAnnotationRecursive(cls, DbPartition.class);

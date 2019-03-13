@@ -67,14 +67,14 @@ public class CurrentModel {
    * Return true if the model contains tables that are partitioned.
    */
   public boolean isTablePartitioning() {
-    return model.isTablePartitioning();
+    return read().isTablePartitioning();
   }
 
   /**
    * Return the tables that have partitioning.
    */
   public List<MTable> getPartitionedTables() {
-    return model.getPartitionedTables();
+    return read().getPartitionedTables();
   }
 
   private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {

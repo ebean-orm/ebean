@@ -8,6 +8,8 @@ import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
+import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
@@ -802,6 +804,11 @@ public class DefaultDbMigration implements DbMigration {
         return new SQLitePlatform();
       case HANA:
         return new HanaPlatform();
+      case COCKROACH:
+        return new CockroachPlatform();
+      case CLICKHOUSE:
+        return new ClickHousePlatform();
+
       case GENERIC:
         return new DatabasePlatform();
 
