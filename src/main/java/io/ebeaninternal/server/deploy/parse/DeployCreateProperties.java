@@ -64,7 +64,7 @@ public class DeployCreateProperties {
    * </p>
    */
   private boolean ignoreFieldByName(String fieldName) {
-    if (fieldName.startsWith("_ebean_")) {
+    if (fieldName.startsWith("_ebean_") || fieldName.equals("_$targetDatabase")) {
       // ignore Ebean internal fields
       return true;
     }
