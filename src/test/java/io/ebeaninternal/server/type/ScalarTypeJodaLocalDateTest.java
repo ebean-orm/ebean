@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScalarTypeJodaLocalDateTest {
 
-  ScalarTypeJodaLocalDate type = new ScalarTypeJodaLocalDate();
+  private ScalarTypeJodaLocalDate type = new ScalarTypeJodaLocalDate();
 
   @Test
-  public void convertToMillis_convertFromMillis() throws Exception {
+  public void convertToMillis_convertFromMillis() {
 
     LocalDate localDate = new LocalDate();
     long millis = type.convertToMillis(localDate);
@@ -23,18 +23,23 @@ public class ScalarTypeJodaLocalDateTest {
   }
 
   @Test
-  public void convertToDate_convertFromDate() throws Exception {
+  public void convertToDate_convertFromDate() {
 
-    LocalDate localDate = new LocalDate();
+    convertDate(new LocalDate());
+    convertDate(new LocalDate(1899, 12, 1));
+    convertDate(new LocalDate(1900, 1, 1));
+  }
+
+  private void convertDate(LocalDate localDate) {
+
     Date dateValue = type.convertToDate(localDate);
     LocalDate localDate1 = type.convertFromDate(dateValue);
 
     assertThat(localDate).isEqualTo(localDate1);
   }
 
-
   @Test
-  public void toJdbcType() throws Exception {
+  public void toJdbcType() {
 
     LocalDate localDate = new LocalDate();
     Object jdbcType = type.toJdbcType(localDate);
@@ -44,7 +49,7 @@ public class ScalarTypeJodaLocalDateTest {
   }
 
   @Test
-  public void toBeanType() throws Exception {
+  public void toBeanType() {
 
     LocalDate localDate = new LocalDate();
     Date dateValue = type.convertToDate(localDate);
