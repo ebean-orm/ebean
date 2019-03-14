@@ -1,10 +1,9 @@
 package org.tests.types;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
-
 import org.junit.Test;
 import org.tests.model.types.SomeNewTypesBean;
 
@@ -27,7 +26,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestNewTypes extends BaseTestCase {
 
@@ -54,59 +55,59 @@ public class TestNewTypes extends BaseTestCase {
     bean.setDuration(Duration.ofMinutes(5));
 
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     bean.setYear(Year.now().minusYears(2));
     bean.setMonth(Month.SEPTEMBER);
 
-    Ebean.save(bean);
+    DB.save(bean);
     Thread.sleep(DB_CLOCK_DELTA); // wait, to ensure that instant < Instant.now()
-    List<SomeNewTypesBean> list = Ebean.find(SomeNewTypesBean.class).where().lt("instant", Instant.now()).findList();
+    List<SomeNewTypesBean> list = DB.find(SomeNewTypesBean.class).where().lt("instant", Instant.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().le("localDate", LocalDate.now()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().le("localDate", LocalDate.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().lt("localDateTime", LocalDateTime.now()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().lt("localDateTime", LocalDateTime.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().lt("offsetDateTime", OffsetDateTime.now()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().lt("offsetDateTime", OffsetDateTime.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().lt("zonedDateTime", ZonedDateTime.now()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().lt("zonedDateTime", ZonedDateTime.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().le("localTime", LocalTime.now()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().le("localTime", LocalTime.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().eq("zoneId", ZoneId.systemDefault().getId()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().eq("zoneId", ZoneId.systemDefault().getId()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().eq("zoneOffset", ZonedDateTime.now().getOffset()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().eq("zoneOffset", ZonedDateTime.now().getOffset()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().le("yearMonth", YearMonth.of(2014, 9)).findList();
+    list = DB.find(SomeNewTypesBean.class).where().le("yearMonth", YearMonth.of(2014, 9)).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().le("monthDay", MonthDay.of(9,22)).findList();
+    list = DB.find(SomeNewTypesBean.class).where().le("monthDay", MonthDay.of(9,22)).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().le("year", Year.now()).findList();
+    list = DB.find(SomeNewTypesBean.class).where().le("year", Year.now()).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().le("month", Month.SEPTEMBER).findList();
+    list = DB.find(SomeNewTypesBean.class).where().le("month", Month.SEPTEMBER).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().eq("path", Paths.get(TEMP_PATH)).findList();
+    list = DB.find(SomeNewTypesBean.class).where().eq("path", Paths.get(TEMP_PATH)).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().eq("period", Period.of(4,3,2)).findList();
+    list = DB.find(SomeNewTypesBean.class).where().eq("period", Period.of(4,3,2)).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().eq("duration", Duration.ofMinutes(5)).findList();
+    list = DB.find(SomeNewTypesBean.class).where().eq("duration", Duration.ofMinutes(5)).findList();
     assertTrue(!list.isEmpty());
 
-    SomeNewTypesBean fetched = Ebean.find(SomeNewTypesBean.class, bean.getId());
+    SomeNewTypesBean fetched = DB.find(SomeNewTypesBean.class, bean.getId());
 
     assertEquals(bean.getZoneId(), fetched.getZoneId());
     assertEquals(bean.getZoneOffset(), fetched.getZoneOffset());
@@ -124,9 +125,9 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getDuration(), fetched.getDuration());
 
 
-    String asJson = Ebean.json().toJson(fetched);
+    String asJson = DB.json().toJson(fetched);
 
-    SomeNewTypesBean toBean = Ebean.json().toBean(SomeNewTypesBean.class, asJson);
+    SomeNewTypesBean toBean = DB.json().toBean(SomeNewTypesBean.class, asJson);
 
     assertEquals(bean.getZoneId(), toBean.getZoneId());
     assertEquals(bean.getZoneOffset(), toBean.getZoneOffset());
@@ -151,9 +152,9 @@ public class TestNewTypes extends BaseTestCase {
 
     SomeNewTypesBean bean = new SomeNewTypesBean();
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    SomeNewTypesBean fetched = Ebean.find(SomeNewTypesBean.class, bean.getId());
+    SomeNewTypesBean fetched = DB.find(SomeNewTypesBean.class, bean.getId());
 
     assertNull(fetched.getZoneId());
     assertNull(fetched.getZoneOffset());
@@ -195,13 +196,13 @@ public class TestNewTypes extends BaseTestCase {
   }
 
   @Test
-  public void testSetGetPathNull() throws Exception {
+  public void testSetGetPathNull()  {
     SomeNewTypesBean refBean = new SomeNewTypesBean();
     testSetGetPath(refBean);
   }
   private void testSetGetPath(SomeNewTypesBean refBean) {
     SomeNewTypesBean testBean = new SomeNewTypesBean();
-    BeanType<SomeNewTypesBean> beanType = Ebean.getDefaultServer().getPluginApi().getBeanType(SomeNewTypesBean.class);
+    BeanType<SomeNewTypesBean> beanType = DB.getDefault().getPluginApi().getBeanType(SomeNewTypesBean.class);
     ExpressionPath localDate = beanType.getExpressionPath("localDate");
     ExpressionPath localDateTime = beanType.getExpressionPath("localDateTime");
     ExpressionPath offsetDateTime = beanType.getExpressionPath("offsetDateTime");
@@ -267,8 +268,8 @@ public class TestNewTypes extends BaseTestCase {
     duration.pathSet(testBean, refBean.getDuration());
     assertThat(duration.pathGet(testBean)).isEqualTo(refBean.getDuration());
 
-    Ebean.save(refBean);
-    Ebean.save(testBean);
+    DB.save(refBean);
+    DB.save(testBean);
   }
 
 }
