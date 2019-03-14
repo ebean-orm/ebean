@@ -34,12 +34,19 @@ public class ClickHousePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("UInt16", false));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("UInt32", false));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("UInt64", false));
-    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("Decimal", 38));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("Decimal", 16,4));
+    dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("Float64", false));
 
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("String", false));
     dbTypeMap.put(DbType.DATE, new DbPlatformType("Date", false));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("DateTime", false));
 
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.JSONVARCHAR, new DbPlatformType("String", false));
+
     dbTypeMap.put(DbType.UUID, new DbPlatformType("UUID", false));
+    dbTypeMap.put(DbType.INET, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.CDIR, new DbPlatformType("String", false));
   }
 }
