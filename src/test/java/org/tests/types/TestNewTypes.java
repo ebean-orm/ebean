@@ -200,6 +200,7 @@ public class TestNewTypes extends BaseTestCase {
     SomeNewTypesBean refBean = new SomeNewTypesBean();
     testSetGetPath(refBean);
   }
+
   private void testSetGetPath(SomeNewTypesBean refBean) {
     SomeNewTypesBean testBean = new SomeNewTypesBean();
     BeanType<SomeNewTypesBean> beanType = DB.getDefault().getPluginApi().getBeanType(SomeNewTypesBean.class);
@@ -272,4 +273,24 @@ public class TestNewTypes extends BaseTestCase {
     DB.save(testBean);
   }
 
+  @Test
+  public void test_localDate_pre1900() {
+
+    localDateAt(LocalDate.now());
+    localDateAt(LocalDate.of(1899, 12, 31));
+    localDateAt(LocalDate.of(1899, 12, 1));
+    localDateAt(LocalDate.of(1700, 12, 1));
+    localDateAt(LocalDate.of(1900, 1, 1));
+  }
+
+  private void localDateAt(LocalDate localDate) {
+
+    SomeNewTypesBean bean = new SomeNewTypesBean();
+    bean.setLocalDate(localDate);
+    DB.save(bean);
+
+    SomeNewTypesBean found = DB.find(SomeNewTypesBean.class, bean.getId());
+
+    assertThat(found.getLocalDate()).isEqualTo(localDate);
+  }
 }
