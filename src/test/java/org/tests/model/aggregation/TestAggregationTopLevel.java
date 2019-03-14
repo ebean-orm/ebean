@@ -1,7 +1,7 @@
 package org.tests.model.aggregation;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
@@ -24,7 +24,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void query_noSelect() {
 
-    Query<DMachineStatsAgg> query = Ebean.find(DMachineStatsAgg.class)
+    Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)
       .where().gt("date", LocalDate.now().minusDays(10))
       .query();
 
@@ -36,7 +36,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void query_machineTotalKms_withHaving() {
 
-    Query<DMachineStatsAgg> query = Ebean.find(DMachineStatsAgg.class)
+    Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)
       .select("machine, date, totalKms, totalCost")
       .where().gt("date", LocalDate.now().minusDays(10))
       .having().gt("totalCost", 10)
@@ -50,7 +50,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void query_machineTotalKms() {
 
-    Query<DMachineStatsAgg> query = Ebean.find(DMachineStatsAgg.class)
+    Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)
       .select("machine, totalKms, totalCost")
       .where().gt("date", LocalDate.now().minusDays(10))
       .query();
@@ -63,7 +63,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void query_byDate() {
 
-    Query<DMachineStatsAgg> query = Ebean.find(DMachineStatsAgg.class)
+    Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)
       .select("date, totalKms, hours, rate, totalCost, maxKms")
       .where().gt("date", LocalDate.now().minusDays(10))
       .having().gt("hours", 2)
@@ -77,7 +77,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_machineDate_dynamicFormula() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("machine, date, sum(totalKms), sum(hours)")
       .where().gt("date", LocalDate.now().minusDays(10))
       .having().gt("sum(hours)", 2)
@@ -91,7 +91,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_machine_dynamicFormula() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("machine, sum(totalKms)")
       .where().gt("date", LocalDate.now().minusDays(10))
       .having().gt("sum(hours)", 2)
@@ -105,7 +105,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_machine_dynamicFormula_withJoin() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("sum(totalKms), sum(hours)")
       .fetch("machine", "name")
       .where().gt("date", LocalDate.now().minusDays(10))
@@ -125,7 +125,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_machine_dynamicFormula_withJoin2() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("date, sum(totalKms), sum(hours)")
       .fetch("machine", "name")
       .where().gt("date", LocalDate.now().minusDays(10))
@@ -146,7 +146,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_machine_dynamicFormula_withQueryJoin() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("sum(totalKms), sum(hours)")
       .fetchQuery("machine", "name")
       .where().gt("date", LocalDate.now().minusDays(10))
@@ -168,7 +168,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_machine_dynamicFormula_withQueryJoin2() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("date, sum(totalKms), sum(hours)")
       .fetchQuery("machine", "name")
       .where().gt("date", LocalDate.now().minusDays(10))
@@ -190,7 +190,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_MachineAndDate_dynamicFormula() {
 
-    Query<DMachineStats> query = Ebean.find(DMachineStats.class)
+    Query<DMachineStats> query = DB.find(DMachineStats.class)
       .select("machine, date, max(rate)")
       .where().gt("date", LocalDate.now().minusDays(10))
       .query();
@@ -205,7 +205,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<DMachine> query = Ebean.find(DMachine.class)
+    Query<DMachine> query = DB.find(DMachine.class)
       .select("name")
       .fetch("machineStats", "sum(totalKms)")
       .where().eq("name", "Machine0")
@@ -226,7 +226,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<DMachine> query = Ebean.find(DMachine.class)
+    Query<DMachine> query = DB.find(DMachine.class)
       .select("name")
       .fetch("machineStats", "date, max(rate), sum(totalKms)")
       .where().eq("name", "Machine0")
@@ -258,7 +258,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       machines.add(new DMachine(org, "Machine" + i));
     }
 
-    Ebean.saveAll(machines);
+    DB.saveAll(machines);
 
     List<DMachineStats> allStats = new ArrayList<>();
 
@@ -280,6 +280,6 @@ public class TestAggregationTopLevel extends BaseTestCase {
       date = date.minusDays(1);
     }
 
-    Ebean.saveAll(allStats);
+    DB.saveAll(allStats);
   }
 }

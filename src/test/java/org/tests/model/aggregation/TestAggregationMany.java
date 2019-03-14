@@ -1,7 +1,7 @@
 package org.tests.model.aggregation;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<DMachine> machines = Ebean.find(DMachine.class)
+    List<DMachine> machines = DB.find(DMachine.class)
       .setDisableLazyLoading(true)
       .fetchQuery("auxUseAggs", "name, useSecs, fuel")
       .where().eq("organisation", org)
@@ -48,7 +48,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<DMachine> machines = Ebean.find(DMachine.class)
+    List<DMachine> machines = DB.find(DMachine.class)
       .setDisableLazyLoading(true)
       .select("name")
       .fetch("auxUseAggs", "name, useSecs, fuel")
@@ -73,7 +73,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<DMachine> machines = Ebean.find(DMachine.class)
+    List<DMachine> machines = DB.find(DMachine.class)
       .setDisableLazyLoading(true)
       .select("name")
       .fetch("auxUseAggs", "useSecs, fuel")
