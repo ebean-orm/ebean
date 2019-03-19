@@ -2974,7 +2974,7 @@ public class ServerConfig {
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
-    defaultEnumType = p.getEnum(EnumType.class, "defaultEnumType", EnumType.ORDINAL);
+    defaultEnumType = p.getEnum(EnumType.class, "defaultEnumType", defaultEnumType);
     disableLazyLoading = p.getBoolean("disableLazyLoading", disableLazyLoading);
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
