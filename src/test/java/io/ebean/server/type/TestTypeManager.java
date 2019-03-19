@@ -7,6 +7,7 @@ import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarTypeEnumStandard;
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.model.ivo.Money;
@@ -95,10 +96,37 @@ public class TestTypeManager extends BaseTestCase {
 
   }
 
+  @Test
+  public void testWithConfig() {
+    DefaultTypeManager typeManager1 = createTypeManager();
+    ScalarType<?> type1 = typeManager1.createEnumScalarType(MySex.class, null);
+    assertThat(type1 instanceof ScalarTypeEnumStandard.OrdinalEnum);
+    //
+    DefaultTypeManager typeManager2 = createTypeManagerDefaultEnumTypeString();
+    ScalarType<?> type2 = typeManager2.createEnumScalarType(MySex.class, null);
+    assertThat(type2 instanceof ScalarTypeEnumStandard.StringEnum);
+    //
+    DefaultTypeManager typeManager3 = createTypeManagerDefaultEnumTypeString();
+    ScalarType<?> type3 = typeManager3.createEnumScalarType(MySex.class, EnumType.ORDINAL);
+    assertThat(type3 instanceof ScalarTypeEnumStandard.OrdinalEnum);
+  }
+
   private DefaultTypeManager createTypeManager() {
 
     ServerConfig serverConfig = new ServerConfig();
     serverConfig.setDatabasePlatform(new H2Platform());
+
+    BootupClasses bootupClasses = new BootupClasses();
+    bootupClasses.getAttributeConverters().add(MoneyTypeConverter.class);
+
+    return new DefaultTypeManager(serverConfig, bootupClasses);
+  }
+
+  private DefaultTypeManager createTypeManagerDefaultEnumTypeString() {
+
+    ServerConfig serverConfig = new ServerConfig();
+    serverConfig.setDatabasePlatform(new H2Platform());
+    serverConfig.setDefaultEnumType(EnumType.STRING);
 
     BootupClasses bootupClasses = new BootupClasses();
     bootupClasses.getAttributeConverters().add(MoneyTypeConverter.class);

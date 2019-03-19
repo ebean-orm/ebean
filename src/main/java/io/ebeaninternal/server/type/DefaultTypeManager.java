@@ -154,6 +154,8 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final boolean offlineMigrationGeneration;
 
+  private final EnumType defaultEnumType;
+
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
   /**
@@ -200,6 +202,8 @@ public final class DefaultTypeManager implements TypeManager {
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
 
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
+
+    this.defaultEnumType = config.getDefaultEnumType();
 
     initialiseStandard(jsonDateTime, config);
     initialiseJavaTimeTypes(jsonDateTime, config);
@@ -645,8 +649,13 @@ public final class DefaultTypeManager implements TypeManager {
 
   private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
     if (type == null) {
-      // default as per spec is ORDINAL
-      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+      if(defaultEnumType == EnumType.ORDINAL) {
+        return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+      } else {
+        return new ScalarTypeEnumStandard.StringEnum(enumType);
+      }
 
     } else if (type == EnumType.ORDINAL) {
       return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
