@@ -36,9 +36,13 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ModifyAwareList)) return false;
-    ModifyAwareList<?> that = (ModifyAwareList<?>) o;
-    return Objects.equals(list, that.list);
+    if (o instanceof ModifyAwareList) {
+      ModifyAwareList<?> that = (ModifyAwareList<?>) o;
+      return Objects.equals(list, that.list);
+    }
+    if (!(o instanceof List)) return false;
+    List<?> that = (List<?>) o;
+    return Objects.equals(list, that);
   }
 
   @Override

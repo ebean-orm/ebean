@@ -55,9 +55,13 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ModifyAwareSet)) return false;
-    ModifyAwareSet<?> that = (ModifyAwareSet<?>) o;
-    return Objects.equals(set, that.set);
+    if (o instanceof ModifyAwareSet) {
+      ModifyAwareSet<?> that = (ModifyAwareSet<?>) o;
+      return Objects.equals(set, that.set);
+    }
+    if (!(o instanceof Set)) return false;
+    Set<?> that = (Set<?>) o;
+    return Objects.equals(set, that);
   }
 
   @Override
