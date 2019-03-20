@@ -189,7 +189,7 @@ public class DdlGenerator {
     runScript(connection, false, createAllContent, getCreateFileName());
 
     if (extraDdl && jaxbPresent) {
-      if (currentModel.isTablePartitioning()) {
+      if (currentModel().isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
         if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
           runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
@@ -201,7 +201,7 @@ public class DdlGenerator {
         runScript(connection, false, extraApply, "extra-ddl");
       }
 
-      if (currentModel.isTablePartitioning()) {
+      if (currentModel().isTablePartitioning()) {
         checkInitialTablePartitions(connection);
       }
     }

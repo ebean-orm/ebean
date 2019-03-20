@@ -20,6 +20,11 @@ public interface DdlBuffer {
   boolean isEmpty();
 
   /**
+   * Append a statement allowing for null or empty statements.
+   */
+  DdlBuffer appendStatement(String content) throws IOException;
+
+  /**
    * Append DDL content to the buffer.
    */
   DdlBuffer append(String content) throws IOException;

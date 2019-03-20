@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.ClickHouseDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.CockroachDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
@@ -50,6 +51,8 @@ public class PlatformDdlBuilder {
         return new SqlServerDdl(platform);
       case HANA:
         return new HanaColumnStoreDdl(platform);
+      case CLICKHOUSE:
+        return new ClickHouseDdl(platform);
       default:
         return new PlatformDdl(platform);
     }

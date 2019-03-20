@@ -104,7 +104,6 @@ public class MySqlDdl extends PlatformDdl {
       }
       buffer.append(String.format(" comment '%s'", comment));
     }
-
   }
 
   @Override

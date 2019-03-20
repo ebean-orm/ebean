@@ -211,6 +211,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final String draftTable;
 
   private final PartitionMeta partitionMeta;
+  private final String storageEngine;
 
   /**
    * DB table comment.
@@ -492,6 +493,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
     this.partitionMeta = deploy.getPartitionMeta();
+    this.storageEngine = deploy.getStorageEngine();
     this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
 
     // helper object used to derive lists of properties
@@ -1970,10 +1972,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
     query.setPersistenceContext(pc);
     return query
-        // .select(getIdProperty().getName())
-        // we do not select the id because we
-        // probably have to load the entire bean
-        .setId(id).findOne();
+      // .select(getIdProperty().getName())
+      // we do not select the id because we
+      // probably have to load the entire bean
+      .setId(id).findOne();
   }
 
   /**
@@ -2872,6 +2874,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public PartitionMeta getPartitionMeta() {
     return partitionMeta;
+  }
+
+  /**
+   * Return the storage engine.
+   */
+  public String getStorageEngine() {
+    return storageEngine;
   }
 
   /**
