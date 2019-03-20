@@ -32,6 +32,7 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
 
+import javax.persistence.EnumType;
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -228,6 +229,8 @@ public class ServerConfig {
   private PersistBatch persistBatchOnCascade = PersistBatch.INHERIT;
 
   private int persistBatchSize = 20;
+
+  private EnumType defaultEnumType = EnumType.ORDINAL;
 
   private boolean disableLazyLoading;
 
@@ -976,6 +979,14 @@ public class ServerConfig {
    */
   public void setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
+  }
+
+  public EnumType getDefaultEnumType() {
+    return defaultEnumType;
+  }
+
+  public void setDefaultEnumType(EnumType defaultEnumType) {
+    this.defaultEnumType = defaultEnumType;
   }
 
   /**
@@ -2963,6 +2974,7 @@ public class ServerConfig {
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
+    defaultEnumType = p.getEnum(EnumType.class, "defaultEnumType", defaultEnumType);
     disableLazyLoading = p.getBoolean("disableLazyLoading", disableLazyLoading);
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
