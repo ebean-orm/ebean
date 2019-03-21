@@ -433,7 +433,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     } else {
       for (XmRawSql sql : entityDeploy.getRawSql()) {
-        RawSqlBuilder builder = RawSqlBuilder.parse(sql.getQuery().getValue());
+        RawSqlBuilder builder;
+        try {
+          builder = RawSqlBuilder.parse(sql.getQuery().getValue());
+        } catch (RuntimeException e) {
+          builder = RawSqlBuilder.unparsed(sql.getQuery().getValue());
+        }
+
         for (XmColumnMapping columnMapping : sql.getColumnMapping()) {
           builder.columnMapping(columnMapping.getColumn(), columnMapping.getProperty());
         }

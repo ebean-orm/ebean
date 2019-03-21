@@ -10,7 +10,6 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
@@ -75,6 +74,19 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     assertThat(sql).contains("o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line_1, a.line_2, a.city from o_order o");
     assertThat(sql).contains("join o_customer c on o.kcustomer_id = c.id ");
     assertThat(sql).contains("where o.status = ?  order by c.name, c.id");
+  }
+
+  @IgnorePlatform(Platform.ORACLE)
+  @Test
+  public void testNamed_fromCustomXmlLocations_withComments() {
+
+    ResetBasicData.reset();
+
+    Query<Order> query = Ebean.createNamedQuery(Order.class, "myRawTest3");
+    query.setMaxRows(10);
+
+    List<Order> list = query.findList();
+    assertThat(list).isNotEmpty();
   }
 
   @Test
