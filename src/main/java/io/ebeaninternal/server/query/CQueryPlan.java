@@ -110,7 +110,7 @@ public class CQueryPlan {
     this.planKey = request.getQueryPlanKey();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
-    this.label = query.getLabel();
+    this.label = query.getPlanLabel();
     this.location = location();
     this.autoTuned = query.isAutoTuned();
     this.asOfTableCount = query.getAsOfTableCount();
@@ -135,7 +135,7 @@ public class CQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
-    this.label = query.getLabel();
+    this.label = query.getPlanLabel();
     this.location = location();
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;

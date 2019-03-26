@@ -17,6 +17,8 @@ public class ProfileLocationTest {
   public void test_obtain() {
 
     assertThat(doIt()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:13)");
+    assertThat(loc.shortDescription()).isEqualTo("ProfileLocationTest.doIt(ProfileLocationTest.java:13)");
+    assertThat(loc.label()).isEqualTo("ProfileLocationTest.doIt");
   }
 
   @Test

@@ -198,6 +198,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   String getLabel();
 
   /**
+   * Return the label manually set on the query or from the profile location.
+   */
+  String getPlanLabel();
+
+  /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
    */
   boolean isFindById();

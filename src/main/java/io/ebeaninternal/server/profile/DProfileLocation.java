@@ -15,6 +15,8 @@ class DProfileLocation implements ProfileLocation {
 
   private String shortDescription;
 
+  private String label;
+
   private final int lineNumber;
 
   DProfileLocation() {
@@ -42,10 +44,17 @@ class DProfileLocation implements ProfileLocation {
   public String obtain() {
     // atomic assignment so happy with this
     if (location == null) {
-      location = create();
-      shortDescription = shortDesc(location);
+      final String loc = create();
+      shortDescription = shortDesc(loc);
+      label = UtilLocation.label(shortDescription);
+      location = loc;
     }
     return location;
+  }
+
+  @Override
+  public String label() {
+    return label;
   }
 
   @Override

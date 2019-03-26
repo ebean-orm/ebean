@@ -164,7 +164,7 @@ public final class CQueryPlanStats {
 
     @Override
     public String toString() {
-      return "location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
+      return "label:" + getLabel() + " location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
     }
 
     @Override

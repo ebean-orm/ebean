@@ -362,6 +362,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public String getPlanLabel() {
+    if (label != null) {
+      return label;
+    }
+    if (profileLocation != null) {
+      return profileLocation.label();
+    }
+    return null;
+  }
+
+  @Override
   public Query<T> setLabel(String label) {
     this.label = label;
     return this;
