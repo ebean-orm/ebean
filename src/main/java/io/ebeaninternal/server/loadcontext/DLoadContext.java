@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.loadcontext;
 
 import io.ebean.CacheMode;
+import io.ebean.ProfileLocation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallStack;
 import io.ebean.bean.EntityBeanIntercept;
@@ -55,6 +56,8 @@ public class DLoadContext implements LoadContext {
   private final String relativePath;
   private final ObjectGraphOrigin origin;
   private final boolean useProfiling;
+  private final String planLabel;
+  private final ProfileLocation profileLocation;
 
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
 
@@ -83,6 +86,8 @@ public class DLoadContext implements LoadContext {
     this.disableReadAudit = false;
     this.includeSoftDeletes = false;
     this.relativePath = null;
+    this.planLabel = null;
+    this.profileLocation = null;
     this.useProfiling = false;
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
   }
@@ -110,6 +115,8 @@ public class DLoadContext implements LoadContext {
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.getUseBeanCache();
     this.useProfiling = query.getProfilingListener() != null;
+    this.planLabel = query.getPlanLabel();
+    this.profileLocation = query.getProfileLocation();
 
     ObjectGraphNode parentNode = query.getParentNode();
     if (parentNode != null) {
@@ -126,6 +133,19 @@ public class DLoadContext implements LoadContext {
     registerSecondaryQueries(secondaryQueries);
   }
 
+  /**
+   * Return the query plan label of the origin query.
+   */
+  public String getPlanLabel() {
+    return planLabel;
+  }
+
+  /**
+   * Return the profile location of the origin query.
+   */
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
+  }
 
   /**
    * Register the +query and +lazy secondary queries with their appropriate LoadBeanContext or LoadManyContext.
@@ -211,10 +231,7 @@ public class DLoadContext implements LoadContext {
 
   @Override
   public ObjectGraphNode getObjectGraphNode(String path) {
-
-    ObjectGraphNode node = nodePathMap.computeIfAbsent(path, this::createObjectGraphNode);
-
-    return node;
+    return nodePathMap.computeIfAbsent(path, this::createObjectGraphNode);
   }
 
   private ObjectGraphNode createObjectGraphNode(String path) {
