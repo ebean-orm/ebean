@@ -239,7 +239,7 @@ public final class CQueryPlanStats {
 
     @Override
     public String getQueryPlanHash() {
-      return queryPlan.getPlanKey().toString();
+      return queryPlan.getSqlHash();
     }
 
     @Override
