@@ -5,7 +5,7 @@ package io.ebean.config;
  */
 public class AutoTuneConfig {
 
-  private AutoTuneMode mode = AutoTuneMode.DEFAULT_ON;
+  private AutoTuneMode mode = AutoTuneMode.DEFAULT_OFF;
 
   private String queryTuningFile = "ebean-autotune.xml";
 

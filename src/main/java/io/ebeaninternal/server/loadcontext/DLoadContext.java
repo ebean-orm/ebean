@@ -13,6 +13,7 @@ import io.ebeaninternal.api.LoadSecondaryQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuerySecondary;
+import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -55,9 +56,9 @@ public class DLoadContext implements LoadContext {
    */
   private final String relativePath;
   private final ObjectGraphOrigin origin;
-  private final boolean useProfiling;
   private final String planLabel;
   private final ProfileLocation profileLocation;
+  private final ProfilingListener profilingListener;
 
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
 
@@ -88,7 +89,7 @@ public class DLoadContext implements LoadContext {
     this.relativePath = null;
     this.planLabel = null;
     this.profileLocation = null;
-    this.useProfiling = false;
+    this.profilingListener = null;
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
   }
 
@@ -114,7 +115,7 @@ public class DLoadContext implements LoadContext {
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.getUseBeanCache();
-    this.useProfiling = query.getProfilingListener() != null;
+    this.profilingListener = query.getProfilingListener();
     this.planLabel = query.getPlanLabel();
     this.profileLocation = query.getProfileLocation();
 
@@ -368,8 +369,8 @@ public class DLoadContext implements LoadContext {
     if (disableReadAudit) {
       query.setDisableReadAuditing();
     }
-    if (useProfiling) {
-      query.setAutoTune(true);
+    if (profilingListener != null) {
+      query.setProfilingListener(profilingListener);
     }
     if (tenantId != null) {
       query.setTenantId(tenantId);
