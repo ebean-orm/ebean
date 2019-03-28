@@ -49,7 +49,7 @@ public class ProfileOriginTest extends BaseTestCase {
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
-    assertThat(detail.asString().trim()).isEqualTo("select (orderDate)  fetch customer (name)");
+    assertThat(detail.asString()).isEqualTo("select (orderDate) fetch customer (name)");
   }
 
   @Test
@@ -90,7 +90,7 @@ public class ProfileOriginTest extends BaseTestCase {
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
-    assertThat(detail.asString().trim()).isEqualTo("select (orderDate)  fetch customer (billingAddress)");
+    assertThat(detail.asString()).isEqualTo("select (orderDate) fetch customer (billingAddress)");
   }
 
 
@@ -120,7 +120,7 @@ public class ProfileOriginTest extends BaseTestCase {
     po.collectUsageInfo(c);
 
     OrmQueryDetail detail = po.buildDetail(desc);
-    assertThat(detail.asString().trim()).isEqualTo("fetch details (orderQty,shipQty,unitPrice)  fetch details.product (name)");
+    assertThat(detail.asString()).isEqualTo("fetch details (orderQty,shipQty,unitPrice) fetch details.product (name)");
   }
 
   private NodeUsageCollector node(String path) {
