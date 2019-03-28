@@ -82,9 +82,9 @@
   <!--<logger name="org.avaje.docker" level="TRACE"/>-->
   <!--<logger name="io.ebean.DDL" level="DEBUG"/>-->
 
-  <!--<logger name="io.ebean.SQL" level="TRACE"/>-->
-  <!--<logger name="io.ebean.TXN" level="TRACE"/>-->
-  <!--<logger name="io.ebean.SUM" level="TRACE"/>-->
+  <logger name="io.ebean.SQL" level="TRACE"/>
+  <logger name="io.ebean.TXN" level="TRACE"/>
+  <logger name="io.ebean.SUM" level="TRACE"/>
 
   <!--<logger name="io.ebean.cache.TABLEMOD" level="TRACE"/>-->
 
