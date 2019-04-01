@@ -24,6 +24,7 @@ public class DtoQueryTest extends BaseTestCase {
   public void dto_findList_constructorMatch() {
 
     ResetBasicData.reset();
+    resetAllMetrics();
 
     DtoQuery<DCust> dtoQuery = server().findDto(DCust.class, "select id, name from o_customer");
 
@@ -31,6 +32,17 @@ public class DtoQueryTest extends BaseTestCase {
 
     log.info(list.toString());
     assertThat(list).isNotEmpty();
+
+    BasicMetricVisitor basic = visitMetricsBasic();
+
+    List<MetaQueryMetric> stats = basic.getDtoQueryMetrics();
+    for (MetaQueryMetric stat : stats) {
+      long meanMicros = stat.getMean();
+      assertThat(meanMicros).isLessThan(900_000);
+    }
+
+    assertThat(stats).hasSize(1);
+    assertThat(stats.get(0).getCount()).isEqualTo(1);
   }
 
   @Test

@@ -144,15 +144,13 @@ public abstract class AbstractSqlQueryRequest {
    * Prepare and execute the SQL using the Binder.
    */
   public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+    startNano = System.nanoTime();
     executeAsSql(binder);
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
 
-    startNano = System.nanoTime();
-
     prepareSql();
-
     Connection conn = trans.getInternalConnection();
 
     pstmt = conn.prepareStatement(sql);
