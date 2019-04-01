@@ -1,6 +1,12 @@
 [![Build Status](https://travis-ci.org/ebean-orm/ebean.svg?branch=master)](https://travis-ci.org/ebean-orm/ebean)
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
 
+# Sponsors
+[1]: https://www.foconis.de/
+[2]: https://www.foconis.de/templates/yootheme/cache/foconis_logo_322-709da1de.png
+
+[![Foconis.de][2]][1]
+
 # Need help?
 Post questions or issues to the Ebean google group - https://groups.google.com/forum/#!forum/ebean
 
