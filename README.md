@@ -7,6 +7,11 @@
 
 [![Foconis.de][2]][1]
 
+[3]: https://www.payintech.com/
+[4]: https://www.payintech.com/wp-content/uploads/2015/10/PayinTech-logo-noir.png
+
+[![payintech.com][4]][3]
+
 # Need help?
 Post questions or issues to the Ebean google group - https://groups.google.com/forum/#!forum/ebean
 
