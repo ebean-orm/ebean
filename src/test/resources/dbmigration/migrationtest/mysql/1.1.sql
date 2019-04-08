@@ -39,7 +39,6 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic alter status set default 'A';
 alter table migtest_e_basic modify status varchar(1) not null;
-alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
@@ -53,7 +52,6 @@ update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add column new_boolean_field2 tinyint(1) default 1 not null;
 alter table migtest_e_basic add column progress integer default 0 not null;
-alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer default 42 not null;
 
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest2;
