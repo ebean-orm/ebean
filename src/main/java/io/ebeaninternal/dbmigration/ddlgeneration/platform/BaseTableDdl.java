@@ -262,7 +262,6 @@ public class BaseTableDdl implements TableDdl {
     DdlBuffer apply = writer.apply();
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
     writeTableColumns(apply, columns, useIdentity);
-    writeCheckConstraints(apply, createTable);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
@@ -504,31 +503,6 @@ public class BaseTableDdl implements TableDdl {
   protected void dropSequence(DdlBuffer buffer, String sequenceName) throws IOException {
 
     buffer.appendStatement(platformDdl.dropSequence(sequenceName));
-  }
-
-  /**
-   * Write all the check constraints.
-   */
-  protected void writeCheckConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
-
-    for (Column column : createTable.getColumn()) {
-      String checkConstraint = column.getCheckConstraint();
-      if (hasValue(checkConstraint)) {
-        writeCheckConstraint(apply, column, checkConstraint);
-      }
-    }
-  }
-
-  /**
-   * Write a check constraint.
-   */
-  protected void writeCheckConstraint(DdlBuffer buffer, Column column, String checkConstraint) throws IOException {
-
-    String ckName = column.getCheckConstraintName();
-
-    buffer.append(",").newLine();
-    buffer.append("  constraint ").append(ckName);
-    buffer.append(" ").append(checkConstraint);
   }
 
   protected void writeCompoundUniqueConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
