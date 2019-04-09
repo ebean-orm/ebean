@@ -30,6 +30,7 @@ public class PostgresPlatform extends DatabasePlatform {
     super();
     this.platform = Platform.POSTGRES;
     this.supportsNativeIlike = true;
+    this.supportsDeleteTableAlias = true;
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;

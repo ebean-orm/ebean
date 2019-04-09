@@ -170,6 +170,10 @@ public abstract class BaseTestCase {
     return isH2() || isPostgres();
   }
 
+  public boolean isPlatformSupportsDeleteTableAlias() {
+    return spiEbeanServer().getDatabasePlatform().isSupportsDeleteTableAlias();
+  }
+
   public boolean isPersistBatchOnCascade() {
     return spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }

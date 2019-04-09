@@ -49,6 +49,8 @@ public class DatabasePlatform {
    */
   protected boolean useExtraTransactionOnIterateSecondaryQueries;
 
+  protected boolean supportsDeleteTableAlias;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
@@ -176,10 +178,10 @@ public class DatabasePlatform {
    * findIterate() and findVisit().
    */
   protected boolean forwardOnlyHintOnFindIterate;
-  
+
   /**
    * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
-   * 
+   *
    * This is {@code false} for HANA
    */
   protected boolean supportsResultSetConcurrencyModeUpdatable = true;
@@ -304,6 +306,13 @@ public class DatabasePlatform {
    */
   public boolean isSupportsNativeIlike() {
     return supportsNativeIlike;
+  }
+
+  /**
+   * Return true if the platform supports delete statements with table alias.
+   */
+  public boolean isSupportsDeleteTableAlias() {
+    return supportsDeleteTableAlias;
   }
 
   /**
@@ -524,7 +533,7 @@ public class DatabasePlatform {
   public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
   }
-  
+
   /**
    * Return true if the ResultSet CONCUR_UPDATABLE Hint should be used on
    * createNativeSqlTree() PreparedStatements.
@@ -535,7 +544,7 @@ public class DatabasePlatform {
   public boolean isSupportsResultSetConcurrencyModeUpdatable() {
     return supportsResultSetConcurrencyModeUpdatable;
   }
-  
+
   /**
    * Set to true if the ResultSet CONCUR_UPDATABLE Hint should be used by default on createNativeSqlTree() PreparedStatements.
    */

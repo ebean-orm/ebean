@@ -135,14 +135,22 @@ class CQueryBuilder {
 
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
 
+    String alias = alias(rootTableAlias);
     if (!sqlTree.isIncludeJoins()) {
-      // simple - delete from table ...
-      return aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
+      if (dbPlatform.isSupportsDeleteTableAlias()) {
+        // delete from table <alias> ...
+        return aliasReplace(buildSql("delete", request, predicates, sqlTree).getSql(), alias);
+      } else if (dbPlatform.getPlatform() == Platform.MYSQL) {
+        return aliasReplace(buildSql("delete " + alias, request, predicates, sqlTree).getSql(), alias);
+      } else {
+        // simple - delete from table ...
+        return aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
+      }
     }
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSql(null, request, predicates, sqlTree).getSql();
     sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
-    sql = aliasReplace(sql, alias(rootTableAlias));
+    sql = aliasReplace(sql, alias);
     return sql;
   }
 
@@ -425,7 +433,7 @@ class CQueryBuilder {
     try {
       // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
       // statement here by specifying ResultSet.CONCUR_UPDATABLE
-      PreparedStatement statement = connection.prepareStatement(sql,ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
+      PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
       predicates.bind(statement, connection);
 
       ResultSet resultSet = statement.executeQuery();
@@ -702,21 +710,21 @@ class CQueryBuilder {
   }
 
   private String toSql(CountDistinctOrder orderBy) {
-    switch(orderBy) {
-    case ATTR_ASC:
-      return " order by r1.attribute_";
-    case ATTR_DESC:
-      return " order by r1.attribute_ desc";
-    case COUNT_ASC_ATTR_ASC:
-      return " order by count(*), r1.attribute_";
-    case COUNT_ASC_ATTR_DESC:
-      return " order by count(*), r1.attribute_ desc";
-    case COUNT_DESC_ATTR_ASC:
-      return " order by count(*) desc, r1.attribute_";
-    case COUNT_DESC_ATTR_DESC:
-      return " order by count(*) desc, r1.attribute_ desc";
-    default:
-      throw new IllegalArgumentException("Illegal enum: "+ orderBy);
+    switch (orderBy) {
+      case ATTR_ASC:
+        return " order by r1.attribute_";
+      case ATTR_DESC:
+        return " order by r1.attribute_ desc";
+      case COUNT_ASC_ATTR_ASC:
+        return " order by count(*), r1.attribute_";
+      case COUNT_ASC_ATTR_DESC:
+        return " order by count(*), r1.attribute_ desc";
+      case COUNT_DESC_ATTR_ASC:
+        return " order by count(*) desc, r1.attribute_";
+      case COUNT_DESC_ATTR_DESC:
+        return " order by count(*) desc, r1.attribute_ desc";
+      default:
+        throw new IllegalArgumentException("Illegal enum: " + orderBy);
     }
   }
 

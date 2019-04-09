@@ -50,7 +50,13 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("delete from bbookmark_user where name =");
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(loggedSql.get(0)).contains("delete from bbookmark_user t0 where t0.name =");
+    } else if (isMySql()){
+      assertThat(loggedSql.get(0)).contains("delete t0 from bbookmark_user t0 where t0.name =");
+    } else {
+      assertThat(loggedSql.get(0)).contains("delete from bbookmark_user where name =");
+    }
 
 
     server.find(BBookmarkUser.class).select("id").where().eq("name", "NotARealFirstName").delete();
@@ -102,8 +108,13 @@ public class TestDeleteByQuery extends BaseTestCase {
     Ebean.find(BBookmarkUser.class).setId(7000).delete();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("delete from bbookmark_user where id = ?");
-    assertThat(sql.get(1)).contains("delete from bbookmark_user where id = ?");
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(sql.get(0)).contains("delete from bbookmark_user t0 where t0.id = ?");
+      assertThat(sql.get(1)).contains("delete from bbookmark_user t0 where t0.id = ?");
+    } else if (!isMySql()) {
+      assertThat(sql.get(0)).contains("delete from bbookmark_user where id = ?");
+      assertThat(sql.get(1)).contains("delete from bbookmark_user where id = ?");
+    }
 
     // and note this is the easiest option
     Ebean.delete(BBookmarkUser.class, 7000);
@@ -140,7 +151,11 @@ public class TestDeleteByQuery extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("delete from contact where id = ?");
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(sql.get(0)).contains("delete from contact t0 where t0.id = ?");
+    } else if (!isMySql()){
+      assertThat(sql.get(0)).contains("delete from contact where id = ?");
+    }
   }
 
   @Test
