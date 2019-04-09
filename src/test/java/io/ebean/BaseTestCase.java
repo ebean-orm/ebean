@@ -2,9 +2,9 @@ package io.ebean;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricType;
+import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -64,12 +64,12 @@ public abstract class BaseTestCase {
     server().getMetaInfoManager().resetAllMetrics();
   }
 
-  protected BasicMetricVisitor visitMetricsBasic() {
-     return server().getMetaInfoManager().visitBasic();
+  protected ServerMetrics collectMetrics() {
+     return server().getMetaInfoManager().collectMetrics();
   }
 
   protected List<MetaTimedMetric> visitTimedMetrics() {
-    return visitMetricsBasic().getTimedMetrics();
+    return collectMetrics().getTimedMetrics();
   }
 
   protected List<MetaTimedMetric> sqlMetrics() {

@@ -4,6 +4,7 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
+import io.ebean.meta.ServerMetrics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,9 +34,9 @@ public class DtoQueryTest extends BaseTestCase {
     log.info(list.toString());
     assertThat(list).isNotEmpty();
 
-    BasicMetricVisitor basic = visitMetricsBasic();
+    ServerMetrics metrics = collectMetrics();
 
-    List<MetaQueryMetric> stats = basic.getDtoQueryMetrics();
+    List<MetaQueryMetric> stats = metrics.getDtoQueryMetrics();
     for (MetaQueryMetric stat : stats) {
       long meanMicros = stat.getMean();
       assertThat(meanMicros).isLessThan(900_000);
@@ -208,7 +209,7 @@ public class DtoQueryTest extends BaseTestCase {
       .setParameter("name", "rob")
       .findList();
 
-    BasicMetricVisitor metric2 = server().getMetaInfoManager().visitBasic();
+    ServerMetrics metric2 = server().getMetaInfoManager().collectMetrics();
 
     stats = metric2.getDtoQueryMetrics();
     assertThat(stats).hasSize(2);

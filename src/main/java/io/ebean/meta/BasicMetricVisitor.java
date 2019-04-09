@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A simple MetricVisitor that can collect the desired metrics into lists.
  */
-public class BasicMetricVisitor extends AbstractMetricVisitor {
+public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerMetrics {
 
   private final List<MetaTimedMetric> timed = new ArrayList<>();
   private final List<MetaQueryMetric> dtoQuery = new ArrayList<>();
@@ -29,6 +29,7 @@ public class BasicMetricVisitor extends AbstractMetricVisitor {
   /**
    * Return timed metrics for Transactions, labelled SqlQuery, labelled SqlUpdate.
    */
+  @Override
   public List<MetaTimedMetric> getTimedMetrics() {
     return timed;
   }
@@ -36,6 +37,7 @@ public class BasicMetricVisitor extends AbstractMetricVisitor {
   /**
    * Return the DTO query metrics.
    */
+  @Override
   public List<MetaQueryMetric> getDtoQueryMetrics() {
     return dtoQuery;
   }
@@ -43,6 +45,7 @@ public class BasicMetricVisitor extends AbstractMetricVisitor {
   /**
    * Return the ORM query metrics.
    */
+  @Override
   public List<MetaOrmQueryMetric> getOrmQueryMetrics() {
     return ormQuery;
   }

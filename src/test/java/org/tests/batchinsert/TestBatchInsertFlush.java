@@ -8,8 +8,8 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.ServerMetrics;
 import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -77,8 +77,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
       transaction.end();
     }
 
-    BasicMetricVisitor basic = visitMetricsBasic();
-    List<MetaTimedMetric> txnStats = basic.getTimedMetrics();
+    ServerMetrics metrics = collectMetrics();
+    List<MetaTimedMetric> txnStats = metrics.getTimedMetrics();
     for (MetaTimedMetric txnMetric : txnStats) {
       System.out.println(txnMetric);
     }

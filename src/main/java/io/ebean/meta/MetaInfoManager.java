@@ -8,6 +8,15 @@ import java.util.List;
 public interface MetaInfoManager {
 
   /**
+   * Return the metrics for the database instance.
+   * <p>
+   * This will reset the metrics (reset counters back to zero etc) and
+   * will only return the non-empty metrics.
+   * </p>
+   */
+  ServerMetrics collectMetrics();
+
+  /**
    * Collect query plans.
    */
   List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request);
