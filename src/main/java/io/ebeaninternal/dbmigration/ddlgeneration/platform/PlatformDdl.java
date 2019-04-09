@@ -223,8 +223,7 @@ public class PlatformDdl {
     for (Column column : columns) {
       String checkConstraint = column.getCheckConstraint();
       if (hasValue(checkConstraint)) {
-        checkConstraint = createCheckConstraint(maxConstraintName(column.getCheckConstraintName()),
-            checkConstraint);
+        checkConstraint = createCheckConstraint(maxConstraintName(column.getCheckConstraintName()), checkConstraint);
         if (hasValue(checkConstraint)) {
           apply.append(",").newLine();
           apply.append(checkConstraint);
@@ -511,8 +510,7 @@ public class PlatformDdl {
 
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
-        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(),
-          column.getCheckConstraint());
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
         if (hasValue(ddl)) {
           buffer.append(ddl).endOfStatement();
         }
