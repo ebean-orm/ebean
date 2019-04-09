@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.36.5-SNAPSHOT</version>
+  <version>11.37.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -250,7 +250,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-agent</artifactId>
-      <version>11.27.1</version>
+      <version>11.37.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -330,7 +330,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.35.1</version>
+        <version>11.37.1</version>
         <executions>
           <execution>
             <id>test</id>
