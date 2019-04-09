@@ -607,11 +607,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     transaction.registerDeleteBean(hash);
   }
 
-  public void unregisterDeleteBean() {
-    Integer hash = getBeanHash();
-    transaction.unregisterDeleteBean(hash);
-  }
-
   public boolean isRegisteredForDeleteBean() {
     if (transaction == null) {
       return false;

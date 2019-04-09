@@ -882,7 +882,6 @@ public final class DefaultPersister implements Persister {
       // bean to handle bi-directional cascading
       request.registerDeleteBean();
       deleteAssocMany(request);
-      request.unregisterDeleteBean();
 
       unloadedForeignKeys = getDeleteUnloadedForeignKeys(request);
       if (unloadedForeignKeys != null) {

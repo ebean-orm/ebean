@@ -184,11 +184,6 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void unregisterDeleteBean(Integer hash) {
-    transaction.unregisterDeleteBean(hash);
-  }
-
-  @Override
   public boolean isRegisteredDeleteBean(Integer hash) {
     return transaction.isRegisteredDeleteBean(hash);
   }

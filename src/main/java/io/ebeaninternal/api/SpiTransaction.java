@@ -70,11 +70,6 @@ public interface SpiTransaction extends Transaction {
   void registerDeleteBean(Integer hash);
 
   /**
-   * Unregister the hash of the bean.
-   */
-  void unregisterDeleteBean(Integer hash);
-
-  /**
    * Return true if this is a bean that has already been saved/deleted.
    */
   boolean isRegisteredDeleteBean(Integer hash);
