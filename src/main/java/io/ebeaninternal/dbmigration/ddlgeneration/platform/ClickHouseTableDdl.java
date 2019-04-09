@@ -25,10 +25,4 @@ public class ClickHouseTableDdl extends BaseTableDdl {
     // do nothing
   }
 
-
-  @Override
-  protected void writeCheckConstraints(DdlBuffer apply, CreateTable createTable) {
-    // do nothing
-  }
-
 }

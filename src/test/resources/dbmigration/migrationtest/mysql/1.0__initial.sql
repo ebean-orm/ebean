@@ -70,7 +70,6 @@ create table migtest_e_basic (
   indextest5                    varchar(127),
   indextest6                    varchar(127),
   user_id                       integer not null,
-  constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint uq_migtest_e_basic_indextest2 unique (indextest2),
   constraint uq_migtest_e_basic_indextest6 unique (indextest6),
   constraint pk_migtest_e_basic primary key (id)
@@ -79,7 +78,6 @@ create table migtest_e_basic (
 create table migtest_e_enum (
   id                            integer auto_increment not null,
   test_status                   varchar(1),
-  constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
   constraint pk_migtest_e_enum primary key (id)
 );
 
