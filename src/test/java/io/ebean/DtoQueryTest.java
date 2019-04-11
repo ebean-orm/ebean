@@ -201,7 +201,7 @@ public class DtoQueryTest extends BaseTestCase {
     MetaQueryMetric queryMetric = stats.get(0);
     assertThat(queryMetric.getLabel()).isEqualTo("basic");
     assertThat(queryMetric.getCount()).isEqualTo(3);
-    assertThat(queryMetric.getName()).isEqualTo("basic");
+    assertThat(queryMetric.getName()).isEqualTo("DCust_basic");
 
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")

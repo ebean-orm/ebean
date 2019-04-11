@@ -127,7 +127,7 @@ public class NamedDtoQueryTest extends BaseTestCase {
     MetaQueryMetric queryMetric = stats.get(0);
     assertThat(queryMetric.getLabel()).isEqualTo("basic");
     assertThat(queryMetric.getCount()).isEqualTo(3);
-    assertThat(queryMetric.getName()).isEqualTo("basic");
+    assertThat(queryMetric.getName()).isEqualTo("DCust_basic");
 
 
     server().createNamedDtoQuery(DCust.class, "findByName_c4")
