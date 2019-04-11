@@ -36,6 +36,8 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
   }
 
+  private static final ProfileLocation loc0 = ProfileLocation.create();
+
   @ForPlatform(Platform.H2)
   @Test
   public void testPlanHits() {
@@ -48,10 +50,10 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     for (String val : prefix) {
       DB.find(Contact.class)
+        .setProfileLocation(loc0)
         .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where()
         .istartsWith(concat("lastName", ", ", "firstName"), val).orderBy().asc("lastName").setMaxRows(10)
         .asDto(ContactDto.class).setLabel("prefixLoop").findList();
-
     }
 
     ServerMetrics metrics = collectMetrics();
@@ -60,6 +62,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     for (MetaQueryMetric stat : stats) {
       long meanMicros = stat.getMean();
       assertThat(meanMicros).isLessThan(900_000);
+      assertThat(stat.getProfileLocation()).isSameAs(loc0);
     }
 
     assertThat(stats).hasSize(1);

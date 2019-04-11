@@ -1,18 +1,11 @@
 package io.ebean.meta;
 
-import io.ebean.ProfileLocation;
-
 import java.util.List;
 
 /**
  * Query execution statistics for Orm queries.
  */
 public interface MetaOrmQueryMetric extends MetaQueryMetric {
-
-  /**
-   * Return the profile location.
-   */
-  ProfileLocation getProfileLocation();
 
   /**
    * Return true if this query plan was tuned by AutoTune.

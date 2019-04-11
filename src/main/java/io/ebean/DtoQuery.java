@@ -110,6 +110,12 @@ public interface DtoQuery<T> {
   DtoQuery<T> setLabel(String label);
 
   /**
+   * Set the profile location of this query. This is used to relate query execution metrics
+   * back to a location like a specific line of code.
+   */
+  DtoQuery<T> setProfileLocation(ProfileLocation profileLocation);
+
+  /**
    * Set a timeout on this query.
    * <p>
    * This will typically result in a call to setQueryTimeout() on a

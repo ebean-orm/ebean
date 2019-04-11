@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.profile;
 
+import io.ebean.ProfileLocation;
 import io.ebean.meta.MetricType;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.QueryPlanMetric;
@@ -22,8 +23,8 @@ public class DMetricFactory implements MetricFactory {
   }
 
   @Override
-  public QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, String sql) {
-    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, sql), new DTimedMetric(metricType, label));
+  public QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, ProfileLocation profileLocation, String sql) {
+    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, profileLocation, sql), new DTimedMetric(metricType, label));
   }
 
 }

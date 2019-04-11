@@ -37,6 +37,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     super(server, query, null);
     this.queryEngine = engine;
     this.query = query;
+    query.obtainLocation();
   }
 
   /**

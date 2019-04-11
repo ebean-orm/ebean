@@ -110,22 +110,12 @@ class DumpMetrics {
 
     StringBuilder sb = new StringBuilder();
 
-    sb.append("query:").append(padName(metric.getName())).append(" ");
-    addCounters(metric, sb);
-
+    appendQueryName(metric, sb);
+    appendCounters(metric, sb);
     if (dumpHash) {
       sb.append("\n hash:").append(metric.getQueryPlanHash());
     }
-
-    ProfileLocation profileLocation = metric.getProfileLocation();
-    if (dumpLoc && profileLocation != null) {
-      sb.append("\n  loc:").append(profileLocation.shortDescription());
-    }
-
-    if (dumpSql) {
-      sb.append("\n\n  sql:").append(metric.getSql()).append("\n\n");
-    }
-
+    appendProfileAndSql(metric, sb);
     out(sb.toString());
   }
 
@@ -134,24 +124,36 @@ class DumpMetrics {
 
     StringBuilder sb = new StringBuilder();
 
+    appendQueryName(metric, sb);
+    appendCounters(metric, sb);
+    appendProfileAndSql(metric, sb);
+    out(sb.toString());
+  }
+
+  private void appendQueryName(MetaQueryMetric metric, StringBuilder sb) {
     sb.append("query:").append(padName(metric.getName())).append(" ");
-    addCounters(metric, sb);
+  }
+
+  private void appendProfileAndSql(MetaQueryMetric metric, StringBuilder sb) {
+    ProfileLocation profileLocation = metric.getProfileLocation();
+    if (dumpLoc && profileLocation != null) {
+      sb.append("\n  loc:").append(profileLocation.shortDescription());
+    }
 
     if (dumpSql) {
       sb.append(" \n\n  sql:").append(metric.getSql()).append("\n\n");
     }
-    out(sb.toString());
   }
 
   private void log(MetaTimedMetric metric) {
 
     StringBuilder sb = new StringBuilder();
     sb.append(padNameTimed(metric.getName())).append(" ");
-    addCounters(metric, sb);
+    appendCounters(metric, sb);
     out(sb.toString());
   }
 
-  private void addCounters(MetaTimedMetric timedMetric, StringBuilder sb) {
+  private void appendCounters(MetaTimedMetric timedMetric, StringBuilder sb) {
     sb.append(" count:").append(pad(timedMetric.getCount()))
       .append(" total:").append(pad(timedMetric.getTotal()))
       .append(" mean:").append(pad(timedMetric.getMean()))
