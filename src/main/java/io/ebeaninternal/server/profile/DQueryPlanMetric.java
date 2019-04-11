@@ -67,7 +67,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
     @Override
     public String getName() {
-      return stats.getName();
+      return meta.getName();
     }
 
     @Override

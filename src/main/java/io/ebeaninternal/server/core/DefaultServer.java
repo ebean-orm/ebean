@@ -505,6 +505,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void shutdownPlugins() {
 
+    if (serverConfig.isDumpMetricsOnShutdown()) {
+      new DumpMetrics(this, serverConfig.getDumpMetricsOptions()).dump();
+    }
+
     for (Plugin plugin : serverPlugins) {
       try {
         plugin.shutdown();
@@ -1234,7 +1238,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
-    request.profileLocationById();
     if (request.isUseDocStore()) {
       return docStore().find(request);
     }
@@ -1588,7 +1591,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
-    request.profileLocationAll();
     request.resetBeanCacheAutoMode(findOne);
     Object result = request.getFromQueryCache();
     if (result != null) {

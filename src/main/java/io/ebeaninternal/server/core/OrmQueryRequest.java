@@ -103,20 +103,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
-  public void profileLocationById() {
-    if (query.getProfileLocation() == null) {
-      query.setProfileLocation(beanDescriptor.profileLocationById());
-    }
-  }
-
-  @Override
-  public void profileLocationAll() {
-    if (query.getProfileLocation() == null && query.isFindAll()) {
-      query.setProfileLocation(beanDescriptor.profileLocationAll());
-    }
-  }
-
-  @Override
   public boolean isDeleteByStatement() {
     if (!transaction.isPersistCascade() || beanDescriptor.isDeleteByStatement()) {
       // plain delete by query

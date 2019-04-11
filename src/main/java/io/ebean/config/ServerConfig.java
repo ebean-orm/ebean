@@ -524,6 +524,10 @@ public class ServerConfig {
    */
   private boolean idGeneratorAutomatic = true;
 
+  private boolean dumpMetricsOnShutdown;
+
+  private String dumpMetricsOptions;
+
   /**
    * Construct a Database Configuration for programmatically creating an Database.
    */
@@ -2903,6 +2907,8 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
+    dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
+    dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
@@ -3285,6 +3291,36 @@ public class ServerConfig {
    */
   public void setCollectQueryPlans(boolean collectQueryPlans) {
     this.collectQueryPlans = collectQueryPlans;
+  }
+
+  /**
+   * Return true if metrics should be dumped when the server is shutdown.
+   */
+  public boolean isDumpMetricsOnShutdown() {
+    return dumpMetricsOnShutdown;
+  }
+
+  /**
+   * Set to true if metrics should be dumped when the server is shutdown.
+   */
+  public void setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
+    this.dumpMetricsOnShutdown = dumpMetricsOnShutdown;
+  }
+
+  /**
+   * Return the options for dumping metrics.
+   */
+  public String getDumpMetricsOptions() {
+    return dumpMetricsOptions;
+  }
+
+  /**
+   * Include 'sql' or 'hash' in options such that they are included in the output.
+   *
+   * @param dumpMetricsOptions Example "sql,hash", "sql"
+   */
+  public void setDumpMetricsOptions(String dumpMetricsOptions) {
+    this.dumpMetricsOptions = dumpMetricsOptions;
   }
 
   public enum UuidVersion {

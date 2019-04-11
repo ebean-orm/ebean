@@ -184,7 +184,7 @@ public final class CQueryPlanStats {
 
     @Override
     public String getName() {
-      return queryPlan.getLabel();
+      return queryPlan.getName();
     }
 
     @Override

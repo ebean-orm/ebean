@@ -26,7 +26,7 @@ public abstract class QueryPlanLogger {
   }
 
   protected DQueryPlanOutput createPlan(CQueryPlan plan, String bind, String planString) {
-    return new DQueryPlanOutput(plan.getBeanType(), plan.getLabel(), plan.getSql(), bind, planString);
+    return new DQueryPlanOutput(plan.getBeanType(), plan.getName(), plan.getSql(), bind, planString);
   }
 
   DQueryPlanOutput readQueryPlanBasic(CQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {

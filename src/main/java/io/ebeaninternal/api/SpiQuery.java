@@ -54,67 +54,69 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     /**
      * Find by Id or unique returning a single bean.
      */
-    BEAN(FIND_ONE),
+    BEAN(FIND_ONE, "byId"),
 
     /**
      * Find returning a List.
      */
-    LIST(FIND_MANY),
+    LIST(FIND_MANY, "findList"),
 
     /**
      * Find returning a Set.
      */
-    SET(FIND_MANY),
+    SET(FIND_MANY, "findSet"),
 
     /**
      * Find returning a Map.
      */
-    MAP(FIND_MANY),
+    MAP(FIND_MANY, "findMap"),
 
     /**
      * Find iterate type query - findEach(), findIterate() etc.
      */
-    ITERATE(FIND_ITERATE),
+    ITERATE(FIND_ITERATE, "findEach"),
 
     /**
      * Find the Id's.
      */
-    ID_LIST(FIND_ID_LIST),
+    ID_LIST(FIND_ID_LIST, "findIds"),
 
     /**
      * Find single attribute.
      */
-    ATTRIBUTE(FIND_ATTRIBUTE),
+    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute"),
 
     /**
      * Find rowCount.
      */
-    COUNT(FIND_COUNT),
+    COUNT(FIND_COUNT, "findCount"),
 
     /**
      * A subquery used as part of a where clause.
      */
-    SUBQUERY(FIND_SUBQUERY),
+    SUBQUERY(FIND_SUBQUERY, "subquery"),
 
     /**
      * Delete query.
      */
-    DELETE(FIND_DELETE, true),
+    DELETE(FIND_DELETE, "delete", true),
 
     /**
      * Update query.
      */
-    UPDATE(FIND_UPDATE, true);
+    UPDATE(FIND_UPDATE, "update", true);
 
-    boolean update;
-    String profileEventId;
+    private boolean update;
+    private String profileEventId;
+    private String label;
 
-    Type(String profileEventId) {
-      this(profileEventId, false);
+    Type(String profileEventId, String label) {
+      this(profileEventId, label, false);
     }
 
-    Type(String profileEventId, boolean update) {
+    Type(String profileEventId, String label, boolean update) {
       this.profileEventId = profileEventId;
+      this.label = label;
       this.update = update;
     }
 
@@ -127,6 +129,10 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
 
     public String profileEventId() {
       return profileEventId;
+    }
+
+    public String label() {
+      return label;
     }
   }
 
