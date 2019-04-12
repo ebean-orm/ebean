@@ -17,7 +17,7 @@
       </td>
       <td align="center" valign="middle">
         <a href="https://www.premium-minds.com" target="_blank">
-          <img width="222px" src="https://ebean.io/images/logo-premium-minds.png">
+          <img width="222px" src="https://ebean.io/images/logo-med-principal.png">
         </a>
       </td>
     </tr>
