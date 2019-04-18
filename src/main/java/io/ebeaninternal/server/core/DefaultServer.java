@@ -685,7 +685,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T createEntityBean(Class<T> type) {
-    return getBeanDescriptor(type).createBean();
+    BeanDescriptor<T> desc = getBeanDescriptor(type);
+    if (desc == null) {
+      throw new NullPointerException("No bean type " + type.getName() + " registered");
+    }
+    return desc.createBean();
   }
 
   /**

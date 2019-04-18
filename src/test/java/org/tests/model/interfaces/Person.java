@@ -5,7 +5,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
+import io.ebean.annotation.EntityImplements;
+
 @Entity
+@EntityImplements(IPerson.class)
 public class Person implements IPerson {
   @Id
   private long oid;
@@ -13,7 +16,7 @@ public class Person implements IPerson {
   @Version
   private int version;
 
-  @ManyToOne(targetEntity = Address.class)
+  @ManyToOne
   private IAddress defaultAddress;
 
   @Override
