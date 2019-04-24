@@ -473,8 +473,8 @@ public class DeployBeanDescriptor<T> {
   /**
    * Set that this type invalidates query caches.
    */
-  public void setInvalidateQueryCache() {
-    this.cacheOptions = CacheOptions.INVALIDATE_QUERY_CACHE;
+  public void setInvalidateQueryCache(String region) {
+    this.cacheOptions = CacheOptions.invalidateQueryCache(region);
   }
 
   /**

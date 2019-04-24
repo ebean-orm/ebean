@@ -61,25 +61,29 @@ public class DefaultServerCacheManager implements SpiCacheManager {
 
   @Override
   public void setEnabledRegions(String regions) {
+    if (regions != null) {
+      List<String> enabledRegionNames = Arrays.asList(regions.split(","));
 
-    List<String> enabledRegions = Arrays.asList(regions.split(","));
-    List<String> disabledRegions = new ArrayList<>();
+      List<String> disabled = new ArrayList<>();
+      List<String> enabled = new ArrayList<>();
 
-    for (SpiCacheRegion region : regionMap.values()) {
-      if (enabledRegions.contains(region.getName())) {
-        if (!region.isEnabled()) {
-          region.setEnabled(true);
-          log.debug("Cache region[{}] enabled", region.getName());
-        }
-      } else {
-        disabledRegions.add(region.getName());
-        if (region.isEnabled()) {
-          region.setEnabled(false);
-          log.debug("Cache region[{}] disabled", region.getName());
+      for (SpiCacheRegion region : regionMap.values()) {
+        if (enabledRegionNames.contains(region.getName())) {
+          enabled.add(region.getName());
+          if (!region.isEnabled()) {
+            region.setEnabled(true);
+            log.debug("Cache region[{}] enabled", region.getName());
+          }
+        } else {
+          disabled.add(region.getName());
+          if (region.isEnabled()) {
+            region.setEnabled(false);
+            log.debug("Cache region[{}] disabled", region.getName());
+          }
         }
       }
+      log.info("Cache regions enabled:{} disabled:{}", enabled, disabled);
     }
-    log.info("Cache regions enabled:{} disabled:{}", enabledRegions, disabledRegions);
   }
 
   @Override

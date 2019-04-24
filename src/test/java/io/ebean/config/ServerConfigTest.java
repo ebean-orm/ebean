@@ -68,6 +68,7 @@ public class ServerConfigTest {
     props.setProperty("mappingLocations", "classpath:/foo;bar");
     props.setProperty("namingConvention", "io.ebean.config.MatchingNamingConvention");
     props.setProperty("idGeneratorAutomatic", "true");
+    props.setProperty("enabledL2Regions", "r0,users,orgs");
 
 
     serverConfig.loadFromProperties(props);
@@ -85,6 +86,7 @@ public class ServerConfigTest {
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
+    assertEquals("r0,users,orgs", serverConfig.getEnabledL2Regions());
 
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
@@ -111,6 +113,9 @@ public class ServerConfigTest {
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
+
+    serverConfig.setEnabledL2Regions("r0,orgs");
+    assertEquals("r0,orgs", serverConfig.getEnabledL2Regions());
   }
 
   @Test

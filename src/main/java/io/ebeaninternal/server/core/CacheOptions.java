@@ -12,7 +12,9 @@ public class CacheOptions {
    */
   public static final CacheOptions NO_CACHING = new CacheOptions();
 
-  public static final CacheOptions INVALIDATE_QUERY_CACHE = new CacheOptions(true);
+  private static final String R0 = "r0";
+
+  private static final CacheOptions INVALIDATE_QUERY_CACHE_R0 = new CacheOptions(true);
 
   private final boolean invalidateQueryCache;
   private final boolean enableBeanCache;
@@ -20,6 +22,14 @@ public class CacheOptions {
   private final boolean readOnly;
   private final String[] naturalKey;
   private final String region;
+
+  public static CacheOptions invalidateQueryCache(String region) {
+    if (R0.equals(region)) {
+      return INVALIDATE_QUERY_CACHE_R0;
+    } else {
+      return new CacheOptions(true, region);
+    }
+  }
 
   /**
    * Construct for no caching.
@@ -37,12 +47,16 @@ public class CacheOptions {
    * Construct for invalidateQueryCache.
    */
   private CacheOptions(boolean invalidateQueryCache) {
+    this(invalidateQueryCache, R0);
+  }
+
+  private CacheOptions(boolean invalidateQueryCache, String region) {
     this.invalidateQueryCache = invalidateQueryCache;
     this.enableBeanCache = false;
     this.enableQueryCache = false;
     this.readOnly = false;
     this.naturalKey = null;
-    this.region = null;
+    this.region = region;
   }
 
   /**

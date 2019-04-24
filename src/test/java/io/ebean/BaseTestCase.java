@@ -48,7 +48,7 @@ public abstract class BaseTestCase {
       DB_CLOCK_DELTA = 100;
     }
     logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
+    if (!AgentLoader.loadAgentByMainClass("io.ebean.enhance.Transformer", "debug=1")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }
     try {

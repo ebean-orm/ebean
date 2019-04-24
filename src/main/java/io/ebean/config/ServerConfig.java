@@ -479,6 +479,7 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+  private String enabledL2Regions;
 
   /**
    * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
@@ -2914,6 +2915,7 @@ public class ServerConfig {
     collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
+    enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
     notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
@@ -3134,6 +3136,20 @@ public class ServerConfig {
    */
   public void setExpressionNativeIlike(boolean expressionNativeIlike) {
     this.expressionNativeIlike = expressionNativeIlike;
+  }
+
+  /**
+   * Return the enabled L2 cache regions.
+   */
+  public String getEnabledL2Regions() {
+    return enabledL2Regions;
+  }
+
+  /**
+   * Set the enabled L2 cache regions (comma delimited).
+   */
+  public void setEnabledL2Regions(String enabledL2Regions) {
+    this.enabledL2Regions = enabledL2Regions;
   }
 
   /**
