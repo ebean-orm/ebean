@@ -19,16 +19,18 @@ public class CacheOptions {
   private final boolean enableQueryCache;
   private final boolean readOnly;
   private final String[] naturalKey;
+  private final String region;
 
   /**
    * Construct for no caching.
    */
   private CacheOptions() {
-    invalidateQueryCache = false;
-    enableBeanCache = false;
-    enableQueryCache = false;
-    readOnly = false;
-    naturalKey = null;
+    this.invalidateQueryCache = false;
+    this.enableBeanCache = false;
+    this.enableQueryCache = false;
+    this.readOnly = false;
+    this.naturalKey = null;
+    this.region = null;
   }
 
   /**
@@ -36,21 +38,30 @@ public class CacheOptions {
    */
   private CacheOptions(boolean invalidateQueryCache) {
     this.invalidateQueryCache = invalidateQueryCache;
-    enableBeanCache = false;
-    enableQueryCache = false;
-    readOnly = false;
-    naturalKey = null;
+    this.enableBeanCache = false;
+    this.enableQueryCache = false;
+    this.readOnly = false;
+    this.naturalKey = null;
+    this.region = null;
   }
 
   /**
    * Construct with cache annotation.
    */
   public CacheOptions(Cache cache, String[] naturalKey) {
-    invalidateQueryCache = false;
-    enableBeanCache = cache.enableBeanCache();
-    enableQueryCache = cache.enableQueryCache();
-    readOnly = cache.readOnly();
+    this.invalidateQueryCache = false;
+    this.enableBeanCache = cache.enableBeanCache();
+    this.enableQueryCache = cache.enableQueryCache();
+    this.readOnly = cache.readOnly();
     this.naturalKey = naturalKey;
+    this.region = cache.region();
+  }
+
+  /**
+   * Return the cache region name.
+   */
+  public String getRegion() {
+    return region;
   }
 
   /**

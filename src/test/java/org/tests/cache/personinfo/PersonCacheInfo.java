@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
 @Entity
-@Cache
+@Cache(region = "email")
 public class PersonCacheInfo {
 
   @Id

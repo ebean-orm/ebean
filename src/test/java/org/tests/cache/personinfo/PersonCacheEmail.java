@@ -8,7 +8,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 @Entity
-@Cache
+@Cache(region = "email")
 public class PersonCacheEmail {
 
   @Id
