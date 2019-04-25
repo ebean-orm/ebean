@@ -12,7 +12,7 @@
       </td>
       <td align="center" valign="middle">
         <a href="https://www.payintech.com/" target="_blank">
-          <img width="222px" src="https://www.payintech.com/wp-content/uploads/2015/10/PayinTech-logo-noir.png">
+          <img width="222px" src="https://ebean.io/images/sponsor_PayinTech-logo-noir.png">
         </a>
       </td>
       <td align="center" valign="middle">
