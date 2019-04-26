@@ -30,6 +30,11 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   BeanDescriptor<T> getBeanDescriptor();
 
   /**
+   * Prepare the query for execution.
+   */
+  void prepareQuery();
+
+  /**
    * This will create a local (readOnly) transaction if no current transaction
    * exists.
    * <p>

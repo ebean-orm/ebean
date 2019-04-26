@@ -1490,6 +1490,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
+  public BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
+    return cacheHelp.cacheIdLookup(context, ids);
+  }
+
   /**
    * Use natural key lookup to hit the bean cache.
    */

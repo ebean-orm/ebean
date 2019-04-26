@@ -374,27 +374,30 @@ final class BeanDescriptorCacheHelp<T> {
     return new CachedManyIds(idList);
   }
 
-//  BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> keys) {
-//
-//    Set<Object> ids = new HashSet<>(keys);
-//    Map<Object, Object> beanDataMap = beanCache.getAll(ids);
-//    if (beanLog.isTraceEnabled()) {
-//      beanLog.trace("   GET MANY {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
-//    }
-//
-//    BeanCacheResult<T> result = new BeanCacheResult<>();
-//    // process the hits into beans etc
-//    for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
-//
-//      Object id = entry.getKey();
-//      CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
-//
-//      T bean = convertToBean(id, false, context, cachedBeanData);
-//      result.add(bean, id);
-//    }
-//
-//    return result;
-//  }
+  /**
+   * Hit the bean cache with the given ids returning the hits.
+   */
+  BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
+
+    Set<Object> keys = new HashSet<>(ids.size());
+    for (Object id : ids) {
+      keys.add(desc.cacheKey(id));
+    }
+
+    Map<Object, Object> beanDataMap = beanCache.getAll(keys);
+    if (beanLog.isTraceEnabled()) {
+      beanLog.trace("   GET MANY {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
+    }
+
+    BeanCacheResult<T> result = new BeanCacheResult<>();
+    for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
+      CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
+      T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
+      result.add(bean, desc.getBeanId(bean));
+    }
+
+    return result;
+  }
 
   /**
    * Use natural keys to hit the bean cache and return resulting hits.

@@ -63,23 +63,25 @@ class InExpression extends AbstractExpression {
     return vals;
   }
 
+  private List<Object> initBindValues() {
+    if (bindValues == null) {
+      bindValues = values();
+    }
+    return bindValues;
+  }
+
   @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache for NOT IN or when "empty"
     if (not || empty) {
       return false;
     }
-    List<Object> copy = data.matchIn(propName, bindValues);
-    if (copy == null) {
-      return false;
-    }
-    bindValues = copy;
-    return true;
+    return data.matchIn(propName, initBindValues());
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    bindValues = values();
+    initBindValues();
     if (bindValues.size() > 0) {
       multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
     }
@@ -146,9 +148,7 @@ class InExpression extends AbstractExpression {
 
     if (prop != null) {
       request.append(prop.getAssocIdInExpr(propName));
-      String inClause = prop.getAssocIdInValueExpr(not, bindValues.size());
-      request.append(inClause);
-
+      request.append(prop.getAssocIdInValueExpr(not, bindValues.size()));
     } else {
       request.append(propName);
       request.appendInExpression(not, bindValues);

@@ -68,7 +68,6 @@ public class PersonCacheTests {
     for (PersonCacheEmail email : emailList) {
       // get property that isn't in the cached data
       assertThat(email.getPersonInfo().getName()).isNotNull();
-      System.out.println(email.getPersonInfo().getName());
     }
 
     List<String> sql = LoggedSqlCollector.current();
@@ -76,14 +75,15 @@ public class PersonCacheTests {
 
     assertThat(beanCacheInfo.getStatistics(true).getHitCount()).isEqualTo(3);
 
-    log.info("Fetch again ...");
+    // force cache misses on PersonCacheEmail
+    beanCacheEmail.clear();
+    log.info("Fetch again - cache missing on PersonCacheEmail and cache hits on PersonCacheInfo ...");
 
     emailList =
       DB.find(PersonCacheEmail.class)
         .where().idIn(ids)
         .setUseCache(true)
         .findList();
-
 
     for (PersonCacheEmail email : emailList) {
       // get property but it is in the cache data now

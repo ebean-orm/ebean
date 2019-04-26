@@ -16,6 +16,7 @@ import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.CQueryPlanKey;
+import io.ebeaninternal.api.CacheIdLookup;
 import io.ebeaninternal.api.HashQuery;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.api.NaturalKeyQueryData;
@@ -208,7 +209,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Prepare the query and calculate the query plan key.
    */
-  void prepareQuery() {
+  @Override
+  public void prepareQuery() {
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
     this.secondaryQueries = query.convertJoins();
@@ -597,6 +599,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     //    - query and Load misses into bean cache
     //    - merge the 2 results and return
     //
+
+    CacheIdLookup<T> idLookup = query.cacheIdLookup();
+    if (idLookup != null) {
+      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
+      // adjust the query (IN clause) based on the cache hits
+      this.cacheBeans = idLookup.removeHits(cacheResult);
+      return idLookup.allHits();
+    }
 
     if (!beanDescriptor.isNaturalKeyCaching()) {
       return false;

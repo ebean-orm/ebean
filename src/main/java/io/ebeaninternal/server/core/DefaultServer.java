@@ -1071,14 +1071,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
 
+    SpiOrmQueryRequest<T> request = buildQueryRequest(type, query, t);
+    request.prepareQuery();
+    return request;
+  }
+
+  <T> SpiOrmQueryRequest<T> buildQueryRequest(Type type, Query<T> query, Transaction t) {
+
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(type);
     spiQuery.checkNamedParameters();
 
-    return createQueryRequest(spiQuery, t);
+    return buildQueryRequest(spiQuery, t);
   }
 
-  private <T> SpiOrmQueryRequest<T> createQueryRequest(SpiQuery<T> query, Transaction t) {
+  private <T> SpiOrmQueryRequest<T> buildQueryRequest(SpiQuery<T> query, Transaction t) {
 
     if (t == null) {
       t = currentServerTransaction();
@@ -1101,10 +1108,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setOrigin(createCallStack());
     }
 
-    OrmQueryRequest<T> request = new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) t);
-    request.prepareQuery();
-
-    return request;
+    return new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) t);
   }
 
   /**
@@ -1175,7 +1179,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
+    SpiOrmQueryRequest<T> request = buildQueryRequest(spiQuery, t);
+    request.prepareQuery();
     if (request.isUseDocStore()) {
       return docStore().find(request);
     }
@@ -1528,14 +1533,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @SuppressWarnings("unchecked")
   private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+    SpiOrmQueryRequest<T> request = buildQueryRequest(Type.LIST, query, t);
     request.resetBeanCacheAutoMode(findOne);
+    if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
+      // hit bean cache and got all results from cache
+      return request.getBeanCacheHits();
+    }
+
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (List<T>) result;
-    }
-    if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
-      return request.getBeanCacheHits();
     }
     if (request.isUseDocStore()) {
       return docStore().findList(request);
