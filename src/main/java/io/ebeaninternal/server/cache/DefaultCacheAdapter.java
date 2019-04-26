@@ -2,6 +2,9 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.cache.ServerCacheRegion;
+
+import java.util.List;
 
 /**
  * Adapts SpiCacheManager to ServerCacheManager.
@@ -20,6 +23,26 @@ public class DefaultCacheAdapter implements ServerCacheManager {
   @Override
   public boolean isLocalL2Caching() {
     return cacheManager.isLocalL2Caching();
+  }
+
+  @Override
+  public List<ServerCacheRegion> allRegions() {
+    return cacheManager.allRegions();
+  }
+
+  @Override
+  public void setEnabledRegions(String regions) {
+    cacheManager.setEnabledRegions(regions);
+  }
+
+  @Override
+  public ServerCacheRegion getRegion(String region) {
+    return cacheManager.getRegion(region);
+  }
+
+  @Override
+  public void setAllRegionsEnabled(boolean enabled) {
+    cacheManager.setAllRegionsEnabled(enabled);
   }
 
   @Override

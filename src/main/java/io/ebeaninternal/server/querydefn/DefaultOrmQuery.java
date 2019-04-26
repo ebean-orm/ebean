@@ -33,6 +33,7 @@ import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
+import io.ebeaninternal.api.CacheIdLookup;
 import io.ebeaninternal.api.HashQuery;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
@@ -50,6 +51,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
+import io.ebeaninternal.server.expression.IdInExpression;
 import io.ebeaninternal.server.expression.SimpleExpression;
 import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
@@ -731,6 +733,21 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isWithId() {
     return !manualId && !distinct && !singleAttribute;
+  }
+
+  @Override
+  public CacheIdLookup<T> cacheIdLookup() {
+    if (whereExpressions == null) {
+      return null;
+    }
+    List<SpiExpression> underlyingList = whereExpressions.getUnderlyingList();
+    if (underlyingList.size() == 1) {
+      SpiExpression singleExpression = underlyingList.get(0);
+      if (singleExpression instanceof IdInExpression) {
+        return new CacheIdLookup<>((IdInExpression)singleExpression);
+      }
+    }
+    return null;
   }
 
   @Override
@@ -1848,8 +1865,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void checkNamedParameters() {
     if (namedParams != null) {
-      Collection<ONamedParam> values = namedParams.values();
-      for (ONamedParam value : values) {
+      for (ONamedParam value : namedParams.values()) {
         value.checkValueSet();
       }
     }

@@ -430,6 +430,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   void resetBeanCacheAutoMode(boolean findOne);
 
   /**
+   * Bean cache lookup for find by ids.
+   */
+  CacheIdLookup<T> cacheIdLookup();
+
+  /**
    * Collect natural key data for this query or null if the query does not match
    * the requirements of natural key lookup.
    */

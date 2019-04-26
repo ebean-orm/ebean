@@ -69,18 +69,18 @@ public class NaturalKeyQueryData<T> {
   /**
    * Match for IN expression. We only allow one IN clause.
    */
-  public List<Object> matchIn(String propName, List<Object> sourceValues) {
+  public boolean matchIn(String propName, List<Object> inValues) {
     if (hasIn) {
       // only 1 IN allowed (to project naturalIds)
-      return null;
+      return false;
     }
     if (matchProperty(propName)) {
       this.hasIn = true;
       this.inProperty = propName;
-      this.inValues = new ArrayList<>(sourceValues);
-      return this.inValues;
+      this.inValues = inValues;
+      return true;
     }
-    return null;
+    return false;
   }
 
   /**
@@ -198,21 +198,19 @@ public class NaturalKeyQueryData<T> {
     this.hitCount = hits.size();
 
     List<T> beans = new ArrayList<>(hitCount);
-
     for (BeanCacheResult.Entry<T> hit : hits) {
-      if (inValues != null) {
-        Object naturalKey = hit.getKey();
-        Object inValue = set.getInValue(naturalKey);
-        inValues.remove(inValue);
-
-      } else if (inPairs != null) {
-        Object naturalKey = hit.getKey();
-        Pairs.Entry inValue = (Pairs.Entry)set.getInValue(naturalKey);
-        inPairs.remove(inValue);
-      }
+      removeKey(set.getInValue(hit.getKey()));
       beans.add(hit.getBean());
     }
-
     return beans;
+  }
+
+  private void removeKey(Object inValue) {
+    if (inValues != null) {
+      inValues.remove(inValue);
+    } else if (inPairs != null) {
+      //noinspection SuspiciousMethodCalls
+      inPairs.remove(inValue);
+    }
   }
 }

@@ -7,6 +7,8 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.ServerCache;
 import io.ebeaninternal.api.BeanCacheResult;
+import io.ebeaninternal.api.SpiCacheControl;
+import io.ebeaninternal.api.SpiCacheRegion;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
@@ -72,6 +74,9 @@ final class BeanDescriptorCacheHelp<T> {
 
   private final boolean noCaching;
 
+  private final SpiCacheControl cacheControl;
+  private final SpiCacheRegion cacheRegion;
+
   /**
    * Set to true if all persist changes need to notify the cache.
    */
@@ -113,6 +118,13 @@ final class BeanDescriptorCacheHelp<T> {
       this.naturalKeyCache = null;
     }
     this.noCaching = (beanCache == null && queryCache == null);
+    if (noCaching) {
+      this.cacheControl = DCacheControlNone.INSTANCE;
+      this.cacheRegion = (invalidateQueryCache) ? cacheManager.getRegion(cacheOptions.getRegion()) : DCacheRegionNone.INSTANCE;
+    } else {
+      this.cacheRegion = cacheManager.getRegion(cacheOptions.getRegion());
+      this.cacheControl = new DCacheControl(cacheRegion, (beanCache != null), (naturalKeyCache != null), (queryCache != null));
+    }
   }
 
   /**
@@ -123,8 +135,8 @@ final class BeanDescriptorCacheHelp<T> {
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
 
     if (logger.isDebugEnabled()) {
-      if (isBeanCaching() || isQueryCaching() || cacheNotifyOnAll || cacheNotifyOnDelete) {
-        String notifyMode = cacheNotifyOnAll ? "All" : (cacheNotifyOnDelete ? "Delete" : "None");
+      if (cacheNotifyOnAll || cacheNotifyOnDelete) {
+        String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
         logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
           desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
@@ -148,36 +160,36 @@ final class BeanDescriptorCacheHelp<T> {
    * Return true if the persist request needs to notify the cache.
    */
   boolean isCacheNotify(PersistRequest.Type type) {
-    return cacheNotifyOnAll
-      || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
+    return cacheRegion.isEnabled()
+      && (cacheNotifyOnAll || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT));
   }
 
   /**
    * Return true if there is currently query caching for this type of bean.
    */
   boolean isQueryCaching() {
-    return queryCache != null;
+    return cacheControl.isQueryCaching();
   }
 
   /**
    * Return true if there is currently bean caching for this type of bean.
    */
   boolean isBeanCaching() {
-    return beanCache != null;
+    return cacheControl.isBeanCaching();
   }
 
   /**
    * Return true if there is natural key caching for this type of bean.
    */
   boolean isNaturalKeyCaching() {
-    return naturalKeyCache != null;
+    return cacheControl.isNaturalKeyCaching();
   }
 
   /**
    * Return true if there is bean or query caching on this type.
    */
   boolean isCaching() {
-    return beanCache != null || queryCache != null;
+    return cacheControl.isCaching();
   }
 
   /**
@@ -206,7 +218,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Add query cache clear to the changeSet.
    */
-  void queryCacheClear(CacheChangeSet changeSet) {
+  private void queryCacheClear(CacheChangeSet changeSet) {
     if (queryCache != null) {
       changeSet.addClearQuery(desc);
     }
@@ -292,8 +304,8 @@ final class BeanDescriptorCacheHelp<T> {
       return false;
     }
 
-    Object ownerBean = bc.getOwnerBean();
-    EntityBeanIntercept ebi = ((EntityBean) ownerBean)._ebean_getIntercept();
+    EntityBean ownerBean = bc.getOwnerBean();
+    EntityBeanIntercept ebi = ownerBean._ebean_getIntercept();
     PersistenceContext persistenceContext = ebi.getPersistenceContext();
 
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
@@ -360,6 +372,31 @@ final class BeanDescriptorCacheHelp<T> {
       idList.add(targetDescriptor.getId((EntityBean) bean));
     }
     return new CachedManyIds(idList);
+  }
+
+  /**
+   * Hit the bean cache with the given ids returning the hits.
+   */
+  BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
+
+    Set<Object> keys = new HashSet<>(ids.size());
+    for (Object id : ids) {
+      keys.add(desc.cacheKey(id));
+    }
+
+    Map<Object, Object> beanDataMap = beanCache.getAll(keys);
+    if (beanLog.isTraceEnabled()) {
+      beanLog.trace("   GET MANY {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
+    }
+
+    BeanCacheResult<T> result = new BeanCacheResult<>();
+    for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
+      CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
+      T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
+      result.add(bean, desc.getBeanId(bean));
+    }
+
+    return result;
   }
 
   /**

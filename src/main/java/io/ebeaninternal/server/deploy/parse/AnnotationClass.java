@@ -202,13 +202,12 @@ public class AnnotationClass extends AnnotationParser {
       } else {
         InvalidateQueryCache invalidateQueryCache = AnnotationUtil.findAnnotationRecursive(cls, InvalidateQueryCache.class);
         if (invalidateQueryCache != null) {
-          descriptor.setInvalidateQueryCache();
+          descriptor.setInvalidateQueryCache(invalidateQueryCache.region());
         }
       }
     }
 
-    Set<NamedQuery> namedQueries = AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class);
-    for (NamedQuery namedQuery : namedQueries) {
+    for (NamedQuery namedQuery : AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
   }

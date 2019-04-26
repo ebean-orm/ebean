@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaQueryPlan;
 
 /**
@@ -9,29 +10,28 @@ class DQueryPlanOutput implements MetaQueryPlan {
 
   private final Class<?> beanType;
   private final String label;
-
+  private final ProfileLocation profileLocation;
 
   private final String sql;
-
   private final String bind;
-
   private final String plan;
 
-  private String planHash;
+  private String sqlHash;
   private long queryTimeMicros;
   private long captureCount;
 
-  DQueryPlanOutput(Class<?> beanType, String label, String sql, String bind, String plan) {
+  DQueryPlanOutput(Class<?> beanType, String label, String sql, String bind, String plan, ProfileLocation profileLocation) {
     this.beanType = beanType;
     this.label = label;
     this.sql = sql;
     this.bind = bind;
     this.plan = plan;
+    this.profileLocation = profileLocation;
   }
 
   @Override
   public String getQueryPlanHash() {
-    return planHash;
+    return sqlHash;
   }
 
   /**
@@ -94,15 +94,15 @@ class DQueryPlanOutput implements MetaQueryPlan {
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + planHash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + sqlHash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
   }
 
   /**
    * Additionally set the query execution time and the number of bind captures.
    */
-  void with(long queryTimeMicros, long captureCount, String planHash) {
+  void with(long queryTimeMicros, long captureCount, String sqlHash) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
-    this.planHash = planHash;
+    this.sqlHash = sqlHash;
   }
 }

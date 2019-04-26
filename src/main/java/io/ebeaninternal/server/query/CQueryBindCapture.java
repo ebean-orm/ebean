@@ -60,7 +60,7 @@ class CQueryBindCapture {
 
     DQueryPlanOutput queryPlan = planLogger.logQueryPlan(request.getConnection(), cQueryPlan, last);
     if (queryPlan != null) {
-      queryPlan.with(queryTimeMicros, captureCount, cQueryPlan.getPlanKey().toString());
+      queryPlan.with(queryTimeMicros, captureCount, cQueryPlan.getSqlHash());
       request.process(queryPlan);
     }
   }
