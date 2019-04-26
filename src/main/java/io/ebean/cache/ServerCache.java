@@ -1,5 +1,7 @@
 package io.ebean.cache;
 
+import io.ebean.meta.MetricVisitor;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -79,4 +81,11 @@ public interface ServerCache {
    * @param reset if true the statistics are reset.
    */
   ServerCacheStatistics getStatistics(boolean reset);
+
+  /**
+   * Visit the metrics for the cache.
+   */
+  default void visit(MetricVisitor visitor) {
+    // do nothing by default
+  }
 }

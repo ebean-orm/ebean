@@ -2,6 +2,7 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheRegion;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiCacheRegion;
 
 import java.util.List;
@@ -10,6 +11,11 @@ import java.util.List;
  * The cache service for server side caching of beans and query results.
  */
 public interface SpiCacheManager {
+
+  /**
+   * Visit and collect the metrics.
+   */
+  void visitMetrics(MetricVisitor visitor);
 
   /**
    * Return true if the L2 caching is local.

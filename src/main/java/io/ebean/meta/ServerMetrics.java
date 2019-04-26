@@ -21,4 +21,10 @@ public interface ServerMetrics {
    * Return the ORM query metrics.
    */
   List<MetaOrmQueryMetric> getOrmQueryMetrics();
+
+  /**
+   * Return the Counter metrics.
+   */
+  List<MetaCountMetric> getCountMetrics();
+
 }

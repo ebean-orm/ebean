@@ -1,11 +1,18 @@
 package io.ebean.cache;
 
+import io.ebean.meta.MetricVisitor;
+
 import java.util.List;
 
 /**
  * The cache service for server side caching of beans and query results.
  */
 public interface ServerCacheManager {
+
+  /**
+   * Visit the metrics for all the server caches.
+   */
+  void visitMetrics(MetricVisitor visitor);
 
   /**
    * Return true if the L2 caching is local.

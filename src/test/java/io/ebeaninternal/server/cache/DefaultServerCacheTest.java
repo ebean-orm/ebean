@@ -17,7 +17,7 @@ public class DefaultServerCacheTest {
     cacheOptions.setMaxSecsToLive(600);
     cacheOptions.setTrimFrequency(60);
 
-    ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", cacheOptions, null, null);
+    ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", null, cacheOptions, null, null);
     DefaultServerCacheConfig config = new DefaultServerCacheConfig(con);
     return new DefaultServerCache(config);
   }

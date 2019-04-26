@@ -11,19 +11,20 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
   private final List<MetaTimedMetric> timed = new ArrayList<>();
   private final List<MetaQueryMetric> dtoQuery = new ArrayList<>();
   private final List<MetaOrmQueryMetric> ormQuery = new ArrayList<>();
+  private final List<MetaCountMetric> countMetrics = new ArrayList<>();
 
   /**
    * Construct to reset and collect everything.
    */
   public BasicMetricVisitor() {
-    super(true, true, true);
+    super(true, true, true, true);
   }
 
   /**
    * Construct specifying reset and what to collect.
    */
-  public BasicMetricVisitor(boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics) {
-    super(reset, collectTransactionMetrics, collectQueryMetrics);
+  public BasicMetricVisitor(boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics, boolean collectL2Metrics) {
+    super(reset, collectTransactionMetrics, collectQueryMetrics, collectL2Metrics);
   }
 
   /**
@@ -51,6 +52,11 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
   }
 
   @Override
+  public List<MetaCountMetric> getCountMetrics() {
+    return countMetrics;
+  }
+
+  @Override
   public void visitTimed(MetaTimedMetric metric) {
     timed.add(metric);
   }
@@ -63,5 +69,10 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
   @Override
   public void visitOrmQuery(MetaOrmQueryMetric metric) {
     ormQuery.add(metric);
+  }
+
+  @Override
+  public void visitCount(MetaCountMetric metric) {
+    countMetrics.add(metric);
   }
 }

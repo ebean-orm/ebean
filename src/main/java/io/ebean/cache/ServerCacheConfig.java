@@ -9,13 +9,15 @@ public class ServerCacheConfig {
 
   private final ServerCacheType type;
   private final String cacheKey;
+  private final String shortName;
   private final ServerCacheOptions cacheOptions;
   private final CurrentTenantProvider tenantProvider;
   private final QueryCacheEntryValidate queryCacheEntryValidate;
 
-  public ServerCacheConfig(ServerCacheType type, String cacheKey, ServerCacheOptions cacheOptions, CurrentTenantProvider tenantProvider, QueryCacheEntryValidate queryCacheEntryValidate) {
+  public ServerCacheConfig(ServerCacheType type, String cacheKey, String shortName, ServerCacheOptions cacheOptions, CurrentTenantProvider tenantProvider, QueryCacheEntryValidate queryCacheEntryValidate) {
     this.type = type;
     this.cacheKey = cacheKey;
+    this.shortName = shortName;
     this.cacheOptions = cacheOptions;
     this.tenantProvider = tenantProvider;
     this.queryCacheEntryValidate = queryCacheEntryValidate;
@@ -33,6 +35,13 @@ public class ServerCacheConfig {
    */
   public String getCacheKey() {
     return cacheKey;
+  }
+
+  /**
+   * Return the short name for the cache.
+   */
+  public String getShortName() {
+    return shortName;
   }
 
   /**

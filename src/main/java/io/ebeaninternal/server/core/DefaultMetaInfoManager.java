@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.meta.AbstractMetricVisitor;
 import io.ebean.meta.BasicMetricVisitor;
+import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaOrmQueryNode;
@@ -71,7 +72,7 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   private static class ResetVisitor extends AbstractMetricVisitor {
 
     ResetVisitor() {
-      super(true, true, true);
+      super(true, true, true, true);
     }
 
     @Override
@@ -86,6 +87,11 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
 
     @Override
     public void visitOrmQuery(MetaOrmQueryMetric metric) {
+      // ignore
+    }
+
+    @Override
+    public void visitCount(MetaCountMetric metric) {
       // ignore
     }
   }

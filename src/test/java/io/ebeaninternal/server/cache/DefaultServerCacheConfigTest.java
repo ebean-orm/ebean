@@ -16,7 +16,7 @@ public class DefaultServerCacheConfigTest {
     options.setMaxSecsToLive(maxSecsToLive);
     options.setTrimFrequency(trimFreq);
 
-    return new DefaultServerCacheConfig(new ServerCacheConfig(null, null, options, null, null));
+    return new DefaultServerCacheConfig(new ServerCacheConfig(null, null, null, options, null, null));
   }
 
   @Test

@@ -3,6 +3,7 @@ package io.ebeaninternal.server.cache;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheRegion;
+import io.ebean.meta.MetricVisitor;
 
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class DefaultCacheAdapter implements ServerCacheManager {
 
   public DefaultCacheAdapter(SpiCacheManager cacheManager) {
     this.cacheManager = cacheManager;
+  }
+
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
+    cacheManager.visitMetrics(visitor);
   }
 
   @Override

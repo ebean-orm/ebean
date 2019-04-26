@@ -7,11 +7,34 @@ import java.util.Comparator;
  */
 public class SortMetric {
 
+  public static final Comparator<MetaCountMetric> COUNT_NAME = new CountName();
+
   public static final Comparator<MetaTimedMetric> NAME = new Name();
   public static final Comparator<MetaTimedMetric> COUNT = new Count();
   public static final Comparator<MetaTimedMetric> TOTAL = new Total();
   public static final Comparator<MetaTimedMetric> MEAN = new Mean();
   public static final Comparator<MetaTimedMetric> MAX = new Max();
+
+  private static int stringCompare(String name, String name2) {
+    if (name == null) {
+      return name2 == null ? 0 : -1;
+    }
+    if (name2 == null) {
+      return 1;
+    }
+    return name.compareTo(name2);
+  }
+
+  /**
+   * Sort MetaCountMetric's by name.
+   */
+  public static class CountName implements Comparator<MetaCountMetric> {
+
+    @Override
+    public int compare(MetaCountMetric o1, MetaCountMetric o2) {
+      return stringCompare(o1.getName(), o2.getName());
+    }
+  }
 
   /**
    * Sort by name.
@@ -20,16 +43,7 @@ public class SortMetric {
 
     @Override
     public int compare(MetaTimedMetric o1, MetaTimedMetric o2) {
-      String name = o1.getName();
-      String name2 = o2.getName();
-      if (name == null) {
-        return name2 == null ? 0 : -1;
-      }
-      if (name2 == null) {
-        return 1;
-      }
-
-      int i = name.compareTo(name2);
+      int i = stringCompare(o1.getName(), o2.getName());
       return i != 0 ? i : Long.compare(o1.getCount(), o2.getCount());
     }
   }

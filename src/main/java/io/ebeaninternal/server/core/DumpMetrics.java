@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.ProfileLocation;
+import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
@@ -83,6 +84,15 @@ class DumpMetrics {
       log(metric);
     }
 
+    List<MetaCountMetric> countMetrics = serverMetrics.getCountMetrics();
+    if (!countMetrics.isEmpty()) {
+      out("\n-- Counters --");
+      countMetrics.sort(SortMetric.COUNT_NAME);
+      for (MetaCountMetric metric : countMetrics) {
+        logCount(metric);
+      }
+    }
+
     List<MetaOrmQueryMetric> ormQueryMetrics = serverMetrics.getOrmQueryMetrics();
     if (!ormQueryMetrics.isEmpty()) {
       out("\n-- ORM queries --");
@@ -100,6 +110,14 @@ class DumpMetrics {
         logDtoQuery(metric);
       }
     }
+  }
+
+  private void logCount(MetaCountMetric metric) {
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(padNameTimed(metric.getName())).append(" ");
+    sb.append(" count:").append(pad(metric.getCount()));
+    out(sb.toString());
   }
 
   private void out(String sb) {

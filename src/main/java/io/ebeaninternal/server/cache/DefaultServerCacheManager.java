@@ -3,6 +3,7 @@ package io.ebeaninternal.server.cache;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheRegion;
 import io.ebean.cache.ServerCacheType;
+import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiCacheRegion;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.deploy.DCacheRegion;
@@ -99,6 +100,11 @@ public class DefaultServerCacheManager implements SpiCacheManager {
     return regionMap.computeIfAbsent(region, DCacheRegion::new);
   }
 
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
+    cacheHolder.visitMetrics(visitor);
+  }
+
   /**
    * Clear all caches.
    */
@@ -117,7 +123,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
 
   @Override
   public void clear(Class<?> beanType) {
-    cacheHolder.clear(name(beanType));
+    cacheHolder.clear(beanType.getName());
     if (clusterManager != null) {
       clusterManager.cacheClear(serverName, beanType);
     }
@@ -125,17 +131,17 @@ public class DefaultServerCacheManager implements SpiCacheManager {
 
   @Override
   public void clearLocal(Class<?> beanType) {
-    cacheHolder.clear(name(beanType));
+    cacheHolder.clear(beanType.getName());
   }
 
   @Override
-  public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
-    return cacheHolder.getCache(beanType, name(beanType) + "." + propertyName, ServerCacheType.COLLECTION_IDS);
+  public ServerCache getCollectionIdsCache(Class<?> beanType, String collectionProperty) {
+    return cacheHolder.getCache(beanType, collectionProperty);
   }
 
   @Override
   public ServerCache getNaturalKeyCache(Class<?> beanType) {
-    return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.NATURAL_KEY);
+    return cacheHolder.getCache(beanType, ServerCacheType.NATURAL_KEY);
   }
 
   /**
@@ -143,7 +149,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
    */
   @Override
   public ServerCache getQueryCache(Class<?> beanType) {
-    return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.QUERY);
+    return cacheHolder.getCache(beanType, ServerCacheType.QUERY);
   }
 
   /**
@@ -151,11 +157,7 @@ public class DefaultServerCacheManager implements SpiCacheManager {
    */
   @Override
   public ServerCache getBeanCache(Class<?> beanType) {
-    return cacheHolder.getCache(beanType, name(beanType), ServerCacheType.BEAN);
-  }
-
-  private String name(Class<?> beanType) {
-    return beanType.getName();
+    return cacheHolder.getCache(beanType, ServerCacheType.BEAN);
   }
 
 }

@@ -8,11 +8,13 @@ public abstract class AbstractMetricVisitor implements MetricVisitor {
   private final boolean reset;
   private final boolean collectTransactionMetrics;
   private final boolean collectQueryMetrics;
+  private final boolean collectL2Metrics;
 
-  public AbstractMetricVisitor(boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics) {
+  public AbstractMetricVisitor(boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics, boolean collectL2Metrics) {
     this.reset = reset;
     this.collectTransactionMetrics = collectTransactionMetrics;
     this.collectQueryMetrics = collectQueryMetrics;
+    this.collectL2Metrics = collectL2Metrics;
   }
 
   @Override
@@ -28,6 +30,11 @@ public abstract class AbstractMetricVisitor implements MetricVisitor {
   @Override
   public boolean isCollectQueryMetrics() {
     return collectQueryMetrics;
+  }
+
+  @Override
+  public boolean isCollectL2Metrics() {
+    return collectL2Metrics;
   }
 
   @Override

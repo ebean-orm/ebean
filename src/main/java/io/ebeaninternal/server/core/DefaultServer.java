@@ -2389,6 +2389,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (visitor.isCollectTransactionMetrics()) {
       transactionManager.visitMetrics(visitor);
     }
+    if (visitor.isCollectL2Metrics()) {
+      serverCacheManager.visitMetrics(visitor);
+    }
     if (visitor.isCollectQueryMetrics()) {
       beanDescriptorManager.visitMetrics(visitor);
       dtoBeanManager.visitMetrics(visitor);

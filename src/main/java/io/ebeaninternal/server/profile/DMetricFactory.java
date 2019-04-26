@@ -2,6 +2,7 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
 import io.ebean.meta.MetricType;
+import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.QueryPlanMetric;
 import io.ebean.metric.TimedMetric;
@@ -20,6 +21,11 @@ public class DMetricFactory implements MetricFactory {
   @Override
   public TimedMetric createTimedMetric(MetricType metricType, String name) {
     return new DTimedMetric(metricType, name);
+  }
+
+  @Override
+  public CountMetric createCountMetric(MetricType metricType, String name) {
+    return new DCountMetric(metricType, name);
   }
 
   @Override

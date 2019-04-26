@@ -21,7 +21,7 @@ public class DefaultServerCache_RunEvictionTest {
     cacheOptions.setMaxSecsToLive(2);
     cacheOptions.setTrimFrequency(1);
 
-    ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", cacheOptions, null, null);
+    ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", "foo", cacheOptions, null, null);
     return new DefaultServerCache(new DefaultServerCacheConfig(con));
   }
 
