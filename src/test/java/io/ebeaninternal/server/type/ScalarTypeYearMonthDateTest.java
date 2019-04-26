@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -20,8 +22,9 @@ public class ScalarTypeYearMonthDateTest {
 
     LocalDate today = LocalDate.now();
     LocalDate firstMonthDay = today.withDayOfMonth(1);
-    Date date = Date.valueOf(firstMonthDay);
-    long epochMilli = date.getTime();
+    ZonedDateTime zonedDateTime = firstMonthDay.atStartOfDay(ZoneOffset.UTC);
+
+    long epochMilli = zonedDateTime.toInstant().toEpochMilli();
 
     YearMonth yearMonth = type.convertFromMillis(epochMilli);
     long val1 = type.convertToMillis(yearMonth);
@@ -60,7 +63,7 @@ public class ScalarTypeYearMonthDateTest {
     YearMonth val = YearMonth.of(2019, 5);
 
     JsonTester<YearMonth> jsonMillis = new JsonTester<>(type);
-    assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1556625600000}");
+    assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1556668800000}");
 
     JsonTester<YearMonth> jsonIso = new JsonTester<>(new ScalarTypeYearMonthDate(JsonConfig.Date.ISO8601) );
     assertThat(jsonIso.test(val)).isEqualTo("{\"key\":\"2019-05-01\"}");

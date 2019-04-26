@@ -7,7 +7,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -24,8 +24,13 @@ public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
   }
 
   @Override
+  public LocalDate convertFromMillis(long systemTimeMillis) {
+    return new Timestamp(systemTimeMillis).toLocalDateTime().toLocalDate();
+  }
+
+  @Override
   public long convertToMillis(LocalDate value) {
-    ZonedDateTime zonedDateTime = value.atStartOfDay(ZoneId.systemDefault());
+    ZonedDateTime zonedDateTime = value.atStartOfDay(ZoneOffset.UTC);
     return zonedDateTime.toInstant().toEpochMilli();
   }
 
@@ -53,11 +58,6 @@ public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
       return ((java.sql.Date) value).toLocalDate();
     }
     return (LocalDate) value;
-  }
-
-  @Override
-  public LocalDate convertFromMillis(long systemTimeMillis) {
-    return new Timestamp(systemTimeMillis).toLocalDateTime().toLocalDate();
   }
 
 }

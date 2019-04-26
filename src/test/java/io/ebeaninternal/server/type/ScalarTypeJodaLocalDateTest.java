@@ -66,7 +66,7 @@ public class ScalarTypeJodaLocalDateTest {
     LocalDate val = new LocalDate(2019, 5, 9);
 
     JsonTester<LocalDate> jsonMillis = new JsonTester<>(type);
-    assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1557316800000}");
+    assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1557360000000}");
 
     JsonTester<LocalDate> jsonIso = new JsonTester<>(new ScalarTypeJodaLocalDate(JsonConfig.Date.ISO8601) );
     assertThat(jsonIso.test(val)).isEqualTo("{\"key\":\"2019-05-09\"}");

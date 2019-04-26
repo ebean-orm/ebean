@@ -97,12 +97,10 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   @Override
   public void jsonWrite(JsonGenerator writer, T value) throws IOException {
-    switch(mode) {
-      case ISO8601:
-        writer.writeString(toIsoFormat(value));
-        break;
-      default:
-        writer.writeNumber(convertToMillis(value));
+    if (mode == JsonConfig.Date.ISO8601) {
+      writer.writeString(toIsoFormat(value));
+    } else {
+      writer.writeNumber(convertToMillis(value));
     }
   }
 

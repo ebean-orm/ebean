@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
 import io.ebeaninternal.server.core.BasicTypeConverter;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import java.sql.Date;
@@ -28,7 +29,7 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public long convertToMillis(LocalDate value) {
-    return value.toDateTimeAtStartOfDay().getMillis();
+    return value.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis();
   }
 
   @Override
