@@ -13,9 +13,9 @@ public interface MetaOrmQueryMetric extends MetaQueryMetric {
   boolean isAutoTuned();
 
   /**
-   * Return a string representation of the query plan hash.
+   * Return the hash of the sql.
    */
-  String getQueryPlanHash();
+  String getSqlHash();
 
   /**
    * Return the time of the last query executed using this plan.

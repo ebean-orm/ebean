@@ -113,7 +113,7 @@ class DumpMetrics {
     appendQueryName(metric, sb);
     appendCounters(metric, sb);
     if (dumpHash) {
-      sb.append("\n hash:").append(metric.getQueryPlanHash());
+      sb.append("\n hash:").append(metric.getSqlHash());
     }
     appendProfileAndSql(metric, sb);
     out(sb.toString());

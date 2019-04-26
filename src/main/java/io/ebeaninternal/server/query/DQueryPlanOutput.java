@@ -30,7 +30,7 @@ class DQueryPlanOutput implements MetaQueryPlan {
   }
 
   @Override
-  public String getQueryPlanHash() {
+  public String getSqlHash() {
     return sqlHash;
   }
 
@@ -48,6 +48,11 @@ class DQueryPlanOutput implements MetaQueryPlan {
   @Override
   public String getLabel() {
     return label;
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
   }
 
   /**
@@ -84,8 +89,7 @@ class DQueryPlanOutput implements MetaQueryPlan {
   }
 
   /**
-   * Return the total count of times bind capture has occurred. We don't want this to be
-   * massive as that implies a high overhead.
+   * Return the total count of times bind capture has occurred.
    */
   @Override
   public long getCaptureCount() {
