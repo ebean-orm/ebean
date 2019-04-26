@@ -1,8 +1,10 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.JsonConfig;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.sql.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScalarTypeJodaLocalDateTest {
 
-  private ScalarTypeJodaLocalDate type = new ScalarTypeJodaLocalDate();
+  private ScalarTypeJodaLocalDate type = new ScalarTypeJodaLocalDate(JsonConfig.Date.MILLIS);
 
   @Test
   public void convertToMillis_convertFromMillis() {
@@ -58,4 +60,15 @@ public class ScalarTypeJodaLocalDateTest {
     assertThat(beanType).isEqualTo(localDate);
   }
 
+  @Test
+  public void json() throws IOException {
+
+    LocalDate val = new LocalDate(2019, 5, 9);
+
+    JsonTester<LocalDate> jsonMillis = new JsonTester<>(type);
+    assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1557316800000}");
+
+    JsonTester<LocalDate> jsonIso = new JsonTester<>(new ScalarTypeJodaLocalDate(JsonConfig.Date.ISO8601) );
+    assertThat(jsonIso.test(val)).isEqualTo("{\"key\":\"2019-05-09\"}");
+  }
 }

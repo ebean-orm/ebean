@@ -1,7 +1,5 @@
 package org.tests.transaction;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
@@ -9,6 +7,7 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.config.JsonConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.datasource.DataSourceConfig;
@@ -19,7 +18,6 @@ import org.junit.Test;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -127,14 +125,8 @@ public class TestExplicitTransactionMode extends BaseTestCase {
 
   public static class ScalarTypeLocalDateAsString extends ScalarTypeLocalDate {
 
-    @Override
-    public LocalDate jsonRead(JsonParser parser) throws IOException {
-      return super.jsonRead(parser);
-    }
-
-    @Override
-    public void jsonWrite(JsonGenerator writer, LocalDate value) throws IOException {
-      writer.writeString(value.toString());
+    public ScalarTypeLocalDateAsString() {
+      super(JsonConfig.Date.ISO8601);
     }
   }
 }

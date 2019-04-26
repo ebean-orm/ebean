@@ -25,7 +25,7 @@ public class JsonTester<T> {
     this.type = type;
   }
 
-  public void test(T value) throws IOException {
+  public String test(T value) throws IOException {
 
     StringWriter writer = new StringWriter();
 
@@ -48,5 +48,6 @@ public class JsonTester<T> {
     T val1 = type.jsonRead(parser);
     assertEquals(value, val1);
 
+    return writer.toString();
   }
 }

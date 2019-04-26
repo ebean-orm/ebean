@@ -172,6 +172,11 @@ public class ServerConfig {
   private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
 
   /**
+   * The JSON format used for Date types. Default to millis.
+   */
+  private JsonConfig.Date jsonDate = JsonConfig.Date.MILLIS;
+
+  /**
    * For writing JSON specify if null values or empty collections should be exluded.
    * By default all values are included.
    */
@@ -681,6 +686,20 @@ public class ServerConfig {
    */
   public void setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
     this.jsonDateTime = jsonDateTime;
+  }
+
+  /**
+   * Return the JSON format used for Date types.
+   */
+  public JsonConfig.Date getJsonDate() {
+    return jsonDate;
+  }
+
+  /**
+   * Set the JSON format to use for Date types.
+   */
+  public void setJsonDate(JsonConfig.Date jsonDate) {
+    this.jsonDate = jsonDate;
   }
 
   /**
@@ -2988,12 +3007,8 @@ public class ServerConfig {
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
-    String jsonDateTimeFormat = p.get("jsonDateTime", null);
-    if (jsonDateTimeFormat != null) {
-      jsonDateTime = JsonConfig.DateTime.valueOf(jsonDateTimeFormat);
-    } else {
-      jsonDateTime = JsonConfig.DateTime.MILLIS;
-    }
+    jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
+    jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
 
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);

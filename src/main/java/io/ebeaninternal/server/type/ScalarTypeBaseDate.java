@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.config.JsonConfig;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -17,8 +18,11 @@ import java.sql.Types;
  */
 public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
-  public ScalarTypeBaseDate(Class<T> type, boolean jdbcNative, int jdbcType) {
+  protected final JsonConfig.Date mode;
+
+  public ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
+    this.mode = mode;
   }
 
   /**
@@ -93,8 +97,19 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   @Override
   public void jsonWrite(JsonGenerator writer, T value) throws IOException {
-    writer.writeNumber(convertToMillis(value));
+    switch(mode) {
+      case ISO8601:
+        writer.writeString(toIsoFormat(value));
+        break;
+      default:
+        writer.writeNumber(convertToMillis(value));
+    }
   }
+
+  /**
+   * Convert the value to ISO8601 format.
+   */
+  protected abstract String toIsoFormat(T value);
 
   @Override
   public DocPropertyType getDocType() {

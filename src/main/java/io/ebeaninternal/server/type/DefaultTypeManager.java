@@ -130,8 +130,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> timeType = new ScalarTypeTime();
 
-  private final ScalarType<?> dateType = new ScalarTypeDate();
-
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
@@ -143,6 +141,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final ScalarType<?> classType = new ScalarTypeClass();
 
   private final JsonConfig.DateTime jsonDateTime;
+  private final JsonConfig.Date jsonDate;
 
   private final Object objectMapper;
 
@@ -189,6 +188,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
+    this.jsonDate = config.getJsonDate();
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
@@ -205,9 +205,9 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.defaultEnumType = config.getDefaultEnumType();
 
-    initialiseStandard(jsonDateTime, config);
-    initialiseJavaTimeTypes(jsonDateTime, config);
-    initialiseJodaTypes(jsonDateTime, config);
+    initialiseStandard(config);
+    initialiseJavaTimeTypes(config);
+    initialiseJodaTypes(config);
     initialiseJacksonTypes(config);
 
     loadTypesFromProviders(config, objectMapper);
@@ -522,7 +522,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
     // a util Date with jdbcType not matching server wide settings
     if (type.equals(java.util.Date.class)) {
-      return extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
+      return extraTypeFactory.createUtilDate(jsonDateTime, jsonDate, jdbcType);
     }
     // a Calendar with jdbcType not matching server wide settings
     if (type.equals(java.util.Calendar.class)) {
@@ -874,7 +874,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJavaTimeTypes(ServerConfig config) {
 
     if (java7Present) {
       typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
@@ -883,16 +883,16 @@ public final class DefaultTypeManager implements TypeManager {
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
       addType(java.time.Period.class, new ScalarTypePeriod());
-      addType(java.time.LocalDate.class, new ScalarTypeLocalDate());
-      addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
-      addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(mode));
-      addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(mode));
-      addType(Instant.class, new ScalarTypeInstant(mode));
+      addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
+      addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
+      addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
+      addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
+      addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
 
       addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
       addType(Month.class, new ScalarTypeMonth());
       addType(Year.class, new ScalarTypeYear());
-      addType(YearMonth.class, new ScalarTypeYearMonthDate());
+      addType(YearMonth.class, new ScalarTypeYearMonthDate(jsonDate));
       addType(MonthDay.class, new ScalarTypeMonthDay());
       addType(OffsetTime.class, new ScalarTypeOffsetTime());
       addType(ZoneId.class, new ScalarTypeZoneId());
@@ -915,16 +915,16 @@ public final class DefaultTypeManager implements TypeManager {
    * Detect if Joda classes are in the classpath and if so register the Joda data types.
    */
   @SuppressWarnings("deprecation")
-  private void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJodaTypes(ServerConfig config) {
 
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
       logger.debug("Registering Joda data types");
-      addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));
-      addType(DateTime.class, new ScalarTypeJodaDateTime(mode));
-      addType(LocalDate.class, new ScalarTypeJodaLocalDate());
-      addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight());
+      addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
+      addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
+      addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
+      addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight(jsonDate));
       addType(org.joda.time.Period.class, new ScalarTypeJodaPeriod());
 
       String jodaLocalTimeMode = config.getJodaLocalTimeMode();
@@ -944,7 +944,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  private void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseStandard(ServerConfig config) {
 
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
@@ -952,10 +952,10 @@ public final class DefaultTypeManager implements TypeManager {
 
     nativeMap.put(DbPlatformType.HSTORE, hstoreType);
 
-    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
+    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(jsonDateTime, jsonDate);
     addType(java.util.Date.class, utilDateType);
 
-    ScalarType<?> calType = extraTypeFactory.createCalendar(mode);
+    ScalarType<?> calType = extraTypeFactory.createCalendar(jsonDateTime);
     addType(Calendar.class, calType);
 
     ScalarType<?> mathBigIntType = extraTypeFactory.createMathBigInteger();
@@ -1079,10 +1079,12 @@ public final class DefaultTypeManager implements TypeManager {
     // Temporal types
     addType(Time.class, timeType);
     nativeMap.put(Types.TIME, timeType);
+
+    ScalarTypeDate dateType = new ScalarTypeDate(jsonDate);
     addType(Date.class, dateType);
     nativeMap.put(Types.DATE, dateType);
 
-    ScalarType<?> timestampType = new ScalarTypeTimestamp(mode);
+    ScalarType<?> timestampType = new ScalarTypeTimestamp(jsonDateTime);
     addType(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
   }

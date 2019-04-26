@@ -79,27 +79,24 @@ public class DefaultTypeFactory {
   /**
    * Create the default ScalarType for java.util.Date.
    */
-  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode) {
+  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode, JsonConfig.Date jsonDate) {
     // by default map anonymous java.util.Date to java.sql.Timestamp.
-    // String mapType =
-    // properties.getProperty("type.mapping.java.util.Date","timestamp");
     int utilDateType = getTemporalMapType("timestamp");
-
-    return createUtilDate(mode, utilDateType);
+    return createUtilDate(mode, jsonDate, utilDateType);
   }
 
   /**
    * Create a ScalarType for java.util.Date explicitly specifying the type to
    * map to.
    */
-  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode, int utilDateType) {
+  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime jsonDateTime, JsonConfig.Date jsonDate, int utilDateType) {
 
     switch (utilDateType) {
       case Types.DATE:
-        return new ScalarTypeUtilDate.DateType();
+        return new ScalarTypeUtilDate.DateType(jsonDate);
 
       case Types.TIMESTAMP:
-        return new ScalarTypeUtilDate.TimestampType(mode);
+        return new ScalarTypeUtilDate.TimestampType(jsonDateTime);
 
       default:
         throw new RuntimeException("Invalid type " + utilDateType);

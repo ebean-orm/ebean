@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.JsonConfig;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.Date;
@@ -11,8 +12,13 @@ import java.sql.Types;
  */
 public class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
 
-  public ScalarTypeDate() {
-    super(Date.class, true, Types.DATE);
+  public ScalarTypeDate(JsonConfig.Date mode) {
+    super(mode, Date.class, true, Types.DATE);
+  }
+
+  @Override
+  protected String toIsoFormat(Date value) {
+    return value.toLocalDate().toString();
   }
 
   @Override
