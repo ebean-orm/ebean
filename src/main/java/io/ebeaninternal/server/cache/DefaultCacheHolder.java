@@ -48,6 +48,7 @@ class DefaultCacheHolder {
   }
 
   void visitMetrics(MetricVisitor visitor) {
+    cacheFactory.visit(visitor);
     for (ServerCache serverCache : allCaches.values()) {
       serverCache.visit(visitor);
     }
