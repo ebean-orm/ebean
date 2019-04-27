@@ -95,7 +95,7 @@ class BindCaptureTypes {
 
     @Override
     public String toString() {
-      return String.valueOf(x);
+      return Arrays.toString(x);
     }
   }
 
