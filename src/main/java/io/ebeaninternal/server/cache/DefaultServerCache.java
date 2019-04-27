@@ -119,6 +119,20 @@ public class DefaultServerCache implements ServerCache {
     return cacheStats;
   }
 
+  /**
+   * Return the count of get hits.
+   */
+  public long getHitCount() {
+    return hitCount.get(false);
+  }
+
+  /**
+   * Return the count of get misses.
+   */
+  public long getMissCount() {
+    return missCount.get(false);
+  }
+
   @Override
   public int getHitRatio() {
 
