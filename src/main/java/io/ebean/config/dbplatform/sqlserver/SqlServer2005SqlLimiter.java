@@ -65,13 +65,9 @@ public class SqlServer2005SqlLimiter implements SqlLimiter {
     sb.append(NEW_LINE).append(") ");
     sb.append(rowNumberWindowAlias);
     sb.append(" where ");
-    if (firstRow > 0) {
-      sb.append(" rn > ").append(firstRow);
-      if (lastRow > 0) {
-        sb.append(" and ");
-      }
-    }
+    sb.append(" rn > ").append(firstRow);
     if (lastRow > 0) {
+      sb.append(" and ");
       sb.append(" rn <= ").append(lastRow);
     }
 

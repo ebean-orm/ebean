@@ -48,10 +48,8 @@ class CQueryPlanRawSql extends CQueryPlan {
     // an associated bean is in the raw SQL but is mapped columnIgnore
     for (int i = 0; i < indexPositions.length; i++) {
       if (indexPositions[i] == 0) {
-        if (i < indexPositions.length) {
-          // expect discriminator column to immediately proceed id column
-          indexPositions[i] = indexPositions[i + 1] - 1;
-        }
+        // expect discriminator column to immediately proceed id column
+        indexPositions[i] = indexPositions[i + 1] - 1;
       }
     }
 
