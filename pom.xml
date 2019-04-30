@@ -129,7 +129,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
-      <version>4.5.1</version>
+      <version>4.5.2</version>
     </dependency>
 
     <dependency>
@@ -220,10 +220,10 @@
     <!-- Test scope -->
 
     <!--<dependency>-->
-      <!--<groupId>oracle</groupId>-->
-      <!--<artifactId>oracle-jdbc</artifactId>-->
-      <!--<version>7.0</version>-->
-      <!--<scope>test</scope>-->
+    <!--<groupId>oracle</groupId>-->
+    <!--<artifactId>oracle-jdbc</artifactId>-->
+    <!--<version>7.0</version>-->
+    <!--<scope>test</scope>-->
     <!--</dependency>-->
 
     <dependency>
