@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ScalarTypeLocalDateTest {
 
-  ScalarTypeLocalDate type = new ScalarTypeLocalDate(JsonConfig.Date.MILLIS);
+  ScalarTypeLocalDate type = new ScalarTypeLocalDate(JsonConfig.Date.ISO8601);
 
   @Test
   public void testConvertToMillis() {
@@ -62,7 +62,7 @@ public class ScalarTypeLocalDateTest {
 
     LocalDate val = LocalDate.of(2019, 5, 9);
 
-    JsonTester<LocalDate> jsonMillis = new JsonTester<>(type);
+    JsonTester<LocalDate> jsonMillis = new JsonTester<>(new ScalarTypeLocalDate(JsonConfig.Date.MILLIS));
     assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1557360000000}");
 
     JsonTester<LocalDate> jsonIso = new JsonTester<>(new ScalarTypeLocalDate(JsonConfig.Date.ISO8601) );

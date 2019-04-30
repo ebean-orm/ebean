@@ -169,12 +169,12 @@ public class ServerConfig {
   /**
    * The JSON format used for DateTime types. Default to millis.
    */
-  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
+  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.ISO8601;
 
   /**
    * The JSON format used for Date types. Default to millis.
    */
-  private JsonConfig.Date jsonDate = JsonConfig.Date.MILLIS;
+  private JsonConfig.Date jsonDate = JsonConfig.Date.ISO8601;
 
   /**
    * For writing JSON specify if null values or empty collections should be exluded.
