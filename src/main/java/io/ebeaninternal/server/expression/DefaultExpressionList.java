@@ -36,6 +36,7 @@ import io.ebeaninternal.api.SpiJunction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -356,6 +357,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> apply(FetchPath fetchPath) {
     return query.apply(fetchPath);
+  }
+
+  @Override
+  public Query<T> usingTransaction(Transaction transaction) {
+    return query.usingTransaction(transaction);
+  }
+
+  @Override
+  public Query<T> usingConnection(Connection connection) {
+    return query.usingConnection(connection);
   }
 
   @Override

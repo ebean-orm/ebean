@@ -1,14 +1,14 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourcePool;
@@ -46,7 +46,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     assertTrue(connection.getAutoCommit());
     connection.close();
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2autocommit2");
     config.loadFromProperties();
     config.setDataSource(pool);
@@ -61,44 +61,44 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     config.setDdlExtra(false);
     config.addClass(ScalarTypeLocalDateAsString.class);
 
-    EbeanServer ebeanServer = EbeanServerFactory.create(config);
+    Database database = DatabaseFactory.create(config);
 
-    testJsonScalarType(ebeanServer);
+    testJsonScalarType(database);
 
-    Query<UTMaster> query = ebeanServer.find(UTMaster.class);
+    Query<UTMaster> query = database.find(UTMaster.class);
     List<UTMaster> details = query.findList();
     assertEquals(0, details.size());
 
     UTMaster bean0 = new UTMaster("one0");
-    Transaction txn0 = ebeanServer.beginTransaction();
+    Transaction txn0 = database.beginTransaction();
     try {
-      ebeanServer.save(bean0);
+      database.save(bean0);
       txn0.rollback();
     } finally {
       txn0.end();
     }
 
     // rollback as expected
-    assertEquals(0, ebeanServer.find(UTMaster.class).findCount());
+    assertEquals(0, database.find(UTMaster.class).findCount());
 
     UTMaster bean1 = new UTMaster("one1");
     UTMaster bean2 = new UTMaster("two2");
     UTMaster bean3 = new UTMaster("three3");
 
     // use a different transaction to do final query check
-    try (Transaction otherTxn = ebeanServer.createTransaction()) {
+    try (Transaction otherTxn = database.createTransaction()) {
 
-      Transaction txn = ebeanServer.beginTransaction();
+      Transaction txn = database.beginTransaction();
       try {
-        ebeanServer.save(bean1);
-        ebeanServer.save(bean2);
+        database.save(bean1);
+        database.save(bean2);
 
         // not visible in other transaction
-        Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-        details = ebeanServer.extended().findList(query2, otherTxn);
+        Query<UTMaster> query2 = database.find(UTMaster.class);
+        details = database.extended().findList(query2, otherTxn);
         assertEquals(0, details.size());
 
-        ebeanServer.save(bean3);
+        database.save(bean3);
 
         txn.commit();
 
@@ -107,13 +107,15 @@ public class TestExplicitTransactionMode extends BaseTestCase {
       }
 
       // commit as expected
-      Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.extended().findList(query3, otherTxn);
+      details = database.find(UTMaster.class)
+        .usingTransaction(otherTxn)
+        .findList();
+
       assertEquals(3, details.size());
     }
   }
 
-  private void testJsonScalarType(EbeanServer ebeanServer) {
+  private void testJsonScalarType(Database ebeanServer) {
     UTMaster bean = new UTMaster("one1");
     bean.setDate(LocalDate.of(2019, 04, 20));
 

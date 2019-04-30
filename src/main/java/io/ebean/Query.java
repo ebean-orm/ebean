@@ -3,6 +3,7 @@ package io.ebean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -630,6 +631,16 @@ public interface Query<T> {
    * </p>
    */
   Query<T> apply(FetchPath fetchPath);
+
+  /**
+   * Execute the query using the given transaction.
+   */
+  Query<T> usingTransaction(Transaction transaction);
+
+  /**
+   * Execute the query using the given connection.
+   */
+  Query<T> usingConnection(Connection connection);
 
   /**
    * Execute the query returning the list of Id's.

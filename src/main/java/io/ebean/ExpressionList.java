@@ -9,6 +9,7 @@ import io.ebean.search.TextSimple;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -185,6 +186,16 @@ public interface ExpressionList<T> {
    * Execute the query including soft deleted rows.
    */
   Query<T> setIncludeSoftDeletes();
+
+  /**
+   * Execute the query using the given transaction.
+   */
+  Query<T> usingTransaction(Transaction transaction);
+
+  /**
+   * Execute the query using the given connection.
+   */
+  Query<T> usingConnection(Connection connection);
 
   /**
    * Execute as a delete query deleting the 'root level' beans that match the predicates
