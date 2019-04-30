@@ -25,6 +25,7 @@ public abstract class BaseModel extends Model {
   protected DateTime lastUpdate;
 
   protected BaseModel() {
+    super(null);
   }
 
   public Long getId() {

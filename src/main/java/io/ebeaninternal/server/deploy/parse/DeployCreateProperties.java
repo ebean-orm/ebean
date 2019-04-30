@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.Model;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbHstore;
 import io.ebean.annotation.DbJson;
@@ -64,17 +65,18 @@ public class DeployCreateProperties {
    * </p>
    */
   private boolean ignoreFieldByName(String fieldName) {
-    if (fieldName.startsWith("_ebean_") || fieldName.equals("_$targetDatabase")) {
+    if (fieldName.startsWith("_ebean_")) {
       // ignore Ebean internal fields
       return true;
     }
-    if (fieldName.startsWith("ajc$instance$")) {
-      // ignore AspectJ internal fields
-      return true;
-    }
+    // ignore AspectJ internal fields
+    return fieldName.startsWith("ajc$instance$");
+  }
 
-    // we are interested in this field
-    return false;
+  private boolean ignoreField(Field field) {
+    return Modifier.isStatic(field.getModifiers())
+      || Modifier.isTransient(field.getModifiers())
+      || ignoreFieldByName(field.getName());
   }
 
   /**
@@ -83,6 +85,10 @@ public class DeployCreateProperties {
    */
   private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level) {
 
+    if (beanType.equals(Model.class)) {
+      // ignore all fields on model (_$dbName)
+      return;
+    }
     boolean scalaObject = desc.isScalaObject();
 
     try {
@@ -92,16 +98,7 @@ public class DeployCreateProperties {
       for (int i = 0; i < fields.length; i++) {
 
         Field field = fields[i];
-        if (Modifier.isStatic(field.getModifiers())) {
-          // not interested in static fields
-          logger.trace("Skipping static field {} in {}", field.getName(), beanType.getName());
-
-        } else if (Modifier.isTransient(field.getModifiers())) {
-          // not interested in transient fields
-          logger.trace("Skipping transient field {} in {}", field.getName(), beanType.getName());
-
-        } else if (!ignoreFieldByName(field.getName())) {
-
+        if (!ignoreField(field)) {
           String fieldName = getFieldName(field, beanType);
           String initFieldName = initCap(fieldName);
 

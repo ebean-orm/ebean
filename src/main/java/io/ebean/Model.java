@@ -76,6 +76,25 @@ import io.ebean.bean.EntityBean;
 public abstract class Model {
 
   /**
+   * The name of the database this entity will use, null for the default database.
+   */
+  private final String _$dbName;
+
+  /**
+   * Create using the default database.
+   */
+  public Model() {
+    this._$dbName = null;
+  }
+
+  /**
+   * Create with a named database (typically not the default database).
+   */
+  public Model(String dbName) {
+    this._$dbName = dbName;
+  }
+
+  /**
    * Return the underlying 'default' Database.
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
@@ -107,17 +126,8 @@ public abstract class Model {
    *
    * }</pre>
    */
-  public static Database db() {
-    return DB.getDefault();
-  }
-
-  /**
-   * Return a named Database that is typically different to the default database.
-   *
-   * @param server The name of the Database. If this is null then the default Database is returned.
-   */
-  public static Database db(String server) {
-    return DB.byName(server);
+  public Database db() {
+    return DB.byName(_$dbName);
   }
 
   /**
@@ -243,27 +253,6 @@ public abstract class Model {
    */
   public boolean deletePermanent() {
     return db().deletePermanent(this);
-  }
-
-  /**
-   * Perform an update using this entity against the specified server.
-   */
-  public void update(String server) {
-    db(server).update(this);
-  }
-
-  /**
-   * Perform an insert using this entity against the specified server.
-   */
-  public void insert(String server) {
-    db(server).insert(this);
-  }
-
-  /**
-   * Perform a delete using this entity against the specified server.
-   */
-  public boolean delete(String server) {
-    return db(server).delete(this);
   }
 
   /**
