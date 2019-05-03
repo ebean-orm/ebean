@@ -370,7 +370,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch shippingAddress (line1) limit 10");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_address t2 on t2.id = t0.shipping_address_id  order by t0.id");
+    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_address t2 on t2.id = t0.shipping_address_id");
   }
 
   @Test

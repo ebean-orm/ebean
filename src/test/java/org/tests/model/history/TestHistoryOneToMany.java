@@ -50,8 +50,8 @@ public class TestHistoryOneToMany extends BaseTestCase {
 
     if (isH2()) {
       assertThat(sql).hasSize(2);
-      assertThat(sql.get(0)).contains("from hi_tone_with_history t0 where (t0.sys_period_start <= ? and (t0.sys_period_end is null or t0.sys_period_end > ?)) and lower(t0.name) like ? escape''  order by t0.id limit 10");
-      assertThat(sql.get(1)).contains("from hi_ttwo_with_history t0 left join hi_tthree_with_history t1 on t1.hi_ttwo_id = t0.id and (t1.sys_period_start <= ? and (t1.sys_period_end is null or t1.sys_period_end > ?))  where (t0.sys_period_start <= ? and (t0.sys_period_end is null or t0.sys_period_end > ?)) and (t0.hi_tone_id) in (? )  order by t0.id");
+      assertThat(sql.get(0)).contains("from hi_tone_with_history t0 where (t0.sys_period_start <= ? and (t0.sys_period_end is null or t0.sys_period_end > ?)) and lower(t0.name) like ? escape''  limit 10");
+      assertThat(sql.get(1)).contains("from hi_ttwo_with_history t0 left join hi_tthree_with_history t1 on t1.hi_ttwo_id = t0.id and (t1.sys_period_start <= ? and (t1.sys_period_end is null or t1.sys_period_end > ?))  where (t0.sys_period_start <= ? and (t0.sys_period_end is null or t0.sys_period_end > ?)) and (t0.hi_tone_id) in (? )");
     }
 
     assertThat(list).hasSize(1);

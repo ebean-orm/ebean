@@ -1615,7 +1615,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean checkPagingOrderBy() {
-    return !useDocStore && (maxRows > 1 || firstRow > 0) && !distinct && (orderByIsEmpty() || isOrderById());
+    return orderById && !useDocStore;
   }
 
   @Override

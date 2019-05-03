@@ -258,17 +258,20 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   // hmm - same problem when not using distinct
   @Test
   public void findSingleOnIdProperty() {
+
+    ResetBasicData.reset();
+
     Query<Customer> query = Ebean.find(Customer.class)
       .select("id")
       .setMaxRows(100);
 
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
-      assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0 order by t0.id");
+      assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
     } else if (isOracle()) {
       assertThat(sqlOf(query)).contains("where rownum <= 100");
     } else {
-      assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 order by t0.id limit 100");
+      assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }
     assertThat(ids).isNotEmpty();
   }

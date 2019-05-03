@@ -518,7 +518,7 @@ public class ServerConfig {
   /**
    * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
    */
-  private boolean defaultOrderById = false;
+  private boolean defaultOrderById;
 
   /**
    * The mappingLocations for searching xml mapping.
@@ -585,8 +585,9 @@ public class ServerConfig {
 
 
   /**
-   * Sets the default orderById setting for queries.
+   * Deprecated - look to have explicit order by. Sets the default orderById setting for queries.
    */
+  @Deprecated
   public void setDefaultOrderById(boolean defaultOrderById) {
     this.defaultOrderById = defaultOrderById;
   }
