@@ -313,7 +313,7 @@ public class TestMergeCustomer extends BaseTestCase {
     assertThat(sql.get(0)).contains("select t0.id, t3.id, t1.id, t2.id from mcustomer t0 left join maddress t3 on t3.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  left join mcontact t2 on t2.customer_id = t0.id  where t0.id = ?");
     if (isH2() || isHana()) {
       // with nested OneToMany .. we need a second query to read the contact message ids
-      assertThat(sql.get(1)).contains("select t0.contact_id, t0.id from mcontact_message t0 where (t0.contact_id) in (?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
+      assertThat(sql.get(1)).contains("select t0.contact_id, t0.id from mcontact_message t0 where (t0.contact_id) in (?,?,?,?,?,?,?,?,?,?)");
     }
     assertThat(sql.get(2)).contains("delete from mcontact_message where contact_id = ?");
     assertThat(sql.get(3)).contains("delete from mcontact where id=?");

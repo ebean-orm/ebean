@@ -110,7 +110,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - (sku=3 ... we got hits on sku 1 and 2)
-      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ? and t0.sku in (? )  order by t0.sku desc; --bind(abc,Array[1]={3})");
+      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ? and t0.sku in (?) order by t0.sku desc; --bind(abc,Array[1]={3})");
     }
 
     assertThat(list).hasSize(3);
@@ -149,7 +149,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     assertThat(list).hasSize(3);
     assertThat(sql).hasSize(1);
     if (isH2()) {
-      assertThat(sql.get(0)).contains("where t0.store = ? and t0.sku in (?, ? )  order by t0.sku desc; --bind(abc,Array[2]={1,3})");
+      assertThat(sql.get(0)).contains("where t0.store = ? and t0.sku in (?,?) order by t0.sku desc; --bind(abc,Array[2]={1,3})");
     }
     assertNaturalKeyHitMiss(1, 2);
     assertBeanCacheHitMiss(1, 0);
@@ -207,7 +207,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with 2 bind params as we got not hits on the cache
-      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ? and t0.sku in (?, ? )  order by t0.sku desc; --bind(abc,Array[2]={3,4})");
+      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ? and t0.sku in (?,?) order by t0.sku desc; --bind(abc,Array[2]={3,4})");
     }
 
     assertThat(list).hasSize(2);

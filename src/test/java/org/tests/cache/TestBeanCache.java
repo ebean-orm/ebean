@@ -76,7 +76,7 @@ public class TestBeanCache extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
     if (isH2()) {
-      assertThat(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?, ?, ? )");
+      assertThat(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?,?,?)");
     }
 
     log.info("All hits (3 of 3) ...");
@@ -105,7 +105,7 @@ public class TestBeanCache extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // fetch the miss from DB
-      assertThat(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (? )");
+      assertThat(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?)");
     }
 
     // remove beans so that we get a "partial" hit (1 out of 3 in cache)
@@ -124,7 +124,7 @@ public class TestBeanCache extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // fetch the misses from DB
-      assertThat(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?, ? )");
+      assertThat(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?,?)");
     }
   }
 

@@ -36,7 +36,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     assertThat(machines).hasSize(5);
     if (isH2()) {
-      assertThat(sql.get(1)).contains("select t0.machine_id, t0.name, sum(t0.use_secs), sum(t0.fuel) from d_machine_aux_use t0 where (t0.machine_id) in (?, ?, ?, ?, ? )  group by t0.machine_id, t0.name;");
+      assertThat(sql.get(1)).contains("select t0.machine_id, t0.name, sum(t0.use_secs), sum(t0.fuel) from d_machine_aux_use t0 where (t0.machine_id) in (?,?,?,?,?) group by t0.machine_id, t0.name;");
     }
   }
 
