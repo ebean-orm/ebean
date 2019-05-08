@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.PagedList;
 import org.assertj.core.util.Lists;
 import org.ebeantest.LoggedSqlCollector;
@@ -10,6 +10,7 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,8 +25,8 @@ public class TestQueryFindNative extends BaseTestCase {
     LoggedSqlCollector.start();
 
     String sql = "select id,first_name from contact where id in(:ids)";
-    Ebean.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2, 3)).findList();
-    Ebean.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2)).findList();
+    DB.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2, 3)).findList();
+    DB.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2)).findList();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(2);
@@ -120,7 +121,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     String sql = "select c.id from contact c where c.first_name like ? ";
 
-    List<Integer> ids = Ebean.createSqlQuery(sql)
+    List<Integer> ids = DB.sqlQuery(sql)
       .setParameter(1, "J%")
       .findSingleAttributeList(Integer.class);
 
@@ -191,4 +192,58 @@ public class TestQueryFindNative extends BaseTestCase {
     List<Contact> contacts = customers.get(0).getContacts();
     assertThat(contacts).isNotEmpty();
   }
+
+  @Test
+  public void bind_positionedParams_InSelect() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, " +
+      "case when anniversary >= ? then 1 when anniversary < ? then 2 end as order_column_1 " +
+      "from o_customer " +
+      "order by order_column_1";
+
+    LoggedSqlCollector.start();
+
+    List<Customer> result = DB.findNative(Customer.class, sql)
+      .setParameter(1, LocalDate.now())
+      .setParameter(2, LocalDate.now())
+      .setFirstRow(1)
+      .setMaxRows(10)
+      .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("from o_customer order by order_column_1 limit 10 offset 1");
+    }
+  }
+
+  @Test
+  public void bind_namedParams_InSelect() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, " +
+      "case when anniversary >= :date then 1 when anniversary < :date then 2 end as order_column_1 " +
+      "from o_customer " +
+      "order by order_column_1";
+
+    LoggedSqlCollector.start();
+
+    List<Customer> result = DB.findNative(Customer.class, sql)
+      .setParameter("date", LocalDate.now())
+      .setFirstRow(1)
+      .setMaxRows(10)
+      .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("from o_customer order by order_column_1 limit 10 offset 1");
+    }
+  }
+
 }
