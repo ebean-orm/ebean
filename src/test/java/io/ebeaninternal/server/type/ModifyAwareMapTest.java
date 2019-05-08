@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.json.ModifyAwareSet;
+import io.ebeaninternal.json.ModifyAwareMap;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -8,23 +8,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class ModifyAwareSetTest {
+public class ModifyAwareMapTest {
 
-  private ModifyAwareSet<String> createSet() {
-    HashSet<String> set = new HashSet<>();
-    set.addAll(Arrays.asList("A", "B", "C", "D", "E"));
-    return new ModifyAwareSet<>(set);
+  private ModifyAwareMap<String, Integer> createMap() {
+    HashMap<String, Integer> set = new HashMap<>();
+    set.put("A", 1);
+    set.put("B", 2);
+    set.put("C", 3);
+    set.put("D", 4);
+    set.put("E", 5);
+    return new ModifyAwareMap<>(set);
   }
 
-  private ModifyAwareSet<String> createEmptySet() {
-    HashSet<String> set = new HashSet<>();
-    return new ModifyAwareSet<>(set);
+  private ModifyAwareMap<String, Integer> createEmptyMap() {
+    HashMap<String, Integer> set = new HashMap<>();
+    return new ModifyAwareMap<>(set);
   }
 
   @Test
@@ -33,7 +36,7 @@ public class ModifyAwareSetTest {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(os);
 
-    oos.writeObject(createSet());
+    oos.writeObject(createMap());
     oos.flush();
     oos.close();
 
@@ -41,15 +44,15 @@ public class ModifyAwareSetTest {
     ObjectInputStream ois = new ObjectInputStream(is);
 
     @SuppressWarnings("unchecked")
-    ModifyAwareSet<String> read = (ModifyAwareSet<String>)ois.readObject();
-    assertThat(read).contains("A", "B", "C", "D", "E");
+    ModifyAwareMap<String, Integer> read = (ModifyAwareMap<String, Integer>) ois.readObject();
+    assertThat(read).containsKeys("A", "B", "C", "D", "E").containsValues(1, 2, 3, 4, 5);
   }
 
   @Test
   public void equalsWhenEqual() {
 
-    ModifyAwareSet<String> setA = createSet();
-    ModifyAwareSet<String> setB = createSet();
+    ModifyAwareMap<String, Integer> setA = createMap();
+    ModifyAwareMap<String, Integer> setB = createMap();
 
     assertThat(setA).isEqualTo(setB);
     assertThat(setA.hashCode()).isEqualTo(setB.hashCode());
@@ -58,9 +61,9 @@ public class ModifyAwareSetTest {
   @Test
   public void equalsWhenNotEqual() {
 
-    ModifyAwareSet<String> setA = createSet();
-    ModifyAwareSet<String> setB = createSet();
-    setB.add("F");
+    ModifyAwareMap<String, Integer> setA = createMap();
+    ModifyAwareMap<String, Integer> setB = createMap();
+    setB.put("F", 6);
 
     assertThat(setA).isNotEqualTo(setB);
     assertThat(setA.hashCode()).isNotEqualTo(setB.hashCode());
@@ -68,17 +71,17 @@ public class ModifyAwareSetTest {
 
   @Test
   public void testEqualsAndHashCode() throws Exception {
-    ModifyAwareSet<String> setA = createEmptySet();
-    HashSet<String> setB = new HashSet<>();
+    ModifyAwareMap<String, Integer> setA = createEmptyMap();
+    HashMap<String, Integer> setB = new HashMap<>();
 
     assertThat(setA).isEqualTo(setB);
     assertThat(setA.hashCode()).isEqualTo(setB.hashCode());
 
-    setA.add("foo");
+    setA.put("foo", 42);
     assertThat(setA).isNotEqualTo(setB);
     assertThat(setA.hashCode()).isNotEqualTo(setB.hashCode());
 
-    setB.add("foo");
+    setB.put("foo", 42);
     assertThat(setA).isEqualTo(setB);
     assertThat(setA.hashCode()).isEqualTo(setB.hashCode());
   }

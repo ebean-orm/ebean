@@ -66,7 +66,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
 
   @Override
   public int hashCode() {
-    return Objects.hash(set);
+    return set.hashCode();
   }
 
   @Override

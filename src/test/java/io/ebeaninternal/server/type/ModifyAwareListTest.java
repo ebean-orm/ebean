@@ -16,9 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class ModifyAwareListTest {
@@ -289,5 +287,22 @@ public class ModifyAwareListTest {
 
     assertThat(listA).isNotEqualTo(listB);
     assertThat(listA.hashCode()).isNotEqualTo(listB.hashCode());
+  }
+
+  @Test
+  public void testEqualsAndHashCode() throws Exception {
+    ModifyAwareList<String> listA = createEmptyList();
+    ArrayList<String> listB = new ArrayList<>();
+
+    assertThat(listA).isEqualTo(listB);
+    assertThat(listA.hashCode()).isEqualTo(listB.hashCode());
+
+    listA.add("foo");
+    assertThat(listA).isNotEqualTo(listB);
+    assertThat(listA.hashCode()).isNotEqualTo(listB.hashCode());
+
+    listB.add("foo");
+    assertThat(listA).isEqualTo(listB);
+    assertThat(listA.hashCode()).isEqualTo(listB.hashCode());
   }
 }

@@ -47,7 +47,7 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public int hashCode() {
-    return Objects.hash(list);
+    return list.hashCode();
   }
 
   @Override
