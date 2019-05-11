@@ -20,7 +20,7 @@ public class TestQueryFilterCaseInsensitive extends BaseTestCase {
     ResetBasicData.reset();
   }
 
-  @IgnorePlatform(Platform.MYSQL)
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER})
   @Test
   public void testEq() {
 
@@ -39,7 +39,7 @@ public class TestQueryFilterCaseInsensitive extends BaseTestCase {
     assertThat(customers).hasSize(1);
   }
 
-  @IgnorePlatform(Platform.MYSQL)
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER})
   @Test
   public void testNe() {
     List<Customer> customers = DB.find(Customer.class).where()

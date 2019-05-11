@@ -15,11 +15,16 @@ public class TestQueryOrderById extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .select("id,name")
+      .orderBy("id")
       .setFirstRow(1)
       .setMaxRows(5);
 
     query.findList();
-    assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 limit 5 offset 1");
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
+    } else {
+      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
+    }
   }
 
   @Test
@@ -32,6 +37,10 @@ public class TestQueryOrderById extends BaseTestCase {
       .orderById(true);
 
     query.findList();
-    assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
+    } else {
+      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
+    }
   }
 }

@@ -126,6 +126,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     Ebean.find(Order.class)
       .setFirstRow(10)
       .setMaxRows(10)
+      .orderBy("id")
       .findPagedList()
       .getList();
 

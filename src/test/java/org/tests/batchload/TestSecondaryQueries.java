@@ -54,7 +54,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status, t0.kcustomer_id from o_order t0 order by t0.id");
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status, t0.kcustomer_id from o_order t0");
     } else {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
     }
@@ -91,7 +91,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0 order by t0.id");
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0");
     } else {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status from o_order t0");
     }
