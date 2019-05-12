@@ -16,6 +16,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThatThrownBy;;
 
 public class TestExecuteComplete extends BaseTestCase {
 
@@ -24,53 +25,52 @@ public class TestExecuteComplete extends BaseTestCase {
   @Test
   public void execute_when_errorOnCommit_threadLocalIsCleared() {
 
-    try {
-      Ebean.execute(TxScope.required().setBatch(PersistBatch.ALL), () -> {
+    assertThatThrownBy(
+        () -> Ebean.execute(TxScope.required().setBatch(PersistBatch.ALL),
+            () -> {
+              Customer customer = Ebean.getReference(Customer.class, 42424242L);
+              Order order = new Order();
+              order.setCustomer(customer);
+              Ebean.save(order);
+            }
+        )
+    ).isInstanceOf(DataIntegrityException.class);
 
-        Customer customer = Ebean.getReference(Customer.class, 42424242L);
-        Order order = new Order();
-        order.setCustomer(customer);
-
-        Ebean.save(customer);
-      });
-    } catch (DataIntegrityException e) {
-      // assert the thread local has been cleaned up
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-      assertThat(txn).isNull();
-    }
+    // assert the thread local has been cleaned up
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
   }
 
   @ForPlatform(Platform.H2)
   @Test
   public void nestedExecute_when_errorOnCommit_threadLocalIsCleared() {
 
-    try {
-      Ebean.execute(TxScope.required().setBatch(PersistBatch.ALL), () ->
-        Ebean.execute(() -> {
+    assertThatThrownBy(
+        () -> Ebean.execute(TxScope.required().setBatch(PersistBatch.ALL),
+            () -> Ebean.execute(
+                () -> {
+                  Customer customer = Ebean.getReference(Customer.class, 42424242L);
+                  Order order = new Order();
+                  order.setCustomer(customer);
+                  Ebean.save(order);
+                }
+            )
+        )
+    ).isInstanceOf(DataIntegrityException.class);
 
-          Customer customer = Ebean.getReference(Customer.class, 42424242L);
-          Order order = new Order();
-          order.setCustomer(customer);
-
-          Ebean.save(customer);
-        }));
-    } catch (DataIntegrityException e) {
-      // assert the thread local has been cleaned up
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-      assertThat(txn).isNull();
-    }
+    // assert the thread local has been cleaned up
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
   }
 
   @ForPlatform(Platform.H2)
   @Test
   public void transactional_errorOnCommit_expect_threadScopeCleanup() {
 
-    try {
-      errorOnCommit();
-    } catch (DataIntegrityException e) {
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-      assertThat(txn).isNull();
-    }
+    assertThatThrownBy(this::errorOnCommit).isInstanceOf(DataIntegrityException.class);
+
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
   }
 
   @Transactional(batchSize = 10)
@@ -79,7 +79,7 @@ public class TestExecuteComplete extends BaseTestCase {
     Order order = new Order();
     order.setCustomer(customer);
 
-    Ebean.save(customer);
+    Ebean.save(order);
   }
 
   @ForPlatform(Platform.H2)
