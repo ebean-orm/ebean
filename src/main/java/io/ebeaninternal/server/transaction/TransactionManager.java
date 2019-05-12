@@ -211,10 +211,18 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   /**
-   * Set the transaction onto the scope.
+   * Wrap created transaction to a scoped transaction and set it to the scope. (ThreadLocal)
    */
-  public void set(SpiTransaction txn) {
-    scopeManager.set(txn);
+  public SpiTransaction wrapAsScopedTransaction(SpiTransaction transaction) {
+    ScopedTransaction scopedTxn = createScopedTransaction();
+    scopedTxn.push(new ScopeTrans(rollbackOnChecked, true, transaction, new TxScope()));
+    try {
+      scopeManager.set(scopedTxn);
+      return scopedTxn;
+    } catch (PersistenceException txnAlreadyExists) {
+      transaction.end();
+      throw txnAlreadyExists;
+    }
   }
 
   /**
@@ -571,9 +579,8 @@ public class TransactionManager implements SpiTransactionManager {
    * Begin an implicit transaction.
    */
   public SpiTransaction beginServerTransaction() {
-    SpiTransaction t = createTransaction(false, -1);
-    scopeManager.set(t);
-    return t;
+    SpiTransaction transaction = createTransaction(false, -1);
+    return wrapAsScopedTransaction(transaction);
   }
 
   /**
@@ -599,7 +606,7 @@ public class TransactionManager implements SpiTransactionManager {
    */
   @Override
   public ScopedTransaction externalBeginTransaction(SpiTransaction transaction, TxScope txScope) {
-    ScopedTransaction scopedTxn = new ScopedTransaction(scopeManager);
+    ScopedTransaction scopedTxn = createScopedTransaction();
     scopedTxn.push(new ScopeTrans(rollbackOnChecked, false, transaction, txScope));
     scopeManager.set(scopedTxn);
     return scopedTxn;
@@ -653,7 +660,7 @@ public class TransactionManager implements SpiTransactionManager {
 
     txnContainer.push(new ScopeTrans(rollbackOnChecked, createTransaction, transaction, txScope));
     if (setToScope) {
-      set(txnContainer);
+      scopeManager.set(txnContainer);
     }
     return txnContainer;
   }

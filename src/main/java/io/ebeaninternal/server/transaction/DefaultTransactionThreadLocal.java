@@ -1,19 +1,25 @@
 package io.ebeaninternal.server.transaction;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.PersistenceException;
+
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.transaction.TransactionMap.State;
 
 /**
  * Used to store Transactions in a ThreadLocal.
  */
 public final class DefaultTransactionThreadLocal {
 
-  private static final ThreadLocal<TransactionMap> local = new ThreadLocal<TransactionMap>() {
-    @Override
-    protected synchronized TransactionMap initialValue() {
-      return new TransactionMap();
-    }
-  };
+  // local stores a transaction per thread and server name.
+  // we must ensure, that after a commit/rollback or end, all stuck transactions
+  // we also use only maps from java.util, as these object may not trigger a
+  // class leaking issue in an application server if the maps are cleared by the
+  // leak detector
+  private static final ThreadLocal<Map<String, SpiTransaction>> local = new ThreadLocal<>();
+
+  private static final TransactionLeakDetector leakDetector = new TransactionLeakDetector();
 
   /**
    * Not allowed.
@@ -22,18 +28,60 @@ public final class DefaultTransactionThreadLocal {
   }
 
   /**
-   * Return the current TransactionState for a given serverName. This is for the
-   * local thread of course.
+   * Try to clean all stuck transactions and log them.
    */
-  private static TransactionMap.State getState(String serverName) {
-    return local.get().getStateWithCreate(serverName);
+  public static void shutdown() {
+    leakDetector.detectLeaks();
+  }
+
+
+  private static void expungeStaleMap(Map<String, SpiTransaction> map) {
+    if (map != null && map.isEmpty()) {
+
+      leakDetector.remove();
+
+      local.remove();
+    }
+  }
+
+  private static Map<String, SpiTransaction> createMap() {
+    Map<String, SpiTransaction> map = new HashMap<>();
+
+    leakDetector.set(map);
+
+    local.set(map);
+    return map;
   }
 
   /**
    * Set a new Transaction for this serverName and Thread.
    */
   public static void set(String serverName, SpiTransaction trans) {
-    getState(serverName).set(trans);
+    Map<String, SpiTransaction> map = local.get();
+    if (map == null) {
+      if (trans == null) {
+        return;
+      }
+    } else {
+      SpiTransaction existing = map.get(serverName);
+      if (existing != null) {
+        if (existing.isActive()) {
+          throw new PersistenceException("The existing transaction is still active?");
+        } else {
+          leakDetector.replaceTransaction(existing, trans);
+        }
+      }
+    }
+
+    if (trans == null) {
+      map.remove(serverName);
+      expungeStaleMap(map);
+    } else {
+      if (map == null) {
+        map = createMap();
+      }
+      map.put(serverName, trans);
+    }
   }
 
   /**
@@ -46,50 +94,64 @@ public final class DefaultTransactionThreadLocal {
    * </p>
    */
   public static void replace(String serverName, SpiTransaction trans) {
-    getState(serverName).replace(trans);
+    Map<String, SpiTransaction> map = local.get();
+    if (map == null && trans == null) {
+      return;
+    }
+
+    if (trans == null) {
+      map.remove(serverName);
+      expungeStaleMap(map);
+    } else {
+      if (map == null) {
+        map = createMap();
+      }
+      map.put(serverName, trans);
+    }
   }
 
   /**
    * Return the current Transaction for this serverName and Thread.
    */
   public static SpiTransaction get(String serverName) {
-    TransactionMap map = local.get();
-    State state = map.getState(serverName);
-    SpiTransaction t = (state == null) ? null : state.transaction;
-    if (map.isEmpty()) {
-      local.remove();
+    Map<String, SpiTransaction> map = local.get();
+    if (map == null) {
+      return null;
+    } else {
+      return map.get(serverName);
     }
-    return t;
   }
 
   /**
    * Commit the current transaction.
    */
   public static void commit(String serverName) {
-    TransactionMap map = local.get();
-    State state = map.removeState(serverName);
-    if (state == null) {
+    Map<String, SpiTransaction> map = local.get();
+    if (map == null) {
+      return;
+    }
+    SpiTransaction transaction = map.remove(serverName);
+    if (transaction == null) {
       throw new IllegalStateException("No current transaction for [" + serverName + "]");
     }
-    state.commit();
-    if (map.isEmpty()) {
-      local.remove();
-    }
+    transaction.commit();
+    expungeStaleMap(map);
   }
 
   /**
    * Rollback the current transaction.
    */
   public static void rollback(String serverName) {
-    TransactionMap map = local.get();
-    State state = map.removeState(serverName);
-    if (state == null) {
+    Map<String, SpiTransaction> map = local.get();
+    if (map == null) {
+      return;
+    }
+    SpiTransaction transaction = map.remove(serverName);
+    if (transaction == null) {
       throw new IllegalStateException("No current transaction for [" + serverName + "]");
     }
-    state.rollback();
-    if (map.isEmpty()) {
-      local.remove();
-    }
+    transaction.rollback();
+    expungeStaleMap(map);
   }
 
   /**
@@ -112,15 +174,15 @@ public final class DefaultTransactionThreadLocal {
    * </pre>
    */
   public static void end(String serverName) {
-
-    TransactionMap map = local.get();
-    State state = map.removeState(serverName);
-    if (state != null) {
-      state.end();
+    Map<String, SpiTransaction> map = local.get();
+    if (map == null) {
+      return;
     }
-    if (map.isEmpty()) {
-      local.remove();
+    SpiTransaction transaction = map.remove(serverName);
+    if (transaction != null) {
+      transaction.end();
     }
+    expungeStaleMap(map);
   }
 
 }

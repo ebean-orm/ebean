@@ -5,6 +5,9 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,9 @@ public class TestTransactionalSupports extends BaseTestCase {
     } finally {
       Ebean.endTransaction();
     }
+
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
   }
 
   @Test
@@ -47,6 +53,9 @@ public class TestTransactionalSupports extends BaseTestCase {
 
     int got = new SomeTransactionalWithSupportsAndSave().doStuff();
     assertThat(got).isEqualTo(42);
+
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
   }
 
   class SomeTransactionalWithSupports {
