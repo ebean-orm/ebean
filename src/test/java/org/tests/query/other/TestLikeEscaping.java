@@ -40,7 +40,7 @@ public class TestLikeEscaping extends TransactionalTestCase {
         .where().startsWith("name", "_").findCount()
     ).isEqualTo(1);
 
-    if (!isMySql()) {
+    if (isPlatformCaseSensitive()) {
       assertThat(DB.find(Customer.class)
         .where().startsWith("name", "_u").findCount()
       ).isEqualTo(0);
@@ -50,7 +50,7 @@ public class TestLikeEscaping extends TransactionalTestCase {
         .where().istartsWith("name", "_U").findCount()
     ).isEqualTo(1);
 
-    if (!isMySql()) {
+    if (isPlatformCaseSensitive()) {
       assertThat(DB.find(Customer.class)
         .where().startsWith("shippingAddress.line1", "|p").findCount()
       ).isEqualTo(0);
