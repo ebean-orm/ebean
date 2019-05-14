@@ -132,7 +132,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     syncRegistry.registerInterposedSynchronization(txnListener);
 
     // also put in Ebean ThreadLocal
-    transactionManager.scope().set(newTrans);
+    transactionManager.set(newTrans);
     return newTrans;
   }
 

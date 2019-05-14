@@ -211,18 +211,10 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   /**
-   * Wrap created transaction to a scoped transaction and set it to the scope. (ThreadLocal)
+   * Set the transaction onto the scope.
    */
-  public SpiTransaction wrapAsScopedTransaction(SpiTransaction transaction) {
-    ScopedTransaction scopedTxn = createScopedTransaction();
-    scopedTxn.push(new ScopeTrans(rollbackOnChecked, true, transaction, new TxScope()));
-    try {
-      scopeManager.set(scopedTxn);
-      return scopedTxn;
-    } catch (PersistenceException txnAlreadyExists) {
-      transaction.end();
-      throw txnAlreadyExists;
-    }
+  public void set(SpiTransaction txn) {
+    scopeManager.set(txn);
   }
 
   /**
