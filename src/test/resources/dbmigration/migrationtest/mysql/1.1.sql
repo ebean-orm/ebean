@@ -39,6 +39,8 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic alter status set default 'A';
 alter table migtest_e_basic modify status varchar(1) not null;
+alter table migtest_e_basic alter status2 drop default;
+alter table migtest_e_basic modify status2 varchar(127);
 
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
