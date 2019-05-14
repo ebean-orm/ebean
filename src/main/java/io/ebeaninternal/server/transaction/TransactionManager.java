@@ -258,6 +258,7 @@ public class TransactionManager implements SpiTransactionManager {
     if (shutdownDataSource) {
       dataSourceSupplier.shutdown(deregisterDriver);
     }
+    scopeManager.shutdown();
   }
 
   public boolean isDocStoreActive() {
@@ -392,6 +393,12 @@ public class TransactionManager implements SpiTransactionManager {
 
     } catch (Exception ex) {
       logger.error("Error while notifying TransactionEventListener of rollback event", ex);
+    }
+  }
+
+  public void notifyOfDeactivate(SpiTransaction transaction) {
+    if (scopeManager.getInScope() == transaction) {
+      scopeManager.replace(null);
     }
   }
 
@@ -579,8 +586,9 @@ public class TransactionManager implements SpiTransactionManager {
    * Begin an implicit transaction.
    */
   public SpiTransaction beginServerTransaction() {
-    SpiTransaction transaction = createTransaction(false, -1);
-    return wrapAsScopedTransaction(transaction);
+    SpiTransaction t = createTransaction(false, -1);
+    scopeManager.set(t);
+    return t;
   }
 
   /**

@@ -920,6 +920,9 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
     connection = null;
     active = false;
+    if (manager != null) {
+      manager.notifyOfDeactivate(this);;
+    }
     profileEnd();
   }
 

@@ -3,8 +3,6 @@ package io.ebeaninternal.server.lib;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.ClassUtil;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,9 +154,6 @@ public final class ShutdownManager {
           ex.printStackTrace();
         }
       }
-
-      // Shut down the threadLocals and try to clean up pending txns.
-      DefaultTransactionThreadLocal.shutdown();
 
       if ("true".equalsIgnoreCase(System.getProperty("ebean.datasource.deregisterAllDrivers", "false"))) {
         deregisterAllJdbcDrivers();

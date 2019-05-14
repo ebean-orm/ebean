@@ -10,7 +10,8 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
+import io.ebeaninternal.server.core.DefaultServer;
+import io.ebeaninternal.server.transaction.TransactionManager;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +26,10 @@ import java.util.List;;
 
 public class TestExecuteComplete extends BaseTestCase {
 
+  private SpiTransaction currentTransaction() {
+    DefaultServer srv = (DefaultServer) server();
+    return ((TransactionManager)(srv.getTransactionManager())).scope().getInScope();
+  }
 
   @ForPlatform(Platform.H2)
   @Test
@@ -42,7 +47,7 @@ public class TestExecuteComplete extends BaseTestCase {
     ).isInstanceOf(DataIntegrityException.class);
 
     // assert the thread local has been cleaned up
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn = currentTransaction();
     assertThat(txn).isNull();
   }
 
@@ -64,7 +69,7 @@ public class TestExecuteComplete extends BaseTestCase {
     ).isInstanceOf(DataIntegrityException.class);
 
     // assert the thread local has been cleaned up
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn = currentTransaction();
     assertThat(txn).isNull();
   }
 
@@ -74,7 +79,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
     assertThatThrownBy(this::errorOnCommit).isInstanceOf(DataIntegrityException.class);
 
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn = currentTransaction();
     assertThat(txn).isNull();
   }
 
@@ -98,7 +103,7 @@ public class TestExecuteComplete extends BaseTestCase {
       txn1.end();
     }
 
-    SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn2 = currentTransaction();
     assertThat(txn2).isNull();
   }
 
@@ -114,7 +119,7 @@ public class TestExecuteComplete extends BaseTestCase {
       //txn1.end();
     }
 
-    SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn2 = currentTransaction();
     assertThat(txn2).isNull();
   }
 
@@ -130,7 +135,7 @@ public class TestExecuteComplete extends BaseTestCase {
       //txn1.end();
     }
 
-    SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn2 = currentTransaction();
     assertThat(txn2).isNull();
   }
 
@@ -142,7 +147,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
     assertThatThrownBy(this::errorOnOOM).isInstanceOf(OutOfMemoryError.class);
 
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn = currentTransaction();
     assertThat(txn).isNull();
   }
 
@@ -165,7 +170,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
     Transaction txn1 = server().beginTransaction();
 
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    Transaction txn = currentTransaction();
     assertThat(txn).isNotNull();
   }
 }

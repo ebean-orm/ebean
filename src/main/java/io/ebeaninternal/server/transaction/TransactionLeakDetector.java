@@ -31,7 +31,7 @@ import io.ebeaninternal.api.SpiTransaction;
  */
 class TransactionLeakDetector {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultTransactionThreadLocal.class);
+  private static final Logger logger = LoggerFactory.getLogger(TransactionLeakDetector.class);
 
   private boolean detectTransactionLeaks = Boolean.getBoolean("ebean.detectTransactionLeaks");
 
@@ -42,18 +42,18 @@ class TransactionLeakDetector {
   private boolean foundLeak;
 
   private static class TransactionLeakInfo {
-    private Map<String, SpiTransaction> map;
+    private Object[] holder;
     private Exception origin = new Exception();
     private String threadName;
 
-    private TransactionLeakInfo(String threadName, Map<String, SpiTransaction> map) {
+    private TransactionLeakInfo(String threadName, Object[] holder) {
       this.threadName = threadName;
-      this.map = map;
+      this.holder = holder;
     }
 
     private void process() {
-      logger.error("transaction leak(s): {}, created by thread {}", map, threadName, origin);
-      map.clear();
+      logger.error("transaction leak: {}, created by thread {}", holder[0], threadName, origin);
+      holder[0] = null;
     }
   }
 
@@ -65,10 +65,10 @@ class TransactionLeakDetector {
     }
   }
 
-  void set(Map<String, SpiTransaction> map) {
+  void set(Object[] holder) {
     if (detectTransactionLeaks) {
       String threadName = Thread.currentThread().getName();
-      txnLeakInfos.put(threadName, new TransactionLeakInfo(threadName, map));
+      txnLeakInfos.put(threadName, new TransactionLeakInfo(threadName, holder));
     } else {
       counter.increment();
     }
@@ -88,7 +88,7 @@ class TransactionLeakDetector {
     } else if (foundLeak) {
       logger.error("Threre was at least one transaction leak found. Check the log.");
     } else {
-      logger.debug("No transaction leaks detected");
+      logger.info("No transaction leaks detected");
       return false;
     }
     txnLeakInfos.clear();

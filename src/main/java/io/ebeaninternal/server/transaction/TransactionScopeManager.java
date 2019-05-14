@@ -20,6 +20,11 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void register(TransactionManager manager);
 
   /**
+   * Shutdown the TransactionScopeManager and free all resources.
+   */
+  public abstract void shutdown();
+
+  /**
    * Return the current Transaction from internal Ebean scope.
    */
   public abstract SpiTransaction getInScope();
