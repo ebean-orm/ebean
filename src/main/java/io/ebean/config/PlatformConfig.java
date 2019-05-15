@@ -52,6 +52,8 @@ public class PlatformConfig {
    */
   private boolean databaseInetAddressVarchar;
 
+  private boolean caseSensitiveCollation = true;
+
   /**
    * Modify the default mapping of standard types such as default precision for DECIMAL etc.
    */
@@ -74,6 +76,7 @@ public class PlatformConfig {
     this.idType = platformConfig.idType;
     this.geometrySRID = platformConfig.geometrySRID;
     this.dbUuid = platformConfig.dbUuid;
+    this.caseSensitiveCollation = platformConfig.caseSensitiveCollation;
   }
 
   /**
@@ -88,6 +91,20 @@ public class PlatformConfig {
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;
+  }
+
+  /**
+   * Return true if the collation is case sensitive.
+   */
+  public boolean isCaseSensitiveCollation() {
+    return caseSensitiveCollation;
+  }
+
+  /**
+   * Set to false to indicate that the collation is case insensitive.
+   */
+  public void setCaseSensitiveCollation(boolean caseSensitiveCollation) {
+    this.caseSensitiveCollation = caseSensitiveCollation;
   }
 
   /**
@@ -255,6 +272,7 @@ public class PlatformConfig {
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databaseInetAddressVarchar = p.getBoolean("databaseInetAddressVarchar", databaseInetAddressVarchar);
+    caseSensitiveCollation = p.getBoolean("caseSensitiveCollation", caseSensitiveCollation);
 
     DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
     if (dbUuid != null) {

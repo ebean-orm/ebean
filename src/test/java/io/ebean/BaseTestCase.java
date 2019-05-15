@@ -127,7 +127,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformCaseSensitive() {
-    return !isMySql() && !isSqlServer();
+    return spiEbeanServer().getDatabasePlatform().isCaseSensitiveCollation();
   }
 
   /**
