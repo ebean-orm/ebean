@@ -13,8 +13,9 @@ public class ExternalTransactionScopeManager extends DefaultTransactionScopeMana
   /**
    * Instantiates  transaction scope manager.
    */
-  public ExternalTransactionScopeManager(String serverName, ExternalTransactionManager externalManager) {
-    super(serverName);
+  public ExternalTransactionScopeManager(String serverName, TransactionLeakDetector leakDetector,
+      ExternalTransactionManager externalManager) {
+    super(serverName, leakDetector);
     this.externalManager = externalManager;
   }
 
@@ -25,6 +26,7 @@ public class ExternalTransactionScopeManager extends DefaultTransactionScopeMana
 
   @Override
   public SpiTransaction getActive() {
+    // Note: the externalManager is responsible to set the transaction in transaction manager
     return (SpiTransaction) externalManager.getCurrentTransaction();
   }
 

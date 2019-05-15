@@ -29,11 +29,11 @@ import io.ebeaninternal.api.SpiTransaction;
  * @author Roland Praml, FOCONIS AG
  *
  */
-class TransactionLeakDetector {
+public class TransactionLeakDetector {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionLeakDetector.class);
 
-  private boolean detectTransactionLeaks = Boolean.getBoolean("ebean.detectTransactionLeaks");
+  private final boolean details;
 
   private final Map<String, TransactionLeakInfo> txnLeakInfos = new ConcurrentHashMap<>();
 
@@ -41,32 +41,40 @@ class TransactionLeakDetector {
 
   private boolean foundLeak;
 
+  public TransactionLeakDetector(boolean details) {
+    this.details = details;
+  }
+
   private static class TransactionLeakInfo {
     private Object[] holder;
-    private Exception origin = new Exception();
+    private Throwable origin;
     private String threadName;
 
     private TransactionLeakInfo(String threadName, Object[] holder) {
       this.threadName = threadName;
       this.holder = holder;
+      this.origin = new Throwable("Origin of transaction leak:");
     }
 
     private void process() {
-      logger.error("transaction leak: {}, created by thread {}", holder[0], threadName, origin);
+      logger.error("transaction leak: '{}', created by '{}' ", holder[0], threadName, origin);
       holder[0] = null;
     }
   }
 
   void remove() {
-    if (detectTransactionLeaks) {
+    if (details) {
       txnLeakInfos.remove(Thread.currentThread().getName());
     } else {
       counter.decrement();
     }
   }
 
-  void set(Object[] holder) {
-    if (detectTransactionLeaks) {
+  void set(Object[] old, Object[] holder) {
+    if (old != null) {
+      checkLeak((SpiTransaction)old[0], (SpiTransaction)holder[0]);
+    }
+    if (details) {
       String threadName = Thread.currentThread().getName();
       txnLeakInfos.put(threadName, new TransactionLeakInfo(threadName, holder));
     } else {
@@ -75,20 +83,45 @@ class TransactionLeakDetector {
   }
 
   /**
+   * Check if we replace an old transaction (which is not the NoTransaction)
+   */
+  private void checkLeak(SpiTransaction oldTrans, SpiTransaction newTrans) {
+    if (oldTrans == null) {
+      return;
+    } else if (oldTrans instanceof NoTransaction) {
+      return;
+    } else if (oldTrans instanceof ScopedTransaction) {
+      ScopedTransaction scopedTrans = (ScopedTransaction) oldTrans;
+      if (scopedTrans.current() instanceof NoTransaction) {
+        return;
+      }
+    }
+    logger.error("Possible transaction leak: Replacing {} with {}", oldTrans, newTrans);
+    foundLeak = true;
+    if (details) {
+      TransactionLeakInfo leakInfo = txnLeakInfos.get(Thread.currentThread().getName());
+      if (leakInfo != null) {
+        leakInfo.process();
+      }
+    }
+  }
+
+  /**
    * Try to clean all stuck transactions and log them.
    *
    * Returns true, if transaction leaks were found.
    */
-  boolean detectLeaks() {
+  boolean detectLeaks(String servername) {
     if (!txnLeakInfos.isEmpty()) {
-      logger.error("There are transaction leaks. Trying to clean them up");
+      logger.error("There are transaction leaks in '{}'. Trying to clean them up", servername);
       txnLeakInfos.values().forEach(TransactionLeakInfo::process);
-    } else if (counter.sum() > 0) {
-      logger.error("There are {} transaction leaks, but detection is disabled", counter);
+    } else if (counter.sum() != 0) {
+      // if the counter is negative, this means we have an error in the code
+      logger.error("{} transaction leak(s) found in '{}'. Enable TransactionLeakDetection.DETAIL for more infos", counter, servername);
     } else if (foundLeak) {
-      logger.error("Threre was at least one transaction leak found. Check the log.");
+      logger.error("Threre was at least one transaction leak found in '{}'. Check the log.", servername);
     } else {
-      logger.info("No transaction leaks detected");
+      logger.info("No transaction leaks detected in '{}'", servername);
       return false;
     }
     txnLeakInfos.clear();
@@ -97,30 +130,4 @@ class TransactionLeakDetector {
     return true;
   }
 
-  /**
-   * Detects possible transaction leaks when replacing an existing transaction.
-   *
-   * If an existing inactive transaction (which is not the NoTransaction) should
-   * be replaced by a new transaction, this means the existing transaction was not
-   * ended correctly.
-   */
-  void replaceTransaction(SpiTransaction existing, SpiTransaction newTransaction) {
-    if (newTransaction == null) {
-      return; // replacing with empty is always allowed
-    }
-    if (existing instanceof ScopedTransaction) {
-      if (((ScopedTransaction)existing).current() instanceof NoTransaction) {
-        // the NoTransaction was never active. So this would be OK, if we
-        // replace that completely
-        return;
-      }
-    }
-    foundLeak = true;
-    if (detectTransactionLeaks) {
-      TransactionLeakInfo leak = txnLeakInfos.get(Thread.currentThread().getName());
-      logger.error("Found a transaction leak: {} Origin: ", existing, leak == null ? null : leak.origin);
-    } else {
-      logger.error("Found a transaction leak: {}, enable detection for more infos.", existing);
-    }
-  }
 }

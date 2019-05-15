@@ -79,6 +79,7 @@ import io.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import io.ebeaninternal.server.transaction.JtaTransactionManager;
 import io.ebeaninternal.server.transaction.NoopProfileHandler;
 import io.ebeaninternal.server.transaction.TableModState;
+import io.ebeaninternal.server.transaction.TransactionLeakDetector;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.transaction.TransactionManagerOptions;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
@@ -488,6 +489,20 @@ public class InternalConfiguration {
   }
 
   /**
+   * Create the leak detector to detect non closed transactions.
+   */
+  private TransactionLeakDetector createTransactionLeakDetector() {
+    switch (serverConfig.getTransactionLeakDetection()) {
+    case COUNTER:
+      return new TransactionLeakDetector(false);
+    case DETAIL:
+      return new TransactionLeakDetector(true);
+    default:
+      return null;
+    }
+  }
+
+  /**
    * Create the TransactionScopeManager taking into account JTA or external transaction manager.
    */
   private TransactionScopeManager createTransactionScopeManager() {
@@ -496,11 +511,12 @@ public class InternalConfiguration {
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
       externalTransactionManager = new JtaTransactionManager();
     }
+    TransactionLeakDetector leakDetector = createTransactionLeakDetector();
     if (externalTransactionManager != null) {
       logger.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
-      return new ExternalTransactionScopeManager(serverConfig.getName(), externalTransactionManager);
+      return new ExternalTransactionScopeManager(serverConfig.getName(), leakDetector, externalTransactionManager);
     } else {
-      return new DefaultTransactionScopeManager(serverConfig.getName());
+      return new DefaultTransactionScopeManager(serverConfig.getName(), leakDetector);
     }
   }
 

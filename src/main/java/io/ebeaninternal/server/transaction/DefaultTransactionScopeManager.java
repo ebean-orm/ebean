@@ -14,10 +14,11 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   // adopted from here https://bugzilla.mozilla.org/show_bug.cgi?id=281067#c5
   private ThreadLocal<Object[]> local = new ThreadLocal<>();
 
-  private TransactionLeakDetector leakDetector = new TransactionLeakDetector();
+  private final TransactionLeakDetector leakDetector;
 
-  public DefaultTransactionScopeManager(String serverName) {
+  public DefaultTransactionScopeManager(String serverName, TransactionLeakDetector leakDetector) {
     super(serverName);
+    this.leakDetector = leakDetector;
   }
 
   @Override
@@ -69,7 +70,7 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
       return;
     } else if (currentTrans == null || !currentTrans.isActive()) {
       replace(trans);
-    } else {
+    } else if (trans != currentTrans) { // compare identity
       throw new PersistenceException("The existing transaction is still active?");
     }
   }
@@ -80,19 +81,25 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   private void setInternal(SpiTransaction trans) {
     Object[] obj  = new Object[1];
     obj[0] = trans;
-    leakDetector.set(obj);
+    if (leakDetector != null) {
+      leakDetector.set(local.get(), obj);
+    }
     local.set(obj);
   }
 
   private void removeInternal() {
-    leakDetector.remove();
     local.remove();
+    if (leakDetector != null) {
+      leakDetector.remove();
+    }
   }
 
   @Override
   public void shutdown() {
-    leakDetector.detectLeaks();
     local = null;
+    if (leakDetector != null) {
+      leakDetector.detectLeaks(serverName);
+    }
   }
 
 }

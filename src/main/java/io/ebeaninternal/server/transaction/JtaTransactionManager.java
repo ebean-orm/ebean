@@ -116,6 +116,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
       if (logger.isDebugEnabled()) {
         logger.debug("JTA Transaction - no current txn");
       }
+      transactionManager.set(null);
       return null;
     }
 
