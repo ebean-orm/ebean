@@ -70,4 +70,9 @@ public class PropertyEvalTest {
 		System.clearProperty("one");
 		System.clearProperty("two");
 	}
+
+	@Test
+	public void eval_emptyExpression() {
+	  assertEquals("empty placeholder ${}", PropertyEval.eval("empty placeholder ${}"));
+	}
 }

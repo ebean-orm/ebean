@@ -27,6 +27,8 @@ public class LoaderTest {
     assertEquals("fromProperties", properties.getProperty("app.fromProperties"));
     assertEquals("Two", properties.getProperty("app.two"));
 
+    assertEquals("this contains ${} empty placeholder", properties.getProperty("app.emptyPlaceholder"));
+
     assertEquals("bart", properties.getProperty("eval.withDefault"));
     assertEquals(userName, properties.getProperty("eval.name"));
     assertEquals(userHome + "/after", properties.getProperty("eval.home"));
