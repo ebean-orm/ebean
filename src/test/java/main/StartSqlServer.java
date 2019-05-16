@@ -17,6 +17,8 @@ public class StartSqlServer {
     // when changing to a CI collation also use
     // ebean.sqlserver.caseSensitiveCollation=false
     // ... such that tests now take that into account
+
+    //config.setCollation("default");
     //config.setCollation("Latin1_General_100_CI");
 
     SqlServerContainer container = new SqlServerContainer(config);
