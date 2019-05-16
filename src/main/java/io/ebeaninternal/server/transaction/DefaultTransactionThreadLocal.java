@@ -8,12 +8,7 @@ import io.ebeaninternal.server.transaction.TransactionMap.State;
  */
 public final class DefaultTransactionThreadLocal {
 
-  private static final ThreadLocal<TransactionMap> local = new ThreadLocal<TransactionMap>() {
-    @Override
-    protected synchronized TransactionMap initialValue() {
-      return new TransactionMap();
-    }
-  };
+  private static final ThreadLocal<TransactionMap> local = ThreadLocal.withInitial(TransactionMap::new);
 
   /**
    * Not allowed.
@@ -121,6 +116,15 @@ public final class DefaultTransactionThreadLocal {
     if (map.isEmpty()) {
       local.remove();
     }
+  }
+
+  /**
+   * This is for testing purposes only. It will return TRUE, if a TransactionLocal has stuck.
+   */
+  public static boolean clear() {
+    boolean ret = local.get() != null;
+    local.remove();
+    return ret;
   }
 
 }

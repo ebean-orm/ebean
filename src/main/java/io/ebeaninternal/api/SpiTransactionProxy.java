@@ -325,7 +325,7 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
 
   @Override
   public void depth(int diff) {
-    transaction.depth();
+    transaction.depth(diff);
   }
 
   @Override
