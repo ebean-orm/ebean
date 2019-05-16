@@ -46,11 +46,11 @@ CREATE OR ALTER PROCEDURE usp_ebean_drop_default_constraint @tableName nvarchar(
 AS SET NOCOUNT ON
 declare @tmp nvarchar(1000)
 BEGIN
-  select @Tmp = t1.name from sys.default_constraints t1
+  select @tmp = t1.name from sys.default_constraints t1
     join sys.columns t2 on t1.object_id = t2.default_object_id
     where t1.parent_object_id = OBJECT_ID(@tableName) and t2.name = @columnName;
 
-  if @Tmp is not null EXEC('alter table ' + @tableName +' drop constraint ' + @tmp);
+  if @tmp is not null EXEC('alter table ' + @tableName +' drop constraint ' + @tmp);
 END
 $$
 
