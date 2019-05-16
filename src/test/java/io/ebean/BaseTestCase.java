@@ -126,6 +126,10 @@ public abstract class BaseTestCase {
     return sql;
   }
 
+  public boolean isPlatformCaseSensitive() {
+    return spiEbeanServer().getDatabasePlatform().isCaseSensitiveCollation();
+  }
+
   /**
    * MS SQL Server does not allow setting explicit values on identity columns
    * so tests that do this need to be skipped for SQL Server.

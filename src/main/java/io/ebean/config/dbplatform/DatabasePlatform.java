@@ -71,6 +71,8 @@ public class DatabasePlatform {
    */
   protected boolean allQuotedIdentifiers;
 
+  protected boolean caseSensitiveCollation = true;
+
   /**
    * For limit/offset, row_number etc limiting of SQL queries.
    */
@@ -226,6 +228,7 @@ public class DatabasePlatform {
    */
   public void configure(PlatformConfig config) {
     this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
+    this.caseSensitiveCollation = config.isCaseSensitiveCollation();
     configureIdType(config.getIdType());
     configure(config, config.isAllQuotedIdentifiers());
   }
@@ -313,6 +316,16 @@ public class DatabasePlatform {
    */
   public boolean isSupportsDeleteTableAlias() {
     return supportsDeleteTableAlias;
+  }
+
+  /**
+   * Return true if the collation is case sensitive.
+   * <p>
+   * This is expected to be used for testing only.
+   * </p>
+   */
+  public boolean isCaseSensitiveCollation() {
+    return caseSensitiveCollation;
   }
 
   /**

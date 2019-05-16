@@ -132,10 +132,13 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     Query<Customer> query = Ebean.createQuery(Customer.class);
     query.setMaxRows(10);
     query.setFirstRow(3);
+    if (isSqlServer()) {
+      query.orderBy("id");
+    }
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).endsWith("from o_customer t0 offset 3 rows fetch next 10 rows only");
+      assertThat(query.getGeneratedSql()).endsWith("from o_customer t0 order by t0.id offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
       assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
       assertThat(query.getGeneratedSql()).contains("where rn_ > 3");

@@ -596,7 +596,7 @@ public class EqlParserTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = parse("limit 10 offset 5");
+    Query<Customer> query = parse("order by name limit 10 offset 5");
     query.findList();
     if (isH2()) {
       assertThat(query.getGeneratedSql()).contains(" limit 10 offset 5");

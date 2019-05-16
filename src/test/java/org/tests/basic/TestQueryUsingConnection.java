@@ -3,6 +3,8 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
@@ -32,6 +34,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
     }
   }
 
+  @IgnorePlatform(Platform.SQLSERVER)
   @Test
   public void usingTransaction() {
 

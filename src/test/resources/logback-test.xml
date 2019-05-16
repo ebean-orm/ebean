@@ -73,13 +73,10 @@
   </root>
 
 
-  <logger name="io.ebeaninternal.dbmigration.DdlGenerator" level="TRACE"/>
-  <logger name="org.avaje.dbmigration.ddl" level="TRACE"/>
-
   <logger name="org.tests" level="INFO"/>
   <logger name="io.ebean" level="INFO"/>
 
-  <!--<logger name="org.avaje.docker" level="TRACE"/>-->
+  <logger name="io.ebean.docker" level="TRACE"/>
   <!--<logger name="io.ebean.DDL" level="DEBUG"/>-->
 
 <!--  <logger name="io.ebean.SQL" level="TRACE"/>-->
