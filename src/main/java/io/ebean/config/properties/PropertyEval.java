@@ -59,6 +59,9 @@ final class PropertyEval {
 	 */
 	private static String evaluateExpression(String exp) {
 
+    if (exp.isEmpty()) {
+      return null;
+    }
 		if (isJndiExpression(exp)) {
 			// JNDI property lookup...
 			String val = getJndiProperty(exp);
