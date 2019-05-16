@@ -12,28 +12,14 @@ import io.ebean.annotation.Transactional;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
 
-import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.StrictAssertions.assertThatThrownBy;
 
 public class TestExecuteComplete extends BaseTestCase {
-
-  @Rule public TestName name = new TestName();
-
-  @After
-  public void checkForLeak() {
-    if (DefaultTransactionThreadLocal.clear()) {
-      System.out.println(name.getMethodName() + " had stuck transactionmap.");
-    } else {
-      System.out.println(name.getMethodName() + " cleared everything.");
-    }
-  }
 
   @ForPlatform(Platform.H2)
   @Test
