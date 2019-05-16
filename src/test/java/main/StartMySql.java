@@ -3,7 +3,7 @@ package main;
 import io.ebean.docker.commands.MySqlConfig;
 import io.ebean.docker.commands.MySqlContainer;
 
-public class StartMyServer {
+public class StartMySql {
 
   public static void main(String[] args) {
 
