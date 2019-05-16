@@ -840,6 +840,7 @@ public class BaseTableDdl implements TableDdl {
 
   /**
    * This is mysql specific - alter all the base attributes of the column together.
+   * Will be called, if there is a type, dbdefault or notnull change.
    */
   protected void alterColumnBaseAttributes(DdlWrite writer, AlterColumn alter) throws IOException {
 

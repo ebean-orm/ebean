@@ -20,6 +20,11 @@ alter table migtest_fk_none_via_join drop foreign key fk_migtest_fk_none_via_joi
 alter table migtest_fk_set_null drop foreign key fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null;
 alter table migtest_e_basic alter status drop default;
+alter table migtest_e_basic modify status varchar(1);
+
+update migtest_e_basic set status2 = 'N' where status2 is null;
+alter table migtest_e_basic alter status2 set default 'N';
+alter table migtest_e_basic modify status2 varchar(1) not null;
 alter table migtest_e_basic drop index uq_migtest_e_basic_description;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
@@ -38,6 +43,7 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
 alter table migtest_e_history comment = '';
 alter table migtest_e_history2 alter test_string drop default;
+alter table migtest_e_history2 modify test_string varchar(255);
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
@@ -46,6 +52,7 @@ alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
 alter table migtest_e_history4 modify test_number integer;
 alter table migtest_e_history4_history modify test_number integer;
 alter table migtest_e_history6 alter test_number1 drop default;
+alter table migtest_e_history6 modify test_number1 integer;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;

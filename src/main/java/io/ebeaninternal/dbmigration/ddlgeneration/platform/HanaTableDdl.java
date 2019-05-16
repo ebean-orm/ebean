@@ -30,10 +30,7 @@ public class HanaTableDdl extends BaseTableDdl {
 
   @Override
   protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) throws IOException {
-    String ddl = platformDdl.alterColumnBaseAttributes(alter);
-    if (hasValue(ddl)) {
-      writer.apply().append(ddl).endOfStatement();
-    }
+    // done in alterColumnBaseAttributes
   }
 
   @Override

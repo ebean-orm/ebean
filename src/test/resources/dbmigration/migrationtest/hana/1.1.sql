@@ -39,8 +39,15 @@ exec 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status';
 end;
 $$;
 alter table migtest_e_basic alter ( status nvarchar(1) default 'A' not null);
-alter table migtest_e_basic alter ( status nvarchar(1) default 'A' not null);
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 397 begin end;
+exec 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2';
+end;
+$$;
+alter table migtest_e_basic alter ( status2 nvarchar(127) default null);
 
 -- rename all collisions;
 -- cannot create unique index "uq_migtest_e_basic_description" on table "migtest_e_basic" with nullable columns;
@@ -90,7 +97,6 @@ alter table migtest_e_history2 drop system versioning /* 0 */;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter ( test_string nvarchar(255) default 'unknown' not null);
-alter table migtest_e_history2 alter ( test_string nvarchar(255) default 'unknown' not null);
 alter table migtest_e_history2_history alter ( test_string nvarchar(255) default 'unknown' not null);
 alter table migtest_e_history2 add system versioning history table migtest_e_history2_history not validated /* 1 */;
 alter table migtest_e_history2 drop system versioning /* 2 */;
@@ -117,7 +123,6 @@ alter table migtest_e_history6 drop system versioning /* 10 */;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-alter table migtest_e_history6 alter ( test_number1 integer default 42 not null);
 alter table migtest_e_history6 alter ( test_number1 integer default 42 not null);
 alter table migtest_e_history6_history alter ( test_number1 integer default 42 not null);
 alter table migtest_e_history6 add system versioning history table migtest_e_history6_history not validated /* 11 */;

@@ -57,6 +57,7 @@ create table migtest_fk_set_null (
 create table migtest_e_basic (
   id                            integer auto_increment not null,
   status                        varchar(1),
+  status2                       varchar(1) default 'N' not null,
   name                          varchar(127),
   description                   varchar(127),
   some_date                     datetime(6),

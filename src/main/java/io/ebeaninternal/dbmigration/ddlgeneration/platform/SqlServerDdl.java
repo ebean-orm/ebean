@@ -149,7 +149,10 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
-    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+    if (alter.getType() == null
+        && alter.isNotnull() == null) {
+      // No type change or notNull change
+      // defaultValue change already handled in alterColumnDefaultValue
       return null;
     }
     String tableName = alter.getTableName();
