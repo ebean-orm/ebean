@@ -20,6 +20,11 @@
           <img width="222px" src="https://ebean.io/images/logo-med-principal.png">
         </a>
       </td>
+      <td align="center" valign="middle">
+        <a href="https://timerbe.de" target="_blank">
+          <img width="222px" src="https://ebean.io/images/logo-timerbee.png">
+        </a>
+      </td>
     </tr>
   </tbody>
 </table>
