@@ -16,6 +16,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class TestExecuteComplete extends BaseTestCase {
 
@@ -31,8 +32,9 @@ public class TestExecuteComplete extends BaseTestCase {
         Order order = new Order();
         order.setCustomer(customer);
 
-        Ebean.save(customer);
+        Ebean.save(order);
       });
+      assertTrue(false);
     } catch (DataIntegrityException e) {
       // assert the thread local has been cleaned up
       SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
@@ -52,7 +54,7 @@ public class TestExecuteComplete extends BaseTestCase {
           Order order = new Order();
           order.setCustomer(customer);
 
-          Ebean.save(customer);
+          Ebean.save(order);
         }));
     } catch (DataIntegrityException e) {
       // assert the thread local has been cleaned up
@@ -79,7 +81,7 @@ public class TestExecuteComplete extends BaseTestCase {
     Order order = new Order();
     order.setCustomer(customer);
 
-    Ebean.save(customer);
+    Ebean.save(order);
   }
 
   @ForPlatform(Platform.H2)
