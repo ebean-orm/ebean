@@ -228,6 +228,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void clearServerTransaction() {
+    
+  }
+
+  @Override
   public SpiTransaction beginServerTransaction() {
     return null;
   }

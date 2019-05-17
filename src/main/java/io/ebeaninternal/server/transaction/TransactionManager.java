@@ -568,6 +568,13 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   /**
+   * Clear an implicit transaction from thread local scope.
+   */
+  public void clearServerTransaction() {
+    scopeManager.clear();
+  }
+
+  /**
    * Begin an implicit transaction.
    */
   public SpiTransaction beginServerTransaction() {

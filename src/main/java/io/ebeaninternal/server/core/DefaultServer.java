@@ -2255,6 +2255,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public void clearServerTransaction() {
+    transactionManager.clearServerTransaction();
+  }
+
+  @Override
   public SpiTransaction beginServerTransaction() {
     return transactionManager.beginServerTransaction();
   }

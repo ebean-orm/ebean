@@ -134,6 +134,11 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader,
   void externalModification(TransactionEventTable event);
 
   /**
+   * Clear an implicit transaction from the scope.
+   */
+  void clearServerTransaction();
+
+  /**
    * Begin a managed transaction (Uses scope manager / ThreadLocal).
    */
   SpiTransaction beginServerTransaction();

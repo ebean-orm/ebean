@@ -35,9 +35,9 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void set(SpiTransaction trans);
 
   /**
-   * Clears the given Transaction for this serverName and Thread.
+   * Clears the current Transaction from thread local scope (for implicit transactions).
    */
-  public abstract void clear(SpiTransaction trans);
+  public abstract void clear();
 
   /**
    * Replace the current transaction with this one.
