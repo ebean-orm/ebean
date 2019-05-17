@@ -41,6 +41,17 @@ public final class DefaultTransactionThreadLocal {
   }
 
   /**
+   * Clears a transaction from the ThreadLocal to prevent memory leaks.
+   * Will only clear, if trans == currentTransaction
+   */
+  public static void clear(String serverName, SpiTransaction trans) {
+    Map<String, SpiTransaction> map = local.get();
+    if (map.get(serverName) == trans) {
+      map.remove(serverName);
+    }
+  }
+
+  /**
    * A mechanism to get the transaction out of the thread local by replacing it
    * with a 'proxy'.
    * <p>

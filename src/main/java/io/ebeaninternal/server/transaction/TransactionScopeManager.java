@@ -35,6 +35,11 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void set(SpiTransaction trans);
 
   /**
+   * Clears the given Transaction for this serverName and Thread.
+   */
+  public abstract void clear(SpiTransaction trans);
+
+  /**
    * Replace the current transaction with this one.
    * <p>
    * Used for Background fetching and Nested transaction scopes.
