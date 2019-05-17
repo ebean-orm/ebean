@@ -14,14 +14,13 @@ public class EbeanServerFactory_ServerConfigStart_Test {
   @Test
   public void test() throws InterruptedException {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");
     config.setDdlGenerate(false);
     config.setDdlRun(false);
+    config.setDdlExtra(false);
     config.setDefaultServer(false);
     config.setRegister(false);
 

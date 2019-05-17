@@ -4,6 +4,7 @@ import io.ebean.ScriptRunner;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebean.migration.runner.ScriptTransform;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.util.UrlHelper;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -63,7 +64,7 @@ class DScriptRunner implements ScriptRunner {
       throw new IllegalArgumentException("resource is null?");
     }
 
-    try (InputStream inputStream = resource.openStream()) {
+    try (InputStream inputStream = UrlHelper.openNoCache(resource)) {
       return readContent(new InputStreamReader(inputStream));
 
     } catch (IOException e) {

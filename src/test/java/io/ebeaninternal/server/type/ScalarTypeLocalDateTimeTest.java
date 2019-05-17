@@ -28,7 +28,7 @@ public class ScalarTypeLocalDateTimeTest {
   @Test
   public void testConvertToMillis() throws Exception {
 
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().withNano(123_000_000); // jdk11 workaround
     long asMillis = type.convertToMillis(now);
     LocalDateTime fromMillis = type.convertFromMillis(asMillis);
 
@@ -74,7 +74,7 @@ public class ScalarTypeLocalDateTimeTest {
   @Test
   public void testJson() throws Exception {
 
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().withNano(123_000_000); // jdk11 workaround
 
     JsonTester<LocalDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);

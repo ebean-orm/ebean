@@ -57,9 +57,9 @@ public class MultiValueBind {
     }
     sb.append(" in (?");
     for (int i = 1; i < size; i++) {
-      sb.append(", ").append("?");
+      sb.append(",?");
     }
-    sb.append(" ) ");
+    sb.append(")");
     return sb.toString();
   }
 }

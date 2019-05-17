@@ -49,6 +49,8 @@ public class DatabasePlatform {
    */
   protected boolean useExtraTransactionOnIterateSecondaryQueries;
 
+  protected boolean supportsDeleteTableAlias;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
@@ -68,6 +70,8 @@ public class DatabasePlatform {
    * When set to true all db column names and table names use quoted identifiers.
    */
   protected boolean allQuotedIdentifiers;
+
+  protected boolean caseSensitiveCollation = true;
 
   /**
    * For limit/offset, row_number etc limiting of SQL queries.
@@ -176,10 +180,10 @@ public class DatabasePlatform {
    * findIterate() and findVisit().
    */
   protected boolean forwardOnlyHintOnFindIterate;
-  
+
   /**
    * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
-   * 
+   *
    * This is {@code false} for HANA
    */
   protected boolean supportsResultSetConcurrencyModeUpdatable = true;
@@ -224,6 +228,7 @@ public class DatabasePlatform {
    */
   public void configure(PlatformConfig config) {
     this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
+    this.caseSensitiveCollation = config.isCaseSensitiveCollation();
     configureIdType(config.getIdType());
     configure(config, config.isAllQuotedIdentifiers());
   }
@@ -304,6 +309,23 @@ public class DatabasePlatform {
    */
   public boolean isSupportsNativeIlike() {
     return supportsNativeIlike;
+  }
+
+  /**
+   * Return true if the platform supports delete statements with table alias.
+   */
+  public boolean isSupportsDeleteTableAlias() {
+    return supportsDeleteTableAlias;
+  }
+
+  /**
+   * Return true if the collation is case sensitive.
+   * <p>
+   * This is expected to be used for testing only.
+   * </p>
+   */
+  public boolean isCaseSensitiveCollation() {
+    return caseSensitiveCollation;
   }
 
   /**
@@ -524,7 +546,7 @@ public class DatabasePlatform {
   public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
   }
-  
+
   /**
    * Return true if the ResultSet CONCUR_UPDATABLE Hint should be used on
    * createNativeSqlTree() PreparedStatements.
@@ -535,7 +557,7 @@ public class DatabasePlatform {
   public boolean isSupportsResultSetConcurrencyModeUpdatable() {
     return supportsResultSetConcurrencyModeUpdatable;
   }
-  
+
   /**
    * Set to true if the ResultSet CONCUR_UPDATABLE Hint should be used by default on createNativeSqlTree() PreparedStatements.
    */

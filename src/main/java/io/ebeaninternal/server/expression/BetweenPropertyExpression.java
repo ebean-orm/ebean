@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebean.util.SplitName;
 
 import java.io.IOException;
 
@@ -80,7 +80,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(" ?").append(BETWEEN).append(name(lowProperty)).append(" and ").append(name(highProperty)).append(" ");
+    request.append(" ?").append(BETWEEN).append(name(lowProperty)).append(" and ").append(name(highProperty));
   }
 
   @Override

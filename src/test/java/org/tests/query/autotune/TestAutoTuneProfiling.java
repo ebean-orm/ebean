@@ -1,14 +1,14 @@
 package org.tests.query.autotune;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import java.util.List;
 import java.util.Random;
@@ -49,16 +49,17 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
 
   private void execute() {
-    useOrderDate();
-    useOrderDateCustomerName();
-    useLots();
+//    useOrderDate();
+//    useOrderDateCustomerName();
+//    useLots();
     useLotUntuned();
   }
 
   private Order findById(long id) {
-    return Ebean.find(Order.class)
+    return DB.find(Order.class)
       .select("status, orderDate, shipDate")
       .setId(id)
+      .setUseCache(false)
       .findOne();
   }
 
@@ -99,19 +100,19 @@ public class TestAutoTuneProfiling extends BaseTestCase {
       detail.getUnitPrice();
     }
 
-    Customer customer = order.getCustomer();
-    customer.getName();
-    Address billingAddress = customer.getBillingAddress();
-    if (billingAddress != null) {
-      billingAddress.getCity();
-      billingAddress.getLine1();
-      billingAddress.getLine2();
-    }
+//    Customer customer = order.getCustomer();
+//    customer.getName();
+//    Address billingAddress = customer.getBillingAddress();
+//    if (billingAddress != null) {
+//      billingAddress.getCity();
+//      billingAddress.getLine1();
+//      billingAddress.getLine2();
+//    }
   }
 
   private static void collectUsage() {
 
-    Ebean.getDefaultServer().getAutoTune().collectProfiling();
+    DB.getDefault().getAutoTune().collectProfiling();
   }
 
 }

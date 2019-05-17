@@ -73,8 +73,9 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
     query.setMaxRows(1000);
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("order by t0.userid");
-
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("from muser t0 limit 1000");
+    }
     query = Ebean.find(MUser.class)
         .where()
         .eq("roles.roleName", "A")
@@ -85,7 +86,9 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
     query.setMaxRows(1000);
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("order by t0.userid");
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where u1.role_name = ? limit 1000");
+    }
   }
 
   @Test

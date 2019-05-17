@@ -8,8 +8,8 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.ServerMetrics;
 import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -67,9 +67,9 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
       // we get the 2 master inserts first
       assertThat(sql.get(0)).contains("insert into t_atable_thatisrelatively");
-      assertThat(sql.get(1)).contains("insert into t_atable_thatisrelatively");
+      assertThat(sql.get(1)).contains("-- bind(");
       // detail
-      assertThat(sql.get(2)).contains("insert into t_detail_with_other_namexxxyy");
+      assertThat(sql.get(3)).contains("insert into t_detail_with_other_namexxxyy");
 
       assertThat(((SpiTransaction)transaction).getLabel()).isEqualTo("TestBatchInsertFlush.no_cascade");
 
@@ -77,8 +77,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
       transaction.end();
     }
 
-    BasicMetricVisitor basic = visitMetricsBasic();
-    List<MetaTimedMetric> txnStats = basic.getTimedMetrics();
+    ServerMetrics metrics = collectMetrics();
+    List<MetaTimedMetric> txnStats = metrics.getTimedMetrics();
     for (MetaTimedMetric txnMetric : txnStats) {
       System.out.println(txnMetric);
     }
@@ -137,7 +137,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     assertThat(LoggedSqlCollector.current()).isEmpty();
     Integer id = b1.getId();
     assertNotNull(id);
-    assertThat(LoggedSqlCollector.current()).hasSize(2);
+    assertThat(LoggedSqlCollector.current()).hasSize(3);
 
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
@@ -163,7 +163,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       assertThat(LoggedSqlCollector.current()).isEmpty();
       Integer id = b1.getId();
       assertNotNull(id);
-      assertThat(LoggedSqlCollector.current()).hasSize(2);
+      assertThat(LoggedSqlCollector.current()).hasSize(3);
 
       EBasicVer b3 = new EBasicVer("b3");
       server.save(b3, txn);
@@ -203,6 +203,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void noflushWhenIdIsLoaded() {
 
     EbeanServer server = Ebean.getDefaultServer();
@@ -229,7 +230,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       server.save(b3, txn);
 
       txn.commit();
-      assertThat(LoggedSqlCollector.current()).hasSize(3);
+      assertThat(LoggedSqlCollector.current()).hasSize(5);
 
     } finally {
       txn.end();

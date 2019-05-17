@@ -24,7 +24,7 @@ import java.io.Serializable;
  * <p>
  * <pre>{@code
  * // Normal fetch join results in a single SQL query
- * List<Order> list = Ebean.find(Order.class).fetch("details").findList();
+ * List<Order> list = DB.find(Order.class).fetch("details").findList();
  *
  * // Find Orders join details using a single SQL query
  * }</pre>
@@ -36,7 +36,7 @@ import java.io.Serializable;
  *
  * // This will use 2 SQL queries to build this object graph
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .fetch("details", new FetchConfig().query())
  *         .findList();
  *
@@ -52,7 +52,7 @@ import java.io.Serializable;
  *
  * // This will use 3 SQL queries to build this object graph
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .fetch("details", new FetchConfig().query())
  *         .fetch("customer", new FetchConfig().queryFirst(5))
  *         .findList();
@@ -70,7 +70,7 @@ import java.io.Serializable;
  * <pre>{@code
  * // This will use 3 SQL queries to build this object graph
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .select("status, shipDate")
  *         .fetch("details", "quantity, price", new FetchConfig().query())
  *         .fetch("details.product", "sku, name")
@@ -100,7 +100,7 @@ import java.io.Serializable;
  * <pre>{@code
  *
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .fetch("customer", new FetchConfig().query(10).lazy(5))
  *         .findList();
  *
@@ -121,7 +121,7 @@ import java.io.Serializable;
  * <p>
  * <pre>{@code
  *
- * List<Order> list = Ebean.find(Order.class)
+ * List<Order> list = DB.find(Order.class)
  *   .fetch("customer","name", new FetchConfig().lazy(5))
  *   .fetch("customer.contacts","contactName, phone, email")
  *   .fetch("customer.shippingAddress")

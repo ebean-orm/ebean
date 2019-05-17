@@ -46,6 +46,10 @@ public class DefaultServerCacheConfig {
     return config.getCacheKey();
   }
 
+  public String getShortName() {
+    return config.getShortName();
+  }
+
   public Map<Object, DefaultServerCache.CacheEntry> getMap() {
     return map;
   }

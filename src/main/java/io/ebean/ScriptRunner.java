@@ -13,20 +13,8 @@ import java.util.Map;
  * <h3>Example of simple use</h3>
  * <pre>{@code
  *
- *   EbeanServer server = Ebean.getDefaultServer();
- *   server.script().run("/scripts/test-script.sql");
- *
- * }</pre>
- *
- *
- * <h3>Example using place holders in the script</h3>
- * <pre>{@code
- *
- *   Map<String,String> placeholders = new HashMap<>();
- *   placeholders.put("tableName", "e_basic");
- *
- *   EbeanServer server = Ebean.getDefaultServer();
- *   server.script().run("/scripts/test-script.sql");
+ *   Database database = DB.getDefault();
+ *   database.script().run("/scripts/test-script.sql");
  *
  * }</pre>
  */
@@ -45,8 +33,8 @@ public interface ScriptRunner {
    *   Map<String,String> placeholders = new HashMap<>();
    *   placeholders.put("tableName", "e_basic");
    *
-   *   EbeanServer server = Ebean.getDefaultServer();
-   *   server.script().run("/scripts/test-script.sql");
+   *   Database database = DB.getDefault();
+   *   database.script().run("/scripts/test-script.sql", placeholders);
    *
    * }</pre>
    */

@@ -12,9 +12,9 @@ import java.util.Collection;
 
 class RawExpression extends NonPrepareExpression {
 
-  private final String sql;
+  final String sql;
 
-  private final Object[] values;
+  final Object[] values;
 
   RawExpression(String sql, Object[] values) {
     this.sql = sql;

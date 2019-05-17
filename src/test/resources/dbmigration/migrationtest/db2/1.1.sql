@@ -35,6 +35,10 @@ alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I','?'));
+alter table migtest_e_basic drop constraint ck_mgtst__b_z543fg;
+alter table migtest_e_basic alter column status2 varchar(127);
+alter table migtest_e_basic alter column status2 drop default;
+alter table migtest_e_basic alter column status2 set null;
 
 -- rename all collisions;
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_vs45xo unique  (description);

@@ -11,20 +11,38 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.MultiValueBind.IsSupported;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * In a collection of Id values.
  */
 public class IdInExpression extends NonPrepareExpression {
 
-  private final Collection<?> idCollection;
+  private final List<Object> idCollection;
 
   private IsSupported multiValueIdSupported = IsSupported.NO;
 
   public IdInExpression(Collection<?> idCollection) {
-    this.idCollection = idCollection;
+    this.idCollection = new ArrayList<>(idCollection);
+  }
+
+  /**
+   * Return the ids this expression is looking to fetch.
+   */
+  public Collection<Object> idValues() {
+    return idCollection;
+  }
+
+  /**
+   * Remove Ids that where obtained from l2 cache. Don't fetch these from DB.
+   */
+  public int removeIds(Set<Object> hitIds) {
+    idCollection.removeAll(hitIds);
+    return idCollection.size();
   }
 
   @Override

@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import io.ebean.EbeanServerFactory;
+import io.ebean.DatabaseFactory;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.Transaction;
@@ -32,6 +32,7 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
 
+import javax.persistence.EnumType;
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -44,30 +45,30 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
- * The configuration used for creating a EbeanServer.
+ * The configuration used for creating a Database.
  * <p>
- * Used to programmatically construct an EbeanServer and optionally register it
- * with the Ebean singleton.
+ * Used to programmatically construct a Database and optionally register it
+ * with the DB singleton.
  * </p>
  * <p>
- * If you just use Ebean without this programmatic configuration Ebean will read
- * the ebean.properties file and take the configuration from there. This usually
+ * If you just use DB without this programmatic configuration DB will read
+ * the application.properties file and take the configuration from there. This usually
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
  * </p>
  * <pre>{@code
  *
- * ServerConfig c = new ServerConfig();
+ * ServerConfig config = new ServerConfig();
  *
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
- * c.loadFromProperties();
+ * config.loadFromProperties();
  *
  * // explicitly register the entity beans to avoid classpath scanning
- * c.addClass(Customer.class);
- * c.addClass(User.class);
+ * config.addClass(Customer.class);
+ * config.addClass(User.class);
  *
- * EbeanServer server = EbeanServerFactory.create(c);
+ * Database database = DatabaseFactory.create(config);
  *
  * }</pre>
  *
@@ -78,12 +79,12 @@ import java.util.ServiceLoader;
  *
  * @author emcgreal
  * @author rbygrave
- * @see EbeanServerFactory
+ * @see DatabaseFactory
  */
 public class ServerConfig {
 
   /**
-   * The EbeanServer name.
+   * The Database name.
    */
   private String name = "db";
 
@@ -106,12 +107,12 @@ public class ServerConfig {
   private String resourceDirectory;
 
   /**
-   * Set to true to register this EbeanServer with the Ebean singleton.
+   * Set to true to register this Database with the DB singleton.
    */
   private boolean register = true;
 
   /**
-   * Set to true if this is the default/primary server.
+   * Set to true if this is the default/primary database.
    */
   private boolean defaultServer = true;
 
@@ -150,7 +151,7 @@ public class ServerConfig {
   private DocStoreConfig docStoreConfig = new DocStoreConfig();
 
   /**
-   * Set to true when the EbeanServer only uses Document store.
+   * Set to true when the Database only uses Document store.
    */
   private boolean docStoreOnly;
 
@@ -168,7 +169,12 @@ public class ServerConfig {
   /**
    * The JSON format used for DateTime types. Default to millis.
    */
-  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
+  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.ISO8601;
+
+  /**
+   * The JSON format used for Date types. Default to millis.
+   */
+  private JsonConfig.Date jsonDate = JsonConfig.Date.ISO8601;
 
   /**
    * For writing JSON specify if null values or empty collections should be exluded.
@@ -229,6 +235,8 @@ public class ServerConfig {
 
   private int persistBatchSize = 20;
 
+  private EnumType defaultEnumType = EnumType.ORDINAL;
+
   private boolean disableLazyLoading;
 
   /**
@@ -251,6 +259,8 @@ public class ServerConfig {
   private boolean ddlGenerate;
 
   private boolean ddlRun;
+
+  private boolean ddlExtra = true;
 
   private boolean ddlCreateOnly;
 
@@ -348,7 +358,7 @@ public class ServerConfig {
   /**
    * Behaviour of updates in JDBC batch to by default include all properties.
    */
-  private boolean updateAllPropertiesInBatch = true;
+  private boolean updateAllPropertiesInBatch;
 
   /**
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
@@ -366,9 +376,10 @@ public class ServerConfig {
   private UuidVersion uuidVersion = UuidVersion.VERSION4;
 
   /**
-   * The UUID state file (for Version 1 UUIDs).
+   * The UUID state file (for Version 1 UUIDs). By default, the file is created in
+   * ${HOME}/.ebean/${servername}-uuid.state
    */
-  private String uuidStateFile = "ebean-uuid.state";
+  private String uuidStateFile;
 
   /**
    * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
@@ -473,6 +484,7 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+  private String enabledL2Regions;
 
   /**
    * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
@@ -506,7 +518,7 @@ public class ServerConfig {
   /**
    * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
    */
-  private boolean defaultOrderById = false;
+  private boolean defaultOrderById;
 
   /**
    * The mappingLocations for searching xml mapping.
@@ -518,8 +530,12 @@ public class ServerConfig {
    */
   private boolean idGeneratorAutomatic = true;
 
+  private boolean dumpMetricsOnShutdown;
+
+  private String dumpMetricsOptions;
+
   /**
-   * Construct a Server Configuration for programmatically creating an EbeanServer.
+   * Construct a Database Configuration for programmatically creating an Database.
    */
   public ServerConfig() {
 
@@ -569,8 +585,9 @@ public class ServerConfig {
 
 
   /**
-   * Sets the default orderById setting for queries.
+   * Deprecated - look to have explicit order by. Sets the default orderById setting for queries.
    */
+  @Deprecated
   public void setDefaultOrderById(boolean defaultOrderById) {
     this.defaultOrderById = defaultOrderById;
   }
@@ -673,6 +690,20 @@ public class ServerConfig {
   }
 
   /**
+   * Return the JSON format used for Date types.
+   */
+  public JsonConfig.Date getJsonDate() {
+    return jsonDate;
+  }
+
+  /**
+   * Set the JSON format to use for Date types.
+   */
+  public void setJsonDate(JsonConfig.Date jsonDate) {
+    this.jsonDate = jsonDate;
+  }
+
+  /**
    * Return the JSON include mode used when writing JSON.
    */
   public JsonConfig.Include getJsonInclude() {
@@ -690,14 +721,14 @@ public class ServerConfig {
   }
 
   /**
-   * Return the name of the EbeanServer.
+   * Return the name of the Database.
    */
   public String getName() {
     return name;
   }
 
   /**
-   * Set the name of the EbeanServer.
+   * Set the name of the Database.
    */
   public void setName(String name) {
     this.name = name;
@@ -706,8 +737,8 @@ public class ServerConfig {
   /**
    * Return the container / clustering configuration.
    * <p/>
-   * The container holds all the EbeanServer instances and provides clustering communication
-   * services to all the EbeanServer instances.
+   * The container holds all the Database instances and provides clustering communication
+   * services to all the Database instances.
    */
   public ContainerConfig getContainerConfig() {
     return containerConfig;
@@ -716,8 +747,8 @@ public class ServerConfig {
   /**
    * Set the container / clustering configuration.
    * <p/>
-   * The container holds all the EbeanServer instances and provides clustering communication
-   * services to all the EbeanServer instances.
+   * The container holds all the Database instances and provides clustering communication
+   * services to all the Database instances.
    */
   public void setContainerConfig(ContainerConfig containerConfig) {
     this.containerConfig = containerConfig;
@@ -757,8 +788,8 @@ public class ServerConfig {
   }
 
   /**
-   * Set false if you do not want this EbeanServer to be registered as the "default" server
-   * with the Ebean singleton.
+   * Set false if you do not want this Database to be registered as the "default" database
+   * with the DB singleton.
    * <p>
    * This is only used when {@link #setRegister(boolean)} is also true.
    * </p>
@@ -973,6 +1004,14 @@ public class ServerConfig {
    */
   public void setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
+  }
+
+  public EnumType getDefaultEnumType() {
+    return defaultEnumType;
+  }
+
+  public void setDefaultEnumType(EnumType defaultEnumType) {
+    this.defaultEnumType = defaultEnumType;
   }
 
   /**
@@ -1544,14 +1583,14 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if this EbeanServer is a Document store only instance (has no JDBC DB).
+   * Return true if this Database is a Document store only instance (has no JDBC DB).
    */
   public boolean isDocStoreOnly() {
     return docStoreOnly;
   }
 
   /**
-   * Set to true if this EbeanServer is Document store only instance (has no JDBC DB).
+   * Set to true if this Database is Document store only instance (has no JDBC DB).
    */
   public void setDocStoreOnly(boolean docStoreOnly) {
     this.docStoreOnly = docStoreOnly;
@@ -1951,16 +1990,16 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if the EbeanServer instance should be created in offline mode.
+   * Return true if the Database instance should be created in offline mode.
    */
   public boolean isDbOffline() {
     return dbOffline;
   }
 
   /**
-   * Set to true if the EbeanServer instance should be created in offline mode.
+   * Set to true if the Database instance should be created in offline mode.
    * <p>
-   * Typically used to create an EbeanServer instance for DDL Migration generation
+   * Typically used to create an Database instance for DDL Migration generation
    * without requiring a real DataSource / Database to connect to.
    * </p>
    */
@@ -2116,6 +2155,16 @@ public class ServerConfig {
   }
 
   /**
+   * Set to false if you not want to run the extra-ddl.xml scripts. (default = true)
+   * <p>
+   * Typically we want this on when we are running tests.
+   */
+  public void setDdlExtra(boolean ddlExtra) {
+    this.ddlExtra = ddlExtra;
+  }
+
+
+  /**
    * Return true if the "drop all ddl" should be skipped.
    * <p>
    * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
@@ -2186,6 +2235,13 @@ public class ServerConfig {
   }
 
   /**
+   * Return true, if extra-ddl.xml should be executed.
+   */
+  public boolean isDdlExtra() {
+    return ddlExtra;
+  }
+
+  /**
    * Return true if the class path search should be disabled.
    */
   public boolean isDisableClasspathSearch() {
@@ -2194,7 +2250,7 @@ public class ServerConfig {
 
   /**
    * Set to true to disable the class path search even for the case where no entity bean classes
-   * have been registered. This can be used to start an EbeanServer instance just to use the
+   * have been registered. This can be used to start an Database instance just to use the
    * SQL functions such as SqlQuery, SqlUpdate etc.
    */
   public void setDisableClasspathSearch(boolean disableClasspathSearch) {
@@ -2308,8 +2364,7 @@ public class ServerConfig {
    *
    *   // assume Customer has L2 bean caching enabled ...
    *
-   *   Transaction transaction = Ebean.beginTransaction();
-   *   try {
+   *   try (Transaction transaction = DB.beginTransaction()) {
    *
    *     // this uses L2 bean cache as the transaction
    *     // ... is considered "query only" at this point
@@ -2317,7 +2372,7 @@ public class ServerConfig {
    *
    *     // transaction no longer "query only" once
    *     // ... a bean has been saved etc
-   *     Ebean.save(someBean);
+   *     DB.save(someBean);
    *
    *     // will NOT use L2 bean cache as the transaction
    *     // ... is no longer considered "query only"
@@ -2336,9 +2391,6 @@ public class ServerConfig {
    *     transaction.setSkipCache(true);
    *     Customer.find.byId(99); // skips l2 bean cache
    *
-   *
-   *   } finally {
-   *     transaction.end();
    *   }
    *
    * }</pre>
@@ -2406,7 +2458,7 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
+   * Return true if query statistics should be collected by ObjectGraphNode.
    */
   public boolean isCollectQueryStatsByNode() {
     return collectQueryStatsByNode;
@@ -2876,11 +2928,14 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
+    dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
+    dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
+    enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
     notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
@@ -2947,20 +3002,18 @@ public class ServerConfig {
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
+    defaultEnumType = p.getEnum(EnumType.class, "defaultEnumType", defaultEnumType);
     disableLazyLoading = p.getBoolean("disableLazyLoading", disableLazyLoading);
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
-    String jsonDateTimeFormat = p.get("jsonDateTime", null);
-    if (jsonDateTimeFormat != null) {
-      jsonDateTime = JsonConfig.DateTime.valueOf(jsonDateTimeFormat);
-    } else {
-      jsonDateTime = JsonConfig.DateTime.MILLIS;
-    }
+    jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
+    jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
 
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
+    ddlExtra = p.getBoolean("ddl.extra", ddlExtra);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
@@ -3099,6 +3152,20 @@ public class ServerConfig {
    */
   public void setExpressionNativeIlike(boolean expressionNativeIlike) {
     this.expressionNativeIlike = expressionNativeIlike;
+  }
+
+  /**
+   * Return the enabled L2 cache regions.
+   */
+  public String getEnabledL2Regions() {
+    return enabledL2Regions;
+  }
+
+  /**
+   * Set the enabled L2 cache regions (comma delimited).
+   */
+  public void setEnabledL2Regions(String enabledL2Regions) {
+    this.enabledL2Regions = enabledL2Regions;
   }
 
   /**
@@ -3256,6 +3323,36 @@ public class ServerConfig {
    */
   public void setCollectQueryPlans(boolean collectQueryPlans) {
     this.collectQueryPlans = collectQueryPlans;
+  }
+
+  /**
+   * Return true if metrics should be dumped when the server is shutdown.
+   */
+  public boolean isDumpMetricsOnShutdown() {
+    return dumpMetricsOnShutdown;
+  }
+
+  /**
+   * Set to true if metrics should be dumped when the server is shutdown.
+   */
+  public void setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
+    this.dumpMetricsOnShutdown = dumpMetricsOnShutdown;
+  }
+
+  /**
+   * Return the options for dumping metrics.
+   */
+  public String getDumpMetricsOptions() {
+    return dumpMetricsOptions;
+  }
+
+  /**
+   * Include 'sql' or 'hash' in options such that they are included in the output.
+   *
+   * @param dumpMetricsOptions Example "sql,hash", "sql"
+   */
+  public void setDumpMetricsOptions(String dumpMetricsOptions) {
+    this.dumpMetricsOptions = dumpMetricsOptions;
   }
 
   public enum UuidVersion {

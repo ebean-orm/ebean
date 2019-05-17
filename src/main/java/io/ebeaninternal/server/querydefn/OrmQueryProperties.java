@@ -294,7 +294,7 @@ public class OrmQueryProperties implements Serializable {
       sb.append(path).append(" ");
     }
     if (!isEmpty()) {
-      sb.append("(").append(rawProperties).append(") ");
+      sb.append("(").append(rawProperties).append(")");
     }
     return sb.toString();
   }

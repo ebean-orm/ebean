@@ -3,17 +3,37 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryExists extends BaseTestCase {
+
+  @Test
+  public void testExistsBoolean_basic() {
+
+    ResetBasicData.reset();
+
+    Query<Order> query = Ebean.find(Order.class)
+      .where().gt("id", 1)
+      .query();
+
+    boolean check = query.exists();
+    assertThat(check).isTrue();
+
+    String sql = sqlOf(query);
+    if (isH2() || isPostgres()) {
+      assertThat(sql).contains("select t0.id from o_order t0 where t0.id > ? limit 1");
+    }
+
+    assertThat(Ebean.find(Order.class).where().gt("id", 1).exists()).isTrue();
+    assertThat(Ebean.find(Order.class).where().or().gt("id", 1).isNull("shipDate").exists()).isTrue();
+  }
 
   @Test
   public void testExists_orders_onOneToMany() {
@@ -73,7 +93,7 @@ public class TestQueryExists extends BaseTestCase {
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.indexOf("exists (") > 0);
+    assertThat(sql).contains("exists (");
   }
 
   @Test
@@ -86,6 +106,6 @@ public class TestQueryExists extends BaseTestCase {
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.indexOf("not exists (") > 0);
+    assertThat(sql).contains("not exists (");
   }
 }

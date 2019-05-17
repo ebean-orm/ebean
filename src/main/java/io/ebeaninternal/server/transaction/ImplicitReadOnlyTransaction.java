@@ -194,11 +194,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     throw new IllegalStateException(notExpectedMessage);
   }
 
-  @Override
-  public void unregisterDeleteBean(Integer persistedBean) {
-    throw new IllegalStateException(notExpectedMessage);
-  }
-
   /**
    * Return true if this is a bean that has already been saved/deleted.
    */

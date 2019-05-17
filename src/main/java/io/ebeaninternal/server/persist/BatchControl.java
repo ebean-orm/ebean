@@ -3,6 +3,7 @@ package io.ebeaninternal.server.persist;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
+import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Controls the batch ordering of persist requests.
@@ -67,6 +69,10 @@ public final class BatchControl {
    * Size of the largest buffer.
    */
   private int bufferMax;
+  private int topCounter;
+
+  private Queue earlyQueue;
+  private Queue lateQueue;
 
   /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
@@ -224,14 +230,14 @@ public final class BatchControl {
    * Flush without resetting the topOrder (maintains the depth info).
    */
   public void flush() throws BatchedSqlException {
-    flush(false);
+    flushBuffer(false);
   }
 
   /**
    * Flush with a reset the topOrder (fully empty the batch).
    */
   public void flushReset() throws BatchedSqlException {
-    flush(true);
+    flushBuffer(true);
   }
 
   /**
@@ -241,12 +247,25 @@ public final class BatchControl {
     pstmtHolder.clear();
     beanHoldMap.clear();
     maxDepth = 0;
+    topCounter = 0;
+  }
+
+  private void flushBuffer(boolean resetTop) throws BatchedSqlException {
+    flushInternal(resetTop);
+    flushQueue(earlyQueue);
+    flushQueue(lateQueue);
+  }
+
+  private void flushQueue(Queue queue) throws BatchedSqlException {
+    if (queue != null && queue.flush() && !pstmtHolder.isEmpty()) {
+      flushPstmtHolder();
+    }
   }
 
   /**
    * execute all the requests currently queued or batched.
    */
-  private void flush(boolean resetTop) throws BatchedSqlException {
+  private void flushInternal(boolean resetTop) throws BatchedSqlException {
 
     try {
       bufferMax = 0;
@@ -267,8 +286,8 @@ public final class BatchControl {
       if (transaction.isLogSummary()) {
         transaction.logSummary("BatchControl flush " + Arrays.toString(bsArray));
       }
-      for (BatchedBeanHolder aBsArray : bsArray) {
-        aBsArray.executeNow();
+      for (BatchedBeanHolder beanHolder : bsArray) {
+        beanHolder.executeNow();
       }
 
       if (resetTop) {
@@ -302,10 +321,8 @@ public final class BatchControl {
         if (maybe != -1) {
           beanDepth = maybe;
         } else {
-          // we can't be certain of the relative ordering for this type so
-          // flush and reset the batch as we are changing the type of our top level
-          // bean so just keep it simple and flush and reset the top
-          flushReset();
+          // additional "top level" bean type ordered by save() order
+          beanDepth += ++topCounter;
         }
       }
 
@@ -327,14 +344,16 @@ public final class BatchControl {
       return maxDepth + 1;
     }
 
+    int parentMaxDepth = -1;
+
     for (BeanPropertyAssocOne<?> parent : imported) {
       BatchedBeanHolder parentBatch = beanHoldMap.get(parent.getTargetDescriptor().rootName());
       if (parentBatch != null) {
         // deeper that the parent
-        return parentBatch.getOrder() + 1;
+        parentMaxDepth = Math.max(parentMaxDepth, parentBatch.getOrder() + 1);
       }
     }
-    return -1;
+    return parentMaxDepth;
   }
 
   /**
@@ -364,5 +383,44 @@ public final class BatchControl {
    */
   public int[] execute(String key, boolean getGeneratedKeys) throws SQLException {
     return pstmtHolder.execute(key, getGeneratedKeys);
+  }
+
+  /**
+   * Add a SqlUpdate request to execute after flush.
+   */
+  public void addToFlushQueue(PersistRequestUpdateSql request, boolean early) {
+    if (early) {
+      // add it to the early queue
+      if (earlyQueue == null) {
+        earlyQueue = new Queue();
+      }
+      earlyQueue.add(request);
+    } else {
+      // add it to the late queue
+      if (lateQueue == null) {
+        lateQueue = new Queue();
+      }
+      lateQueue.add(request);
+    }
+  }
+
+  private static class Queue {
+
+    private final List<PersistRequestUpdateSql> queue = new ArrayList<>();
+
+    boolean flush() {
+      if (queue.isEmpty()) {
+        return false;
+      }
+      for (PersistRequestUpdateSql request : queue) {
+        request.executeAddBatch();
+      }
+      queue.clear();
+      return true;
+    }
+
+    void add(PersistRequestUpdateSql request) {
+      queue.add(request);
+    }
   }
 }

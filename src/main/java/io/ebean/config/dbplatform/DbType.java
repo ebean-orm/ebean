@@ -35,6 +35,8 @@ public enum DbType {
   ARRAY(Types.ARRAY),
 
   UUID(ExtraDbTypes.UUID),
+  INET(ExtraDbTypes.INET),
+  CDIR(ExtraDbTypes.CDIR),
 
   POINT(ExtraDbTypes.POINT),
   POLYGON(ExtraDbTypes.POLYGON),

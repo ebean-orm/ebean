@@ -41,6 +41,7 @@ class OperatorMapping {
     map.put("iendsWith", EqlOperator.IENDS_WITH);
     map.put("ilike", EqlOperator.ILIKE);
 
+    map.put("inrange", EqlOperator.INRANGE);
     map.put("between", EqlOperator.BETWEEN);
   }
 

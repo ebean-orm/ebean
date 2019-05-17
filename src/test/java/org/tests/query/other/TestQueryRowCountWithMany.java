@@ -3,11 +3,11 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
@@ -69,7 +69,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     Assert.assertEquals(list.size(), rowCount);
     Assert.assertEquals(2, sqlLogged.size());
     assertThat(trimSql(sqlLogged.get(1), 1)).contains(
-      "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )");
+      "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ?)");
 
   }
 
@@ -94,7 +94,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
     Assert.assertEquals(1, sqlLogged.size());
-    assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )");
+    assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ?)");
 
     query.findList();
   }

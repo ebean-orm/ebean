@@ -28,7 +28,7 @@ public class DefaultCallStackFactory implements CallStackFactory {
 
     // find the first non-avaje stackElement
     for (; startIndex < stackTrace.length; startIndex++) {
-      if (!stackTrace[startIndex].getClassName().startsWith(IO_EBEAN)) {
+      if (!ignore(stackTrace[startIndex])) {
         break;
       }
     }
@@ -49,6 +49,16 @@ public class DefaultCallStackFactory implements CallStackFactory {
     }
 
     return createCallStack(finalTrace);
+  }
+
+  private boolean ignore(StackTraceElement element) {
+    if (element.getClassName().startsWith(IO_EBEAN)) {
+      return true;
+    }
+    if (element.getMethodName().startsWith("_ebean_")) {
+      return true;
+    }
+    return false;
   }
 
   private CallStack createCallStack(StackTraceElement[] finalTrace) {

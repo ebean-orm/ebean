@@ -25,6 +25,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.JsonIgnore;
 import io.ebean.annotation.Length;
 import io.ebean.annotation.SoftDelete;
+import io.ebean.annotation.Sum;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.UnmappedJson;
 import io.ebean.annotation.UpdatedTimestamp;
@@ -132,6 +133,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
+      info.setEmbeddedId(prop);
     }
 
     DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
@@ -283,6 +285,10 @@ public class AnnotationFields extends AnnotationParser {
     Aggregation aggregation = get(prop, Aggregation.class);
     if (aggregation != null) {
       prop.setAggregation(aggregation.value());
+    }
+    Sum sum = get(prop, Sum.class);
+    if (sum != null) {
+      prop.setAggregation("sum(" + prop.getName() + ")");
     }
 
     Version version = get(prop, Version.class);

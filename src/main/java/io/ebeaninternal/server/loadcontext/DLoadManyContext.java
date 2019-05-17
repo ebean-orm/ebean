@@ -59,6 +59,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
   public void configureQuery(SpiQuery<?> query) {
 
+    setLabel(query);
     parent.propagateQueryState(query, docStoreMapped);
     query.setParentNode(objectGraphNode);
     if (queryProps != null) {

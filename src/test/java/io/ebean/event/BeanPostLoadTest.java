@@ -46,14 +46,13 @@ public class BeanPostLoadTest extends BaseTestCase {
 
   private EbeanServer getEbeanServer() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
 
     config.setName("h2ebasicver");
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
 
     config.setRegister(false);
     config.setDefaultServer(false);

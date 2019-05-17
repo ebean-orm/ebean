@@ -4,7 +4,6 @@ import io.ebean.util.StringHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -412,15 +411,15 @@ public final class OrderBy<T> implements Serializable {
 
     String[] chunks = orderByClause.split(",");
     for (String chunk : chunks) {
-      String[] pairs = chunk.split(" ");
-      Property p = parseProperty(pairs);
+      Property p = parseProperty(chunk);
       if (p != null) {
         list.add(p);
       }
     }
   }
 
-  private Property parseProperty(String[] pairs) {
+  private Property parseProperty(String chunk) {
+    String[] pairs = chunk.split(" ");
     if (pairs.length == 0) {
       return null;
     }
@@ -446,8 +445,7 @@ public final class OrderBy<T> implements Serializable {
       boolean asc = isAscending(wordList.get(1));
       return new Property(wordList.get(0), asc, wordList.get(2), wordList.get(3));
     }
-    String m = "Expecting a 1, 2 or 4 words in [" + Arrays.toString(pairs) + "] but got " + wordList;
-    throw new RuntimeException(m);
+    return new Property(chunk.trim(), true);
   }
 
   private boolean isAscending(String s) {

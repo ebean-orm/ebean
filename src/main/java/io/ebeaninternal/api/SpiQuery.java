@@ -54,67 +54,69 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     /**
      * Find by Id or unique returning a single bean.
      */
-    BEAN(FIND_ONE),
+    BEAN(FIND_ONE, "byId"),
 
     /**
      * Find returning a List.
      */
-    LIST(FIND_MANY),
+    LIST(FIND_MANY, "findList"),
 
     /**
      * Find returning a Set.
      */
-    SET(FIND_MANY),
+    SET(FIND_MANY, "findSet"),
 
     /**
      * Find returning a Map.
      */
-    MAP(FIND_MANY),
+    MAP(FIND_MANY, "findMap"),
 
     /**
      * Find iterate type query - findEach(), findIterate() etc.
      */
-    ITERATE(FIND_ITERATE),
+    ITERATE(FIND_ITERATE, "findEach"),
 
     /**
      * Find the Id's.
      */
-    ID_LIST(FIND_ID_LIST),
+    ID_LIST(FIND_ID_LIST, "findIds"),
 
     /**
      * Find single attribute.
      */
-    ATTRIBUTE(FIND_ATTRIBUTE),
+    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute"),
 
     /**
      * Find rowCount.
      */
-    COUNT(FIND_COUNT),
+    COUNT(FIND_COUNT, "findCount"),
 
     /**
      * A subquery used as part of a where clause.
      */
-    SUBQUERY(FIND_SUBQUERY),
+    SUBQUERY(FIND_SUBQUERY, "subquery"),
 
     /**
      * Delete query.
      */
-    DELETE(FIND_DELETE, true),
+    DELETE(FIND_DELETE, "delete", true),
 
     /**
      * Update query.
      */
-    UPDATE(FIND_UPDATE, true);
+    UPDATE(FIND_UPDATE, "update", true);
 
-    boolean update;
-    String profileEventId;
+    private boolean update;
+    private String profileEventId;
+    private String label;
 
-    Type(String profileEventId) {
-      this(profileEventId, false);
+    Type(String profileEventId, String label) {
+      this(profileEventId, label, false);
     }
 
-    Type(String profileEventId, boolean update) {
+    Type(String profileEventId, String label, boolean update) {
       this.profileEventId = profileEventId;
+      this.label = label;
       this.update = update;
     }
 
@@ -127,6 +129,10 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
 
     public String profileEventId() {
       return profileEventId;
+    }
+
+    public String label() {
+      return label;
     }
   }
 
@@ -196,6 +202,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return the label set on the query.
    */
   String getLabel();
+
+  /**
+   * Return the label manually set on the query or from the profile location.
+   */
+  String getPlanLabel();
 
   /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
@@ -419,6 +430,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   void resetBeanCacheAutoMode(boolean findOne);
 
   /**
+   * Bean cache lookup for find by ids.
+   */
+  CacheIdLookup<T> cacheIdLookup();
+
+  /**
    * Collect natural key data for this query or null if the query does not match
    * the requirements of natural key lookup.
    */
@@ -438,6 +454,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Set the query to be a delete query.
    */
   void setDelete();
+
+  /**
+   * Set the query to be delete by ids due to cascading delete.
+   */
+  CQueryPlanKey setDeleteByIdsPlan();
 
   /**
    * Set the query to select the id property only.
@@ -821,6 +842,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isCancelled();
 
   /**
+   * Return the base table to use if user defined on the query.
+   */
+  String getBaseTable();
+
+  /**
    * Return root table alias set by {@link #alias(String)} command.
    */
   String getAlias();
@@ -844,4 +870,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Returns the count distinct order setting.
    */
   CountDistinctOrder getCountDistinctOrder();
+
+  /**
+   * Handles load errors.
+   */
+  void handleLoadError(String fullName, Exception e);
 }

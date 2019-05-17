@@ -2,9 +2,9 @@ package io.ebean;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricType;
+import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -48,7 +48,7 @@ public abstract class BaseTestCase {
       DB_CLOCK_DELTA = 100;
     }
     logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("ebean-agent", "debug=1")) {
+    if (!AgentLoader.loadAgentByMainClass("io.ebean.enhance.Transformer", "debug=1")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }
     try {
@@ -64,12 +64,12 @@ public abstract class BaseTestCase {
     server().getMetaInfoManager().resetAllMetrics();
   }
 
-  protected BasicMetricVisitor visitMetricsBasic() {
-     return server().getMetaInfoManager().visitBasic();
+  protected ServerMetrics collectMetrics() {
+     return server().getMetaInfoManager().collectMetrics();
   }
 
   protected List<MetaTimedMetric> visitTimedMetrics() {
-    return visitMetricsBasic().getTimedMetrics();
+    return collectMetrics().getTimedMetrics();
   }
 
   protected List<MetaTimedMetric> sqlMetrics() {
@@ -94,6 +94,16 @@ public abstract class BaseTestCase {
     return trimSql(query.getGeneratedSql(), columns);
   }
 
+  protected void assertSqlBind(List<String> sql, int i) {
+    assertThat(sql.get(i)).contains("-- bind");
+  }
+
+  protected void assertSqlBind(List<String> sql, int from, int to) {
+    for (int i = from; i <= to; i++) {
+      assertThat(sql.get(i)).contains("-- bind");
+    }
+  }
+
   protected String trimSql(String sql) {
 
     if (sql.contains(" c1,")) {
@@ -114,6 +124,10 @@ public abstract class BaseTestCase {
       sql = StringHelper.replaceString(sql, " c" + i + " ", " ");
     }
     return sql;
+  }
+
+  public boolean isPlatformCaseSensitive() {
+    return spiEbeanServer().getDatabasePlatform().isCaseSensitiveCollation();
   }
 
   /**
@@ -158,6 +172,10 @@ public abstract class BaseTestCase {
 
   public boolean isPlatformOrderNullsSupport() {
     return isH2() || isPostgres();
+  }
+
+  public boolean isPlatformSupportsDeleteTableAlias() {
+    return spiEbeanServer().getDatabasePlatform().isSupportsDeleteTableAlias();
   }
 
   public boolean isPersistBatchOnCascade() {

@@ -30,9 +30,9 @@ import java.util.Map;
  *     Expr.or(Expr.eq("status", Order.Status.NEW),
  *             Expr.gt("orderDate", lastWeek));
  *
- * Query<Order> query = Ebean.createQuery(Order.class);
- * query.where().add(newOrLastWeek);
- * List<Order> list = query.findList();
+ * List<Order> list = DB.find(Order.class)
+ *   .where().add(newOrLastWeek)
+ *   .findList();
  * ...
  * }</pre>
  *
@@ -123,6 +123,11 @@ public interface ExpressionFactory {
   Expression eq(String propertyName, Object value);
 
   /**
+   * Equal To or Null - property equal to the given value or null.
+   */
+  Expression eqOrNull(String propertyName, Object value);
+
+  /**
    * Not Equal To - property not equal to the given value.
    */
   Expression ne(String propertyName, Object value);
@@ -150,6 +155,33 @@ public interface ExpressionFactory {
   Expression ineObject(String propertyName, Object value);
 
   /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  Expression inRange(String propertyName, Object value1, Object value2);
+
+  /**
+   * Value in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .startDate.inRangeWith(endDate, now)
+   *
+   *    // which equates to
+   *    startDate <= now and (endDate > now or endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   * The most common use of this could be called "effective dating" where 2 date or
+   * timestamp columns represent the date range in which
+   */
+  Expression inRangeWith(String lowProperty, String highProperty, Object value);
+
+  /**
    * Between - property between the two given values.
    */
   Expression between(String propertyName, Object value1, Object value2);
@@ -158,6 +190,14 @@ public interface ExpressionFactory {
    * Between - value between two given properties.
    */
   Expression betweenProperties(String lowProperty, String highProperty, Object value);
+
+  /**
+   * Greater Than Or Null - property greater than the given value or null.
+   * <p>
+   * A convenient expression combining GT and Is Null.  Most often useful for range
+   * expressions where the top range value is nullable.
+   */
+  Expression gtOrNull(String propertyName, Object value);
 
   /**
    * Greater Than - property greater than the given value.
@@ -169,6 +209,14 @@ public interface ExpressionFactory {
    * value.
    */
   Expression ge(String propertyName, Object value);
+
+  /**
+   * Less Than or Null - property less than the given value or null.
+   * <p>
+   * A convenient expression combining LT and Is Null.  Most often useful for range
+   * expressions where the bottom range value is nullable.
+   */
+  Expression ltOrNull(String propertyName, Object value);
 
   /**
    * Less Than - property less than the given value.
@@ -276,6 +324,41 @@ public interface ExpressionFactory {
    * In - property has a value in the collection of values.
    */
   Expression in(String propertyName, Collection<?> values);
+
+  /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   * <p>
+   * Without this we typically need to code an <code>if</code> block to only add
+   * the IN predicate if the collection is not empty like:
+   * </p>
+   *
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   if (ids != null && !ids.isEmpty()) {
+   *     query.where().in("customer.id", ids);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .inOrEmpty("customer.id", ids)
+   *     .findList();
+   *
+   * }</pre>
+   */
+  Expression inOrEmpty(String propertyName, Collection<?> values);
 
   /**
    * Not In - property has a value in the array of values.

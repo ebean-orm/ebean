@@ -1,13 +1,13 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourcePool;
@@ -42,9 +42,7 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     assertTrue(connection.getAutoCommit());
     connection.close();
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2autocommit");
     config.loadFromProperties();
     config.setDataSource(pool);
@@ -55,11 +53,13 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     config.addClass(UTDetail.class);
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
+
     config.setAutoCommitMode(true);
 
-    EbeanServer ebeanServer = EbeanServerFactory.create(config);
+    Database database = DatabaseFactory.create(config);
 
-    Query<UTMaster> query = ebeanServer.find(UTMaster.class);
+    Query<UTMaster> query = database.find(UTMaster.class);
     List<UTMaster> details = query.findList();
     assertEquals(0, details.size());
 
@@ -68,28 +68,24 @@ public class TestAutoCommitDataSource extends BaseTestCase {
     UTMaster bean3 = new UTMaster("three3");
 
     // use a different transaction to do final query check
-    try (Transaction otherTxn = ebeanServer.createTransaction()) {
-
-      Transaction txn = ebeanServer.beginTransaction();
-      try {
+    try (Transaction otherTxn = database.createTransaction()) {
+      try (Transaction txn = database.beginTransaction()) {
         assertTrue(txn.getConnection().getAutoCommit());
-        ebeanServer.save(bean1);
-        ebeanServer.save(bean2);
+        database.save(bean1);
+        database.save(bean2);
 
-        Query<UTMaster> query2 = ebeanServer.find(UTMaster.class);
-        details = ebeanServer.extended().findList(query2, otherTxn);
+        details = database.find(UTMaster.class)
+          .usingTransaction(otherTxn)
+          .findList();
         assertEquals(2, details.size());
 
-        ebeanServer.save(bean3);
-
+        database.save(bean3);
         txn.rollback();
-
-      } finally {
-        txn.end();
       }
 
-      Query<UTMaster> query3 = ebeanServer.find(UTMaster.class);
-      details = ebeanServer.extended().findList(query3, otherTxn);
+      details = database.find(UTMaster.class)
+        .usingTransaction(otherTxn)
+        .findList();
       assertEquals(3, details.size());
     }
 

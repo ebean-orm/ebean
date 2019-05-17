@@ -6,6 +6,22 @@ package io.ebean.config;
 public abstract class JsonConfig {
 
   /**
+   * Defined the format used for Date types.
+   */
+  public enum Date {
+
+    /**
+     * Format as epoch millis.
+     */
+    MILLIS,
+
+    /**
+     * Format as ISO-8601 date format.
+     */
+    ISO8601
+  }
+
+  /**
    * Defined the format used for DateTime types.
    */
   public enum DateTime {

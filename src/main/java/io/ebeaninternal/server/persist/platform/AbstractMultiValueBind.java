@@ -124,8 +124,8 @@ public abstract class AbstractMultiValueBind extends MultiValueBind {
         //case NCLOB:
       case NCHAR:
       case NVARCHAR:
-        return "varchar";
-      case ExtraDbTypes.UUID: // Db Native UUID
+      case ExtraDbTypes.UUID: // Postgres cast to uuid[]
+      case ExtraDbTypes.INET: // Postgres cast to inet[]
         return "varchar";
 
       default:

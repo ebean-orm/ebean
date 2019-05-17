@@ -11,7 +11,25 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 public class InExpressionTest extends BaseExpressionTest {
 
   @Test
-  public void queryPlanHash_given_diffPropertyName_should_differentPlanHash() throws Exception {
+  public void queryPlanHash_given_diffEmpty_should_differentPlanHash() {
+
+    List<Integer> emptyValues = values();
+
+    InExpression ex1 = new InExpression("foo", emptyValues, false, true);
+    InExpression ex2 = new InExpression("foo", emptyValues, false);
+    InExpression ex3 = new InExpression("foo", emptyValues, false, true);
+    InExpression ex4 = new InExpression("foo", null, false, true);
+
+    ex1.prepareExpression(multi());
+    ex2.prepareExpression(multi());
+
+    different(ex1, ex2);
+    same(ex1, ex3); // same empty
+    same(ex1, ex4); // same null
+  }
+
+  @Test
+  public void queryPlanHash_given_diffPropertyName_should_differentPlanHash() {
 
     List<Integer> values = values(42, 92);
 
@@ -25,7 +43,7 @@ public class InExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void queryPlanHash_given_diffBindCount_should_differentPlanHash() throws Exception {
+  public void queryPlanHash_given_diffBindCount_should_differentPlanHash() {
 
     List<Integer> values1 = values(42, 92);
     List<Integer> values2 = values(42, 92, 82);
@@ -39,7 +57,7 @@ public class InExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void queryPlanHash_given_diffBindCount_withMultiSupport_samePlanHash() throws Exception {
+  public void queryPlanHash_given_diffBindCount_withMultiSupport_samePlanHash() {
 
     List<Integer> values1 = values(42, 92);
     List<Integer> values2 = values(42, 92, 82);
@@ -53,7 +71,7 @@ public class InExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void queryPlanHash_given_diffNotFlag_should_differentPlanHash() throws Exception {
+  public void queryPlanHash_given_diffNotFlag_should_differentPlanHash() {
 
     List<Integer> values = values(42, 92);
 
@@ -67,7 +85,7 @@ public class InExpressionTest extends BaseExpressionTest {
   }
 
   @Test
-  public void queryPlanHash_given_sameNotFlag_should_samePlanHash() throws Exception {
+  public void queryPlanHash_given_sameNotFlag_should_samePlanHash() {
 
     List<Integer> values = values(42, 92);
 

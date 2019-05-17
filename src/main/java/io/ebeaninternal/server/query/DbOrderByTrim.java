@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 class DbOrderByTrim {
 
-  private static final Pattern orderByTrim = Pattern.compile("(?i)\\b asc\\b|\\b desc\\b|\\b nulls first\\b|\\b nulls last\\b");
+  private static final Pattern orderByTrim = Pattern.compile("(?i) asc\\b| desc\\b|\\b nulls first\\b|\\b nulls last\\b");
 
   /**
    * Convert the dbOrderBy clause to be safe for adding to select or distinct on.

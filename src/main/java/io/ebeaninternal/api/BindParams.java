@@ -41,6 +41,14 @@ public class BindParams implements Serializable {
   public BindParams() {
   }
 
+  /**
+   * Reset positioned parameters (usually due to bind parameter expansion).
+   */
+  public void reset() {
+    bindHash = null;
+    positionedParameters.clear();
+  }
+
   public int queryBindHash() {
     int hc = namedParameters.hashCode();
     for (Param positionedParameter : positionedParameters) {
@@ -171,8 +179,7 @@ public class BindParams implements Serializable {
   }
 
   private Param getParam(String name) {
-    Param p = namedParameters.computeIfAbsent(name, k -> new Param());
-    return p;
+    return namedParameters.computeIfAbsent(name, k -> new Param());
   }
 
   private Param getParam(int position) {

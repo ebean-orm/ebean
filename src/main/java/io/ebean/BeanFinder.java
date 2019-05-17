@@ -15,8 +15,8 @@ import java.util.Optional;
  * public class CustomerFinder extends BeanFinder<Long,Customer> {
  *
  *   @Inject
- *   public CustomerFinder(EbeanServer server) {
- *     super(Customer.class, server);
+ *   public CustomerFinder(Database database) {
+ *     super(Customer.class, database);
  *   }
  *
  *   // ... add customer specific finders
@@ -29,25 +29,25 @@ import java.util.Optional;
  */
 public abstract class BeanFinder<I,T> {
 
-  protected final EbeanServer server;
+  protected final Database server;
 
   protected final Class<T> type;
 
   /**
-   * Create with the given bean type and EbeanServer instance.
+   * Create with the given bean type and Database instance.
    *
    * @param type The bean type
-   * @param server The EbeanServer instance typically created via Spring factory or equivalent.
+   * @param server The Database instance typically created via Spring factory or equivalent.
    */
-  protected BeanFinder(Class<T> type, EbeanServer server) {
+  protected BeanFinder(Class<T> type, Database server) {
     this.type = type;
     this.server = server;
   }
 
   /**
-   * Return the EbeanServer to use.
+   * Return the Database to use.
    */
-  public EbeanServer db() {
+  public Database db() {
     return server;
   }
 
@@ -66,21 +66,20 @@ public abstract class BeanFinder<I,T> {
   }
 
   /**
-   * Return typically a different EbeanServer to the default.
+   * Return typically a different Database to the default.
    * <p>
-   * This is equivalent to {@link Ebean#getServer(String)}
+   * This is equivalent to {@link DB#byName(String)}
    *
-   * @param server The name of the EbeanServer. If this is null then the default EbeanServer is
-   *               returned.
+   * @param server The name of the Database. If this is null then the default Database is returned.
    */
-  public EbeanServer db(String server) {
-    return Ebean.getServer(server);
+  public Database db(String server) {
+    return DB.byName(server);
   }
 
   /**
    * Creates an entity reference for this ID.
    * <p>
-   * Equivalent to {@link EbeanServer#getReference(Class, Object)}
+   * Equivalent to {@link Database#getReference(Class, Object)}
    */
   @Nonnull
   public T ref(I id) {
@@ -89,8 +88,6 @@ public abstract class BeanFinder<I,T> {
 
   /**
    * Retrieves an entity by ID.
-   * <p>
-   * Equivalent to {@link EbeanServer#find(Class, Object)}
    */
   @Nullable
   public T findById(I id) {
@@ -107,8 +104,6 @@ public abstract class BeanFinder<I,T> {
 
   /**
    * Delete a bean by Id.
-   * <p>
-   * Equivalent to {@link EbeanServer#delete(Class, Object)}
    */
   public void deleteById(I id) {
     db().delete(type, id);
@@ -138,7 +133,7 @@ public abstract class BeanFinder<I,T> {
    * }</pre>
    *
    * <p>
-   * Equivalent to {@link EbeanServer#update(Class)}
+   * Equivalent to {@link Database#update(Class)}
    */
   protected UpdateQuery<T> updateQuery() {
     return db().update(type);
@@ -147,7 +142,7 @@ public abstract class BeanFinder<I,T> {
   /**
    * Creates a query.
    * <p>
-   * Equivalent to {@link EbeanServer#find(Class)}
+   * Equivalent to {@link Database#find(Class)}
    */
   protected Query<T> query() {
     return db().find(type);

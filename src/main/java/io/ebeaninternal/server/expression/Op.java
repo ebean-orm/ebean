@@ -8,48 +8,48 @@ public enum Op {
   /**
    * Exists (JSON).
    */
-  EXISTS(" is not null ", ""),
+  EXISTS(" is not null", ""),
 
   /**
    * Not Exists (JSON).
    */
-  NOT_EXISTS(" is null ", ""),
+  NOT_EXISTS(" is null", ""),
 
   /**
    * Between (JSON).
    */
-  BETWEEN(" between ? and ? ", ""),
+  BETWEEN(" between ? and ?", ""),
 
   /**
    * Equal to
    */
-  EQ(" = ? ", ""),
+  EQ(" = ?", ""),
 
   /**
    * Not equal to.
    */
-  NOT_EQ(" <> ? ", ""),
+  NOT_EQ(" <> ?", ""),
 
   /**
    * Less than.
    */
 
-  LT(" < ? ", "lt"),
+  LT(" < ?", "lt"),
 
   /**
    * Less than or equal to.
    */
-  LT_EQ(" <= ? ", "lte"),
+  LT_EQ(" <= ?", "lte"),
 
   /**
    * Greater than.
    */
-  GT(" > ? ", "gt"),
+  GT(" > ?", "gt"),
 
   /**
    * Greater than or equal to.
    */
-  GT_EQ(" >= ? ", "gte");
+  GT_EQ(" >= ?", "gte");
 
   final String exp;
 

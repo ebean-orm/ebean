@@ -7,7 +7,7 @@ import java.io.IOException;
 
 class BetweenExpression extends AbstractExpression {
 
-  private static final String BETWEEN = " between ";
+  private static final String _BETWEEN = " between ? and ?";
 
   private final Object valueHigh;
 
@@ -40,7 +40,7 @@ class BetweenExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(propName).append(BETWEEN).append(" ? and ? ");
+    request.append(propName).append(_BETWEEN);
   }
 
   @Override

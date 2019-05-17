@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -137,8 +136,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final Map<String, String> namedQuery;
 
   private final short profileBeanId;
-  private final ProfileLocation locationById;
-  private final ProfileLocation locationAll;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -210,6 +207,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final String draftTable;
 
   private final PartitionMeta partitionMeta;
+  private final String storageEngine;
 
   /**
    * DB table comment.
@@ -445,8 +443,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.locationById = ProfileLocation.createAt(fullName + ".byId");
-    this.locationAll = ProfileLocation.createAt(fullName + ".all");
     this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
@@ -490,6 +486,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
     this.partitionMeta = deploy.getPartitionMeta();
+    this.storageEngine = deploy.getStorageEngine();
     this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
 
     // helper object used to derive lists of properties
@@ -576,20 +573,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
-  }
-
-  /**
-   * Return a location for "find by id".
-   */
-  public ProfileLocation profileLocationById() {
-    return locationById;
-  }
-
-  /**
-   * Return a location for "find all".
-   */
-  public ProfileLocation profileLocationAll() {
-    return locationAll;
   }
 
   /**
@@ -722,16 +705,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       inheritInfo.setDescriptor(this);
     }
 
-    if (isEmbedded()) {
-      // initialise all the properties
-      for (BeanProperty prop : propertiesAll()) {
-        prop.initialise(initContext);
-      }
-    } else {
-      // initialise just the Id properties
-      if (idProperty != null) {
-        idProperty.initialise(initContext);
-      }
+    // initialise just the Id property only
+    if (idProperty != null) {
+      idProperty.initialise(initContext);
     }
   }
 
@@ -757,14 +733,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       }
     }
 
-    if (!isEmbedded()) {
-      // initialise all the non-id properties
-      for (BeanProperty prop : propertiesAll()) {
-        if (!prop.isId()) {
-          prop.initialise(initContext);
-        }
-        prop.registerColumn(this, null);
+    // initialise all the non-id properties
+    for (BeanProperty prop : propertiesAll()) {
+      if (!prop.isId()) {
+        prop.initialise(initContext);
       }
+      prop.registerColumn(this, null);
     }
 
     if (unidirectional != null) {
@@ -1500,19 +1474,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Hit the bean cache trying to load a list/batch of entities.
+   * Return the set of entities that were successfully loaded from L2 cache.
+   */
+  public Set<EntityBeanIntercept> cacheBeanLoadAll(List<EntityBeanIntercept> list, PersistenceContext persistenceContext, int lazyLoadProperty, String propertyName) {
+    return cacheHelp.beanCacheLoadAll(list, persistenceContext, lazyLoadProperty, propertyName);
+  }
+
+  /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
   public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {
     return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
-  /**
-   * Returns true if it managed to populate/load the bean from the cache.
-   */
-  public boolean cacheBeanLoad(EntityBeanIntercept ebi, PersistenceContext context) {
-    EntityBean bean = ebi.getOwner();
-    Object id = getId(bean);
-    return cacheBeanLoad(bean, ebi, id, context);
+  public BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
+    return cacheHelp.cacheIdLookup(context, ids);
   }
 
   /**
@@ -1978,10 +1955,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
     query.setPersistenceContext(pc);
     return query
-        // .select(getIdProperty().getName())
-        // we do not select the id because we
-        // probably have to load the entire bean
-        .setId(id).findOne();
+      // .select(getIdProperty().getName())
+      // we do not select the id because we
+      // probably have to load the entire bean
+      .setId(id).findOne();
   }
 
   /**
@@ -2594,9 +2571,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return a 'dynamic property' used to read a formula.
    */
-  private STreeProperty findSqlTreeFormula(String formulaExpression) {
-
-    return dynamicProperty.computeIfAbsent(formulaExpression, (formula) -> new FormulaPropertyPath(this, formula).build());
+  private STreeProperty findSqlTreeFormula(String formula, String path) {
+    String key = formula + "-" + path;
+    return dynamicProperty.computeIfAbsent(key, (fullKey) -> new FormulaPropertyPath(this, formula, path).build());
   }
 
   /**
@@ -2605,9 +2582,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * The property can be a dynamic formula or a well known bean property.
    */
   @Override
-  public STreeProperty findPropertyWithDynamic(String propName) {
+  public STreeProperty findPropertyWithDynamic(String propName, String path) {
     if (propName.indexOf('(') > -1) {
-      return findSqlTreeFormula(propName);
+      return findSqlTreeFormula(propName, path);
     }
     return _findBeanProperty(propName);
   }
@@ -2880,6 +2857,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public PartitionMeta getPartitionMeta() {
     return partitionMeta;
+  }
+
+  /**
+   * Return the storage engine.
+   */
+  public String getStorageEngine() {
+    return storageEngine;
   }
 
   /**

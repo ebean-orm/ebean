@@ -3,6 +3,7 @@ package io.ebeaninternal.server.loadcontext;
 import io.ebean.FetchConfig;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
@@ -75,6 +76,20 @@ public abstract class DLoadBaseContext {
 
     int lazyBatchSize = fetchConfig.getLazyBatchSize();
     return (lazyBatchSize > 1) ? lazyBatchSize : defaultBatchSize;
+  }
+
+  /**
+   * If the parent has a query plan label then extend it with the path and
+   * set onto the secondary query.
+   */
+  void setLabel(SpiQuery<?> query) {
+
+    String label = parent.getPlanLabel();
+    if (label != null) {
+      label += "_" + fullPath;
+      query.setLabel(label);
+      query.setProfileLocation(parent.getProfileLocation());
+    }
   }
 
   protected PersistenceContext getPersistenceContext() {

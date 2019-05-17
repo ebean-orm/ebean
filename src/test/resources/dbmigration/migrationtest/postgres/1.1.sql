@@ -41,6 +41,10 @@ alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
+alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status2;
+alter table migtest_e_basic alter column status2 type varchar(127);
+alter table migtest_e_basic alter column status2 drop default;
+alter table migtest_e_basic alter column status2 drop not null;
 
 -- rename all collisions;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);

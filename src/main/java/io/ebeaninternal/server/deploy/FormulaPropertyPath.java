@@ -20,15 +20,17 @@ class FormulaPropertyPath {
 
   private final String internalExpression;
 
+  private final String path;
+
   private boolean countDistinct;
 
   private String cast;
   private String alias;
 
-  FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula) {
-
+  FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula, String path) {
     this.descriptor = descriptor;
     this.formula = formula;
+    this.path = path;
 
     int openBracket = formula.indexOf('(');
     int closeBracket = formula.lastIndexOf(')');
@@ -94,6 +96,11 @@ class FormulaPropertyPath {
     DeployPropertyParser parser = descriptor.parser().setCatchFirst(true);
 
     String parsed = parser.parse(internalExpression);
+    if (path != null) {
+      // fetch("machineStats", "sum(hours), sum(totalKms)")
+      parsed = parsed.replace("${}", "${" + path + "}");
+    }
+
     ElPropertyDeploy firstProp = parser.getFirstProp();
 
     ScalarType<?> scalarType;

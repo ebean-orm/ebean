@@ -1,14 +1,13 @@
 package io.ebean.text.json;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import io.ebean.DB;
 import io.ebean.text.PathProperties;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import com.fasterxml.jackson.core.JsonGenerator;
-import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -16,16 +15,18 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class JsonContextTest {
 
   @Test
-  public void testIsSupportedType() throws Exception {
+  public void testIsSupportedType() {
 
-    EbeanServer server = Ebean.getDefaultServer();
-
-    JsonContext json = server.json();
+    JsonContext json = DB.json();
     assertTrue(json.isSupportedType(Customer.class));
     assertFalse(json.isSupportedType(System.class));
   }
@@ -35,14 +36,14 @@ public class JsonContextTest {
 
     ResetBasicData.reset();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .fetch("customer", "id, name")
       .where().eq("customer.id", 1)
       .findList();
 
-    String json = Ebean.json().toJson(orders);
+    String json = DB.json().toJson(orders);
 
-    List<Order> orders1 = Ebean.json().toList(Order.class, json);
+    List<Order> orders1 = DB.json().toList(Order.class, json);
 
     Customer customer = null;
     for (Order order : orders1) {
@@ -60,16 +61,16 @@ public class JsonContextTest {
 
     ResetBasicData.reset();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .select("status")
       .fetch("customer", "id, name")
       .findList();
 
-    String json = Ebean.json().toJson(orders);
+    String json = DB.json().toJson(orders);
 
     JsonReadOptions options = new JsonReadOptions().setEnableLazyLoading(true);
 
-    List<Order> orders1 = Ebean.json().toList(Order.class, json, options);
+    List<Order> orders1 = DB.json().toList(Order.class, json, options);
 
     for (Order order : orders1) {
       Customer customer = order.getCustomer();
@@ -81,11 +82,9 @@ public class JsonContextTest {
   }
 
   @Test
-  public void test_toObject() throws Exception {
+  public void test_toObject() {
 
-    EbeanServer server = Ebean.getDefaultServer();
-
-    JsonContext json = server.json();
+    JsonContext json = DB.getDefault().json();
 
     Customer customer = new Customer();
     customer.setId(1);
@@ -111,7 +110,7 @@ public class JsonContextTest {
 
     String jsonWithUnknown = "{\"id\":42,\"unknownProp\":\"foo\",\"name\":\"rob\",\"version\":1}";
 
-    Customer customer = Ebean.json().toBean(Customer.class, jsonWithUnknown);
+    Customer customer = DB.json().toBean(Customer.class, jsonWithUnknown);
     assertEquals(Integer.valueOf(42), customer.getId());
     assertEquals("rob", customer.getName());
   }
@@ -139,7 +138,7 @@ public class JsonContextTest {
     options.addRootVisitor(custReadVisitor);
 
 
-    Customer customer = Ebean.json().toBean(Customer.class, jsonWithUnknown, options);
+    Customer customer = DB.json().toBean(Customer.class, jsonWithUnknown, options);
     assertEquals(Integer.valueOf(42), customer.getId());
     assertEquals("rob", customer.getName());
 
@@ -160,7 +159,7 @@ public class JsonContextTest {
     JsonReadOptions options = new JsonReadOptions();
     options.addRootVisitor(custReadVisitor);
 
-    Customer customer = Ebean.json().toBean(Customer.class, someJsonAllKnown, options);
+    Customer customer = DB.json().toBean(Customer.class, someJsonAllKnown, options);
     assertEquals(Integer.valueOf(42), customer.getId());
     assertEquals("rob", customer.getName());
 
@@ -171,10 +170,8 @@ public class JsonContextTest {
   @Test
   public void testCreateGenerator() throws Exception {
 
-    EbeanServer server = Ebean.getDefaultServer();
-
     StringWriter writer = new StringWriter();
-    JsonContext json = server.json();
+    JsonContext json = DB.json();
     JsonGenerator generator = json.createGenerator(writer);
 
     Customer customer = new Customer();
@@ -198,10 +195,8 @@ public class JsonContextTest {
   @Test
   public void testCreateGenerator_writeRaw() throws Exception {
 
-    EbeanServer server = Ebean.getDefaultServer();
-
     StringWriter writer = new StringWriter();
-    JsonContext json = server.json();
+    JsonContext json = DB.json();
     JsonGenerator generator = json.createGenerator(writer);
 
     // test that we can write anything via writeRaw()

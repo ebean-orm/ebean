@@ -18,6 +18,7 @@ enum EqlOperator {
   ISTARTS_WITH,
   IENDS_WITH,
   ILIKE,
+  INRANGE,
   BETWEEN
 
 }

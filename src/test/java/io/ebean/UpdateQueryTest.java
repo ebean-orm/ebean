@@ -2,8 +2,8 @@ package io.ebean;
 
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.ServerMetrics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Country;
@@ -36,10 +36,10 @@ public class UpdateQueryTest extends BaseTestCase {
 
     query.update();
 
-    assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ?  and id > ?");
+    assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ? and id > ?");
 
-    BasicMetricVisitor basic = visitMetricsBasic();
-    List<MetaOrmQueryMetric> ormQueryMetrics = basic.getOrmQueryMetrics();
+    ServerMetrics metrics = collectMetrics();
+    List<MetaOrmQueryMetric> ormQueryMetrics = metrics.getOrmQueryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
     assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
     assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateActive");
@@ -68,8 +68,8 @@ public class UpdateQueryTest extends BaseTestCase {
 
     assertThat(sql.get(0)).contains("update o_customer set status = status");
 
-    BasicMetricVisitor basic = visitMetricsBasic();
-    List<MetaOrmQueryMetric> ormQueryMetrics = basic.getOrmQueryMetrics();
+    ServerMetrics metrics = collectMetrics();
+    List<MetaOrmQueryMetric> ormQueryMetrics = metrics.getOrmQueryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
     assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
     assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateAll");
@@ -166,7 +166,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     query.update();
 
-    assertThat(sqlOf(query)).contains("update o_customer set status=?, updtime=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and t1.country_code = ?  and t0.id > ? )");
+    assertThat(sqlOf(query)).contains("update o_customer set status=?, updtime=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ? and t1.country_code = ? and t0.id > ?)");
   }
 
   @Test

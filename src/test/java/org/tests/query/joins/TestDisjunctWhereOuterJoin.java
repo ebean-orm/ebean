@@ -79,7 +79,7 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
     String sql = sqlOf(query);
     assertSqlOuterJoins(sql);
-    assertThat(sql).contains("where (t0.user_name = ?  or u1.roleid = ? )");
+    assertThat(sql).contains("where (t0.user_name = ? or u1.roleid = ?)");
   }
 
   private void queryOrExpression(Integer roleid) {
@@ -95,7 +95,7 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
     String sql = sqlOf(query);
     assertSqlOuterJoins(sql);
-    assertThat(sql).contains("where (t0.user_name = ?  or u1.roleid = ? )");
+    assertThat(sql).contains("where (t0.user_name = ? or u1.roleid = ?)");
   }
 
   private void assertSqlOuterJoins(String sql) {

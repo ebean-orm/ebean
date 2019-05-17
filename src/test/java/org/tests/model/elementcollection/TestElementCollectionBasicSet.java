@@ -24,11 +24,11 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(4);
       assertThat(sql.get(0)).contains("insert into ecs_person");
       assertThat(sql.get(1)).contains("insert into ecs_person_phone");
-    }
-    else {
+      assertSqlBind(sql, 2, 3);
+    } else {
       assertThat(sql).hasSize(3);
       assertThat(sql.get(0)).contains("insert into ecs_person");
       assertThat(sql.get(1)).contains("insert into ecs_person_phone");
@@ -103,12 +103,12 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(3);
+      assertThat(sql).hasSize(6);
       assertThat(sql.get(0)).contains("update ecs_person set name=?, version=? where id=? and version=?");
       assertThat(sql.get(1)).contains("delete from ecs_person_phone where ecs_person_id=?");
       assertThat(sql.get(2)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
-    }
-    else {
+      assertSqlBind(sql, 3, 5);
+    } else {
       assertThat(sql).hasSize(5);
       assertThat(sql.get(0)).contains("update ecs_person set name=?, version=? where id=? and version=?");
       assertThat(sql.get(1)).contains("delete from ecs_person_phone where ecs_person_id=?");
@@ -137,11 +137,11 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(6);
       assertThat(sql.get(0)).contains("delete from ecs_person_phone where ecs_person_id=?");
       assertThat(sql.get(1)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
-    }
-    else {
+      assertSqlBind(sql, 2, 5);
+    } else {
       assertThat(sql).hasSize(5);
       assertThat(sql.get(0)).contains("delete from ecs_person_phone where ecs_person_id=?");
       assertThat(sql.get(1)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
