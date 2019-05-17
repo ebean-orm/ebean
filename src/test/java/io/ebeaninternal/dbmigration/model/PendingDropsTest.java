@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.migration.Migration;

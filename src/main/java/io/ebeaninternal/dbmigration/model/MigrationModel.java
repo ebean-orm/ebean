@@ -3,6 +3,8 @@ package io.ebeaninternal.dbmigration.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.ebean.migration.MigrationVersion;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
