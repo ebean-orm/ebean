@@ -1,11 +1,12 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebeaninternal.dbmigration.model.MigrationVersion;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import io.ebean.migration.MigrationVersion;
 
 /**
  * Utility to determine the last sql migration version and next version.

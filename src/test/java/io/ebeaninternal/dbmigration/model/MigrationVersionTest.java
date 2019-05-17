@@ -2,12 +2,15 @@ package io.ebeaninternal.dbmigration.model;
 
 import org.junit.Test;
 
+import io.ebean.migration.MigrationVersion;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
+// FIXME: this test should be moved to ebean-migration artifact
 public class MigrationVersionTest {
 
 
@@ -143,12 +146,20 @@ public class MigrationVersionTest {
     MigrationVersion v2 = MigrationVersion.parse("1.1_1.2_foo");
     MigrationVersion v3 = MigrationVersion.parse("1.1_1.2__foo");
 
-    assertThat(v0.compareTo(v1)).isGreaterThan(0);
-    assertThat(v1.compareTo(v0)).isLessThan(0);
+    // same version number, but not equal. It prints out the warning:
+    // The migrationscript '1.1.1.1_junk' contains non numeric version part.
+    // This may lead to misordered version scripts.
+    assertThat(v0.compareTo(v1)).isEqualTo(0);
+    assertThat(v0).isNotEqualTo(v1);
+    assertThat(v1.compareTo(v0)).isEqualTo(0);
+    assertThat(v1).isNotEqualTo(v0);
     assertThat(v1.compareTo(v2)).isEqualTo(0);
+    assertThat(v1).isNotEqualTo(v2);
 
-    assertThat(v0.compareTo(v3)).isLessThan(0);
-    assertThat(v3.compareTo(v0)).isGreaterThan(0);
+    assertThat(v0.compareTo(v3)).isEqualTo(0);
+    assertThat(v0).isNotEqualTo(v3);
+    assertThat(v3.compareTo(v0)).isEqualTo(0);
+    assertThat(v3).isNotEqualTo(v0);
   }
 
   @Test
