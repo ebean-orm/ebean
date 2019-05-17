@@ -42,5 +42,9 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
     DefaultTransactionThreadLocal.set(serverName, trans);
   }
 
+  @Override
+  public void clear(SpiTransaction trans) {
+    DefaultTransactionThreadLocal.clear(serverName, trans);
+  }
 
 }
