@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public final class DefaultTransactionThreadLocal {
 
-  private static final ThreadLocal<Map<String, SpiTransaction>> local = new ThreadLocal<>();
+  private static final ThreadLocal<Map<String, SpiTransaction>> local = ThreadLocal.withInitial(HashMap::new);
 
   /**
    * Not allowed.
@@ -19,31 +19,11 @@ public final class DefaultTransactionThreadLocal {
   private DefaultTransactionThreadLocal() {
   }
 
-  private static Map<String, SpiTransaction> createMap() {
-    Map<String, SpiTransaction> map = new HashMap<>();
-    local.set(map);
-    return map;
-  }
-
-  /**
-   * Obtain the map creating if needed.
-   */
-  private static Map<String, SpiTransaction> obtainMap() {
-    final Map<String, SpiTransaction> map = local.get();
-    if (map == null) {
-      return createMap();
-    }
-    return map;
-  }
-
   /**
    * Remove the transaction entry for the given serverName.
    */
   private static void remove(String serverName) {
-    Map<String, SpiTransaction> map = local.get();
-    if (map != null) {
-      map.remove(serverName);
-    }
+    local.get().remove(serverName);
   }
 
   /**
@@ -53,8 +33,7 @@ public final class DefaultTransactionThreadLocal {
     if (trans == null) {
       remove(serverName);
     } else {
-      Map<String, SpiTransaction> map = obtainMap();
-      SpiTransaction existingTransaction = map.put(serverName, trans);
+      SpiTransaction existingTransaction = local.get().put(serverName, trans);
       if (existingTransaction != null && existingTransaction.isActive()) {
         throw new PersistenceException("The existing transaction is still active?");
       }
@@ -74,8 +53,7 @@ public final class DefaultTransactionThreadLocal {
     if (trans == null) {
       remove(serverName);
     } else {
-      Map<String, SpiTransaction> map = obtainMap();
-      map.put(serverName, trans);
+      local.get().put(serverName, trans);
     }
   }
 
@@ -83,18 +61,11 @@ public final class DefaultTransactionThreadLocal {
    * Return the current Transaction for this serverName and Thread.
    */
   public static SpiTransaction get(String serverName) {
-    Map<String, SpiTransaction> map = local.get();
-    if (map == null) {
-      return null;
-    }
-    return map.get(serverName);
+    return local.get().get(serverName);
   }
 
-  private static SpiTransaction obtain(String serverName, Map<String, SpiTransaction> map) {
-    if (map == null) {
-      throw new IllegalStateException("No current transaction for [" + serverName + "]");
-    }
-    SpiTransaction transaction = map.remove(serverName);
+  private static SpiTransaction obtain(String serverName) {
+    SpiTransaction transaction = local.get().remove(serverName);
     if (transaction == null) {
       throw new IllegalStateException("No current transaction for [" + serverName + "]");
     }
@@ -105,24 +76,14 @@ public final class DefaultTransactionThreadLocal {
    * Commit the current transaction.
    */
   public static void commit(String serverName) {
-    Map<String, SpiTransaction> map = local.get();
-    SpiTransaction transaction = obtain(serverName, map);
-    transaction.commit();
-    if (map.isEmpty()) {
-      local.remove();
-    }
+    obtain(serverName).commit();
   }
 
   /**
    * Rollback the current transaction.
    */
   public static void rollback(String serverName) {
-    Map<String, SpiTransaction> map = local.get();
-    SpiTransaction transaction = obtain(serverName, map);
-    transaction.rollback();
-    if (map.isEmpty()) {
-      local.remove();
-    }
+    obtain(serverName).rollback();
   }
 
   /**
@@ -145,17 +106,9 @@ public final class DefaultTransactionThreadLocal {
    * </pre>
    */
   public static void end(String serverName) {
-
-    Map<String, SpiTransaction> map = local.get();
-    if (map == null) {
-      return;
-    }
-    SpiTransaction transaction = map.remove(serverName);
+    SpiTransaction transaction = local.get().remove(serverName);
     if (transaction != null) {
       transaction.end();
-    }
-    if (map.isEmpty()) {
-      local.remove();
     }
   }
 
