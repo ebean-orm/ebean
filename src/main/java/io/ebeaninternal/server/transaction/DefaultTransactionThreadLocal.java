@@ -75,6 +75,14 @@ public final class DefaultTransactionThreadLocal {
     return local.get().get(serverName);
   }
 
+  /**
+   * Return all transactions of the current thread (active/inactive).
+   * This is intended for test/debugging purposes only!
+   */
+  public static Map<String, SpiTransaction> currentTransactions() {
+    return local.get();
+  }
+
   private static SpiTransaction obtain(String serverName) {
     SpiTransaction transaction = local.get().remove(serverName);
     if (transaction == null) {

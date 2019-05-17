@@ -314,7 +314,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public String toString() {
-    return logPrefix;
+    if (active) {
+      return logPrefix;
+    } else {
+      return logPrefix + "(inactive)";
+    }
   }
 
   @Override
