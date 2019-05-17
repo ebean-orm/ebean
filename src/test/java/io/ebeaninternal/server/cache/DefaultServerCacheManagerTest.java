@@ -43,6 +43,7 @@ public class DefaultServerCacheManagerTest {
 
     DefaultServerCache cache = cache(manager, Customer.class);
     assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
+    assertThat(cache.getShortName()).isEqualTo("Customer_B");
 
     DefaultServerCache cache1 = cache(manager, Customer.class);
     assertThat(cache1).isSameAs(cache);
@@ -50,28 +51,32 @@ public class DefaultServerCacheManagerTest {
     DefaultServerCache cache2 = cache(manager, Contact.class);
     assertThat(cache1).isNotSameAs(cache2);
     assertThat(cache2.getName()).isEqualTo("org.tests.model.basic.Contact_B");
+    assertThat(cache2.getShortName()).isEqualTo("Contact_B");
 
 
     DefaultServerCache natKeyCache = (DefaultServerCache) manager.getNaturalKeyCache(Customer.class);
     assertThat(natKeyCache.getName()).isEqualTo("org.tests.model.basic.Customer_N");
+    assertThat(natKeyCache.getShortName()).isEqualTo("Customer_N");
 
     DefaultServerCache queryCache = (DefaultServerCache) manager.getQueryCache(Customer.class);
     assertThat(queryCache.getName()).isEqualTo("org.tests.model.basic.Customer_Q");
+    assertThat(queryCache.getShortName()).isEqualTo("Customer_Q");
 
     DefaultServerCache collCache = (DefaultServerCache) manager.getCollectionIdsCache(Customer.class, "contacts");
     assertThat(collCache.getName()).isEqualTo("org.tests.model.basic.Customer.contacts_C");
+    assertThat(collCache.getShortName()).isEqualTo("Customer.contacts_C");
 
-    cache.clearCount.sumThenReset();
-    collCache.clearCount.sumThenReset();
-    queryCache.clearCount.sumThenReset();
-    natKeyCache.clearCount.sumThenReset();
+    cache.clearCount.reset();
+    collCache.clearCount.reset();
+    queryCache.clearCount.reset();
+    natKeyCache.clearCount.reset();
 
     manager.clear(Customer.class);
 
-    assertThat(cache.clearCount.sumThenReset()).isEqualTo(1);
-    assertThat(natKeyCache.clearCount.sumThenReset()).isEqualTo(1);
-    assertThat(queryCache.clearCount.sumThenReset()).isEqualTo(1);
-    assertThat(collCache.clearCount.sumThenReset()).isEqualTo(1);
+    assertThat(cache.clearCount.get(true)).isEqualTo(1);
+    assertThat(natKeyCache.clearCount.get(true)).isEqualTo(1);
+    assertThat(queryCache.clearCount.get(true)).isEqualTo(1);
+    assertThat(collCache.clearCount.get(true)).isEqualTo(1);
   }
 
   private DefaultServerCache cache(DefaultServerCacheManager manager, Class<?> beanType) {

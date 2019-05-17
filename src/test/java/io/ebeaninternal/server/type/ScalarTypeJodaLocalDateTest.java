@@ -1,8 +1,10 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.JsonConfig;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.sql.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,10 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScalarTypeJodaLocalDateTest {
 
-  ScalarTypeJodaLocalDate type = new ScalarTypeJodaLocalDate();
+  private ScalarTypeJodaLocalDate type = new ScalarTypeJodaLocalDate(JsonConfig.Date.MILLIS);
 
   @Test
-  public void convertToMillis_convertFromMillis() throws Exception {
+  public void convertToMillis_convertFromMillis() {
 
     LocalDate localDate = new LocalDate();
     long millis = type.convertToMillis(localDate);
@@ -23,18 +25,23 @@ public class ScalarTypeJodaLocalDateTest {
   }
 
   @Test
-  public void convertToDate_convertFromDate() throws Exception {
+  public void convertToDate_convertFromDate() {
 
-    LocalDate localDate = new LocalDate();
+    convertDate(new LocalDate());
+    convertDate(new LocalDate(1899, 12, 1));
+    convertDate(new LocalDate(1900, 1, 1));
+  }
+
+  private void convertDate(LocalDate localDate) {
+
     Date dateValue = type.convertToDate(localDate);
     LocalDate localDate1 = type.convertFromDate(dateValue);
 
     assertThat(localDate).isEqualTo(localDate1);
   }
 
-
   @Test
-  public void toJdbcType() throws Exception {
+  public void toJdbcType() {
 
     LocalDate localDate = new LocalDate();
     Object jdbcType = type.toJdbcType(localDate);
@@ -44,7 +51,7 @@ public class ScalarTypeJodaLocalDateTest {
   }
 
   @Test
-  public void toBeanType() throws Exception {
+  public void toBeanType() {
 
     LocalDate localDate = new LocalDate();
     Date dateValue = type.convertToDate(localDate);
@@ -53,4 +60,15 @@ public class ScalarTypeJodaLocalDateTest {
     assertThat(beanType).isEqualTo(localDate);
   }
 
+  @Test
+  public void json() throws IOException {
+
+    LocalDate val = new LocalDate(2019, 5, 9);
+
+    JsonTester<LocalDate> jsonMillis = new JsonTester<>(type);
+    assertThat(jsonMillis.test(val)).isEqualTo("{\"key\":1557360000000}");
+
+    JsonTester<LocalDate> jsonIso = new JsonTester<>(new ScalarTypeJodaLocalDate(JsonConfig.Date.ISO8601) );
+    assertThat(jsonIso.test(val)).isEqualTo("{\"key\":\"2019-05-09\"}");
+  }
 }

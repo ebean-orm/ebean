@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -78,7 +79,7 @@ public class ScalarTypeJsonSet {
         // parse JSON into modifyAware list
         return EJson.parseSet(json, true);
       } catch (IOException e) {
-        throw new SQLException("Failed to parse JSON content as List: [" + json + "]", e);
+        throw new TextException("Failed to parse JSON [{}] as Set", json, e);
       }
     }
 

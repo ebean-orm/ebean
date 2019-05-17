@@ -65,6 +65,8 @@ public class CQueryPlan {
 
   private final String label;
 
+  private final String name;
+
   private final CQueryPlanKey planKey;
 
   private final boolean rawSql;
@@ -72,6 +74,7 @@ public class CQueryPlan {
   private final boolean rowNumberIncluded;
 
   private final String sql;
+  private final String sqlHash;
 
   private final String logWhereSql;
 
@@ -110,11 +113,13 @@ public class CQueryPlan {
     this.planKey = request.getQueryPlanKey();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
-    this.label = query.getLabel();
+    this.label = query.getPlanLabel();
+    this.name = deriveName(label, query.getType());
     this.location = location();
     this.autoTuned = query.isAutoTuned();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
+    this.sqlHash = md5Hash(sql);
     this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
@@ -135,12 +140,14 @@ public class CQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
-    this.label = query.getLabel();
+    this.label = query.getPlanLabel();
+    this.name = deriveName(label, query.getType());
     this.location = location();
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.asOfTableCount = 0;
     this.sql = sql;
+    this.sqlHash = md5Hash(sql);
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
     this.rowNumberIncluded = rowNumberIncluded;
@@ -149,6 +156,16 @@ public class CQueryPlan {
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
+  }
+
+  private String deriveName(String label, SpiQuery.Type type) {
+    if (label == null) {
+      return beanType.getSimpleName() + "." + type.label();
+    }
+    if (label.startsWith(beanType.getSimpleName())) {
+      return label;
+    }
+    return beanType.getSimpleName() + "_" + label;
   }
 
   private CQueryBindCapture initBindCapture(ServerConfig serverConfig, SpiQuery<?> query) {
@@ -187,6 +204,10 @@ public class CQueryPlan {
 
   public String getLabel() {
     return label;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public String getLocation() {
@@ -245,19 +266,23 @@ public class CQueryPlan {
 
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
-    return rawSql ? planKey.getPartialKey() + "_" + getSqlMd5Hash() : planKey.getPartialKey();
+    return rawSql ? planKey.getPartialKey() + "_" + sqlHash : planKey.getPartialKey();
   }
 
   /**
-   * Return the MD5 hash of the underlying sql.
+   * Return the MD5 hash of the sql.
    */
-  private String getSqlMd5Hash() {
+  private String md5Hash(String sql) {
     try {
       return Md5.hash(sql);
     } catch (Exception e) {
-      logger.error("Failed to MD5 hash the rawSql query", e);
+      logger.error("Failed to MD5 hash the query", e);
       return "error";
     }
+  }
+
+  public String getSqlHash() {
+    return sqlHash;
   }
 
   public String getSql() {

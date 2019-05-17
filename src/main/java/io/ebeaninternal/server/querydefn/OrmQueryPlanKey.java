@@ -26,6 +26,11 @@ class OrmQueryPlanKey implements CQueryPlanKey {
   }
 
   @Override
+  public CQueryPlanKey withDeleteByIds() {
+    return new OrmQueryPlanKey(description + ":deleteByIds", 0, 0, null);
+  }
+
+  @Override
   public String getPartialKey() {
     return description;
   }

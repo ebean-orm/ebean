@@ -124,11 +124,6 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void unregisterDeleteBean(Integer hash) {
-
-  }
-
-  @Override
   public boolean isRegisteredDeleteBean(Integer hash) {
     return false;
   }

@@ -42,7 +42,7 @@ class NativeILikeExpression extends AbstractExpression {
       pname = prop.getBeanProperty().getDecryptProperty(propName);
     }
 
-    request.append(pname).append(" ilike ? ");
+    request.append(pname).append(" ilike ?");
   }
 
   /**

@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  *   String sql = "select id, name from customer where name like :name and status_code = :status";
  *
  *   List<CustomerDto> beans =
- *     Ebean.findDto(CustomerDto.class, sql)
+ *     DB.findDto(CustomerDto.class, sql)
  *     .setParameter("name", "Acme%")
  *     .setParameter("status", "ACTIVE")
  *     .findList();
@@ -108,6 +108,12 @@ public interface DtoQuery<T> {
    * @param label A label that is unique to the DTO bean type.
    */
   DtoQuery<T> setLabel(String label);
+
+  /**
+   * Set the profile location of this query. This is used to relate query execution metrics
+   * back to a location like a specific line of code.
+   */
+  DtoQuery<T> setProfileLocation(ProfileLocation profileLocation);
 
   /**
    * Set a timeout on this query.

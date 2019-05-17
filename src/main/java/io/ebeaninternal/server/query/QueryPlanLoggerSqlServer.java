@@ -20,28 +20,31 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
   public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
 
     try (Statement stmt = conn.createStatement()) {
-      stmt.execute("SET STATISTICS XML ON");
+      stmt.execute("set statistics xml on");
+      stmt.execute("begin transaction");
       try (PreparedStatement explainStmt = conn.prepareStatement(plan.getSql())) {
         bind.prepare(explainStmt, conn);
 
         try (ResultSet rset = explainStmt.executeQuery()) {
-          // unfortunately, this will execute the
+          // unfortunately, this will execute the query, so we execute this in a transaction
         }
+        stmt.execute("rollback transaction");
+        String xml = null;
         if (explainStmt.getMoreResults()) {
           try (ResultSet rset = explainStmt.getResultSet()) {
             StringBuilder sb = new StringBuilder();
-            while (rset.next()) {
-              sb.append("XML: ").append(rset.getString(1));
+            if (rset.next()) {
+              xml = rset.getString(1);
             }
-            return createPlan(plan, bind.toString(), sb.toString());
           }
         }
+        return createPlan(plan, bind.toString(), xml);
 
       } catch (SQLException e) {
         queryPlanLog.error("Could not log query plan", e);
 
       } finally {
-        stmt.execute("SET STATISTICS XML OFF");
+        stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
       queryPlanLog.error("Could not log query plan", e);

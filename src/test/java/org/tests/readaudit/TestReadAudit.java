@@ -306,14 +306,14 @@ public class TestReadAudit extends BaseTestCase {
 
   private SpiEbeanServer getServer() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
     config.setName("h2other");
     config.loadFromProperties();
 
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
+
     config.setDefaultServer(false);
     config.setRegister(false);
 

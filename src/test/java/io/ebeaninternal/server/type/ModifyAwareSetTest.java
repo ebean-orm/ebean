@@ -12,12 +12,18 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class ModifyAwareSetTest {
 
   private ModifyAwareSet<String> createSet() {
     HashSet<String> set = new HashSet<>();
     set.addAll(Arrays.asList("A", "B", "C", "D", "E"));
+    return new ModifyAwareSet<>(set);
+  }
+
+  private ModifyAwareSet<String> createEmptySet() {
+    HashSet<String> set = new HashSet<>();
     return new ModifyAwareSet<>(set);
   }
 
@@ -58,5 +64,22 @@ public class ModifyAwareSetTest {
 
     assertThat(setA).isNotEqualTo(setB);
     assertThat(setA.hashCode()).isNotEqualTo(setB.hashCode());
+  }
+
+  @Test
+  public void testEqualsAndHashCode() throws Exception {
+    ModifyAwareSet<String> setA = createEmptySet();
+    HashSet<String> setB = new HashSet<>();
+
+    assertThat(setA).isEqualTo(setB);
+    assertThat(setA.hashCode()).isEqualTo(setB.hashCode());
+
+    setA.add("foo");
+    assertThat(setA).isNotEqualTo(setB);
+    assertThat(setA.hashCode()).isNotEqualTo(setB.hashCode());
+
+    setB.add("foo");
+    assertThat(setA).isEqualTo(setB);
+    assertThat(setA.hashCode()).isEqualTo(setB.hashCode());
   }
 }

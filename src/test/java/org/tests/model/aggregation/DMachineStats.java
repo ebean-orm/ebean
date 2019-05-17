@@ -15,7 +15,7 @@ public class DMachineStats {
   @Id
   long id;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   DMachine machine;
 
   LocalDate date;

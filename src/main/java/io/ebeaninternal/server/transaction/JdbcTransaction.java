@@ -437,16 +437,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   /**
-   * Unregister the persisted bean.
-   */
-  @Override
-  public void unregisterDeleteBean(Integer persistedBean) {
-    if (deletingBeansHash != null) {
-      deletingBeansHash.remove(persistedBean);
-    }
-  }
-
-  /**
    * Return true if this is a bean that has already been saved/deleted.
    */
   @Override

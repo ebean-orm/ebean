@@ -13,27 +13,15 @@ import java.util.Map;
  * {@link Query#where()}.
  * </p>
  * <p>
- * This provides a convenient way to create expressions for the 'Default'
- * server. It is actually a short cut for using the ExpressionFactory of the
- * 'default' EbeanServer.
+ * This provides a convenient way to create expressions for the default
+ * database.
  * <p>
- * See also {@link Ebean#getExpressionFactory()}
+ * See also {@link DB#getExpressionFactory()}
  * </p>
  * <p>
  * Creates standard common expressions for using in a Query Where or Having
  * clause.
  * </p>
- * <pre>{@code
- *
- * // Example: Using an Expr.or() method
- * Query<Order> query = Ebean.createQuery(Order.class);
- * query.where(
- *     Expr.or(Expr.eq("status", Order.NEW),
- *             Expr.gt("orderDate", lastWeek));
- *
- * List<Order> list = query.findList();
- * ...
- * }</pre>
  *
  * @see Query#where()
  */
@@ -65,10 +53,19 @@ public class Expr {
   }
 
   /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  public static Expression inRange(String propertyName, Object value1, Object value2) {
+    return Ebean.getExpressionFactory().inRange(propertyName, value1, value2);
+  }
+
+  /**
    * Between - property between the two given values.
    */
   public static Expression between(String propertyName, Object value1, Object value2) {
-
     return Ebean.getExpressionFactory().between(propertyName, value1, value2);
   }
 
@@ -76,7 +73,6 @@ public class Expr {
    * Between - value between two given properties.
    */
   public static Expression between(String lowProperty, String highProperty, Object value) {
-
     return Ebean.getExpressionFactory().betweenProperties(lowProperty, highProperty, value);
   }
 
@@ -240,6 +236,43 @@ public class Expr {
    */
   public static Expression in(String propertyName, Collection<?> values) {
     return Ebean.getExpressionFactory().in(propertyName, values);
+  }
+
+  /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   * <p>
+   * Without this we typically need to code an <code>if</code> block to only add
+   * the IN predicate if the collection is not empty like:
+   * </p>
+   *
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   if (ids != null && !ids.isEmpty()) {
+   *     query.where().in("customer.id", ids);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .inOrEmpty("customer.id", ids)
+   *     .findList();
+   *
+   * }</pre>
+   */
+  public static Expression inOrEmpty(String propertyName, Collection<?> values) {
+    return Ebean.getExpressionFactory().inOrEmpty(propertyName, values);
   }
 
   /**

@@ -51,6 +51,11 @@ public interface DbMigration {
   }
 
   /**
+   * Set to false to suppress logging to System out.
+   */
+  void setLogToSystemOut(boolean logToSystemOut);
+
+  /**
    * Set the path from the current working directory to the application resources.
    * <p>
    * This defaults to maven style 'src/main/resources'.

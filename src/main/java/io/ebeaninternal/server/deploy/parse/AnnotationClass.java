@@ -10,6 +10,7 @@ import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
+import io.ebean.annotation.StorageEngine;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
@@ -154,6 +155,11 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
+    StorageEngine storage = AnnotationUtil.findAnnotationRecursive(cls, StorageEngine.class);
+    if (storage != null) {
+      descriptor.setStorageEngine(storage.value());
+    }
+
     DbPartition partition = AnnotationUtil.findAnnotationRecursive(cls, DbPartition.class);
     if (partition != null) {
       descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
@@ -196,13 +202,12 @@ public class AnnotationClass extends AnnotationParser {
       } else {
         InvalidateQueryCache invalidateQueryCache = AnnotationUtil.findAnnotationRecursive(cls, InvalidateQueryCache.class);
         if (invalidateQueryCache != null) {
-          descriptor.setInvalidateQueryCache();
+          descriptor.setInvalidateQueryCache(invalidateQueryCache.region());
         }
       }
     }
 
-    Set<NamedQuery> namedQueries = AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class);
-    for (NamedQuery namedQuery : namedQueries) {
+    for (NamedQuery namedQuery : AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
   }

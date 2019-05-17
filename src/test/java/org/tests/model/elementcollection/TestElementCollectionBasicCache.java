@@ -1,5 +1,6 @@
 package org.tests.model.elementcollection;
 
+import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -10,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestElementCollectionBasicCache {
+public class TestElementCollectionBasicCache extends BaseTestCase {
 
   @Test
   public void test() {
@@ -42,9 +43,9 @@ public class TestElementCollectionBasicCache {
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(3);
-    }
-    else {
+      assertThat(sql).hasSize(6);
+      assertSqlBind(sql, 3, 5);
+    } else {
       assertThat(sql).hasSize(5);
     }
 
@@ -68,9 +69,8 @@ public class TestElementCollectionBasicCache {
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2); // cache hit
-    }
-    else {
+      assertThat(sql).hasSize(6); // cache hit
+    } else {
       assertThat(sql).hasSize(5); // cache hit
     }
 

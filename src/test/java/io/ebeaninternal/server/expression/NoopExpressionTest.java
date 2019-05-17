@@ -48,7 +48,7 @@ public class NoopExpressionTest extends BaseExpressionTest {
     query.findList();
     String generatedSql = sqlOf(query);
 
-    assertThat(generatedSql).contains("select t0.id from o_customer t0 where t0.name is null  and 1=1  and t0.status is not null");
+    assertThat(generatedSql).contains("select t0.id from o_customer t0 where t0.name is null and 1=1 and t0.status is not null");
   }
 
   @Test

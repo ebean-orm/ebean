@@ -49,6 +49,10 @@ class EqlAdapterHelper {
     peekExprList().between(path, bind(value1), bind(value2));
   }
 
+  protected void addInRange(String path, String value1, String value2) {
+    peekExprList().inRange(path, bind(value1), bind(value2));
+  }
+
   protected void addIn(String path, List<Object> inValues) {
     peekExprList().in(path, inValues);
   }

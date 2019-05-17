@@ -2,6 +2,9 @@ package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -12,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestOneToOneOrphanRemove extends BaseTestCase {
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void base() {
 
     OtoCust jack = new OtoCust("Jack");
@@ -30,10 +34,11 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     Ebean.save(jack);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertThat(sql.get(0)).contains("delete from oto_cust_address where aid=? and version=?");
     assertThat(sql.get(1)).contains("update oto_cust set version=? where cid=? and version=?");
     assertThat(sql.get(2)).contains("insert into oto_cust_address ");
+    assertThat(sql.get(3)).contains("-- bind(other1");
 
     jack.setAddress(null);
     Ebean.save(jack);

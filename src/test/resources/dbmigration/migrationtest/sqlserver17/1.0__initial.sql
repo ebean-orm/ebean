@@ -65,6 +65,7 @@ create sequence migtest_fk_set_null_seq as bigint  start with 1 ;
 create table migtest_e_basic (
   id                            integer not null,
   status                        nvarchar(1),
+  status2                       nvarchar(1) default 'N' not null,
   name                          nvarchar(127),
   description                   nvarchar(127),
   some_date                     datetime2,
@@ -79,6 +80,7 @@ create table migtest_e_basic (
   indextest6                    nvarchar(127),
   user_id                       integer not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
+  constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
   constraint pk_migtest_e_basic primary key (id)
 );
 create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;

@@ -33,6 +33,11 @@ public class PropertyEvalTest {
 		System.clearProperty("foo");
 	}
 
+  @Test
+  public void eval_emptyPlaceholder() {
+    assertEquals("${}", PropertyEval.eval("${}"));
+  }
+
 	@Test
 	public void eval_singleExpression_withDefault() {
 

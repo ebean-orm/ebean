@@ -103,7 +103,6 @@ public class MultiTenantPartitionTest {
 
 
   private static EbeanServer init() {
-    System.setProperty("ebean.ignoreExtraDdl", "true");
 
     ServerConfig config = new ServerConfig();
 
@@ -111,6 +110,7 @@ public class MultiTenantPartitionTest {
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
     config.setRegister(false);
     config.setDefaultServer(false);
     config.setCurrentTenantProvider(new CurrentTenant());

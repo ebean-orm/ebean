@@ -79,6 +79,8 @@ public class MTable {
    */
   private String tablespace;
 
+  private String storageEngine;
+
   /**
    * Tablespace to use for indexes on this table.
    */
@@ -159,6 +161,7 @@ public class MTable {
     this.name = createTable.getName();
     this.pkName = createTable.getPkName();
     this.comment = createTable.getComment();
+    this.storageEngine = createTable.getStorageEngine();
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
     this.withHistory = Boolean.TRUE.equals(createTable.isWithHistory());
@@ -244,6 +247,7 @@ public class MTable {
       createTable.setPartitionMode(partitionMeta.getMode().name());
       createTable.setPartitionColumn(partitionMeta.getProperty());
     }
+    createTable.setStorageEngine(storageEngine);
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
     createTable.setSequenceName(sequenceName);
@@ -450,6 +454,10 @@ public class MTable {
 
   public void setComment(String comment) {
     this.comment = comment;
+  }
+
+  public void setStorageEngine(String storageEngine) {
+    this.storageEngine = storageEngine;
   }
 
   public String getTablespace() {

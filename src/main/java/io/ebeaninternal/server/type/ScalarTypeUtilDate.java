@@ -82,10 +82,13 @@ public class ScalarTypeUtilDate {
 
   public static class DateType extends ScalarTypeBaseDate<java.util.Date> {
 
-    public DateType() {
-      super(Date.class, false, Types.DATE);
+    public DateType(JsonConfig.Date mode) {
+      super(mode, Date.class, false, Types.DATE);
     }
 
+    protected String toIsoFormat(java.util.Date value) {
+      return UtilDateParser.format(value);
+    }
 
     @Override
     public long convertToMillis(java.util.Date value) {

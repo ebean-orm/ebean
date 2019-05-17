@@ -3,9 +3,18 @@ package io.ebean.meta;
 import java.util.List;
 
 /**
- * Provides access to the meta data in EbeanServer such as query execution statistics.
+ * Provides access to the meta data in Database such as query execution statistics.
  */
 public interface MetaInfoManager {
+
+  /**
+   * Return the metrics for the database instance.
+   * <p>
+   * This will reset the metrics (reset counters back to zero etc) and
+   * will only return the non-empty metrics.
+   * </p>
+   */
+  ServerMetrics collectMetrics();
 
   /**
    * Collect query plans.

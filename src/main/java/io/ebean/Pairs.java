@@ -26,7 +26,7 @@ import java.util.List;
  *   pairs.add("sj2", 1001);
  *   pairs.add("pf3", 1000);
  *
- *   List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+ *   List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
  *   .where()
  *   .eq("store", "def")
  *   .inPairs(pairs)       // IN clause with 'pairs' of values

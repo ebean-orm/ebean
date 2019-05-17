@@ -137,6 +137,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
   private List<IndexDefinition> indexDefinitions;
 
+  private String storageEngine;
+
   /**
    * The base database table.
    */
@@ -276,6 +278,14 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     return Modifier.isAbstract(beanType.getModifiers());
   }
 
+  public void setStorageEngine(String storageEngine) {
+    this.storageEngine = storageEngine;
+  }
+
+  public String getStorageEngine() {
+    return storageEngine;
+  }
+
   /**
    * Set to true for @History entity beans that have history.
    */
@@ -316,7 +326,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     this.partitionMeta = partitionMeta;
   }
 
-  public PartitionMeta  getPartitionMeta() {
+  public PartitionMeta getPartitionMeta() {
     if (partitionMeta != null) {
       DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
       if (beanProperty != null) {
@@ -464,8 +474,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   /**
    * Set that this type invalidates query caches.
    */
-  public void setInvalidateQueryCache() {
-    this.cacheOptions = CacheOptions.INVALIDATE_QUERY_CACHE;
+  public void setInvalidateQueryCache(String region) {
+    this.cacheOptions = CacheOptions.invalidateQueryCache(region);
   }
 
   /**

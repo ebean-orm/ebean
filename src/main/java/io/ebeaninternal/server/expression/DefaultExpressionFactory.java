@@ -162,6 +162,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new SimpleExpression(propertyName, Op.EQ, value);
   }
 
+  @Override
+  public Expression eqOrNull(String propertyName, Object value) {
+    return or(eq(propertyName, value), isNull(propertyName));
+  }
+
   /**
    * Not Equal To - property not equal to the given value.
    */
@@ -217,8 +222,20 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Between - property between the two given values.
    */
   @Override
-  public Expression between(String propertyName, Object value1, Object value2) {
+  public Expression inRange(String propertyName, Object value1, Object value2) {
+    return new InRangeExpression(propertyName, value1, value2);
+  }
 
+  @Override
+  public Expression inRangeWith(String lowProperty, String highProperty, Object value) {
+    return and(le(lowProperty, value), gtOrNull(highProperty, value));
+  }
+
+  /**
+   * Between - property between the two given values.
+   */
+  @Override
+  public Expression between(String propertyName, Object value1, Object value2) {
     return new BetweenExpression(propertyName, value1, value2);
   }
 
@@ -227,7 +244,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression betweenProperties(String lowProperty, String highProperty, Object value) {
-
     return new BetweenPropertyExpression(lowProperty, highProperty, value);
   }
 
@@ -236,8 +252,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression gt(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.GT, value);
+  }
+
+  /**
+   * Greater Than or null - property greater than the given value or null.
+   */
+  @Override
+  public Expression gtOrNull(String propertyName, Object value) {
+    return or(gt(propertyName, value), isNull(propertyName));
   }
 
   /**
@@ -246,8 +269,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression ge(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.GT_EQ, value);
+  }
+
+  /**
+   * Less Than or null - property less than the given value or null.
+   */
+  @Override
+  public Expression ltOrNull(String propertyName, Object value) {
+    return or(lt(propertyName, value), isNull(propertyName));
   }
 
   /**
@@ -255,7 +285,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression lt(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.LT, value);
   }
 
@@ -264,7 +293,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression le(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.LT_EQ, value);
   }
 
@@ -273,7 +301,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression isNull(String propertyName) {
-
     return new NullExpression(propertyName, false);
   }
 
@@ -282,7 +309,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression isNotNull(String propertyName) {
-
     return new NullExpression(propertyName, true);
   }
 
@@ -430,6 +456,16 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   */
+  @Override
+  public Expression inOrEmpty(String propertyName, Collection<?> values) {
+    return new InExpression(propertyName, values, false, true);
+  }
+
+  /**
    * In - property has a value in the array of values.
    */
   @Override
@@ -529,7 +565,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression raw(String raw, Object value) {
-    return new RawExpression(raw, new Object[]{value});
+    return RawExpressionBuilder.buildSingle(raw, value);
   }
 
   /**
@@ -541,7 +577,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression raw(String raw, Object[] values) {
-    return new RawExpression(raw, values);
+    return RawExpressionBuilder.build(raw, values);
   }
 
   /**

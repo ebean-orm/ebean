@@ -51,6 +51,15 @@ public final class TableJoin {
     this.queryHash = calcQueryHash();
   }
 
+  private TableJoin(TableJoin source, String overrideColumn) {
+    this.table = source.table;
+    this.type = source.type;
+    this.inheritInfo = source.inheritInfo;
+    this.columns = new TableJoinColumn[1];
+    this.columns[0] = source.columns[0].withOverrideColumn(overrideColumn);
+    this.queryHash = calcQueryHash();
+  }
+
   /**
    * Calculate a hash value for adding to a query plan.
    */
@@ -165,5 +174,12 @@ public final class TableJoin {
       sb.append(" = ");
       sb.append(a2).append(".").append(pair.getForeignDbColumn());
     }
+  }
+
+  TableJoin withOverrideColumn(String overrideColumn) {
+    if (columns.length == 1 && overrideColumn != null && !overrideColumn.equals(columns[0].getLocalDbColumn())) {
+      return new TableJoin(this, overrideColumn);
+    }
+    return this;
   }
 }

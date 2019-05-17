@@ -16,15 +16,18 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
 
   private final boolean sqlDistinct;
 
+  private final String baseTable;
+
   /**
    * Specify for SqlSelect to include an Id property or not.
    */
-  SqlTreeNodeRoot(STreeType desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                  TableJoin includeJoin, STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean sqlDistinct) {
+  SqlTreeNodeRoot(STreeType desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId, TableJoin includeJoin,
+                  STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean sqlDistinct, String baseTable) {
 
     super(desc, props, myList, withId, many, temporalMode, disableLazyLoad);
     this.includeJoin = includeJoin;
     this.sqlDistinct = sqlDistinct;
+    this.baseTable = baseTable;
   }
 
   @Override
@@ -73,7 +76,7 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   @Override
   public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
-    ctx.append(desc.getBaseTable(temporalMode));
+    ctx.append(baseTable);
     ctx.append(" ").append(baseTableAlias);
     ctx.appendFromForUpdate();
 

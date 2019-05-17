@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlRow;
-import org.tests.model.basic.UUOne;
 import org.junit.Test;
+import org.tests.model.basic.UUOne;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,11 +25,11 @@ public class TestBinaryUUID extends BaseTestCase {
     one1.setId(id);
     one1.setName("second one");
 
-    Ebean.save(one0);
-    Ebean.save(one1);
+    DB.save(one0);
+    DB.save(one1);
 
-    UUOne fetch0 = Ebean.find(UUOne.class, one0.getId());
-    UUOne fetch1 = Ebean.find(UUOne.class, one1.getId());
+    UUOne fetch0 = DB.find(UUOne.class, one0.getId());
+    UUOne fetch1 = DB.find(UUOne.class, one1.getId());
 
     assertEquals(one0.getId(), fetch0.getId());
     assertEquals(one0.getName(), fetch0.getName());
@@ -38,7 +38,7 @@ public class TestBinaryUUID extends BaseTestCase {
     assertEquals(one1.getName(), fetch1.getName());
 
     String sql = "select id, name from uuone";
-    List<SqlRow> list = Ebean.createSqlQuery(sql).findList();
+    List<SqlRow> list = DB.createSqlQuery(sql).findList();
     for (SqlRow sqlRow : list) {
       Object sqlId = sqlRow.get("id");
       assertNotNull(sqlId);
@@ -47,8 +47,8 @@ public class TestBinaryUUID extends BaseTestCase {
     }
 
 
-    String asJson = Ebean.json().toJson(fetch0);
-    UUOne bean = Ebean.json().toBean(UUOne.class, asJson);
+    String asJson = DB.json().toJson(fetch0);
+    UUOne bean = DB.json().toBean(UUOne.class, asJson);
 
     assertEquals(fetch0.getId(), bean.getId());
     assertEquals(fetch0.getName(), bean.getName());

@@ -20,7 +20,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   protected boolean disableLazyLoad;
 
   /**
-   * The EbeanServer this is associated with. (used for lazy fetch).
+   * The Database this is associated with. (used for lazy fetch).
    */
   protected transient BeanCollectionLoader loader;
 

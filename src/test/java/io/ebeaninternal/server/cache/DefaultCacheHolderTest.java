@@ -34,19 +34,22 @@ public class DefaultCacheHolderTest {
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options());
 
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
-    assertThat(cache.getName()).isEqualTo("customer_B");
+    DefaultServerCache cache = cache(holder, Customer.class);
+    assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
+    assertThat(cache.getShortName()).isEqualTo("Customer_B");
 
-    DefaultServerCache cache1 = cache(holder, Customer.class, "customer");
+    DefaultServerCache cache1 = cache(holder, Customer.class);
     assertThat(cache1).isSameAs(cache);
 
-    DefaultServerCache cache2 = cache(holder, Contact.class, "contact");
+    DefaultServerCache cache2 = cache(holder, Contact.class);
     assertThat(cache1).isNotSameAs(cache2);
-    assertThat(cache2.getName()).isEqualTo("contact_B");
+    assertThat(cache2.getName()).isEqualTo("org.tests.model.basic.Contact_B");
+    assertThat(cache2.getShortName()).isEqualTo("Contact_B");
+
   }
 
-  private DefaultServerCache cache(DefaultCacheHolder holder, Class<?> type, String name) {
-    return (DefaultServerCache) holder.getCache(type, name, ServerCacheType.BEAN);
+  private DefaultServerCache cache(DefaultCacheHolder holder, Class<?> type) {
+    return (DefaultServerCache) holder.getCache(type, ServerCacheType.BEAN);
   }
 
   @Test
@@ -57,8 +60,9 @@ public class DefaultCacheHolderTest {
     DefaultCacheHolder holder = new DefaultCacheHolder(builder);
 
     tenantId.set("ten_1");
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
-    assertThat(cache.getName()).isEqualTo("customer_B");
+    DefaultServerCache cache = cache(holder, Customer.class);
+    assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
+    assertThat(cache.getShortName()).isEqualTo("Customer_B");
 
     cache.put("1", "value-for-tenant1");
     cache.put("2", "an other value-for-tenant1");
@@ -114,7 +118,7 @@ public class DefaultCacheHolderTest {
   public void clearAll() {
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options());
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
+    DefaultServerCache cache = cache(holder, Customer.class);
     cache.put("foo", "foo");
     assertThat(cache.size()).isEqualTo(1);
     holder.clearAll();
@@ -128,7 +132,7 @@ public class DefaultCacheHolderTest {
     CacheManagerOptions options = options().with(tenantId::get);
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options);
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
+    DefaultServerCache cache = cache(holder, Customer.class);
     cache.put("foo", "foo");
     assertThat(cache.size()).isEqualTo(1);
 

@@ -19,7 +19,7 @@ import java.sql.Types;
 public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
 
-  protected final DateTimeJsonParser dateTimeParser = new DateTimeJsonParser();
+  protected final UtilDateTimeParser dateTimeParser = new UtilDateTimeParser();
 
   protected final JsonConfig.DateTime mode;
 

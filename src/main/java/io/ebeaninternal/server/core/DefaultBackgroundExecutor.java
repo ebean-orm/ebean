@@ -6,6 +6,8 @@ import io.ebeaninternal.server.lib.DaemonScheduleThreadPool;
 import org.slf4j.MDC;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,6 +63,46 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
           MDC.clear();
         }
       }, delay, delay, unit);
+    }
+  }
+
+  @Override
+  public ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit) {
+    final Map<String, String> map = MDC.getCopyOfContextMap();
+
+    if (map == null) {
+      return schedulePool.schedule(r, delay, unit);
+    } else {
+      return schedulePool.schedule(() -> {
+        MDC.setContextMap(map);
+        try {
+          r.run();
+        } finally {
+          MDC.clear();
+        }
+      }, delay, unit);
+    }
+  }
+
+  @Override
+  public <V> ScheduledFuture<V> schedule(Callable<V> c, long delay, TimeUnit unit) {
+    final Map<String, String> map = MDC.getCopyOfContextMap();
+
+    if (map == null) {
+      return schedulePool.schedule(c, delay, unit);
+    } else {
+      return schedulePool.schedule(new Callable<V>() {
+        @Override
+        public V call() throws Exception {
+          MDC.setContextMap(map);
+          try {
+            return c.call();
+          } finally {
+            MDC.clear();
+          }
+        }
+
+      }, delay, unit);
     }
   }
 

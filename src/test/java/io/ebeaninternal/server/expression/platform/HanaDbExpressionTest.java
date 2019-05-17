@@ -64,6 +64,6 @@ public class HanaDbExpressionTest {
   public void testJson() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.json(request, "jsonproperty", "path", Op.EQ, "val");
-    assertEquals("json_value(jsonproperty, '$.path') = ? ", request.getSql());
+    assertEquals("json_value(jsonproperty, '$.path') = ?", request.getSql());
   }
 }

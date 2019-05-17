@@ -508,13 +508,23 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public SqlQuery sqlQuery(String sql) {
+    return null;
+  }
+
+  @Override
   public SqlQuery createSqlQuery(String sql) {
+    return sqlQuery(sql);
+  }
+
+  @Override
+  public SqlUpdate sqlUpdate(String sql) {
     return null;
   }
 
   @Override
   public SqlUpdate createSqlUpdate(String sql) {
-    return null;
+    return sqlUpdate(sql);
   }
 
   @Override
@@ -629,6 +639,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public boolean exists(Class<?> beanType, Object beanId, Transaction transaction) {
+    return false;
+  }
+
+  @Override
+  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
     return false;
   }
 

@@ -40,7 +40,7 @@ import java.sql.SQLException;
  *
  *   String sql = "select id, name, status from o_customer where name = ?";
  *
- *  CustomerDto rob = Ebean.createSqlQuery(sql)
+ *  CustomerDto rob = DB.sqlQuery(sql)
  *    .setParameter(1, "Rob")
  *    .findOne(CUSTOMER_MAPPER);
  *

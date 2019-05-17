@@ -27,6 +27,9 @@ public class DbPlatformTypeMapping {
 
   private static final DbPlatformType BOOLEAN_LOGICAL = new BooleanLogicalType();
 
+  private static final DbPlatformType INET_NATIVE = new DbPlatformType("inet", false);
+  private static final DbPlatformType INET_VARCHAR = new DbPlatformType("varchar", 50);
+
   private static final DbPlatformType UUID_NATIVE = new DbPlatformType("uuid", false);
   @SuppressWarnings("unused")
   private static final DbPlatformType UUID_PLACEHOLDER = new DbPlatformType("uuidPlaceholder");
@@ -106,6 +109,7 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONBLOB, new DbPlatformType("jsonblob"));
       put(DbType.JSONVARCHAR, new DbPlatformType("jsonvarchar", 1000));
       put(DbType.UUID, UUID_NATIVE);
+      put(DbType.INET, INET_NATIVE);
 
     } else {
       put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
@@ -121,6 +125,7 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONVARCHAR, JSON_VARCHAR_PLACEHOLDER);
       // default to native UUID and override on platform configure()
       put(DbType.UUID, UUID_NATIVE);
+      put(DbType.INET, INET_VARCHAR);
     }
   }
 

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.JsonConfig;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.Date;
@@ -7,7 +8,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -15,12 +16,16 @@ import java.time.ZonedDateTime;
  */
 public class ScalarTypeYearMonthDate extends ScalarTypeBaseDate<YearMonth> {
 
-  public ScalarTypeYearMonthDate() {
-    super(YearMonth.class, false, Types.DATE);
+  public ScalarTypeYearMonthDate(JsonConfig.Date mode) {
+    super(mode, YearMonth.class, false, Types.DATE);
+  }
+
+  protected String toIsoFormat(YearMonth value) {
+    return value.atDay(1).toString();
   }
 
   protected LocalDate toLocalDate(YearMonth yearMonth) {
-    return LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
+    return yearMonth.atDay(1);
   }
 
   protected YearMonth fromLocalDate(LocalDate localDate) {
@@ -34,8 +39,7 @@ public class ScalarTypeYearMonthDate extends ScalarTypeBaseDate<YearMonth> {
 
   @Override
   public long convertToMillis(YearMonth value) {
-    LocalDate localDate = toLocalDate(value);
-    ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
+    ZonedDateTime zonedDateTime = value.atDay(1).atStartOfDay(ZoneOffset.UTC);
     return zonedDateTime.toInstant().toEpochMilli();
   }
 

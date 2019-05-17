@@ -41,7 +41,7 @@ public class BaseQueryTuner {
    */
   private final boolean skipAll;
 
-  public BaseQueryTuner(AutoTuneConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
+  BaseQueryTuner(AutoTuneConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
     this.server = server;
     this.profilingListener = profilingListener;
     this.mode = config.getMode();
@@ -84,9 +84,14 @@ public class BaseQueryTuner {
   /**
    * Auto tune the query and enable profiling.
    */
-  public boolean tuneQuery(SpiQuery<?> query) {
+  boolean tuneQuery(SpiQuery<?> query) {
 
     if (skipAll || !tunableQuery(query)) {
+      return false;
+    }
+
+    if (query.getProfilingListener() != null) {
+      // profiling secondary query
       return false;
     }
 
@@ -138,6 +143,7 @@ public class BaseQueryTuner {
     switch (type) {
       case COUNT:
       case ID_LIST:
+      case UPDATE:
       case DELETE:
       case SUBQUERY:
         return false;

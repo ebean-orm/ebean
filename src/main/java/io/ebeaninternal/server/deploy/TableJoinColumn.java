@@ -46,6 +46,16 @@ public class TableJoinColumn {
     this.queryHash = hash();
   }
 
+  private TableJoinColumn(TableJoinColumn source, String overrideColumn) {
+    this.localDbColumn = InternString.intern(overrideColumn);
+    this.foreignDbColumn = source.foreignDbColumn;
+    this.localSqlFormula = null;
+    this.foreignSqlFormula = null;
+    this.insertable = source.isInsertable();
+    this.updateable = source.isUpdateable();
+    this.queryHash = hash();
+  }
+
   int hash() {
     int result = localDbColumn != null ? localDbColumn.hashCode() : 0;
     result = 92821 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
@@ -123,4 +133,7 @@ public class TableJoinColumn {
     return foreignSqlFormula;
   }
 
+  TableJoinColumn withOverrideColumn(String overrideColumn) {
+    return new TableJoinColumn(this, overrideColumn);
+  }
 }

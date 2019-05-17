@@ -93,6 +93,13 @@ public class SqlTreeProperties {
   }
 
   /**
+   * Check for aggregation (need for groug by clause).
+   */
+  public void checkAggregation() {
+    aggregationJoin();
+  }
+
+  /**
    * Return the property to join for aggregation.
    */
   private String aggregationJoin() {

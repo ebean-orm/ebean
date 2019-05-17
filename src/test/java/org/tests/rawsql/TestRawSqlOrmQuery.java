@@ -10,7 +10,6 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
@@ -77,6 +76,19 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     assertThat(sql).contains("where o.status = ?  order by c.name, c.id");
   }
 
+  @IgnorePlatform(Platform.ORACLE)
+  @Test
+  public void testNamed_fromCustomXmlLocations_withComments() {
+
+    ResetBasicData.reset();
+
+    Query<Order> query = Ebean.createNamedQuery(Order.class, "myRawTest3");
+    query.setMaxRows(10);
+
+    List<Order> list = query.findList();
+    assertThat(list).isNotEmpty();
+  }
+
   @Test
   public void test() {
 
@@ -105,7 +117,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
   }
 
   @Test
-  @IgnorePlatform(Platform.MYSQL)
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER})
   public void test_upperCaseSql() {
 
     ResetBasicData.reset();
@@ -139,6 +151,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     query.setFirstRow(1);
     query.setMaxRows(2);
+    query.orderBy("id");
 
     List<Customer> list = query.findList();
 

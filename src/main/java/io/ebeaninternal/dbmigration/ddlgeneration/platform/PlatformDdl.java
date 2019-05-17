@@ -118,6 +118,8 @@ public class PlatformDdl {
    */
   protected boolean inlineForeignKeys;
 
+  protected boolean includeStorageEngine;
+
   protected final DbDefaultValue dbDefaultValue;
 
   protected String fallbackArrayType = "varchar(1000)";
@@ -192,6 +194,13 @@ public class PlatformDdl {
   }
 
   /**
+   * Return true if the platform includes storage engine clause.
+   */
+  public boolean isIncludeStorageEngine() {
+    return includeStorageEngine;
+  }
+
+  /**
    * Return true if foreign key reference constraints need to inlined with create table.
    * Ideally we don't do this as then the constraints are not named. Do this for SQLite.
    */
@@ -204,10 +213,21 @@ public class PlatformDdl {
    */
   public void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
     for (int i = 0; i < columns.size(); i++) {
+      if (i > 0) {
+        apply.append(",");
+      }
       apply.newLine();
       writeColumnDefinition(apply, columns.get(i), useIdentity);
-      if (i < columns.size() - 1) {
-        apply.append(",");
+    }
+
+    for (Column column : columns) {
+      String checkConstraint = column.getCheckConstraint();
+      if (hasValue(checkConstraint)) {
+        checkConstraint = createCheckConstraint(maxConstraintName(column.getCheckConstraintName()), checkConstraint);
+        if (hasValue(checkConstraint)) {
+          apply.append(",").newLine();
+          apply.append(checkConstraint);
+        }
       }
     }
   }
@@ -230,11 +250,25 @@ public class PlatformDdl {
       }
     }
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
-      buffer.append(" not null");
+      writeColumnNotNull(buffer);
     }
 
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
+  }
+
+  /**
+   * Allow for platform overriding (e.g. ClickHouse).
+   */
+  protected void writeColumnNotNull(DdlBuffer buffer) throws IOException {
+    buffer.append(" not null");
+  }
+
+  /**
+   * Returns the check constraint.
+   */
+  public String createCheckConstraint(String ckName, String checkConstraint) {
+    return "  constraint " + ckName + " " + checkConstraint;
   }
 
   /**
@@ -409,13 +443,17 @@ public class PlatformDdl {
   }
 
   protected String translate(ConstraintMode mode) {
-    switch(mode) {
-      case SET_NULL: return "set null";
-      case SET_DEFAULT: return "set default";
-      case RESTRICT: return "restrict";
-      case CASCADE: return "cascade";
+    switch (mode) {
+      case SET_NULL:
+        return "set null";
+      case SET_DEFAULT:
+        return "set default";
+      case RESTRICT:
+        return "restrict";
+      case CASCADE:
+        return "cascade";
       default:
-        throw new IllegalStateException("Unknown mode "+mode);
+        throw new IllegalStateException("Unknown mode " + mode);
     }
   }
 
@@ -465,16 +503,17 @@ public class PlatformDdl {
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
-        buffer.append(" not null");
+        writeColumnNotNull(buffer);
       }
       buffer.append(addColumnSuffix);
       buffer.endOfStatement();
 
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
-        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(),
-            column.getCheckConstraint());
-        buffer.append(ddl).endOfStatement();
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        if (hasValue(ddl)) {
+          buffer.append(ddl).endOfStatement();
+        }
       }
     } else {
       buffer.append(addColumnSuffix);
@@ -485,7 +524,7 @@ public class PlatformDdl {
 
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
     buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
-    .append(dropColumnSuffix).endOfStatement();
+      .append(dropColumnSuffix).endOfStatement();
   }
 
   /**
@@ -560,7 +599,7 @@ public class PlatformDdl {
   }
 
   protected void appendWithSpace(String content, StringBuilder buffer) {
-    if (content != null && !content.isEmpty()) {
+    if (hasValue(content)) {
       buffer.append(" ").append(content);
     }
   }
@@ -594,6 +633,13 @@ public class PlatformDdl {
   }
 
   /**
+   * Return true if null or trimmed string is empty.
+   */
+  protected boolean hasValue(String value) {
+    return value != null && !value.trim().isEmpty();
+  }
+
+  /**
    * Null safe Boolean true test.
    */
   protected boolean isTrue(Boolean value) {
@@ -605,6 +651,13 @@ public class PlatformDdl {
    */
   public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
     // do nothing by default (MySql only)
+  }
+
+  /**
+   * Add an table storage engine to the create table statement.
+   */
+  public void tableStorageEngine(DdlBuffer apply, String storageEngine) throws IOException {
+    // do nothing by default
   }
 
   /**
@@ -643,10 +696,10 @@ public class PlatformDdl {
 
   /**
    * Shortens the given name to the maximum constraint name length of the platform in a deterministic way.
-   *
+   * <p>
    * First, all vowels are removed, If the string is still to long, 31 bits are taken from the hash code
    * of the string and base36 encoded (10 digits and 26 chars) string.
-   *
+   * <p>
    * As 36^6 > 31^2, the resulting string is never longer as 6 chars.
    */
   protected String maxConstraintName(String name) {
@@ -654,7 +707,7 @@ public class PlatformDdl {
       int hash = name.hashCode() & 0x7FFFFFFF;
       name = VowelRemover.trim(name, 4);
       if (name.length() > platform.getMaxConstraintNameLength()) {
-        return name.substring(0, platform.getMaxConstraintNameLength()-7) + "_" + Integer.toString(hash, 36);
+        return name.substring(0, platform.getMaxConstraintNameLength() - 7) + "_" + Integer.toString(hash, 36);
       }
     }
     return name;

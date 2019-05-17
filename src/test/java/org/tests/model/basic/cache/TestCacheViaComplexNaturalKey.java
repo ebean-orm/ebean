@@ -8,6 +8,8 @@ import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +18,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestCacheViaComplexNaturalKey extends BaseTestCase {
+
+  private static final Logger log = LoggerFactory.getLogger(TestCacheViaComplexNaturalKey.class);
 
   private ServerCache beanCache = cacheManager().getBeanCache(OCachedNatKeyBean.class);
   private ServerCache natKeyCache = cacheManager().getNaturalKeyCache(OCachedNatKeyBean.class);
@@ -29,11 +33,8 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
   private static synchronized void insertSome() {
     if (!loadOnce) {
       Ebean.find(OCachedNatKeyBean.class).delete();
-
-      List<String> stores = new ArrayList<>(Arrays.asList("abc", "def"));
-      for (String store : stores) {
-        List<String> skus = new ArrayList<>(Arrays.asList("1", "2", "3", "4"));
-        for (String sku : skus) {
+      for (String store : Arrays.asList("abc", "def")) {
+        for (String sku : Arrays.asList("1", "2", "3", "4")) {
           saveBean(store, sku);
         }
       }
@@ -92,10 +93,11 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     loadSomeIntoCache();
 
     String storeId = "abc";
-    List<String> skus = new ArrayList<>(Arrays.asList("1", "2", "3"));
+    List<String> skus = Arrays.asList("1", "2", "3");
 
     LoggedSqlCollector.start();
 
+    log.info("Partial (2 of 3) ...");
     List<OCachedNatKeyBean> list = Ebean.find(OCachedNatKeyBean.class)
       .where()
       .eq("store", storeId)
@@ -104,17 +106,53 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
       .orderBy("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - (sku=3 ... we got hits on sku 1 and 2)
-      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ?  and t0.sku in (? )  order by t0.sku desc; --bind(abc,Array[1]={3})");
+      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ? and t0.sku in (?) order by t0.sku desc; --bind(abc,Array[1]={3})");
     }
 
     assertThat(list).hasSize(3);
-
     assertNaturalKeyHitMiss(2, 1);
     assertBeanCacheHitMiss(2, 0);
+
+    list = Ebean.find(OCachedNatKeyBean.class)
+      .where()
+      .eq("store", storeId)
+      .in("sku", skus)
+      .setUseCache(true)
+      .orderBy("sku desc")
+      .findList();
+
+    sql = LoggedSqlCollector.current();
+
+    assertThat(list).hasSize(3);
+    assertThat(sql).hasSize(0);
+    assertNaturalKeyHitMiss(3, 0);
+    assertBeanCacheHitMiss(3, 0);
+
+    natKeyCache.remove("abc;1;");
+    natKeyCache.remove("abc;3;");
+
+    log.info("Partial (1 of 3) ...");
+    list = Ebean.find(OCachedNatKeyBean.class)
+      .where()
+      .eq("store", storeId)
+      .in("sku", skus)
+      .setUseCache(true)
+      .orderBy("sku desc")
+      .findList();
+
+    sql = LoggedSqlCollector.stop();
+
+    assertThat(list).hasSize(3);
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      assertThat(sql.get(0)).contains("where t0.store = ? and t0.sku in (?,?) order by t0.sku desc; --bind(abc,Array[2]={1,3})");
+    }
+    assertNaturalKeyHitMiss(1, 2);
+    assertBeanCacheHitMiss(1, 0);
   }
 
   @Test
@@ -169,7 +207,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with 2 bind params as we got not hits on the cache
-      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ?  and t0.sku in (?, ? )  order by t0.sku desc; --bind(abc,Array[2]={3,4})");
+      assertThat(sql.get(0)).contains("from o_cached_natkey t0 where t0.store = ? and t0.sku in (?,?) order by t0.sku desc; --bind(abc,Array[2]={3,4})");
     }
 
     assertThat(list).hasSize(2);

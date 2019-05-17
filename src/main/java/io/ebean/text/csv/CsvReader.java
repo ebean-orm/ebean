@@ -20,7 +20,7 @@ import java.util.Locale;
  *
  *   FileReader reader = new FileReader(f);
  *
- *   CsvReader&lt;Customer&gt; csvReader = Ebean.createCsvReader(Customer.class);
+ *   CsvReader<Customer> csvReader = DB.createCsvReader(Customer.class);
  *
  *   csvReader.setPersistBatchSize(20);
  *

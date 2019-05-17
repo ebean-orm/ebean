@@ -62,7 +62,7 @@ public class ScalarTypeZonedDateTimeTest {
   @Test
   public void testJson() throws Exception {
 
-    ZonedDateTime now = ZonedDateTime.now();
+    ZonedDateTime now = ZonedDateTime.now().withNano(123_000_000); // jdk11 workaround
 
     JsonTester<ZonedDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);

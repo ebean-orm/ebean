@@ -1,13 +1,24 @@
 package io.ebean.text;
 
+import io.ebean.DB;
 import io.ebean.FetchPath;
+import io.ebean.Query;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PathPropertiesTests {
 
+  private static final Logger log = LoggerFactory.getLogger(PathPropertiesTests.class);
 
   @Test
   public void test_noParentheses() {
@@ -183,5 +194,24 @@ public class PathPropertiesTests {
 
     assertFalse(root.includesPath(null, "details"));
     assertFalse(root.includesPath("customer", "shippingAddress"));
+  }
+
+  @Test
+  public void example_withQueryAndJson() {
+
+    ResetBasicData.reset();
+
+    PathProperties pathProps = PathProperties.parse("id,name,billingAddress(city),shippingAddress(*))");
+
+    Query<Customer> query = DB.find(Customer.class)
+      .where().lt("id", 2)
+      .query();
+
+    pathProps.apply(query);
+
+    List<Customer> list = query.findList();
+
+    String asJson = DB.json().toJson(list, pathProps);
+    log.info("Json: {}", asJson);
   }
 }

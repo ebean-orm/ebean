@@ -378,7 +378,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     if (!readId || temporalVersions) {
       // a bean with no Id (never found in context)
-      if (lazyLoadParentId != null && desc.isElementType()) {
+      if (lazyLoadParentId != null) {
         ctx.setLazyLoadedChildBean(localBean, lazyLoadParentId);
       }
       return localBean;
@@ -422,6 +422,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
+    if (lazyLoadParent != null) {
+      lazyLoadParent.addSelectExported(ctx, prefix);
+    }
     if (readId) {
       appendSelectId(ctx, idBinder.getBeanProperty());
     }
@@ -486,7 +489,15 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public boolean isAggregation() {
-    return aggregation;
+    if (aggregation) {
+      return true;
+    }
+    for (SqlTreeNode child : children) {
+      if (child.isAggregation()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

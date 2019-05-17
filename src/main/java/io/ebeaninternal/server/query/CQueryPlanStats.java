@@ -164,7 +164,7 @@ public final class CQueryPlanStats {
 
     @Override
     public String toString() {
-      return "location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
+      return "label:" + getLabel() + " location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
     }
 
     @Override
@@ -184,7 +184,7 @@ public final class CQueryPlanStats {
 
     @Override
     public String getName() {
-      return queryPlan.getLabel();
+      return queryPlan.getName();
     }
 
     @Override
@@ -238,8 +238,8 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public String getQueryPlanHash() {
-      return queryPlan.getPlanKey().toString();
+    public String getSqlHash() {
+      return queryPlan.getSqlHash();
     }
 
     @Override

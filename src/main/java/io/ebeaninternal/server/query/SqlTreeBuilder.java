@@ -273,7 +273,10 @@ public final class SqlTreeBuilder {
     OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
     SqlTreeProperties props = getBaseSelect(desc, queryProps);
 
-    if (prefix == null && !rawSql) {
+    if (prefix != null) {
+      // check for aggregation on a fetch
+      props.checkAggregation();
+    } else if (!rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
         sqlDistinct = true;
       }
@@ -312,7 +315,12 @@ public final class SqlTreeBuilder {
       // Optional many property for lazy loading query
       STreePropertyAssocMany lazyLoadMany = (query == null) ? null : query.getLazyLoadMany();
       boolean withId = !rawNoId && !subQuery && (query == null || query.isWithId());
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct);
+
+      String baseTable = (query == null) ? null : query.getBaseTable();
+      if (baseTable == null) {
+        baseTable = desc.getBaseTable(temporalMode);
+      }
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
       return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, temporalMode, disableLazyLoad);
@@ -412,10 +420,10 @@ public final class SqlTreeBuilder {
 
       // make sure we only included the base/embedded bean once
       if (!selectProps.containsProperty(baseName)) {
-        STreeProperty p = desc.findPropertyWithDynamic(baseName);
+        STreeProperty p = desc.findPropertyWithDynamic(baseName, null);
         if (p == null) {
           // maybe dynamic formula with schema prefix
-          p = desc.findPropertyWithDynamic(propName);
+          p = desc.findPropertyWithDynamic(propName, null);
           if (p != null) {
             selectProps.add(p);
           } else {
@@ -432,7 +440,7 @@ public final class SqlTreeBuilder {
     } else {
       // find the property including searching the
       // sub class hierarchy if required
-      STreeProperty p = desc.findPropertyWithDynamic(propName);
+      STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
         logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
         p = desc.findProperty("id");
@@ -497,9 +505,9 @@ public final class SqlTreeBuilder {
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
       if (queryProps != null
-          && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
-          && propertyAssocOne.hasForeignKey()
-          && !propertyAssocOne.isFormula()) {
+        && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+        && propertyAssocOne.hasForeignKey()
+        && !propertyAssocOne.isFormula()) {
         // if it is a joined bean with FK constraint... then don't add the property
         // as it will have its own entire Node in the SqlTree
       } else {

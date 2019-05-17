@@ -14,6 +14,8 @@ import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.types.Cdir;
+import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.dbmigration.DbOffline;
@@ -37,6 +39,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
@@ -126,9 +130,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> timeType = new ScalarTypeTime();
 
-  private final ScalarType<?> dateType = new ScalarTypeDate();
-
-  private final ScalarType<?> inetAddressType = new ScalarTypeInetAddress();
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
@@ -140,6 +141,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final ScalarType<?> classType = new ScalarTypeClass();
 
   private final JsonConfig.DateTime jsonDateTime;
+  private final JsonConfig.Date jsonDate;
 
   private final Object objectMapper;
 
@@ -150,6 +152,8 @@ public final class DefaultTypeManager implements TypeManager {
   private final boolean postgres;
 
   private final boolean offlineMigrationGeneration;
+
+  private final EnumType defaultEnumType;
 
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
@@ -184,6 +188,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
+    this.jsonDate = config.getJsonDate();
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
@@ -198,9 +203,11 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
 
-    initialiseStandard(jsonDateTime, config);
-    initialiseJavaTimeTypes(jsonDateTime, config);
-    initialiseJodaTypes(jsonDateTime, config);
+    this.defaultEnumType = config.getDefaultEnumType();
+
+    initialiseStandard(config);
+    initialiseJavaTimeTypes(config);
+    initialiseJodaTypes(config);
     initialiseJacksonTypes(config);
 
     loadTypesFromProviders(config, objectMapper);
@@ -515,7 +522,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
     // a util Date with jdbcType not matching server wide settings
     if (type.equals(java.util.Date.class)) {
-      return extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
+      return extraTypeFactory.createUtilDate(jsonDateTime, jsonDate, jdbcType);
     }
     // a Calendar with jdbcType not matching server wide settings
     if (type.equals(java.util.Calendar.class)) {
@@ -642,8 +649,13 @@ public final class DefaultTypeManager implements TypeManager {
 
   private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
     if (type == null) {
-      // default as per spec is ORDINAL
-      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+      if(defaultEnumType == EnumType.ORDINAL) {
+        return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+      } else {
+        return new ScalarTypeEnumStandard.StringEnum(enumType);
+      }
 
     } else if (type == EnumType.ORDINAL) {
       return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
@@ -660,10 +672,9 @@ public final class DefaultTypeManager implements TypeManager {
       DbEnumValue dbValue = AnnotationUtil.findAnnotation(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, method, integerValues);
+        return createEnumScalarTypeDbValue(enumType, method, integerValues, dbValue.length());
       }
     }
-
 
     // look for EnumValue annotations instead
     return createEnumScalarType2(enumType);
@@ -675,7 +686,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Return null if the EnumValue annotations are not present/used.
    * </p>
    */
-  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
+  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length) {
 
     Map<String, String> nameValueMap = new LinkedHashMap<>();
 
@@ -693,7 +704,7 @@ public final class DefaultTypeManager implements TypeManager {
       return null;
     }
 
-    return createEnumScalarType(enumType, nameValueMap, integerType, 0);
+    return createEnumScalarType(enumType, nameValueMap, integerType, length);
   }
 
   /**
@@ -863,7 +874,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJavaTimeTypes(ServerConfig config) {
 
     if (java7Present) {
       typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
@@ -872,16 +883,16 @@ public final class DefaultTypeManager implements TypeManager {
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
       addType(java.time.Period.class, new ScalarTypePeriod());
-      addType(java.time.LocalDate.class, new ScalarTypeLocalDate());
-      addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
-      addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(mode));
-      addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(mode));
-      addType(Instant.class, new ScalarTypeInstant(mode));
+      addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
+      addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
+      addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
+      addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
+      addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
 
       addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
       addType(Month.class, new ScalarTypeMonth());
       addType(Year.class, new ScalarTypeYear());
-      addType(YearMonth.class, new ScalarTypeYearMonthDate());
+      addType(YearMonth.class, new ScalarTypeYearMonthDate(jsonDate));
       addType(MonthDay.class, new ScalarTypeMonthDay());
       addType(OffsetTime.class, new ScalarTypeOffsetTime());
       addType(ZoneId.class, new ScalarTypeZoneId());
@@ -904,16 +915,16 @@ public final class DefaultTypeManager implements TypeManager {
    * Detect if Joda classes are in the classpath and if so register the Joda data types.
    */
   @SuppressWarnings("deprecation")
-  private void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJodaTypes(ServerConfig config) {
 
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
       logger.debug("Registering Joda data types");
-      addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));
-      addType(DateTime.class, new ScalarTypeJodaDateTime(mode));
-      addType(LocalDate.class, new ScalarTypeJodaLocalDate());
-      addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight());
+      addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
+      addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
+      addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
+      addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight(jsonDate));
       addType(org.joda.time.Period.class, new ScalarTypeJodaPeriod());
 
       String jodaLocalTimeMode = config.getJodaLocalTimeMode();
@@ -933,7 +944,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  private void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseStandard(ServerConfig config) {
 
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
@@ -941,10 +952,10 @@ public final class DefaultTypeManager implements TypeManager {
 
     nativeMap.put(DbPlatformType.HSTORE, hstoreType);
 
-    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
+    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(jsonDateTime, jsonDate);
     addType(java.util.Date.class, utilDateType);
 
-    ScalarType<?> calType = extraTypeFactory.createCalendar(mode);
+    ScalarType<?> calType = extraTypeFactory.createCalendar(jsonDateTime);
     addType(Calendar.class, calType);
 
     ScalarType<?> mathBigIntType = extraTypeFactory.createMathBigInteger();
@@ -975,8 +986,21 @@ public final class DefaultTypeManager implements TypeManager {
       addType(UUID.class, uuidType);
     }
 
+    if (offlineMigrationGeneration || (postgres && !config.getPlatformConfig().isDatabaseInetAddressVarchar())) {
+      addInetAddressType(new ScalarTypeInetAddressPostgres());
+    } else {
+      addInetAddressType(new ScalarTypeInetAddress());
+    }
+
+    if (offlineMigrationGeneration || postgres) {
+      addType(Cdir.class, new ScalarTypeCdir.Postgres());
+      addType(Inet.class, new ScalarTypeInet.Postgres());
+    } else {
+      addType(Cdir.class, new ScalarTypeCdir.Varchar());
+      addType(Inet.class, new ScalarTypeInet.Varchar());
+    }
+
     addType(File.class, fileType);
-    addType(InetAddress.class, inetAddressType);
     addType(Locale.class, localeType);
     addType(Currency.class, currencyType);
     addType(TimeZone.class, timeZoneType);
@@ -1055,12 +1079,20 @@ public final class DefaultTypeManager implements TypeManager {
     // Temporal types
     addType(Time.class, timeType);
     nativeMap.put(Types.TIME, timeType);
+
+    ScalarTypeDate dateType = new ScalarTypeDate(jsonDate);
     addType(Date.class, dateType);
     nativeMap.put(Types.DATE, dateType);
 
-    ScalarType<?> timestampType = new ScalarTypeTimestamp(mode);
+    ScalarType<?> timestampType = new ScalarTypeTimestamp(jsonDateTime);
     addType(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
+  }
+
+  private void addInetAddressType(ScalarType scalarType) {
+    addType(InetAddress.class, scalarType);
+    addType(Inet4Address.class, scalarType);
+    addType(Inet6Address.class, scalarType);
   }
 
 }

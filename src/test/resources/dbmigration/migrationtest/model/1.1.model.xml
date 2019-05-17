@@ -14,6 +14,7 @@
         <alterColumn columnName="one_id" tableName="migtest_fk_none_via_join" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_via_join_one_id" foreignKeyIndex="ix_migtest_fk_none_via_join_one_id"/>
         <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
+        <alterColumn columnName="status2" tableName="migtest_e_basic" type="varchar(127)" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" dropCheckConstraint="ck_migtest_e_basic_status2"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
             <before>
                 <ddl>-- rename all collisions</ddl>

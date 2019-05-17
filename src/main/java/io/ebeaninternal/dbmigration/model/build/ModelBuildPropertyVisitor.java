@@ -147,7 +147,11 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
 
-    visitScalar(p);
+    if (p instanceof BeanPropertyAssocOne) {
+      visitOneImported((BeanPropertyAssocOne)p);
+    } else {
+      visitScalar(p);
+    }
     if (embedded.isId()) {
       // compound primary key
       lastColumn.setPrimaryKey(true);

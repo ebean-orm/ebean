@@ -3,6 +3,9 @@ package org.tests.query.orderby;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -38,6 +41,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER}) // do not support nulls first/last
   public void testDistinctOn() {
 
     MRole role = Ebean.getReference(MRole.class, 1);
@@ -69,8 +73,9 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
     query.setMaxRows(1000);
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("order by t0.userid");
-
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("from muser t0 limit 1000");
+    }
     query = Ebean.find(MUser.class)
         .where()
         .eq("roles.roleName", "A")
@@ -81,7 +86,9 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
     query.setMaxRows(1000);
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("order by t0.userid");
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where u1.role_name = ? limit 1000");
+    }
   }
 
   @Test

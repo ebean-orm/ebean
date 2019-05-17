@@ -68,12 +68,12 @@ public class CQueryEngine {
   }
 
   public <T> int delete(OrmQueryRequest<T> request) {
-    CQueryUpdate query = queryBuilder.buildUpdateQuery("Delete", request);
+    CQueryUpdate query = queryBuilder.buildUpdateQuery(true, request);
     return executeUpdate(request, query);
   }
 
   public <T> int update(OrmQueryRequest<T> request) {
-    CQueryUpdate query = queryBuilder.buildUpdateQuery("Update", request);
+    CQueryUpdate query = queryBuilder.buildUpdateQuery(false, request);
     return executeUpdate(request, query);
   }
 

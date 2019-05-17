@@ -6,15 +6,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class DateTimeJsonParser {
+class UtilDateTimeParser {
 
   private final SimpleDateFormat dateTimeProto20;
   private final SimpleDateFormat dateTimeProto22;
   private final SimpleDateFormat dateTimeProto23;
   private final SimpleDateFormat dateTimeProto24;
 
-
-  public DateTimeJsonParser() {
+  UtilDateTimeParser() {
     dateTimeProto20 = init("yyyy-MM-dd'T'HH:mm:ss'Z'");
     dateTimeProto22 = init("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
     dateTimeProto23 = init("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");

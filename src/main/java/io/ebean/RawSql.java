@@ -87,7 +87,7 @@ package io.ebean;
  *     // .columnMapping("sum(d.order_qty*d.unit_price)", "totalAmount")
  *     .create();
  *
- *   List<OrderAggregate> list = Ebean.find(OrderAggregate.class)
+ *   List<OrderAggregate> list = DB.find(OrderAggregate.class)
  *       .setRawSql(rawSql)
  *       .where().gt("order.id", 0)
  *       .having().gt("totalAmount", 20)
@@ -114,7 +114,7 @@ package io.ebean;
  *     .columnMappingIgnore("'ignoreMe'")
  *     .create();
  *
- *   List<OrderAggregate> orders = Ebean.find(OrderAggregate.class)
+ *   List<OrderAggregate> orders = DB.find(OrderAggregate.class)
  *     .setRawSql(rawSql)
  *     .fetch("order", "status,orderDate", new FetchConfig().query())
  *     .fetch("order.customer", "name")
@@ -146,7 +146,7 @@ package io.ebean;
  *       .tableAliasMapping("p", "details.product")
  *       .create();
  *
- *  List<Order> ordersFromRaw = Ebean.find(Order.class)
+ *  List<Order> ordersFromRaw = DB.find(Order.class)
  *       .setRawSql(rawSql)
  *       .setParameter("maxOrderId", 2)
  *       .setParameter("productId", 1)

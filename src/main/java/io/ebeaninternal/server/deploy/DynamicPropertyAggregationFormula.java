@@ -49,15 +49,15 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   @Override
   public void load(SqlBeanLoad sqlBeanLoad) {
-
+    Object value;
     try {
-      Object value = scalarType.read(sqlBeanLoad.ctx().getDataReader());
-      if (asTarget != null) {
-        sqlBeanLoad.load(asTarget, value);
-      }
-
+      value = scalarType.read(sqlBeanLoad.ctx().getDataReader());
     } catch (Exception e) {
-      throw new PersistenceException("Error loading on " + fullName, e);
+      sqlBeanLoad.ctx().handleLoadError(fullName, e);
+      return;
+    }
+    if (asTarget != null) {
+      sqlBeanLoad.load(asTarget, value);
     }
   }
 

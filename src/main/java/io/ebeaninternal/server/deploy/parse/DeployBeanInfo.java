@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebean.RawSql;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
@@ -22,6 +23,8 @@ public class DeployBeanInfo<T> {
   private final DeployUtil util;
 
   private final DeployBeanDescriptor<T> descriptor;
+
+  private DeployBeanPropertyAssoc<?> embeddedId;
 
   /**
    * Create with a DeployUtil and BeanDescriptor.
@@ -88,5 +91,20 @@ public class DeployBeanInfo<T> {
    */
   public void setPrimaryKeyJoin(TableJoin join) {
     descriptor.setPrimaryKeyJoin(join);
+  }
+
+  /**
+   * This bean type has an embedded Id property.
+   */
+  public void setEmbeddedId(DeployBeanPropertyAssoc<?> embeddedId) {
+    this.embeddedId = embeddedId;
+  }
+
+  public Class<?> getEmbeddedIdType() {
+    return (embeddedId == null) ? null : embeddedId.getTargetType();
+  }
+
+  public boolean isEmbedded() {
+    return descriptor.isEmbedded();
   }
 }

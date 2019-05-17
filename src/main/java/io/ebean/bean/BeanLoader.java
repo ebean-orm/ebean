@@ -9,7 +9,7 @@ package io.ebean.bean;
 public interface BeanLoader {
 
   /**
-   * Return the name of the associated EbeanServer.
+   * Return the name of the associated Database.
    */
   String getName();
 

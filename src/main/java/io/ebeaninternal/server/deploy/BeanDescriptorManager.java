@@ -152,8 +152,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final String serverName;
 
-  private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
-
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<>();
 
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
@@ -197,6 +195,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final Map<String, String> draftTableMap = new HashMap<>();
 
   private final int queryPlanTTLSeconds;
+
+  // temporary collections used during startup and then cleared
+
+  private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
+  private Set<Class<?>> embeddedIdTypes = new HashSet<>();
+  private List<DeployBeanInfo<?>> embeddedBeans = new ArrayList<>();
 
   /**
    * Create for a given database dbConfig.
@@ -369,7 +373,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       createListeners();
       readEntityDeploymentInitial();
       readXmlMapping(mappings);
-      readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
@@ -391,7 +394,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       logStatus();
 
-      deployInfoMap.clear();
+      // clear collections we no longer need
+      embeddedIdTypes = null;
+      embeddedBeans = null;
       deployInfoMap = null;
 
       return asOfTableMap;
@@ -434,7 +439,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     } else {
       for (XmRawSql sql : entityDeploy.getRawSql()) {
-        RawSqlBuilder builder = RawSqlBuilder.parse(sql.getQuery().getValue());
+        RawSqlBuilder builder;
+        try {
+          builder = RawSqlBuilder.parse(sql.getQuery().getValue());
+        } catch (RuntimeException e) {
+          builder = RawSqlBuilder.unparsed(sql.getQuery().getValue());
+        }
+
         for (XmColumnMapping columnMapping : sql.getColumnMapping()) {
           builder.columnMapping(columnMapping.getColumn(), columnMapping.getProperty());
         }
@@ -598,8 +609,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (BeanDescriptor<?> d : descMap.values()) {
       d.initLast();
       if (!d.isEmbedded()) {
-        BeanManager<?> m = beanManagerFactory.create(d);
-        beanManagerMap.put(d.getFullName(), m);
+        beanManagerMap.put(d.getFullName(), beanManagerFactory.create(d));
         checkForValidEmbeddedId(d);
       }
     }
@@ -682,11 +692,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     logger.debug("Entities[{}]", entityBeanCount);
   }
 
-  private <T> BeanDescriptor<T> createEmbedded(Class<T> beanClass) {
-    DeployBeanInfo<T> info = getDeploy(beanClass);
-    return new BeanDescriptor<>(this, info.getDescriptor());
-  }
-
   /**
    * Return the bean deploy info for the given class.
    */
@@ -695,21 +700,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return (DeployBeanInfo<T>) deployInfoMap.get(cls);
   }
 
-  private void registerBeanDescriptor(BeanDescriptor<?> desc) {
+  private void registerBeanDescriptor(DeployBeanInfo<?> info) {
+    BeanDescriptor desc = new BeanDescriptor<>(this, info.getDescriptor());
     descMap.put(desc.getBeanType().getName(), desc);
     if (desc.isDocStoreMapped()) {
       descQueueMap.put(desc.getDocStoreQueueId(), desc);
-    }
-  }
-
-  /**
-   * Read deployment information for all the embedded beans.
-   */
-  private void readEmbeddedDeployment() {
-
-    List<Class<?>> embeddedClasses = bootupClasses.getEmbeddables();
-    for (Class<?> embeddedClass : embeddedClasses) {
-      registerBeanDescriptor(createEmbedded(embeddedClass));
     }
   }
 
@@ -725,12 +720,29 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (Class<?> entityClass : bootupClasses.getEntities()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
       deployInfoMap.put(entityClass, info);
+      Class<?> embeddedIdType = info.getEmbeddedIdType();
+      if (embeddedIdType != null){
+        embeddedIdTypes.add(embeddedIdType);
+      }
     }
     for (Class<?> entityClass : bootupClasses.getEmbeddables()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
-      readDeployAssociations(info);
       deployInfoMap.put(entityClass, info);
+      if (embeddedIdTypes.contains(entityClass)) {
+        // register embeddedId types early - scalar properties only
+        // and needed for creating BeanTables (id properties)
+        registerEmbeddedBean(info);
+      } else {
+        // delay register of other embedded beans until after
+        // the BeanTables have been created to support ManyToOne
+        embeddedBeans.add(info);
+      }
     }
+  }
+
+  private void registerEmbeddedBean(DeployBeanInfo<?> info) {
+    readDeployAssociations(info);
+    registerBeanDescriptor(info);
   }
 
   /**
@@ -744,6 +756,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       BeanTable beanTable = createBeanTable(info);
       beanTableMap.put(beanTable.getBeanType(), beanTable);
+    }
+
+    // register non-id embedded beans (after bean tables are created)
+    for (DeployBeanInfo<?> info : embeddedBeans) {
+      registerEmbeddedBean(info);
     }
   }
 
@@ -822,13 +839,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       secondaryPropsJoins(info);
     }
 
-    // Set inheritance info
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       setInheritanceInfo(info);
     }
 
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      registerBeanDescriptor(new BeanDescriptor(this, info.getDescriptor()));
+      if (!info.isEmbedded()) {
+        registerBeanDescriptor(info);
+      }
     }
   }
 

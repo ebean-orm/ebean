@@ -16,20 +16,33 @@ package io.ebean;
  * notify Ebean of external changes and enable Ebean to maintain it's "L2"
  * server cache.
  * </p>
- * <p>
+ *
  * <pre>{@code
  *
- *   // example that uses 'named' parameters
+ *   // example using 'positioned' parameters
  *
- *   String s = "UPDATE f_topic set post_count = :count where id = :id";
+ *   String sql = "insert into audit_log (group, title, description) values (?, ?, ?);
  *
- *   SqlUpdate update = Ebean.createSqlUpdate(s);
- *   update.setParameter("id", 1);
- *   update.setParameter("count", 50);
+ *   int rows =
+ *     DB.sqlUpdate(sql)
+ *       .setParams("login", "new user", "user rob was created")
+ *       .executeNow();
  *
- *   int modifiedCount = update.execute();
+ * }</pre>
  *
- *   String msg = "There were " + modifiedCount + " rows updated";
+ * <pre>{@code
+ *
+ *   // example using 'named' parameters
+ *
+ *   String sql = "update topic set post_count = :count where id = :id";
+ *
+ *   int rows =
+ *     DB.sqlUpdate(sql)
+ *       .setParameter("id", 1)
+ *       .setParameter("count", 50)
+ *       .execute();
+ *
+ *   String msg = "There were " + rows + " rows updated";
  *
  * }</pre>
  * <p>
@@ -37,9 +50,10 @@ package io.ebean;
  * <pre>{@code
  *
  *  String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
- *  SqlUpdate insert = Ebean.createSqlUpdate(sql);
  *
- *  try (Transaction txn = Ebean.beginTransaction()) {
+ *  SqlUpdate insert = DB.sqlUpdate(sql);
+ *
+ *  try (Transaction txn = DB.beginTransaction()) {
  *    txn.setBatchMode(true);
  *
  *    insert.setNextParameter(10000);
@@ -65,7 +79,7 @@ package io.ebean;
  * </p>
  * <pre>{@code
  *
- *   try (Transaction txn = Ebean.beginTransaction()) {
+ *   try (Transaction txn = DB.beginTransaction()) {
  *
  *     insert.setNextParameter(10000);
  *     insert.setNextParameter("hello");
@@ -216,6 +230,33 @@ public interface SqlUpdate {
    * </p>
    */
   SqlUpdate setTimeout(int secs);
+
+  /**
+   * Set one of more positioned parameters.
+   * <p>
+   * This is a convenient alternative to multiple setParameter() calls.
+   *
+   * <pre>{@code
+   *
+   *   String sql = "insert into audit_log (id, name, version) values (?,?,?)";
+   *
+   *   DB.sqlUpdate(sql)
+   *       .setParams(UUID.randomUUID(), "Hello", 1)
+   *       .executeNow();
+   *
+   *
+   *   // is the same as ...
+   *
+   *   DB.sqlUpdate(sql)
+   *       .setParameter(1, UUID.randomUUID())
+   *       .setParameter(2, "Hello")
+   *       .setParameter(3, 1)
+   *       .executeNow();
+   *
+   * }</pre>
+   *
+   */
+  SqlUpdate setParams(Object... values);
 
   /**
    * Set the next positioned parameter.

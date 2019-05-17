@@ -40,6 +40,7 @@ public class DdlGenerator {
 
   private final boolean generateDdl;
   private final boolean runDdl;
+  private final boolean extraDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
   private final boolean ddlCommitOnCreateIndex;
@@ -54,6 +55,7 @@ public class DdlGenerator {
     this.server = server;
     this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
+    this.extraDdl = serverConfig.isDdlExtra();
     this.createOnly = serverConfig.isDdlCreateOnly();
     this.dbSchema = serverConfig.getDbSchema();
     if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
@@ -166,8 +168,7 @@ public class DdlGenerator {
 
   protected void runDropSql(Connection connection) throws IOException {
     if (!createOnly) {
-      String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
-      if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
+      if (extraDdl && jaxbPresent) {
         String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
         if (extraApply != null) {
           runScript(connection, false, extraApply, "extra-ddl");
@@ -187,9 +188,8 @@ public class DdlGenerator {
     }
     runScript(connection, false, createAllContent, getCreateFileName());
 
-    String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
-    if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
-      if (currentModel.isTablePartitioning()) {
+    if (extraDdl && jaxbPresent) {
+      if (currentModel().isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
         if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
           runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
@@ -201,7 +201,7 @@ public class DdlGenerator {
         runScript(connection, false, extraApply, "extra-ddl");
       }
 
-      if (currentModel.isTablePartitioning()) {
+      if (currentModel().isTablePartitioning()) {
         checkInitialTablePartitions(connection);
       }
     }

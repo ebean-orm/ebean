@@ -39,6 +39,15 @@ public class BaseDdlBuffer implements DdlBuffer {
   }
 
   @Override
+  public DdlBuffer appendStatement(String content) throws IOException {
+    if (content != null && !content.isEmpty()) {
+      writer.append(content);
+      endOfStatement();
+    }
+    return this;
+  }
+
+  @Override
   public DdlBuffer append(String content) throws IOException {
     writer.append(content);
     return this;
@@ -73,7 +82,9 @@ public class BaseDdlBuffer implements DdlBuffer {
    */
   @Override
   public DdlBuffer end() throws IOException {
-    writer.append("\n");
+    if (!isEmpty()) {
+      writer.append("\n");
+    }
     return this;
   }
 

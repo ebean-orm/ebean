@@ -1,7 +1,7 @@
 package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
   private JtMonkey m2 = new JtMonkey("Uim");
 
   private void initialInsert() {
-    Ebean.saveAll(Arrays.asList(troop, m0, m1, m2));
+    DB.saveAll(Arrays.asList(troop, m0, m1, m2));
   }
 
   @Test
@@ -34,28 +34,28 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     troop.getMonkeys().add(m0);
     troop.getMonkeys().add(m1);
 
-    Ebean.save(troop);
+    DB.save(troop);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(1);
+      assertThat(sql).hasSize(3);
       assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
-    }
-    else {
+      assertSqlBind(sql, 1, 2);
+
+    } else {
       assertThat(sql).hasSize(2);
       assertThat(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
       assertThat(sql.get(1)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
     }
 
-    int intersectionRows = Ebean.createSqlQuery("select count(*) as total from troop_monkey where troop_pid = ?")
+    long intersectionRows = DB.sqlQuery("select count(*) as total from troop_monkey where troop_pid = ?")
       .setParameter(1, troop.getPid())
-      .findOne()
-      .getInteger("total");
+      .findSingleLong();
 
-    assertThat(intersectionRows).isEqualTo(2);
+    assertThat(intersectionRows).isEqualTo(2L);
 
     LoggedSqlCollector.current();
-    JtTroop fetchTroop = Ebean.find(JtTroop.class)
+    JtTroop fetchTroop = DB.find(JtTroop.class)
       .fetch("monkeys")
       .where().idEq(troop.getPid())
       .findOne();
@@ -67,7 +67,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     assertThat(trimSql(sql.get(0))).contains("from troop t0 left join troop_monkey t1z_ on t1z_.troop_pid = t0.pid  left join monkey t1 on t1.mid = t1z_.monkey_mid  where t0.pid = ?");
     assertThat(trimSql(sql.get(0))).contains("select t0.pid, t0.name, t0.version, t1.mid, t1.name, t1.food_preference, t1.version");
 
-    Ebean.delete(troop);
+    DB.delete(troop);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
@@ -85,25 +85,27 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     // make m2 dirty ... cascades to an update on Uim
     m2.setFoodPreference("Apple");
     trainer.getMonkeys().add(m2);
-    trainer.getMonkeys().add(Ebean.getReference(JtMonkey.class, m1.getMid()));
+    trainer.getMonkeys().add(DB.getReference(JtMonkey.class, m1.getMid()));
     trainer.getMonkeys().add(new JtMonkey("FAlp"));
     trainer.getMonkeys().add(new JtMonkey("FBet"));
     trainer.getMonkeys().add(new JtMonkey("FThe"));
 
     LoggedSqlCollector.start();
-    Ebean.save(trainer);
+    DB.save(trainer);
 
     List<String> sql = LoggedSqlCollector.current();
-    //Collections.sort(sql);
 
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(6);
+      assertThat(sql).hasSize(13);
       assertThat(sql.get(0)).contains("insert into trainer ");
       assertThat(sql.get(1)).contains("insert into monkey ");
-      assertThat(sql.get(4)).contains("update monkey set name=?, food_preference=?, version=? where mid=? and version=?");
-      assertThat(sql.get(5)).contains("insert into trainer_monkey ");
-    }
-    else {
+      assertSqlBind(sql, 2, 4);
+      assertThat(sql.get(5)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
+      assertThat(sql.get(6)).contains("-- bind(");
+      assertThat(sql.get(7)).contains("insert into trainer_monkey ");
+      assertSqlBind(sql, 8, 12);
+
+    } else {
       assertThat(sql).hasSize(10);
       assertThat(sql.get(0)).contains("insert into trainer ");
       assertThat(sql.get(1)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
@@ -113,7 +115,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     }
 
 
-    int intersectionRows = Ebean.createSqlQuery("select count(*) as total from trainer_monkey where trainer_tid = ?")
+    int intersectionRows = DB.sqlQuery("select count(*) as total from trainer_monkey where trainer_tid = ?")
       .setParameter(1, trainer.getTid())
       .findOne()
       .getInteger("total");
@@ -122,7 +124,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
 
     LoggedSqlCollector.current();
-    Ebean.delete(trainer);
+    DB.delete(trainer);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);

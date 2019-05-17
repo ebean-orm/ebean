@@ -1,6 +1,7 @@
 package org.tests.family;
 
 import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -218,6 +219,10 @@ public class TestInheritance extends BaseTestCase {
     assertEquals("Foo", grandparent1.getFamilyName());
     assertEquals("Munich", grandparent1.getAddress());
     assertEquals(1, grandparent1.getEffectiveBean().getId().intValue());
+
+    Ebean.find(ChildPerson.class).delete();
+    Ebean.find(GrandParentPerson.class).delete();
+    Ebean.find(EBasic.class).delete();
   }
 
   @Test
@@ -260,5 +265,8 @@ public class TestInheritance extends BaseTestCase {
     count = server().find(GrandParentPerson.class).where().eq("basicSameName.description", "Description A").findCount();
     assertEquals(1, count);
 
+    Ebean.find(ChildPerson.class).delete();
+    Ebean.find(GrandParentPerson.class).delete();
+    Ebean.find(EBasic.class).delete();
   }
 }

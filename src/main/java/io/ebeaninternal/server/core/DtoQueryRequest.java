@@ -37,6 +37,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     super(server, query, null);
     this.queryEngine = engine;
     this.query = query;
+    query.obtainLocation();
   }
 
   /**
@@ -44,6 +45,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
    */
   @Override
   public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+    startNano = System.nanoTime();
     SpiQuery<?> ormQuery = query.getOrmQuery();
     if (ormQuery != null) {
       ormQuery.setType(type);

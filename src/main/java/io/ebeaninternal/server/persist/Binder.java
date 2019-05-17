@@ -9,6 +9,7 @@ import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.PostgresHelper;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
@@ -372,6 +373,11 @@ public class Binder {
         case DbPlatformType.UUID:
           // native UUID support in H2 and Postgres
           b.setObject(data);
+          break;
+
+        case DbPlatformType.INET:
+          // data is always a String at this point
+          b.setObject(PostgresHelper.asInet(data.toString()));
           break;
 
         case java.sql.Types.OTHER:

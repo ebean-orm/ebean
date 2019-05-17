@@ -24,6 +24,11 @@ class RawSqlQueryPlanKey implements CQueryPlanKey {
     return getPartialKey() + ":r";
   }
 
+  @Override
+  public CQueryPlanKey withDeleteByIds() {
+    throw new IllegalStateException("Not allowed");
+  }
+
   /**
    * Return as a partial key. For rawSql hash the sql is part of the key and as such
    * needs to be included in order to have a complete key. Typically the MD5 of the sql
