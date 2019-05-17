@@ -9,12 +9,18 @@ import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.HelpCreateQueryRequest;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
+import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
+
 import org.avaje.agentloader.AgentLoader;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +28,31 @@ import org.tests.model.basic.Country;
 
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 @RunWith(ConditionalTestRunner.class)
 public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
+
+  @Rule public TestName name = new TestName();
+
+  @After
+  public void checkForLeak() {
+    Map<String, SpiTransaction> trans = DefaultTransactionThreadLocal.currentTransactions();
+    if (trans != null) {
+      if (!trans.isEmpty()) {
+        String msg = getClass().getSimpleName() + "." + name.getMethodName() + " did not clear threadScope:" + trans;
+        trans.clear(); // clear for next test
+        fail(msg);
+      }
+    }
+  }
+
 
   /**
    * this is the clock delta that may occur between testing machine and db server.
