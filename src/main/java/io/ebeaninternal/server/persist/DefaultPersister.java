@@ -123,6 +123,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException e) {
       request.rollbackTransIfRequired();
       throw e;
+    } finally {
+      request.clearTransIfRequired();
     }
   }
 
@@ -435,6 +437,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
       throw ex;
+    } finally {
+      req.clearTransIfRequired();
     }
   }
 
@@ -471,6 +475,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
       throw ex;
+    } finally {
+      req.clearTransIfRequired();
     }
   }
 
@@ -623,6 +629,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
       throw ex;
+    } finally {
+      req.clearTransIfRequired();
     }
   }
 
