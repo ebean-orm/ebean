@@ -5,6 +5,8 @@ import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
+import io.ebean.config.dbplatform.IdType;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.m2m.MnyB;
@@ -75,9 +77,8 @@ public class TestBatchModelFlush extends BaseTestCase {
     assertThat(sql).hasSize(9);
 
     // first saved to batch - (depth 100)
-    boolean hasSequence = isSqlServer();
     assertThat(sql.get(0)).contains("insert into mny_b");
-    if (!hasSequence) {
+    if (idType() == IdType.IDENTITY) {
       assertThat(sql.get(1)).contains(" -- bind(BatchMultipleTop_0");
       assertThat(sql.get(2)).contains(" -- bind(BatchMultipleTop_1");
     }
@@ -87,7 +88,7 @@ public class TestBatchModelFlush extends BaseTestCase {
     assertThat(sql.get(5)).contains(" -- bind(");
     // third saved to batch - (depth 102)
     assertThat(sql.get(6)).contains("insert into mny_topic");
-    if (!hasSequence) {
+    if (idType() == IdType.IDENTITY) {
       assertThat(sql.get(7)).contains(" -- bind(MnyTopic_0");
       assertThat(sql.get(8)).contains(" -- bind(MnyTopic_1");
     }

@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
+import io.ebean.config.dbplatform.IdType;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.ServerMetrics;
@@ -195,6 +196,10 @@ public abstract class BaseTestCase {
 
   protected Platform platform() {
     return spiEbeanServer().getDatabasePlatform().getPlatform();
+  }
+
+  protected IdType idType() {
+    return spiEbeanServer().getDatabasePlatform().getDbIdentity().getIdType();
   }
 
   protected SpiEbeanServer spiEbeanServer() {
