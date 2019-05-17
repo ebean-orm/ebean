@@ -497,8 +497,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "select t0.first_name as attribute_ from contact t0"
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
-    // FIXME: These asserts will fail, because other tests will interfere. see #1298
-    //assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
+    assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
 
 
     query = Ebean.find(Contact.class).select("firstName");
@@ -506,14 +505,14 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setCountDistinct(CountDistinctOrder.ATTR_DESC)
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
-    //assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
+    assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
 
     query = Ebean.find(Contact.class).select("firstName");
     list1 = query
       .setCountDistinct(CountDistinctOrder.COUNT_ASC_ATTR_DESC)
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
-    //assertThat(list1.toString()).isEqualTo("[1: Tracy, 1: Jack, 1: Fiona, 3: Jim1, 3: Fred1, 3: Bugs1]");
+    assertThat(list1.toString()).isEqualTo("[1: Tracy, 1: Jack, 1: Fiona, 3: Jim1, 3: Fred1, 3: Bugs1]");
 
     query = Ebean.find(Contact.class).fetch("customer.shippingAddress", "line1");//("firstName")
     List<CountedValue<Object>> list2 = query
@@ -525,8 +524,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "left join o_address t2 on t2.id = t1.shipping_address_id "
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list2.get(0)).isInstanceOf(CountedValue.class);
-    //assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
-
+    if (isPostgres() || isOracle()) {
+      assertThat(list2.toString()).isEqualTo("[3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way, 1: null]");
+    } else {
+      assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
+    }
 
     query = Ebean.find(Contact.class).select("firstName")
       .where().eq("customer.shippingAddress.line1", "12 Apple St").query();
@@ -539,7 +541,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "left join o_address t2 on t2.id = t1.shipping_address_id  where t2.line_1 = ?"
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list3.get(0)).isInstanceOf(CountedValue.class);
-    //assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
+    assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
 
 
     query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1")
@@ -558,8 +560,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "where (t3.line_1 <> ? or t3.line_1 is null)"
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list4.get(0)).isInstanceOf(CountedValue.class);
-    //assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
-
+    if (isPostgres() || isOracle()) {
+      assertThat(list4.toString()).isEqualTo("[3: Bos town, 3: P.O.Box 1234, 1: null]");
+    } else {
+      assertThat(list4.toString()).isEqualTo("[1: null, 3: Bos town, 3: P.O.Box 1234]");
+    }
 
     // Test Limiter for MSSQL
     query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1").setFirstRow(1).setMaxRows(2);
@@ -581,7 +586,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");
     }
     assertThat(list5.get(0)).isInstanceOf(CountedValue.class);
-    //assertThat(list5.toString()).isEqualTo("[3: P.O.Box 1234, 3: Bos town]");
+    assertThat(list5.toString()).isEqualTo("[3: P.O.Box 1234, 3: Bos town]");
   }
 
   @Test
