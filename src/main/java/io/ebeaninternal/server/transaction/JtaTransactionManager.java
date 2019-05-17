@@ -102,7 +102,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     }
 
     // check current Ebean transaction
-    SpiTransaction currentEbeanTransaction = transactionManager.getInScope();
+    SpiTransaction currentEbeanTransaction = DefaultTransactionThreadLocal.get(serverName);
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
       String msg = "JTA Transaction - no current txn BUT using current Ebean one " + currentEbeanTransaction.getId();
@@ -116,7 +116,6 @@ public class JtaTransactionManager implements ExternalTransactionManager {
       if (logger.isDebugEnabled()) {
         logger.debug("JTA Transaction - no current txn");
       }
-      transactionManager.set(null);
       return null;
     }
 
@@ -133,7 +132,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     syncRegistry.registerInterposedSynchronization(txnListener);
 
     // also put in Ebean ThreadLocal
-    transactionManager.set(newTrans);
+    DefaultTransactionThreadLocal.set(serverName, newTrans);
     return newTrans;
   }
 
@@ -193,10 +192,12 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
     private final SpiTransaction transaction;
 
+    private final String serverName;
 
     private JtaTxnListener(TransactionManager transactionManager, SpiTransaction t) {
       this.transactionManager = transactionManager;
       this.transaction = t;
+      this.serverName = transactionManager.getServerName();
     }
 
     @Override
@@ -214,6 +215,8 @@ public class JtaTransactionManager implements ExternalTransactionManager {
             logger.debug("Jta Txn [" + transaction.getId() + "] committed");
           }
           transactionManager.notifyOfCommit(transaction);
+          // Remove this transaction object as it is completed
+          DefaultTransactionThreadLocal.replace(serverName, null);
           break;
 
         case Status.STATUS_ROLLEDBACK:
@@ -221,6 +224,8 @@ public class JtaTransactionManager implements ExternalTransactionManager {
             logger.debug("Jta Txn [" + transaction.getId() + "] rollback");
           }
           transactionManager.notifyOfRollback(transaction, null);
+          // Remove this transaction object as it is completed
+          DefaultTransactionThreadLocal.replace(serverName, null);
           break;
 
         default:
@@ -231,8 +236,6 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
       // No matter the completion status of the transaction, we release the connection we got from the pool.
       JdbcClose.close(transaction.getInternalConnection());
-      // And we remove this transaction object as it is completed
-      transactionManager.scope().clear(transaction);
     }
   }
 
