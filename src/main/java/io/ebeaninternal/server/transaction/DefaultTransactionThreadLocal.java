@@ -1,19 +1,17 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.transaction.TransactionMap.State;
+
+import javax.persistence.PersistenceException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Used to store Transactions in a ThreadLocal.
  */
 public final class DefaultTransactionThreadLocal {
 
-  private static final ThreadLocal<TransactionMap> local = new ThreadLocal<TransactionMap>() {
-    @Override
-    protected synchronized TransactionMap initialValue() {
-      return new TransactionMap();
-    }
-  };
+  private static final ThreadLocal<Map<String, SpiTransaction>> local = ThreadLocal.withInitial(HashMap::new);
 
   /**
    * Not allowed.
@@ -22,18 +20,24 @@ public final class DefaultTransactionThreadLocal {
   }
 
   /**
-   * Return the current TransactionState for a given serverName. This is for the
-   * local thread of course.
+   * Remove the transaction entry for the given serverName.
    */
-  private static TransactionMap.State getState(String serverName) {
-    return local.get().getStateWithCreate(serverName);
+  private static void remove(String serverName) {
+    local.get().remove(serverName);
   }
 
   /**
    * Set a new Transaction for this serverName and Thread.
    */
   public static void set(String serverName, SpiTransaction trans) {
-    getState(serverName).set(trans);
+    if (trans == null) {
+      remove(serverName);
+    } else {
+      SpiTransaction existingTransaction = local.get().put(serverName, trans);
+      if (existingTransaction != null && existingTransaction.isActive()) {
+        throw new PersistenceException("The existing transaction is still active?");
+      }
+    }
   }
 
   /**
@@ -46,50 +50,40 @@ public final class DefaultTransactionThreadLocal {
    * </p>
    */
   public static void replace(String serverName, SpiTransaction trans) {
-    getState(serverName).replace(trans);
+    if (trans == null) {
+      remove(serverName);
+    } else {
+      local.get().put(serverName, trans);
+    }
   }
 
   /**
    * Return the current Transaction for this serverName and Thread.
    */
   public static SpiTransaction get(String serverName) {
-    TransactionMap map = local.get();
-    State state = map.getState(serverName);
-    SpiTransaction t = (state == null) ? null : state.transaction;
-    if (map.isEmpty()) {
-      local.remove();
+    return local.get().get(serverName);
+  }
+
+  private static SpiTransaction obtain(String serverName) {
+    SpiTransaction transaction = local.get().remove(serverName);
+    if (transaction == null) {
+      throw new IllegalStateException("No current transaction for [" + serverName + "]");
     }
-    return t;
+    return transaction;
   }
 
   /**
    * Commit the current transaction.
    */
   public static void commit(String serverName) {
-    TransactionMap map = local.get();
-    State state = map.removeState(serverName);
-    if (state == null) {
-      throw new IllegalStateException("No current transaction for [" + serverName + "]");
-    }
-    state.commit();
-    if (map.isEmpty()) {
-      local.remove();
-    }
+    obtain(serverName).commit();
   }
 
   /**
    * Rollback the current transaction.
    */
   public static void rollback(String serverName) {
-    TransactionMap map = local.get();
-    State state = map.removeState(serverName);
-    if (state == null) {
-      throw new IllegalStateException("No current transaction for [" + serverName + "]");
-    }
-    state.rollback();
-    if (map.isEmpty()) {
-      local.remove();
-    }
+    obtain(serverName).rollback();
   }
 
   /**
@@ -112,14 +106,9 @@ public final class DefaultTransactionThreadLocal {
    * </pre>
    */
   public static void end(String serverName) {
-
-    TransactionMap map = local.get();
-    State state = map.removeState(serverName);
-    if (state != null) {
-      state.end();
-    }
-    if (map.isEmpty()) {
-      local.remove();
+    SpiTransaction transaction = local.get().remove(serverName);
+    if (transaction != null) {
+      transaction.end();
     }
   }
 
