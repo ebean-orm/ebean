@@ -133,4 +133,42 @@ public class TestExecuteComplete extends BaseTestCase {
     assertThat(txn2).isNull();
   }
 
+  @ForPlatform(Platform.H2)
+  @Test
+  public void implicit_query_expect_threadScopeCleanup() {
+
+    DB.find(Customer.class).findList();
+
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void implicit_save_expect_threadScopeCleanup() {
+
+    Customer cust = new Customer();
+    cust.setName("Roland");
+    DB.save(cust);
+
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void no_transaction_expect_threadScopeCleanup() {
+
+    try (Transaction txn = DB.beginTransaction(TxScope.notSupported())) {
+      SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
+      // The NoTransaction placeholder can normally only occur inside
+      // a scopedTrans. (Class is package private, so check
+      assertThat(txn2.toString()).contains("NoTransaction");
+      assertThat(txn2.toString()).contains("NoTransaction");
+    }
+
+    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+    assertThat(txn).isNull();
+  }
+
 }
