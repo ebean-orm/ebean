@@ -2235,6 +2235,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (RuntimeException e) {
       wrap.endIfCreated();
       throw e;
+    } finally {
+      wrap.clearIfCreated();
     }
   }
 

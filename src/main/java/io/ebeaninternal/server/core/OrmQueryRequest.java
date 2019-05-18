@@ -350,6 +350,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public void endTransIfRequired() {
     if (createdTransaction && transaction.isActive()) {
       transaction.commit();
+      if (query.getType().isUpdate()) {
+        // for implicit update/delete queries clear the thread local
+        ebeanServer.clearServerTransaction();
+      }
     }
   }
 

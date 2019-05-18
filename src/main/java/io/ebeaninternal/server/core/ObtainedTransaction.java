@@ -41,4 +41,7 @@ class ObtainedTransaction {
     // do nothing
   }
 
+  public void clearIfCreated() {
+    // do nothing
+  }
 }

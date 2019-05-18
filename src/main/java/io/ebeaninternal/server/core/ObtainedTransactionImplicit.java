@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.EbeanServer;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 
 /**
@@ -11,12 +11,12 @@ import io.ebeaninternal.api.SpiTransaction;
  */
 final class ObtainedTransactionImplicit extends ObtainedTransaction {
 
-  private final EbeanServer server;
+  private final SpiEbeanServer server;
 
   /**
    * Wrap the transaction indicating if it was just created.
    */
-  ObtainedTransactionImplicit(SpiTransaction t, EbeanServer server) {
+  ObtainedTransactionImplicit(SpiTransaction t, SpiEbeanServer server) {
     super(t);
     this.server = server;
   }
@@ -29,6 +29,11 @@ final class ObtainedTransactionImplicit extends ObtainedTransaction {
   @Override
   public void endIfCreated() {
     server.endTransaction();
+  }
+
+  @Override
+  public void clearIfCreated() {
+    server.clearServerTransaction();
   }
 
 }
