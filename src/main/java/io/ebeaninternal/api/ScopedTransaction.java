@@ -70,7 +70,7 @@ public class ScopedTransaction extends SpiTransactionProxy {
 
   private void clearScopeOnce() {
     if (!scopeCleared) {
-      manager.set(null);
+      manager.clear();
       scopeCleared = true;
     }
   }

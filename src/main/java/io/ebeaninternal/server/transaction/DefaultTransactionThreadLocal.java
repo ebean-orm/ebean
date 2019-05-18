@@ -31,12 +31,11 @@ public final class DefaultTransactionThreadLocal {
    */
   public static void set(String serverName, SpiTransaction trans) {
     if (trans == null) {
-      remove(serverName);
-    } else {
-      SpiTransaction existingTransaction = local.get().put(serverName, trans);
-      if (existingTransaction != null && existingTransaction.isActive()) {
-        throw new PersistenceException("The existing transaction is still active?");
-      }
+      throw new IllegalStateException("Setting a null transaction?");
+    }
+    SpiTransaction existingTransaction = local.get().put(serverName, trans);
+    if (existingTransaction != null && existingTransaction.isActive()) {
+      throw new PersistenceException("The existing transaction is still active?");
     }
   }
 
@@ -80,54 +79,6 @@ public final class DefaultTransactionThreadLocal {
    */
   public static Map<String, SpiTransaction> currentTransactions() {
     return local.get();
-  }
-
-  private static SpiTransaction obtain(String serverName) {
-    SpiTransaction transaction = local.get().remove(serverName);
-    if (transaction == null) {
-      throw new IllegalStateException("No current transaction for [" + serverName + "]");
-    }
-    return transaction;
-  }
-
-  /**
-   * Commit the current transaction.
-   */
-  public static void commit(String serverName) {
-    obtain(serverName).commit();
-  }
-
-  /**
-   * Rollback the current transaction.
-   */
-  public static void rollback(String serverName) {
-    obtain(serverName).rollback();
-  }
-
-  /**
-   * If the transaction has not been committed then roll it back.
-   * <p>
-   * Designed to be put in a finally block instead of a rollback() in each catch
-   * block.
-   * <p>
-   * <pre>
-   * Ebean.beginTransaction();
-   * try {
-   *   // ... perform some actions in a single transaction
-   *
-   *   Ebean.commitTransaction();
-   *
-   * } finally {
-   *   // ensure transaction ended. If some error occurred then rollback()
-   *   Ebean.endTransaction();
-   * }
-   * </pre>
-   */
-  public static void end(String serverName) {
-    SpiTransaction transaction = local.get().remove(serverName);
-    if (transaction != null) {
-      transaction.end();
-    }
   }
 
 }
