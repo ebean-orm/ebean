@@ -145,6 +145,20 @@ class BeanLifecycleAdapterFactory {
     return methodList.toArray(new Method[methodList.size()]);
   }
 
+  static RuntimeException unwrapException(ReflectiveOperationException e) {
+    if (e instanceof InvocationTargetException) {
+      Throwable targetException = ((InvocationTargetException)e).getTargetException();
+      if (targetException instanceof RuntimeException) {
+        // return unchecked exceptions
+        return (RuntimeException) targetException;
+      } else {
+        // wrap checked exceptions
+        return new PersistenceException("Error invoking lifecycle method", targetException);
+      }
+    }
+    return new PersistenceException("Error invoking lifecycle method", e);
+  }
+
   /**
    * Holds Methods for the lifecycle events.s
    */
@@ -192,7 +206,7 @@ class BeanLifecycleAdapterFactory {
       try {
         method.invoke(bean);
       } catch (InvocationTargetException | IllegalAccessException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
+        throw unwrapException(e);
       }
     }
 
@@ -268,7 +282,7 @@ class BeanLifecycleAdapterFactory {
       try {
         method.invoke(bean);
       } catch (InvocationTargetException | IllegalAccessException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
+        throw unwrapException(e);
       }
     }
 
@@ -301,7 +315,7 @@ class BeanLifecycleAdapterFactory {
       try {
         method.invoke(bean);
       } catch (InvocationTargetException | IllegalAccessException e) {
-        throw new PersistenceException("Error invoking lifecycle method", e);
+        throw unwrapException(e);
       }
     }
 
