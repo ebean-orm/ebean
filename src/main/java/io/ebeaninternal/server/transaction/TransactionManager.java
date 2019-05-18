@@ -597,7 +597,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   @Override
   public void externalRemoveTransaction() {
-    scopeManager.replace(null);
+    scopeManager.clearExternal();
   }
 
   /**

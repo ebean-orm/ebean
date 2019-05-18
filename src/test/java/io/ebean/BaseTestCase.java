@@ -15,8 +15,7 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
-import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
-
+import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import org.avaje.agentloader.AgentLoader;
 import org.junit.After;
 import org.junit.Rule;
@@ -28,7 +27,6 @@ import org.tests.model.basic.Country;
 
 import java.sql.Types;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,13 +41,12 @@ public abstract class BaseTestCase {
 
   @After
   public void checkForLeak() {
-    Map<String, SpiTransaction> trans = DefaultTransactionThreadLocal.currentTransactions();
+    TransactionScopeManager scope = spiEbeanServer().getTransactionManager().scope();
+    SpiTransaction trans = scope.getInScope();
     if (trans != null) {
-      if (!trans.isEmpty()) {
-        String msg = getClass().getSimpleName() + "." + name.getMethodName() + " did not clear threadScope:" + trans;
-        trans.clear(); // clear for next test
-        fail(msg);
-      }
+      String msg = getClass().getSimpleName() + "." + name.getMethodName() + " did not clear threadScope:" + trans;
+      scope.clearExternal(); // clear for next test
+      fail(msg);
     }
   }
 
@@ -102,6 +99,10 @@ public abstract class BaseTestCase {
     return timedMetrics.stream()
       .filter((it) -> it.getMetricType() == MetricType.SQL)
       .collect(Collectors.toList());
+  }
+
+  protected SpiTransaction getInScopeTransaction() {
+    return spiEbeanServer().getTransactionManager().scope().getInScope();
   }
 
   /**

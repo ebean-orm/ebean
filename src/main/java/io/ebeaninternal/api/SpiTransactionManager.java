@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.TxScope;
+import io.ebeaninternal.server.transaction.TransactionScopeManager;
 
 import javax.sql.DataSource;
 
@@ -8,6 +9,11 @@ import javax.sql.DataSource;
  * Service provider interface for the transaction manager.
  */
 public interface SpiTransactionManager {
+
+  /**
+   * Return the scope manager for this server.
+   */
+  TransactionScopeManager scope();
 
   /**
    * Return the main DataSource.
