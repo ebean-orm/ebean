@@ -10,7 +10,6 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.transaction.DefaultTransactionThreadLocal;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -37,8 +36,7 @@ public class TestExecuteComplete extends BaseTestCase {
       fail();
     } catch (DataIntegrityException e) {
       // assert the thread local has been cleaned up
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-      assertThat(txn).isNull();
+      assertThat(getInScopeTransaction()).isNull();
     }
   }
 
@@ -59,8 +57,7 @@ public class TestExecuteComplete extends BaseTestCase {
       fail();
     } catch (DataIntegrityException e) {
       // assert the thread local has been cleaned up
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-      assertThat(txn).isNull();
+      assertThat(getInScopeTransaction()).isNull();
     }
   }
 
@@ -72,8 +69,7 @@ public class TestExecuteComplete extends BaseTestCase {
       errorOnCommit();
       fail();
     } catch (DataIntegrityException e) {
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-      assertThat(txn).isNull();
+      assertThat(getInScopeTransaction()).isNull();
     }
   }
 
@@ -97,8 +93,7 @@ public class TestExecuteComplete extends BaseTestCase {
       txn1.end();
     }
 
-    SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
-    assertThat(txn2).isNull();
+    assertThat(getInScopeTransaction()).isNull();
   }
 
   @ForPlatform(Platform.H2)
@@ -113,8 +108,7 @@ public class TestExecuteComplete extends BaseTestCase {
       //txn1.end();
     }
 
-    SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
-    assertThat(txn2).isNull();
+    assertThat(getInScopeTransaction()).isNull();
   }
 
   @ForPlatform(Platform.H2)
@@ -129,8 +123,7 @@ public class TestExecuteComplete extends BaseTestCase {
       //txn1.end();
     }
 
-    SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
-    assertThat(txn2).isNull();
+    assertThat(getInScopeTransaction()).isNull();
   }
 
   @ForPlatform(Platform.H2)
@@ -139,8 +132,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
     DB.find(Customer.class).findList();
 
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-    assertThat(txn).isNull();
+    assertThat(getInScopeTransaction()).isNull();
   }
 
   @ForPlatform(Platform.H2)
@@ -151,8 +143,7 @@ public class TestExecuteComplete extends BaseTestCase {
     cust.setName("Roland");
     DB.save(cust);
 
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-    assertThat(txn).isNull();
+    assertThat(getInScopeTransaction()).isNull();
   }
 
   @ForPlatform(Platform.H2)
@@ -160,15 +151,14 @@ public class TestExecuteComplete extends BaseTestCase {
   public void no_transaction_expect_threadScopeCleanup() {
 
     try (Transaction txn = DB.beginTransaction(TxScope.notSupported())) {
-      SpiTransaction txn2 = DefaultTransactionThreadLocal.get("h2");
+      SpiTransaction txn2 = getInScopeTransaction();
       // The NoTransaction placeholder can normally only occur inside
       // a scopedTrans. (Class is package private, so check
       assertThat(txn2.toString()).contains("NoTransaction");
       assertThat(txn2.toString()).contains("NoTransaction");
     }
 
-    SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
-    assertThat(txn).isNull();
+    assertThat(getInScopeTransaction()).isNull();
   }
 
 }

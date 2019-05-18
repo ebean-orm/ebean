@@ -2,11 +2,15 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
 
+import javax.persistence.PersistenceException;
+
 /**
  * Manages the transaction scoping using a Ebean thread local.
  */
 public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
+
+  private final ThreadLocal<SpiTransaction> local = new ThreadLocal<>();
 
   public DefaultTransactionScopeManager(String serverName) {
     super(serverName);
@@ -19,12 +23,12 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
   @Override
   public SpiTransaction getInScope() {
-    return DefaultTransactionThreadLocal.get(serverName);
+    return local.get();
   }
 
   @Override
   public SpiTransaction getActive() {
-    SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
+    SpiTransaction t = local.get();
     if (t == null || !t.isActive()) {
       return null;
     } else {
@@ -34,17 +38,36 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
   @Override
   public void replace(SpiTransaction trans) {
-    DefaultTransactionThreadLocal.replace(serverName, trans);
+    if (trans == null) {
+      throw new IllegalStateException("Setting a null transaction?");
+    }
+    local.set(trans);
   }
 
   @Override
   public void set(SpiTransaction trans) {
-    DefaultTransactionThreadLocal.set(serverName, trans);
+    if (trans == null) {
+      throw new IllegalStateException("Setting a null transaction?");
+    }
+    checkForActiveTransaction();
+    local.set(trans);
   }
 
   @Override
   public void clear() {
-    DefaultTransactionThreadLocal.clear(serverName);
+    checkForActiveTransaction();
+    local.remove();
   }
 
+  @Override
+  public void clearExternal() {
+    local.remove();
+  }
+
+  private void checkForActiveTransaction() {
+    SpiTransaction transaction = local.get();
+    if (transaction != null && transaction.isActive()) {
+      throw new PersistenceException("Invalid state - there is an existing Active transaction " + transaction);
+    }
+  }
 }

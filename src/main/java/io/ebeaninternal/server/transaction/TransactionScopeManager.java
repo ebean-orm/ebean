@@ -40,6 +40,12 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void clear();
 
   /**
+   * Clears the current Transaction from thread local scope without any check for active
+   * transactions. Intended for use with external transactions.
+   */
+  public abstract void clearExternal();
+
+  /**
    * Replace the current transaction with this one.
    * <p>
    * Used for Background fetching and Nested transaction scopes.

@@ -18,12 +18,12 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @Test
   public void get() {
     Ebean.execute(() -> {
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+      SpiTransaction txn = getInScopeTransaction();
       assertNotNull(txn);
     });
 
     // thread local should be set to null
-    assertNull(DefaultTransactionThreadLocal.get("h2"));
+    assertNull(getInScopeTransaction());
   }
 
   @ForPlatform({Platform.H2})
@@ -32,19 +32,19 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
 
     try (Transaction transaction = Ebean.beginTransaction()) {
       assertNotNull(transaction);
-      SpiTransaction txn = DefaultTransactionThreadLocal.get("h2");
+      SpiTransaction txn = getInScopeTransaction();
       assertSame(txn, transaction);
 
       try (Transaction nested = Ebean.beginTransaction()) {
         assertNotNull(nested);
-        SpiTransaction txnNested = DefaultTransactionThreadLocal.get("h2");
+        SpiTransaction txnNested = getInScopeTransaction();
         assertSame(txnNested, nested);
       }
 
-      assertNotNull(DefaultTransactionThreadLocal.get("h2"));
+      assertNotNull(getInScopeTransaction());
     }
 
-    assertNull(DefaultTransactionThreadLocal.get("h2"));
+    assertNull(getInScopeTransaction());
   }
 
   @ForPlatform({Platform.H2})
@@ -53,9 +53,9 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
 
     try (Transaction transaction = Ebean.beginTransaction()) {
       transaction.commit();
-      assertNull(DefaultTransactionThreadLocal.get("h2"));
+      assertNull(getInScopeTransaction());
     }
-    assertNull(DefaultTransactionThreadLocal.get("h2"));
+    assertNull(getInScopeTransaction());
   }
 
   @ForPlatform({Platform.H2})
@@ -65,9 +65,9 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
     try (Transaction transaction = Ebean.beginTransaction()) {
 
       transaction.rollback();
-      assertNull(DefaultTransactionThreadLocal.get("h2"));
+      assertNull(getInScopeTransaction());
     }
-    assertNull(DefaultTransactionThreadLocal.get("h2"));
+    assertNull(getInScopeTransaction());
   }
 
   @ForPlatform({Platform.H2})
