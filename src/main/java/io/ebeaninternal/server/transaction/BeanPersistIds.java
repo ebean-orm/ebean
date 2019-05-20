@@ -128,6 +128,7 @@ public class BeanPersistIds implements BinaryWritable {
    * Notify the cache of this event that came from another server in the cluster.
    */
   public void notifyCache(CacheChangeSet changeSet) {
+    changeSet.addInvalidate(beanDescriptor);
     changeSet.addClearQuery(beanDescriptor);
     if (ids != null) {
       changeSet.addBeanRemoveMany(beanDescriptor, ids);

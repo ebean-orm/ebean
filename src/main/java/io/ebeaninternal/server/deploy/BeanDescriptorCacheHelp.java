@@ -220,6 +220,7 @@ final class BeanDescriptorCacheHelp<T> {
    */
   private void queryCacheClear(CacheChangeSet changeSet) {
     if (queryCache != null) {
+      changeSet.addInvalidate(desc);
       changeSet.addClearQuery(desc);
     }
   }
