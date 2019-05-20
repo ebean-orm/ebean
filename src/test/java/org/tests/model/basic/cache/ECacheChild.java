@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 import io.ebean.annotation.Cache;
 
 @Entity
-@Cache(enableQueryCache = true)
+@Cache(enableQueryCache = true, enableBeanCache = false)
 public class ECacheChild {
 
   @Id
