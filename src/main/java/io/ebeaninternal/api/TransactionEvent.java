@@ -30,8 +30,6 @@ public class TransactionEvent implements Serializable {
    */
   private final transient boolean local;
 
-  private final long startMillis;
-
   private TransactionEventTable eventTables;
 
   private transient List<PersistRequestBean<?>> listenerNotify;
@@ -43,8 +41,7 @@ public class TransactionEvent implements Serializable {
   /**
    * Create the TransactionEvent, one per Transaction.
    */
-  public TransactionEvent(long startMillis) {
-    this.startMillis = startMillis;
+  public TransactionEvent() {
     this.local = true;
   }
 
@@ -119,7 +116,7 @@ public class TransactionEvent implements Serializable {
     }
 
     if (changeSet == null) {
-      changeSet = new CacheChangeSet(manager.clockNowMillis());
+      changeSet = new CacheChangeSet();
     }
     if (eventTables != null && !eventTables.isEmpty()) {
       // notify cache with table based changes
@@ -154,7 +151,7 @@ public class TransactionEvent implements Serializable {
    */
   public CacheChangeSet obtainCacheChangeSet() {
     if (changeSet == null) {
-      changeSet = new CacheChangeSet(startMillis);
+      changeSet = new CacheChangeSet();
     }
     return changeSet;
   }

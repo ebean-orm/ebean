@@ -145,9 +145,9 @@ final class PostCommitProcessing {
     if (cacheChanges != null) {
       Set<String> touched = cacheChanges.touchedTables();
       if (touched != null && !touched.isEmpty()) {
-        manager.processTouchedTables(touched, cacheChanges.modificationTimestamp());
+        manager.processTouchedTables(touched);
         if (remoteTransactionEvent != null) {
-          remoteTransactionEvent.addRemoteTableMod(new RemoteTableMod(cacheChanges.modificationTimestamp(), touched));
+          remoteTransactionEvent.addRemoteTableMod(new RemoteTableMod(touched));
         }
       }
       cacheChanges.apply();

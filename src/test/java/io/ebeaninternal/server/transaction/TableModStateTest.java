@@ -1,25 +1,26 @@
 package io.ebeaninternal.server.transaction;
 
-import io.ebeaninternal.server.core.ClockService;
 import org.junit.Test;
 
-import java.time.Clock;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TableModStateTest {
 
-  private TableModState tableModState = new TableModState(new ClockService(Clock.systemUTC()));
+  private TableModState tableModState = new TableModState();
 
   @Test
   public void isValid() {
 
-    long now = System.currentTimeMillis();
+    long before = System.nanoTime();
 
-    tableModState.touch(setOf("one", "two", "three"), now);
+    tableModState.touch(setOf("one", "two", "three"));
+
+    long after = System.nanoTime();
 
     // empty
     assertTrue(tableModState.isValid(Collections.emptySet(), 12L));
@@ -28,13 +29,13 @@ public class TableModStateTest {
     assertTrue(tableModState.isValid(setOf("noEntry"), 12L));
 
     // later timestamp
-    assertTrue(tableModState.isValid(setOf("one"), now + 1));
-    assertTrue(tableModState.isValid(setOf("one", "two", "noEntry"), now + 1));
+    assertTrue(tableModState.isValid(setOf("one"), after));
+    assertTrue(tableModState.isValid(setOf("one", "two", "noEntry"), after));
 
     // invalid
-    assertFalse(tableModState.isValid(setOf("one"), now - 1));
-    assertFalse(tableModState.isValid(setOf("one", "two"), now - 1));
-    assertFalse(tableModState.isValid(setOf("three", "two"), now - 1));
+    assertFalse(tableModState.isValid(setOf("one"), before));
+    assertFalse(tableModState.isValid(setOf("one", "two"), before));
+    assertFalse(tableModState.isValid(setOf("three", "two"), before));
 
   }
 

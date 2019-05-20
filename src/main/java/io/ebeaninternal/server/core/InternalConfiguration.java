@@ -169,7 +169,7 @@ public class InternalConfiguration {
     this.online = online;
     this.serverConfig = serverConfig;
     this.clockService = new ClockService(serverConfig.getClock());
-    this.tableModState = new TableModState(clockService);
+    this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();

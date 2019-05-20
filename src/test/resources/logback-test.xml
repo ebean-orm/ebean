@@ -83,6 +83,7 @@
 <!--  <logger name="io.ebean.TXN" level="TRACE"/>-->
 <!--  <logger name="io.ebean.SUM" level="TRACE"/>-->
 
+<!--  <logger name="io.ebean.cache" level="TRACE"/>-->
 <!--  <logger name="io.ebean.cache.REGION" level="TRACE"/>-->
 <!--  <logger name="io.ebean.cache.TABLEMOD" level="TRACE"/>-->
 

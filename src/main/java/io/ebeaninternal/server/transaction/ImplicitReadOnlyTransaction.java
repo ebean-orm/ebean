@@ -65,7 +65,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   private Map<String, Object> userObjects;
 
   private long startNanos;
-  private long startMillis;
 
   /**
    * Create without a tenantId.
@@ -78,7 +77,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
-    this.startMillis = manager.clockNowMillis();
   }
 
   /**
@@ -90,9 +88,9 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public long getStartMillis() {
+  public long getStartNanoTime() {
     // not used on read only transaction
-    return startMillis;
+    return startNanos;
   }
 
   @Override

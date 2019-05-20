@@ -29,8 +29,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public long getStartMillis() {
-    return transaction.getStartMillis();
+  public long getStartNanoTime() {
+    return transaction.getStartNanoTime();
   }
 
   @Override
