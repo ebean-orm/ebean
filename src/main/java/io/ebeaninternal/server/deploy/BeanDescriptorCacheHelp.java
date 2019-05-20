@@ -220,7 +220,6 @@ final class BeanDescriptorCacheHelp<T> {
    */
   private void queryCacheClear(CacheChangeSet changeSet) {
     if (queryCache != null) {
-      changeSet.addInvalidate(desc);
       changeSet.addClearQuery(desc);
     }
   }
@@ -910,12 +909,11 @@ final class BeanDescriptorCacheHelp<T> {
       return;
     }
     changeSet.addInvalidate(desc);
+    changeSet.addClearQuery(desc);
     // inserts don't invalidate the bean cache
     if (tableIUD.isUpdateOrDelete()) {
       changeSet.addClearBean(desc);
     }
-    // any change invalidates the query cache
-    changeSet.addClearQuery(desc);
     // any change invalidates the collection IDs cache
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
       imported.cacheClear(changeSet);
