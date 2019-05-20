@@ -28,13 +28,10 @@ public class CacheChangeSet {
 
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
 
-  private final long modificationTimestamp;
-
   /**
    * Construct specifying if we also need to process invalidation for entities based on views.
    */
-  public CacheChangeSet(long modificationTimestamp) {
-    this.modificationTimestamp = modificationTimestamp;
+  public CacheChangeSet() {
   }
 
   /**
@@ -170,13 +167,6 @@ public class CacheChangeSet {
   private ManyChange many(BeanDescriptor<?> desc, String manyProperty) {
     ManyKey key = new ManyKey(desc, manyProperty);
     return manyChangeMap.computeIfAbsent(key, ManyChange::new);
-  }
-
-  /**
-   * Return the modification timestamp for these changes.
-   */
-  public long modificationTimestamp() {
-    return modificationTimestamp;
   }
 
   /**

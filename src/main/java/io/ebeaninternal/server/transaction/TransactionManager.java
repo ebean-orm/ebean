@@ -452,7 +452,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
 
-    TransactionEvent event = new TransactionEvent(clockNowMillis());
+    TransactionEvent event = new TransactionEvent();
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
@@ -469,7 +469,7 @@ public class TransactionManager implements SpiTransactionManager {
       clusterLogger.debug("processing {}", remoteEvent);
     }
 
-    CacheChangeSet changeSet = new CacheChangeSet(clockNowMillis());
+    CacheChangeSet changeSet = new CacheChangeSet();
 
     RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
     if (tableMod != null) {
@@ -522,12 +522,12 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Invalidate the query caches for entities based on views.
    */
-  public void processTouchedTables(Set<String> touchedTables, long modTimestamp) {
-    tableModState.touch(touchedTables, modTimestamp);
+  public void processTouchedTables(Set<String> touchedTables) {
+    tableModState.touch(touchedTables);
     if (viewInvalidation) {
       beanDescriptorManager.processViewInvalidation(touchedTables);
     }
-    cacheNotify.notify(new ServerCacheNotification(modTimestamp, touchedTables));
+    cacheNotify.notify(new ServerCacheNotification(touchedTables));
   }
 
   /**

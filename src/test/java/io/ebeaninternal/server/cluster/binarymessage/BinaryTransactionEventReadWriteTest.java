@@ -41,11 +41,10 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
     RemoteTransactionEvent event = new RemoteTransactionEvent("db");
 
-    long timestamp = System.currentTimeMillis();
     Set<String> tables = new HashSet<>();
     Collections.addAll(tables, "one", "two", "three");
 
-    event.addRemoteTableMod(new RemoteTableMod(timestamp, tables));
+    event.addRemoteTableMod(new RemoteTableMod(tables));
     event.addRemoteCacheEvent(new RemoteCacheEvent(Customer.class));
 
     event.addTableIUD(new TransactionEventTable.TableIUD("foo", true, false, true));
@@ -70,7 +69,6 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
     // table mod
     RemoteTableMod remoteTableMod = read.getRemoteTableMod();
-    assertThat(remoteTableMod.getTimestamp()).isEqualTo(timestamp);
     assertThat(remoteTableMod.getTables()).isEqualTo(tables);
 
     // Bean persist ids
@@ -84,18 +82,15 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
     RemoteTransactionEvent event = new RemoteTransactionEvent("db");
 
-    long timestamp = System.currentTimeMillis();
     Set<String> tables = new HashSet<>();
     Collections.addAll(tables, "one", "two", "three");
 
-    event.addRemoteTableMod(new RemoteTableMod(timestamp, tables));
+    event.addRemoteTableMod(new RemoteTableMod(tables));
 
     byte[] binaryMessage = event.writeBinaryAsBytes(256);
     RemoteTransactionEvent read = reader.read(binaryMessage);
 
     RemoteTableMod remoteTableMod = read.getRemoteTableMod();
-
-    assertThat(remoteTableMod.getTimestamp()).isEqualTo(timestamp);
     assertThat(remoteTableMod.getTables()).isEqualTo(tables);
   }
 

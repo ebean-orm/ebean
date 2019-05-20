@@ -185,7 +185,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   protected ProfileLocation profileLocation;
 
   protected final long startNanos;
-  private final long startMillis;
 
   /**
    * Create a new JdbcTransaction.
@@ -202,7 +201,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.startNanos = System.nanoTime();
 
       if (manager == null) {
-        this.startMillis = System.currentTimeMillis();
         this.logSql = false;
         this.logSummary = false;
         this.skipCacheAfterWrite = true;
@@ -210,7 +208,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.batchOnCascadeMode = false;
         this.onQueryOnly = OnQueryOnly.ROLLBACK;
       } else {
-        this.startMillis = manager.clockNowMillis();
         this.logSql = manager.isLogSql();
         this.logSummary = manager.isLogSummary();
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
@@ -237,8 +234,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public long getStartMillis() {
-    return startMillis;
+  public long getStartNanoTime() {
+    return startNanos;
   }
 
   @Override
@@ -827,7 +824,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   public TransactionEvent getEvent() {
     queryOnly = false;
     if (event == null) {
-      event = new TransactionEvent(startMillis);
+      event = new TransactionEvent();
     }
     return event;
   }
@@ -1024,7 +1021,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       // the event has been sent to the transaction manager
       // for postCommit processing (l2 cache updates etc)
       // start a new transaction event
-      event = new TransactionEvent(startMillis);
+      event = new TransactionEvent();
 
     } catch (Exception e) {
       doRollback(e);

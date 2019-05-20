@@ -4,13 +4,10 @@ import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.transaction.TableModState;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
-
-import java.time.Clock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +22,7 @@ public class DefaultCacheHolderTest {
   private CacheManagerOptions options() {
     return new CacheManagerOptions(null, new ServerConfig(), true)
       .with(defaultOptions, defaultOptions)
-      .with(cacheFactory, new TableModState(new ClockService(Clock.systemUTC())));
+      .with(cacheFactory, new TableModState());
   }
 
 

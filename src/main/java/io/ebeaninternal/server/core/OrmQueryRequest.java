@@ -696,9 +696,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   public void putToQueryCache(Object result) {
-    // use transaction start where as query statement start would be better at READ_COMMITTED
-    long asOfTimestamp = transaction.getStartMillis();
-    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, asOfTimestamp));
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.getStartNanoTime()));
   }
 
   /**
