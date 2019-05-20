@@ -83,6 +83,7 @@ public class CacheChangeSet {
    */
   public void addClearQuery(BeanDescriptor<?> descriptor) {
     queryCaches.add(descriptor);
+    touchedTables.add(descriptor.getBaseTable());
   }
 
   /**

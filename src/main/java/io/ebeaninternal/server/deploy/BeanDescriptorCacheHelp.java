@@ -908,7 +908,6 @@ final class BeanDescriptorCacheHelp<T> {
     if (noCaching) {
       return;
     }
-    changeSet.addInvalidate(desc);
     changeSet.addClearQuery(desc);
     // inserts don't invalidate the bean cache
     if (tableIUD.isUpdateOrDelete()) {
