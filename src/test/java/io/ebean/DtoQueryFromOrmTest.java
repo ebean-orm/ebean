@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.ResetBasicData;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +69,49 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     assertThat(stats).hasSize(1);
     assertThat(stats.get(0).getCount()).isEqualTo(4);
   }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectFormulaWith_bindPositionedParameters() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Contact> list = DB.find(Contact.class)
+      .select("email, concat(lastName, ISO_WEEK(?)) as lastName")
+      .setMaxRows(10)
+      .setParameter(1, OffsetDateTime.now())
+      .findList();
+
+    assertThat(list).isNotEmpty();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
+  }
+
+//  @ForPlatform(Platform.H2)
+//  @Test
+//  public void selectFormulaWith_bindNamedParameters_FAILS_namedParamsNotSupportedInSelectClause() {
+//
+//    ResetBasicData.reset();
+//
+//    LoggedSqlCollector.start();
+//
+//    List<Contact> list = DB.find(Contact.class)
+//      .select("email, concat(lastName, ISO_WEEK(:date)) as lastName")
+//      .setMaxRows(10)
+//      .setParameter("date", OffsetDateTime.now())
+//      .findList();
+//
+//
+//    assertThat(list).isNotEmpty();
+//
+//    List<String> sql = LoggedSqlCollector.stop();
+//    assertThat(sql).hasSize(2);
+//    assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
+//  }
 
   @Test
   public void asDto_withExplicitId() {
