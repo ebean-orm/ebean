@@ -36,6 +36,11 @@ public class UtilDateTimeParserTest {
     parseAndFormat("2016-02-28T20:39:00.000Z", "2016-02-28T20:39:00.000Z");
   }
 
+  @Test
+  public void parseFormat_when_millis_3dp_2() {
+    parseAndFormat("2016-02-28T20:39:32.999000Z", "2016-02-28T20:39:32.999Z");
+  }
+
   private void parseAndFormat(String input, String expected) {
     Timestamp timestamp = parser.parse(input);
     String format = parser.format(timestamp);
