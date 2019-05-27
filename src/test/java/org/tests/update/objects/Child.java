@@ -13,7 +13,7 @@ public class Child {
   private Long id;
   @Version
   private long version = 0L;
-  @OneToOne(mappedBy = "child")
+  @OneToOne
   private Parent parent;
 
   private boolean testProperty = false;

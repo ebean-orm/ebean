@@ -1,5 +1,6 @@
 package org.tests.update;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import io.ebean.BaseTestCase;
@@ -44,32 +45,48 @@ public class TestUpdateCircularSave extends BaseTestCase {
 
 
   @Test
-  public void testFetchChildSaveParent() {
+  public void testFetchChildModifyChildSaveParent() {
 
-    long dId = createCAndD();
-    modifyPropertyToTrue2(dId);
+    long childId = createParentAndChild().getChild().getId();
 
-    Parent parent = Ebean.find(Parent.class, dId);
-    assert parent != null;
-    // Fails here because D was not saved even though C has cascade = ALL
-    assertTrue(parent.getChild().isTestProperty());
-  }
-
-  private void modifyPropertyToTrue2(long dId) {
-    Child child = Ebean.find(Child.class, dId);
+    Child child = Ebean.find(Child.class, childId);
     assert child != null;
 
     child.setTestProperty(true);
     final Parent parent = child.getParent();
     Ebean.save(parent);
+
+    assertChildModified(childId);
   }
 
-  private long createCAndD() {
+  private void assertChildModified(long childId) {
+    Parent parent = Ebean.find(Parent.class, childId);
+    assert parent != null;
+    // Fails here because D was not saved even though C has cascade = ALL
+    assertTrue(parent.getChild().isTestProperty());
+    assertEquals(parent.getChild().getVersion(), 2L);
+  }
+
+  private Parent createParentAndChild() {
     Parent parent = new Parent();
     Child child = new Child();
     parent.setChild(child);
 
     Ebean.save(parent);
-    return parent.getChild().getId();
+    return parent;
+  }
+
+
+  @Test
+  public void testFetchParentModifyChildSaveParent() {
+    long parentId = createParentAndChild().getId();
+
+    Parent parent = Ebean.find(Parent.class, parentId);
+    assert parent != null;
+
+    parent.getChild().setTestProperty(true);
+    Ebean.save(parent);
+
+    assertChildModified(parent.getChild().getId());
   }
 }

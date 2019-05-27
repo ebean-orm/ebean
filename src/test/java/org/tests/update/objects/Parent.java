@@ -14,7 +14,7 @@ public class Parent {
   private Long id;
   @Version
   private long version = 0L;
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "parent")
   private Child child;
 
   public Long getId() {
