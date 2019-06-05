@@ -7,7 +7,10 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.util.Calendar;
+
+import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 
 /**
  * ScalarType for java.util.Calendar.
@@ -49,13 +52,20 @@ public class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
   }
 
   @Override
+  public Calendar convertFromInstant(Instant ts) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(ts.toEpochMilli());
+    return calendar;
+  }
+
+  @Override
   protected String toJsonNanos(Calendar value) {
     return String.valueOf(value.getTime());
   }
 
   @Override
   protected String toJsonISO8601(Calendar value) {
-    return dateTimeParser.format(value.getTime());
+    return formatIso(value.toInstant());
   }
 
   @Override

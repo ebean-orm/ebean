@@ -3,13 +3,13 @@ package io.ebeaninternal.server.type;
 
 import org.junit.Test;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class UtilDateTimeParserTest {
+public class IsoJsonDateTimeParserTest {
 
-  private UtilDateTimeParser parser = new UtilDateTimeParser();
+  private IsoJsonDateTimeParser parser = new IsoJsonDateTimeParser();
 
   @Test
   public void parseFormat_when_hasMillis() {
@@ -42,8 +42,8 @@ public class UtilDateTimeParserTest {
   }
 
   private void parseAndFormat(String input, String expected) {
-    Timestamp timestamp = parser.parse(input);
-    String format = parser.format(timestamp);
+    Instant timestamp = parser.parseIso(input);
+    String format = parser.formatIso(timestamp);
     assertThat(format).isEqualTo(expected);
   }
 }

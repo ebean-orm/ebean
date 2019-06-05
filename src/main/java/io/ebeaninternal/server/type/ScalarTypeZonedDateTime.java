@@ -34,12 +34,17 @@ public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTim
 
   @Override
   public ZonedDateTime convertFromMillis(long systemTimeMillis) {
-    return ZonedDateTime.ofInstant(Instant.ofEpochMilli(systemTimeMillis), ZoneId.systemDefault());
+    return convertFromInstant(Instant.ofEpochMilli(systemTimeMillis));
   }
 
   @Override
   public ZonedDateTime convertFromTimestamp(Timestamp ts) {
-    return ZonedDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault());
+    return convertFromInstant(ts.toInstant());
+  }
+
+  @Override
+  public ZonedDateTime convertFromInstant(Instant ts) {
+    return ZonedDateTime.ofInstant(ts, ZoneId.systemDefault());
   }
 
   @Override

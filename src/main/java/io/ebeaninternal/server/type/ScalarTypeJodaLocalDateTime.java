@@ -6,6 +6,7 @@ import org.joda.time.LocalDateTime;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 
 /**
  * ScalarType for Joda LocalDateTime. This maps to a JDBC Timestamp.
@@ -31,7 +32,6 @@ public class ScalarTypeJodaLocalDateTime extends ScalarTypeBaseDateTime<LocalDat
     return value.toDateTime().getMillis();
   }
 
-
   @Override
   public LocalDateTime convertFromMillis(long systemTimeMillis) {
     return new LocalDateTime(systemTimeMillis);
@@ -40,6 +40,11 @@ public class ScalarTypeJodaLocalDateTime extends ScalarTypeBaseDateTime<LocalDat
   @Override
   public LocalDateTime convertFromTimestamp(Timestamp ts) {
     return new LocalDateTime(ts.getTime());
+  }
+
+  @Override
+  public LocalDateTime convertFromInstant(Instant ts) {
+    return new LocalDateTime(ts.toEpochMilli());
   }
 
   @Override

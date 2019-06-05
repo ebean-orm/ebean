@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 
 /**
  * ScalarType for Joda DateTime. This maps to a JDBC Timestamp.
@@ -39,6 +40,11 @@ public class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
   @Override
   public DateTime convertFromTimestamp(Timestamp ts) {
     return new DateTime(ts.getTime());
+  }
+
+  @Override
+  public DateTime convertFromInstant(Instant ts) {
+    return new DateTime(ts.toEpochMilli());
   }
 
   @Override

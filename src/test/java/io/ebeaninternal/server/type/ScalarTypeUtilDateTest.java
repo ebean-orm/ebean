@@ -24,4 +24,16 @@ public class ScalarTypeUtilDateTest {
     Date val1 = jsonIso.type.parse("2019-05-09");
     assertThat(jsonIso.test(val1)).isEqualTo("{\"key\":\"2019-05-09\"}");
   }
+
+  @Test
+  public void toJsonISO8601() {
+
+    ScalarTypeUtilDate.TimestampType typeIso = new ScalarTypeUtilDate.TimestampType(JsonConfig.DateTime.ISO8601);
+
+    Date now = new Date();
+    String asJson = typeIso.toJsonISO8601(now);
+
+    Date value = typeIso.fromJsonISO8601(asJson);
+    assertThat(now).isEqualTo(value);
+  }
 }

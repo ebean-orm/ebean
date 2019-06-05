@@ -10,7 +10,10 @@ import java.io.ObjectOutputStream;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ScalarTypeInstantTest {
 
@@ -123,7 +126,6 @@ public class ScalarTypeInstantTest {
   @Test
   public void testJsonRead() throws Exception {
 
-
     Instant now = now();
 
     JsonTester<Instant> jsonTester = new JsonTester<>(type);
@@ -139,4 +141,15 @@ public class ScalarTypeInstantTest {
 
   }
 
+  @Test
+  public void isoJsonParseFormat() {
+
+    ScalarTypeInstant typeIso = new ScalarTypeInstant(JsonConfig.DateTime.ISO8601);
+
+    Instant instant = Instant.now();
+    String asJson = typeIso.toJsonISO8601(instant);
+
+    Instant value = typeIso.fromJsonISO8601(asJson);
+    assertThat(instant).isEqualTo(value);
+  }
 }
