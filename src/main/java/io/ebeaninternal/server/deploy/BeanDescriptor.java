@@ -1915,17 +1915,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         beanPostConstructListener.autowire(bean); // calls all registered listeners
         beanPostConstructListener.postConstruct(bean); // calls first the @PostConstruct method and then the listeners
       }
-
-      if (unloadProperties.length > 0) {
+      if (isNew) {
+        if (beanPostConstructListener != null) {
+          beanPostConstructListener.postCreate(bean);
+          // if bean is not new, postLoad will be executed later in the bean's lifecycle
+        }
+        // do not unload properties for new beans!
+      } else if (unloadProperties.length > 0) {
         // 'unload' any properties initialised in the default constructor
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
         for (int unloadProperty : unloadProperties) {
           ebi.setPropertyUnloaded(unloadProperty);
         }
-      }
-      if (beanPostConstructListener != null && isNew) {
-        beanPostConstructListener.postCreate(bean);
-        // if bean is not new, postLoad will be executed later in the bean's lifecycle
       }
       return bean;
 
