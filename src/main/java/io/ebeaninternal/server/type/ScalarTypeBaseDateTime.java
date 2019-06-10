@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.config.JsonConfig;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.config.JsonConfig;
+import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,14 +12,14 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
+
+import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.parseIso;
 
 /**
  * Base type for DateTime types.
  */
 public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
-
-
-  protected final UtilDateTimeParser dateTimeParser = new UtilDateTimeParser();
 
   protected final JsonConfig.DateTime mode;
 
@@ -44,6 +44,11 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   public abstract T convertFromTimestamp(Timestamp ts);
 
   /**
+   * Convert to the value from a Instant.
+   */
+  public abstract T convertFromInstant(Instant ts);
+
+  /**
    * Convert from epoch millis to the value.
    */
   @Override
@@ -63,6 +68,13 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
    * Convert the value to ISO8601 format.
    */
   protected abstract String toJsonISO8601(T value);
+
+  /**
+   * Convert the value to ISO8601 format.
+   */
+  protected T fromJsonISO8601(String value) {
+    return convertFromInstant(parseIso(value));
+  }
 
   @Override
   public void bind(DataBind b, T value) throws SQLException {
@@ -104,8 +116,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
         return convertFromTimestamp(timestamp);
       }
       default: {
-        String jsonDateTime = parser.getText();
-        return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));
+        return fromJsonISO8601(parser.getText());
       }
     }
   }

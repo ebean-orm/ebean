@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
+import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.*;
 
 public class ScalarTypeZonedDateTimeTest {
@@ -74,5 +75,17 @@ public class ScalarTypeZonedDateTimeTest {
     ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601);
     jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
+  }
+
+  @Test
+  public void toJsonISO8601() {
+
+    ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601);
+
+    ZonedDateTime now = ZonedDateTime.now();
+    String asJson = typeIso.toJsonISO8601(now);
+
+    ZonedDateTime value = typeIso.fromJsonISO8601(asJson);
+    assertThat(now).isEqualTo(value);
   }
 }
