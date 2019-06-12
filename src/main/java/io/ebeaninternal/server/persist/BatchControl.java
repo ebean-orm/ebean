@@ -5,12 +5,12 @@ import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 /**
@@ -29,6 +29,8 @@ import java.util.List;
  */
 public final class BatchControl {
 
+  private static final Object DUMMY = new Object();
+
   /**
    * Used to sort queue entries by depth.
    */
@@ -45,6 +47,17 @@ public final class BatchControl {
    * sorted by their depth to get the execution order.
    */
   private final HashMap<String, BatchedBeanHolder> beanHoldMap = new HashMap<>();
+
+  /**
+   * Set of beans in this batch. This is used to ensure that a single bean instance is not included
+   * in the batch twice (two separate insert requests etc).
+   */
+  private final IdentityHashMap<Object, Object> persistedBeans = new IdentityHashMap<>();
+
+  /**
+   * Helper to determine statement ordering based on depth (and type).
+   */
+  private final BatchDepthOrder depthOrder = new BatchDepthOrder();
 
   private final SpiTransaction transaction;
 
@@ -63,13 +76,10 @@ public final class BatchControl {
 
   private boolean batchFlushOnMixed = true;
 
-  private int maxDepth;
-
   /**
    * Size of the largest buffer.
    */
   private int bufferMax;
-  private int topCounter;
 
   private Queue earlyQueue;
   private Queue lateQueue;
@@ -183,6 +193,14 @@ public final class BatchControl {
    */
   private boolean addToBatch(PersistRequestBean<?> request) throws BatchedSqlException {
 
+    Object alreadyInBatch = persistedBeans.put(request.getEntityBean(), DUMMY);
+    if (alreadyInBatch != null) {
+      // special case where the same bean instance has already been
+      // added to the batch (doesn't really occur with non-batching
+      // as the bean gets changed from dirty to loaded earlier)
+      return false;
+    }
+
     BatchedBeanHolder beanHolder = getBeanHolder(request);
     int bufferSize = beanHolder.append(request);
 
@@ -227,14 +245,14 @@ public final class BatchControl {
   }
 
   /**
-   * Flush without resetting the topOrder (maintains the depth info).
+   * Flush without resetting the depth info.
    */
   public void flush() throws BatchedSqlException {
     flushBuffer(false);
   }
 
   /**
-   * Flush with a reset the topOrder (fully empty the batch).
+   * Flush with a reset of the depth info.
    */
   public void flushReset() throws BatchedSqlException {
     flushBuffer(true);
@@ -246,8 +264,8 @@ public final class BatchControl {
   public void clear() {
     pstmtHolder.clear();
     beanHoldMap.clear();
-    maxDepth = 0;
-    topCounter = 0;
+    depthOrder.clear();
+    persistedBeans.clear();
   }
 
   private void flushBuffer(boolean resetTop) throws BatchedSqlException {
@@ -289,10 +307,10 @@ public final class BatchControl {
       for (BatchedBeanHolder beanHolder : bsArray) {
         beanHolder.executeNow();
       }
-
+      persistedBeans.clear();
       if (resetTop) {
         beanHoldMap.clear();
-        maxDepth = 0;
+        depthOrder.clear();
       }
     } catch (BatchedSqlException e) {
       // clear the batch on error in case we want to
@@ -306,69 +324,28 @@ public final class BatchControl {
    * Return an entry for the given type description. The type description is
    * typically the bean class name (or table name for MapBeans).
    */
-  private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) throws BatchedSqlException {
+  private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) {
 
-    BeanDescriptor<?> beanDescriptor = request.getBeanDescriptor();
-    BatchedBeanHolder batchBeanHolder = beanHoldMap.get(beanDescriptor.rootName());
+    int depth = transaction.depth();
+    BeanDescriptor<?> desc = request.getBeanDescriptor();
+
+    // batching by bean type AND depth
+    String key = desc.rootName() + ":" + depth;
+
+    BatchedBeanHolder batchBeanHolder = beanHoldMap.get(key);
     if (batchBeanHolder == null) {
-      int relativeDepth = transaction.depth();
-
-      int beanDepth = 100 + relativeDepth;
-      if (relativeDepth == 0 && !beanHoldMap.isEmpty()) {
-        // could be non-cascading or uni-directional relationship
-        // so see look for a 'parent' in the beanHoldMap
-        int maybe = relativeToParentDepth(beanDescriptor);
-        if (maybe != -1) {
-          beanDepth = maybe;
-        } else {
-          // additional "top level" bean type ordered by save() order
-          beanDepth += ++topCounter;
-        }
-      }
-
-      maxDepth = Math.max(maxDepth, beanDepth);
-      batchBeanHolder = new BatchedBeanHolder(this, beanDescriptor, beanDepth);
-      beanHoldMap.put(beanDescriptor.rootName(), batchBeanHolder);
+      int ordering = depthOrder.orderingFor(depth);
+      batchBeanHolder = new BatchedBeanHolder(this, desc, ordering);
+      beanHoldMap.put(key, batchBeanHolder);
     }
     return batchBeanHolder;
-  }
-
-  /**
-   * Find a depth based on imported relationships (to a parent that is already in the buffer).
-   */
-  private int relativeToParentDepth(BeanDescriptor<?> beanDescriptor) {
-
-    BeanPropertyAssocOne<?>[] imported = beanDescriptor.propertiesOneImported();
-    if (imported.length == 0) {
-      // a top level type so just maintain the order relative to the current depth
-      return maxDepth + 1;
-    }
-
-    int parentMaxDepth = -1;
-
-    for (BeanPropertyAssocOne<?> parent : imported) {
-      BatchedBeanHolder parentBatch = beanHoldMap.get(parent.getTargetDescriptor().rootName());
-      if (parentBatch != null) {
-        // deeper that the parent
-        parentMaxDepth = Math.max(parentMaxDepth, parentBatch.getOrder() + 1);
-      }
-    }
-    return parentMaxDepth;
   }
 
   /**
    * Return true if this holds no persist requests.
    */
   private boolean isBeansEmpty() {
-    if (beanHoldMap.isEmpty()) {
-      return true;
-    }
-    for (BatchedBeanHolder beanHolder : beanHoldMap.values()) {
-      if (!beanHolder.isEmpty()) {
-        return false;
-      }
-    }
-    return true;
+    return persistedBeans.isEmpty();
   }
 
   /**

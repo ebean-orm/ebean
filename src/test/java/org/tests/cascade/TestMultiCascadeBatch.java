@@ -28,6 +28,7 @@ public class TestMultiCascadeBatch extends BaseTestCase {
 
   @Test
   public void testMultipleCascadeInsideTransaction() {
+
     final Site mainSite = new Site();
     mainSite.setName("mainSite");
     Ebean.save(mainSite);
