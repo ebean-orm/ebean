@@ -346,19 +346,20 @@ public final class IdBinderEmbedded implements IdBinder {
   public Object read(DbReadContext ctx) throws SQLException {
 
     EntityBean embId = idDesc.createEntityBean();
-    boolean notNull = true;
+    boolean nullValue = true;
 
     for (BeanProperty prop : props) {
-      Object value = prop.readSet(ctx, embId);
-      if (value == null) {
-        notNull = false;
+      Object value = prop.read(ctx);
+      if (value != null) {
+        prop.setValue(embId, value);
+        nullValue = false;
       }
     }
 
-    if (notNull) {
-      return embId;
-    } else {
+    if (nullValue) {
       return null;
+    } else {
+      return embId;
     }
   }
 
