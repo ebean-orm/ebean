@@ -117,7 +117,6 @@ public class BatchedPstmtHolder {
     BatchedPstmt[] values = stmtMap.values().toArray(new BatchedPstmt[stmtMap.values().size()]);
     clear();
 
-    // this loop
     for (BatchedPstmt bs : values) {
       try {
         if (!isError) {
@@ -130,12 +129,8 @@ public class BatchedPstmtHolder {
           next = next.getNextException();
         }
 
-        if (firstError == null) {
-          firstError = ex;
-          errorSql = bs.getSql();
-        } else {
-          logger.error("Error executing batched PreparedStatement", ex);
-        }
+        firstError = ex;
+        errorSql = bs.getSql();
         isError = true;
 
       } finally {
@@ -146,7 +141,6 @@ public class BatchedPstmtHolder {
         }
       }
     }
-
 
     if (firstError != null) {
       String msg = "Error when batch flush on sql: " + errorSql;
