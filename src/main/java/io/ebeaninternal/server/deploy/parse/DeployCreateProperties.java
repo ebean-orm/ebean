@@ -199,7 +199,7 @@ public class DeployCreateProperties {
     return null;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
 
     try {
@@ -213,7 +213,7 @@ public class DeployCreateProperties {
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();

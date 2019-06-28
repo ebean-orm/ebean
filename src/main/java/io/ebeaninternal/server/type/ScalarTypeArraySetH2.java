@@ -49,7 +49,7 @@ class ScalarTypeArraySetH2<T> extends ScalarTypeArraySet<T> {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"rawtypes"})
     public ScalarTypeArraySetH2 typeForEnum(ScalarType<?> scalarType) {
       return new ScalarTypeArraySetH2("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
     }

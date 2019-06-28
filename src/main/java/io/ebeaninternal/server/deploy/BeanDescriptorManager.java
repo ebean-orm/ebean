@@ -815,7 +815,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return new BeanTable(beanTable, this);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private void readEntityRelationships() {
 
     // We only perform 'circular' checks etc after we have
@@ -1650,7 +1649,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return changeLogListener;
   }
 
-  public void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
+  private void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
 
     String baseTable = prop.getDesc().getBaseTable();
     DeployTableJoin inverse = prop.getTableJoin().createInverse(baseTable);

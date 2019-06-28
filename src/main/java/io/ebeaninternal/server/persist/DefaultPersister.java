@@ -1244,15 +1244,15 @@ public final class DefaultPersister implements Persister {
    * perform an insert, update or delete.
    */
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type) {
-    return createRequestInternal(bean, t, type, Flags.ZERO);
+    return createRequestInternal(bean, t, type);
   }
 
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type, int flags) {
+  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type) {
     BeanManager<T> mgr = getBeanManager(bean);
-    return createRequest(bean, t, null, mgr, type, flags);
+    return createRequest(bean, t, null, mgr, type, Flags.ZERO);
   }
 
   /**
@@ -1280,7 +1280,7 @@ public final class DefaultPersister implements Persister {
    * Create the Persist Request Object that wraps all the objects used to
    * perform an insert, update or delete.
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
                                                   PersistRequest.Type type, int flags) {
 
@@ -1292,13 +1292,12 @@ public final class DefaultPersister implements Persister {
     return createDeleteRequest(bean, t, type, Flags.unsetRecurse(flags));
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private <T> PersistRequestBean<T> createDeleteRequest(EntityBean bean, Transaction t, Type type) {
     return createDeleteRequest(bean, t, type, Flags.ZERO);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public <T> PersistRequestBean<T> createDeleteRequest(Object bean, Transaction t, PersistRequest.Type type, int flags) {
+  @SuppressWarnings({"unchecked"})
+  private <T> PersistRequestBean<T> createDeleteRequest(Object bean, Transaction t, PersistRequest.Type type, int flags) {
 
     BeanManager<T> mgr = getBeanManager(bean);
     if (type == Type.DELETE_PERMANENT) {
@@ -1308,7 +1307,7 @@ public final class DefaultPersister implements Persister {
       type = Type.DELETE_SOFT;
     }
 
-    PersistRequestBean<T> request =  new PersistRequestBean<T>(server, (T)bean, null, mgr, (SpiTransaction) t, persistExecute, type, flags);
+    PersistRequestBean<T> request =  new PersistRequestBean<>(server, (T)bean, null, mgr, (SpiTransaction) t, persistExecute, type, flags);
     request.initForSoftDelete();
     return request;
   }

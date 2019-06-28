@@ -71,7 +71,7 @@ public class DeployBeanPropertyLists {
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
 

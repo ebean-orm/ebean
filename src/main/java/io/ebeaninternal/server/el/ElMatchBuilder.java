@@ -175,7 +175,7 @@ class ElMatchBuilder {
     final Set<?> set;
     final ElPropertyValue elGetValue;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked"})
     public InSet(Set<?> set, ElPropertyValue elGetValue) {
       this.set = new HashSet(set);
       this.elGetValue = elGetValue;

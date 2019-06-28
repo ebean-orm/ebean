@@ -496,7 +496,7 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private ScalarTypeEncryptedWrapper<?> createScalarType(DeployBeanProperty prop, ScalarType<?> st) {
 
     // Use Java Encryptor wrapping the logical scalar type
