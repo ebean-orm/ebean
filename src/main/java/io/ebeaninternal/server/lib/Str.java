@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.lib.util;
+package io.ebeaninternal.server.lib;
 
 /**
  * String utility for adding strings together.

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.persist.TrimLogSql;

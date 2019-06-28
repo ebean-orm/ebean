@@ -14,7 +14,7 @@ import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeanservice.docstore.api.DocStoreTransaction;

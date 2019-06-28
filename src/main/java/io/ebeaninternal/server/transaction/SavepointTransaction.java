@@ -2,7 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionProxy;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
