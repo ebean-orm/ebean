@@ -32,7 +32,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   protected final STreeType desc;
 
-  protected final IdBinder idBinder;
+  final IdBinder idBinder;
 
   /**
    * The children which will be other SelectBean or SelectProxyBean.
@@ -56,7 +56,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * False if report bean and has no id property.
    */
-  protected final boolean readId;
+  final boolean readId;
 
   private final boolean disableLazyLoad;
 
@@ -68,7 +68,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   final STreePropertyAssocMany lazyLoadParent;
 
-  final SpiQuery.TemporalMode temporalMode;
+  private final SpiQuery.TemporalMode temporalMode;
 
   private final boolean temporalVersions;
 
@@ -83,7 +83,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
   private boolean intersectionAsOfTableAlias;
 
   private final boolean aggregation;
-  private final boolean aggregationRoot;
 
   /**
    * Construct for leaf node.
@@ -122,7 +121,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.extraWhere = (beanProp == null) ? null : beanProp.getExtraWhere();
 
     this.aggregation = props.isAggregation();
-    this.aggregationRoot = props.isAggregationRoot();
+    boolean aggregationRoot = props.isAggregationRoot();
 
     // the bean has an Id property and we want to use it
     this.readId = !aggregationRoot && withId && desc.hasId();
@@ -130,7 +129,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
-    this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
+    this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[0]);
 
     pathMap = createPathMap(prefix, desc);
   }
@@ -584,7 +583,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  protected void appendSelectId(DbSqlContext ctx, STreeProperty prop) {
+  void appendSelectId(DbSqlContext ctx, STreeProperty prop) {
     if (prop != null) {
       prop.appendSelect(ctx, false);
     }
@@ -742,13 +741,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
       return true;
     }
 
-    if (contextBean._ebean_getIntercept().isFullyLoadedBean()) {
-      // reload if contextBean is partial object
-      return false;
-    }
-
-    // return true by default
-    return true;
+    // reload if contextBean is partial object
+    return !contextBean._ebean_getIntercept().isFullyLoadedBean();
   }
 
   @Override
