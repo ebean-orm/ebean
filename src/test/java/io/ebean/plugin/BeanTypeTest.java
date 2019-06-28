@@ -25,9 +25,9 @@ import static org.junit.Assert.assertTrue;
 
 public class BeanTypeTest {
 
-  static Database db = DB.getDefault();
+  private static Database db = DB.getDefault();
 
-  <T> BeanType<T> beanType(Class<T> cls) {
+  private <T> BeanType<T> beanType(Class<T> cls) {
     return db.getPluginApi().getBeanType(cls);
   }
 
@@ -177,10 +177,8 @@ public class BeanTypeTest {
     beanType(Order.class).docStore().applyPath(orderQuery);
 
     OrmQueryDetail detail = orderQuery.getDetail();
-    assertThat(detail.getChunk("customer", false).getSelectProperties())
-      .containsExactly("id", "name");
+    assertThat(detail.getChunk("customer", false).getSelectInclude()).containsExactly("id", "name");
   }
-
 
   @Test(expected = IllegalStateException.class)
   public void docStoreIndex() throws Exception {

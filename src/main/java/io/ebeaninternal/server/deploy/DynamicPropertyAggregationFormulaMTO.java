@@ -12,6 +12,11 @@ public class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyAggrega
   }
 
   @Override
+  public boolean isAggregationManyToOne() {
+    return true;
+  }
+
+  @Override
   public void load(SqlBeanLoad sqlBeanLoad) {
     Object value;
     try {

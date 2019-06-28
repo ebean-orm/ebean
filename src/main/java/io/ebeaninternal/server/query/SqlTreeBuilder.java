@@ -273,10 +273,7 @@ public final class SqlTreeBuilder {
     OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
     SqlTreeProperties props = getBaseSelect(desc, queryProps);
 
-    if (prefix != null) {
-      // check for aggregation on a fetch
-      props.checkAggregation();
-    } else if (!rawSql) {
+    if (prefix == null && !rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
         sqlDistinct = true;
       }
@@ -479,9 +476,21 @@ public final class SqlTreeBuilder {
     // Also note that this can include transient properties.
     // This makes sense for transient properties used to
     // hold sum() count() type values (with SqlSelect)
-    for (String propName : queryProps.getSelectProperties()) {
+    final Set<String> selectInclude = queryProps.getSelectInclude();
+    for (String propName : selectInclude) {
       if (!propName.isEmpty()) {
         addProperty(selectProps, desc, queryProps, propName);
+      }
+    }
+
+    if (!selectProps.isAggregationManyToOne()) {
+      final Set<String> selectQueryJoin = queryProps.getSelectQueryJoin();
+      if (selectQueryJoin != null) {
+        for (String joinProperty : selectQueryJoin) {
+          if (!selectInclude.contains(joinProperty)) {
+            addProperty(selectProps, desc, queryProps, joinProperty);
+          }
+        }
       }
     }
 

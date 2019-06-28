@@ -348,22 +348,12 @@ public class OrmQueryProperties implements Serializable {
     includedBeanJoin.add(propertyName);
   }
 
-  /**
-   * This excludes the bean joined properties.
-   * <p>
-   * This is because bean joins will have there own node in the SqlTree.
-   * </p>
-   */
-  public Set<String> getSelectProperties() {
+  public Set<String> getSelectInclude() {
+    return included;
+  }
 
-    if (secondaryQueryJoins == null) {
-      return included;
-    }
-
-    LinkedHashSet<String> temp = new LinkedHashSet<>(2 * (secondaryQueryJoins.size() + included.size()));
-    temp.addAll(included);
-    temp.addAll(secondaryQueryJoins);
-    return temp;
+  public Set<String> getSelectQueryJoin() {
+    return secondaryQueryJoins;
   }
 
   void addSecondaryQueryJoin(String property) {

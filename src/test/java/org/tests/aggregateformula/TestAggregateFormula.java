@@ -4,13 +4,16 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class TestAggregateFormula extends BaseTestCase {
 
@@ -36,35 +39,71 @@ public class TestAggregateFormula extends BaseTestCase {
     assertThat(contact.getCustomer().getId()).isNotNull();
   }
 
-//  @Test
-//  public void minOnManyToOne_withFetchQuery() {
-//
-//    ResetBasicData.reset();
-//
-//    LoggedSqlCollector.start();
-//
-//    List<Contact> contacts = Ebean.find(Contact.class)
-//      .select("lastName, min(customer)")
-//      .fetchQuery("customer", "name, status")
-//      //.fetch("customer.billingAddress", "city, country")
-//      .findList();
-//
-//    for (Contact contact : contacts) {
-//      contact.getCustomer().getName();
-//    }
-//
-//    List<String> sql = LoggedSqlCollector.stop();
-//    assertThat(sql).hasSize(2);
-//    assertThat(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
-//    assertThat(sql.get(1)).contains("select t0.id, t0.name, t0.status from o_customer t0 where");
-//
-//    assertThat(contacts).isNotEmpty();
-//
-//    Contact contact = contacts.get(0);
-//    assertThat(contact.getLastName()).isNotNull();
-//    assertThat(contact.getCustomer()).isNotNull();
-//    assertThat(contact.getCustomer().getId()).isNotNull();
-//  }
+  @Test
+  public void minOnManyToOne_withFetchQuery() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Contact> contacts = Ebean.find(Contact.class)
+      .select("lastName, min(customer)")
+      .fetchQuery("customer", "name, status")
+      .findList();
+
+    for (Contact contact : contacts) {
+      Customer customer = contact.getCustomer();
+      assertNotNull(customer.getName());
+      assertNotNull(customer.getStatus());
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
+    assertThat(sql.get(1)).contains("select t0.id, t0.name, t0.status from o_customer t0 where");
+
+    assertThat(contacts).isNotEmpty();
+
+    Contact contact = contacts.get(0);
+    assertThat(contact.getLastName()).isNotNull();
+    assertThat(contact.getCustomer()).isNotNull();
+    assertThat(contact.getCustomer().getId()).isNotNull();
+  }
+
+  @Test
+  public void minOnManyToOne_withFetchQueryWithJoin() {
+
+    ResetBasicData.reset();
+    LoggedSqlCollector.start();
+
+    List<Contact> contacts = Ebean.find(Contact.class)
+      .select("lastName, min(customer)")
+      .fetchQuery("customer", "name, status")
+      .fetch("customer.billingAddress", "city, country")
+      .findList();
+
+    for (Contact contact : contacts) {
+      Customer customer = contact.getCustomer();
+      assertNotNull(customer.getName());
+      assertNotNull(customer.getStatus());
+      final Address billingAddress = customer.getBillingAddress();
+      if (billingAddress != null) {
+        assertNotNull(billingAddress.getCountry());
+      }
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
+    assertThat(sql.get(1)).contains("select t0.id, t0.name, t0.status, t1.id, t1.city, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where");
+
+    assertThat(contacts).isNotEmpty();
+
+    Contact contact = contacts.get(0);
+    assertThat(contact.getLastName()).isNotNull();
+    assertThat(contact.getCustomer()).isNotNull();
+    assertThat(contact.getCustomer().getId()).isNotNull();
+  }
 
   @Test
   public void sum_withoutAlias() {
