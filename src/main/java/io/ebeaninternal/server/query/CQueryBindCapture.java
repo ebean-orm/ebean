@@ -5,7 +5,7 @@ import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 class CQueryBindCapture {
 
-  private final double multiplier = 1.3d;
+  private static final double multiplier = 1.3d;
 
   private final CQueryPlan cQueryPlan;
   private final QueryPlanLogger planLogger;

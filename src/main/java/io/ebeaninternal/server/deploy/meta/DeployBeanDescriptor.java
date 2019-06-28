@@ -1267,6 +1267,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Returns the jackson annotated class, if jackson is present.
    */
+  @SuppressWarnings("unchecked")
   public Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
     if (jacksonAnnotatedClass == null) {
       jacksonAnnotatedClass = new DeployBeanObtainJackson(serverConfig, beanType).obtain();

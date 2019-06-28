@@ -8,6 +8,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
  */
 public class BeanPropertyIdClass extends BeanPropertyAssocOne {
 
+  @SuppressWarnings("unchecked")
   public BeanPropertyIdClass(BeanDescriptorMap owner, BeanDescriptor descriptor, DeployBeanPropertyAssocOne deploy) {
     super(owner, descriptor, deploy);
   }

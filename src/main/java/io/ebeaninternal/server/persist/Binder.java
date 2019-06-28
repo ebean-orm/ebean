@@ -108,7 +108,7 @@ public class Binder {
         if (isLob(dt)) {
           bindBuf.append("[LOB]");
         } else {
-          bindBuf.append(String.valueOf(val));
+          bindBuf.append(val);
         }
       }
     }

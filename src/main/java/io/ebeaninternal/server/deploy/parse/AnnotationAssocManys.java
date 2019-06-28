@@ -183,6 +183,7 @@ class AnnotationAssocManys extends AnnotationParser {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void readElementCollection(DeployBeanPropertyAssocMany<?> prop, ElementCollection elementCollection) {
 
     prop.setElementCollection();

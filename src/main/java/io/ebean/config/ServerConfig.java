@@ -653,6 +653,7 @@ public class ServerConfig {
    * @param cls The type of the service object to obtain
    * @return The service object given the class type
    */
+  @SuppressWarnings("unchecked")
   public <P> P getServiceObject(Class<P> cls) {
     return (P) serviceObject.get(serviceObjectKey(cls));
   }

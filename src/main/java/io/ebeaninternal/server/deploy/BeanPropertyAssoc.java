@@ -107,6 +107,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Copy constructor for ManyToOne inside Embeddable.
    */
+  @SuppressWarnings("unchecked")
   public BeanPropertyAssoc(BeanPropertyAssoc source, BeanPropertyOverride override) {
     super(source, override);
     foreignKey = source.foreignKey;

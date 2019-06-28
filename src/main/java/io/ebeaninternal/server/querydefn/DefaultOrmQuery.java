@@ -1718,6 +1718,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return beanDescriptor.getBeanType();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Query<T> setInheritType(Class<? extends T> type) {
     if (type == beanType) {

@@ -495,7 +495,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> select(FetchGroup fetchGroup) {
+  public Query<T> select(FetchGroup<T> fetchGroup) {
     return query.select(fetchGroup);
   }
 
