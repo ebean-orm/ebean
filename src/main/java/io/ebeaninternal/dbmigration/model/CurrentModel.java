@@ -150,7 +150,7 @@ public class CurrentModel {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
         if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
-          ddl.append(prefix + script.getName()).append('\n');
+          ddl.append(prefix).append(script.getName()).append('\n');
           ddl.append(script.getValue());
         }
       }

@@ -142,7 +142,7 @@ class BeanLifecycleAdapterFactory {
    * Utility method to covert List of Method into array (because we care about performance here).
    */
   static Method[] toArray(List<Method> methodList) {
-    return methodList.toArray(new Method[methodList.size()]);
+    return methodList.toArray(new Method[0]);
   }
 
   static RuntimeException unwrapException(ReflectiveOperationException e) {

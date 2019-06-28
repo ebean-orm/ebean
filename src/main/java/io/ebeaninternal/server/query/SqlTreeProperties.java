@@ -61,7 +61,7 @@ public class SqlTreeProperties {
   }
 
   public STreeProperty[] getProps() {
-    return propsList.toArray(new STreeProperty[propsList.size()]);
+    return propsList.toArray(new STreeProperty[0]);
   }
 
   boolean isPartialObject() {

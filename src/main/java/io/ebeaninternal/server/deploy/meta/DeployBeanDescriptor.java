@@ -561,7 +561,7 @@ public class DeployBeanDescriptor<T> {
     if (indexDefinitions == null) {
       return null;
     } else {
-      return indexDefinitions.toArray(new IndexDefinition[indexDefinitions.size()]);
+      return indexDefinitions.toArray(new IndexDefinition[0]);
     }
   }
 

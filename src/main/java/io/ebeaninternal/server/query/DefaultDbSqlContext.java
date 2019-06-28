@@ -101,7 +101,7 @@ class DefaultDbSqlContext implements DbSqlContext {
       return null;
     }
 
-    return encryptedProps.toArray(new BeanProperty[encryptedProps.size()]);
+    return encryptedProps.toArray(new BeanProperty[0]);
   }
 
   @Override

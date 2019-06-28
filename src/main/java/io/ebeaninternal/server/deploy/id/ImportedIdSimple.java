@@ -78,7 +78,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
    */
   public static ImportedIdSimple[] sort(List<ImportedIdSimple> list) {
 
-    ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[list.size()]);
+    ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[0]);
 
     // sort into the same order as the BeanProperties
     Arrays.sort(importedIds, COMPARATOR);

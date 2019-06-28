@@ -719,7 +719,7 @@ public final class SqlTreeBuilder {
           extras.add(predProp);
         }
       }
-      return extras.toArray(new String[extras.size()]);
+      return extras.toArray(new String[0]);
     }
 
   }

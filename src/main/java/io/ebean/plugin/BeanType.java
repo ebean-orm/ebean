@@ -223,7 +223,6 @@ public interface BeanType<T> {
 
   /**
    * Visit all children recursively
-   * @param visitor
    */
   void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor);
 

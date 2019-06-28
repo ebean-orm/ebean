@@ -352,7 +352,7 @@ public final class BatchControl {
    * Return the BatchedBeanHolder's ready for sorting and executing.
    */
   private BatchedBeanHolder[] getBeanHolderArray() {
-    return beanHoldMap.values().toArray(new BatchedBeanHolder[beanHoldMap.size()]);
+    return beanHoldMap.values().toArray(new BatchedBeanHolder[0]);
   }
 
   /**

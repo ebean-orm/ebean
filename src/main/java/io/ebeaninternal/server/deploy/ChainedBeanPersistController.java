@@ -44,7 +44,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
    */
   public ChainedBeanPersistController(List<BeanPersistController> list) {
     this.list = list;
-    BeanPersistController[] c = list.toArray(new BeanPersistController[list.size()]);
+    BeanPersistController[] c = list.toArray(new BeanPersistController[0]);
     Arrays.sort(c, SORTER);
     this.chain = c;
   }

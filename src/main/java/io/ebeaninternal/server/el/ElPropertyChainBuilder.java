@@ -58,13 +58,12 @@ public class ElPropertyChainBuilder {
    * Build the immutable ElGetChain from the build information.
    */
   public ElPropertyChain build() {
-    return new ElPropertyChain(containsMany, embedded, expression, chain.toArray(new ElPropertyValue[chain.size()]));
+    return new ElPropertyChain(containsMany, embedded, expression, chain.toArray(new ElPropertyValue[0]));
   }
 
   /**
    * Permits to set whole chain as embedded when the leaf is embedded
-   * @param embedded
-     */
+   */
   public void setEmbedded(boolean embedded) {
     this.embedded = embedded;
   }

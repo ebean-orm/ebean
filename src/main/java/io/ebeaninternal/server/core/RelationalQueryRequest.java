@@ -100,7 +100,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     for (int i = 1; i < columnsPlusOne; i++) {
       propNames.add(metaData.getColumnLabel(i));
     }
-    return propNames.toArray(new String[propNames.size()]);
+    return propNames.toArray(new String[0]);
   }
 
   /**

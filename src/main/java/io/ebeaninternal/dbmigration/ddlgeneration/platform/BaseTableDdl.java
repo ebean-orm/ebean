@@ -134,7 +134,7 @@ public class BaseTableDdl implements TableDdl {
         if (defaultValue == null) {
           handleStrictError(tableName, columnName);
         }
-        before = Arrays.asList(platformDdl.getUpdateNullWithDefault());
+        before = Collections.singletonList(platformDdl.getUpdateNullWithDefault());
       } else {
         before = getScriptsForPlatform(alter.getBefore(), platformDdl.getPlatform().getName());
       }

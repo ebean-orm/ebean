@@ -24,7 +24,7 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
    */
   public ChainedBeanQueryAdapter(List<BeanQueryAdapter> list) {
     this.list = list;
-    BeanQueryAdapter[] c = list.toArray(new BeanQueryAdapter[list.size()]);
+    BeanQueryAdapter[] c = list.toArray(new BeanQueryAdapter[0]);
     Arrays.sort(c, SORTER);
     this.chain = c;
   }

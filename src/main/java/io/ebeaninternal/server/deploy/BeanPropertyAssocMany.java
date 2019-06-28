@@ -683,7 +683,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
     }
 
-    return list.toArray(new ExportedProperty[list.size()]);
+    return list.toArray(new ExportedProperty[0]);
   }
 
   /**

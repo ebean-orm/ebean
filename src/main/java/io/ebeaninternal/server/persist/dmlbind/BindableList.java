@@ -17,7 +17,7 @@ public class BindableList implements Bindable {
   private final Bindable[] items;
 
   public BindableList(List<Bindable> list) {
-    items = list.toArray(new Bindable[list.size()]);
+    items = list.toArray(new Bindable[0]);
   }
 
   /**

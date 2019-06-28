@@ -114,7 +114,7 @@ public class BatchedPstmtHolder {
     // the flush may get called recursively in executeBatch/postExecute.
     // which leads that we process stmtMap.values() twice in the loop.
     // So we copy the values, that we want to flush and clear it immediately.
-    BatchedPstmt[] values = stmtMap.values().toArray(new BatchedPstmt[stmtMap.values().size()]);
+    BatchedPstmt[] values = stmtMap.values().toArray(new BatchedPstmt[0]);
     clear();
 
     for (BatchedPstmt bs : values) {

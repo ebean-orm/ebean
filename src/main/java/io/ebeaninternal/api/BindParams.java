@@ -115,10 +115,10 @@ public class BindParams implements Serializable {
    * Return a Natural Key bind param if supported.
    */
   public NaturalKeyBindParam getNaturalKeyBindParam() {
-    if (positionedParameters != null) {
+    if (!positionedParameters.isEmpty()) {
       return null;
     }
-    if (namedParameters != null && namedParameters.size() == 1) {
+    if (namedParameters.size() == 1) {
       Entry<String, Param> e = namedParameters.entrySet().iterator().next();
       return new NaturalKeyBindParam(e.getKey(), e.getValue().getInValue());
     }

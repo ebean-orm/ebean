@@ -189,7 +189,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
   private void checkForNoConstraint(DeployBeanPropertyAssocOne<?> prop, JoinColumn joinColumn) {
     ForeignKey foreignKey = joinColumn.foreignKey();
-    if (foreignKey != null && foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
+    if (foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
       prop.setForeignKey(new PropertyForeignKey());
     }
   }

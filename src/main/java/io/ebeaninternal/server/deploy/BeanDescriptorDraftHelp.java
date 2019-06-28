@@ -39,7 +39,7 @@ public final class BeanDescriptorDraftHelp<T> {
       }
     }
 
-    return list.toArray(new BeanProperty[list.size()]);
+    return list.toArray(new BeanProperty[0]);
   }
 
   /**

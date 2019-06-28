@@ -19,7 +19,7 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
    */
   public ChainedBeanPostLoad(List<BeanPostLoad> list) {
     this.list = list;
-    this.chain = list.toArray(new BeanPostLoad[list.size()]);
+    this.chain = list.toArray(new BeanPostLoad[0]);
   }
 
   /**

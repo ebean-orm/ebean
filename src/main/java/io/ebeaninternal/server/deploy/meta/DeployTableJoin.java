@@ -106,7 +106,7 @@ public class DeployTableJoin {
    * Return the join columns.
    */
   public DeployTableJoinColumn[] columns() {
-    return columns.toArray(new DeployTableJoinColumn[columns.size()]);
+    return columns.toArray(new DeployTableJoinColumn[0]);
   }
 
   /**

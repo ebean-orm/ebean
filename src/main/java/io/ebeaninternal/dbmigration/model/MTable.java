@@ -769,7 +769,7 @@ public class MTable {
           nullableColumns.add(columnName);
         }
       }
-      uniq.setNullableColumns(nullableColumns.toArray(new String[nullableColumns.size()]));
+      uniq.setNullableColumns(nullableColumns.toArray(new String[0]));
     }
   }
 

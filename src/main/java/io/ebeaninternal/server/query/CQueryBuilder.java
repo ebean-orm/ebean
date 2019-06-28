@@ -452,7 +452,7 @@ class CQueryBuilder {
         }
       }
 
-      RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[propertyNames.size()]));
+      RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[0]));
       query.setRawSql(rawSql);
       return createRawSqlSqlTree(request, predicates);
 

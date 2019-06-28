@@ -582,7 +582,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       }
     }
 
-    return list.toArray(new ExportedProperty[list.size()]);
+    return list.toArray(new ExportedProperty[0]);
   }
 
   /**
@@ -769,10 +769,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       writeJson.writeNullField(name);
 
     } else {
-      if (writeJson.isParentBean(value)) {
-        // bi-directional and already rendered parent
-
-      } else {
+      if (!writeJson.isParentBean(value)) {
         // Hmmm, not writing complex non-entity bean
         if (value instanceof EntityBean) {
           writeJson.beginAssocOne(name, bean);
