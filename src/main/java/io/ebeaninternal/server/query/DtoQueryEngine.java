@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.query.dto;
+package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
