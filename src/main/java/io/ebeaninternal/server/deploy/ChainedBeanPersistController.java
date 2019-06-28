@@ -185,7 +185,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 
       int i1 = o1.getExecutionOrder();
       int i2 = o2.getExecutionOrder();
-      return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
+      return Integer.compare(i1, i2);
     }
 
   }

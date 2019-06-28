@@ -15,7 +15,7 @@ class ElementHelpMap implements ElementHelp {
 
   private static class Collector implements ElementCollector {
 
-    private Map<Object, Object> map = new LinkedHashMap<>();
+    private final Map<Object, Object> map = new LinkedHashMap<>();
 
     @Override
     public void addElement(Object element) {

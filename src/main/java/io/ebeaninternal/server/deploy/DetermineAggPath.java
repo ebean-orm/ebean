@@ -16,7 +16,7 @@ class DetermineAggPath {
       // a top level aggregation (so here we need to exclude Id property)
       return null;
     }
-    return path.getManyPath(0, desc);
+    return path.getManyPath(desc);
   }
 
   static Path paths(String aggregation) {
@@ -82,9 +82,9 @@ class DetermineAggPath {
       }
     }
 
-    String getManyPath(int pos, DeployBeanDescriptor<?> desc) {
+    String getManyPath(DeployBeanDescriptor<?> desc) {
+      int pos = 0;
       while (true) {
-
         String path = paths[pos];
         DeployBeanProperty details = desc.getBeanProperty(path);
         if (details instanceof DeployBeanPropertyAssocMany<?>) {

@@ -8,6 +8,7 @@ import io.ebeaninternal.dbmigration.migration.DdlScript;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A column in the logical model.
@@ -309,7 +310,7 @@ public class MColumn {
   }
 
   protected static boolean different(String val1, String val2) {
-    return (val1 == null) ? val2 != null : !val1.equals(val2);
+    return !Objects.equals(val1, val2);
   }
 
   private boolean hasValue(String val) {

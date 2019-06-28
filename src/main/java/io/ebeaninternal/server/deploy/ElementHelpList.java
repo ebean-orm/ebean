@@ -15,7 +15,7 @@ class ElementHelpList implements ElementHelp {
 
   private static class Collector implements ElementCollector {
 
-    private List<Object> list = new ArrayList<>();
+    private final List<Object> list = new ArrayList<>();
 
     @Override
     public void addElement(Object element) {

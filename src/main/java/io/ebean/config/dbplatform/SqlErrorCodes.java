@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class SqlErrorCodes {
 
-  private Map<String,DataErrorType> map = new HashMap<>();
+  private final Map<String,DataErrorType> map = new HashMap<>();
 
   /**
    * Map the codes to AcquireLockException.

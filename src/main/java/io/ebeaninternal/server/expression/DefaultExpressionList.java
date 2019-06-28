@@ -60,7 +60,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private final ExpressionList<T> parentExprList;
 
-  protected ExpressionFactory expr;
+  protected final ExpressionFactory expr;
 
   String allDocNestedPath;
 

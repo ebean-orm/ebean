@@ -36,7 +36,7 @@ public class SaveManyBeans extends SaveManyBase {
   private final DeleteMode deleteMode;
 
   private Collection<?> collection;
-  private DefaultPersister persister;
+  private final DefaultPersister persister;
   private boolean deleteMissing;
   private int sortOrder;
 

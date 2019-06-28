@@ -12,7 +12,7 @@ import java.util.List;
  */
 class OrmQueryPropertiesParser {
 
-  private static Response EMPTY = new Response();
+  private static final Response EMPTY = new Response();
 
   /**
    * Immutable response of the parsed properties and options.

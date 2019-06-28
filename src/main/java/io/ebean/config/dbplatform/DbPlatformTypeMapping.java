@@ -23,7 +23,7 @@ public class DbPlatformTypeMapping {
     }
   }
 
-  private static DbPlatformTypeLookup lookup = new DbPlatformTypeLookup();
+  private static final DbPlatformTypeLookup lookup = new DbPlatformTypeLookup();
 
   private static final DbPlatformType BOOLEAN_LOGICAL = new BooleanLogicalType();
 

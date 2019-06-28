@@ -106,9 +106,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
      */
     UPDATE(FIND_UPDATE, "update", true);
 
-    private boolean update;
-    private String profileEventId;
-    private String label;
+    private final boolean update;
+    private final String profileEventId;
+    private final String label;
 
     Type(String profileEventId, String label) {
       this(profileEventId, label, false);

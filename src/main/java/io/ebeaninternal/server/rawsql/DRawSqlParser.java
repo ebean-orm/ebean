@@ -55,7 +55,7 @@ class DRawSqlParser {
 
   private Sql parse() {
 
-    parseSqlFindKeywords(true);
+    parseSqlFindKeywords();
 
     whereExprPos = findWhereExprPosition();
     havingExprPos = findHavingExprPosition();
@@ -165,7 +165,7 @@ class DRawSqlParser {
     }
   }
 
-  private void parseSqlFindKeywords(boolean allKeywords) {
+  private void parseSqlFindKeywords() {
 
     selectPos = textParser.findWordLower("select");
     if (selectPos == -1) {
@@ -182,10 +182,6 @@ class DRawSqlParser {
     if (fromPos == -1) {
       String msg = "Error parsing sql, can not find FROM keyword in:";
       throw new RuntimeException(msg + sql);
-    }
-
-    if (!allKeywords) {
-      return;
     }
 
     wherePos = textParser.findWordLower("where");

@@ -10,7 +10,7 @@ import java.util.ServiceLoader;
  */
 class MetricServiceProvider {
 
-  private static MetricFactory metricFactory = init();
+  private static final MetricFactory metricFactory = init();
 
   private static MetricFactory init() {
 

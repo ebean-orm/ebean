@@ -18,9 +18,9 @@ public enum DeleteMode {
    */
   HARD(PersistRequest.Type.DELETE_PERMANENT, true);
 
-  private boolean hard;
+  private final boolean hard;
 
-  private PersistRequest.Type persistType;
+  private final PersistRequest.Type persistType;
 
   DeleteMode(PersistRequest.Type persistType, boolean hard) {
     this.persistType = persistType;

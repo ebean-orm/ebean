@@ -183,7 +183,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Flag set when read auditing.
    */
-  private boolean audit;
+  private final boolean audit;
 
   /**
    * Flag set when findIterate is being read audited meaning we log in batches.

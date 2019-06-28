@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class TimedProfileLocationRegistry {
 
-  private static final List<TimedProfileLocation> list = Collections.synchronizedList(new ArrayList<TimedProfileLocation>());
+  private static final List<TimedProfileLocation> list = Collections.synchronizedList(new ArrayList<>());
 
   /**
    * Register the timed profile location instance.

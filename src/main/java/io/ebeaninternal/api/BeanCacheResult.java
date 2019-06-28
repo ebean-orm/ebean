@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class BeanCacheResult<T> {
 
-  private List<Entry<T>> list = new ArrayList<>();
+  private final List<Entry<T>> list = new ArrayList<>();
 
   /**
    * Add an entry.

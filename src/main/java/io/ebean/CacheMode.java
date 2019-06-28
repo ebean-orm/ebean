@@ -69,8 +69,8 @@ public enum CacheMode {
    */
   GET(true, false);
 
-  private boolean get;
-  private boolean put;
+  private final boolean get;
+  private final boolean put;
 
   CacheMode(boolean get, boolean put) {
     this.get = get;

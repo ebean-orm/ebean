@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class AutoTuneCollection {
 
-  List<Entry> entries = new ArrayList<>();
+  final List<Entry> entries = new ArrayList<>();
 
   public Entry add(ObjectGraphOrigin origin, OrmQueryDetail detail, String sourceQuery) {
     Entry entry = new Entry(origin, detail, sourceQuery);

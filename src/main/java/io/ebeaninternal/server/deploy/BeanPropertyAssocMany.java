@@ -79,7 +79,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Descriptor for the 'target' when the property maps to an element collection.
    */
-  BeanDescriptor<T> elementDescriptor;
+  final BeanDescriptor<T> elementDescriptor;
 
   /**
    * Order by used when fetch joining the associated many.

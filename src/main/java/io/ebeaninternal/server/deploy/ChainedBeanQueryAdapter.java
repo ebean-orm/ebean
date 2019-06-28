@@ -89,10 +89,7 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 
     @Override
     public int compare(BeanQueryAdapter o1, BeanQueryAdapter o2) {
-
-      int i1 = o1.getExecutionOrder();
-      int i2 = o2.getExecutionOrder();
-      return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
+      return Integer.compare(o1.getExecutionOrder(), o2.getExecutionOrder());
     }
 
   }

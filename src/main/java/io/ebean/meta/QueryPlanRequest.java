@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class QueryPlanRequest {
 
-  private List<MetaQueryPlan> plans = new ArrayList<>();
+  private final List<MetaQueryPlan> plans = new ArrayList<>();
 
   private Connection connection;
 

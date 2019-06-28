@@ -85,7 +85,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private DocStoreMode docStoreMode;
 
-  private ConcurrencyMode concurrencyMode;
+  private final ConcurrencyMode concurrencyMode;
 
   /**
    * The unique id used for logging summary.

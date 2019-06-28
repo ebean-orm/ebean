@@ -76,21 +76,16 @@ public class DocMappingBuilder {
    * Apply any override mappings from the top level docStore annotation.
    */
   public void applyMapping() {
-
-    DocMapping[] mapping = docStore.mapping();
-    for (DocMapping docMapping : mapping) {
-      applyFieldMapping(null, docMapping);
+    for (DocMapping docMapping : docStore.mapping()) {
+      applyFieldMapping(docMapping);
     }
   }
 
-  private void applyFieldMapping(String prefix, DocMapping docMapping) {
+  private void applyFieldMapping(DocMapping docMapping) {
 
-    String name = docMapping.name();
-    String fullName = SplitName.add(prefix, name);
-
-    DocPropertyMapping mapping = map.get(fullName);
+    DocPropertyMapping mapping = map.get(docMapping.name());
     if (mapping == null) {
-      throw new IllegalStateException("DocMapping for [" + fullName + "] but property not included in document?");
+      throw new IllegalStateException("DocMapping for [" + docMapping.name() + "] but property not included in document?");
     }
     mapping.apply(docMapping);
   }

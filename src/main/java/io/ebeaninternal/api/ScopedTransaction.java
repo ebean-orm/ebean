@@ -17,7 +17,7 @@ public class ScopedTransaction extends SpiTransactionProxy {
   /**
    * Stack of 'nested' transactions.
    */
-  private ArrayStack<ScopeTrans> stack = new ArrayStack<>();
+  private final ArrayStack<ScopeTrans> stack = new ArrayStack<>();
 
   private ScopeTrans current;
 

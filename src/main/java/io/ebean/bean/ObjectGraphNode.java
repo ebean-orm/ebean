@@ -1,6 +1,7 @@
 package io.ebean.bean;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Identifies a unique node of an object graph.
@@ -85,8 +86,7 @@ public final class ObjectGraphNode implements Serializable {
     }
 
     ObjectGraphNode e = (ObjectGraphNode) obj;
-    //noinspection StringEquality
-    return ((e.path == path) || (e.path != null && e.path.equals(path)))
+    return (Objects.equals(e.path, path))
       && e.originQueryPoint.equals(originQueryPoint);
   }
 }

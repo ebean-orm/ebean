@@ -11,7 +11,7 @@ class ElementEntityBean implements EntityBean {
 
   private Object[] data;
 
-  private EntityBeanIntercept intercept;
+  private final EntityBeanIntercept intercept;
 
   ElementEntityBean(String[] properties) {
     this.properties = properties;

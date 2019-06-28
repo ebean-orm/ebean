@@ -21,7 +21,7 @@ public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.TABLEMOD");
 
-  private Map<String, Long> tableModStamp = new ConcurrentHashMap<>();
+  private final Map<String, Long> tableModStamp = new ConcurrentHashMap<>();
 
   public TableModState() {
   }

@@ -4,6 +4,7 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Generally speaking tests the value at a given path in the JSON document.
@@ -91,8 +92,8 @@ class JsonPathExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     JsonPathExpression that = (JsonPathExpression) other;
-    if (value != null ? !value.equals(that.value) : that.value != null) return false;
-    return upperValue != null ? upperValue.equals(that.upperValue) : that.upperValue == null;
+    if (!Objects.equals(value, that.value)) return false;
+    return Objects.equals(upperValue, that.upperValue);
   }
 
   @Override

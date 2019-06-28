@@ -160,7 +160,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Clock to use for WhenModified and WhenCreated.
    */
-  private ClockService clockService;
+  private final ClockService clockService;
 
   private final CallStackFactory callStackFactory;
 

@@ -91,17 +91,13 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     if (map == null) {
       return schedulePool.schedule(c, delay, unit);
     } else {
-      return schedulePool.schedule(new Callable<V>() {
-        @Override
-        public V call() throws Exception {
-          MDC.setContextMap(map);
-          try {
-            return c.call();
-          } finally {
-            MDC.clear();
-          }
+      return schedulePool.schedule(() -> {
+        MDC.setContextMap(map);
+        try {
+          return c.call();
+        } finally {
+          MDC.clear();
         }
-
       }, delay, unit);
     }
   }

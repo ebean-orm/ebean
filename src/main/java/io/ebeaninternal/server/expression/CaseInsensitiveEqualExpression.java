@@ -8,7 +8,7 @@ import java.io.IOException;
 
 class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
-  private boolean not;
+  private final boolean not;
 
   CaseInsensitiveEqualExpression(String propertyName, Object value, boolean not) {
     super(propertyName, value);

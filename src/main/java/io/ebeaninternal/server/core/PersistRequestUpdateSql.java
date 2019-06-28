@@ -29,7 +29,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
   private boolean addBatch;
 
-  private boolean forceNoBatch;
+  private final boolean forceNoBatch;
 
   private boolean batchThisRequest;
 

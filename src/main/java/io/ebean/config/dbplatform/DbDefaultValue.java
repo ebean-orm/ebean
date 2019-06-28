@@ -27,15 +27,13 @@ public class DbDefaultValue {
    * The key for the NOW / current timestamp.
    */
   public static final String NOW = "now";
-  
+
   /**
    * The 'null' literal.
    */
   public static final String NULL = "null";
-  
 
-
-  protected Map<String, String> map = new LinkedHashMap<>();
+  protected final Map<String, String> map = new LinkedHashMap<>();
 
   /**
    * Set the DB now function.
@@ -82,10 +80,9 @@ public class DbDefaultValue {
     return val != null ? val : dbDefaultLiteral;
   }
 
-  
   /**
    * This method checks & convert the {@link DbDefault#value()} to a valid SQL literal.
-   * 
+   *
    * This is mainly to quote string literals and verify integer/dates for correctness.
    * <p>
    * Note: There are some special cases:
@@ -98,24 +95,24 @@ public class DbDefaultValue {
    *        If you need really the String "null", you have to specify <code>@DbDefault("'null'")</code>
    *        which gives you the <code>default 'null'</code> statement.</li>
    *    <li>Any statement, that begins and ends with single quote will not be checked or get quoted again.</li>
-   *    <li>A statement that begins with "$RAW:", e.g <code>@DbDefault("$RAW:N'SANDNES'")</code> will lead to 
+   *    <li>A statement that begins with "$RAW:", e.g <code>@DbDefault("$RAW:N'SANDNES'")</code> will lead to
    *        a <code>default N'SANDNES'</code> in DDL. Note that this is platform specific!</li>
    * </ul>
    */
   public static String toSqlLiteral(String defaultValue, Class<?> propertyType, int sqlType) {
     if (propertyType == null
-        || defaultValue == null 
+        || defaultValue == null
         || NULL.equals(defaultValue)
         || (defaultValue.startsWith("'") && defaultValue.endsWith("'"))
-        || (defaultValue.startsWith("$RAW:"))) {  
+        || (defaultValue.startsWith("$RAW:"))) {
       return defaultValue;
     }
 
     if (Boolean.class.isAssignableFrom(propertyType) || Boolean.TYPE.isAssignableFrom(propertyType)) {
       return toBooleanLiteral(defaultValue);
     }
-    
-    if (Number.class.isAssignableFrom(propertyType) 
+
+    if (Number.class.isAssignableFrom(propertyType)
         || Byte.TYPE.equals(propertyType)
         || Short.TYPE.equals(propertyType)
         || Integer.TYPE.equals(propertyType)
@@ -126,7 +123,7 @@ public class DbDefaultValue {
       Double.valueOf(defaultValue); // verify if it is a number
       return defaultValue;
     }
-   
+
     // check if it is a date/time - in all other cases return quoted defaultValue
     switch (sqlType) {
       // date
@@ -155,7 +152,7 @@ public class DbDefaultValue {
     }
     throw new IllegalArgumentException("'" + value + "' is not a valid value for boolean");
   }
-  
+
   /**
    * This adds single qoutes around the <code>value</code> and doubles single quotes.
    * "User's home" will return "'User''s home'"
@@ -175,7 +172,7 @@ public class DbDefaultValue {
     return sb.toString();
 
   }
-  
+
   private static String toDateLiteral(String value) {
     if (NOW.equals(value)) {
       return value; // this will get translated later
@@ -191,7 +188,7 @@ public class DbDefaultValue {
     DatatypeConverter.parseTime(value); // verify
     return toTextLiteral(value);
   }
-  
+
   private static String toDateTimeLiteral(String value) {
     if (NOW.equals(value)) {
       return value; // this will get translated later

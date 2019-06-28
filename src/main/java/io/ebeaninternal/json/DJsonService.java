@@ -181,7 +181,7 @@ public class DJsonService implements SpiJsonService {
     if (modifyAware) {
       return ((ModifyAwareList<T>) list).asSet();
     } else {
-      return new LinkedHashSet<T>(list);
+      return new LinkedHashSet<>(list);
     }
   }
 

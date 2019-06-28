@@ -62,14 +62,14 @@ public class BaseTableDdl implements TableDdl {
    * Used to check that indexes on foreign keys should be skipped as a unique index on the columns
    * already exists.
    */
-  protected IndexSet indexSet = new IndexSet();
+  protected final IndexSet indexSet = new IndexSet();
 
   /**
    * Used when unique constraints specifically for OneToOne can't be created normally (MsSqlServer).
    */
-  protected List<Column> externalUnique = new ArrayList<>();
+  protected final List<Column> externalUnique = new ArrayList<>();
 
-  protected List<UniqueConstraint> externalCompoundUnique = new ArrayList<>();
+  protected final List<UniqueConstraint> externalCompoundUnique = new ArrayList<>();
 
   // counters used when constraint names are truncated due to maximum length
   // and these counters are used to keep the constraint name unique
@@ -82,9 +82,9 @@ public class BaseTableDdl implements TableDdl {
    * Base tables that have associated history tables that need their triggers/functions regenerated as
    * columns have been added, removed, included or excluded.
    */
-  protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
+  protected final Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
 
-  private boolean strictMode;
+  private final boolean strictMode;
 
   private final HistorySupport historySupport;
 

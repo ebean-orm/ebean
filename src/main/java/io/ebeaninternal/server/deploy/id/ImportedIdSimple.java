@@ -100,7 +100,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public int compareTo(ImportedIdSimple other) {
-    return (position < other.position ? -1 : (position == other.position ? 0 : 1));
+    return Integer.compare(position, other.position);
   }
 
   @Override

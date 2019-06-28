@@ -35,9 +35,9 @@ public enum TenantMode {
    * (that holds configuration e.g.)
    */
   DB_WITH_MASTER(true, true);
-  
-  boolean dynamicDataSource;
-  boolean ddlEnabled;
+
+  final boolean dynamicDataSource;
+  final boolean ddlEnabled;
 
   TenantMode(boolean dynamicDataSource, boolean ddlEnabled) {
     this.dynamicDataSource = dynamicDataSource;
@@ -50,12 +50,12 @@ public enum TenantMode {
   public boolean isDynamicDataSource() {
     return dynamicDataSource;
   }
-  
+
   /**
    * Returns true, if DDL is enabled.
    */
   public boolean isDdlEnabled() {
     return ddlEnabled;
   }
- 
+
 }

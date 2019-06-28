@@ -4,13 +4,13 @@ import io.ebean.annotation.Platform;
 
 public final class PlatformQueryPlan {
 
-  private static QueryPlanLogger explainLogger = new QueryPlanLoggerExplain();
+  private static final QueryPlanLogger explainLogger = new QueryPlanLoggerExplain();
 
-  private static QueryPlanLogger postgresLogger = new QueryPlanLoggerPostgres();
+  private static final QueryPlanLogger postgresLogger = new QueryPlanLoggerPostgres();
 
-  private static QueryPlanLogger sqlServerLogger = new QueryPlanLoggerSqlServer();
+  private static final QueryPlanLogger sqlServerLogger = new QueryPlanLoggerSqlServer();
 
-  private static QueryPlanLogger oracleLogger = new QueryPlanLoggerOracle();
+  private static final QueryPlanLogger oracleLogger = new QueryPlanLoggerOracle();
 
   /**
    * Returns the logger to log query plans for the given platform.
