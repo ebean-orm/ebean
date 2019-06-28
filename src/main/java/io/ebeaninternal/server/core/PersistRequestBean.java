@@ -1326,10 +1326,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void docStorePersist() {
     idValue = beanDescriptor.getId(entityBean);
-    switch (type) {
-      case UPDATE:
-        dirtyProperties = intercept.getDirtyProperties();
-        break;
+    if (type == Type.UPDATE) {
+      dirtyProperties = intercept.getDirtyProperties();
     }
     // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
     docStoreMode = DocStoreMode.IGNORE;

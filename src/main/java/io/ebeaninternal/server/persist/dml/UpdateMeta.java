@@ -74,13 +74,8 @@ public final class UpdateMeta {
       tenantId.dmlBind(bind, bean);
     }
 
-    switch (persist.getConcurrencyMode()) {
-      case VERSION:
-        version.dmlBind(bind, bean);
-        break;
-
-      default:
-        break;
+    if (persist.getConcurrencyMode() == ConcurrencyMode.VERSION) {
+      version.dmlBind(bind, bean);
     }
   }
 

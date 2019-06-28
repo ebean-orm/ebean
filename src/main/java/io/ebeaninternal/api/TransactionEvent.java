@@ -75,7 +75,7 @@ public class TransactionEvent implements Serializable {
    * Return the list of PersistRequestBean's for this transaction.
    */
   public List<PersistRequestBean<?>> getListenerNotify() {
-    return (listenerNotify == null) ? null : listenerNotify;
+    return listenerNotify;
   }
 
   public TransactionEventTable getEventTables() {

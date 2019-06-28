@@ -261,10 +261,7 @@ class EqlAdapter<T> extends EQLBaseListener {
   }
 
   private boolean isValue(String text) {
-    if (text.length() == 1 && (text.equals("(") || text.equals(")") || text.equals(","))) {
-      return false;
-    }
-    return true;
+    return text.length() != 1 || (!text.equals("(") && !text.equals(")") && !text.equals(","));
   }
 
   @Override

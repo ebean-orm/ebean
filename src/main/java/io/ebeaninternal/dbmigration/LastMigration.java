@@ -60,10 +60,7 @@ class LastMigration {
   }
 
   private static boolean includeSqlFile(String lowerFileName) {
-    if (lowerFileName.startsWith("r") || lowerFileName.startsWith("i") || !lowerFileName.endsWith(SQL)) {
-      return false;
-    }
-    return true;
+    return !lowerFileName.startsWith("r") && !lowerFileName.startsWith("i") && lowerFileName.endsWith(SQL);
   }
 
   private static boolean includeModelFile(String lowerFileName) {

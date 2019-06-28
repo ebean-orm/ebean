@@ -55,10 +55,7 @@ public class DefaultCallStackFactory implements CallStackFactory {
     if (element.getClassName().startsWith(IO_EBEAN)) {
       return true;
     }
-    if (element.getMethodName().startsWith("_ebean_")) {
-      return true;
-    }
-    return false;
+    return element.getMethodName().startsWith("_ebean_");
   }
 
   private CallStack createCallStack(StackTraceElement[] finalTrace) {

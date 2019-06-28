@@ -92,8 +92,7 @@ class DetermineAggPath {
 
         } else if (details instanceof DeployBeanPropertyAssocOne<?>) {
           DeployBeanPropertyAssocOne<?> one = (DeployBeanPropertyAssocOne<?>) details;
-          DeployBeanDescriptor<?> targetDesc = one.getTargetDeploy();
-          desc = targetDesc;
+          desc = one.getTargetDeploy();
           pos = pos + 1;
           continue;
         }

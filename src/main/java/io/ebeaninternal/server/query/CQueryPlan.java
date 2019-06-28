@@ -133,7 +133,7 @@ public class CQueryPlan {
   /**
    * Create a query plan for a raw sql query.
    */
-  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rowNumberIncluded, String logWhereSql) {
 
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
@@ -143,18 +143,18 @@ public class CQueryPlan {
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType());
     this.location = location();
-    this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
+    this.planKey = buildPlanKey(sql, false, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.asOfTableCount = 0;
     this.sql = sql;
     this.sqlHash = md5Hash(sql);
     this.sqlTree = sqlTree;
-    this.rawSql = rawSql;
+    this.rawSql = false;
     this.rowNumberIncluded = rowNumberIncluded;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
-    this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
+    this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
   }
 

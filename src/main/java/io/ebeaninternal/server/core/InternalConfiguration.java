@@ -328,12 +328,10 @@ public class InternalConfiguration {
 
   private MultiValueBind createMultiValueBind(Platform platform) {
     // only Postgres at this stage
-    switch (platform) {
-      case POSTGRES:
-        return new PostgresMultiValueBind();
-      default:
-        return new MultiValueBind();
+    if (platform == Platform.POSTGRES) {
+      return new PostgresMultiValueBind();
     }
+    return new MultiValueBind();
   }
 
   public SpiJsonContext createJsonContext(SpiEbeanServer server) {

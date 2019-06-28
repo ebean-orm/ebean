@@ -31,13 +31,7 @@ public class DeployPropertyParserMap extends DeployParser {
 
   @Override
   public String getDeployWord(String expression) {
-
-    String deployExpr = map.get(expression);
-    if (deployExpr == null) {
-      return null;
-    } else {
-      return deployExpr;
-    }
+    return map.get(expression);
   }
 
 }
