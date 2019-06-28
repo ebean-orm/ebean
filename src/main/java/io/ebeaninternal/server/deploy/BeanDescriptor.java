@@ -2576,7 +2576,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   private STreeProperty findSqlTreeFormula(String formula, String path) {
     String key = formula + "-" + path;
-    return dynamicProperty.computeIfAbsent(key, (fullKey) -> new FormulaPropertyPath(this, formula, path).build());
+    return dynamicProperty.computeIfAbsent(key, (fullKey) -> FormulaPropertyPath.create(this, formula, path));
   }
 
   /**

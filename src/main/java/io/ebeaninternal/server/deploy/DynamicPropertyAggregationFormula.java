@@ -16,7 +16,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   private final boolean aggregate;
 
-  private final BeanProperty asTarget;
+  final BeanProperty asTarget;
 
   private final String alias;
 

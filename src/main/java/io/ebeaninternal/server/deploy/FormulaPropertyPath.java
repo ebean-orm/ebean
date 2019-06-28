@@ -6,7 +6,7 @@ import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.Types;
 
-class FormulaPropertyPath {
+final class FormulaPropertyPath {
 
   private static final String[] AGG_FUNCTIONS = {"count", "max", "min", "avg", "sum"};
 
@@ -20,17 +20,22 @@ class FormulaPropertyPath {
 
   private final String internalExpression;
 
-  private final String path;
+  private final ElPropertyDeploy firstProp;
+
+  private final String parsedAggregation;
 
   private boolean countDistinct;
 
   private String cast;
   private String alias;
 
+  static STreeProperty create(BeanDescriptor<?> descriptor, String formula, String path) {
+    return new FormulaPropertyPath(descriptor, formula, path).build();
+  }
+
   FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula, String path) {
     this.descriptor = descriptor;
     this.formula = formula;
-    this.path = path;
 
     int openBracket = formula.indexOf('(');
     int closeBracket = formula.lastIndexOf(')');
@@ -38,13 +43,21 @@ class FormulaPropertyPath {
       throw new IllegalStateException("Unable to parse formula [" + formula + "]");
     }
     outerFunction = formula.substring(0, openBracket).trim();
-    internalExpression = trimDistinct(formula.substring(openBracket+1, closeBracket));
+    internalExpression = trimDistinct(formula.substring(openBracket + 1, closeBracket));
 
-    if (closeBracket < formula.length() -1) {
+    if (closeBracket < formula.length() - 1) {
       // ::CastType as foo
-      String suffix = formula.substring(closeBracket+1).trim();
-      parseSuffix(suffix);
+      parseSuffix(formula.substring(closeBracket + 1).trim());
     }
+
+    DeployPropertyParser parser = descriptor.parser().setCatchFirst(true);
+    String parsed = parser.parse(internalExpression);
+    if (path != null) {
+      // fetch("machineStats", "sum(hours), sum(totalKms)")
+      parsed = parsed.replace("${}", "${" + path + "}");
+    }
+    this.parsedAggregation = buildFormula(parsed);
+    this.firstProp = parser.getFirstProp();
   }
 
   private void parseSuffix(String suffix) {
@@ -93,42 +106,50 @@ class FormulaPropertyPath {
 
   STreeProperty build() {
 
-    DeployPropertyParser parser = descriptor.parser().setCatchFirst(true);
-
-    String parsed = parser.parse(internalExpression);
-    if (path != null) {
-      // fetch("machineStats", "sum(hours), sum(totalKms)")
-      parsed = parsed.replace("${}", "${" + path + "}");
-    }
-
-    ElPropertyDeploy firstProp = parser.getFirstProp();
-
-    ScalarType<?> scalarType;
     if (cast != null) {
-      scalarType = descriptor.getScalarType(cast);
+      ScalarType<?> scalarType = descriptor.getScalarType(cast);
       if (scalarType == null) {
-        throw new IllegalStateException("Unable to find scalarType for cast of ["+cast+"] on formula [" + formula + "] for type " + descriptor);
+        throw new IllegalStateException("Unable to find scalarType for cast of [" + cast + "] on formula [" + formula + "] for type " + descriptor);
       }
-
-    } else if (isCount()) {
-      scalarType = descriptor.getScalarType(Types.BIGINT);
-
-    } else if (isConcat()) {
-      scalarType = descriptor.getScalarType(Types.VARCHAR);
-
-    } else {
-      // determine scalarType based on first property found by parser
-      if (firstProp != null) {
-        scalarType = firstProp.getBeanProperty().getScalarType();
-      } else {
-        throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor + " - maybe use a cast like ::String ?");
-      }
+      return create(scalarType);
+    }
+    if (isCount()) {
+      return create(descriptor.getScalarType(Types.BIGINT));
+    }
+    if (isConcat()) {
+      return create(descriptor.getScalarType(Types.VARCHAR));
+    }
+    if (firstProp == null) {
+      throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor + " - maybe use a cast like ::String ?");
     }
 
-    String logicalName = (alias == null) ? internalExpression : alias;
-    BeanProperty targetProperty = descriptor._findBeanProperty(logicalName);
-    String parsedAggregation = buildFormula(parsed);
-    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), targetProperty, alias);
+    // determine scalarType based on first property found by parser
+    final BeanProperty property = firstProp.getBeanProperty();
+    if (!property.isAssocId()) {
+      return create(property.getScalarType());
+    } else {
+      return createManyToOne(property);
+    }
+  }
+
+  private DynamicPropertyAggregationFormula create(ScalarType<?> scalarType) {
+
+    String logicalName = logicalName();
+    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), target(logicalName), alias);
+  }
+
+  private DynamicPropertyAggregationFormula createManyToOne(BeanProperty property) {
+
+    String logicalName = logicalName();
+    return new DynamicPropertyAggregationFormulaMTO((BeanPropertyAssocOne) property, logicalName, parsedAggregation, isAggregate(), target(logicalName), alias);
+  }
+
+  private BeanProperty target(String logicalName) {
+    return descriptor._findBeanProperty(logicalName);
+  }
+
+  private String logicalName() {
+    return (alias == null) ? internalExpression : alias;
   }
 
   private boolean isAggregate() {

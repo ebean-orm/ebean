@@ -23,6 +23,7 @@ import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarDataReader;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -463,6 +464,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public ScalarDataReader<?> getIdReader() {
     return targetDescriptor.getIdProperty();
+  }
+
+  public ScalarType getIdScalarType() {
+    return targetDescriptor.getIdProperty().scalarType;
   }
 
   /**
