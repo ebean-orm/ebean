@@ -177,8 +177,12 @@ public final class InsertMeta {
     request.setInsertSetMode();
 
     request.append("insert into ").append(table);
-    request.append(" (");
+    if (nullId && noColumnsForInsert(draftTable)) {
+      request.append(" default values");
+      return request.toString();
+    }
 
+    request.append(" (");
     if (!nullId) {
       id.dmlAppend(request);
     }
@@ -200,8 +204,16 @@ public final class InsertMeta {
     request.append(") values (");
     request.append(request.getInsertBindBuffer());
     request.append(")");
-
     return request.toString();
+  }
+
+  /**
+   * Return true if the insert actually contains no columns.
+   */
+  private boolean noColumnsForInsert(boolean draftTable) {
+    return shadowFKey == null
+      && discriminator == null
+      && (draftTable ? all.isEmpty() : allExcludeDraftOnly.isEmpty());
   }
 
 }

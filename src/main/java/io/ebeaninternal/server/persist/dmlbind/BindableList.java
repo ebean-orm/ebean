@@ -33,6 +33,10 @@ public class BindableList implements Bindable {
     return new BindableList(copy);
   }
 
+  public boolean isEmpty() {
+    return items.length == 0;
+  }
+
   @Override
   public boolean isDraftOnly() {
     return false;
