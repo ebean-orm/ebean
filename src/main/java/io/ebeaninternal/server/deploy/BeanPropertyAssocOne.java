@@ -45,6 +45,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private final boolean orphanRemoval;
 
   private final boolean primaryKeyExport;
+  private final boolean primaryKeyJoin;
 
   private AssocOneHelp localHelp;
 
@@ -75,6 +76,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
     super(descriptor, deploy);
     primaryKeyExport = deploy.isPrimaryKeyExport();
+    primaryKeyJoin = deploy.isPrimaryKeyJoin();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
@@ -100,6 +102,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   public BeanPropertyAssocOne(BeanPropertyAssocOne source, BeanPropertyOverride override) {
     super(source, override);
     primaryKeyExport = source.primaryKeyExport;
+    primaryKeyJoin = source.primaryKeyJoin;
     oneToOne = source.oneToOne;
     oneToOneExported = source.oneToOneExported;
     orphanRemoval = source.orphanRemoval;
@@ -357,7 +360,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   public boolean hasForeignKey() {
-    return foreignKey == null || !foreignKey.isNoConstraint();
+    return foreignKey == null || primaryKeyJoin || !foreignKey.isNoConstraint();
   }
 
   public boolean hasForeignKeyIndex() {

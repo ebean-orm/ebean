@@ -256,9 +256,15 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
       TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
       if (primaryKeyJoin != null && !table.isPartitioned()) {
-        TableJoinColumn[] columns = primaryKeyJoin.columns();
-        col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
-        col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
+        final PropertyForeignKey foreignKey = primaryKeyJoin.getForeignKey();
+        if (foreignKey == null || !foreignKey.isNoConstraint()) {
+          TableJoinColumn[] columns = primaryKeyJoin.columns();
+          col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
+          col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
+          if (foreignKey != null) {
+            col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
+          }
+        }
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());

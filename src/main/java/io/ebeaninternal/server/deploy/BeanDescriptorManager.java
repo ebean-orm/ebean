@@ -1654,8 +1654,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     String baseTable = prop.getDesc().getBaseTable();
     DeployTableJoin inverse = prop.getTableJoin().createInverse(baseTable);
 
-    TableJoin inverseJoin = new TableJoin(inverse);
-
+    TableJoin inverseJoin = new TableJoin(inverse, prop.getForeignKey());
     DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
     target.setPrimaryKeyJoin(inverseJoin);
   }
