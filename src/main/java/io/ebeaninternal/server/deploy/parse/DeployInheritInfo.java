@@ -199,9 +199,7 @@ public class DeployInheritInfo {
   public String getWhere() {
 
     List<Object> discList = new ArrayList<>();
-
     appendDiscriminator(discList);
-
     return buildWhereLiteral(discList);
   }
 

@@ -6,8 +6,8 @@ import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.parse.DeployInheritInfo;
 import io.ebeaninternal.server.query.SqlTreeProperties;
 
-import java.lang.reflect.Modifier;
 import javax.persistence.PersistenceException;
+import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -176,6 +176,16 @@ public class InheritInfo {
   }
 
   /**
+   * Return true if this node has children.
+   * <p>
+   * When an inheritance node has no children then we don't need
+   * the discriminator column as the type is effectively known.
+   */
+  public boolean hasChildren() {
+    return !children.isEmpty();
+  }
+
+  /**
    * Get the bean property additionally looking in the sub types.
    */
   public BeanProperty findSubTypeProperty(String propertyName) {
@@ -200,7 +210,6 @@ public class InheritInfo {
 
     for (InheritInfo childInfo : children) {
       selectProps.add(childInfo.descriptor.propertiesLocal());
-
       childInfo.addChildrenProperties(selectProps);
     }
   }
@@ -209,9 +218,10 @@ public class InheritInfo {
    * Return the associated InheritInfo for this DB row read.
    */
   public InheritInfo readType(DbReadContext ctx) throws SQLException {
-
-    String discValue = ctx.getDataReader().getString();
-    return readType(discValue);
+    if (!hasChildren()) {
+      return this;
+    }
+    return readType(ctx.getDataReader().getString());
   }
 
   /**
@@ -327,7 +337,6 @@ public class InheritInfo {
    * Return the derived where for the discriminator.
    */
   public String getWhere() {
-
     return where;
   }
 
