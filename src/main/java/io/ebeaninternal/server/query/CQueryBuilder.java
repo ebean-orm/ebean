@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.CountDistinctOrder;
+import io.ebean.OrderBy;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -600,7 +601,10 @@ class CQueryBuilder {
       }
       if (distinct && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
-        sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
+        final OrderBy<?> orderBy = query.getOrderBy();
+        if (orderBy != null && orderBy.supportsSelect()) {
+          sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
+        }
       }
     }
 

@@ -80,7 +80,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with ascending order to this OrderBy.
    */
   public Query<T> asc(String propertyName, String collation) {
-
     list.add(new Property(propertyName, true, collation));
     return query;
   }
@@ -89,7 +88,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with descending order to this OrderBy.
    */
   public Query<T> desc(String propertyName) {
-
     list.add(new Property(propertyName, false));
     return query;
   }
@@ -98,7 +96,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with descending order to this OrderBy.
    */
   public Query<T> desc(String propertyName, String collation) {
-
     list.add(new Property(propertyName, false, collation));
     return query;
   }
@@ -108,7 +105,6 @@ public final class OrderBy<T> implements Serializable {
    * Return true if the property is known to be contained in the order by clause.
    */
   public boolean containsProperty(String propertyName) {
-
     for (Property aList : list) {
       if (propertyName.equals(aList.getProperty())) {
         return true;
@@ -161,10 +157,9 @@ public final class OrderBy<T> implements Serializable {
    * Return a copy of the OrderBy.
    */
   public OrderBy<T> copy() {
-
     OrderBy<T> copy = new OrderBy<>();
-    for (Property aList : list) {
-      copy.add(aList.copy());
+    for (Property property : list) {
+      copy.add(property.copy());
     }
     return copy;
   }
@@ -239,6 +234,18 @@ public final class OrderBy<T> implements Serializable {
   public OrderBy<T> clear() {
     list.clear();
     return this;
+  }
+
+  /**
+   * Return true if this order by can be used in select clause.
+   */
+  public boolean supportsSelect() {
+    for (Property property : list) {
+      if (!property.supportsSelect()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -401,6 +408,12 @@ public final class OrderBy<T> implements Serializable {
       this.ascending = ascending;
     }
 
+    /**
+     * Support use in select clause if no collation or nulls ordering.
+     */
+    boolean supportsSelect() {
+      return nulls == null && collation == null;
+    }
   }
 
   private void parse(String orderByClause) {

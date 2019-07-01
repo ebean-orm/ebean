@@ -57,7 +57,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     if (isPostgres()) {
       assertThat(sql).contains("select distinct on (t0.user_name, t0.userid) t0.userid,");
     } else if (isH2()) {
-      assertThat(sql).contains("select distinct t0.userid, t0.user_name, t0.user_type_id,");
+      assertThat(sql).contains("select distinct t0.userid, t0.user_name, t0.user_type_id from muser t0");
     }
 
   }

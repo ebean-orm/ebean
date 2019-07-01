@@ -18,6 +18,30 @@ import static org.junit.Assert.assertNotNull;
 public class TestAggregateFormula extends BaseTestCase {
 
   @Test
+  public void minDistinctOrderByNulls() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Contact> contacts = Ebean.find(Contact.class)
+      .setDistinct(true)
+      .select("lastName, min(customer)")
+      .orderBy("min(customer) asc nulls last")
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select distinct t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name order by min(t0.customer_id) nulls last");
+
+    assertThat(contacts).isNotEmpty();
+
+    Contact contact = contacts.get(0);
+    assertThat(contact.getLastName()).isNotNull();
+    assertThat(contact.getCustomer()).isNotNull();
+    assertThat(contact.getCustomer().getId()).isNotNull();
+  }
+
+  @Test
   public void minOnManyToOne() {
 
     ResetBasicData.reset();
