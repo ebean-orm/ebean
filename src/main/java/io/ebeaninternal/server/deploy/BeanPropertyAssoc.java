@@ -156,6 +156,20 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   /**
+   * Return true if foreign key constraint is enabled on this relationship (not disabled).
+   */
+  public boolean hasForeignKeyConstraint() {
+    return foreignKey == null || !foreignKey.isNoConstraint();
+  }
+
+  /**
+   * Return true if foreign key index is enabled on this relationship (not disabled).
+   */
+  public boolean hasForeignKeyIndex() {
+    return foreignKey == null || !foreignKey.isNoIndex();
+  }
+
+  /**
    * Create a ElPropertyValue for a *ToOne or *ToMany.
    */
   protected ElPropertyValue createElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
@@ -228,7 +242,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
 
   /**
    * Create a new query for the target type.
-   *
+   * <p>
    * We use target descriptor rather than target property type to support ElementCollection.
    */
   public SpiQuery<T> newQuery(SpiEbeanServer server) {

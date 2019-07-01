@@ -363,10 +363,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return foreignKey == null || primaryKeyJoin || !foreignKey.isNoConstraint();
   }
 
-  public boolean hasForeignKeyIndex() {
-    return foreignKey == null || !foreignKey.isNoIndex();
-  }
-
   /**
    * Return true if this a OneToOne property. Otherwise assumed ManyToOne.
    */

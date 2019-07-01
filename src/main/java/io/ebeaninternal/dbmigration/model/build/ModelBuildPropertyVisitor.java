@@ -170,8 +170,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
-    PropertyForeignKey foreignKey = p.getForeignKey();
-
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {
       // compound foreign key
@@ -196,7 +194,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDbMigrationInfos(p.getDbMigrationInfos());
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
-        if (p.hasForeignKey() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
+        if (p.hasForeignKeyConstraint() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
           // single references column (put it on the column)
           String refTable = importedProperty.getBeanDescriptor().getBaseTable();
           if (refTable == null) {
@@ -208,6 +206,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
           if (p.hasForeignKeyIndex()) {
             col.setForeignKeyIndex(determineForeignKeyIndexName(col.getName()));
           }
+          PropertyForeignKey foreignKey = p.getForeignKey();
           if (foreignKey != null) {
             col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
           }
