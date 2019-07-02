@@ -5,8 +5,6 @@ package io.ebeaninternal.server.persist.dml;
  */
 public class GenerateDmlRequest {
 
-  private static final String IS_NULL = " is null";
-
   private final StringBuilder sb = new StringBuilder(100);
 
   private StringBuilder insertBindBuffer;
@@ -57,11 +55,11 @@ public class GenerateDmlRequest {
     }
   }
 
-  public int getBindColumnCount() {
+  int getBindColumnCount() {
     return bindColumnCount;
   }
 
-  public String getInsertBindBuffer() {
+  String getInsertBindBuffer() {
     return insertBindBuffer.toString();
   }
 
@@ -70,19 +68,19 @@ public class GenerateDmlRequest {
     return sb.toString();
   }
 
-  public void setWhereIdMode() {
+  void setWhereIdMode() {
     this.prefix = "";
     this.prefix2 = " and ";
   }
 
-  public void setInsertSetMode() {
+  void setInsertSetMode() {
     this.insertBindBuffer = new StringBuilder(100);
     this.insertMode = 1;
     this.prefix = "";
     this.prefix2 = ", ";
   }
 
-  public void setUpdateSetMode() {
+  void setUpdateSetMode() {
     this.prefix = "";
     this.prefix2 = ", ";
   }

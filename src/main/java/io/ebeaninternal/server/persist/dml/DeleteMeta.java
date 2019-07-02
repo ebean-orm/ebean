@@ -26,10 +26,7 @@ final class DeleteMeta {
 
   private final String tableName;
 
-  private final boolean emptyStringAsNull;
-
-  DeleteMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
-    this.emptyStringAsNull = emptyStringAsNull;
+  DeleteMeta(BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
     this.tableName = desc.getBaseTable();
     this.id = id;
     this.version = version;
@@ -47,10 +44,6 @@ final class DeleteMeta {
       this.sqlDraftNone = sqlNone;
       this.sqlDraftVersion = sqlVersion;
     }
-  }
-
-  boolean isEmptyStringAsNull() {
-    return emptyStringAsNull;
   }
 
   /**

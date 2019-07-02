@@ -24,16 +24,10 @@ final class UpdateMeta {
   private final Bindable version;
   private final Bindable tenantId;
 
-  private final String tableName;
-
   private final UpdatePlan modeNoneUpdatePlan;
   private final UpdatePlan modeVersionUpdatePlan;
 
-  private final boolean emptyStringAsNull;
-
-  UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable tenantId) {
-    this.emptyStringAsNull = emptyStringAsNull;
-    this.tableName = desc.getBaseTable();
+  UpdateMeta(BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable tenantId) {
     this.set = set;
     this.id = id;
     this.version = version;
@@ -44,13 +38,6 @@ final class UpdateMeta {
 
     this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
     this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);
-  }
-
-  /**
-   * Return true if empty strings should be treated as null.
-   */
-  boolean isEmptyStringAsNull() {
-    return emptyStringAsNull;
   }
 
   /**

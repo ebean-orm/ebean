@@ -45,7 +45,7 @@ public class InsertHandler extends DmlHandler {
    * Create to handle the insert execution.
    */
   public InsertHandler(PersistRequestBean<?> persist, InsertMeta meta) {
-    super(persist, meta.isEmptyStringToNull());
+    super(persist);
     this.meta = meta;
     this.concatinatedKey = meta.isConcatenatedKey();
   }

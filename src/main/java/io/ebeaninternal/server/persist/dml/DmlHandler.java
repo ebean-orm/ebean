@@ -51,7 +51,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
   private short batchedStatus;
 
-  DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
+  DmlHandler(PersistRequestBean<?> persistRequest) {
     this.now = System.currentTimeMillis();
     this.persistRequest = persistRequest;
     this.transaction = persistRequest.getTransaction();

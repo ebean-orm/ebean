@@ -44,11 +44,7 @@ final class InsertMeta {
 
   private final String[] identityDbColumns;
 
-  private final boolean emptyStringToNull;
-
-  public InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
-
-    this.emptyStringToNull = dbPlatform.isTreatEmptyStringsAsNull();
+  InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
     this.discriminator = getDiscriminator(desc);
     this.id = id;
     this.all = all;
@@ -57,7 +53,6 @@ final class InsertMeta {
 
     String tableName = desc.getBaseTable();
     String draftTableName = desc.getDraftTable();
-
     this.sqlWithId = genSql(false, tableName, false);
     this.sqlDraftWithId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlWithId;
 
@@ -90,28 +85,17 @@ final class InsertMeta {
 
   private static Bindable getDiscriminator(BeanDescriptor<?> desc) {
     InheritInfo inheritInfo = desc.getInheritInfo();
-    if (inheritInfo != null) {
-      return new BindableDiscriminator(inheritInfo);
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Return true if empty strings should be treated as null.
-   */
-  public boolean isEmptyStringToNull() {
-    return emptyStringToNull;
+    return inheritInfo != null ? new BindableDiscriminator(inheritInfo) : null;
   }
 
   /**
    * Return true if this is a concatenated key.
    */
-  public boolean isConcatenatedKey() {
+  boolean isConcatenatedKey() {
     return concatinatedKey;
   }
 
-  public String[] getIdentityDbColumns() {
+  String[] getIdentityDbColumns() {
     return identityDbColumns;
   }
 
@@ -119,7 +103,7 @@ final class InsertMeta {
    * Return true if we should use a SQL query to return the generated key.
    * This can not be used with JDBC batch mode.
    */
-  public boolean supportsSelectLastInsertedId() {
+  boolean supportsSelectLastInsertedId() {
     return supportsSelectLastInsertedId;
   }
 
@@ -127,14 +111,14 @@ final class InsertMeta {
    * Return true if getGeneratedKeys is supported by the underlying jdbc
    * driver and database.
    */
-  public boolean supportsGetGeneratedKeys() {
+  boolean supportsGetGeneratedKeys() {
     return supportsGetGeneratedKeys;
   }
 
   /**
    * Return true if the Id can be derived from other property values.
    */
-  public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
+  boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
     return id.deriveConcatenatedId(persist);
   }
 

@@ -18,7 +18,7 @@ public class UpdateHandler extends DmlHandler {
   private boolean emptySetClause;
 
   UpdateHandler(PersistRequestBean<?> persist, UpdateMeta meta) {
-    super(persist, meta.isEmptyStringAsNull());
+    super(persist);
     this.meta = meta;
   }
 
