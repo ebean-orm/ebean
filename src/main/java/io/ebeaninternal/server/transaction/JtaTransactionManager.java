@@ -10,13 +10,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
@@ -149,29 +144,28 @@ public class JtaTransactionManager implements ExternalTransactionManager {
   private static class DummyUserTransaction implements UserTransaction {
 
     @Override
-    public void begin() throws NotSupportedException, SystemException {
+    public void begin() {
     }
 
     @Override
-    public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
-      SecurityException, IllegalStateException, SystemException {
+    public void commit() throws SecurityException, IllegalStateException {
     }
 
     @Override
-    public int getStatus() throws SystemException {
+    public int getStatus() {
       return 0;
     }
 
     @Override
-    public void rollback() throws IllegalStateException, SecurityException, SystemException {
+    public void rollback() throws IllegalStateException, SecurityException {
     }
 
     @Override
-    public void setRollbackOnly() throws IllegalStateException, SystemException {
+    public void setRollbackOnly() throws IllegalStateException {
     }
 
     @Override
-    public void setTransactionTimeout(int seconds) throws SystemException {
+    public void setTransactionTimeout(int seconds) {
     }
   }
 

@@ -8,12 +8,6 @@ import io.ebeaninternal.api.SpiTransactionScopeManager;
  */
 public abstract class TransactionScopeManager implements SpiTransactionScopeManager {
 
-  protected final String serverName;
-
-  public TransactionScopeManager(String serverName) {
-    this.serverName = serverName;
-  }
-
   /**
    * Register the transaction manager (for use by external transaction scopes).
    */

@@ -12,10 +12,6 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
   private final ThreadLocal<SpiTransaction> local = new ThreadLocal<>();
 
-  public DefaultTransactionScopeManager(String serverName) {
-    super(serverName);
-  }
-
   @Override
   public void register(TransactionManager manager) {
     // do nothing

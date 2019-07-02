@@ -47,24 +47,24 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   /**
    * The status of the transaction.
    */
-  protected boolean active;
+  private boolean active;
 
   /**
    * The underlying Connection which is expected to use autoCommit such that we avoid the
    * explicit commit call at the end of the 'transaction' (for performance).
    */
-  protected Connection connection;
+  private Connection connection;
 
   /**
    * Holder of the objects fetched to ensure unique objects are used.
    */
-  protected PersistenceContext persistenceContext;
+  private PersistenceContext persistenceContext;
 
   private Object tenantId;
 
   private Map<String, Object> userObjects;
 
-  private long startNanos;
+  private final long startNanos;
 
   /**
    * Create without a tenantId.
