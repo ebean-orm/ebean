@@ -16,13 +16,6 @@ class BindValues {
   }
 
   /**
-   * Return the number of bind values.
-   */
-  public int size() {
-    return list.size();
-  }
-
-  /**
    * Add a bind value with its JDBC datatype.
    *
    * @param value  the bind value

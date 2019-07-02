@@ -109,13 +109,6 @@ public final class BatchControl {
   }
 
   /**
-   * Return the batchSize.
-   */
-  public int getBatchSize() {
-    return batchSize;
-  }
-
-  /**
    * Set the size of batch execution.
    * <p>
    * The user can set this via the Transaction.

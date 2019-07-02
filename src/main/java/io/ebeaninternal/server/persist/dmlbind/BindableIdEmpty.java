@@ -4,7 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class BindableIdEmpty implements BindableId {
