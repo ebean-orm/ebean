@@ -461,8 +461,6 @@ public final class SqlTreeBuilder {
   private SqlTreeProperties getBaseSelectPartial(STreeType desc, OrmQueryProperties queryProps) {
 
     SqlTreeProperties selectProps = new SqlTreeProperties();
-    selectProps.setReadOnly(queryProps.isReadOnly());
-
     // add properties in the order in which they appear
     // in the query. Gives predictable sql/properties for
     // use with SqlSelect type queries.
