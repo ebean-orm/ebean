@@ -30,33 +30,30 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * The originating request.
    */
-  protected final PersistRequestBean<?> persistRequest;
+  final PersistRequestBean<?> persistRequest;
 
-  protected final StringBuilder bindLog;
+  private final StringBuilder bindLog;
 
-  protected final SpiTransaction transaction;
+  final SpiTransaction transaction;
 
-  protected final boolean emptyStringToNull;
+  private final boolean logLevelSql;
 
-  protected final boolean logLevelSql;
-
-  protected final long now;
+  private final long now;
 
   /**
    * The PreparedStatement used for the dml.
    */
-  protected DataBind dataBind;
+  DataBind dataBind;
 
-  protected BatchedPstmt batchedPstmt;
+  BatchedPstmt batchedPstmt;
 
-  protected String sql;
+  String sql;
 
   private short batchedStatus;
 
-  protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
+  DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
     this.now = System.currentTimeMillis();
     this.persistRequest = persistRequest;
-    this.emptyStringToNull = emptyStringToNull;
     this.transaction = persistRequest.getTransaction();
     this.logLevelSql = transaction.isLogSql();
     if (logLevelSql) {
@@ -79,7 +76,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind to the statement returning the DataBind.
    */
-  protected DataBind bind(PreparedStatement stmt) {
+  DataBind bind(PreparedStatement stmt) {
     return new DataBind(persistRequest.getDataTimeZone(), stmt, transaction.getInternalConnection());
   }
 
@@ -98,7 +95,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Check the rowCount.
    */
-  protected void checkRowCount(int rowCount) throws OptimisticLockException {
+  void checkRowCount(int rowCount) throws OptimisticLockException {
     try {
       persistRequest.checkRowCount(rowCount);
       persistRequest.postExecute();
@@ -133,14 +130,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
-   * Return the bind log.
-   */
-  @Override
-  public String getBindLog() {
-    return bindLog == null ? "" : bindLog.toString();
-  }
-
-  /**
    * Set the Id value that was bound. This value is used for logging summary
    * level information.
    */
@@ -152,7 +141,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Log the sql to the transaction log.
    */
-  protected void logSql(String sql) {
+  void logSql(String sql) {
     if (logLevelSql) {
       switch (batchedStatus) {
         case BATCHED_FIRST: {
@@ -185,7 +174,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       } else {
         String sval = value.toString();
         if (sval.length() > 50) {
-          bindLog.append(sval.substring(0, 47)).append("...");
+          bindLog.append(sval, 0, 47).append("...");
         } else {
           bindLog.append(sval);
         }
@@ -244,7 +233,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
+  PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
 
     Connection conn = t.getInternalConnection();
     if (genKeys) {
@@ -261,7 +250,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Return a prepared statement taking into account batch requirements.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
+  PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
     batchedPstmt = batch.getBatchedPstmt(sql, request);

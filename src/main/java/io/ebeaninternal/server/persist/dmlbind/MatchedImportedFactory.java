@@ -9,7 +9,7 @@ class MatchedImportedFactory {
   /**
    * Create the array of matchedImportedProperty based on the properties and descriptor.
    */
-  protected static MatchedImportedProperty[] build(BeanProperty[] props, BeanDescriptor<?> desc) {
+  static MatchedImportedProperty[] build(BeanProperty[] props, BeanDescriptor<?> desc) {
 
     MatchedImportedProperty[] matches = new MatchedImportedProperty[props.length];
 

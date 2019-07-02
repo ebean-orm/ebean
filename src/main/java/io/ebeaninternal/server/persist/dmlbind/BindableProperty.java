@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class BindableProperty implements Bindable {
 
-  protected final BeanProperty prop;
+  final BeanProperty prop;
 
   public BindableProperty(BeanProperty prop) {
     this.prop = prop;

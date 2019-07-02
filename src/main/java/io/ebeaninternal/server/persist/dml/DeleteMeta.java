@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * Meta data for delete handler. The meta data is for a particular bean type. It
  * is considered immutable and is thread safe.
  */
-public final class DeleteMeta {
+final class DeleteMeta {
 
   private final String sqlVersion;
   private final String sqlNone;

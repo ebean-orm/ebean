@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Factory for creating InsertMeta UpdateMeta and DeleteMeta.
  */
-public class MetaFactory {
+class MetaFactory {
 
   private final FactoryBaseProperties baseFact;
   private final FactoryEmbedded embeddedFact;

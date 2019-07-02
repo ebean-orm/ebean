@@ -14,9 +14,9 @@ import java.util.List;
  */
 class BindableAssocOne implements Bindable {
 
-  protected final BeanPropertyAssocOne<?> assocOne;
+  final BeanPropertyAssocOne<?> assocOne;
 
-  protected final ImportedId importedId;
+  final ImportedId importedId;
 
   BindableAssocOne(BeanPropertyAssocOne<?> assocOne) {
     this.assocOne = assocOne;
@@ -55,7 +55,7 @@ class BindableAssocOne implements Bindable {
   /**
    * Bind and register a deferred relationship value.
    */
-  void registerDeferred(BindableRequest request, EntityBean bean, EntityBean assocBean) throws SQLException {
+  private void registerDeferred(BindableRequest request, EntityBean bean, EntityBean assocBean) throws SQLException {
     Object boundValue = importedId.bind(request, assocBean);
     if (boundValue == null && assocBean != null) {
       // this is the scenario for a derived foreign key

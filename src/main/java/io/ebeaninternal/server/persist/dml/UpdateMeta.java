@@ -17,7 +17,7 @@ import java.util.List;
  * Meta data for update handler. The meta data is for a particular bean type. It
  * is considered immutable and is thread safe.
  */
-public final class UpdateMeta {
+final class UpdateMeta {
 
   private final BindableList set;
   private final BindableId id;
@@ -51,13 +51,6 @@ public final class UpdateMeta {
    */
   boolean isEmptyStringAsNull() {
     return emptyStringAsNull;
-  }
-
-  /**
-   * Return the base table name.
-   */
-  public String getTableName() {
-    return tableName;
   }
 
   /**

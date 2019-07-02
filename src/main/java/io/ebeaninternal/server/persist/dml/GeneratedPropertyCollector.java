@@ -25,7 +25,7 @@ class GeneratedPropertyCollector {
     return new GeneratedProperties(preInsert, preUpdate);
   }
 
-  void add(BeanProperty prop) {
+  private void add(BeanProperty prop) {
     GeneratedProperty gen = prop.getGeneratedProperty();
     if (gen != null) {
       if (gen.includeInInsert()) {

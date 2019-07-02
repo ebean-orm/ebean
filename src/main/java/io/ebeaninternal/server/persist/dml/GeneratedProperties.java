@@ -64,12 +64,12 @@ class GeneratedProperties {
       this.generatedProperty = property.getGeneratedProperty();
     }
 
-    public void preInsert(EntityBean bean, long now) {
+    void preInsert(EntityBean bean, long now) {
       Object value = generatedProperty.getInsertValue(property, bean, now);
       property.setValue(bean, value);
     }
 
-    public void preUpdate(EntityBean bean, long now) {
+    void preUpdate(EntityBean bean, long now) {
       Object value = generatedProperty.getUpdateValue(property, bean, now);
       property.setValue(bean, value);
     }

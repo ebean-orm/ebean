@@ -191,7 +191,7 @@ public final class BatchControl {
   /**
    * Add the request to the batch and return true if we should flush.
    */
-  private boolean addToBatch(PersistRequestBean<?> request) throws BatchedSqlException {
+  private boolean addToBatch(PersistRequestBean<?> request) {
 
     Object alreadyInBatch = persistedBeans.put(request.getEntityBean(), DUMMY);
     if (alreadyInBatch != null) {

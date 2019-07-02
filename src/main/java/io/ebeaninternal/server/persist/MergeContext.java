@@ -18,7 +18,7 @@ class MergeContext {
 
   private final List<EntityBean> deleteBeans = new ArrayList<>();
 
-  private boolean clientGeneratedIds;
+  private final boolean clientGeneratedIds;
 
   MergeContext(SpiEbeanServer server, SpiTransaction transaction, boolean clientGeneratedIds) {
     this.server = server;

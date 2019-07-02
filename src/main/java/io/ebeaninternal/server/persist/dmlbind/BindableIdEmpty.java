@@ -30,7 +30,7 @@ public class BindableIdEmpty implements BindableId {
   }
 
   @Override
-  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
+  public void dmlBind(BindableRequest request, EntityBean bean) {
     // nothing
   }
 

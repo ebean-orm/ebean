@@ -26,7 +26,7 @@ class BatchDepthOrder {
 
     int count;
 
-    public int increment() {
+    int increment() {
       return count++;
     }
   }

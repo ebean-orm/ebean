@@ -16,7 +16,7 @@ import java.sql.SQLException;
  * Meta data for insert handler. The meta data is for a particular bean type. It
  * is considered immutable and is thread safe.
  */
-public final class InsertMeta {
+final class InsertMeta {
 
   private final String sqlNullId;
   private final String sqlWithId;
