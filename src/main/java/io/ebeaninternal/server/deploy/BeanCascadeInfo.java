@@ -36,8 +36,6 @@ public class BeanCascadeInfo {
         refresh = true;
         break;
       case PERSIST:
-        save = true;
-        break;
       case MERGE:
         save = true;
         break;

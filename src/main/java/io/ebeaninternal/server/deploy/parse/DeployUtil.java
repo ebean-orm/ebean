@@ -245,8 +245,6 @@ public class DeployUtil {
   private int getDbJsonStorage(DbJsonType dbJsonType) {
 
     switch (dbJsonType) {
-      case JSON:
-        return DbPlatformType.JSON;
       case JSONB:
         return DbPlatformType.JSONB;
       case VARCHAR:

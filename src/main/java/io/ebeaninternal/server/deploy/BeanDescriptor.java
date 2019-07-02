@@ -92,6 +92,7 @@ import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -1290,13 +1291,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Return true if there is bean or query caching for this type.
-   */
-  public boolean isCaching() {
-    return cacheHelp.isCaching();
-  }
-
-  /**
    * Return true if there is currently bean caching for this type of bean.
    */
   @Override
@@ -2118,13 +2112,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Get a property value from a bean of this type.
-   */
-  public Object getValue(EntityBean bean, String property) {
-    return getBeanProperty(property).getValue(bean);
-  }
-
-  /**
    * Return true if this bean type should use IdGeneration.
    * <p>
    * If this is false and the Id is null it is assumed that a database auto
@@ -2145,7 +2132,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the class type this BeanDescriptor describes.
    */
-  @Override
+  @Override @Nonnull
   public Class<T> getBeanType() {
     return beanType;
   }
@@ -2157,7 +2144,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * instead.
    * </p>
    */
-  @Override
+  @Override @Nonnull
   public String getFullName() {
     return fullName;
   }
@@ -2165,7 +2152,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the short name of the entity bean.
    */
-  @Override
+  @Override @Nonnull
   public String getName() {
     return name;
   }
@@ -2624,13 +2611,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         aPropertiesMany.resetMany(bean);
       }
     }
-  }
-
-  /**
-   * Return the name of the server this BeanDescriptor belongs to.
-   */
-  public String getServerName() {
-    return serverName;
   }
 
   /**
@@ -3139,7 +3119,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return selectLastInsertedId != null;
   }
 
-  @Override
+  @Override @Nonnull
   public Collection<? extends Property> allProperties() {
     return propertiesAll();
   }
@@ -3513,7 +3493,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     jsonHelp.jsonWrite(writeJson, bean, key);
   }
 
-  void jsonWriteProperties(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
+  void jsonWriteProperties(SpiJsonWriter writeJson, EntityBean bean) {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 

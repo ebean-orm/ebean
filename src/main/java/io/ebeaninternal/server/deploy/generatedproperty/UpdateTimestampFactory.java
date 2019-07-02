@@ -17,13 +17,12 @@ import java.util.Map;
  */
 class UpdateTimestampFactory {
 
-  private final GeneratedUpdateLong longTime = new GeneratedUpdateLong();
-
   private final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 
   UpdateTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedUpdateTimestamp());
     map.put(java.util.Date.class, new GeneratedUpdateDate());
+    GeneratedUpdateLong longTime = new GeneratedUpdateLong();
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 

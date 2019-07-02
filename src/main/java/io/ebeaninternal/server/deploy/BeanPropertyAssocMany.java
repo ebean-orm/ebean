@@ -426,7 +426,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
-  public Object read(DbReadContext ctx) throws SQLException {
+  public Object read(DbReadContext ctx) {
     return null;
   }
 
@@ -955,10 +955,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   public boolean isTargetDocStoreMapped() {
     return targetDescriptor.isDocStoreMapped();
-  }
-
-  public BeanCollectionHelp<T> getHelp() {
-    return help;
   }
 
   void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {

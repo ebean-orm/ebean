@@ -54,7 +54,7 @@ public final class DeployUpdateParser extends DeployParser {
       }
 
       // append up to the dot
-      localBuffer.append(currentWord.substring(start, dotPos + 1));
+      localBuffer.append(currentWord, start, dotPos + 1);
 
       if (dotPos == currentWord.length() - 1) {
         // ends with a "." ???
@@ -63,7 +63,7 @@ public final class DeployUpdateParser extends DeployParser {
 
       // get the remainder after the dot
       start = dotPos + 1;
-      String remainder = currentWord.substring(start, currentWord.length());
+      String remainder = currentWord.substring(start);
 
       String dbWord = getDeployWord(remainder);
       if (dbWord != null) {

@@ -1259,12 +1259,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public static boolean isLobType(int type) {
     switch (type) {
       case Types.CLOB:
-        return true;
       case Types.BLOB:
-        return true;
-      case Types.LONGVARBINARY:
-        return true;
       case Types.LONGVARCHAR:
+      case Types.LONGVARBINARY:
         return true;
 
       default:
@@ -1310,13 +1307,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public boolean isExcludedFromHistory() {
     return excludedFromHistory;
-  }
-
-  /**
-   * Return true if this is a ManyToMany with history support (on the intersection table).
-   */
-  public boolean isManyToManyWithHistory() {
-    return false;
   }
 
   /**

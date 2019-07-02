@@ -5,7 +5,6 @@ import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
-import java.sql.SQLException;
 
 /**
  * Dynamic property based on aggregation (max, min, avg, count).
@@ -39,7 +38,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   }
 
   @Override
-  public Object read(DataReader dataReader) throws SQLException {
+  public Object read(DataReader dataReader) {
     try {
       return scalarType.read(dataReader);
     } catch (Exception e) {

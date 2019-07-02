@@ -17,13 +17,12 @@ import java.util.Map;
  */
 class InsertTimestampFactory {
 
-  private final GeneratedInsertLong longTime = new GeneratedInsertLong();
-
   private final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 
   InsertTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedInsertTimestamp());
     map.put(java.util.Date.class, new GeneratedInsertDate());
+    GeneratedInsertLong longTime = new GeneratedInsertLong();
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 
@@ -37,7 +36,6 @@ class InsertTimestampFactory {
       map.put(org.joda.time.LocalDateTime.class, new GeneratedInsertJodaTime.LocalDT());
       map.put(org.joda.time.DateTime.class, new GeneratedInsertJodaTime.DateTimeDT());
     }
-
   }
 
   void setInsertTimestamp(DeployBeanProperty property) {

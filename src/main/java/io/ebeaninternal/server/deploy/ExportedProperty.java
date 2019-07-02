@@ -9,7 +9,7 @@ import io.ebeaninternal.server.core.InternString;
  * Used to for Assoc Manys to create references etc.
  * </p>
  */
-public class ExportedProperty {
+class ExportedProperty {
 
   private final String foreignDbColumn;
 
@@ -17,7 +17,7 @@ public class ExportedProperty {
 
   private final boolean embedded;
 
-  public ExportedProperty(boolean embedded, String foreignDbColumn, BeanProperty property) {
+  ExportedProperty(boolean embedded, String foreignDbColumn, BeanProperty property) {
     this.embedded = embedded;
     this.foreignDbColumn = InternString.intern(foreignDbColumn);
     this.property = property;

@@ -41,8 +41,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   private final String localSqlFormula;
 
-  private final String logicalName;
-
   final BeanProperty foreignProperty;
 
   private final int position;
@@ -66,7 +64,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     this.position = position;
     this.insertable = insertable;
     this.updateable = updateable;
-    this.logicalName = InternString.intern(owner.getName() + "." + foreignProperty.getName());
   }
 
   public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
