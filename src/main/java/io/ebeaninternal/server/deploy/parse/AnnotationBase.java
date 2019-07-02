@@ -45,7 +45,7 @@ public abstract class AnnotationBase {
   protected final NamingConvention namingConvention;
   protected final DeployUtil util;
 
-  protected AnnotationBase(DeployUtil util) {
+  AnnotationBase(DeployUtil util) {
     this.util = util;
     this.databasePlatform = util.getDbPlatform();
     this.platform = databasePlatform.getPlatform();
@@ -128,5 +128,4 @@ public abstract class AnnotationBase {
     }
     return a;
   }
- 
 }

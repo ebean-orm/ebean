@@ -133,16 +133,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
     for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
-      if (beanTable == null) {
-        throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
-      }
-      prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
-      if (!joinColumn.updatable()) {
-        prop.setDbUpdateable(false);
-      }
-      if (!joinColumn.nullable()) {
-        prop.setNullable(false);
-      }
+      setFromJoinColumn(prop, beanTable, joinColumn);
       checkForNoConstraint(prop, joinColumn);
     }
 
@@ -150,16 +141,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       for (JoinColumn joinColumn : joinTable.joinColumns()) {
-        if (beanTable == null) {
-          throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
-        }
-        prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
-        if (!joinColumn.updatable()) {
-          prop.setDbUpdateable(false);
-        }
-        if (!joinColumn.nullable()) {
-          prop.setNullable(false);
-        }
+        setFromJoinColumn(prop, beanTable, joinColumn);
       }
     }
 
@@ -184,6 +166,19 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
         beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());
       }
+    }
+  }
+
+  private void setFromJoinColumn(DeployBeanPropertyAssocOne<?> prop, BeanTable beanTable, JoinColumn joinColumn) {
+    if (beanTable == null) {
+      throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName() + " - no related 'BeanTable'");
+    }
+    prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
+    if (!joinColumn.updatable()) {
+      prop.setDbUpdateable(false);
+    }
+    if (!joinColumn.nullable()) {
+      prop.setNullable(false);
     }
   }
 

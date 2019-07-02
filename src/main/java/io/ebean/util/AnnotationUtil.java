@@ -9,6 +9,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -107,9 +108,7 @@ public class AnnotationUtil {
    * Finds all annotations recusively for a class and its superclasses or interfaces.
    */
   public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
-    if (annotationType == null) {
-      return null;
-    }
+    Objects.requireNonNull(annotationType);
     Set<A> ret = new LinkedHashSet<>();
     Set<Annotation> visited = new HashSet<>();
     Set<Class<?>> visitedInterfaces = new HashSet<>();
