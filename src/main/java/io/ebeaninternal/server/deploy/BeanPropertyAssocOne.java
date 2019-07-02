@@ -390,10 +390,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       return;
     }
 
+    String nextPrefix = (prefix == null) ? name : prefix + "." + name;
+
     if (embedded) {
-      prefix = (prefix == null) ? name : prefix + "." + name;
       BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
-      targetDescriptor.diff(prefix, map, (EntityBean) newEmb, (EntityBean) oldEmb);
+      targetDescriptor.diff(nextPrefix, map, (EntityBean) newEmb, (EntityBean) oldEmb);
 
     } else {
       // we are only interested in the Id value
@@ -406,8 +407,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       Object newId = (newBean == null) ? null : idProperty.getValue(newBean);
       Object oldId = (oldBean == null) ? null : idProperty.getValue(oldBean);
       if (newId != null || oldId != null) {
-        prefix = (prefix == null) ? name : prefix + "." + name;
-        idProperty.diffVal(prefix, map, newId, oldId);
+        idProperty.diffVal(nextPrefix, map, newId, oldId);
       }
     }
   }
