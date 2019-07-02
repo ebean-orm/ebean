@@ -35,8 +35,6 @@ public final class SqlTreeBuilder {
 
   private final OrmQueryDetail queryDetail;
 
-  private final StringBuilder summary = new StringBuilder();
-
   private final CQueryPredicates predicates;
 
   private final boolean subQuery;
@@ -75,7 +73,7 @@ public final class SqlTreeBuilder {
   /**
    * Construct for RawSql query.
    */
-  public SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
+  SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
 
     this.rawSql = true;
     this.desc = request.getBeanDescriptor();
@@ -98,7 +96,7 @@ public final class SqlTreeBuilder {
    * support the where and/or order by clause. If so these extra joins are added
    * to the root node.
    */
-  public SqlTreeBuilder(CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
+  SqlTreeBuilder(CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -125,8 +123,6 @@ public final class SqlTreeBuilder {
    * Build based on the includes and using the BeanJoinTree.
    */
   public SqlTree build() {
-
-    summary.append(desc.getName());
 
     // build the appropriate chain of SelectAdapter's
     buildRoot(desc);
@@ -551,7 +547,6 @@ public final class SqlTreeBuilder {
       }
 
       manyProperty = manyProp;
-      summary.append(" +many:").append(propName);
       return true;
     }
     return false;
@@ -569,7 +564,6 @@ public final class SqlTreeBuilder {
 
     if (queryDetail.includesPath(prefix)) {
       // explicitly included
-      summary.append(", ").append(prefix);
       String[] splitNames = SplitName.split(prefix);
       queryDetail.includeBeanJoin(splitNames[0], splitNames[1]);
       return true;

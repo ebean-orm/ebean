@@ -137,7 +137,7 @@ class CQueryBuilder {
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
 
     String alias = alias(rootTableAlias);
-    if (!sqlTree.isIncludeJoins()) {
+    if (sqlTree.noJoins()) {
       if (dbPlatform.isSupportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSql("delete", request, predicates, sqlTree).getSql(), alias);
@@ -169,7 +169,7 @@ class CQueryBuilder {
     sb.append(" set ").append(predicates.getDbUpdateClause());
     String updateClause = sb.toString();
 
-    if (!sqlTree.isIncludeJoins()) {
+    if (sqlTree.noJoins()) {
       // simple - update table set ... where ...
       return aliasStrip(buildSqlUpdate(updateClause, request, predicates, sqlTree).getSql());
     }
@@ -645,7 +645,7 @@ class CQueryBuilder {
     }
 
     String dbWhere = predicates.getDbWhere();
-    if (!isEmpty(dbWhere)) {
+    if (hasValue(dbWhere)) {
       if (!hasWhere) {
         hasWhere = true;
         sb.append(" where ");
@@ -656,7 +656,7 @@ class CQueryBuilder {
     }
 
     String dbFilterMany = predicates.getDbFilterMany();
-    if (!isEmpty(dbFilterMany)) {
+    if (hasValue(dbFilterMany)) {
       if (!hasWhere) {
         hasWhere = true;
         sb.append(" where ");
@@ -689,7 +689,7 @@ class CQueryBuilder {
     }
 
     String dbHaving = predicates.getDbHaving();
-    if (!isEmpty(dbHaving)) {
+    if (hasValue(dbHaving)) {
       sb.append(" having ").append(dbHaving);
     }
 
@@ -744,8 +744,8 @@ class CQueryBuilder {
     return true;
   }
 
-  private boolean isEmpty(String s) {
-    return s == null || s.isEmpty();
+  private boolean hasValue(String s) {
+    return s != null && !s.isEmpty();
   }
 
   boolean isPlatformDistinctOn() {

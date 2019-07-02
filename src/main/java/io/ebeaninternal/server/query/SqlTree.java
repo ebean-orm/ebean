@@ -37,7 +37,7 @@ class SqlTree {
    */
   private final String inheritanceWhereSql;
 
-  private final boolean includeJoins;
+  private final boolean noJoins;
 
   /**
    * Create the SqlSelectClause.
@@ -53,7 +53,7 @@ class SqlTree {
     this.inheritanceWhereSql = inheritanceWhereSql;
     this.encryptedProps = encryptedProps;
     this.manyProperty = manyProperty;
-    this.includeJoins = includeJoins;
+    this.noJoins = !includeJoins;
   }
 
   /**
@@ -66,8 +66,8 @@ class SqlTree {
   /**
    * Return true if the query includes joins (not valid for rawSql).
    */
-  boolean isIncludeJoins() {
-    return includeJoins;
+  boolean noJoins() {
+    return noJoins;
   }
 
   /**
