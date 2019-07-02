@@ -17,25 +17,18 @@ import java.util.List;
  * Meta data for update handler. The meta data is for a particular bean type. It
  * is considered immutable and is thread safe.
  */
-final class UpdateMeta {
+final class UpdateMeta extends BaseMeta {
 
   private final BindableList set;
-  private final BindableId id;
-  private final Bindable version;
-  private final Bindable tenantId;
-
   private final UpdatePlan modeNoneUpdatePlan;
   private final UpdatePlan modeVersionUpdatePlan;
 
   UpdateMeta(BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable tenantId) {
+    super(id, version, tenantId);
     this.set = set;
-    this.id = id;
-    this.version = version;
-    this.tenantId = tenantId;
 
     String sqlNone = genSql(ConcurrencyMode.NONE, set, desc.getBaseTable());
     String sqlVersion = genSql(ConcurrencyMode.VERSION, set, desc.getBaseTable());
-
     this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
     this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);
   }
@@ -115,7 +108,6 @@ final class UpdateMeta {
 
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.append("update ").append(tableName).append(" set ");
-
     request.setUpdateSetMode();
     bindableList.dmlAppend(request);
 
@@ -126,19 +118,7 @@ final class UpdateMeta {
     }
 
     request.append(" where ");
-
-    request.setWhereIdMode();
-    id.dmlAppend(request);
-    if (tenantId != null) {
-      tenantId.dmlAppend(request);
-    }
-    if (ConcurrencyMode.VERSION == conMode) {
-      if (version != null) {
-        version.dmlAppend(request);
-      }
-    }
-
-    return request.toString();
+    return appendWhere(request, conMode);
   }
 
 }
