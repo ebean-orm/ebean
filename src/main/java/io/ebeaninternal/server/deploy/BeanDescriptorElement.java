@@ -32,11 +32,6 @@ abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     return props[0].getScalarType();
   }
 
-  @Override
-  public boolean isElementType() {
-    return true;
-  }
-
   /**
    * Our entity beans used are somewhat fake ones (ElementEntityBean) such that we hold the unidirectional property
    * value (foreign key) and the actual element collection value (scalar or embedded plus map key).

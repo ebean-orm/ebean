@@ -2628,11 +2628,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return autoTunable;
   }
 
-  @Override
-  public boolean isElementType() {
-    return false;
-  }
-
   /**
    * Returns the Inheritance mapping information. This will be null if this type
    * of bean is not involved in any ORM inheritance mapping.

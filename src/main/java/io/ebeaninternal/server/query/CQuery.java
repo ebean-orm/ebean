@@ -521,7 +521,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return result;
   }
 
-  protected EntityBean next() {
+  EntityBean next() {
     if (audit) {
       auditNextBean();
     }
@@ -532,7 +532,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return nextBean;
   }
 
-  protected boolean hasNext() throws SQLException {
+  boolean hasNext() throws SQLException {
 
     synchronized (this) {
       if (noMoreRows || cancelled) {
@@ -582,7 +582,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Update execution stats and check for slow query.
    */
-  void updateExecutionStatistics() {
+  private void updateExecutionStatistics() {
     updateStatistics();
     request.slowQueryCheck(executionTimeMicros, rowCount);
   }

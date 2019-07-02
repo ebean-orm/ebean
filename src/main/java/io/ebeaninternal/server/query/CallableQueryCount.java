@@ -25,7 +25,7 @@ public class CallableQueryCount<T> extends CallableQuery<T> implements Callable<
    * Execute the query returning the row count.
    */
   @Override
-  public Integer call() throws Exception {
+  public Integer call() {
     try {
       return server.findCountWithCopy(query, transaction);
     } finally {

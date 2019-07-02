@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.FutureRowCount;
-import io.ebean.Query;
 import io.ebean.Transaction;
 
 import java.util.concurrent.FutureTask;
@@ -24,10 +23,6 @@ public class QueryFutureRowCount<T> extends BaseFuture<Integer> implements Futur
 
   public Transaction getTransaction() {
     return call.transaction;
-  }
-
-  public Query<T> getQuery() {
-    return call.query;
   }
 
   @Override

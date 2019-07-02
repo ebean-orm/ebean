@@ -148,9 +148,7 @@ public final class SqlTreeBuilder {
     }
 
     boolean includeJoins = alias != null && alias.isIncludeJoins();
-
-    return new SqlTree(summary.toString(), rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
-      manyProperty, queryDetail.getFetchPaths(), includeJoins);
+    return new SqlTree(rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps, manyProperty, includeJoins);
   }
 
   private String buildSelectClause() {

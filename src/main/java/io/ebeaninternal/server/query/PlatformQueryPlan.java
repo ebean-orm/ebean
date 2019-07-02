@@ -2,7 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.annotation.Platform;
 
-public final class PlatformQueryPlan {
+final class PlatformQueryPlan {
 
   private static final QueryPlanLogger explainLogger = new QueryPlanLoggerExplain();
 

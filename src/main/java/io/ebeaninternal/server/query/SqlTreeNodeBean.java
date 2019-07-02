@@ -30,21 +30,21 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
-  protected final STreeType desc;
+  final STreeType desc;
 
   final IdBinder idBinder;
 
   /**
    * The children which will be other SelectBean or SelectProxyBean.
    */
-  protected final SqlTreeNode[] children;
+  final SqlTreeNode[] children;
 
   /**
    * Set to true if this is a partial object fetch.
    */
   private final boolean partialObject;
 
-  protected final STreeProperty[] properties;
+  private final STreeProperty[] properties;
 
   /**
    * Extra where clause added by Where annotation on associated many.
@@ -60,9 +60,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private final boolean disableLazyLoad;
 
-  protected final InheritInfo inheritInfo;
+  private final InheritInfo inheritInfo;
 
-  protected final String prefix;
+  final String prefix;
 
   private final Map<String, String> pathMap;
 
@@ -134,7 +134,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     pathMap = createPathMap(prefix, desc);
   }
 
-  protected boolean isRoot() {
+  boolean isRoot() {
     return false;
   }
 
@@ -221,8 +221,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   private class LoadInherit extends Load {
 
-    LoadInherit(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) {
-      super(ctx, parentBean, contextParent);
+    LoadInherit(DbReadContext ctx, EntityBean parentBean) {
+      super(ctx, parentBean);
     }
 
     @Override
@@ -258,7 +258,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     final DbReadContext ctx;
     final EntityBean parentBean;
-    final EntityBean contextParent;
 
     Object lazyLoadParentId;
     Class<?> localType;
@@ -273,10 +272,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
     SqlBeanLoad sqlBeanLoad;
     boolean lazyLoadMany;
 
-    Load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) {
+    Load(DbReadContext ctx, EntityBean parentBean) {
       this.ctx = ctx;
       this.parentBean = parentBean;
-      this.contextParent = contextParent;
     }
 
     void initLazyParent() throws SQLException {
@@ -455,7 +453,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
 
-    Load load = (inheritInfo != null) ? new LoadInherit(ctx, parentBean, contextParent) : new Load(ctx, parentBean, contextParent);
+    Load load = (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
     load.initialise();
     if (load.isLazyLoadManyRoot()) {
       return load.getContextBean();
@@ -612,7 +610,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  protected void appendExtraWhere(DbSqlContext ctx) {
+  void appendExtraWhere(DbSqlContext ctx) {
     if (extraWhere != null) {
       if (ctx.length() > 0) {
         ctx.append(" and");
@@ -691,7 +689,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Join to base table for this node. This includes a join to the intersection
    * table if this is a ManyToMany node.
    */
-  public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
+  SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
     SqlJoinType sqlJoinType = appendFromAsJoin(ctx, joinType);
     if (temporalMode != SpiQuery.TemporalMode.SOFT_DELETED && desc.isSoftDelete()) {
@@ -701,7 +699,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     return sqlJoinType;
   }
 
-  protected SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
+  SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
 
     if (nodeBeanProp instanceof STreePropertyAssocMany) {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;

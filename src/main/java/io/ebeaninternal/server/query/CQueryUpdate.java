@@ -34,16 +34,12 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
    */
   private final String sql;
 
-  private final String type;
-
   /**
    * The statement used to create the resultSet.
    */
   private PreparedStatement pstmt;
 
   private String bindLog;
-
-  private long executionTimeMicros;
 
   private int rowCount;
 
@@ -52,8 +48,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
   /**
    * Create the Sql select based on the request.
    */
-  CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
-    this.type = type;
+  CQueryUpdate(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
     this.queryPlan = queryPlan;
     this.query = request.getQuery();
@@ -61,19 +56,6 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
     query.setGeneratedSql(sql);
-  }
-
-  /**
-   * Return a summary description of this query.
-   */
-  public String getSummary() {
-    StringBuilder sb = new StringBuilder(80);
-    sb.append(type).append(" exeMicros[").append(executionTimeMicros)
-      .append("] rows[").append(rowCount)
-      .append("] type[").append(desc.getName())
-      .append("] predicates[").append(predicates.getLogWhereSql())
-      .append("] bind[").append(bindLog).append("]");
-    return sb.toString();
   }
 
   /**
@@ -109,7 +91,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
       bindLog = predicates.bind(pstmt, conn);
       rowCount = pstmt.executeUpdate();
 
-      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      long executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(rowCount, executionTimeMicros, null)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);

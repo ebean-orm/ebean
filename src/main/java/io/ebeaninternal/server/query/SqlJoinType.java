@@ -20,17 +20,10 @@ public enum SqlJoinType {
    */
   AUTO("JOIN-TYPE-AUTO-LITERAL-NOT-USED");
 
-  final String literal;
+  private final String literal;
 
   SqlJoinType(String literal) {
     this.literal = literal;
-  }
-
-  /**
-   * Return the SQL join literal.
-   */
-  public String getLiteral() {
-    return literal;
   }
 
   /**
@@ -39,9 +32,9 @@ public enum SqlJoinType {
    */
   public String getLiteral(SqlJoinType deploymentJoinType) {
     if (this == SqlJoinType.AUTO) {
-      return deploymentJoinType.getLiteral();
+      return deploymentJoinType.literal;
     }
-    return this.getLiteral();
+    return this.literal;
   }
 
   /**

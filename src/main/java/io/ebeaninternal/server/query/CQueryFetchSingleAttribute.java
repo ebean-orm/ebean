@@ -84,7 +84,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
   /**
    * Return a summary description of this query.
    */
-  protected String getSummary() {
+  String getSummary() {
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindAttr exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
@@ -98,7 +98,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
   /**
    * Execute the query returning the row count.
    */
-  protected List<Object> findList() throws SQLException {
+  List<Object> findList() throws SQLException {
 
     long startNano = System.nanoTime();
     try {
@@ -136,14 +136,14 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
   /**
    * Return the bind log.
    */
-  protected String getBindLog() {
+  String getBindLog() {
     return bindLog;
   }
 
   /**
    * Return the generated sql.
    */
-  protected String getGeneratedSql() {
+  String getGeneratedSql() {
     return sql;
   }
 

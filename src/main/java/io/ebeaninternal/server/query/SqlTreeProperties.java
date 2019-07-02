@@ -68,10 +68,6 @@ public class SqlTreeProperties {
     return !allProperties;
   }
 
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
   }

@@ -32,7 +32,6 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
         String xml = null;
         if (explainStmt.getMoreResults()) {
           try (ResultSet rset = explainStmt.getResultSet()) {
-            StringBuilder sb = new StringBuilder();
             if (rset.next()) {
               xml = rset.getString(1);
             }

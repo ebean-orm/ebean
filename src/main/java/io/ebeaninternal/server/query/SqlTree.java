@@ -19,13 +19,6 @@ class SqlTree {
    */
   private final STreePropertyAssocMany manyProperty;
 
-  private final Set<String> includes;
-
-  /**
-   * Summary of the select being generated.
-   */
-  private final String summary;
-
   private final String distinctOn;
 
   private final String selectSql;
@@ -49,10 +42,9 @@ class SqlTree {
   /**
    * Create the SqlSelectClause.
    */
-  SqlTree(String summary, SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
-          STreeProperty[] encryptedProps, STreePropertyAssocMany manyProperty, Set<String> includes, boolean includeJoins) {
+  SqlTree(SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
+          STreeProperty[] encryptedProps, STreePropertyAssocMany manyProperty, boolean includeJoins) {
 
-    this.summary = summary;
     this.rootNode = rootNode;
     this.distinctOn = distinctOn;
     this.selectSql = selectSql;
@@ -61,7 +53,6 @@ class SqlTree {
     this.inheritanceWhereSql = inheritanceWhereSql;
     this.encryptedProps = encryptedProps;
     this.manyProperty = manyProperty;
-    this.includes = includes;
     this.includeJoins = includeJoins;
   }
 
@@ -102,13 +93,6 @@ class SqlTree {
     return list;
   }
 
-  /**
-   * Return the includes. Associated beans lists etc.
-   */
-  public Set<String> getIncludes() {
-    return includes;
-  }
-
   String getDistinctOn() {
     return distinctOn;
   }
@@ -136,13 +120,6 @@ class SqlTree {
    */
   String getInheritanceWhereSql() {
     return inheritanceWhereSql;
-  }
-
-  /**
-   * Return a summary of the select clause.
-   */
-  public String getSummary() {
-    return summary;
   }
 
   SqlTreeNode getRootNode() {

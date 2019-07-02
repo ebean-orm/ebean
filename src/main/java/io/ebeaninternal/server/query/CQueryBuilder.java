@@ -114,7 +114,7 @@ class CQueryBuilder {
     if (queryPlan != null) {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
-      return new CQueryUpdate(type, request, predicates, queryPlan);
+      return new CQueryUpdate(request, predicates, queryPlan);
     }
 
     predicates.prepare(true);
@@ -131,7 +131,7 @@ class CQueryBuilder {
     // cache the query plan
     queryPlan = new CQueryPlan(request, sql, sqlTree, false, predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
-    return new CQueryUpdate(type, request, predicates, queryPlan);
+    return new CQueryUpdate(request, predicates, queryPlan);
   }
 
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
