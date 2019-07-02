@@ -50,7 +50,7 @@ class ReadAnnotationConfig {
     return eagerFetchLobs;
   }
 
-  public boolean isIdGeneratorAutomatic() {
+  boolean isIdGeneratorAutomatic() {
     return idGeneratorAutomatic;
   }
 

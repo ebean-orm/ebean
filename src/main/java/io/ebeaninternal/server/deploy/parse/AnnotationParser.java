@@ -25,11 +25,11 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   protected final Class<?> beanType;
 
-  protected final boolean validationAnnotations;
+  final boolean validationAnnotations;
 
-  protected final ReadAnnotationConfig readConfig;
+  final ReadAnnotationConfig readConfig;
 
-  public AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+  AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info.getUtil());
     this.readConfig = readConfig;
     this.validationAnnotations = readConfig.isJavaxValidationAnnotations();
@@ -47,7 +47,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   /**
    * Read the Id annotation on an embeddedId.
    */
-  protected void readIdAssocOne(DeployBeanPropertyAssoc<?> prop) {
+  void readIdAssocOne(DeployBeanPropertyAssoc<?> prop) {
     prop.setNullable(false);
     if (prop.isIdClass()) {
       prop.setImportedPrimaryKey();
@@ -61,7 +61,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   /**
    * Read the Id annotation on scalar property.
    */
-  protected void readIdScalar(DeployBeanProperty prop) {
+  void readIdScalar(DeployBeanProperty prop) {
     prop.setNullable(false);
     if (prop.isIdClass()) {
       prop.setImportedPrimaryKey();
@@ -78,7 +78,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   /**
    * Helper method to set cascade types to the CascadeInfo on BeanProperty.
    */
-  protected void setCascadeTypes(CascadeType[] cascadeTypes, BeanCascadeInfo cascadeInfo) {
+  void setCascadeTypes(CascadeType[] cascadeTypes, BeanCascadeInfo cascadeInfo) {
     if (cascadeTypes != null && cascadeTypes.length > 0) {
       cascadeInfo.setTypes(cascadeTypes);
     }
@@ -87,7 +87,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   /**
    * Read an AttributeOverrides if they exist for this embedded bean.
    */
-  protected void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
+  void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
 
     Set<AttributeOverride> attrOverrides = getAll(prop, AttributeOverride.class);
     if (!attrOverrides.isEmpty()) {
@@ -100,7 +100,7 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   }
 
-  protected void readColumn(Column columnAnn, DeployBeanProperty prop) {
+  void readColumn(Column columnAnn, DeployBeanProperty prop) {
 
     if (!isEmpty(columnAnn.name())) {
       String dbColumn = databasePlatform.convertQuotedIdentifiers(columnAnn.name());
@@ -132,14 +132,10 @@ public abstract class AnnotationParser extends AnnotationBase {
    * Return true if the validation groups are {@link Default} (respectively empty)
    * can be applied to DDL generation.
    */
-  protected boolean isEbeanValidationGroups(Class<?>[] groups) {
+  boolean isEbeanValidationGroups(Class<?>[] groups) {
     if (!util.isUseJavaxValidationNotNull()) {
       return false;
     }
-    if (groups.length == 0
-      || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
-      return true;
-    }
-    return false;
+    return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
   }
 }
