@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;

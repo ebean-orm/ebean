@@ -33,11 +33,6 @@ public interface DbSqlContext {
   BeanProperty[] getEncryptedProps();
 
   /**
-   * Append a char directly to the SQL buffer.
-   */
-  DbSqlContext append(char s);
-
-  /**
    * Append a string directly to the SQL buffer.
    */
   DbSqlContext append(String s);

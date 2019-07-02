@@ -11,15 +11,6 @@ public class IndexDefinition {
 
   private final boolean unique;
 
-  /**
-   * A single column index.
-   */
-  public IndexDefinition(String column, String name, boolean unique) {
-    this.columns = new String[]{column};
-    this.unique = unique;
-    this.name = name;
-  }
-
   public IndexDefinition(String[] columns, String name, boolean unique) {
     this.columns = columns;
     this.unique = unique;

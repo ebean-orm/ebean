@@ -144,11 +144,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * The EbeanServer name. Same as the plugin name.
-   */
-  private final String serverName;
-
-  /**
    * The nature/type of this bean.
    */
   private final EntityType entityType;
@@ -435,7 +430,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     this.owner = owner;
     this.multiValueSupported = owner.isMultiValueSupported();
-    this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
     this.name = InternString.intern(deploy.getName());
@@ -2132,7 +2126,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the class type this BeanDescriptor describes.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public Class<T> getBeanType() {
     return beanType;
   }
@@ -2144,7 +2139,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * instead.
    * </p>
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public String getFullName() {
     return fullName;
   }
@@ -2152,7 +2148,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the short name of the entity bean.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public String getName() {
     return name;
   }
@@ -3119,7 +3116,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return selectLastInsertedId != null;
   }
 
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public Collection<? extends Property> allProperties() {
     return propertiesAll();
   }

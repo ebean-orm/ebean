@@ -66,8 +66,6 @@ public class DeployBeanPropertyLists {
 
   private final List<BeanProperty> nonTransients = new ArrayList<>();
 
-  private final TableJoin[] tableJoins;
-
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
 
@@ -137,12 +135,6 @@ public class DeployBeanPropertyLists {
       // put the discriminator property into the property map only
       // (after the real properties have been organised into their lists)
       propertyMap.put(discProperty.getName(), discProperty);
-    }
-
-    List<DeployTableJoin> deployTableJoins = deploy.getTableJoins();
-    tableJoins = new TableJoin[deployTableJoins.size()];
-    for (int i = 0; i < deployTableJoins.size(); i++) {
-      tableJoins[i] = new TableJoin(deployTableJoins.get(i));
     }
   }
 
@@ -273,10 +265,6 @@ public class DeployBeanPropertyLists {
 
   public LinkedHashMap<String, BeanProperty> getPropertyMap() {
     return propertyMap;
-  }
-
-  public TableJoin[] getTableJoin() {
-    return tableJoins;
   }
 
   /**

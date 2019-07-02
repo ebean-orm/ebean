@@ -232,12 +232,6 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public DefaultDbSqlContext append(char s) {
-    sb.append(s);
-    return this;
-  }
-
-  @Override
   public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType) {
 
     // replace ${ta} place holder with the real table alias...

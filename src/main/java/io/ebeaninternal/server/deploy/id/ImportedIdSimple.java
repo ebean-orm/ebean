@@ -155,7 +155,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     }
   }
 
-
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(localDbColumn);

@@ -134,13 +134,6 @@ public final class TableJoin {
     return table;
   }
 
-  /**
-   * Return the type of join. LEFT JOIN etc.
-   */
-  public SqlJoinType getType() {
-    return type;
-  }
-
   public void addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, String predicate) {
     String[] names = SplitName.split(prefix);
     String a1 = ctx.getTableAlias(names[0]);

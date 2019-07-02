@@ -10,8 +10,6 @@ import io.ebeaninternal.server.type.DataBind;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
