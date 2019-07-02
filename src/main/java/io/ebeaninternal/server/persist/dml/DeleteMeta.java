@@ -24,10 +24,7 @@ final class DeleteMeta {
   private final Bindable version;
   private final Bindable tenantId;
 
-  private final String tableName;
-
   DeleteMeta(BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
-    this.tableName = desc.getBaseTable();
     this.id = id;
     this.version = version;
     this.tenantId = tenantId;
@@ -44,13 +41,6 @@ final class DeleteMeta {
       this.sqlDraftNone = sqlNone;
       this.sqlDraftVersion = sqlVersion;
     }
-  }
-
-  /**
-   * Return the table name.
-   */
-  public String getTableName() {
-    return tableName;
   }
 
   /**

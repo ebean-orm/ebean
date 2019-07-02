@@ -267,7 +267,6 @@ public final class DefaultPersister implements Persister {
 
     final BeanDescriptor<T> desc;
     final Transaction transaction;
-    final BeanProperty draftDirty;
     final List<T> draftUpdates = new ArrayList<>();
 
     /**
@@ -288,7 +287,6 @@ public final class DefaultPersister implements Persister {
     DraftHandler(BeanDescriptor<T> desc, Transaction transaction) {
       this.desc = desc;
       this.transaction = transaction;
-      this.draftDirty = desc.getDraftDirty();
     }
 
     /**
@@ -1288,8 +1286,8 @@ public final class DefaultPersister implements Persister {
     return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, flags);
   }
 
-  <T> PersistRequestBean<T> createDeleteRemoved(T bean, Transaction t, PersistRequest.Type type, int flags) {
-    return createDeleteRequest(bean, t, type, Flags.unsetRecurse(flags));
+  <T> PersistRequestBean<T> createDeleteRemoved(T bean, Transaction t, int flags) {
+    return createDeleteRequest(bean, t, PersistRequest.Type.DELETE, Flags.unsetRecurse(flags));
   }
 
   private <T> PersistRequestBean<T> createDeleteRequest(EntityBean bean, Transaction t, Type type) {
