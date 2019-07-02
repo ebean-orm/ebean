@@ -69,12 +69,21 @@ class AnnotationAssocManys extends AnnotationParser {
     }
   }
 
+  private boolean readOrphanRemoval(OneToMany property) {
+    try {
+      return property.orphanRemoval();
+    } catch (NoSuchMethodError e) {
+      // Support old JPA API
+      return false;
+    }
+  }
+
   private void read(DeployBeanPropertyAssocMany<?> prop) {
 
     OneToMany oneToMany = get(prop, OneToMany.class);
     if (oneToMany != null) {
       readToOne(oneToMany, prop);
-      if (oneToMany.orphanRemoval()) {
+      if (readOrphanRemoval(oneToMany)) {
         prop.setModifyListenMode(ModifyListenMode.REMOVALS);
         prop.getCascadeInfo().setDelete(true);
       }

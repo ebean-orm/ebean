@@ -52,7 +52,6 @@ public class AnnotationAssocOnes extends AnnotationParser {
    */
   @Override
   public void parse() {
-
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssocOne<?>) {
         readAssocOne((DeployBeanPropertyAssocOne<?>) prop);
@@ -183,9 +182,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
   }
 
   private void checkForNoConstraint(DeployBeanPropertyAssocOne<?> prop, JoinColumn joinColumn) {
-    ForeignKey foreignKey = joinColumn.foreignKey();
-    if (foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
-      prop.setForeignKey(new PropertyForeignKey());
+    try {
+      ForeignKey foreignKey = joinColumn.foreignKey();
+      if (foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
+        prop.setForeignKey(new PropertyForeignKey());
+      }
+    } catch (NoSuchMethodError e) {
+      // support old JPA API
     }
   }
 
@@ -222,15 +225,22 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setNullable(propAnn.optional());
     prop.setFetchType(propAnn.fetch());
     prop.setMappedBy(propAnn.mappedBy());
+    prop.setOrphanRemoval(readOrphanRemoval(propAnn));
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
-      prop.setOrphanRemoval(propAnn.orphanRemoval());
-    } else if (propAnn.orphanRemoval()) {
-      prop.setOrphanRemoval(true);
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());
     prop.setBeanTable(beanTable(prop));
+  }
+
+  private boolean readOrphanRemoval(OneToOne property) {
+    try {
+      return property.orphanRemoval();
+    } catch (NoSuchMethodError e) {
+      // Support old JPA API
+      return false;
+    }
   }
 
   private void readPrimaryKeyJoin(PrimaryKeyJoinColumn primaryKeyJoin, DeployBeanPropertyAssocOne<?> prop) {
