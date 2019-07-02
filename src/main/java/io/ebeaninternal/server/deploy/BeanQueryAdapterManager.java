@@ -11,25 +11,25 @@ import java.util.List;
 /**
  * Default implementation for creating BeanControllers.
  */
-public class BeanQueryAdapterManager {
+class BeanQueryAdapterManager {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanQueryAdapterManager.class);
 
   private final List<BeanQueryAdapter> list;
 
-  public BeanQueryAdapterManager(BootupClasses bootupClasses) {
+  BeanQueryAdapterManager(BootupClasses bootupClasses) {
 
     list = bootupClasses.getBeanQueryAdapters();
   }
 
-  public int getRegisterCount() {
+  int getRegisterCount() {
     return list.size();
   }
 
   /**
    * Return the BeanPersistController for a given entity type.
    */
-  public void addQueryAdapter(DeployBeanDescriptor<?> deployDesc) {
+  void addQueryAdapter(DeployBeanDescriptor<?> deployDesc) {
 
     for (BeanQueryAdapter c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {

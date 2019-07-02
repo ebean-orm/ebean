@@ -19,11 +19,11 @@ import java.util.UUID;
  */
 public abstract class AnnotationParser extends AnnotationBase {
 
-  protected final DeployBeanInfo<?> info;
+  final DeployBeanInfo<?> info;
 
-  protected final DeployBeanDescriptor<?> descriptor;
+  final DeployBeanDescriptor<?> descriptor;
 
-  protected final Class<?> beanType;
+  final Class<?> beanType;
 
   final boolean validationAnnotations;
 

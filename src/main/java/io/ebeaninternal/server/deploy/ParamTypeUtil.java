@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 /**
  * Helper object to find generic parameter types for a given class.
  */
-public class ParamTypeUtil {
+class ParamTypeUtil {
 
   /**
    * Find and return the parameter type given a generic interface or class.

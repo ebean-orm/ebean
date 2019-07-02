@@ -15,13 +15,13 @@ import java.util.Map;
 /**
  * Helper for creating Insert timestamp GeneratedProperty objects.
  */
-public class InsertTimestampFactory {
+class InsertTimestampFactory {
 
-  final GeneratedInsertLong longTime = new GeneratedInsertLong();
+  private final GeneratedInsertLong longTime = new GeneratedInsertLong();
 
-  final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
+  private final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 
-  public InsertTimestampFactory(ClassLoadConfig classLoadConfig) {
+  InsertTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedInsertTimestamp());
     map.put(java.util.Date.class, new GeneratedInsertDate());
     map.put(Long.class, longTime);
@@ -40,7 +40,7 @@ public class InsertTimestampFactory {
 
   }
 
-  public void setInsertTimestamp(DeployBeanProperty property) {
+  void setInsertTimestamp(DeployBeanProperty property) {
 
     property.setGeneratedProperty(createInsertTimestamp(property));
   }
@@ -48,7 +48,7 @@ public class InsertTimestampFactory {
   /**
    * Create the insert GeneratedProperty depending on the property type.
    */
-  public GeneratedProperty createInsertTimestamp(DeployBeanProperty property) {
+  GeneratedProperty createInsertTimestamp(DeployBeanProperty property) {
 
     Class<?> propType = property.getPropertyType();
     GeneratedProperty generatedProperty = map.get(propType);

@@ -206,7 +206,7 @@ public class DeployBeanProperty {
    */
   private GeneratedProperty generatedProperty;
 
-  protected final DeployBeanDescriptor<?> desc;
+  final DeployBeanDescriptor<?> desc;
 
   private boolean undirectionalShadow;
 
@@ -329,7 +329,7 @@ public class DeployBeanProperty {
   /**
    * Return the sortOrder for the properties.
    */
-  public int getSortOrder() {
+  int getSortOrder() {
     return sortOrder;
   }
 
@@ -357,7 +357,7 @@ public class DeployBeanProperty {
   /**
    * Mark this property as mapping to the discriminator column.
    */
-  public void setDiscriminator() {
+  void setDiscriminator() {
     this.discriminator = true;
   }
 
@@ -524,7 +524,7 @@ public class DeployBeanProperty {
     return naturalKey;
   }
 
-  public void setNaturalKey() {
+  void setNaturalKey() {
     this.naturalKey = true;
   }
 
@@ -763,7 +763,7 @@ public class DeployBeanProperty {
     return lob;
   }
 
-  public boolean isDbNumberType() {
+  boolean isDbNumberType() {
     return isNumericType(dbType);
   }
 

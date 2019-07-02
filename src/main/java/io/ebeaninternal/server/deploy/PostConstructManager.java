@@ -11,24 +11,24 @@ import java.util.List;
 /**
  * Default implementation for creating BeanControllers.
  */
-public class PostConstructManager {
+class PostConstructManager {
 
   private static final Logger logger = LoggerFactory.getLogger(PostConstructManager.class);
 
   private final List<BeanPostConstructListener> list;
 
-  public PostConstructManager(BootupClasses bootupClasses) {
+  PostConstructManager(BootupClasses bootupClasses) {
     this.list = bootupClasses.getBeanPostConstructoListeners();
   }
 
-  public int getRegisterCount() {
+  int getRegisterCount() {
     return list.size();
   }
 
   /**
    * Register BeanPostLoad listeners for a given entity type.
    */
-  public void addPostConstructListeners(DeployBeanDescriptor<?> deployDesc) {
+  void addPostConstructListeners(DeployBeanDescriptor<?> deployDesc) {
 
     for (BeanPostConstructListener c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {

@@ -15,13 +15,13 @@ import java.util.Map;
 /**
  * Helper for creating Update timestamp GeneratedProperty objects.
  */
-public class UpdateTimestampFactory {
+class UpdateTimestampFactory {
 
-  final GeneratedUpdateLong longTime = new GeneratedUpdateLong();
+  private final GeneratedUpdateLong longTime = new GeneratedUpdateLong();
 
-  final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
+  private final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 
-  public UpdateTimestampFactory(ClassLoadConfig classLoadConfig) {
+  UpdateTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedUpdateTimestamp());
     map.put(java.util.Date.class, new GeneratedUpdateDate());
     map.put(Long.class, longTime);
@@ -39,7 +39,7 @@ public class UpdateTimestampFactory {
     }
   }
 
-  public void setUpdateTimestamp(DeployBeanProperty property) {
+  void setUpdateTimestamp(DeployBeanProperty property) {
 
     property.setGeneratedProperty(createUpdateTimestamp(property));
   }
@@ -47,7 +47,7 @@ public class UpdateTimestampFactory {
   /**
    * Create the update GeneratedProperty depending on the property type.
    */
-  protected GeneratedProperty createUpdateTimestamp(DeployBeanProperty property) {
+  GeneratedProperty createUpdateTimestamp(DeployBeanProperty property) {
 
     Class<?> propType = property.getPropertyType();
     GeneratedProperty generatedProperty = map.get(propType);

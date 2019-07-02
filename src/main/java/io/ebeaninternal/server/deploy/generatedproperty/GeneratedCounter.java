@@ -9,9 +9,9 @@ import io.ebeaninternal.server.deploy.BeanProperty;
  */
 public class GeneratedCounter implements GeneratedProperty {
 
-  final int numberType;
+  private final int numberType;
 
-  public GeneratedCounter(int numberType) {
+  GeneratedCounter(int numberType) {
     this.numberType = numberType;
   }
 

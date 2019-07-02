@@ -141,11 +141,11 @@ class BeanLifecycleAdapterFactory {
   /**
    * Utility method to covert List of Method into array (because we care about performance here).
    */
-  static Method[] toArray(List<Method> methodList) {
+  private static Method[] toArray(List<Method> methodList) {
     return methodList.toArray(new Method[0]);
   }
 
-  static RuntimeException unwrapException(ReflectiveOperationException e) {
+  private static RuntimeException unwrapException(ReflectiveOperationException e) {
     if (e instanceof InvocationTargetException) {
       Throwable targetException = ((InvocationTargetException)e).getTargetException();
       if (targetException instanceof RuntimeException) {

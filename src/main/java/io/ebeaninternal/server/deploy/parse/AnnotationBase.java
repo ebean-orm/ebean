@@ -38,12 +38,12 @@ import java.util.Set;
  * <p>This means, searching for <code>JoinColumn</code> will find them also if they are inside a
  * <code>JoinColumn<b>s</b></code> annotation</p>
  */
-public abstract class AnnotationBase {
+abstract class AnnotationBase {
 
-  protected final DatabasePlatform databasePlatform;
-  protected final Platform platform;
-  protected final NamingConvention namingConvention;
-  protected final DeployUtil util;
+  final DatabasePlatform databasePlatform;
+  private final Platform platform;
+  final NamingConvention namingConvention;
+  final DeployUtil util;
 
   AnnotationBase(DeployUtil util) {
     this.util = util;
@@ -60,7 +60,7 @@ public abstract class AnnotationBase {
   /**
    * Checks string is null or empty .
    */
-  protected boolean isEmpty(String s) {
+  boolean isEmpty(String s) {
     return s == null || s.trim().isEmpty();
   }
 
@@ -78,7 +78,7 @@ public abstract class AnnotationBase {
    * </p>
    * <p>
    */
-  protected <T extends Annotation> T get(DeployBeanProperty prop, Class<T> annClass) {
+  <T extends Annotation> T get(DeployBeanProperty prop, Class<T> annClass) {
     T a = null;
     Field field = prop.getField();
     if (field != null) {
@@ -97,7 +97,7 @@ public abstract class AnnotationBase {
    * Return all annotations for this property. Annotations are not filtered by platfrom and you'll get
    * really all annotations that are directly, indirectly or meta-present.
    */
-  protected <T extends Annotation> Set<T> getAll(DeployBeanProperty prop, Class<T> annClass) {
+  <T extends Annotation> Set<T> getAll(DeployBeanProperty prop, Class<T> annClass) {
     Set<T> ret = null;
     Field field = prop.getField();
     if (field != null) {
@@ -121,7 +121,7 @@ public abstract class AnnotationBase {
    * (This is used for SequenceGenerator e.g.)
    * </p>
    */
-  protected <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
+  <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
     T a = get(prop, annClass);
     if (a == null) {
       a = AnnotationUtil.findAnnotation(prop.getOwningType(), annClass, platform);

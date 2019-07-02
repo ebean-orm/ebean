@@ -12,7 +12,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   /**
    * The type of the joined bean.
    */
-  protected Class<T> targetType;
+  Class<T> targetType;
 
   /**
    * Persist settings.
@@ -27,7 +27,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   /**
    * Join between the beans.
    */
-  protected final DeployTableJoin tableJoin = new DeployTableJoin();
+  final DeployTableJoin tableJoin = new DeployTableJoin();
 
   /**
    * Literal added to where clause of lazy loading query.

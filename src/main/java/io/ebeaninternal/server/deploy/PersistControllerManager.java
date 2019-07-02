@@ -11,25 +11,25 @@ import java.util.List;
 /**
  * Default implementation for creating BeanControllers.
  */
-public class PersistControllerManager {
+class PersistControllerManager {
 
   private static final Logger logger = LoggerFactory.getLogger(PersistControllerManager.class);
 
   private final List<BeanPersistController> list;
 
-  public PersistControllerManager(BootupClasses bootupClasses) {
+  PersistControllerManager(BootupClasses bootupClasses) {
 
     list = bootupClasses.getBeanPersistControllers();
   }
 
-  public int getRegisterCount() {
+  int getRegisterCount() {
     return list.size();
   }
 
   /**
    * Return the BeanPersistController for a given entity type.
    */
-  public void addPersistControllers(DeployBeanDescriptor<?> deployDesc) {
+  void addPersistControllers(DeployBeanDescriptor<?> deployDesc) {
 
     for (BeanPersistController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {

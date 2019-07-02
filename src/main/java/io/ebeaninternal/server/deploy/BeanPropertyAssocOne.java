@@ -49,11 +49,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   private AssocOneHelp localHelp;
 
-  protected final BeanProperty[] embeddedProps;
+  final BeanProperty[] embeddedProps;
 
   private final HashMap<String, BeanProperty> embeddedPropsMap;
 
-  protected ImportedId importedId;
+  ImportedId importedId;
 
   private String deleteByParentIdSql;
   private String deleteByParentIdInSql;
@@ -157,7 +157,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   /**
    * Derive late in lifecycle cache notification on this relationship.
    */
-  public void initialisePostTarget() {
+  void initialisePostTarget() {
     this.cacheNotifyRelationship = isCacheNotifyRelationship();
   }
 
@@ -465,7 +465,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return targetDescriptor.getIdProperty();
   }
 
-  public ScalarType getIdScalarType() {
+  ScalarType getIdScalarType() {
     return targetDescriptor.getIdProperty().scalarType;
   }
 
@@ -674,7 +674,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
-  void setEmbeddedOwner(EntityBean bean, Object value) {
+  private void setEmbeddedOwner(EntityBean bean, Object value) {
     ((EntityBean) value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
   }
 

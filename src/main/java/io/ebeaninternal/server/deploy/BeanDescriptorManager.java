@@ -663,7 +663,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return (BeanManager<T>) getBeanManager(entityType.getName());
   }
 
-  public BeanManager<?> getBeanManager(String beanClassName) {
+  private BeanManager<?> getBeanManager(String beanClassName) {
     return beanManagerMap.get(beanClassName);
   }
 

@@ -56,7 +56,7 @@ public class TableJoinColumn {
     this.queryHash = hash();
   }
 
-  int hash() {
+  private int hash() {
     int result = localDbColumn != null ? localDbColumn.hashCode() : 0;
     result = 92821 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
     result = 92821 * result + (localSqlFormula != null ? localSqlFormula.hashCode() : 0);
@@ -93,7 +93,7 @@ public class TableJoinColumn {
   /**
    * Return a hash for including in a query plan.
    */
-  public int queryHash() {
+  int queryHash() {
     return queryHash;
   }
 
@@ -121,7 +121,7 @@ public class TableJoinColumn {
   /**
    * Return true if this column should be updateable.
    */
-  public boolean isUpdateable() {
+  boolean isUpdateable() {
     return updateable;
   }
 

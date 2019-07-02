@@ -12,24 +12,24 @@ import java.util.List;
  * Manages the assignment/registration of BeanPersistListener with their
  * respective DeployBeanDescriptor's.
  */
-public class PersistListenerManager {
+class PersistListenerManager {
 
   private static final Logger logger = LoggerFactory.getLogger(PersistListenerManager.class);
 
   private final List<BeanPersistListener> list;
 
-  public PersistListenerManager(BootupClasses bootupClasses) {
+  PersistListenerManager(BootupClasses bootupClasses) {
     list = bootupClasses.getBeanPersistListeners();
   }
 
-  public int getRegisterCount() {
+  int getRegisterCount() {
     return list.size();
   }
 
   /**
    * Return the BeanPersistController for a given entity type.
    */
-  public <T> void addPersistListeners(DeployBeanDescriptor<T> deployDesc) {
+  <T> void addPersistListeners(DeployBeanDescriptor<T> deployDesc) {
 
     for (BeanPersistListener listener : list) {
       if (listener.isRegisterFor(deployDesc.getBeanType())) {

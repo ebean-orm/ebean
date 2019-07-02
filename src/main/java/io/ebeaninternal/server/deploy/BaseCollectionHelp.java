@@ -11,7 +11,7 @@ import java.util.Collection;
 abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
 
   final BeanPropertyAssocMany<T> many;
-  final BeanDescriptor<T> targetDescriptor;
+  private final BeanDescriptor<T> targetDescriptor;
   final String propertyName;
 
   BeanCollectionLoader loader;

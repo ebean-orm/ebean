@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @param <T> The entity bean type
  */
-public final class BeanDescriptorDraftHelp<T> {
+final class BeanDescriptorDraftHelp<T> {
 
   private final BeanDescriptor<T> desc;
 
@@ -19,7 +19,7 @@ public final class BeanDescriptorDraftHelp<T> {
 
   private final BeanProperty[] resetProperties;
 
-  public BeanDescriptorDraftHelp(BeanDescriptor<T> desc) {
+  BeanDescriptorDraftHelp(BeanDescriptor<T> desc) {
     this.desc = desc;
     this.draftDirty = desc.getDraftDirty();
     this.resetProperties = resetProperties();
@@ -45,7 +45,7 @@ public final class BeanDescriptorDraftHelp<T> {
   /**
    * Set the value of all the 'reset properties' to null on the draft bean.
    */
-  public boolean draftReset(T draftBean) {
+  boolean draftReset(T draftBean) {
 
     EntityBean draftEntityBean = (EntityBean) draftBean;
 
@@ -102,7 +102,7 @@ public final class BeanDescriptorDraftHelp<T> {
   /**
    * Fetch draftable element relationships.
    */
-  public void draftQueryOptimise(Query<T> query) {
+  void draftQueryOptimise(Query<T> query) {
 
     BeanPropertyAssocOne<?>[] one = desc.propertiesOne();
     for (BeanPropertyAssocOne<?> anOne : one) {

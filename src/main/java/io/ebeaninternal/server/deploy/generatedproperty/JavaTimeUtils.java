@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 /**
  * Helper methods for Java time conversion.
  */
-public class JavaTimeUtils {
+class JavaTimeUtils {
 
   /**
    * Return the system millis time as a LocalDateTime.
@@ -21,21 +21,21 @@ public class JavaTimeUtils {
   /**
    * Return the system millis time as a LocalDateTime.
    */
-  public static Object toLocalDateTime(long systemMillis) {
+  static Object toLocalDateTime(long systemMillis) {
     return new Timestamp(systemMillis).toLocalDateTime();
   }
 
   /**
    * Return the system millis time as a OffsetDateTime.
    */
-  public static Object toOffsetDateTime(long systemMillis) {
+  static Object toOffsetDateTime(long systemMillis) {
     return OffsetDateTime.ofInstant(Instant.ofEpochMilli(systemMillis), ZoneId.systemDefault());
   }
 
   /**
    * Return the system millis time as a ZonedDateTime.
    */
-  public static Object toZonedDateTime(long systemMillis) {
+  static Object toZonedDateTime(long systemMillis) {
     return ZonedDateTime.ofInstant(Instant.ofEpochMilli(systemMillis), ZoneId.systemDefault());
   }
 }
