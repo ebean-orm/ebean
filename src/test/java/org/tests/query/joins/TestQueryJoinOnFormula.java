@@ -2,13 +2,11 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.FetchConfig;
-import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.model.family.ChildPerson;
 import org.tests.model.family.ParentPerson;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,81 +18,55 @@ import static org.junit.Assert.assertEquals;
 
 public class TestQueryJoinOnFormula extends BaseTestCase {
 
-  
+
   @Before
   public void init() {
     ResetBasicData.reset();
   }
-  
-  /**
-   * If there is no query.select() or query.fetch() in the query, there should be a meaningful exception.
-   */
-  @Test
-  public void test_OrderFindIdsNoSelect() {
 
-    assertThatThrownBy(() -> {
-      Ebean.find(Order.class)
-        .where().eq("totalItems", 3)
-        .findIds();
-    }).hasMessageContaining("property 'totalItems' has to be selected explicitly");
-  }
-  
-  /**
-   * If there is no query.select() or query.fetch() in the query, there should be a meaningful exception.
-   */
-  @Test
-  public void test_OrderFindListNoSelect() {
-
-    assertThatThrownBy(() -> {
-      Ebean.find(Order.class)
-        .where().eq("totalItems", 3)
-        .findList();
-    }).hasMessageContaining("property 'totalItems' has to be selected explicitly");
-  }
-  
   @Test
   public void test_OrderFindIds() {
 
     LoggedSqlCollector.start();
 
     List<Integer> orderIds = Ebean.find(Order.class)
-        .select("totalItems")
         .where().eq("totalItems", 3)
         .findIds();
     assertThat(orderIds).hasSize(2);
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
+    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
   }
-  
+
   @Test
   public void test_OrderFindList() {
 
     LoggedSqlCollector.start();
 
     List<Order> orders = Ebean.find(Order.class)
-        .select("totalItems")
         .where().eq("totalItems", 3)
         .findList();
     assertThat(orders).hasSize(2);
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
+    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
   }
-  
+
   @Test
   public void test_OrderFindCount() {
 
     LoggedSqlCollector.start();
 
     int orders = Ebean.find(Order.class)
-        .select("totalItems")
         .where().eq("totalItems", 3)
         .findCount();
     assertThat(orders).isEqualTo(2);
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
+    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
   }
 
   @Test
@@ -103,15 +75,16 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<Date> orderDates = Ebean.find(Order.class)
-        .select("orderDate,totalItems")
+        .select("orderDate")
         .where().eq("totalItems", 3)
         .findSingleAttributeList();
     assertThat(orderDates).hasSize(2);
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
+    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
   }
-  
+
   @Test
   public void test_OrderFindOne() {
 
@@ -123,13 +96,14 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
         .setMaxRows(1)
         .orderById(true)
         .findOne();
-    
+
     assertThat(order.getTotalItems()).isEqualTo(3);
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
+    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
   }
-  
+
   @Test
   public void test_ParentPersonFindIds() {
 
@@ -138,26 +112,28 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     List<ParentPerson> orderIds = Ebean.find(ParentPerson.class)
         .where().eq("totalAge", 3)
         .findIds();
-    assertThat(orderIds).hasSize(2);
-    
+    // TODO: There are no beans in database, so for now only the query must run.
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
   }
-  
+
   @Test
   public void test_ParentPersonFindList() {
 
     LoggedSqlCollector.start();
 
     Ebean.find(ParentPerson.class)
-        .where().eq("totalAge", 3)
+        .select("identifier")
+        //.where().eq("totalAge", 3)
+        .where().eq("familyName", "foo")
         .findList();
     // TODO: There are no beans in database, so for now only the query must run.
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
   }
-  
+
   @Test
   public void test_ParentPersonFindCount() {
 
@@ -167,11 +143,11 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().eq("totalAge", 3)
       .findCount();
     // TODO: There are no beans in database, so for now only the query must run.
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
   }
-  
+
   @Test
   public void test_ParentPersonFindSingleAttributeList() {
 
@@ -182,11 +158,11 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().eq("totalAge", 3)
       .findSingleAttributeList();
     // TODO: There are no beans in database, so for now only the query must run.
-    
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
   }
-  
+
   @Test
   public void test_ParentPersonFindOne() {
 
@@ -198,7 +174,35 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .orderById(true)
       .findOne();
     // TODO: There are no beans in database, so for now only the query must run.
-    
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertEquals(1, loggedSql.size());
+  }
+
+  @Test
+  public void test_ChildPersonParentFindIds() {
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(ChildPerson.class)
+        .where().eq("parent.totalAge", 3)
+        .findIds();
+    // TODO: There are no beans in database, so for now only the query must run.
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertEquals(1, loggedSql.size());
+  }
+
+  @Test
+  public void test_ChildPersonParentFindCount() {
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(ChildPerson.class)
+        .where().eq("parent.totalAge", 3)
+        .findCount();
+    // TODO: There are no beans in database, so for now only the query must run.
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
   }
