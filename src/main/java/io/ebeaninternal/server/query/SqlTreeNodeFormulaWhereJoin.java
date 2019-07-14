@@ -67,18 +67,15 @@ class SqlTreeNodeFormulaWhereJoin implements SqlTreeNode {
    */
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType currentJoinType) {
-
     // always use the join type as per this many where join
     // (OUTER for disjunction and otherwise INNER)
     nodeBeanProp.appendFrom(ctx, manyJoinType);
   }
 
-
-
   @Override
   public void dependentTables(Set<String> tables) {
-    //FIXME: we cannot easily determine the dependent tables, this would require an enhancement
-    //of the @Formula(dependentTables=...) annotation
+    // FIXME: we cannot easily determine the dependent tables this would require an enhancement
+    // of the @Formula(dependentTables=...) annotation
   }
 
   @Override

@@ -299,8 +299,7 @@ public final class SqlTreeBuilder {
     if (manyWhereJoins.isFormulaWithJoin()) {
       for (String property: manyWhereJoins.getFormulaJoinProperties()) {
         STreeProperty beanProperty = desc.findPropertyFromPath(property);
-        SqlTreeNodeFormulaWhereJoin nodeJoin = new SqlTreeNodeFormulaWhereJoin(beanProperty, SqlJoinType.OUTER);
-        myJoinList.add(nodeJoin);
+        myJoinList.add(new SqlTreeNodeFormulaWhereJoin(beanProperty, SqlJoinType.OUTER));
       }
     }
   }
