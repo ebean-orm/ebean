@@ -16,7 +16,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
-import org.avaje.agentloader.AgentLoader;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -67,10 +66,6 @@ public abstract class BaseTestCase {
       DB_CLOCK_DELTA = Integer.parseInt(s);
     } else {
       DB_CLOCK_DELTA = 100;
-    }
-    logger.debug("... preStart");
-    if (!AgentLoader.loadAgentByMainClass("io.ebean.enhance.Transformer", "debug=1")) {
-      logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }
     try {
       // First try, if we get the default server. If this fails, all tests will fail.

@@ -2,8 +2,6 @@ package org.tests.transaction;
 
 import io.ebean.Ebean;
 import io.ebean.annotation.Transactional;
-import org.avaje.agentloader.AgentLoader;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +20,6 @@ import static org.junit.Assert.fail;
  */
 public class TransactionNotTerminatedAfterRollback {
   private static final Logger LOG = LoggerFactory.getLogger(TransactionNotTerminatedAfterRollback.class);
-
-  @BeforeClass
-  public static void preStart() {
-    LOG.debug("... preStart");
-    // display the log message to see if the UserService is enhanced
-    AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent", "debug=1");
-  }
 
   @Test
   public void test() {

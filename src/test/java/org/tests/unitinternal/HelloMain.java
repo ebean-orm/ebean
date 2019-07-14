@@ -4,7 +4,6 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
 import io.ebean.datasource.DataSourceConfig;
-import org.avaje.agentloader.AgentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.TOne;
@@ -14,13 +13,6 @@ import java.io.File;
 public class HelloMain {
 
   protected static Logger logger = LoggerFactory.getLogger(HelloMain.class);
-
-  static {
-    logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent", "debug=1;packages=com.avaje.tests.**")) {
-      logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
-    }
-  }
 
   public static void main(String[] args) {
     // ### Configuration Objects ###

@@ -240,20 +240,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-agentloader</artifactId>
-      <version>3.0.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-agent</artifactId>
-      <version>11.41.2</version>
-      <scope>test</scope>
-    </dependency>
-
     <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
          and not require a separate module for it -->
     <dependency>
