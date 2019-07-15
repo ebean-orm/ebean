@@ -36,7 +36,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
+    assertThat(loggedSql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
   }
 
   @Test
@@ -51,7 +51,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
+    assertThat(loggedSql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
   }
 
   @Test
@@ -67,7 +67,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
-    assertThat(loggedSql.get(0)).contains("elect count(*) from ( select t0.id, z_bt0.total_items from o_order t0 join (select order_id,");
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.id from o_order t0  left join (select order_id,");
   }
 
   @Test
@@ -85,7 +85,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.id, z_bt0.total_items, z_bt0.total_amount from o_order t0 join (select order_id,");
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.id from o_order t0  left join (select order_id,");
   }
 
   @Test
@@ -101,7 +101,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("join (select order_id, count(*) as total_items,");
+    assertThat(loggedSql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
     assertThat(loggedSql.get(0)).contains("select t0.order_date from o_order t0");
   }
 
@@ -167,7 +167,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?)");
-    assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.identifier, coalesce(f2.child_age, 0) from parent_person t0");
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.identifier from parent_person t0 left join (select i2.parent_identifier, count(*) as child_count");
   }
 
   @Test
