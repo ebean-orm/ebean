@@ -40,4 +40,19 @@ public interface SpiTransactionManager {
    */
   void externalRemoveTransaction();
 
+  /**
+   * Notify of a transaction commit.
+   */
+  void notifyOfCommit(SpiTransaction transaction);
+
+  /**
+   * Notify of a transaction rollback.
+   */
+  void notifyOfRollback(SpiTransaction transaction, Throwable cause);
+
+  /**
+   * Notify of a query only transaction commit.
+   */
+  void notifyOfQueryOnly(SpiTransaction transaction);
+
 }

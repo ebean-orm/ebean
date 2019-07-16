@@ -360,7 +360,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Process a local rolled back transaction.
    */
-  void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
+  @Override
+  public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
 
     try {
       if (txnLogger.isDebug()) {
@@ -379,8 +380,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Query only transaction in read committed isolation.
    */
-  void notifyOfQueryOnly(SpiTransaction transaction) {
-
+  @Override
+  public void notifyOfQueryOnly(SpiTransaction transaction) {
     // Nothing that interesting here
     if (txnLogger.isTrace()) {
       txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
@@ -414,8 +415,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Process a local committed transaction.
    */
-  void notifyOfCommit(SpiTransaction transaction) {
-
+  @Override
+  public void notifyOfCommit(SpiTransaction transaction) {
     try {
       if (txnLogger.isDebug()) {
         txnLogger.debug(transaction.getLogPrefix() + "Commit");
