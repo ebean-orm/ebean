@@ -76,7 +76,7 @@ public class ExternalJdbcTransaction extends JdbcTransaction {
    */
   @Override
   public void rollback(Throwable e) throws PersistenceException {
-    throw new PersistenceException("This is an external transaction so must be rolled back externally");
+    throw new PersistenceException("This is an external transaction so must be rolled back externally", e);
   }
 
 }
