@@ -65,6 +65,13 @@ public interface BeanCollection<E> extends Serializable {
   void reset(EntityBean ownerBean, String propertyName);
 
   /**
+   * Reset the collection back to an empty state ready for reloading.
+   * <p>
+   * This is done as part of bean refresh.
+   */
+  void reset();
+
+  /**
    * Return true if the collection is uninitialised or is empty without any held modifications.
    * <p>
    * Returning true means can safely skip cascade save for this bean collection.
