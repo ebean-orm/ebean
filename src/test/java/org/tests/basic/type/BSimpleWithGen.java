@@ -10,12 +10,16 @@ import java.util.Map;
 public class BSimpleWithGen {
 
   @Id
-  Integer id;
+  private Integer id;
 
-  String name;
+  private String name;
 
   @Transient
-  Map<String, List<String>> someMap;
+  private Map<String, List<String>> someMap;
+
+  public BSimpleWithGen(String name) {
+    this.name = name;
+  }
 
   public Integer getId() {
     return id;
