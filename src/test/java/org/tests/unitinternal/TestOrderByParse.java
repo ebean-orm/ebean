@@ -182,7 +182,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
     assertEquals("id collate latin_1", o1.toStringFormat());
-    assertFalse(o1.supportsSelect());
+    assertTrue(o1.supportsSelect());
 
     o1 = new OrderBy<>();
     o1.desc("id", "latin_1");
@@ -190,7 +190,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(!o1.getProperties().get(0).isAscending());
     assertEquals("id collate latin_1 desc", o1.toStringFormat());
-    assertFalse(o1.supportsSelect());
+    assertTrue(o1.supportsSelect());
 
     o1 = new OrderBy<>();
     o1.desc("id", "latin_1");
@@ -201,7 +201,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(!o1.getProperties().get(0).isAscending());
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id collate latin_1 desc, date", o1.toStringFormat());
-    assertFalse(o1.supportsSelect());
+    assertTrue(o1.supportsSelect());
 
     o1 = new OrderBy<>();
     o1.desc("id", "latin_1");
@@ -212,7 +212,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(!o1.getProperties().get(0).isAscending());
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id collate latin_1 desc, name collate latin_2", o1.toStringFormat());
-    assertFalse(o1.supportsSelect());
+    assertTrue(o1.supportsSelect());
 
     // functional (DB2) syntax
     o1 = new OrderBy<>();
@@ -221,8 +221,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(!o1.getProperties().get(0).isAscending());
     assertEquals("COLLATION_KEY(id, 'latin_1') desc", o1.toStringFormat());
-    assertFalse(o1.supportsSelect());
-
+    assertTrue(o1.supportsSelect());
   }
 
   @Test

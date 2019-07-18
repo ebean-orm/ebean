@@ -412,7 +412,7 @@ public final class OrderBy<T> implements Serializable {
      * Support use in select clause if no collation or nulls ordering.
      */
     boolean supportsSelect() {
-      return nulls == null && collation == null;
+      return nulls == null;
     }
   }
 
