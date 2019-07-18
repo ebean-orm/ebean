@@ -12,11 +12,13 @@ import java.sql.SQLException;
 
 class DtoMetaConstructor {
 
-	private final Class<?>[] types;
-	private final MethodHandle handle;
+  private final Class<?>[] types;
+  private final MethodHandle handle;
+
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private final ScalarType<?>[] scalarTypes;
 
-	DtoMetaConstructor(TypeManager typeManager, Constructor<?> constructor, Class<?> someClass) throws NoSuchMethodException, IllegalAccessException {
+  DtoMetaConstructor(TypeManager typeManager, Constructor<?> constructor, Class<?> someClass) throws NoSuchMethodException, IllegalAccessException {
 
     this.types = constructor.getParameterTypes();
     this.scalarTypes = new ScalarType[types.length];
@@ -24,13 +26,12 @@ class DtoMetaConstructor {
       scalarTypes[i] = typeManager.getScalarType(types[i]);
     }
 
-    MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-		this.handle = lookup.findConstructor(someClass, typeFor(types));
-	}
+    this.handle = LOOKUP.findConstructor(someClass, typeFor(types));
+  }
 
-	private MethodType typeFor(Class<?>[] types) {
-		return MethodType.methodType(void.class, types);
-	}
+  private MethodType typeFor(Class<?>[] types) {
+    return MethodType.methodType(void.class, types);
+  }
 
   Class<?>[] getTypes() {
     return types;
@@ -48,7 +49,7 @@ class DtoMetaConstructor {
     }
   }
 
-	public Object process(DataReader dataReader) throws SQLException {
+  public Object process(DataReader dataReader) throws SQLException {
     Object[] values = new Object[scalarTypes.length];
     for (int i = 0; i < scalarTypes.length; i++) {
       values[i] = scalarTypes[i].read(dataReader);
@@ -56,12 +57,12 @@ class DtoMetaConstructor {
     return invoke(values);
   }
 
-	private Object invoke(Object... args) {
-	  try {
-	    return handle.invokeWithArguments(args);
+  private Object invoke(Object... args) {
+    try {
+      return handle.invokeWithArguments(args);
     } catch (Throwable e) {
-	    throw new RuntimeException("Unexpected error invoking constructor", e);
+      throw new RuntimeException("Unexpected error invoking constructor", e);
     }
-	}
+  }
 
 }
