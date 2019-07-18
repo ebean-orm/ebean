@@ -4,10 +4,6 @@
   <ddl-script name="order views" platforms="h2" drop="true">
       drop view order_agg_vw if exists;
   </ddl-script>
-  <ddl-script name="main entity views" platforms="h2" drop="true">
-      drop view vw_main_entity if exists;
-      drop view vw_main_entity_relation if exists;
-  </ddl-script>
   
   <ddl-script name="order views" platforms="db2,h2,postgres,oracle,mysql">
     create or replace view order_agg_vw as
@@ -15,14 +11,6 @@
            sum(d.ship_qty * d.unit_price) as ship_total
     from o_order_detail d
     group by d.order_id
-  </ddl-script>
-
-  <ddl-script name="main entity views" platforms="db2,h2,postgres,oracle,mysql">
-    create or replace view vw_main_entity as
-    select * from main_entity;
-    
-    create or replace view vw_main_entity_relation as
-    select * from main_entity_relation;
   </ddl-script>
   
   <ddl-script name="order views hsqldb" platforms="hsqldb">
