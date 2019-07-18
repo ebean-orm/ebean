@@ -4,7 +4,7 @@
   <ddl-script name="order views" platforms="h2" drop="true">
       drop view order_agg_vw if exists;
   </ddl-script>
-  
+
   <ddl-script name="order views" platforms="db2,h2,postgres,oracle,mysql">
     create or replace view order_agg_vw as
     select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
@@ -12,7 +12,7 @@
     from o_order_detail d
     group by d.order_id
   </ddl-script>
-  
+
   <ddl-script name="order views hsqldb" platforms="hsqldb">
     drop view order_agg_vw if exists ;
     create view order_agg_vw as
@@ -21,7 +21,7 @@
     from o_order_detail d
     group by d.order_id;
   </ddl-script>
-  
+
   <ddl-script name="order views hana" platforms="hana">
     create view order_agg_vw as
     select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
@@ -37,7 +37,6 @@
            sum(d.ship_qty * d.unit_price) as ship_total
     from o_order_detail d
     group by d.order_id;
-
   </ddl-script>
 
   <ddl-script name="order views mssql" platforms="sqlserver">
