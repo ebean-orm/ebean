@@ -1,5 +1,6 @@
 package org.tests.insert;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.ForPlatform;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestOnlyIdEntity {
+public class TestOnlyIdEntity extends BaseTestCase {
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
