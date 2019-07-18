@@ -13,6 +13,8 @@ import java.sql.SQLException;
 
 class DtoMetaProperty implements DtoReadSet {
 
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+
   private final Class<?> dtoType;
   private final String name;
   private final MethodHandle setter;
@@ -28,8 +30,7 @@ class DtoMetaProperty implements DtoReadSet {
 
       Class<?> propertyType = descriptor.getPropertyType();
 
-      MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-      this.setter = lookup.findVirtual(dtoType, writeMethod.getName(), MethodType.methodType(void.class, propertyType));
+      this.setter = LOOKUP.findVirtual(dtoType, writeMethod.getName(), MethodType.methodType(void.class, propertyType));
       this.scalarType = typeManager.getScalarType(propertyType);
 
     } else {
