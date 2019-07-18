@@ -1,20 +1,21 @@
 package org.tests.lazyforeignkeys;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-
-import java.util.List;
-
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.text.PathProperties;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestLazyForeignKeys extends BaseTestCase {
 
@@ -30,12 +31,12 @@ public class TestLazyForeignKeys extends BaseTestCase {
     e1.setId("ent1");
     MainEntity e2 = new MainEntity();
     e2.setId("ent2");
-    
+
     rel1.setEntity1(e1);
     rel1.setEntity2(e2);
     DB.save(rel1);
   }
-  
+
   @After
   public void cleanup() {
     DB.find(MainEntity.class).delete();
@@ -62,7 +63,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
     assertThat(loggedSql.get(1)).contains("select t0.id, t0.attr1, t0.attr2, t0.id is null from main_entity t0");
     assertThat(loggedSql.get(2)).contains("select t0.id, t0.attr1, t0.attr2, t0.id is null from main_entity t0");
   }
-  
+
   @Test
   public void testFindListWithSelect() {
     PathProperties pathProp = new PathProperties();
@@ -74,7 +75,6 @@ public class TestLazyForeignKeys extends BaseTestCase {
     List<MainEntityRelation> list = query.findList();
     assertEquals(1, list.size());
 
-    System.out.println(query.getGeneratedSql());
     assertThat(query.getGeneratedSql()).contains("t0.id, t0.attr1, t0.id1, t0.id2, t1.id, t2.id");
 
     MainEntityRelation rel1 = list.get(0);

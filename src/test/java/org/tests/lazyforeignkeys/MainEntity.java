@@ -1,12 +1,12 @@
 package org.tests.lazyforeignkeys;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.SoftDelete;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "main_entity")

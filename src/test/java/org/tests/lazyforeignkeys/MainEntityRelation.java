@@ -1,14 +1,13 @@
 package org.tests.lazyforeignkeys;
 
-import java.util.UUID;
+import io.ebean.annotation.DbForeignKey;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import io.ebean.annotation.DbForeignKey;
+import java.util.UUID;
 
 
 @Entity
@@ -22,14 +21,14 @@ public class MainEntityRelation {
   @JoinColumn(name = "id1")
   @DbForeignKey(noConstraint = true)
   private MainEntity entity1;
-  
+
   @ManyToOne
   @JoinColumn(name = "id2")
   @DbForeignKey(noConstraint = true)
   private MainEntity entity2;
-  
+
   private String attr1;
-  
+
   public MainEntity getEntity1() {
     return entity1;
   }
