@@ -248,10 +248,14 @@ public final class SqlTreeBuilder {
 
     List<SqlTreeNode> myJoinList = new ArrayList<>();
 
+    List<STreePropertyAssocOne> extraProps = new ArrayList<>();
     for (STreePropertyAssocOne one : desc.propsOne()) {
       String propPrefix = SplitName.add(prefix, one.getName());
       if (isIncludeBean(propPrefix)) {
         selectIncludes.add(propPrefix);
+        if (!one.hasForeignKey()) {
+          extraProps.add(one);
+        }
         buildSelectChain(propPrefix, one, one.target(), myJoinList);
       }
     }
@@ -273,6 +277,7 @@ public final class SqlTreeBuilder {
       }
       addManyWhereJoins(myJoinList);
     }
+    extraProps.forEach(props::add);
 
     SqlTreeNode selectNode = buildNode(prefix, prop, desc, myJoinList, props);
     if (joinList != null) {
