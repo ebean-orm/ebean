@@ -4,7 +4,11 @@ import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import io.ebean.annotation.DbForeignKey;
 
 
 @Entity
@@ -14,28 +18,34 @@ public class MainEntityRelation {
   @Id
   private UUID id;
 
-  private String id1;
+  @ManyToOne
+  @JoinColumn(name = "id1")
+  @DbForeignKey(noConstraint = true)
+  private MainEntity entity1;
   
-  private String id2;
+  @ManyToOne
+  @JoinColumn(name = "id2")
+  @DbForeignKey(noConstraint = true)
+  private MainEntity entity2;
   
   private String attr1;
-
-  public String getId1() {
-    return id1;
-  }
-
-  public void setId1(String id1) {
-    this.id1 = id1;
-  }
-
-  public String getId2() {
-    return id2;
-  }
-
-  public void setId2(String id2) {
-    this.id2 = id2;
-  }
   
+  public MainEntity getEntity1() {
+    return entity1;
+  }
+
+  public void setEntity1(MainEntity entity1) {
+    this.entity1 = entity1;
+  }
+
+  public MainEntity getEntity2() {
+    return entity2;
+  }
+
+  public void setEntity2(MainEntity entity2) {
+    this.entity2 = entity2;
+  }
+
   public String getAttr1() {
     return attr1;
   }
