@@ -3,7 +3,6 @@ package io.ebeaninternal.server.transaction;
 import io.ebeaninternal.api.SpiTransaction;
 
 import java.sql.Connection;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Transaction manager used for doc store only EbeanServer instance.
@@ -11,8 +10,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * There is no underlying JDBC DataSource etc
  */
 public class DocStoreTransactionManager extends TransactionManager {
-
-  private final AtomicLong counter = new AtomicLong(1000L);
 
   /**
    * Create the TransactionManager
@@ -23,8 +20,7 @@ public class DocStoreTransactionManager extends TransactionManager {
 
   @Override
   public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-    long id = counter.incrementAndGet();
-    return createTransaction(explicit, null, id);
+    return createTransaction(explicit, null);
   }
 
   @Override
@@ -33,7 +29,7 @@ public class DocStoreTransactionManager extends TransactionManager {
   }
 
   @Override
-  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
-    return new DocStoreOnlyTransaction(prefix + id, explicit, this);
+  protected SpiTransaction createTransaction(boolean explicit, Connection c) {
+    return new DocStoreOnlyTransaction(nextTxnId(), explicit, this);
   }
 }

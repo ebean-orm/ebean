@@ -19,9 +19,8 @@ public class AutoCommitTransactionManager extends TransactionManager {
    * Create an autoCommit based Transaction.
    */
   @Override
-  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
-
-    return new AutoCommitJdbcTransaction(prefix + id, explicit, c, this);
+  protected SpiTransaction createTransaction(boolean explicit, Connection c) {
+    return new AutoCommitJdbcTransaction(nextTxnId(), explicit, c, this);
   }
 
 }

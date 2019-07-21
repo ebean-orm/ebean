@@ -31,8 +31,12 @@ class SavepointTransaction extends SpiTransactionProxy {
     this.transaction = transaction;
     this.connection = transaction.getInternalConnection();
     this.savepoint = connection.setSavepoint();
-    int savepointId = savepoint.getSavepointId();
-    this.spPrefix = "sp[" + savepointId + "] ";
+    if (manager.isTxnDebug()) {
+      int savepointId = manager.isSupportsSavepointId() ? savepoint.getSavepointId() : 0;
+      this.spPrefix = "sp[" + savepointId + "] ";
+    } else {
+      this.spPrefix = "sp[] ";
+    }
     this.logPrefix = transaction.getLogPrefix() + spPrefix;
   }
 

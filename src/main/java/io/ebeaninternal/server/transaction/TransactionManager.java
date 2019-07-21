@@ -45,6 +45,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Manages transactions.
@@ -72,6 +73,8 @@ public class TransactionManager implements SpiTransactionManager {
   final String prefix;
 
   private final String externalTransPrefix;
+
+  private final AtomicLong counter = new AtomicLong(1000L);
 
   /**
    * The dataSource of connections.
@@ -129,6 +132,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final SpiLogManager logManager;
   private final SpiLogger txnLogger;
+  private final boolean txnDebug;
 
   private final DatabasePlatform databasePlatform;
 
@@ -141,6 +145,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final TableModState tableModState;
   private final ServerCacheNotify cacheNotify;
+  private final boolean supportsSavepointId;
 
   /**
    * Create the TransactionManager
@@ -149,7 +154,9 @@ public class TransactionManager implements SpiTransactionManager {
 
     this.logManager = options.logManager;
     this.txnLogger = logManager.txn();
+    this.txnDebug = txnLogger.isDebug();
     this.databasePlatform = options.config.getDatabasePlatform();
+    this.supportsSavepointId = databasePlatform.isSupportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
     this.persistBatch = PersistBatch.ALL == options.config.getPersistBatch();
@@ -240,6 +247,13 @@ public class TransactionManager implements SpiTransactionManager {
     if (shutdownDataSource) {
       dataSourceSupplier.shutdown(deregisterDriver);
     }
+  }
+
+  /**
+   * Return true if the DB platform supports SavepointId().
+   */
+  boolean isSupportsSavepointId() {
+    return supportsSavepointId;
   }
 
   boolean isDocStoreActive() {
@@ -352,9 +366,15 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new transaction.
    */
-  SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
+  SpiTransaction createTransaction(boolean explicit, Connection c) {
+    return new JdbcTransaction(nextTxnId(), explicit, c, this);
+  }
 
-    return new JdbcTransaction(prefix + id, explicit, c, this);
+  /**
+   * Return the next transaction id.
+   */
+  String nextTxnId() {
+    return txnDebug ? prefix + counter.incrementAndGet() : prefix;
   }
 
   /**
@@ -726,6 +746,13 @@ public class TransactionManager implements SpiTransactionManager {
       default:
         throw new RuntimeException("Should never get here?");
     }
+  }
+
+  /**
+   * Return true if Transaction debug is on.
+   */
+  public boolean isTxnDebug() {
+    return txnDebug;
   }
 
   public SpiLogManager log() {

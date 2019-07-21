@@ -6,14 +6,11 @@ import io.ebeaninternal.api.SpiTransaction;
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Creates transactions with implementations for basic mode and multi-tenancy mode.
  */
 abstract class TransactionFactory {
-
-  final AtomicLong counter = new AtomicLong(1000);
 
   final TransactionManager manager;
 

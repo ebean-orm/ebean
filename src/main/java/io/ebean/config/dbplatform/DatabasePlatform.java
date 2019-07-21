@@ -51,6 +51,8 @@ public class DatabasePlatform {
 
   protected boolean supportsDeleteTableAlias;
 
+  protected boolean supportsSavepointId = true;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
@@ -326,6 +328,13 @@ public class DatabasePlatform {
    */
   public boolean isCaseSensitiveCollation() {
     return caseSensitiveCollation;
+  }
+
+  /**
+   * Return true if the platform supports SavepointId values.
+   */
+  public boolean isSupportsSavepointId() {
+    return supportsSavepointId;
   }
 
   /**
