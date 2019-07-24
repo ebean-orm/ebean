@@ -21,7 +21,7 @@
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://timerbe.de" target="_blank">
+        <a href="https://timerbee.de" target="_blank">
           <img width="222px" src="https://ebean.io/images/logo-timerbee.png">
         </a>
       </td>
