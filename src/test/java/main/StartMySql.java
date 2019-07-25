@@ -7,7 +7,7 @@ public class StartMySql {
 
   public static void main(String[] args) {
 
-    MySqlConfig config = new MySqlConfig("5.7");
+    MySqlConfig config = new MySqlConfig("8.0");
     config.setDbName("unit");
     config.setUser("unit");
     config.setPassword("unit");
@@ -23,6 +23,6 @@ public class StartMySql {
 //    config.setCharacterSet("utf8mb4");
 
     MySqlContainer container = new MySqlContainer(config);
-    container.start();
+    container.startWithDropCreate();
   }
 }

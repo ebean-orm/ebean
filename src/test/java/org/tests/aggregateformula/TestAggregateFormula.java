@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class TestAggregateFormula extends BaseTestCase {
 
-  @IgnorePlatform(Platform.SQLSERVER)
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL})
   @Test
   public void minDistinctOrderByNulls() {
 

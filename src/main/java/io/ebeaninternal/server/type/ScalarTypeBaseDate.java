@@ -20,7 +20,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   protected final JsonConfig.Date mode;
 
-  public ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
+  ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
     this.mode = mode;
   }

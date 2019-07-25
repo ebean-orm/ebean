@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import java.nio.file.Path;
+import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -44,6 +45,8 @@ public class SomeNewTypesBean {
 
   @Column(name = "month_day")
   MonthDay monthDay;
+
+  java.sql.Date sqlDate;
 
   LocalDate localDate;
 
@@ -121,6 +124,14 @@ public class SomeNewTypesBean {
 
   public void setMonthDay(MonthDay monthDay) {
     this.monthDay = monthDay;
+  }
+
+  public Date getSqlDate() {
+    return sqlDate;
+  }
+
+  public void setSqlDate(Date sqlDate) {
+    this.sqlDate = sqlDate;
   }
 
   public LocalDate getLocalDate() {

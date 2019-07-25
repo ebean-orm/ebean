@@ -45,6 +45,7 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.core.timezone.CloneDataTimeZone;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.core.timezone.LocalDataTimeZone;
 import io.ebeaninternal.server.core.timezone.NoDataTimeZone;
 import io.ebeaninternal.server.core.timezone.SimpleDataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -366,6 +367,10 @@ public class InternalConfiguration {
     return bootupClasses;
   }
 
+  private Platform getPlatform() {
+    return getDatabasePlatform().getPlatform();
+  }
+
   public DatabasePlatform getDatabasePlatform() {
     return serverConfig.getDatabasePlatform();
   }
@@ -509,9 +514,12 @@ public class InternalConfiguration {
 
     String tz = serverConfig.getDataTimeZone();
     if (tz == null) {
+      if (getPlatform() == Platform.MYSQL) {
+        return new LocalDataTimeZone();
+      }
       return new NoDataTimeZone();
     }
-    if (getDatabasePlatform().getPlatform() == Platform.ORACLE) {
+    if (getPlatform() == Platform.ORACLE) {
       return new CloneDataTimeZone(tz);
     } else {
       return new SimpleDataTimeZone(tz);
