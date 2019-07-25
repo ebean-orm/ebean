@@ -1,15 +1,21 @@
 -- Initial script to create stored procedures etc for sqlserver platform
 
 -- create table-value-parameters
-if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint);
-if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float);
-if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit);
-if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date);
-if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time);
-if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier);
-if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max));
+if not exists (select name  from sys.types where name = 'ebean_bigint_tvp') create type ebean_bigint_tvp as table (c1 bigint)
+GO
+if not exists (select name  from sys.types where name = 'ebean_float_tvp') create type ebean_float_tvp as table (c1 float)
+GO
+if not exists (select name  from sys.types where name = 'ebean_bit_tvp') create type ebean_bit_tvp as table (c1 bit)
+GO
+if not exists (select name  from sys.types where name = 'ebean_date_tvp') create type ebean_date_tvp as table (c1 date)
+GO
+if not exists (select name  from sys.types where name = 'ebean_time_tvp') create type ebean_time_tvp as table (c1 time)
+GO
+if not exists (select name  from sys.types where name = 'ebean_uniqueidentifier_tvp') create type ebean_uniqueidentifier_tvp as table (c1 uniqueidentifier)
+GO
+if not exists (select name  from sys.types where name = 'ebean_nvarchar_tvp') create type ebean_nvarchar_tvp as table (c1 nvarchar(max))
+GO
 
-delimiter $$
 --
 -- PROCEDURE: usp_ebean_drop_indices TABLE, COLUMN
 -- deletes all indices referring to TABLE.COLUMN
@@ -35,9 +41,8 @@ BEGIN
   CLOSE index_cursor;
   DEALLOCATE index_cursor;
 END
-$$
+GO
 
-delimiter $$
 --
 -- PROCEDURE: usp_ebean_drop_default_constraint TABLE, COLUMN
 -- deletes the default constraint, which has a random name
@@ -52,9 +57,8 @@ BEGIN
 
   if @tmp is not null EXEC('alter table ' + @tableName +' drop constraint ' + @tmp);
 END
-$$
+GO
 
-delimiter $$
 --
 -- PROCEDURE: usp_ebean_drop_constraints TABLE, COLUMN
 -- deletes constraints and foreign keys refering to TABLE.COLUMN
@@ -86,9 +90,8 @@ BEGIN
   CLOSE name_cursor;
   DEALLOCATE name_cursor;
 END
-$$
+GO
 
-delimiter $$
 --
 -- PROCEDURE: usp_ebean_drop_column TABLE, COLUMN
 -- deletes the column annd ensures that all indices and constraints are dropped first
@@ -104,4 +107,4 @@ BEGIN
   set @sql = 'alter table ' + @tableName + ' drop column ' + @columnName;
   EXECUTE(@sql);
 END
-$$
+GO
