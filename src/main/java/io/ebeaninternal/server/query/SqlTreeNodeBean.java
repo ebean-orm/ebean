@@ -376,7 +376,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       if (!lazyLoadMany && localBean != null) {
         ctx.setCurrentPrefix(prefix, pathMap);
         if (readId && !temporalVersions) {
-          createListProxies(localDesc, ctx, localBean, disableLazyLoad);
+          createListProxies();
         }
         if (temporalMode == SpiQuery.TemporalMode.DRAFT) {
           localDesc.setDraft(localBean);
@@ -409,6 +409,30 @@ class SqlTreeNodeBean implements SqlTreeNode {
         if (ctx.isAutoTuneProfiling() && !disableLazyLoad) {
           // collect autoTune profiling for this bean...
           ctx.profileBean(ebi, prefix);
+        }
+      }
+    }
+
+    /**
+     * Create lazy loading proxies for the Many's except for the one that is
+     * included in the actual query.
+     */
+    private void createListProxies() {
+      STreePropertyAssocMany fetchedMany = ctx.getManyProperty();
+      boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
+      // load the List/Set/Map proxy objects (deferred fetching of lists)
+      for (STreePropertyAssocMany many : localDesc.propsMany()) {
+        if (many != fetchedMany) {
+          // create a proxy for the many (deferred fetching)
+          BeanCollection<?> ref = many.createReference(localBean, forceNewReference);
+          if (ref != null) {
+            if (disableLazyLoad) {
+              ref.setDisableLazyLoad(true);
+            }
+            if (!ref.isRegisteredWithLoadContext()) {
+              ctx.register(many.getName(), ref);
+            }
+          }
         }
       }
     }
@@ -461,32 +485,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
     load.postLoad();
     load.setBeanToParent();
     return load.complete();
-  }
-
-  /**
-   * Create lazy loading proxies for the Many's except for the one that is
-   * included in the actual query.
-   */
-  private void createListProxies(STreeType localDesc, DbReadContext ctx, EntityBean localBean, boolean disableLazyLoad) {
-
-    STreePropertyAssocMany fetchedMany = ctx.getManyProperty();
-
-    // load the List/Set/Map proxy objects (deferred fetching of lists)
-    for (STreePropertyAssocMany many : localDesc.propsMany()) {
-
-      if (fetchedMany == null || !fetchedMany.equals(many)) {
-        // create a proxy for the many (deferred fetching)
-        BeanCollection<?> ref = many.createReferenceIfNull(localBean);
-        if (ref != null) {
-          if (disableLazyLoad) {
-            ref.setDisableLazyLoad(true);
-          }
-          if (!ref.isRegisteredWithLoadContext()) {
-            ctx.register(many.getName(), ref);
-          }
-        }
-      }
-    }
   }
 
   @Override

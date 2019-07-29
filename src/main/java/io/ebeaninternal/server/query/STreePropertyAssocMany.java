@@ -23,6 +23,11 @@ public interface STreePropertyAssocMany extends STreePropertyAssoc {
   BeanCollection<?> createReferenceIfNull(EntityBean localBean);
 
   /**
+   * Return a reference collection forcing a new reference on REFRESH query.
+   */
+  BeanCollection<?> createReference(EntityBean localBean, boolean forceNewReference);
+
+  /**
    * Return true if the property has a join table.
    */
   boolean hasJoinTable();
