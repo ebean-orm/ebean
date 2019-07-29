@@ -35,6 +35,7 @@ import java.sql.SQLException;
 public class DdlGenerator {
 
   private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
+  private static final String[] BUILD_DIRS = {"target", "build"};
 
   private final SpiEbeanServer server;
 
@@ -50,6 +51,7 @@ public class DdlGenerator {
   private CurrentModel currentModel;
   private String dropAllContent;
   private String createAllContent;
+  private File baseDir;
 
   public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
@@ -67,6 +69,17 @@ public class DdlGenerator {
       this.ddlCommitOnCreateIndex = server.getDatabasePlatform().isDdlCommitOnCreateIndex();
     }
     this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
+    this.baseDir = initBaseDir();
+  }
+
+  private File initBaseDir() {
+    for (String buildDir : BUILD_DIRS) {
+      File dir = new File(buildDir);
+      if (dir.exists() && dir.isDirectory()) {
+        return dir;
+      }
+    }
+    return new File(".");
   }
 
   /**
@@ -212,7 +225,6 @@ public class DdlGenerator {
    * extra-ddl.xml should have some partition initialisation but this helps people get going.
    */
   private void checkInitialTablePartitions(Connection connection) {
-
     DatabasePlatform databasePlatform = server.getDatabasePlatform();
     try {
       StringBuilder sb = new StringBuilder();
@@ -245,12 +257,11 @@ public class DdlGenerator {
   }
 
   protected void runResourceScript(Connection connection, String sqlScript) throws IOException {
-
     if (sqlScript != null) {
       try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
         if (is != null) {
           String content = readContent(new InputStreamReader(is));
-          runScript(connection,  false, content, sqlScript);
+          runScript(connection, false, content, sqlScript);
         }
       }
     }
@@ -268,7 +279,6 @@ public class DdlGenerator {
   }
 
   protected void writeDrop(String dropFile) {
-
     try {
       writeFile(dropFile, generateDropAllDdl());
     } catch (IOException e) {
@@ -277,7 +287,6 @@ public class DdlGenerator {
   }
 
   protected void writeCreate(String createFile) {
-
     try {
       writeFile(createFile, generateCreateAllDdl());
     } catch (IOException e) {
@@ -286,7 +295,6 @@ public class DdlGenerator {
   }
 
   protected String generateDropAllDdl() {
-
     try {
       dropAllContent = currentModel().getDropAllDdl();
       return dropAllContent;
@@ -296,7 +304,6 @@ public class DdlGenerator {
   }
 
   protected String generateCreateAllDdl() {
-
     try {
       createAllContent = currentModel().getCreateDdl();
       return createAllContent;
@@ -321,8 +328,7 @@ public class DdlGenerator {
   }
 
   protected void writeFile(String fileName, String fileContent) throws IOException {
-
-    File f = new File(fileName);
+    File f = new File(baseDir, fileName);
     try (FileWriter fw = new FileWriter(f)) {
       fw.write(fileContent);
       fw.flush();
@@ -330,17 +336,14 @@ public class DdlGenerator {
   }
 
   protected String readFile(String fileName) throws IOException {
-
-    File f = new File(fileName);
+    File f = new File(baseDir, fileName);
     if (!f.exists()) {
       return null;
     }
-
     return readContent(new FileReader(f));
   }
 
   protected String readContent(Reader reader) throws IOException {
-
     StringBuilder buf = new StringBuilder();
     try (LineNumberReader lineReader = new LineNumberReader(reader)) {
       String s;
@@ -355,7 +358,6 @@ public class DdlGenerator {
    * Create the ScriptTransform for placeholder key/value replacement.
    */
   private ScriptTransform createScriptTransform(DbMigrationConfig config) {
-
     return ScriptTransform.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
   }
 
