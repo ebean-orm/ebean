@@ -17,4 +17,9 @@ public class LocalDataTimeZone implements DataTimeZone {
   public Calendar getTimeZone() {
     return zone;
   }
+
+  @Override
+    public Calendar getDateTimeZone() {
+      return zone; // workaround for MySQL. TODO: rename class to MySqlDataTimeZone!?
+    }
 }
