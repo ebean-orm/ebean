@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.41.5-SNAPSHOT</version>
+  <version>11.42.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -315,7 +315,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.41.3</version>
+        <version>11.42.1</version>
         <executions>
           <execution>
             <id>test</id>
