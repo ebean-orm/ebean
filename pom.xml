@@ -16,7 +16,8 @@
   <url>http://ebean-orm.github.io/</url>
 
   <properties>
-    <jackson-core.version>2.9.8</jackson-core.version>
+    <jackson-core.version>2.9.9</jackson-core.version>
+    <jackson-databind.version>2.9.9.1</jackson-databind.version>
     <snakeyaml.version>1.21</snakeyaml.version>
   </properties>
 
@@ -161,7 +162,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson-core.version}</version>
+      <version>${jackson-databind.version}</version>
       <scope>provided</scope>
     </dependency>
 
