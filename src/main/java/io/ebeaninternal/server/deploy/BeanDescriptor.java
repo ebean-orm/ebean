@@ -3202,7 +3202,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
-    return ebi.hasIdOnly(idPropertyIndex);
+    return propertiesBaseScalar.length > 0 && ebi.hasIdOnly(idPropertyIndex);
   }
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
