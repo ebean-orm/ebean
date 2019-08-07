@@ -92,7 +92,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
         if (!network.isLoopback()) {
           byte[] addr = network.getHardwareAddress();
           if (validAddr(addr)) {
-            if (network.isUp() && network.isVirtual()) {
+            if (network.isUp() && !network.isVirtual()) {
               logger.debug("Using interface {}", network);
               return addr;
             } else if (fallbackAddr == null) {
