@@ -107,6 +107,24 @@
   </dependencies>
 
   <build>
+    <resources>
+      <!-- We only want to apply filtering on the pom.properties file -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/pom.properties</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/pom.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
