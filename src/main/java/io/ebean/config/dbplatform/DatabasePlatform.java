@@ -577,7 +577,7 @@ public class DatabasePlatform {
   /**
    * Normally not needed - overridden in CockroachPlatform.
    */
-  public boolean isDdlCommitOnCreateIndex() {
+  public boolean isDdlAutoCommit() {
     return false;
   }
 

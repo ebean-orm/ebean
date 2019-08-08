@@ -33,7 +33,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected String currentTimestamp = "now(6)";
   protected String sysPeriodType = "datetime(6)";
 
-  public DbTriggerBasedHistoryDdl() {
+  DbTriggerBasedHistoryDdl() {
   }
 
   @Override
@@ -252,7 +252,6 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void appendColumnNames(DdlBuffer buffer, List<String> columns, String columnPrefix) throws IOException {
-
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         buffer.append(", ");
@@ -266,7 +265,6 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    * Append a single column to the buffer if it is not null.
    */
   protected void appendColumnName(DdlBuffer buffer, String prefix, String columnName) throws IOException {
-
     if (columnName != null) {
       buffer.append(prefix).append(columnName);
     }
@@ -281,7 +279,6 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    * </p>
    */
   protected List<String> columnNamesForApply(MTable table) {
-
     return table.allHistoryColumns(true);
   }
 

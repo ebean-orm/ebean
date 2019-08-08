@@ -21,7 +21,7 @@ public class CockroachPlatform extends PostgresPlatform {
    * Needs a commit after create index such that alter table add foreign key ... succeeds.
    */
   @Override
-  public boolean isDdlCommitOnCreateIndex() {
+  public boolean isDdlAutoCommit() {
     return true;
   }
 

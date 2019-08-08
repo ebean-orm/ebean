@@ -44,7 +44,7 @@ public class DdlGenerator {
   private final boolean extraDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
-  private final boolean ddlCommitOnCreateIndex;
+  private final boolean ddlAutoCommit;
   private final String dbSchema;
   private final ScriptTransform scriptTransform;
 
@@ -63,10 +63,10 @@ public class DdlGenerator {
     if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
-      this.ddlCommitOnCreateIndex = false;
+      this.ddlAutoCommit = false;
     } else {
       this.runDdl = serverConfig.isDdlRun();
-      this.ddlCommitOnCreateIndex = server.getDatabasePlatform().isDdlCommitOnCreateIndex();
+      this.ddlAutoCommit = server.getDatabasePlatform().isDdlAutoCommit();
     }
     this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
     this.baseDir = initBaseDir();
@@ -160,13 +160,11 @@ public class DdlGenerator {
 
     DdlRunner runner = new DdlRunner(expectErrors, scriptName);
     try {
-      if (expectErrors) {
+      if (expectErrors || ddlAutoCommit) {
         connection.setAutoCommit(true);
-      } else if (ddlCommitOnCreateIndex) {
-        runner.setCommitOnCreateIndex();
       }
       int count = runner.runAll(scriptTransform.transform(content), connection);
-      if (expectErrors) {
+      if (expectErrors || ddlAutoCommit) {
         connection.setAutoCommit(false);
       }
       connection.commit();

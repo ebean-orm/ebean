@@ -10,7 +10,6 @@ public class CockroachDdl extends PlatformDdl {
 
   public CockroachDdl(DatabasePlatform platform) {
     super(platform);
-    this.historyDdl = new PostgresHistoryDdl();
     this.dropTableCascade = " cascade";
     this.columnSetType = "type ";
     this.alterTableIfExists = "if exists ";
