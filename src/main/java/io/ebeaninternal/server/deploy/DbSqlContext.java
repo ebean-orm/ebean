@@ -10,7 +10,7 @@ public interface DbSqlContext {
   /**
    * Add a join to the sql query.
    */
-  void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance);
+  void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance, String extraWhere);
 
   /**
    * Push the current table alias onto the stack.

@@ -115,7 +115,7 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance) {
+  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance, String extraWhere) {
 
     if (tableJoins == null) {
       tableJoins = new HashSet<>();
@@ -176,6 +176,13 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     if (addAsOfOnClause) {
       sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
+    }
+
+    if (extraWhere != null && !extraWhere.isEmpty()) {
+      String ew = StringHelper.replaceString(extraWhere, tableAliasPlaceHolder, a2);
+      // we will also need a many-table alias here
+      ew = StringHelper.replaceString(ew, "${mta}", a1);
+      sb.append(" and ").append(ew);
     }
 
     sb.append(" ");
