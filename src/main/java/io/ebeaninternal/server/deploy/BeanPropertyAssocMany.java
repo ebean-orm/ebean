@@ -1070,4 +1070,16 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void bindElementValue(SqlUpdate insert, Object value) {
     targetDescriptor.bindElementValue(insert, value);
   }
+
+  /**
+   * Returns true, if we must create a m2m join table.
+   */
+  public boolean createJoinTable() {
+    if (hasJoinTable() && getMappedBy() == null) {
+      // only create on other 'owning' side
+      return !descriptor.isTableManaged(intersectionJoin.getTable());
+    } else {
+      return false;
+    }
+  }
 }

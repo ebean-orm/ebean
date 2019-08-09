@@ -71,4 +71,10 @@ public interface BeanDescriptorMap {
    * Return the scalarType for the given logical type.
    */
   ScalarType<?> getScalarType(String cast);
+
+  /**
+   * Returns true, if the given table (or view) is managed by ebean
+   * (= an entity exists)
+   */
+  boolean isTableManaged(String tableName);
 }
