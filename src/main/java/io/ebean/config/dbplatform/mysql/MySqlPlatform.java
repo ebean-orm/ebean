@@ -31,8 +31,6 @@ public class MySqlPlatform extends DatabasePlatform {
     this.dbEncrypt = new MySqlDbEncrypt();
     this.historySupport = new MySqlHistorySupport();
     this.columnAliasPrefix = null;
-    //this.truncateTableBefore = "set foreign_key_checks = 0";
-    //this.truncateTableAfter = "set foreign_key_checks = 1";
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);

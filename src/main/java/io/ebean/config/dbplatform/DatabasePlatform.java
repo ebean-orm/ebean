@@ -140,8 +140,6 @@ public class DatabasePlatform {
   protected Platform platform = Platform.GENERIC;
 
   protected String truncateTable = "truncate table %s";
-  protected String truncateTableBefore;
-  protected String truncateTableAfter;
 
   protected String columnAliasPrefix = "c";
 
@@ -717,20 +715,6 @@ public class DatabasePlatform {
    */
   public String truncateStatement(String table) {
     return String.format(truncateTable, table);
-  }
-
-  /**
-   * Return a statement to execute prior to truncate (like disable foreign keys for mysql).
-   */
-  public String truncateStatementBefore() {
-    return truncateTableBefore;
-  }
-
-  /**
-   * Return a statement to execute after truncate (like enable foreign keys for mysql).
-   */
-  public String truncateStatementAfter() {
-    return truncateTableAfter;
   }
 
   /**

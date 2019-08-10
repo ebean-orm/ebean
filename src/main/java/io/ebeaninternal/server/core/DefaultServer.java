@@ -653,11 +653,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void truncate(String... tables) {
     try (Connection connection = getDataSource().getConnection()) {
-      executeSql(connection, databasePlatform.truncateStatementBefore());
       for (String table : tables) {
         executeSql(connection, databasePlatform.truncateStatement(table));
       }
-      executeSql(connection, databasePlatform.truncateStatementAfter());
       connection.commit();
     } catch(SQLException e) {
       throw new PersistenceException("Error executing truncate", e);
