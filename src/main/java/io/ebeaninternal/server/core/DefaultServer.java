@@ -124,8 +124,10 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -637,6 +639,38 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     evt.add(tableName, inserts, updates, deletes);
 
     externalModification(evt);
+  }
+
+  @Override
+  public void truncate(Class<?>... types) {
+    List<String> tableNames = new ArrayList<>();
+    for (Class<?> type : types) {
+      tableNames.add(getBeanDescriptor(type).getBaseTable());
+    }
+    truncate(tableNames.toArray(new String[0]));
+  }
+
+  @Override
+  public void truncate(String... tables) {
+    try (Connection connection = getDataSource().getConnection()) {
+      executeSql(connection, databasePlatform.truncateStatementBefore());
+      for (String table : tables) {
+        executeSql(connection, databasePlatform.truncateStatement(table));
+      }
+      executeSql(connection, databasePlatform.truncateStatementAfter());
+      connection.commit();
+    } catch(SQLException e) {
+      throw new PersistenceException("Error executing truncate", e);
+    }
+  }
+
+  private void executeSql(Connection connection, String sql) throws SQLException {
+    if (sql != null) {
+      try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        transactionManager.log().sql().debug(sql);
+        stmt.execute();
+      }
+    }
   }
 
   /**

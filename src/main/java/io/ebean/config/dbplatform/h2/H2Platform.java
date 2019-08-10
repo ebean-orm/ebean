@@ -26,7 +26,8 @@ public class H2Platform extends DatabasePlatform {
     this.supportsDeleteTableAlias = true;
     this.dbDefaultValue.setNow("now()");
     this.columnAliasPrefix = null;
-
+    //this.truncateTableBefore = "set referential_integrity false";
+    //this.truncateTableAfter = "set referential_integrity true";
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("50200","HYT00")

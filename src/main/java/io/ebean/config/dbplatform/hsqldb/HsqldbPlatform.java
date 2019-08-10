@@ -21,7 +21,7 @@ public class HsqldbPlatform extends DatabasePlatform {
     super();
     this.platform = Platform.HSQLDB;
     this.dbEncrypt = new H2DbEncrypt();
-
+    this.truncateTable = "delete from %s";
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);

@@ -36,7 +36,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.clobDbType = Types.VARCHAR;
     this.nativeUuidType = true;
     this.columnAliasPrefix = null;
-
+    this.truncateTable = "truncate table %s cascade";
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
 

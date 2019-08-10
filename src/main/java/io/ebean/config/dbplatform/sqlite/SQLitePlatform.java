@@ -17,7 +17,7 @@ public class SQLitePlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
     this.dbIdentity.setSupportsSequence(false);
     this.dbIdentity.setSelectLastInsertedIdTemplate("select last_insert_rowid()");
-
+    this.truncateTable = "delete from %s";
     this.booleanDbType = Types.INTEGER;
     this.likeClauseRaw = "like ?";
     this.likeClauseEscaped = "like ?";

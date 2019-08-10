@@ -94,7 +94,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void setClock(Clock clock) {
-
   }
 
   @Override
@@ -104,7 +103,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void shutdownManaged() {
-
   }
 
   @Override
@@ -113,8 +111,15 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void scopedTransactionEnter(TxScope txScope) {
+  public void truncate(String... tables) {
+  }
 
+  @Override
+  public void truncate(Class<?>... tables) {
+  }
+
+  @Override
+  public void scopedTransactionEnter(TxScope txScope) {
   }
 
   @Override
@@ -229,7 +234,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void clearServerTransaction() {
-    
   }
 
   @Override
@@ -249,7 +253,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void remoteTransactionEvent(RemoteTransactionEvent event) {
-
   }
 
   @Override
@@ -274,17 +277,14 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void merge(Object bean) {
-
   }
 
   @Override
   public void merge(Object bean, MergeOptions options) {
-
   }
 
   @Override
   public void merge(Object bean, MergeOptions options, Transaction transaction) {
-
   }
 
   @Override
@@ -304,12 +304,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void loadBean(LoadBeanRequest loadRequest) {
-
   }
 
   @Override
   public void loadMany(LoadManyRequest loadRequest) {
-
   }
 
   @Override
@@ -324,27 +322,22 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros) {
-
   }
 
   @Override
   public void visitMetrics(MetricVisitor visitor) {
-
   }
 
   @Override
   public void loadMany(BeanCollection<?> collection, boolean onlyIds) {
-
   }
 
   @Override
   public void loadBean(EntityBeanIntercept ebi) {
-
   }
 
   @Override
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
-
   }
 
   @Override
@@ -439,7 +432,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> void sort(List<T> list, String sortByClause) {
-
   }
 
   @Override
@@ -449,12 +441,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer) {
-
   }
 
   @Override
   public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
-
   }
 
   @Override
@@ -509,7 +499,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void findEachRow(SpiSqlQuery query, RowConsumer consumer) {
-
   }
 
   @Override
@@ -539,7 +528,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void register(TransactionCallback transactionCallback) throws PersistenceException {
-
   }
 
   @Override
@@ -614,32 +602,26 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void flush() {
-
   }
 
   @Override
   public void commitTransaction() {
-
   }
 
   @Override
   public void rollbackTransaction() {
-
   }
 
   @Override
   public void endTransaction() {
-
   }
 
   @Override
   public void refresh(Object bean) {
-
   }
 
   @Override
   public void refreshMany(Object bean, String propertyName) {
-
   }
 
   @Override
@@ -679,12 +661,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction) {
-
   }
 
   @Override
   public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction) {
-
   }
 
   @Override
@@ -757,7 +737,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void save(Object bean) throws OptimisticLockException {
-
   }
 
   @Override
@@ -807,7 +786,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void externalModification(String tableName, boolean inserted, boolean updated, boolean deleted) {
-
   }
 
   @Override
@@ -817,37 +795,30 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void save(Object bean, Transaction transaction) throws OptimisticLockException {
-
   }
 
   @Override
   public void markAsDirty(Object bean) {
-
   }
 
   @Override
   public void update(Object bean) throws OptimisticLockException {
-
   }
 
   @Override
   public void update(Object bean, Transaction t) throws OptimisticLockException {
-
   }
 
   @Override
   public void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException {
-
   }
 
   @Override
   public void insert(Object bean) {
-
   }
 
   @Override
   public void insert(Object bean, Transaction t) {
-
   }
 
   @Override
@@ -887,7 +858,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
-
   }
 
   @Override
@@ -902,12 +872,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void execute(TxScope scope, Runnable r) {
-
   }
 
   @Override
   public void execute(Runnable r) {
-
   }
 
   @Override
@@ -982,27 +950,22 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void updateAll(Collection<?> beans) throws OptimisticLockException {
-
   }
 
   @Override
   public void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
-
   }
 
   @Override
   public void insertAll(Collection<?> beans) {
-
   }
 
   @Override
   public void insertAll(Collection<?> beans, Transaction transaction) {
-
   }
 
   @Override
   public void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query) {
-
   }
 
   @Override

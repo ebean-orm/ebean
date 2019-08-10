@@ -1580,4 +1580,15 @@ public interface Database {
    * </p>
    */
   <T> Set<String> validateQuery(Query<T> query);
+
+  /**
+   * Truncate all the given tables.
+   */
+  void truncate(String... tables);
+
+  /**
+   * Truncate the base tables for the given bean types.
+   */
+  void truncate(Class<?>... tables);
+
 }
