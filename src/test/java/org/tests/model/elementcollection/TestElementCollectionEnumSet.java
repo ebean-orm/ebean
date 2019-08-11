@@ -1,7 +1,6 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import org.junit.Test;
 
@@ -11,7 +10,6 @@ public class TestElementCollectionEnumSet extends BaseTestCase {
 
   @Test
   public void test() {
-    DB.truncate(EcEnumPerson.class);
 
     EcEnumPerson person = new EcEnumPerson("Enum Person");
     person.getTags().add(EcEnumPerson.Tags.BLUE);

@@ -1,7 +1,6 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -15,7 +14,6 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
   @Test
   public void test() {
-    DB.truncate(EcsPerson.class);
 
     LoggedSqlCollector.start();
 

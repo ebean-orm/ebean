@@ -1,7 +1,6 @@
 package org.tests.model.lazywithid;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import org.junit.Test;
 
@@ -12,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 public class TestColumnIdName extends BaseTestCase {
   @Test
   public void test() {
-    DB.truncate(Tune.class);
 
     Tune tune = new Tune();
     tune.getLoonies().add(new Looney("Taz"));

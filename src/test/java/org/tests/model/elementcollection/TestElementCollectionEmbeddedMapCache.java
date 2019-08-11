@@ -1,7 +1,6 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -14,7 +13,6 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
 
   @Test
   public void test() {
-    DB.truncate(EcbmPerson.class);
 
     EcbmPerson person = new EcbmPerson("Cache1");
     person.getPhoneNumbers().put("home", new EcPhone("64", "021", "1234"));

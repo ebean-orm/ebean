@@ -1,7 +1,6 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -16,7 +15,6 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
 
   @Test
   public void test() {
-    DB.truncate(EcmPerson.class);
 
     EcmPerson person = new EcmPerson("CacheMap");
     person.getPhoneNumbers().put("home", "021 1234");

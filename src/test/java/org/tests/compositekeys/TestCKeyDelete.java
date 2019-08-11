@@ -38,7 +38,6 @@ public class TestCKeyDelete extends BaseTestCase {
 
   @Test
   public void testDeleteWhere() {
-    DB.truncate(CKeyParent.class);
 
     CKeyParentId id = new CKeyParentId(101, "deleteMe2");
     CKeyParentId searchId = new CKeyParentId(101, "deleteMe2");

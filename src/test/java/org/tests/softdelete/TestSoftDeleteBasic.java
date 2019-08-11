@@ -1,7 +1,6 @@
 package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlQuery;
@@ -114,7 +113,6 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
   @Test
   public void testFindSoftDeleted() {
-    DB.truncate(EBasicSoftDelete.class);
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("softDelFetch");
