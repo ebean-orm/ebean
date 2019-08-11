@@ -1,6 +1,7 @@
 package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
@@ -15,6 +16,8 @@ public class TestM2MDeleteCascadeFromParent extends BaseTestCase {
 
   @Test
   public void test() {
+
+    DB.truncate("mny_b_mny_c","mny_c","mny_b", "mny_a");
 
     MnyC c0 = new MnyC();
     c0.setName("c0");

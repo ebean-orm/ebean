@@ -31,7 +31,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     customer.setAnniversary(largeDate);
 
     Address billingAddress = new Address();
-    billingAddress.setId(Short.valueOf("12"));
+    billingAddress.setId(12);
     billingAddress.setCity("SomePlace");
 
     customer.setBillingAddress(billingAddress);

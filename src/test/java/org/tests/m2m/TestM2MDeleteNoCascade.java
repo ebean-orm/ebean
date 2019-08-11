@@ -2,6 +2,8 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.tests.model.basic.MnocRole;
 import org.tests.model.basic.MnocUser;
 import org.junit.Assert;
@@ -12,6 +14,7 @@ import java.util.List;
 
 public class TestM2MDeleteNoCascade extends BaseTestCase {
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void test() {
 

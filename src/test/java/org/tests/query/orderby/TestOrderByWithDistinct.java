@@ -41,7 +41,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
   }
 
   @Test
-  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER}) // do not support nulls first/last
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER, Platform.NUODB}) // do not support nulls first/last
   public void testDistinctOn() {
 
     MRole role = Ebean.getReference(MRole.class, 1);

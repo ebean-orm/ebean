@@ -77,7 +77,7 @@
   <logger name="io.ebean" level="INFO"/>
 
   <logger name="io.ebean.docker" level="TRACE"/>
-  <!--<logger name="io.ebean.DDL" level="DEBUG"/>-->
+<!--  <logger name="io.ebean.DDL" level="DEBUG"/>-->
 
   <logger name="io.ebean.SQL" level="TRACE"/>
 <!--  <logger name="io.ebean.TXN" level="TRACE"/>-->

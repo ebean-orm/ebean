@@ -15,6 +15,7 @@ import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
@@ -804,6 +805,8 @@ public class DefaultDbMigration implements DbMigration {
         return new SQLitePlatform();
       case HANA:
         return new HanaPlatform();
+      case NUODB:
+        return new NuoDbPlatform();
       case COCKROACH:
         return new CockroachPlatform();
       case CLICKHOUSE:

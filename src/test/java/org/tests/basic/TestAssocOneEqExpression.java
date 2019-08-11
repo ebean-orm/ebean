@@ -29,7 +29,7 @@ public class TestAssocOneEqExpression extends BaseTestCase {
     Assert.assertTrue(sql.contains("where t0.kcustomer_id = ?"));
 
     Address b = new Address();
-    b.setId((short) 1);
+    b.setId(1);
 
     Query<Order> q2 = Ebean.find(Order.class)
       .where().eq("customer.billingAddress", b)

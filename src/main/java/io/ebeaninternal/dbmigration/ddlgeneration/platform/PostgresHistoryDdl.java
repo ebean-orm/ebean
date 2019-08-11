@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
-
-  public PostgresHistoryDdl() {
-    this.currentTimestamp = "current_timestamp";
+  PostgresHistoryDdl() {
+    this.now = "current_timestamp";
+    this.sysPeriodEndValue = "current_timestamp";
   }
 
   /**
@@ -36,7 +36,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
   protected void addSysPeriodColumns(DdlBuffer apply, String baseTableName, String whenCreatedColumn) throws IOException {
     apply
       .append("alter table ").append(baseTableName)
-      .append(" add column ").append(sysPeriod).append(" tstzrange not null default tstzrange(").append(currentTimestamp).append(", null)")
+      .append(" add column ").append(sysPeriod).append(" tstzrange not null default tstzrange(").append(now).append(", null)")
       .endOfStatement();
 
     if (whenCreatedColumn != null) {

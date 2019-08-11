@@ -1,8 +1,11 @@
 package org.tests.insert;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.DataIntegrityException;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -11,6 +14,7 @@ import org.tests.model.basic.ResetBasicData;
 public class TestInsertDataIntegrityException extends BaseTestCase {
 
 
+  @IgnorePlatform(Platform.NUODB)
   @Test(expected = DataIntegrityException.class)
   public void insert_invalidForeignKey() {
 
@@ -23,6 +27,6 @@ public class TestInsertDataIntegrityException extends BaseTestCase {
     order.setStatus(Order.Status.NEW);
     order.setCustomer(invalidCustomer);
 
-    Ebean.save(order);
+    DB.save(order);
   }
 }

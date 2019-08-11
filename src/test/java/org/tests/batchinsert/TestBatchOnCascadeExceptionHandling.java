@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
 
-  @IgnorePlatform(Platform.HANA)
+  @IgnorePlatform({Platform.HANA, Platform.NUODB})
   @Test
   public void testBatchScenarioWithSavepoint() throws SQLException {
     server().save(createEntityWithName("conflict", "before"));
@@ -52,6 +52,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     assertThat(winner.getDescription()).isEqualTo("after");
   }
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void testBatchedInsertFailure() {
     server().save(createEntityWithName("foo"));
@@ -60,6 +61,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     });
   }
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void testBatchedUpdateFailure() {
     server().save(createEntityWithName("bla"));
@@ -71,6 +73,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     });
   }
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void testBatchedDeleteFailure() {
     final EOptOneC c = new EOptOneC();

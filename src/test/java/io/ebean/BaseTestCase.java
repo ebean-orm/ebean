@@ -170,6 +170,10 @@ public abstract class BaseTestCase {
     return Platform.ORACLE == platform();
   }
 
+  public boolean isNuoDb() {
+    return Platform.NUODB == platform();
+  }
+
   public boolean isDb2() {
     return Platform.DB2 == platform();
   }

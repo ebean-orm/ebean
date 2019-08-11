@@ -1,17 +1,18 @@
 package org.tests.model.lazywithid;
 
-import static org.junit.Assert.assertEquals;
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.Ebean;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.Test;
-
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import static org.junit.Assert.assertEquals;
 
 public class TestColumnIdName extends BaseTestCase {
   @Test
   public void test() {
+    DB.truncate(Tune.class);
 
     Tune tune = new Tune();
     tune.getLoonies().add(new Looney("Taz"));

@@ -2,6 +2,8 @@ package org.tests.ddl;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -82,6 +84,7 @@ public class TestForeignKeyModes extends BaseTestCase {
     assertThat(sql.get(1)).contains("delete from dfk_none_via_mto_m where id=?");
   }
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void setNullOnDelete() {
 
@@ -99,6 +102,7 @@ public class TestForeignKeyModes extends BaseTestCase {
     assertThat(found.getOne()).isNull();
   }
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void onDeleteCascade() {
 

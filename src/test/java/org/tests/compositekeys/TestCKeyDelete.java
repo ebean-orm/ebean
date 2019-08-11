@@ -1,7 +1,7 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.Test;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.CKeyParentId;
@@ -24,20 +24,21 @@ public class TestCKeyDelete extends BaseTestCase {
     p.setId(id);
     p.setName("testDelete");
 
-    Ebean.save(p);
+    DB.save(p);
 
-    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
+    CKeyParent found = DB.find(CKeyParent.class).where().idEq(searchId).findOne();
     assertNotNull(found);
 
-    Ebean.delete(CKeyParent.class, searchId);
+    DB.delete(CKeyParent.class, searchId);
 
-    CKeyParent notFound = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
+    CKeyParent notFound = DB.find(CKeyParent.class).where().idEq(searchId).findOne();
     assertNull(notFound);
 
   }
 
   @Test
   public void testDeleteWhere() {
+    DB.truncate(CKeyParent.class);
 
     CKeyParentId id = new CKeyParentId(101, "deleteMe2");
     CKeyParentId searchId = new CKeyParentId(101, "deleteMe2");
@@ -46,18 +47,18 @@ public class TestCKeyDelete extends BaseTestCase {
     p.setId(id);
     p.setName("testDelete");
 
-    Ebean.save(p);
+    DB.save(p);
 
-    List<CKeyParentId> ids = Ebean.find(CKeyParent.class).where().eq("id.oneKey", 101).findIds();
+    List<CKeyParentId> ids = DB.find(CKeyParent.class).where().eq("id.oneKey", 101).findIds();
     assertThat(ids).hasSize(1);
 
     CKeyParentId foundId = ids.get(0);
     assertThat(foundId.getOneKey()).isEqualTo(101);
     assertThat(foundId.getTwoKey()).isEqualTo("deleteMe2");
 
-    Ebean.createQuery(CKeyParent.class).where().eq("id.oneKey", 101).delete();
+    DB.createQuery(CKeyParent.class).where().eq("id.oneKey", 101).delete();
 
-    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
+    CKeyParent found = DB.find(CKeyParent.class).where().idEq(searchId).findOne();
     assertNull(found);
   }
 }
