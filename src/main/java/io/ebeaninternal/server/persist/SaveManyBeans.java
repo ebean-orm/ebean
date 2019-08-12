@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
@@ -222,7 +224,7 @@ public class SaveManyBeans extends SaveManyBase {
       }
       if (detailBean instanceof EntityBean) {
         Object id = targetDescriptor.getId((EntityBean) detailBean);
-        if (!DmlUtil.isNullOrZero(id)) {
+        if (!isNullOrZero(id)) {
           // remember the Id (other details not in the collection) will be removed
           detailIds.add(id);
         }

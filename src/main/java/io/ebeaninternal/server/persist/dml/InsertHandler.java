@@ -6,7 +6,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.persist.DmlUtil;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -14,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 
 /**
  * Insert bean handler.
@@ -66,7 +67,7 @@ public class InsertHandler extends DmlHandler {
 
     Object idValue = desc.getId(bean);
 
-    boolean withId = !DmlUtil.isNullOrZero(idValue);
+    boolean withId = !isNullOrZero(idValue);
 
     // check to see if we are going to use generated keys
     if (!withId) {

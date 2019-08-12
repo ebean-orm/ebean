@@ -10,7 +10,7 @@ import javax.persistence.Version;
 public class RelMaster {
 
   @Id
-  Long id;
+  long id;
 
   String name;
 
@@ -20,11 +20,11 @@ public class RelMaster {
   @ManyToOne(cascade = CascadeType.REMOVE)
   private RelDetail detail;
 
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

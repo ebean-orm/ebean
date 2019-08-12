@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Persister implementation using DML.
  * <p>
@@ -1227,11 +1229,9 @@ public final class DefaultPersister implements Persister {
     EntityBean bean = request.getEntityBean();
     Object uid = idProp.getValue(bean);
 
-    if (DmlUtil.isNullOrZero(uid)) {
-
+    if (isNullOrZero(uid)) {
       // generate the nextId and set it to the property
       Object nextId = desc.nextId(request.getTransaction());
-
       // cast the data type if required and set it
       desc.convertSetId(nextId, bean);
     }

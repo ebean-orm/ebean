@@ -112,6 +112,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Describes Beans including their deployment information.
  */
@@ -3210,7 +3212,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   boolean hasIdValue(EntityBean bean) {
-    return (idProperty != null && !DmlUtil.isNullOrZero(idProperty.getValue(bean)));
+    return (idProperty != null && !isNullOrZero(idProperty.getValue(bean)));
   }
 
   boolean hasVersionProperty(EntityBeanIntercept ebi) {
