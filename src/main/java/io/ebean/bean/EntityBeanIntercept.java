@@ -117,6 +117,14 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * EXPERIMENTAL - Constructor only for use by serialization frameworks.
+   */
+  public EntityBeanIntercept() {
+    this.owner = null;
+    this.flags = null;
+  }
+
+  /**
    * Return the 'owning' entity bean.
    */
   public EntityBean getOwner() {
