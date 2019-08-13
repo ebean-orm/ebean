@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.autotune.service;
 
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.AutoTuneConfig;
 import io.ebean.config.AutoTuneMode;
@@ -97,7 +97,7 @@ public class BaseQueryTuner {
 
     if (!useTuning(query)) {
       if (profiling) {
-        profiling(query, server.createCallStack());
+        profiling(query, server.createCallOrigin());
       }
       return false;
     }
@@ -110,8 +110,8 @@ public class BaseQueryTuner {
     }
 
     // create a query point to identify the query
-    CallStack stack = server.createCallStack();
-    ObjectGraphNode origin = query.setOrigin(stack);
+    CallOrigin callOrigin = server.createCallOrigin();
+    ObjectGraphNode origin = query.setOrigin(callOrigin);
 
     if (profiling) {
       if (profilingListener.isProfileRequest(origin, query)) {
@@ -154,10 +154,10 @@ public class BaseQueryTuner {
     }
   }
 
-  private void profiling(SpiQuery<?> query, CallStack stack) {
+  private void profiling(SpiQuery<?> query, CallOrigin call) {
 
     // create a query point to identify the query
-    ObjectGraphNode origin = query.setOrigin(stack);
+    ObjectGraphNode origin = query.setOrigin(call);
     if (profilingListener.isProfileRequest(origin, query)) {
       // collect more profiling based on profiling rate etc
       query.setProfilingListener(profilingListener);

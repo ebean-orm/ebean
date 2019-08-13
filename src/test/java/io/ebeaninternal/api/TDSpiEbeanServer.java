@@ -32,7 +32,7 @@ import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.cache.ServerCacheManager;
@@ -168,7 +168,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public CallStack createCallStack() {
+  public CallOrigin createCallOrigin() {
     return null;
   }
 

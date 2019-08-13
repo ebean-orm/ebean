@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.CallStack;
 
 import java.util.Arrays;
@@ -7,7 +8,7 @@ import java.util.Arrays;
 /**
  * Default CallStackFactory where the Hash function for StackTraceElement includes the line number.
  */
-public class DefaultCallStackFactory implements CallStackFactory {
+public class DefaultCallOriginFactory implements CallOriginFactory {
 
   private static final int IGNORE_LEADING_ELEMENTS = 5;
 
@@ -15,12 +16,12 @@ public class DefaultCallStackFactory implements CallStackFactory {
 
   private final int maxCallStack;
 
-  DefaultCallStackFactory(int maxCallStack) {
+  DefaultCallOriginFactory(int maxCallStack) {
     this.maxCallStack = maxCallStack;
   }
 
   @Override
-  public CallStack createCallStack() {
+  public CallOrigin createCallOrigin() {
      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
     // ignore the first 6 as they are always avaje stack elements
@@ -58,7 +59,7 @@ public class DefaultCallStackFactory implements CallStackFactory {
     return element.getMethodName().startsWith("_ebean_");
   }
 
-  private CallStack createCallStack(StackTraceElement[] finalTrace) {
+  private CallOrigin createCallStack(StackTraceElement[] finalTrace) {
     return new CallStack(finalTrace, finalTrace[0].hashCode(), pathHash(finalTrace));
   }
 

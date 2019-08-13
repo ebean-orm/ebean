@@ -3,7 +3,7 @@ package io.ebeaninternal.server.loadcontext;
 import io.ebean.CacheMode;
 import io.ebean.ProfileLocation;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -94,8 +94,8 @@ public class DLoadContext implements LoadContext {
   }
 
   private ObjectGraphOrigin initOrigin() {
-    CallStack callStack = ebeanServer.createCallStack();
-    return new ObjectGraphOrigin(0, callStack, rootDescriptor.getFullName());
+    CallOrigin callOrigin = ebeanServer.createCallOrigin();
+    return new ObjectGraphOrigin(0, callOrigin, rootDescriptor.getFullName());
   }
 
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {

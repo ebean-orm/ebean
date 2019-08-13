@@ -35,7 +35,7 @@ import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
@@ -164,7 +164,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   private final ClockService clockService;
 
-  private final CallStackFactory callStackFactory;
+  private final CallOriginFactory callStackFactory;
 
   /**
    * Handles the save, delete, updateSql CallableSql.
@@ -312,12 +312,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Create the CallStackFactory depending if AutoTune is being used.
    */
-  private CallStackFactory initCallStackFactory(ServerConfig serverConfig) {
+  private CallOriginFactory initCallStackFactory(ServerConfig serverConfig) {
     if (!serverConfig.getAutoTuneConfig().isActive()) {
       // use a common CallStack for performance as we don't care with no AutoTune
-      return new NoopCallStackFactory();
+      return new NoopCallOriginFactory();
     }
-    return new DefaultCallStackFactory(serverConfig.getMaxCallStack());
+    return new DefaultCallOriginFactory(serverConfig.getMaxCallStack());
   }
 
   private void configureServerPlugins() {
@@ -1135,7 +1135,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
-      query.setOrigin(createCallStack());
+      query.setOrigin(createCallOrigin());
     }
 
     return new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) t);
@@ -2309,8 +2309,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * </p>
    */
   @Override
-  public CallStack createCallStack() {
-    return callStackFactory.createCallStack();
+  public CallOrigin createCallOrigin() {
+    return callStackFactory.createCallOrigin();
   }
 
   @Override

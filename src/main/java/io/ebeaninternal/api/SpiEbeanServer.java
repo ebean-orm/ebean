@@ -11,7 +11,7 @@ import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.BeanLoader;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -81,7 +81,7 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader,
    * graph costing.
    * </p>
    */
-  CallStack createCallStack();
+  CallOrigin createCallOrigin();
 
   /**
    * Return the PersistenceContextScope to use defined at query or server level.
