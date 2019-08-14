@@ -24,7 +24,7 @@ import io.ebean.RawSql;
 import io.ebean.Transaction;
 import io.ebean.UpdateQuery;
 import io.ebean.Version;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.bean.PersistenceContext;
@@ -1073,10 +1073,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public ObjectGraphNode setOrigin(CallStack callStack) {
+  public ObjectGraphNode setOrigin(CallOrigin callOrigin) {
 
     // create a 'origin' which links this query to the profiling information
-    ObjectGraphOrigin o = new ObjectGraphOrigin(calculateOriginQueryHash(), callStack, beanType.getName());
+    ObjectGraphOrigin o = new ObjectGraphOrigin(calculateOriginQueryHash(), callOrigin, beanType.getName());
     parentNode = new ObjectGraphNode(o, null);
     return parentNode;
   }

@@ -16,7 +16,7 @@ public final class ObjectGraphOrigin implements Serializable {
 
   private static final long serialVersionUID = 410937765287968708L;
 
-  private final CallStack callStack;
+  private final CallOrigin callOrigin;
 
   private final String beanType;
 
@@ -24,11 +24,11 @@ public final class ObjectGraphOrigin implements Serializable {
 
   private final String key;
 
-  public ObjectGraphOrigin(int queryHash, CallStack callStack, String beanType) {
-    this.callStack = callStack;
+  public ObjectGraphOrigin(int queryHash, CallOrigin callOrigin, String beanType) {
+    this.callOrigin = callOrigin;
     this.beanType = beanType;
     this.queryHash = queryHash;
-    this.key = callStack.getOriginKey(queryHash);
+    this.key = callOrigin.getOriginKey(queryHash);
   }
 
   /**
@@ -49,22 +49,22 @@ public final class ObjectGraphOrigin implements Serializable {
   /**
    * The call stack involved.
    */
-  public CallStack getCallStack() {
-    return callStack;
+  public CallOrigin getCallOrigin() {
+    return callOrigin;
   }
 
-  public String getFirstStackElement() {
-    return callStack.getFirstStackTraceElement().toString();
+  public String getTopElement() {
+    return callOrigin.getTopElement();
   }
 
   @Override
   public String toString() {
-    return "key[" + key + "] type[" + beanType + "] " + callStack.getFirstStackTraceElement() + " ";
+    return "key[" + key + "] type[" + beanType + "] " + callOrigin.getTopElement();
   }
 
   @Override
   public int hashCode() {
-    int hc = 92821 * callStack.hashCode();
+    int hc = 92821 * callOrigin.hashCode();
     hc = 92821 * hc + beanType.hashCode();
     hc = 92821 * hc + queryHash;
     return hc;
@@ -82,6 +82,6 @@ public final class ObjectGraphOrigin implements Serializable {
     ObjectGraphOrigin e = (ObjectGraphOrigin) obj;
     return e.queryHash == queryHash
       && e.beanType.equals(beanType)
-      && e.callStack.equals(callStack);
+      && e.callOrigin.equals(callOrigin);
   }
 }

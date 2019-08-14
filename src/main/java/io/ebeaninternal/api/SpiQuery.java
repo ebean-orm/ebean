@@ -7,7 +7,7 @@ import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
@@ -558,7 +558,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * because the queryPlanHash is used to identify the query point.
    * </p>
    */
-  ObjectGraphNode setOrigin(CallStack callStack);
+  ObjectGraphNode setOrigin(CallOrigin callOrigin);
 
   /**
    * Set the profile point of the bean or collection that is lazy loading.

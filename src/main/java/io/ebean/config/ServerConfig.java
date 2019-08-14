@@ -2929,6 +2929,7 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
+    maxCallStack = p.getInt("maxCallStack", maxCallStack);
     dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
     dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);

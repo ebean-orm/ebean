@@ -21,7 +21,7 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 10; i++) {
       execute();
     }
     collectUsage();
@@ -35,7 +35,7 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
     sortOfBusy();
 
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 10; i++) {
       execute();
     }
   }
