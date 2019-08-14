@@ -23,4 +23,10 @@ public interface SpiFetchGroupService {
    * @return The FetchGroupBuilder to add additional select and fetch clauses
    */
   <T> FetchGroupBuilder<T> of(Class<T> beanType);
+
+  /**
+   * Return a new FetchGroupQuery for building FetchGroup via query beans.
+   */
+  <T> SpiFetchGroupQuery<T> queryFor(Class<T> beanType);
+
 }

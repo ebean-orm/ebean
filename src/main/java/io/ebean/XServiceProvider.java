@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.service.SpiFetchGroupQuery;
 import io.ebean.service.SpiFetchGroupService;
 import io.ebean.service.SpiProfileLocationFactory;
 import io.ebean.service.SpiRawSqlService;
@@ -70,5 +71,12 @@ class XServiceProvider {
    */
   static <T> FetchGroupBuilder<T> fetchGroupOf(Class<T> cls) {
     return fetchGroupService.of(cls);
+  }
+
+  /**
+   * Return the FetchGroup Query for building fetch groups via query beans.
+   */
+  static <T> SpiFetchGroupQuery<T> fetchGroupQueryFor(Class<T> cls) {
+    return fetchGroupService.queryFor(cls);
   }
 }
