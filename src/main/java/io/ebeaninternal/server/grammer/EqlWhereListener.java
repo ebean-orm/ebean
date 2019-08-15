@@ -37,7 +37,9 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
 
   abstract ExpressionFactory expressionFactory();
 
-  abstract Object namedParam(String substring);
+  abstract Object namedParam(String paramName);
+
+  abstract Object positionParam(String paramPosition);
 
   /**
    * Push the expression list onto the appropriate stack.
@@ -290,6 +292,8 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
 
     char firstChar = Character.toLowerCase(valueAsText.charAt(0));
     switch (firstChar) {
+      case '?':
+        return EqlValueType.POS_PARAM;
       case ':':
         return EqlValueType.NAMED_PARAM;
       case 't':
@@ -394,6 +398,8 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
         return new BigDecimal(value);
       case STRING:
         return unquote(value);
+      case POS_PARAM:
+        return positionParam(value);
       case NAMED_PARAM:
         return namedParam(value.substring(1));
       default:

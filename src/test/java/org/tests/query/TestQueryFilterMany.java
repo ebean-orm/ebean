@@ -176,4 +176,23 @@ public class TestQueryFilterMany extends BaseTestCase {
     platformAssertIn(sql.get(2), " from contact_note t0 where (t0.contact_id)");
     assertThat(sql.get(2)).contains(" and lower(t0.title) like");
   }
+
+  @Test
+  public void testFilterManyUsingExpression() {
+
+    ResetBasicData.reset();
+    LoggedSqlCollector.start();
+
+    Ebean.find(Customer.class)
+      .where()
+      .filterMany("contacts", "firstName isNotNull and email istartsWith ?", "rob")
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains(" from o_customer t0");
+    assertThat(sql.get(1)).contains("from contact t0 where ");
+    assertThat(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ? escape'|' )");
+  }
 }

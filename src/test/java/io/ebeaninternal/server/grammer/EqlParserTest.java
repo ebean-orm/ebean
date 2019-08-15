@@ -691,15 +691,45 @@ public class EqlParserTest extends BaseTestCase {
     }
   }
 
-//  @Test
-//  public void where_withParams() {
-//
-//    final Query<Customer> query = where("name = ? and smallnote istartsWith ?", "Rob", "Foo");
-//    query.findList();
-//    if (isH2()) {
-//      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 where t0.name is not null");
-//    }
-//  }
+  @Test
+  public void where_withParams() {
+
+    final Query<Customer> query = where("id isNotNull and name = ? and smallnote istartsWith ?", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.id is not null and t0.name = ? and lower(t0.smallnote) like ? escape'|' )");
+    }
+  }
+
+  @Test
+  public void where_withParamsQuPos() {
+
+    final Query<Customer> query = where("name = ?1 and smallnote istartsWith ?2 and name like ?1", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" where (t0.name = ? and lower(t0.smallnote) like ? escape'|'  and t0.name like ? escape'' )");
+    }
+  }
+
+  @Test
+  public void where_orSimple() {
+
+    final Query<Customer> query = where("id isNotNull or name = ?", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.id is not null or t0.name = ?)");
+    }
+  }
+
+  @Test
+  public void where_orWithParams() {
+
+    final Query<Customer> query = where("(id isNotNull or name = ?) and smallnote istartsWith ?", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|' )");
+    }
+  }
 
   private Query<Customer> where(String where, Object... params) {
 

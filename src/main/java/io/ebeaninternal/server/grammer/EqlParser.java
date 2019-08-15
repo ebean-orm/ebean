@@ -36,7 +36,7 @@ public class EqlParser {
     EQLParser parser = new EQLParser(new CommonTokenStream(new EQLLexer(CharStreams.fromString(raw))));
     parser.addErrorListener(errorListener);
 
-    new ParseTreeWalker().walk(new EqlWhereAdapter<>(where, expr), parser.conditional_expression());
+    new ParseTreeWalker().walk(new EqlWhereAdapter<>(where, expr, params), parser.conditional_expression());
   }
 
   static class ErrorListener extends BaseErrorListener {

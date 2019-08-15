@@ -36,6 +36,11 @@ class EqlAdapter<T> extends EqlWhereListener<T> {
     return query.createNamedParameter(parameterName);
   }
 
+  @Override
+  Object positionParam(String paramPosition) {
+    return query.createNamedParameter(paramPosition);
+  }
+
   /**
    * Return the current expression list that expressions should be added to.
    */

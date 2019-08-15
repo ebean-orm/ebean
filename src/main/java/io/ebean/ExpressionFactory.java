@@ -536,4 +536,12 @@ public interface ExpressionFactory {
    */
   <T> Junction<T> junction(Junction.Type type, Query<T> query, ExpressionList<T> parent);
 
+  /**
+   * Add the expressions to the given expression list.
+   *
+   * @param where       The expression list to add the expressions to
+   * @param expressions The expressions that are parsed
+   * @param params      Bind parameters to match ? or ?1 bind positions.
+   */
+  <T> void where(ExpressionList<T> where, String expressions, Object[] params);
 }
