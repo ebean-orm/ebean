@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.grammer;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
@@ -675,9 +676,36 @@ public class EqlParserTest extends BaseTestCase {
 
   private Query<Customer> parse(String raw) {
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     EqlParser.parse(raw, (SpiQuery<?>) query);
     return query;
   }
 
+  @Test
+  public void where_simple() {
+
+    final Query<Customer> query = where("name isNotNull");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 where t0.name is not null");
+    }
+  }
+
+//  @Test
+//  public void where_withParams() {
+//
+//    final Query<Customer> query = where("name = ? and smallnote istartsWith ?", "Rob", "Foo");
+//    query.findList();
+//    if (isH2()) {
+//      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 where t0.name is not null");
+//    }
+//  }
+
+  private Query<Customer> where(String where, Object... params) {
+
+    Query<Customer> query = DB.find(Customer.class);
+    EqlParser.parseWhere(where, query.where(), query.getExpressionFactory(), params);
+
+    return query;
+  }
 }

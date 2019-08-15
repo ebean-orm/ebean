@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.grammer;
 
+import io.ebean.ExpressionFactory;
+import io.ebean.ExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.grammer.antlr.EQLLexer;
 import io.ebeaninternal.server.grammer.antlr.EQLParser;
@@ -22,18 +24,19 @@ public class EqlParser {
    */
   public static <T> void parse(String raw, SpiQuery<T> query) {
 
-    EQLLexer lexer = new EQLLexer(CharStreams.fromString(raw));
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    EQLParser parser = new EQLParser(tokens);
+    EQLParser parser = new EQLParser(new CommonTokenStream(new EQLLexer(CharStreams.fromString(raw))));
     parser.addErrorListener(errorListener);
-    EQLParser.Select_statementContext context = parser.select_statement();
 
-    EqlAdapter<T> adapter = new EqlAdapter<>(query);
-
-    ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(adapter, context);
-
+    new ParseTreeWalker().walk(new EqlAdapter<>(query), parser.select_statement());
     query.simplifyExpressions();
+  }
+
+  public static <T> void parseWhere(String raw, ExpressionList<T> where, ExpressionFactory expr, Object[] params) {
+
+    EQLParser parser = new EQLParser(new CommonTokenStream(new EQLLexer(CharStreams.fromString(raw))));
+    parser.addErrorListener(errorListener);
+
+    new ParseTreeWalker().walk(new EqlWhereAdapter<>(where, expr), parser.conditional_expression());
   }
 
   static class ErrorListener extends BaseErrorListener {
