@@ -123,12 +123,17 @@ any_expression
    | inrange_expression
    | between_expression
    | propertyBetween_expression
+   | inOrEmpty_expression
    | in_expression
    | isNull_expression
    | isNotNull_expression
    | isEmpty_expression
    | isNotEmpty_expression
    | '(' any_expression ')'
+   ;
+
+inOrEmpty_expression
+   : PATH_VARIABLE 'inOrEmpty' in_value
    ;
 
 in_expression
@@ -199,6 +204,7 @@ comparison_operator
    | '<>' | '!=' | 'ne'
    | 'ieq'
    | 'ine'
+   | 'eqOrNull' | 'gtOrNull' | 'ltOrNull'
    ;
 
 value_expression

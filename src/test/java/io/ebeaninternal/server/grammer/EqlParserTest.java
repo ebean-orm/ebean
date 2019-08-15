@@ -14,7 +14,9 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +36,63 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+  }
+
+  @Test
+  public void where_eqOrNull_bindVal() {
+    Query<Customer> query = parse("where name eqOrNull 'Rob'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+  }
+
+  @Test
+  public void where_eqOrNull_bindNamed() {
+    Query<Customer> query = parse("where name eqOrNull :name");
+    query.setParameter("name", "Rob");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+  }
+
+  @Test
+  public void where_eqOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name eqOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_eqOrNull_bindPositioned_asNull() {
+
+    final Query<Customer> query = where("name eqOrNull ?", (String)null);
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("(t0.name is null or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_gtOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name gtOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.name > ? or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_ltOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name ltOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.name < ? or t0.name is null)");
+    }
   }
 
   @Test
@@ -274,6 +333,62 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  @Test
+  public void where_inOrEmpty_withVals() {
+
+    final Query<Customer> query = where("name inOrEmpty ?", Arrays.asList("Baz", "Maz", "Jim"));
+    query.findList();
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  @Test
+  public void where_inOrEmpty_withValsAsSet() {
+
+    final Query<Customer> query = where("name inOrEmpty ?", new HashSet<>(Arrays.asList("Baz", "Maz", "Jim")));
+    query.findList();
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  @Test
+  public void where_inOrEmpty_withEmpty() {
+
+    final Query<Customer> query = where("name inOrEmpty ?", new ArrayList());
+    query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain("where");
+  }
+
+  @Test
+  public void where_inOrEmpty_withNull() {
+
+    List<String> names = null;
+    final Query<Customer> query = where("name inOrEmpty ?", names);
+    query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain("where");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void query_inOrEmpty_withVals() {
+
+    Query<Customer> query = parse("where name inOrEmpty (:names)");
+    query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
+    query.findList();
+
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  /**
+   * This test fails in that we can't use inOrEmpty with named parameters.
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void query_inOrEmpty_withNamedParams_expect_IllegalArgument() {
+
+    Query<Customer> query = parse("where name inOrEmpty (:names)");
+    query.setParameter("names", new ArrayList<>());
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain("where");
   }
 
   @Test

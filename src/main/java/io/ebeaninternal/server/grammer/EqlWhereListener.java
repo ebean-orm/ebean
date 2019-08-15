@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 abstract class EqlWhereListener<T> extends EQLBaseListener {
 
@@ -25,6 +26,8 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
   ArrayStack<ExpressionList<T>> whereStack;
 
   boolean textMode;
+
+  private boolean inWithEmpty;
 
   private List<Object> inValues;
 
@@ -103,6 +106,13 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
   }
 
   @Override
+  public void enterInOrEmpty_expression(EQLParser.InOrEmpty_expressionContext ctx) {
+    this.inWithEmpty = true;
+    this.inValues = new ArrayList<>();
+    this.inPropertyName = getLeftHandSidePath(ctx);
+  }
+
+  @Override
   public void enterIn_expression(EQLParser.In_expressionContext ctx) {
     this.inValues = new ArrayList<>();
     this.inPropertyName = getLeftHandSidePath(ctx);
@@ -113,10 +123,40 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
     int childCount = ctx.getChildCount();
     for (int i = 0; i < childCount; i++) {
       String text = child(ctx, i);
-      if (isValue(text)) {
-        inValues.add(bind(text));
+      if (text.startsWith("?")) {
+        inValues = toList(getBindValue(EqlValueType.POS_PARAM, text));
+      } else {
+        if (inWithEmpty) {
+          throw new IllegalArgumentException("Sorry, can only use inOrEmpty with positioned parameters");
+        }
+        if (isValue(text)) {
+          inValues.add(bind(text));
+        }
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<Object> toList(Object value) {
+    if (value == null) return null;
+    if (value instanceof List) {
+      return (List<Object>)value;
+    }
+    if (value instanceof Set) {
+      return new ArrayList<>((Set)value);
+    }
+    throw new IllegalArgumentException("Expected List of Set but got " + value);
+  }
+
+  @Override
+  public void exitIn_expression(EQLParser.In_expressionContext ctx) {
+    peekExprList().in(inPropertyName, inValues);
+  }
+
+  @Override
+  public void exitInOrEmpty_expression(EQLParser.InOrEmpty_expressionContext ctx) {
+    inWithEmpty = false;
+    peekExprList().inOrEmpty(inPropertyName, inValues);
   }
 
   String child(ParserRuleContext ctx, int position) {
@@ -126,11 +166,6 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
 
   private boolean isValue(String text) {
     return text.length() != 1 || (!text.equals("(") && !text.equals(")") && !text.equals(","));
-  }
-
-  @Override
-  public void exitIn_expression(EQLParser.In_expressionContext ctx) {
-    addIn(inPropertyName, inValues);
   }
 
   @Override
@@ -210,6 +245,12 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
         return EqlOperator.LT;
       case GTE:
         return EqlOperator.LTE;
+      case EQORNULL:
+        return EqlOperator.EQORNULL;
+      case GTORNULL:
+        return EqlOperator.LTORNULL;
+      case LTORNULL:
+        return EqlOperator.GTORNULL;
       default:
         throw new IllegalStateException("Can not invert operator " + op);
     }
@@ -322,12 +363,7 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
     peekExprList().inRange(path, bind(value1), bind(value2));
   }
 
-  private void addIn(String path, List<Object> inValues) {
-    peekExprList().in(path, inValues);
-  }
-
   private void addExpression(String path, EqlOperator op, String value) {
-
     switch (op) {
       case EQ:
         peekExprList().eq(path, bind(value));
@@ -377,6 +413,16 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
       case IENDS_WITH:
         addLike(true, LikeType.ENDS_WITH, path, bind(value));
         break;
+      case EQORNULL:
+        peekExprList().eqOrNull(path, bind(value));
+        break;
+      case GTORNULL:
+        peekExprList().gtOrNull(path, bind(value));
+        break;
+      case LTORNULL:
+        peekExprList().ltOrNull(path, bind(value));
+        break;
+
       default:
         throw new IllegalStateException("Unhandled operator " + op);
     }
