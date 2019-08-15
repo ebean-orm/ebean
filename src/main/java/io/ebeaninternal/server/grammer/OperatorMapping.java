@@ -42,6 +42,7 @@ class OperatorMapping {
     map.put("ilike", EqlOperator.ILIKE);
 
     map.put("inrange", EqlOperator.INRANGE);
+    map.put("inRange", EqlOperator.INRANGE);
     map.put("between", EqlOperator.BETWEEN);
     map.put("eqOrNull", EqlOperator.EQORNULL);
     map.put("gtOrNull", EqlOperator.GTORNULL);

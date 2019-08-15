@@ -150,7 +150,11 @@ between_expression
    ;
 
 inrange_expression
-   : PATH_VARIABLE 'inrange' value_expression 'to' value_expression
+   : PATH_VARIABLE inrange_op value_expression 'to' value_expression
+   ;
+
+inrange_op
+   : 'inrange' | 'inRange'
    ;
 
 propertyBetween_expression

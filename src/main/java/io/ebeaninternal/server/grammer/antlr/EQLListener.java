@@ -338,6 +338,16 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitInrange_expression(EQLParser.Inrange_expressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#inrange_op}.
+	 * @param ctx the parse tree
+	 */
+	void enterInrange_op(EQLParser.Inrange_opContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#inrange_op}.
+	 * @param ctx the parse tree
+	 */
+	void exitInrange_op(EQLParser.Inrange_opContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#propertyBetween_expression}.
 	 * @param ctx the parse tree
 	 */

@@ -14,6 +14,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -843,6 +844,26 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
     if (isH2()) {
       assertThat(query.getGeneratedSql()).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|' )");
+    }
+  }
+
+  @Test
+  public void where_dateInRange() {
+
+    final Query<Customer> query = where("anniversary inrange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
+    }
+  }
+
+  @Test
+  public void where_dateInRange_camelCase() {
+
+    final Query<Customer> query = where("anniversary inRange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
     }
   }
 
