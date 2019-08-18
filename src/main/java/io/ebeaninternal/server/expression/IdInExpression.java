@@ -5,6 +5,7 @@ import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.server.core.BindPadding;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
@@ -46,6 +47,10 @@ public class IdInExpression extends NonPrepareExpression {
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     multiValueIdSupported = request.isMultiValueIdSupported();
+    if (!multiValueIdSupported && !idCollection.isEmpty() && request.isPadInExpression()) {
+      // pad out the ids for better hit ratio on DB query plans
+      BindPadding.padIds(idCollection);
+    }
   }
 
   @Override

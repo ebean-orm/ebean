@@ -20,18 +20,18 @@ public abstract class BaseExpressionTest extends BaseTestCase {
   }
 
   protected String hash(SpiExpression expression) {
-    StringBuilder sb  = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     if (expression != null) {
       expression.queryPlanHash(sb);
     }
     return sb.toString();
   }
 
-  protected void same(SpiExpression one, SpiExpression two){
+  protected void same(SpiExpression one, SpiExpression two) {
     assertThat(hash(one)).isEqualTo(hash(two));
   }
 
-  protected void different(SpiExpression one, SpiExpression two){
+  protected void different(SpiExpression one, SpiExpression two) {
     assertThat(hash(one)).isNotEqualTo(hash(two));
   }
 
@@ -50,7 +50,7 @@ public abstract class BaseExpressionTest extends BaseTestCase {
   }
 
 
-  private static final TDQueryRequest<Customer> MULTI_VALUE= new TDQueryRequest<>(true);
+  private static final TDQueryRequest<Customer> MULTI_VALUE = new TDQueryRequest<>(true);
   private static final TDQueryRequest<Customer> NO_MULTI_VALUE = new TDQueryRequest<>(false);
 
   static class TDQueryRequest<T> implements BeanQueryRequest<T> {
@@ -74,6 +74,11 @@ public abstract class BaseExpressionTest extends BaseTestCase {
     @Override
     public Query<T> getQuery() {
       return null;
+    }
+
+    @Override
+    public boolean isPadInExpression() {
+      return supported;
     }
 
     @Override

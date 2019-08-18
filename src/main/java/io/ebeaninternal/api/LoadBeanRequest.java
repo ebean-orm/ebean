@@ -4,8 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,8 +14,6 @@ import java.util.Set;
  * Request for loading ManyToOne and OneToOne relationships.
  */
 public class LoadBeanRequest extends LoadRequest {
-
-  private static final Logger logger = LoggerFactory.getLogger(LoadBeanRequest.class);
 
   private final List<EntityBeanIntercept> batch;
 
@@ -56,7 +52,7 @@ public class LoadBeanRequest extends LoadRequest {
     return loadBuffer.getBeanDescriptor().getBeanType();
   }
 
-  public boolean isLoadCache() {
+  private boolean isLoadCache() {
     return loadCache;
   }
 
@@ -75,15 +71,8 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Return the load context.
    */
-  public LoadBeanBuffer getLoadContext() {
+  private LoadBeanBuffer getLoadContext() {
     return loadBuffer;
-  }
-
-  /**
-   * Return the property that invoked the lazy loading.
-   */
-  public String getLazyLoadProperty() {
-    return lazyLoadProperty;
   }
 
   public int getBatchSize() {
@@ -93,30 +82,14 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Return the list of Id values for the beans in the lazy load buffer.
    */
-  public List<Object> getIdList(int batchSize) {
+  public List<Object> getIdList() {
 
-    List<Object> idList = new ArrayList<>(batchSize);
+    List<Object> idList = new ArrayList<>();
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     for (EntityBeanIntercept ebi : batch) {
-      EntityBean bean = ebi.getOwner();
-      idList.add(desc.getId(bean));
+      idList.add(desc.getId(ebi.getOwner()));
     }
-
-
-    if (!desc.isMultiValueIdSupported() && !idList.isEmpty()) {
-      int extraIds = batchSize - batch.size();
-      if (extraIds > 0) {
-        // for performance make up the Id's to the batch size
-        // so we get the same query (for Ebean and the db)
-        Object firstId = idList.get(0);
-        for (int i = 0; i < extraIds; i++) {
-          // just add the first Id again
-          idList.add(firstId);
-        }
-      }
-    }
-
     return idList;
   }
 

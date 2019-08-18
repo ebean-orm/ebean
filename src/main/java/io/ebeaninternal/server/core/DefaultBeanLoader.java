@@ -38,54 +38,14 @@ class DefaultBeanLoader {
     this.onIterateUseExtraTxn = server.getDatabasePlatform().useExtraTransactionOnIterateSecondaryQueries();
   }
 
-  /**
-   * Return a batch size that might be less than the requestedBatchSize.
-   * <p>
-   * This means we can have large and variable requestedBatchSizes.
-   * </p>
-   * <p>
-   * We want to restrict the number of different batch sizes as we want to
-   * re-use the query plan cache and get DB statement re-use.
-   * </p>
-   */
-  private int getBatchSize(int batchSize) {
-
-    if (batchSize == 1) {
-      // there is only one bean/collection to load
-      return 1;
-    }
-    if (batchSize <= 5) {
-      // anything less than 5 becomes 5
-      return 5;
-    }
-    if (batchSize <= 10) {
-      return 10;
-    }
-    if (batchSize <= 20) {
-      return 20;
-    }
-    if (batchSize <= 50) {
-      return 50;
-    }
-    if (batchSize <= 100) {
-      return 100;
-    }
-    return batchSize;
-  }
-
   void refreshMany(EntityBean parentBean, String propertyName) {
     refreshMany(parentBean, propertyName, null);
   }
 
   void loadMany(LoadManyRequest loadRequest) {
 
-    List<BeanCollection<?>> batch = loadRequest.getBatch();
-
-    int batchSize = getBatchSize(batch.size());
-
-    SpiQuery<?> query = loadRequest.createQuery(server, batchSize);
+    SpiQuery<?> query = loadRequest.createQuery(server);
     executeQuery(loadRequest, query);
-
     loadRequest.postLoad();
   }
 
@@ -97,7 +57,7 @@ class DefaultBeanLoader {
     loadManyInternal(parentBean, propertyName, null, false, onlyIds);
   }
 
-  void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
+  private void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
     loadManyInternal(parentBean, propertyName, t, true, false);
   }
 
@@ -147,8 +107,7 @@ class DefaultBeanLoader {
       query.setLoadDescription("+lazy", null);
     }
 
-    String idProperty = parentDesc.getIdBinder().getIdProperty();
-    query.select(idProperty);
+    query.select(parentDesc.getIdBinder().getIdProperty());
 
     if (onlyIds) {
       query.fetch(many.getName(), many.getTargetIdProperty());
@@ -192,9 +151,7 @@ class DefaultBeanLoader {
       throw new RuntimeException("Nothing in batch?");
     }
 
-    int batchSize = getBatchSize(batch.size());
-
-    List<Object> idList = loadRequest.getIdList(batchSize);
+    List<Object> idList = loadRequest.getIdList();
     if (idList.isEmpty()) {
       // everything was loaded from cache
       return;
@@ -315,6 +272,5 @@ class DefaultBeanLoader {
     }
 
     desc.resetManyProperties(dbBean);
-
   }
 }

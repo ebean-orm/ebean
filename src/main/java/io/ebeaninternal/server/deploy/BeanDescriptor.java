@@ -1836,6 +1836,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return true if Id IN expression should have bind parameters padded.
+   */
+  public boolean isPadInExpression() {
+    return !multiValueSupported && isSimpleId();
+  }
+
+  /**
    * Return the sql for binding an id. This is the columns with table alias that
    * make up the id.
    */

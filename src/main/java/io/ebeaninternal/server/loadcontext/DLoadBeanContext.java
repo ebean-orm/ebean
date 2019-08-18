@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.loadcontext;
 
+import io.ebean.CacheMode;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -20,6 +21,8 @@ import java.util.Set;
  */
 class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
+  private final boolean cache;
+
   private List<LoadBuffer> bufferList;
 
   private LoadBuffer currentBuffer;
@@ -29,6 +32,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(firstBatchSize);
+    this.cache = (queryProps == null) ? false : queryProps.isCache();
   }
 
   /**
@@ -43,6 +47,9 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
   private void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
 
+    if (cache) {
+      query.setBeanCacheMode(CacheMode.ON);
+    }
     setLabel(query);
     parent.propagateQueryState(query, desc.isDocStoreMapped());
     query.setParentNode(objectGraphNode);

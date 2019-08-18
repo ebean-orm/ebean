@@ -116,6 +116,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
+  public boolean isPadInExpression() {
+    return beanDescriptor.isPadInExpression();
+  }
+
+  @Override
   public boolean isMultiValueIdSupported() {
     return beanDescriptor.isMultiValueIdSupported();
   }
