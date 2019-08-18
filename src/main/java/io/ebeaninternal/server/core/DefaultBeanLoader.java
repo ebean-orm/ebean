@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Helper to handle lazy loading and refreshing of beans.
  */
-public class DefaultBeanLoader {
+class DefaultBeanLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultBeanLoader.class);
 
@@ -33,7 +33,7 @@ public class DefaultBeanLoader {
 
   private final boolean onIterateUseExtraTxn;
 
-  protected DefaultBeanLoader(DefaultServer server) {
+  DefaultBeanLoader(DefaultServer server) {
     this.server = server;
     this.onIterateUseExtraTxn = server.getDatabasePlatform().useExtraTransactionOnIterateSecondaryQueries();
   }
@@ -73,11 +73,11 @@ public class DefaultBeanLoader {
     return batchSize;
   }
 
-  public void refreshMany(EntityBean parentBean, String propertyName) {
+  void refreshMany(EntityBean parentBean, String propertyName) {
     refreshMany(parentBean, propertyName, null);
   }
 
-  public void loadMany(LoadManyRequest loadRequest) {
+  void loadMany(LoadManyRequest loadRequest) {
 
     List<BeanCollection<?>> batch = loadRequest.getBatch();
 
@@ -89,7 +89,7 @@ public class DefaultBeanLoader {
     loadRequest.postLoad();
   }
 
-  public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
+  void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
     EntityBean parentBean = bc.getOwnerBean();
     String propertyName = bc.getPropertyName();
@@ -97,7 +97,7 @@ public class DefaultBeanLoader {
     loadManyInternal(parentBean, propertyName, null, false, onlyIds);
   }
 
-  public void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
+  void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
     loadManyInternal(parentBean, propertyName, t, true, false);
   }
 
@@ -185,7 +185,7 @@ public class DefaultBeanLoader {
   /**
    * Load a batch of beans for +query or +lazy loading.
    */
-  public void loadBean(LoadBeanRequest loadRequest) {
+  void loadBean(LoadBeanRequest loadRequest) {
 
     List<EntityBeanIntercept> batch = loadRequest.getBatch();
     if (batch.isEmpty()) {
@@ -228,7 +228,7 @@ public class DefaultBeanLoader {
     refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN, -1);
   }
 
-  public void loadBean(EntityBeanIntercept ebi) {
+  void loadBean(EntityBeanIntercept ebi) {
     refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
   }
 

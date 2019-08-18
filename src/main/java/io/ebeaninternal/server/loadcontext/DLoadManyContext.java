@@ -17,7 +17,10 @@ import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
+/**
+ * ToMany bean load context.
+ */
+class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
   protected final BeanPropertyAssocMany<?> property;
 
@@ -27,7 +30,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
   private LoadBuffer currentBuffer;
 
-  public DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property,
+  DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property,
                           String path, int defaultBatchSize, OrmQueryProperties queryProps) {
 
     super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
@@ -57,7 +60,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     currentBuffer = createBuffer(secondaryBatchSize);
   }
 
-  public void configureQuery(SpiQuery<?> query) {
+  private void configureQuery(SpiQuery<?> query) {
 
     setLabel(query);
     parent.propagateQueryState(query, docStoreMapped);
@@ -122,14 +125,14 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
    * A buffer for batch loading bean collections on a given path.
    * Supports batch lazy loading and secondary query loading.
    */
-  public static class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
+  static class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
 
     private final PersistenceContext persistenceContext;
     private final DLoadManyContext context;
     private final int batchSize;
     private final List<BeanCollection<?>> list;
 
-    public LoadBuffer(DLoadManyContext context, int batchSize) {
+    LoadBuffer(DLoadManyContext context, int batchSize) {
       this.context = context;
       // set the persistence context as at this moment in
       // case it changes as part of a findIterate etc

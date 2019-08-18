@@ -224,10 +224,7 @@ public class DLoadContext implements LoadContext {
    */
   private LoadSecondaryQuery getLoadSecondaryQuery(String path) {
     LoadSecondaryQuery beanLoad = beanMap.get(path);
-    if (beanLoad == null) {
-      beanLoad = manyMap.get(path);
-    }
-    return beanLoad;
+    return beanLoad == null ? manyMap.get(path) : beanLoad;
   }
 
   @Override

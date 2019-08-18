@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Default implementation of LoadBeanContext.
+ * ToOne bean load context.
  */
-public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
+class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
   private List<LoadBuffer> bufferList;
 
   private LoadBuffer currentBuffer;
 
-  public DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
+  DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
     super(parent, desc, path, defaultBatchSize, queryProps);
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
@@ -41,7 +41,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     currentBuffer = createBuffer(secondaryBatchSize);
   }
 
-  protected void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
+  private void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
 
     setLabel(query);
     parent.propagateQueryState(query, desc.isDocStoreMapped());
@@ -79,8 +79,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
-            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest);
-            parent.getEbeanServer().loadBean(req);
+            parent.getEbeanServer().loadBean(new LoadBeanRequest(loadBuffer, parentRequest));
             if (!queryProps.isQueryFetchAll()) {
               // Stop - only fetch the first batch ... the rest will be lazy loaded
               break;
@@ -97,18 +96,17 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     }
   }
 
-
   /**
    * A buffer for batch loading beans on a given path.
    */
-  public static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
+  static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
 
     private final DLoadBeanContext context;
     private final int batchSize;
     private final List<EntityBeanIntercept> list;
     private PersistenceContext persistenceContext;
 
-    public LoadBuffer(DLoadBeanContext context, int batchSize) {
+    LoadBuffer(DLoadBeanContext context, int batchSize) {
       this.context = context;
       this.batchSize = batchSize;
       this.list = new ArrayList<>(batchSize);
