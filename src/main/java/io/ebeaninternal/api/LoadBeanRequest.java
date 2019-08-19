@@ -23,11 +23,14 @@ public class LoadBeanRequest extends LoadRequest {
 
   private final boolean loadCache;
 
+  private boolean loadedFromCache;
+
   /**
    * Construct for lazy load request.
    */
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, String lazyLoadProperty, boolean loadCache) {
-    this(LoadBuffer, null, true, lazyLoadProperty, loadCache);
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
+    this(LoadBuffer, null, true, ebi.getLazyLoadProperty(), loadCache);
+    this.loadedFromCache = ebi.isLoadedFromCache();
   }
 
   /**
@@ -52,10 +55,16 @@ public class LoadBeanRequest extends LoadRequest {
     return loadBuffer.getBeanDescriptor().getBeanType();
   }
 
+  /**
+   * Return true if the beans invoking lazy loading were previously loaded from cache.
+   */
+  public boolean isLoadedFromCache() {
+    return loadedFromCache;
+  }
+
   private boolean isLoadCache() {
     return loadCache;
   }
-
 
   public String getDescription() {
     return "path:" + loadBuffer.getFullPath() + " batch:" + batch.size();

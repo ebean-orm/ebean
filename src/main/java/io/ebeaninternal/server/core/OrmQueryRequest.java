@@ -97,6 +97,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
+    this.persistenceContext = query.getPersistenceContext();
   }
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {

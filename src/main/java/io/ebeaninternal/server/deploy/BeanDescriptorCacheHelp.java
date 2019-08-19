@@ -675,24 +675,29 @@ final class BeanDescriptorCacheHelp<T> {
    */
   EntityBean loadBeanDirect(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
 
+    id = desc.convertId(id);
+    EntityBean bean = null;
     if (context == null) {
       context = new DefaultPersistenceContext();
+    } else {
+      bean = (EntityBean)desc.contextGet(context, id);
     }
 
-    EntityBean bean = desc.createEntityBean();
-    id = desc.convertSetId(id, bean);
+    if (bean == null) {
+      bean = desc.createEntityBean();
+      desc.setId(id, bean);
+      desc.contextPut(context, id, bean);
+
+      EntityBeanIntercept ebi = bean._ebean_getIntercept();
+      // Not using loadContext here so no batch lazy loading for these beans
+      ebi.setBeanLoader(desc.getEbeanServer());
+      if (Boolean.TRUE.equals(readOnly)) {
+        ebi.setReadOnly(true);
+      }
+      ebi.setPersistenceContext(context);
+    }
+
     CachedBeanDataToBean.load(desc, bean, data, context);
-
-    EntityBeanIntercept ebi = bean._ebean_getIntercept();
-
-    // Not using a loadContext for beans coming out of L2 cache
-    // so that means no batch lazy loading for these beans
-    ebi.setBeanLoader(desc.getEbeanServer());
-    if (Boolean.TRUE.equals(readOnly)) {
-      ebi.setReadOnly(true);
-    }
-    ebi.setPersistenceContext(context);
-    desc.contextPut(context, id, bean);
 
     if (desc.isReadAuditing()) {
       desc.readAuditBean("l2", "", bean);

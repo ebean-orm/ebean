@@ -79,6 +79,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
 
+  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
+
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
   private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
@@ -1405,6 +1407,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return fetch(property, null, FETCH_QUERY);
   }
 
+  public Query<T> fetchCache(String property) {
+    return fetch(property, null, FETCH_CACHE);
+  }
+
   @Override
   public Query<T> fetchLazy(String property) {
     return fetch(property, null, FETCH_LAZY);
@@ -1423,6 +1429,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> fetchQuery(String property, String columns) {
     return fetch(property, columns, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchCache(String property, String columns) {
+    return fetch(property, columns, FETCH_CACHE);
   }
 
   @Override

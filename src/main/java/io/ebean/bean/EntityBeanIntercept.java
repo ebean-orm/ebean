@@ -95,13 +95,10 @@ public final class EntityBeanIntercept implements Serializable {
   private final byte[] flags;
 
   private boolean fullyLoadedBean;
-
+  private boolean loadedFromCache;
   private Object[] origValues;
-
   private Exception[] loadErrors;
-
   private int lazyLoadProperty = -1;
-
   private Object ownerId;
   private int sortOrder;
 
@@ -309,6 +306,22 @@ public final class EntityBeanIntercept implements Serializable {
         }
       }
     }
+  }
+
+  /**
+   * Set true when the bean has been loaded from L2 bean cache.
+   * The effect of this is that we should skip the cache if there
+   * is subsequent lazy loading (bean cache partially populated).
+   */
+  public void setLoadedFromCache(boolean loadedFromCache) {
+    this.loadedFromCache = loadedFromCache;
+  }
+
+  /**
+   * Return true if this bean was loaded from L2 bean cache.
+   */
+  public boolean isLoadedFromCache() {
+    return loadedFromCache;
   }
 
   /**
@@ -780,7 +793,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   public boolean[] getLoaded() {
-    boolean[] ret= new boolean[flags.length];
+    boolean[] ret = new boolean[flags.length];
     for (int i = 0; i < ret.length; i++) {
       ret[i] = (flags[i] & FLAG_LOADED_PROP) != 0;
     }

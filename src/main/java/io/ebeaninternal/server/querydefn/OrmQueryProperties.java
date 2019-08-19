@@ -107,6 +107,9 @@ public class OrmQueryProperties implements Serializable {
     this.readOnly = response.readOnly;
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
+      if (fetchConfig.isCache()) {
+        this.cache = true;
+      }
     } else {
       this.fetchConfig = response.fetchConfig;
     }

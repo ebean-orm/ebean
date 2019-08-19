@@ -570,37 +570,31 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void refreshMany(Object parentBean, String propertyName) {
-
     beanLoader.refreshMany(checkEntityBean(parentBean), propertyName);
   }
 
   @Override
   public void loadMany(LoadManyRequest loadRequest) {
-
     beanLoader.loadMany(loadRequest);
   }
 
   @Override
   public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-
     beanLoader.loadMany(bc, onlyIds);
   }
 
   @Override
   public void refresh(Object bean) {
-
     beanLoader.refresh(checkEntityBean(bean));
   }
 
   @Override
   public void loadBean(LoadBeanRequest loadRequest) {
-
     beanLoader.loadBean(loadRequest);
   }
 
   @Override
   public void loadBean(EntityBeanIntercept ebi) {
-
     beanLoader.loadBean(ebi);
   }
 

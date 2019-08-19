@@ -24,11 +24,9 @@ public class IdBinderFactory {
    * Create the IdConvertSet for the given type of Id properties.
    */
   public IdBinder createIdBinder(BeanProperty id) {
-
     if (id == null) {
       // for report type beans that don't need an id
       return EMPTY;
-
     }
     if (id.isEmbedded()) {
       return new IdBinderEmbedded(idInExpandedForm, (BeanPropertyAssocOne<?>) id);

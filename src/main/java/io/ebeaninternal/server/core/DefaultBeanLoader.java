@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.CacheMode;
 import io.ebean.ExpressionList;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
@@ -38,10 +39,6 @@ class DefaultBeanLoader {
     this.onIterateUseExtraTxn = server.getDatabasePlatform().useExtraTransactionOnIterateSecondaryQueries();
   }
 
-  void refreshMany(EntityBean parentBean, String propertyName) {
-    refreshMany(parentBean, propertyName, null);
-  }
-
   void loadMany(LoadManyRequest loadRequest) {
 
     SpiQuery<?> query = loadRequest.createQuery(server);
@@ -57,8 +54,8 @@ class DefaultBeanLoader {
     loadManyInternal(parentBean, propertyName, null, false, onlyIds);
   }
 
-  private void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
-    loadManyInternal(parentBean, propertyName, t, true, false);
+  void refreshMany(EntityBean parentBean, String propertyName) {
+    loadManyInternal(parentBean, propertyName, null, true, false);
   }
 
   private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, boolean onlyIds) {
@@ -159,6 +156,9 @@ class DefaultBeanLoader {
 
     SpiQuery<?> query = server.createQuery(loadRequest.getBeanType());
     loadRequest.configureQuery(query, idList);
+    if (loadRequest.isLoadedFromCache()) {
+      query.setBeanCacheMode(CacheMode.PUT);
+    }
 
     List<?> list = executeQuery(loadRequest, query);
     loadRequest.postLoad(list);

@@ -43,6 +43,8 @@ import java.util.function.Predicate;
  */
 class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
 
+  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
+
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
   private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
@@ -77,6 +79,11 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   }
 
   @Override
+  public Query<T> fetchCache(String property) {
+    return fetch(property, null, FETCH_CACHE);
+  }
+
+  @Override
   public Query<T> fetchLazy(String property) {
     return fetch(property, null, FETCH_LAZY);
   }
@@ -94,6 +101,11 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   @Override
   public Query<T> fetchQuery(String property, String columns) {
     return fetch(property, columns, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchCache(String property, String columns) {
+    return fetch(property, columns, FETCH_CACHE);
   }
 
   @Override

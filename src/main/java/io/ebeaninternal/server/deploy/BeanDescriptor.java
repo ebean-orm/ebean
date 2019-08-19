@@ -2316,6 +2316,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return idBinder.convertSetId(idValue, bean);
   }
 
+  /**
+   * Set the Id value to the bean (without type conversion).
+   */
+  public void setId(Object idValue, EntityBean bean) {
+    idProperty.setValueIntercept(bean, idValue);
+  }
+
   @Override
   public Property getProperty(String propName) {
     return findProperty(propName);
