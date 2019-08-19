@@ -85,9 +85,7 @@ abstract class DLoadBaseContext {
 
     String label = parent.getPlanLabel();
     if (label != null) {
-      label += "_" + fullPath;
-      query.setLabel(label);
-      query.setProfileLocation(parent.getProfileLocation());
+      query.setProfilePath(label, fullPath, parent.getProfileLocation());
     }
   }
 

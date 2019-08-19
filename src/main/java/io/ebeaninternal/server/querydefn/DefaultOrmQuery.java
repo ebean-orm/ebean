@@ -381,6 +381,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void setProfilePath(String label, String relativePath, ProfileLocation profileLocation) {
+    this.profileLocation = profileLocation;
+    this.label = ((profileLocation == null) ? label : profileLocation.label()) + "_" + relativePath;
+  }
+
+  @Override
   public Query<T> setLabel(String label) {
     this.label = label;
     return this;

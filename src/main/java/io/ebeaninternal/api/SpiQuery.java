@@ -290,6 +290,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean selectAllForLazyLoadProperty();
 
   /**
+   * Set the on a secondary query given the label, relativePath and profile location of the parent query.
+   */
+  void setProfilePath(String label, String relativePath, ProfileLocation profileLocation);
+
+  /**
    * Set the query mode.
    */
   void setMode(Mode m);

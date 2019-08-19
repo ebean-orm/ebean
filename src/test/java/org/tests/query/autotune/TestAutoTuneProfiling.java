@@ -2,6 +2,7 @@ package org.tests.query.autotune;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.ProfileLocation;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.tests.model.basic.Address;
@@ -55,8 +56,12 @@ public class TestAutoTuneProfiling extends BaseTestCase {
     useLotUntuned();
   }
 
+  private static final ProfileLocation loc0 = ProfileLocation.create();
+
   private Order findById(long id) {
+
     return DB.find(Order.class)
+      .setProfileLocation(loc0)
       .select("status, orderDate, shipDate")
       .setId(id)
       .setUseCache(false)
