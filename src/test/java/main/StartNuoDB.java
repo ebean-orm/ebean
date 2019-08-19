@@ -8,7 +8,7 @@ public class StartNuoDB {
   public static void main(String[] args) {
 
     NuoDBConfig config = new NuoDBConfig();
-    config.setSchema("unit");
+    config.setSchema("test_user");
 
     NuoDBContainer container = new NuoDBContainer(config);
     container.stopRemove();

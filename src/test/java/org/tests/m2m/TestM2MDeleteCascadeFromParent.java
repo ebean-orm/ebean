@@ -1,8 +1,7 @@
 package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.SqlQuery;
+import io.ebean.DB;
 import io.ebean.SqlRow;
 import org.junit.Test;
 import org.tests.model.m2m.MnyA;
@@ -15,6 +14,11 @@ public class TestM2MDeleteCascadeFromParent extends BaseTestCase {
 
   @Test
   public void test() {
+
+    DB.sqlUpdate("delete from mny_b_mny_c").execute();
+    DB.sqlUpdate("delete from mny_c").execute();
+    DB.sqlUpdate("delete from mny_b").execute();
+    DB.sqlUpdate("delete from mny_a").execute();
 
     MnyC c0 = new MnyC();
     c0.setName("c0");
@@ -30,16 +34,12 @@ public class TestM2MDeleteCascadeFromParent extends BaseTestCase {
     b0.save();
 
     c0.getBs().add(b0);
-    Ebean.save(c0);
+    DB.save(c0);
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select count(*) as count from mny_b_mny_c");
-    SqlRow unique = sqlQuery.findOne();
-    assertEquals(Long.valueOf(1), unique.getLong("count"));
+    SqlRow row = DB.sqlQuery("select count(*) as count from mny_b_mny_c").findOne();
+    assertEquals(Long.valueOf(1), row.getLong("count"));
 
-
-    //Ebean.deleteManyToManyAssociations(b0, "cs");
     a0.delete();
-
   }
 
 
