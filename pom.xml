@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.43.2</version>
+  <version>11.43.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -23,7 +23,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-11.43.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <profiles>
