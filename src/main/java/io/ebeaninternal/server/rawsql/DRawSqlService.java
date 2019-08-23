@@ -45,6 +45,9 @@ public class DRawSqlService implements SpiRawSqlService {
       if (name == null) {
         name = meta.getColumnName(i);
       }
+      if (ret.containsKey(name)) {
+        name = meta.getSchemaName(i) + "." + meta.getTableName(i) + "." + name;
+      }
       ret.put(name, resultSet.getObject(i));
     }
     return ret;
