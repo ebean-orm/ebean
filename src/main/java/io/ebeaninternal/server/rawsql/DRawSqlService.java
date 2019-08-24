@@ -46,10 +46,25 @@ public class DRawSqlService implements SpiRawSqlService {
         name = meta.getColumnName(i);
       }
       if (ret.containsKey(name)) {
-        name = meta.getSchemaName(i) + "." + meta.getTableName(i) + "." + name;
+        name = combine(meta.getSchemaName(i), meta.getTableName(i), name);
       }
       ret.put(name, resultSet.getObject(i));
     }
     return ret;
+  }
+
+  /**
+   * Combine schema table and column names allowing for null schema and table.
+   */
+  String combine(String schemaName, String tableName, String name) {
+
+    StringBuilder sb = new StringBuilder();
+    if (schemaName != null) {
+      sb.append(schemaName).append(".");
+    }
+    if (tableName != null) {
+      sb.append(tableName).append(".");
+    }
+    return sb.append(name).toString();
   }
 }
