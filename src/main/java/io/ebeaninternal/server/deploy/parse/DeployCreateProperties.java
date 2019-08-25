@@ -313,9 +313,16 @@ public class DeployCreateProperties {
 
       Type[] typeArgs = ptype.getActualTypeArguments();
       if (typeArgs.length == 1) {
-        // probably a Set or List
+        // expecting set or list
         if (typeArgs[0] instanceof Class<?>) {
           return (Class<?>) typeArgs[0];
+        }
+        if (typeArgs[0] instanceof WildcardType) {
+          final Type[] upperBounds = ((WildcardType) typeArgs[0]).getUpperBounds();
+          if (upperBounds.length == 1 && upperBounds[0] instanceof Class<?>) {
+            // kotlin generated wildcard type
+            return (Class<?>) upperBounds[0];
+          }
         }
         // throw new RuntimeException("Unexpected Parameterised Type? "+typeArgs[0]);
         return null;
