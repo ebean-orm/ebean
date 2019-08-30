@@ -48,6 +48,7 @@ public class OraclePlatform extends DatabasePlatform {
         //.addAcquireLock("")
         .addDuplicateKey("1")
         .addDataIntegrity("2291")
+        .addSerializableConflict("72000")
         .build();
 
     this.openQuote = "\"";

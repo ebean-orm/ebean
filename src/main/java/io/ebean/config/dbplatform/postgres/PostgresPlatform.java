@@ -52,6 +52,7 @@ public class PostgresPlatform extends DatabasePlatform {
         .addAcquireLock("55P03")
         .addDuplicateKey("23505")
         .addDataIntegrity("23000","23502","23503","23514")
+        .addSerializableConflict("40001")
         .build();
 
     this.openQuote = "\"";

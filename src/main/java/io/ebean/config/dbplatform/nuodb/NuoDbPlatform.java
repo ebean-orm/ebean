@@ -37,6 +37,7 @@ public class NuoDbPlatform extends DatabasePlatform {
       new SqlErrorCodes()
         //.addAcquireLock("")
         .addDuplicateKey("23000")
+        .addSerializableConflict("40002")
         .build();
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
