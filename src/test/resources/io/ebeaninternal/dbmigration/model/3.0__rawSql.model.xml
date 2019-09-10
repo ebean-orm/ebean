@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+  <changeSet type="apply">
+    <sql>
+      <apply>something</apply>
+      <rollback>other thing</rollback>
+    </sql>
+  </changeSet>
+</migration>

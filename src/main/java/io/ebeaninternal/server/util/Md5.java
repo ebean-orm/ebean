@@ -1,8 +1,9 @@
 package io.ebeaninternal.server.util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-public class Md5 {
+public final class Md5 {
 
   /**
    * Return the MD5 hash of the underlying sql.
@@ -11,8 +12,7 @@ public class Md5 {
 
     try {
       MessageDigest md = MessageDigest.getInstance("MD5");
-      byte[] digest = md.digest(content.getBytes("UTF-8"));
-      return digestToHex(digest);
+      return digestToHex(md.digest(content.getBytes(StandardCharsets.UTF_8)));
     } catch (Exception e) {
       throw new RuntimeException("MD5 hashing failed", e);
     }

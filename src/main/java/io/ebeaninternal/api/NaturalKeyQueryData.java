@@ -3,7 +3,6 @@ package io.ebeaninternal.api;
 import io.ebean.Pairs;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +24,7 @@ public class NaturalKeyQueryData<T> {
   private List<Pairs.Entry> inPairs;
 
   // IN clause - only one allowed
-  private Collection<?> inValues;
+  private List<Object> inValues;
   private String inProperty;
 
   // normal EQ expressions
@@ -52,25 +51,25 @@ public class NaturalKeyQueryData<T> {
   /**
    * Match for In Pairs expression. We only allow one IN clause.
    */
-  public boolean matchInPairs(Pairs pairs) {
+  public List<Pairs.Entry> matchInPairs(String property0, String property1, List<Pairs.Entry> inPairs) {
     if (hasIn) {
       // only 1 IN allowed (to project naturalIds)
-      return false;
+      return null;
     }
-    if (matchProperty(pairs.getProperty0()) && matchProperty(pairs.getProperty1())) {
+    if (matchProperty(property0) && matchProperty(property1)) {
       this.hasIn = true;
-      this.inProperty0 = pairs.getProperty0();
-      this.inProperty1 = pairs.getProperty1();
-      this.inPairs = pairs.getEntries();
-      return true;
+      this.inProperty0 = property0;
+      this.inProperty1 = property1;
+      this.inPairs = new ArrayList<>(inPairs); // will be modified
+      return this.inPairs;
     }
-    return false;
+    return null;
   }
 
   /**
    * Match for IN expression. We only allow one IN clause.
    */
-  public boolean matchIn(String propName, Collection<?> sourceValues) {
+  public boolean matchIn(String propName, List<Object> inValues) {
     if (hasIn) {
       // only 1 IN allowed (to project naturalIds)
       return false;
@@ -78,7 +77,7 @@ public class NaturalKeyQueryData<T> {
     if (matchProperty(propName)) {
       this.hasIn = true;
       this.inProperty = propName;
-      this.inValues = sourceValues;
+      this.inValues = inValues;
       return true;
     }
     return false;
@@ -199,21 +198,19 @@ public class NaturalKeyQueryData<T> {
     this.hitCount = hits.size();
 
     List<T> beans = new ArrayList<>(hitCount);
-
     for (BeanCacheResult.Entry<T> hit : hits) {
-      if (inValues != null) {
-        Object naturalKey = hit.getKey();
-        Object inValue = set.getInValue(naturalKey);
-        inValues.remove(inValue);
-
-      } else if (inPairs != null) {
-        Object naturalKey = hit.getKey();
-        Pairs.Entry inValue = (Pairs.Entry)set.getInValue(naturalKey);
-        inPairs.remove(inValue);
-      }
+      removeKey(set.getInValue(hit.getKey()));
       beans.add(hit.getBean());
     }
-
     return beans;
+  }
+
+  private void removeKey(Object inValue) {
+    if (inValues != null) {
+      inValues.remove(inValue);
+    } else if (inPairs != null) {
+      //noinspection SuspiciousMethodCalls
+      inPairs.remove(inValue);
+    }
   }
 }

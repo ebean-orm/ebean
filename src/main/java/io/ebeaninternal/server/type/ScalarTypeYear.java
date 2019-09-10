@@ -65,6 +65,7 @@ public class ScalarTypeYear extends ScalarTypeBase<Year> {
   @Override
   public Year toBeanType(Object value) {
     if (value instanceof Year) return (Year) value;
+    if (value == null) return null;
     return Year.of(BasicTypeConverter.toInteger(value));
   }
 

@@ -6,21 +6,22 @@ import io.ebean.EbeanServerFactory;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanList;
 import io.ebean.config.ServerConfig;
+import org.junit.Test;
+import org.tests.example.ModUuidGenerator;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ECustomId;
-import org.tests.example.ModUuidGenerator;
-import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BeanFindControllerTest extends BaseTestCase {
 
   @Test
   public void test() {
-
-    System.setProperty("ebean.ignoreExtraDdl", "true");
 
     ServerConfig config = new ServerConfig();
 
@@ -28,6 +29,8 @@ public class BeanFindControllerTest extends BaseTestCase {
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
+
     config.setRegister(false);
     config.setDefaultServer(false);
     config.add(new ModUuidGenerator());

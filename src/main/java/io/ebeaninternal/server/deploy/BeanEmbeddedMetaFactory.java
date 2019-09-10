@@ -1,15 +1,15 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.config.BeanNotRegisteredException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
-import javax.persistence.PersistenceException;
 import java.util.Map;
 
 /**
  * Creates BeanProperties for Embedded beans that have deployment information
  * such as the actual DB column name and table alias.
  */
-public class BeanEmbeddedMetaFactory {
+class BeanEmbeddedMetaFactory {
 
   /**
    * Create BeanProperties for embedded beans using the deployment specific DB column name and table alias.
@@ -22,15 +22,15 @@ public class BeanEmbeddedMetaFactory {
     BeanDescriptor<?> targetDesc = owner.getBeanDescriptor(prop.getTargetType());
     if (targetDesc == null) {
       String msg = "Could not find BeanDescriptor for " + prop.getTargetType()
-        + ". Perhaps the EmbeddedId class is not registered?";
-      throw new PersistenceException(msg);
+        + ". Perhaps the EmbeddedId class is not registered? See https://ebean.io/docs/trouble-shooting#not-registered";
+      throw new BeanNotRegisteredException(msg);
     }
 
     // deployment override information (column names)
     String columnPrefix = prop.getColumnPrefix();
     Map<String, String> propColMap = prop.getDeployEmbedded().getPropertyColumnMap();
 
-    BeanProperty[] sourceProperties = targetDesc.propertiesBaseScalar();
+    BeanProperty[] sourceProperties = targetDesc.propertiesNonTransient();
     BeanProperty[] embeddedProperties = new BeanProperty[sourceProperties.length];
 
     for (int i = 0; i < sourceProperties.length; i++) {
@@ -45,7 +45,11 @@ public class BeanEmbeddedMetaFactory {
       }
 
       BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn);
-      embeddedProperties[i] = new BeanProperty(sourceProperties[i], overrides);
+      if (sourceProperties[i] instanceof BeanPropertyAssocOne) {
+        embeddedProperties[i] = new BeanPropertyAssocOne((BeanPropertyAssocOne)sourceProperties[i], overrides);
+      } else {
+        embeddedProperties[i] = new BeanProperty(sourceProperties[i], overrides);
+      }
     }
 
     return new BeanEmbeddedMeta(embeddedProperties);

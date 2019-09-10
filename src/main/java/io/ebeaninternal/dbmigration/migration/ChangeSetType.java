@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for changeSetType.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="apply"/>
  *     &lt;enumeration value="pendingDrops"/>
  *     &lt;enumeration value="baseline"/>
+ *     &lt;enumeration value="drop"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -29,7 +30,9 @@ public enum ChangeSetType {
   @XmlEnumValue("pendingDrops")
   PENDING_DROPS("pendingDrops"),
   @XmlEnumValue("baseline")
-  BASELINE("baseline");
+  BASELINE("baseline"),
+  @XmlEnumValue("drop")
+  DROP("drop");
   private final String value;
 
   ChangeSetType(String v) {

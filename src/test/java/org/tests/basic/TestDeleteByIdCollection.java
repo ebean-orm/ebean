@@ -1,7 +1,8 @@
 package org.tests.basic;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -11,7 +12,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestDeleteByIdCollection extends BaseTestCase {
+public class TestDeleteByIdCollection extends TransactionalTestCase {
 
   @Test
   public void test() {

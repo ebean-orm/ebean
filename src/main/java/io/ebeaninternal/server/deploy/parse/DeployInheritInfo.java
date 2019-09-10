@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebeaninternal.server.deploy.InheritInfo;
 
+import java.lang.reflect.Modifier;
 import javax.persistence.DiscriminatorType;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class DeployInheritInfo {
    * Return true if this is abstract node.
    */
   public boolean isAbstract() {
-    return (discriminatorObjectValue == null);
+    return Modifier.isAbstract(type.getModifiers());
   }
 
   /**
@@ -137,7 +138,7 @@ public class DeployInheritInfo {
   /**
    * Set the sql type of the discriminator.
    */
-  public void setColumnType(DiscriminatorType type) {
+  void setColumnType(DiscriminatorType type) {
     if (type == DiscriminatorType.INTEGER) {
       this.columnType = Types.INTEGER;
     } else {
@@ -198,14 +199,12 @@ public class DeployInheritInfo {
   public String getWhere() {
 
     List<Object> discList = new ArrayList<>();
-
     appendDiscriminator(discList);
-
     return buildWhereLiteral(discList);
   }
 
   private void appendDiscriminator(List<Object> list) {
-    if (discriminatorObjectValue != null) {
+    if (!isAbstract()) {
       list.add(discriminatorObjectValue);
     }
     for (DeployInheritInfo child : children) {

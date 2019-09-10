@@ -2,6 +2,7 @@ package io.ebean.config.dbplatform.postgres;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
@@ -11,6 +12,10 @@ import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 
 /**
@@ -25,12 +30,13 @@ public class PostgresPlatform extends DatabasePlatform {
     super();
     this.platform = Platform.POSTGRES;
     this.supportsNativeIlike = true;
+    this.supportsDeleteTableAlias = true;
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
     this.nativeUuidType = true;
     this.columnAliasPrefix = null;
-
+    this.truncateTable = "truncate table %s cascade";
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
 
@@ -39,11 +45,14 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
+    this.dbDefaultValue.setNow("current_timestamp");
+
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("55P03")
         .addDuplicateKey("23505")
         .addDataIntegrity("23000","23502","23503","23514")
+        .addSerializableConflict("40001")
         .build();
 
     this.openQuote = "\"";
@@ -53,6 +62,7 @@ public class PostgresPlatform extends DatabasePlatform {
     DbPlatformType dbBytea = new DbPlatformType("bytea", false);
 
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
+    dbTypeMap.put(DbType.INET, new DbPlatformType("inet", false));
     dbTypeMap.put(DbType.HSTORE, new DbPlatformType("hstore", false));
     dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("jsonb", false));
@@ -87,12 +97,20 @@ public class PostgresPlatform extends DatabasePlatform {
   }
 
   /**
+   * So we can generate varchar[], int[], uuid[] column definitions and use the associated scalar types.
+   */
+  @Override
+  public boolean isNativeArrayType() {
+    return true;
+  }
+
+  /**
    * Create a Postgres specific sequence IdGenerator.
    */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
 
-    return new PostgresSequenceIdGenerator(be, ds, seqName, batchSize);
+    return new PostgresSequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
   @Override
@@ -106,4 +124,32 @@ public class PostgresPlatform extends DatabasePlatform {
         return sql + " for update";
     }
   }
+
+  @Override
+  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
+
+    try (PreparedStatement statement = connection.prepareStatement("select count(*) from pg_inherits i WHERE  i.inhparent = ?::regclass")) {
+      statement.setString(1, table);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        return resultSet.next() && resultSet.getInt(1) > 0;
+      }
+    }
+  }
+
+  /**
+   * Return SQL using built in partition helper functions to create some initial partitions.
+   *
+   * Only use this if extra-ddl doesn't have some initial partitions defined (which it should).
+   */
+  @Override
+  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String pkey) {
+    if (property == null) {
+      property = "";
+    }
+    if (pkey == null) {
+      pkey = "";
+    }
+    return "select partition('" + mode.name().toLowerCase() + "','" + tableName + "','" + pkey + "','" + property + "',1);";
+  }
+
 }

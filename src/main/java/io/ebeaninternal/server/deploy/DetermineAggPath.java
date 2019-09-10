@@ -12,7 +12,11 @@ class DetermineAggPath {
    */
   static String manyPath(String aggregation, DeployBeanDescriptor<?> desc) {
     DetermineAggPath.Path path = paths(aggregation);
-    return path.getManyPath(0, desc);
+    if (path.length() == 1) {
+      // a top level aggregation (so here we need to exclude Id property)
+      return null;
+    }
+    return path.getManyPath(desc);
   }
 
   static Path paths(String aggregation) {
@@ -78,9 +82,9 @@ class DetermineAggPath {
       }
     }
 
-    String getManyPath(int pos, DeployBeanDescriptor<?> desc) {
+    String getManyPath(DeployBeanDescriptor<?> desc) {
+      int pos = 0;
       while (true) {
-
         String path = paths[pos];
         DeployBeanProperty details = desc.getBeanProperty(path);
         if (details instanceof DeployBeanPropertyAssocMany<?>) {
@@ -88,8 +92,7 @@ class DetermineAggPath {
 
         } else if (details instanceof DeployBeanPropertyAssocOne<?>) {
           DeployBeanPropertyAssocOne<?> one = (DeployBeanPropertyAssocOne<?>) details;
-          DeployBeanDescriptor<?> targetDesc = one.getTargetDeploy();
-          desc = targetDesc;
+          desc = one.getTargetDeploy();
           pos = pos + 1;
           continue;
         }

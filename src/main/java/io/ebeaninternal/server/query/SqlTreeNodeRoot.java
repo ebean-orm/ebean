@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the root node of the Sql Tree.
@@ -15,19 +14,30 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
 
   private final TableJoin includeJoin;
 
+  private final boolean sqlDistinct;
+
+  private final String baseTable;
+
   /**
    * Specify for SqlSelect to include an Id property or not.
    */
-  SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                  TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+  SqlTreeNodeRoot(STreeType desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId, TableJoin includeJoin,
+                  STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean sqlDistinct, String baseTable) {
 
     super(desc, props, myList, withId, many, temporalMode, disableLazyLoad);
     this.includeJoin = includeJoin;
+    this.sqlDistinct = sqlDistinct;
+    this.baseTable = baseTable;
   }
 
   @Override
   protected boolean isRoot() {
     return true;
+  }
+
+  @Override
+  public boolean isSqlDistinct() {
+    return sqlDistinct;
   }
 
   /**
@@ -66,8 +76,9 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   @Override
   public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
-    ctx.append(desc.getBaseTable(temporalMode));
+    ctx.append(baseTable);
     ctx.append(" ").append(baseTableAlias);
+    ctx.appendFromForUpdate();
 
     if (includeJoin != null) {
       String a1 = baseTableAlias;
@@ -78,4 +89,10 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     return joinType;
   }
 
+  @Override
+  public void dependentTables(Set<String> tables) {
+    for (SqlTreeNode child : children) {
+      child.dependentTables(tables);
+    }
+  }
 }

@@ -41,7 +41,7 @@ package io.ebean;
  * <p>
  * <pre>{@code
  *
- * Update<Topic> update = Ebean.createUpdate(Topic.class, "incrementPostCount");
+ * Update<Topic> update = DB.createUpdate(Topic.class, "incrementPostCount");
  * update.setParameter("id", 1);
  * int rows = update.execute();
  *
@@ -151,6 +151,11 @@ public interface Update<T> {
    * Bind a named parameter that is null (same as bind).
    */
   Update<T> setNullParameter(String name, int jdbcType);
+
+  /**
+   * Set a label meaning performance metrics will be collected for the execution of this update.
+   */
+  Update<T> setLabel(String label);
 
   /**
    * Return the sql that is actually executed.

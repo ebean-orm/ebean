@@ -1,21 +1,19 @@
 package org.tests.batchload;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import java.util.List;
 
-public class TestLazyLoadEmptyCollection extends BaseTestCase {
+public class TestLazyLoadEmptyCollection extends TransactionalTestCase {
 
   @Test
   public void test() {
-
-    ResetBasicData.reset();
 
     Customer c = new Customer();
     c.setName("lazytest");

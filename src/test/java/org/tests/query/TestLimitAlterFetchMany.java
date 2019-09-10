@@ -3,9 +3,9 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class TestLimitAlterFetchMany extends BaseTestCase {
     Query<Customer> query = Ebean.find(Customer.class)
       // this will automatically get converted to a
       // query join ... due to the maxRows
-      .fetch("contacts").setMaxRows(5);
+      .fetch("contacts").setMaxRows(5).orderBy("id");
 
     List<Customer> list = query.findList();
 

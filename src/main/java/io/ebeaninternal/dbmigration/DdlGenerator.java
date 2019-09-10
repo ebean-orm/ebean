@@ -1,11 +1,16 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.Transaction;
+import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
+import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.migration.ddl.DdlRunner;
+import io.ebean.migration.runner.ScriptTransform;
+import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.model.CurrentModel;
+import io.ebeaninternal.dbmigration.model.MTable;
+import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
+import io.ebeaninternal.server.deploy.PartitionMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,29 +35,51 @@ import java.sql.SQLException;
 public class DdlGenerator {
 
   private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
+  private static final String[] BUILD_DIRS = {"target", "build"};
 
   private final SpiEbeanServer server;
 
   private final boolean generateDdl;
   private final boolean runDdl;
+  private final boolean extraDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
+  private final boolean ddlAutoCommit;
+  private final String dbSchema;
+  private final ScriptTransform scriptTransform;
 
   private CurrentModel currentModel;
   private String dropAllContent;
   private String createAllContent;
+  private File baseDir;
 
   public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
     this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = serverConfig.isDdlGenerate();
+    this.extraDdl = serverConfig.isDdlExtra();
     this.createOnly = serverConfig.isDdlCreateOnly();
-    if (serverConfig.getTenantMode().isDynamicDataSource() && serverConfig.isDdlRun()) {
+    this.dbSchema = serverConfig.getDbSchema();
+    if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
+      this.ddlAutoCommit = false;
     } else {
       this.runDdl = serverConfig.isDdlRun();
+      this.ddlAutoCommit = server.getDatabasePlatform().isDdlAutoCommit();
     }
+    this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
+    this.baseDir = initBaseDir();
+  }
+
+  private File initBaseDir() {
+    for (String buildDir : BUILD_DIRS) {
+      File dir = new File(buildDir);
+      if (dir.exists() && dir.isDirectory()) {
+        return dir;
+      }
+    }
+    return new File(".");
   }
 
   /**
@@ -82,88 +109,158 @@ public class DdlGenerator {
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
   protected void runDdl() {
-
     if (runDdl) {
+      Connection connection = null;
       try {
-        runInitSql();
-        runDropSql();
-        runCreateSql();
-        runSeedSql();
-
-      } catch (IOException e) {
-        String msg = "Error reading drop/create script from file system";
-        throw new RuntimeException(msg, e);
+        connection = obtainConnection();
+        runDdlWith(connection);
+      } finally {
+        JdbcClose.rollback(connection);
+        JdbcClose.close(connection);
       }
+    }
+  }
+
+  private void runDdlWith(Connection connection) {
+    try {
+      if (dbSchema != null) {
+        createSchemaIfRequired(connection);
+      }
+      runInitSql(connection);
+      runDropSql(connection);
+      runCreateSql(connection);
+      runSeedSql(connection);
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading drop/create script from file system", e);
+    }
+  }
+
+  private Connection obtainConnection() {
+    try {
+      return server.getPluginApi().getDataSource().getConnection();
+    } catch (SQLException e) {
+      throw new PersistenceException("Failed to obtain connection to run DDL", e);
+    }
+  }
+
+  private void createSchemaIfRequired(Connection connection) {
+    try {
+      for (String schema : dbSchema.split(",")) {
+        server.getDatabasePlatform().createSchemaIfNotExists(schema, connection);
+      }
+    } catch (SQLException e) {
+      throw new PersistenceException("Failed to create DB Schema", e);
     }
   }
 
   /**
    * Execute all the DDL statements in the script.
    */
-  public int runScript(boolean expectErrors, String content, String scriptName) {
+  public int runScript(Connection connection, boolean expectErrors, String content, String scriptName) {
 
     DdlRunner runner = new DdlRunner(expectErrors, scriptName);
-
-    Transaction transaction = server.createTransaction();
-    Connection connection = transaction.getConnection();
     try {
-      if (expectErrors) {
+      if (expectErrors || ddlAutoCommit) {
         connection.setAutoCommit(true);
       }
-      int count = runner.runAll(content, connection);
-      if (expectErrors) {
+      int count = runner.runAll(scriptTransform.transform(content), connection);
+      if (expectErrors || ddlAutoCommit) {
         connection.setAutoCommit(false);
       }
-      transaction.commit();
+      connection.commit();
       return count;
 
     } catch (SQLException e) {
       throw new PersistenceException("Failed to run script", e);
-
     } finally {
-      transaction.end();
+      JdbcClose.rollback(connection);
     }
   }
 
-  protected void runDropSql() throws IOException {
+  protected void runDropSql(Connection connection) throws IOException {
     if (!createOnly) {
+      if (extraDdl && jaxbPresent) {
+        String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
+        if (extraApply != null) {
+          runScript(connection, false, extraApply, "extra-ddl");
+        }
+      }
+
       if (dropAllContent == null) {
         dropAllContent = readFile(getDropFileName());
       }
-      runScript(true, dropAllContent, getDropFileName());
+      runScript(connection, true, dropAllContent, getDropFileName());
     }
   }
 
-  protected void runCreateSql() throws IOException {
+  protected void runCreateSql(Connection connection) throws IOException {
     if (createAllContent == null) {
       createAllContent = readFile(getCreateFileName());
     }
-    runScript(false, createAllContent, getCreateFileName());
+    runScript(connection, false, createAllContent, getCreateFileName());
 
-    String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
-    if (!"true".equalsIgnoreCase(ignoreExtraDdl) && jaxbPresent) {
-      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName());
+    if (extraDdl && jaxbPresent) {
+      if (currentModel().isTablePartitioning()) {
+        String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
+        if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
+          runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
+        }
+      }
+
+      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
       if (extraApply != null) {
-        runScript(false, extraApply, "extra-dll");
+        runScript(connection, false, extraApply, "extra-ddl");
+      }
+
+      if (currentModel().isTablePartitioning()) {
+        checkInitialTablePartitions(connection);
       }
     }
   }
 
-  protected void runInitSql() throws IOException {
-    runResourceScript(server.getServerConfig().getDdlInitSql());
+  /**
+   * Check if table partitions exist and if not create some. The expectation is that
+   * extra-ddl.xml should have some partition initialisation but this helps people get going.
+   */
+  private void checkInitialTablePartitions(Connection connection) {
+    DatabasePlatform databasePlatform = server.getDatabasePlatform();
+    try {
+      StringBuilder sb = new StringBuilder();
+      for (MTable table : currentModel.getPartitionedTables()) {
+        String tableName = table.getName();
+        if (!databasePlatform.tablePartitionsExist(connection, tableName)) {
+          log.info("No table partitions for table {}", tableName);
+          PartitionMeta meta = table.getPartitionMeta();
+          String initPart = databasePlatform.tablePartitionInit(tableName, meta.getMode(), meta.getProperty(), table.singlePrimaryKey());
+          sb.append(initPart).append("\n");
+        }
+      }
+
+      String initialPartitionSql = sb.toString();
+      if (!initialPartitionSql.isEmpty()) {
+        runScript(connection, false, initialPartitionSql, "initial table partitions");
+      }
+
+    } catch (SQLException e) {
+      log.error("Error checking initial table partitions", e);
+    }
   }
 
-  protected void runSeedSql() throws IOException {
-    runResourceScript(server.getServerConfig().getDdlSeedSql());
+  protected void runInitSql(Connection connection) throws IOException {
+    runResourceScript(connection, server.getServerConfig().getDdlInitSql());
   }
 
-  protected void runResourceScript(String sqlScript) throws IOException {
+  protected void runSeedSql(Connection connection) throws IOException {
+    runResourceScript(connection, server.getServerConfig().getDdlSeedSql());
+  }
 
+  protected void runResourceScript(Connection connection, String sqlScript) throws IOException {
     if (sqlScript != null) {
-      InputStream is = getClassLoader().getResourceAsStream(sqlScript);
-      if (is != null) {
-        String content = readContent(new InputStreamReader(is));
-        runScript(false, content, sqlScript);
+      try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
+        if (is != null) {
+          String content = readContent(new InputStreamReader(is));
+          runScript(connection, false, content, sqlScript);
+        }
       }
     }
   }
@@ -180,7 +277,6 @@ public class DdlGenerator {
   }
 
   protected void writeDrop(String dropFile) {
-
     try {
       writeFile(dropFile, generateDropAllDdl());
     } catch (IOException e) {
@@ -189,7 +285,6 @@ public class DdlGenerator {
   }
 
   protected void writeCreate(String createFile) {
-
     try {
       writeFile(createFile, generateCreateAllDdl());
     } catch (IOException e) {
@@ -198,7 +293,6 @@ public class DdlGenerator {
   }
 
   protected String generateDropAllDdl() {
-
     try {
       dropAllContent = currentModel().getDropAllDdl();
       return dropAllContent;
@@ -208,7 +302,6 @@ public class DdlGenerator {
   }
 
   protected String generateCreateAllDdl() {
-
     try {
       createAllContent = currentModel().getCreateDdl();
       return createAllContent;
@@ -233,8 +326,7 @@ public class DdlGenerator {
   }
 
   protected void writeFile(String fileName, String fileContent) throws IOException {
-
-    File f = new File(fileName);
+    File f = new File(baseDir, fileName);
     try (FileWriter fw = new FileWriter(f)) {
       fw.write(fileContent);
       fw.flush();
@@ -242,17 +334,14 @@ public class DdlGenerator {
   }
 
   protected String readFile(String fileName) throws IOException {
-
-    File f = new File(fileName);
+    File f = new File(baseDir, fileName);
     if (!f.exists()) {
       return null;
     }
-
     return readContent(new FileReader(f));
   }
 
   protected String readContent(Reader reader) throws IOException {
-
     StringBuilder buf = new StringBuilder();
     try (LineNumberReader lineReader = new LineNumberReader(reader)) {
       String s;
@@ -260,8 +349,14 @@ public class DdlGenerator {
         buf.append(s).append("\n");
       }
       return buf.toString();
-
     }
+  }
+
+  /**
+   * Create the ScriptTransform for placeholder key/value replacement.
+   */
+  private ScriptTransform createScriptTransform(DbMigrationConfig config) {
+    return ScriptTransform.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
   }
 
 }

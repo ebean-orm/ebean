@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.QueryIterator;
 import io.ebean.Version;
+import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeanservice.docstore.api.DocQueryRequest;
@@ -15,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * Defines the ORM query request api.
  */
-public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
+public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequest<T> {
 
   /**
    * Return the query.
@@ -26,7 +27,12 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Return the associated BeanDescriptor.
    */
-  BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<T> getBeanDescriptor();
+
+  /**
+   * Prepare the query for execution.
+   */
+  void prepareQuery();
 
   /**
    * This will create a local (readOnly) transaction if no current transaction
@@ -114,6 +120,11 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   <A> List<A> findSingleAttributeList();
 
   /**
+   * Execute returning the ResultSet.
+   */
+  SpiResultSet findResultSet();
+
+  /**
    * Try to get the query result from the query cache.
    */
   <A> A getFromQueryCache();
@@ -157,12 +168,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   boolean isUseDocStore();
 
   /**
-   * Set profile location for "find by id" if not set.
+   * Return true if delete by statement is allowed for this type given cascade rules etc.
    */
-  void profileLocationById();
-
-  /**
-   * Set profile location for "find all" if not set.
-   */
-  void profileLocationAll();
+  boolean isDeleteByStatement();
 }

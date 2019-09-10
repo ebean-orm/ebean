@@ -24,26 +24,27 @@ public class TestGeneratedKeys extends BaseTestCase {
   @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
   public void testSequence() throws SQLException {
     SpiEbeanServer server = spiEbeanServer();
-    IdType idType = server.getDatabasePlatform().getDbIdentity().getIdType();
-    if (!IdType.SEQUENCE.equals(idType)) {
+
+    if (idType() != IdType.SEQUENCE) {
       // only run this test when SEQUENCE is being used
       return;
     }
 
-    Transaction tx = server.beginTransaction();
+    try (Transaction tx = server.beginTransaction()) {
 
-    long sequenceStart = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
+      long sequenceStart = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
 
-    GenKeySequence al = new GenKeySequence();
-    al.setDescription("my description");
-    server.save(al);
+      GenKeySequence al = new GenKeySequence();
+      al.setDescription("my description");
+      server.save(al);
 
 
-    long sequenceCurrent = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
+      long sequenceCurrent = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
 
-    assertNotNull(al.getId());
-    assertFalse(sequenceStart == sequenceCurrent);
-    assertEquals(sequenceStart + 20, sequenceCurrent);
+      assertNotNull(al.getId());
+      assertFalse(sequenceStart == sequenceCurrent);
+      assertEquals(sequenceStart + 20, sequenceCurrent);
+    }
 
   }
 
@@ -68,27 +69,25 @@ public class TestGeneratedKeys extends BaseTestCase {
   @Test
   public void testIdentity() throws SQLException {
 
-    SpiEbeanServer server = spiEbeanServer();
-    IdType idType = server.getDatabasePlatform().getDbIdentity().getIdType();
-
-    if (!IdType.IDENTITY.equals(idType)) {
+    if (idType() != IdType.IDENTITY) {
       // only run this test when SEQUENCE is being used
       return;
     }
 
-    Transaction tx = server.beginTransaction();
+    try (Transaction tx = server().beginTransaction()) {
 
-    GenKeyIdentity al = new GenKeyIdentity();
-    al.setDescription("my description");
-    server.save(al);
+      GenKeyIdentity al = new GenKeyIdentity();
+      al.setDescription("my description");
+      server().save(al);
 
-    // For JDBC batching we won't get the id until after
-    // the batch has been flushed explicitly or via commit
-    //assertNotNull(al.getId());
+      // For JDBC batching we won't get the id until after
+      // the batch has been flushed explicitly or via commit
+      //assertNotNull(al.getId());
 
-    tx.commit();
+      tx.commit();
 
-    assertNotNull(al.getId());
+      assertNotNull(al.getId());
+    }
   }
 
 }

@@ -6,6 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.Size;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -17,10 +19,15 @@ public class EBasicWithUniqueCon {
   Integer id;
 
   @Column(unique = true)
+  @Size(max=127)
   String name;
 
+  @Size(max=127)
   String other;
+
+  @Size(max=127)
   String otherOne;
+
   String description;
 
   @Version

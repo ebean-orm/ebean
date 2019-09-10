@@ -13,13 +13,24 @@ import org.tests.model.basic.VehicleDriver;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestTextJsonInheritance extends BaseTestCase {
 
   @Test
-  public void test() throws IOException {
+  public void parseJson_when_inheritanceType_outOfOrderDtype() {
+
+    String fom = "{\"id\":90,\"name\":\"Frank\",\"vehicle\":{\"id\":42,\"licenseNumber\":\"T100\",\"capacity\":99.0,\"dtype\":\"T\"}}";
+
+    VehicleDriver driver1 = Ebean.json().toBean(VehicleDriver.class, fom);
+    assertThat(driver1.getVehicle()).isInstanceOf(Truck.class);
+    assertThat(driver1.getVehicle().getLicenseNumber()).isEqualTo("T100");
+  }
+
+  @Test
+  public void test() {
 
     setupData();
 

@@ -3,10 +3,9 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.annotation.PersistBatch;
-import org.tests.model.basic.OCachedBean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.OCachedBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,7 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
 
     Transaction txn = Ebean.beginTransaction();
     try {
-      txn.setBatch(PersistBatch.ALL);
+      txn.setBatchMode(true);
 
       Ebean.saveAll(list);
       txn.commit();
@@ -41,12 +40,8 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
     }
 
     List<String> loggedSql = LoggedSqlCollector.stop();
-    assertThat(loggedSql).hasSize(3);
-
-    for (String sql : loggedSql) {
-      assertThat(sql).contains("insert into o_cached_bean (");
-      assertThat(sql).contains("name) values (?");
-    }
-
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into o_cached_bean (");
+    assertThat(loggedSql.get(0)).contains("name) values (?");
   }
 }

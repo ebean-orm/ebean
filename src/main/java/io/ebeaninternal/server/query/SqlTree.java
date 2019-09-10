@@ -1,10 +1,9 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,14 +17,7 @@ class SqlTree {
   /**
    * Property if resultSet contains master and detail rows.
    */
-  private final BeanPropertyAssocMany<?> manyProperty;
-
-  private final Set<String> includes;
-
-  /**
-   * Summary of the select being generated.
-   */
-  private final String summary;
+  private final STreePropertyAssocMany manyProperty;
 
   private final String distinctOn;
 
@@ -38,22 +30,21 @@ class SqlTree {
   /**
    * Encrypted Properties require additional binding.
    */
-  private final BeanProperty[] encryptedProps;
+  private final STreeProperty[] encryptedProps;
 
   /**
    * Where clause for inheritance.
    */
   private final String inheritanceWhereSql;
 
-  private final boolean includeJoins;
+  private final boolean noJoins;
 
   /**
    * Create the SqlSelectClause.
    */
-  SqlTree(String summary, SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
-          BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes, boolean includeJoins) {
+  SqlTree(SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
+          STreeProperty[] encryptedProps, STreePropertyAssocMany manyProperty, boolean includeJoins) {
 
-    this.summary = summary;
     this.rootNode = rootNode;
     this.distinctOn = distinctOn;
     this.selectSql = selectSql;
@@ -62,15 +53,21 @@ class SqlTree {
     this.inheritanceWhereSql = inheritanceWhereSql;
     this.encryptedProps = encryptedProps;
     this.manyProperty = manyProperty;
-    this.includes = includes;
-    this.includeJoins = includeJoins;
+    this.noJoins = !includeJoins;
+  }
+
+  /**
+   * Return true if the query mandates SQL Distinct due to ToMany inclusion.
+   */
+  boolean isSqlDistinct() {
+    return rootNode.isSqlDistinct();
   }
 
   /**
    * Return true if the query includes joins (not valid for rawSql).
    */
-  boolean isIncludeJoins() {
-    return includeJoins;
+  boolean noJoins() {
+    return noJoins;
   }
 
   /**
@@ -94,13 +91,6 @@ class SqlTree {
     ArrayList<String> list = new ArrayList<>();
     rootNode.buildRawSqlSelectChain(list);
     return list;
-  }
-
-  /**
-   * Return the includes. Associated beans lists etc.
-   */
-  public Set<String> getIncludes() {
-    return includes;
   }
 
   String getDistinctOn() {
@@ -132,13 +122,6 @@ class SqlTree {
     return inheritanceWhereSql;
   }
 
-  /**
-   * Return a summary of the select clause.
-   */
-  public String getSummary() {
-    return summary;
-  }
-
   SqlTreeNode getRootNode() {
     return rootNode;
   }
@@ -147,11 +130,11 @@ class SqlTree {
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
-  BeanPropertyAssocMany<?> getManyProperty() {
+  STreePropertyAssocMany getManyProperty() {
     return manyProperty;
   }
 
-  BeanProperty[] getEncryptedProps() {
+  STreeProperty[] getEncryptedProps() {
     return encryptedProps;
   }
 
@@ -160,5 +143,18 @@ class SqlTree {
    */
   boolean hasMany() {
     return manyProperty != null || rootNode.hasMany();
+  }
+
+  boolean isSingleProperty() {
+    return rootNode.isSingleProperty();
+  }
+
+  /**
+   * Return the tables that are joined in this query.
+   */
+  Set<String> dependentTables() {
+    Set<String> tables = new LinkedHashSet<>();
+    rootNode.dependentTables(tables);
+    return tables;
   }
 }

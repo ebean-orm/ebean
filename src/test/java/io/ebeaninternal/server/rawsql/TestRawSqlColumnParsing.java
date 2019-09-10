@@ -2,12 +2,15 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.Map;
 
-public class TestRawSqlColumnParsing extends TestCase {
+import static org.junit.Assert.assertEquals;
 
+public class TestRawSqlColumnParsing {
+
+  @Test
   public void test_simple() {
 
     ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a,b,c");
@@ -30,6 +33,7 @@ public class TestRawSqlColumnParsing extends TestCase {
 
   }
 
+  @Test
   public void test_simpleWithSpacing() {
 
     ColumnMapping columnMapping = DRawSqlColumnsParser.parse(" a  ,  b    ,  c   ");
@@ -52,6 +56,7 @@ public class TestRawSqlColumnParsing extends TestCase {
 
   }
 
+  @Test
   public void test_withAlias() {
 
     ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a a0,b    b1, c  c2 ,   d    d3  , e  e4 ");
@@ -88,6 +93,7 @@ public class TestRawSqlColumnParsing extends TestCase {
 
   }
 
+  @Test
   public void test_withDatabaseFunction() {
 
     ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a a0,b    b1, MONTH(MAKEDATE(2015, 241)) m2 ,   d    d3  , e  e4 ");
@@ -124,6 +130,7 @@ public class TestRawSqlColumnParsing extends TestCase {
 
   }
 
+  @Test
   public void test_withAsAlias() {
 
     ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a as a0,'b'    b1, \"c(blah)\" as c2 ,   d as   d3  , e     as e4 ");
@@ -160,6 +167,7 @@ public class TestRawSqlColumnParsing extends TestCase {
 
   }
 
+  @Test
   public void test_doubleColon() {
 
     ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a,MD5(id::text) as b,c");

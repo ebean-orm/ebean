@@ -19,7 +19,7 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
     Ebean.save(user);
     Ebean.save(site);
 
-    insertUpdateBridge(user, site);
+    insertUpdateBridgeA(user, site);
     insertUpdateBridgeB(user, site);
     insertUpdateBridgeC(user, site);
   }
@@ -27,21 +27,26 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
   /**
    * Test where matching by db column naming convention.
    */
-  private void insertUpdateBridge(BUser user, BSite site) {
+  private void insertUpdateBridgeA(BUser user, BSite site) {
 
-    BSiteUser access = new BSiteUser(BAccessLevel.ONE, site, user);
+    BSiteUserA access = new BSiteUserA(BAccessLevel.ONE, site, user);
     Ebean.save(access);
 
     access.setAccessLevel(BAccessLevel.TWO);
     Ebean.save(access);
 
-    List<BSiteUser> list = Ebean.find(BSiteUser.class).findList();
+    List<BSiteUserA> list = Ebean.find(BSiteUserA.class).findList();
     assertThat(list).isNotEmpty();
 
-    for (BSiteUser bridge : list) {
+    for (BSiteUserA bridge : list) {
       assertThat(bridge.getId().siteId).isEqualTo(bridge.getSite().id);
       assertThat(bridge.getId().userId).isEqualTo(bridge.getUser().id);
     }
+
+    BSiteUserA found = Ebean.find(BSiteUserA.class, new BSiteUserA.Id(site.id, user.id));
+    found.setAccessLevel(BAccessLevel.THREE);
+
+    Ebean.save(found);
   }
 
   /**

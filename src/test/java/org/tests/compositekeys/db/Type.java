@@ -6,10 +6,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Version;
 import java.util.List;
 
 @Entity
+@Table(name="`type`") // needs to be quoted because it's a keyword on HANA
 public class Type {
   @Id
   private TypeKey key;

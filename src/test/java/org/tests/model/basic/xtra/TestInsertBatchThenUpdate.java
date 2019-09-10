@@ -3,7 +3,8 @@ package org.tests.model.basic.xtra;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -11,17 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 public class TestInsertBatchThenUpdate extends BaseTestCase {
 
   @Test
+  @IgnorePlatform({Platform.SQLSERVER, Platform.HANA}) // has generated IDs
   public void test() {
 
     LoggedSqlCollector.start();
-    Transaction txn = Ebean.beginTransaction();
-    try {
-      txn.setBatch(PersistBatch.ALL);
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchMode(true);
 
       LoggedSqlCollector.start();
 
@@ -48,24 +48,21 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSqlCollector.stop();
-      assertEquals(3, loggedSql.size());
+      assertThat(loggedSql).hasSize(6);
       assertThat(loggedSql.get(0)).contains("insert into td_parent");
-      assertThat(loggedSql.get(1)).contains("insert into td_child ");
-      assertThat(loggedSql.get(2)).contains("update td_parent set parent_name=? where parent_id=?");
-
-    } finally {
-      Ebean.endTransaction();
+      assertThat(loggedSql.get(2)).contains("insert into td_child ");
+      assertThat(loggedSql.get(4)).contains("update td_parent set parent_name=? where parent_id=?");
     }
   }
 
 
   @Test
+  @IgnorePlatform(Platform.HANA)
   public void test_noFlushOn_getterOfNonGeneratedProperty() {
 
     LoggedSqlCollector.start();
-    Transaction txn = Ebean.beginTransaction();
-    try {
-      txn.setBatch(PersistBatch.ALL);
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchMode(true);
 
       LoggedSqlCollector.start();
 
@@ -94,12 +91,9 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSqlCollector.stop();
-      assertEquals(2, loggedSql.size());
+      assertThat(loggedSql).hasSize(4);
       assertThat(loggedSql.get(0)).contains("insert into td_parent");
-      assertThat(loggedSql.get(1)).contains("insert into td_child ");
-
-    } finally {
-      Ebean.endTransaction();
+      assertThat(loggedSql.get(2)).contains("insert into td_child ");
     }
   }
 

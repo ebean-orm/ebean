@@ -1,14 +1,14 @@
 package io.ebean.config.dbplatform.postgres;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.config.dbplatform.SequenceIdGenerator;
+import io.ebean.config.dbplatform.SequenceBatchIdGenerator;
 
 import javax.sql.DataSource;
 
 /**
  * Postgres specific sequence Id Generator.
  */
-public class PostgresSequenceIdGenerator extends SequenceIdGenerator {
+public class PostgresSequenceIdGenerator extends SequenceBatchIdGenerator {
 
   private final String baseSql;
 

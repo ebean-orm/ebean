@@ -15,6 +15,8 @@ class DProfileLocation implements ProfileLocation {
 
   private String shortDescription;
 
+  private String label;
+
   private final int lineNumber;
 
   DProfileLocation() {
@@ -28,6 +30,7 @@ class DProfileLocation implements ProfileLocation {
     this.lineNumber = lineNumber;
   }
 
+  @Override
   public String toString() {
     return "location: " + location;
   }
@@ -37,13 +40,22 @@ class DProfileLocation implements ProfileLocation {
     // do nothing
   }
 
+  @Override
   public String obtain() {
-    // atomic assignment so happy with this
+    // atomic assignments so happy enough with this (racing but atomic)
     if (location == null) {
-      location = create();
-      shortDescription = shortDesc(location);
+      final String loc = create();
+      final String shortDesc = shortDesc(loc);
+      label = UtilLocation.label(shortDesc);
+      shortDescription = shortDesc;
+      location = loc;
     }
     return location;
+  }
+
+  @Override
+  public String label() {
+    return label;
   }
 
   @Override
@@ -52,6 +64,7 @@ class DProfileLocation implements ProfileLocation {
   }
 
   private String create() {
+    // relatively expensive but we only do it once per profile location
     StackTraceElement[] trace = Thread.currentThread().getStackTrace();
     for (int i = 3; i < trace.length; i++) {
       if (!trace[i].getClassName().startsWith(IO_EBEAN)) {

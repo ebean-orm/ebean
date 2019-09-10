@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistRequest;
 
@@ -43,7 +44,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
    */
   public ChainedBeanPersistController(List<BeanPersistController> list) {
     this.list = list;
-    BeanPersistController[] c = list.toArray(new BeanPersistController[list.size()]);
+    BeanPersistController[] c = list.toArray(new BeanPersistController[0]);
     Arrays.sort(c, SORTER);
     this.chain = c;
   }
@@ -148,6 +149,13 @@ public class ChainedBeanPersistController implements BeanPersistController {
   }
 
   @Override
+  public void preDelete(BeanDeleteIdRequest request) {
+    for (BeanPersistController aChain : chain) {
+      aChain.preDelete(request);
+    }
+  }
+
+  @Override
   public boolean preInsert(BeanPersistRequest<?> request) {
     for (BeanPersistController aChain : chain) {
       if (!aChain.preInsert(request)) {
@@ -177,7 +185,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 
       int i1 = o1.getExecutionOrder();
       int i2 = o2.getExecutionOrder();
-      return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
+      return Integer.compare(i1, i2);
     }
 
   }

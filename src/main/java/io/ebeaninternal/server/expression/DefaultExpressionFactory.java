@@ -16,6 +16,7 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.grammer.EqlParser;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -136,6 +137,26 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new ArrayIsEmptyExpression(propertyName, false);
   }
 
+  @Override
+  public Expression bitwiseAny(String propertyName, long flags) {
+    return new BitwiseExpression(propertyName, BitwiseOp.ANY, flags, "!=", 0L);
+  }
+
+  @Override
+  public Expression bitwiseAll(String propertyName, long flags) {
+    return new BitwiseExpression(propertyName, BitwiseOp.ALL, flags, "=", flags);
+  }
+
+  @Override
+  public Expression bitwiseAnd(String propertyName, long flags, long match) {
+    return new BitwiseExpression(propertyName, BitwiseOp.AND, flags, "=", match);
+  }
+
+  @Override
+  public <T> void where(ExpressionList<T> list, String expressions, Object[] params) {
+    EqlParser.parseWhere(expressions, list, this, params);
+  }
+
   /**
    * Equal To - property equal to the given value.
    */
@@ -145,6 +166,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
     }
     return new SimpleExpression(propertyName, Op.EQ, value);
+  }
+
+  @Override
+  public Expression eqOrNull(String propertyName, Object value) {
+    return or(eq(propertyName, value), isNull(propertyName));
   }
 
   /**
@@ -167,7 +193,19 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
     }
-    return new CaseInsensitiveEqualExpression(propertyName, value);
+    return new CaseInsensitiveEqualExpression(propertyName, value, false);
+  }
+
+  /**
+   * Case Insensitive Equal To - property equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  @Override
+  public Expression ine(String propertyName, String value) {
+    if (value == null) {
+      return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNotNull(propertyName);
+    }
+    return new CaseInsensitiveEqualExpression(propertyName, value, true);
   }
 
   /**
@@ -175,7 +213,28 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression ieqObject(String propertyName, Object value) {
-    return new CaseInsensitiveEqualExpression(propertyName, value);
+    return new CaseInsensitiveEqualExpression(propertyName, value, false);
+  }
+
+  /**
+   * Create for named parameter use (and without support for equalsWithNullAsNoop).
+   */
+  @Override
+  public Expression ineObject(String propertyName, Object value) {
+    return new CaseInsensitiveEqualExpression(propertyName, value, true);
+  }
+
+  /**
+   * Between - property between the two given values.
+   */
+  @Override
+  public Expression inRange(String propertyName, Object value1, Object value2) {
+    return new InRangeExpression(propertyName, value1, value2);
+  }
+
+  @Override
+  public Expression inRangeWith(String lowProperty, String highProperty, Object value) {
+    return and(le(lowProperty, value), gtOrNull(highProperty, value));
   }
 
   /**
@@ -183,7 +242,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression between(String propertyName, Object value1, Object value2) {
-
     return new BetweenExpression(propertyName, value1, value2);
   }
 
@@ -192,7 +250,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression betweenProperties(String lowProperty, String highProperty, Object value) {
-
     return new BetweenPropertyExpression(lowProperty, highProperty, value);
   }
 
@@ -201,8 +258,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression gt(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.GT, value);
+  }
+
+  /**
+   * Greater Than or null - property greater than the given value or null.
+   */
+  @Override
+  public Expression gtOrNull(String propertyName, Object value) {
+    return or(gt(propertyName, value), isNull(propertyName));
   }
 
   /**
@@ -211,8 +275,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression ge(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.GT_EQ, value);
+  }
+
+  /**
+   * Less Than or null - property less than the given value or null.
+   */
+  @Override
+  public Expression ltOrNull(String propertyName, Object value) {
+    return or(lt(propertyName, value), isNull(propertyName));
   }
 
   /**
@@ -220,7 +291,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression lt(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.LT, value);
   }
 
@@ -229,7 +299,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression le(String propertyName, Object value) {
-
     return new SimpleExpression(propertyName, Op.LT_EQ, value);
   }
 
@@ -238,7 +307,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression isNull(String propertyName) {
-
     return new NullExpression(propertyName, false);
   }
 
@@ -247,7 +315,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression isNotNull(String propertyName) {
-
     return new NullExpression(propertyName, true);
   }
 
@@ -395,6 +462,16 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   */
+  @Override
+  public Expression inOrEmpty(String propertyName, Collection<?> values) {
+    return new InExpression(propertyName, values, false, true);
+  }
+
+  /**
    * In - property has a value in the array of values.
    */
   @Override
@@ -494,7 +571,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression raw(String raw, Object value) {
-    return new RawExpression(raw, new Object[]{value});
+    return RawExpressionBuilder.buildSingle(raw, value);
   }
 
   /**
@@ -506,7 +583,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression raw(String raw, Object[] values) {
-    return new RawExpression(raw, values);
+    return RawExpressionBuilder.build(raw, values);
   }
 
   /**

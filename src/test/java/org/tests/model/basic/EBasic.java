@@ -6,6 +6,8 @@ import io.ebean.annotation.Index;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -29,6 +31,7 @@ public class EBasic {
   Status status;
 
   @Index
+  @Size(max=127)
   String name;
 
   String description;

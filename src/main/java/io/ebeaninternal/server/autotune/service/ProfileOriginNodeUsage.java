@@ -2,11 +2,11 @@ package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.NodeUsageCollector;
 import io.ebean.text.PathProperties;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,23 +55,27 @@ public class ProfileOriginNodeUsage {
         }
       }
 
+      BeanProperty toOneIdProperty = null;
+      boolean addedToPath = false;
+
       for (String propName : aggregateUsed) {
-        BeanProperty beanProp = desc.getBeanPropertyFromPath(propName);
+        BeanProperty beanProp = desc.findPropertyFromPath(propName);
         if (beanProp == null) {
           logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.getName());
 
         } else {
-          if (beanProp instanceof BeanPropertyAssoc<?>) {
-            BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProp;
-            String targetIdProp = assocProp.getTargetIdProperty();
-            String manyPath = SplitName.add(path, assocProp.getName());
-            pathProps.addToPath(manyPath, targetIdProp);
+          if (beanProp.isId()) {
+            // remember and maybe add ToOne property to parent path
+            toOneIdProperty = beanProp;
+          } else if (beanProp instanceof BeanPropertyAssoc<?>) {
+            // intentionally skip
           } else {
             //noinspection StatementWithEmptyBody
             if (beanProp.isLob() && !beanProp.isFetchEager()) {
               // AutoTune will not include Lob's marked FetchLazy
               // (which is the default for Lob's so typical).
             } else {
+              addedToPath = true;
               pathProps.addToPath(path, beanProp.getName());
             }
           }
@@ -81,8 +85,15 @@ public class ProfileOriginNodeUsage {
       if ((modified || addVersionProperty) && desc != null) {
         BeanProperty versionProp = desc.getVersionProperty();
         if (versionProp != null) {
+          addedToPath = true;
           pathProps.addToPath(path, versionProp.getName());
         }
+      }
+
+      if (toOneIdProperty != null && !addedToPath) {
+        // add ToOne property to parent path
+        ElPropertyValue assocOne = rootDesc.getElGetValue(path);
+        pathProps.addToPath(SplitName.parent(path), assocOne.getName());
       }
     }
   }

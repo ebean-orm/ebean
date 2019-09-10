@@ -1,13 +1,12 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
 import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
@@ -16,9 +15,7 @@ import java.sql.SQLException;
 /**
  * Executes the UpdateSql requests.
  */
-public class ExeOrmUpdate {
-
-  private static final Logger logger = LoggerFactory.getLogger(ExeOrmUpdate.class);
+class ExeOrmUpdate {
 
   private final Binder binder;
 
@@ -27,7 +24,7 @@ public class ExeOrmUpdate {
   /**
    * Create with a given binder.
    */
-  public ExeOrmUpdate(Binder binder) {
+  ExeOrmUpdate(Binder binder) {
     this.pstmtFactory = new PstmtFactory();
     this.binder = binder;
   }
@@ -61,12 +58,8 @@ public class ExeOrmUpdate {
       throw new PersistenceException("Error executing: " + request.getOrmUpdate().getGeneratedSql(), ex);
 
     } finally {
-      if (!batchThisRequest && pstmt != null) {
-        try {
-          pstmt.close();
-        } catch (SQLException e) {
-          logger.error(null, e);
-        }
+      if (!batchThisRequest) {
+        JdbcClose.close(pstmt);
       }
     }
   }
@@ -82,6 +75,7 @@ public class ExeOrmUpdate {
 
   private PreparedStatement bindStmt(PersistRequestOrmUpdate request, boolean batchThisRequest) throws SQLException {
 
+    request.startBind(batchThisRequest);
     SpiUpdate<?> ormUpdate = request.getOrmUpdate();
     SpiTransaction t = request.getTransaction();
 
@@ -107,7 +101,7 @@ public class ExeOrmUpdate {
       if (logSql) {
         t.logSql(sql);
       }
-      pstmt = pstmtFactory.getPstmt(t, sql);
+      pstmt = pstmtFactory.getPstmt(t, sql, false);
     }
 
     String bindLog = null;

@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages the cluster service.
  */
-public class ClusterManager {
+public class ClusterManager implements ServerLookup {
 
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
@@ -29,7 +29,7 @@ public class ClusterManager {
 
   public ClusterManager(ContainerConfig config) {
     ClusterBroadcastFactory factory = createFactory();
-    if (factory != null) {
+    if (factory != null && config.isActive()) {
       broadcast = factory.create(this, config);
     } else {
       broadcast = null;
@@ -59,6 +59,7 @@ public class ClusterManager {
     }
   }
 
+  @Override
   public EbeanServer getServer(String name) {
     synchronized (monitor) {
       return serverMap.get(name);

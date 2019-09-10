@@ -3,10 +3,10 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import javax.persistence.PersistenceException;
 import java.util.List;
@@ -16,7 +16,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestQueryFindPagedList extends BaseTestCase {
 
@@ -92,6 +94,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList2 = Ebean.find(Order.class)
       .setFirstRow(1)
       .setMaxRows(3)
+      .orderBy("id")
       .findPagedList();
 
     pagedList2.loadCount();
@@ -107,6 +110,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList3 = Ebean.find(Order.class)
       .setFirstRow(2)
       .setMaxRows(150)
+      .orderBy("id")
       .findPagedList();
 
     assertFalse(pagedList3.hasNext());
@@ -194,7 +198,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(6).findPagedList();
+    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
 
     LoggedSqlCollector.start();
 

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -9,7 +10,6 @@ import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +37,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
   }
@@ -98,7 +98,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
     }
     request.append(" exists (");
     request.append(sql);
-    request.append(") ");
+    request.append(")");
   }
 
   @Override

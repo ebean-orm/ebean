@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ebean xmlns="http://ebean-orm.github.io/xml/ns/ebean">
+
+  <dto class="io.ebean.NamedDtoQueryTest$DCust">
+    <raw-sql name="findList">
+      <query>
+        select id, name from o_customer
+      </query>
+    </raw-sql>
+    <raw-sql name="findGtId">
+      <query>
+        select id, name from o_customer where id > :id
+      </query>
+    </raw-sql>
+    <raw-sql name="findGtIdDesc">
+      <query>
+        select id, name from o_customer where id > :id order by id desc
+      </query>
+    </raw-sql>
+    <raw-sql name="findByName">
+      <query>
+        select id, name from o_customer where name = :name
+      </query>
+    </raw-sql>
+    <raw-sql name="findByName_c3">
+      <query>
+        select c3.id, c3.name from o_customer c3 where c3.name = :name
+      </query>
+    </raw-sql>
+    <raw-sql name="findByName_c4">
+      <query>
+        select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name
+      </query>
+    </raw-sql>
+    <raw-sql name="findListByName">
+      <query>
+        select c.id, c.name, count(o.id) as totalOrders
+        from o_customer c
+        join o_order o on o.kcustomer_id = c.id
+        where c.name like :name
+        group by c.id, c.name
+      </query>
+    </raw-sql>
+  </dto>
+
+  <dto class="io.ebean.NamedDtoQueryTest$DCust2">
+    <raw-sql name="findByName_relaxedMode">
+      <query>
+        select id, '42' as something_we_cannot_map, name from o_customer
+      </query>
+    </raw-sql>
+    <raw-sql name="findList">
+      <query>
+        select id, name from o_customer
+      </query>
+    </raw-sql>
+  </dto>
+
+  <dto class="io.ebean.NamedDtoQueryTest$DCust3">
+    <raw-sql name="findByName_relaxedMode">
+      <query>
+        select id, name, 42 as total, '42' as something_we_cannot_map from o_customer
+      </query>
+    </raw-sql>
+    <raw-sql name="findByNameLike">
+      <query>
+        select id, name, 42 as totalOrders from o_customer where name like ?
+      </query>
+    </raw-sql>
+    <raw-sql name="findByName">
+      <query>
+        select id, name from o_customer where name = :name
+      </query>
+    </raw-sql>
+  </dto>
+
+</ebean>

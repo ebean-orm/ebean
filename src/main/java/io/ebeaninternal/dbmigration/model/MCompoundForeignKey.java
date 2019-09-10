@@ -1,9 +1,12 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
+import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A unique constraint for multiple columns.
@@ -44,6 +47,32 @@ public class MCompoundForeignKey {
     fk.setColumnNames(toColumnNames(columns));
     fk.setRefColumnNames(toColumnNames(referenceColumns));
     fk.setRefTableName(referenceTable);
+    return fk;
+  }
+  
+  /**
+   * Create and return an AlterForeignKey migration element.
+   */
+  public AlterForeignKey addForeignKey(String tableName) {
+    AlterForeignKey fk = new AlterForeignKey();
+    fk.setName(name);
+    fk.setIndexName(indexName);
+    fk.setColumnNames(toColumnNames(columns));
+    fk.setRefColumnNames(toColumnNames(referenceColumns));
+    fk.setRefTableName(referenceTable);
+    fk.setTableName(tableName);
+    return fk;
+  }
+  
+  /**
+   * Create and return an AlterForeignKey migration element.
+   */
+  public AlterForeignKey dropForeignKey(String tableName) {
+    AlterForeignKey fk = new AlterForeignKey();
+    fk.setName(name);
+    fk.setIndexName(indexName);
+    fk.setColumnNames(DdlHelp.DROP_FOREIGN_KEY);
+    fk.setTableName(tableName);
     return fk;
   }
 
@@ -97,6 +126,26 @@ public class MCompoundForeignKey {
       sb.append(columns.get(i));
     }
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(columns, indexName, name, referenceColumns, referenceTable);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!(obj instanceof MCompoundForeignKey))
+      return false;
+    
+    MCompoundForeignKey other = (MCompoundForeignKey) obj;
+    return Objects.equals(columns, other.columns)
+        && Objects.equals(indexName, other.indexName)
+        && Objects.equals(name, other.name)
+        && Objects.equals(referenceColumns, other.referenceColumns)
+        && Objects.equals(referenceTable, other.referenceTable);
   }
 
 }

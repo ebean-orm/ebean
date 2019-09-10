@@ -1,6 +1,9 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+
+import java.io.IOException;
 
 /**
  * Postgres specific DDL.
@@ -17,14 +20,13 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
+  public boolean suppressPrimaryKeyOnPartition() {
+    return true;
+  }
+
+  @Override
   protected String convertArrayType(String logicalArrayType) {
-    int colonPos = logicalArrayType.lastIndexOf(']');
-    if (colonPos == -1) {
-      return logicalArrayType;
-    } else {
-      // trim of the fallback varchar length
-      return logicalArrayType.substring(0, colonPos + 1);
-    }
+    return NativeDbArray.logicalToNative(logicalArrayType);
   }
 
   /**
@@ -43,5 +45,10 @@ public class PostgresDdl extends PlatformDdl {
       return "smallserial";
     }
     return columnDefn;
+  }
+
+  @Override
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+    apply.append(" partition by range (").append(partitionColumn).append(")");
   }
 }

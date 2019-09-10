@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.annotation.DbArray;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 import javax.persistence.EnumType;
 import java.lang.reflect.Type;
@@ -20,6 +21,11 @@ public interface TypeManager {
    */
   @SuppressWarnings("rawtypes")
   void addEnumType(ScalarType<?> type, Class<? extends Enum> myEnumClass);
+
+  /**
+   * Return the scalar type for the given logical type.
+   */
+  ScalarType<?> getScalarType(String cast);
 
   /**
    * Return the ScalarType for a given jdbc type.
@@ -52,7 +58,7 @@ public interface TypeManager {
    * Note that type expected to be JsonNode or Map.
    * </p>
    */
-  ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType);
+  ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength);
 
   /**
    * Return the ScalarType used to handle DB ARRAY.

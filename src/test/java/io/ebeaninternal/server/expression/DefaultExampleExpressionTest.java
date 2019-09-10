@@ -91,6 +91,25 @@ public class DefaultExampleExpressionTest extends BaseExpressionTest {
 
   }
 
+  @Test
+  public void emptyExampleBean() {
+
+    ResetBasicData.reset();
+
+    Customer customer = new Customer();
+
+    Query<Customer> query = server().find(Customer.class)
+      .where()
+      .eq("status", Customer.Status.NEW)
+      .exampleLike(customer)
+      .startsWith("name", "Rob")
+      .query();
+
+    query.findList();
+
+    assertThat(sqlOf(query)).contains("and 1=1 and t0.name like");
+  }
+
   private <T> OrmQueryRequest<T> create(SpiQuery<T> query) {
     return new OrmQueryRequest<>(null, null, query, null);
   }

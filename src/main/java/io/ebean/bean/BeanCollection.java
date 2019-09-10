@@ -73,6 +73,11 @@ public interface BeanCollection<E> extends Serializable {
   boolean isSkipSave();
 
   /**
+   * Return true if the collection holds modifications.
+   */
+  boolean holdsModifications();
+
+  /**
    * Return the bean that owns this collection.
    */
   EntityBean getOwnerBean();
@@ -192,6 +197,11 @@ public interface BeanCollection<E> extends Serializable {
   void setModifyListening(ModifyListenMode modifyListenMode);
 
   /**
+   * Return the current modify listening mode. Can be null for on newly created beans.
+   */
+  ModifyListenMode getModifyListening();
+
+  /**
    * Add an object to the additions list.
    * <p>
    * This will potentially end up as an insert into a intersection table for a
@@ -226,6 +236,11 @@ public interface BeanCollection<E> extends Serializable {
    * additions and removals have been processed.
    */
   void modifyReset();
+
+  /**
+   * Has been modified by an addition or removal.
+   */
+  boolean wasTouched();
 
   /**
    * Return a shallow copy of this collection that is modifiable.

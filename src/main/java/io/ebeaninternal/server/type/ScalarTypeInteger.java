@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.TextException;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -17,7 +17,9 @@ import java.sql.Types;
  */
 public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
 
-  public ScalarTypeInteger() {
+  public static ScalarTypeInteger INSTANCE = new ScalarTypeInteger();
+
+  private ScalarTypeInteger() {
     super(Integer.class, true, Types.INTEGER);
   }
 

@@ -2,17 +2,17 @@ package org.tests.iud;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.EBasicVer;
+import io.ebean.Transaction;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 public class TestInsertUpdateTrans extends BaseTestCase {
 
   @Test
   public void test() {
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
 
       EBasicVer e0 = new EBasicVer("onInsert");
       e0.setDescription("something");
@@ -34,11 +34,7 @@ public class TestInsertUpdateTrans extends BaseTestCase {
       Assert.assertEquals("onUpdate", e1.getName());
       Assert.assertEquals("differentFromInsert", e1.getDescription());
 
-
-      Ebean.commitTransaction();
-
-    } finally {
-      Ebean.endTransaction();
+      txn.commit();
     }
   }
 }

@@ -5,10 +5,14 @@ enum EqlOperator {
   EQ,
   IEQ,
   NE,
+  INE,
   LT,
   LTE,
   GT,
   GTE,
+  EQORNULL,
+  LTORNULL,
+  GTORNULL,
   CONTAINS,
   STARTS_WITH,
   ENDS_WITH,
@@ -17,6 +21,7 @@ enum EqlOperator {
   ISTARTS_WITH,
   IENDS_WITH,
   ILIKE,
+  INRANGE,
   BETWEEN
 
 }

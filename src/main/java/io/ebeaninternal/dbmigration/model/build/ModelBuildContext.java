@@ -4,13 +4,18 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
 import io.ebeaninternal.dbmigration.model.MColumn;
+import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The context used during DDL generation.
@@ -187,4 +192,49 @@ public class ModelBuildContext {
     addTable(draftTable);
   }
 
+  /**
+   * Return a builder to add foreign keys.
+   */
+  public FkeyBuilder fkeyBuilder(MTable destTable) {
+    return new FkeyBuilder(this, destTable);
+  }
+
+  public static class FkeyBuilder {
+
+    private final AtomicInteger count = new AtomicInteger();
+
+    private final ModelBuildContext ctx;
+
+    private final MTable destTable;
+
+    private final String tableName;
+
+    FkeyBuilder(ModelBuildContext ctx, MTable destTable) {
+      this.ctx = ctx;
+      this.destTable = destTable;
+      this.tableName = destTable.getName();
+    }
+
+    /**
+     * Add a foreign key based on the table join.
+     */
+    public FkeyBuilder addForeignKey(BeanDescriptor<?> desc, TableJoin tableJoin, boolean direction) {
+
+      String baseTable = ctx.normaliseTable(desc.getBaseTable());
+      String fkName = ctx.foreignKeyConstraintName(tableName, baseTable, count.incrementAndGet());
+      String fkIndex = ctx.foreignKeyIndexName(tableName, baseTable, count.get());
+
+      MCompoundForeignKey foreignKey = new MCompoundForeignKey(fkName, desc.getBaseTable(), fkIndex);
+
+      for (TableJoinColumn column : tableJoin.columns()) {
+        String localCol = direction ? column.getForeignDbColumn() : column.getLocalDbColumn();
+        String refCol = !direction ? column.getForeignDbColumn() : column.getLocalDbColumn();
+        foreignKey.addColumnPair(localCol, refCol);
+      }
+
+      destTable.addForeignKey(foreignKey);
+      return this;
+    }
+
+  }
 }

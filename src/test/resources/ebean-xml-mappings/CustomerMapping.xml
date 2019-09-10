@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ebean xmlns="http://ebean-orm.github.io/xml/ns/ebean">
+
+  <entity class="org.tests.model.basic.Customer">
+    <named-query name="withContactsById2">
+      <query>
+        select (name, version)
+        fetch contacts (firstName, lastName, email)
+        where id = :id
+      </query>
+    </named-query>
+  </entity>
+
+</ebean>

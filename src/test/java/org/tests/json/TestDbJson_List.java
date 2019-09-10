@@ -2,18 +2,26 @@ package org.tests.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.json.EBasicJsonList;
-import org.tests.model.json.PlainBean;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+import io.ebean.text.TextException;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.json.EBasicJsonList;
+import org.tests.model.json.PlainBean;
 
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestDbJson_List extends BaseTestCase {
 
@@ -164,5 +172,52 @@ public class TestDbJson_List extends BaseTestCase {
 
     String asJson = Ebean.json().toJson(found);
     assertNotNull(asJson);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void find_corrupt_json_using_setAllowLoadErrors() {
+
+    EBasicJsonList bean = new EBasicJsonList();
+
+    PlainBean plainBean = new PlainBean();
+    plainBean.setName("Blubb");
+    bean.getBeanMap().put("bla", plainBean);
+
+    Ebean.save(bean);
+
+    // set some invalid JSON content into DB
+    Ebean.update(EBasicJsonList.class)
+      .set("beanMap", "blabla")
+      .where().eq("id", bean.getId())
+      .update();
+
+    try {
+      // a normal query fails due to invalid JSON content
+      Ebean.find(EBasicJsonList.class)
+        .setId(bean.getId())
+        .findOne();
+
+      // never get here
+      assertTrue(false);
+
+    } catch (PersistenceException e) {
+      // query fails due to error loading invalid JSON content
+      assertThat(e.getMessage()).contains("beanMap");
+    }
+
+    bean = Ebean.find(EBasicJsonList.class)
+      .setId(bean.getId())
+      .setAllowLoadErrors() // allow invalid JSON content
+      .findOne();
+
+    Map<String, Exception> errors = server().getBeanState(bean).getLoadErrors();
+
+    assertThat(errors).containsKey("beanMap").hasSize(1);
+    assertThat(errors.values().iterator().next())
+      .isInstanceOf(TextException.class)
+      .hasMessageContaining("blabla");
+
+    Ebean.delete(bean);
   }
 }

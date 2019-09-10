@@ -7,6 +7,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.util.List;
 
 @Entity
@@ -19,6 +21,7 @@ public class OrderEntity {
    */
   @Id
   @Column(name = "uuid")
+  @Size(max=40)
   private String id;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "order")

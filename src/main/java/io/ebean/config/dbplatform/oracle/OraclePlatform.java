@@ -23,17 +23,22 @@ public class OraclePlatform extends DatabasePlatform {
   public OraclePlatform() {
     super();
     this.platform = Platform.ORACLE;
+    this.supportsDeleteTableAlias = true;
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
     this.historySupport = new OracleDbHistorySupport();
-
+    this.truncateTable = "truncate table %s cascade";
     dbIdentity.setIdType(IdType.SEQUENCE);
     dbIdentity.setSupportsSequence(true);
     dbIdentity.setSupportsIdentity(true);
     dbIdentity.setSupportsGetGeneratedKeys(true);
+
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("current_timestamp");
 
     this.treatEmptyStringsAsNull = true;
     this.likeClauseRaw = "like ?";
@@ -43,13 +48,14 @@ public class OraclePlatform extends DatabasePlatform {
         //.addAcquireLock("")
         .addDuplicateKey("1")
         .addDataIntegrity("2291")
+        .addSerializableConflict("72000")
         .build();
 
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
     booleanDbType = Types.INTEGER;
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1) default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1)"));
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("number", 10));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("number", 19));
@@ -70,9 +76,8 @@ public class OraclePlatform extends DatabasePlatform {
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
-
-    return new OracleSequenceIdGenerator(be, ds, seqName, batchSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
+    return new OracleSequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
   @Override
@@ -87,8 +92,4 @@ public class OraclePlatform extends DatabasePlatform {
     }
   }
 
-  @Override
-  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
-    sb.append('|').append(ch);
-  }
 }

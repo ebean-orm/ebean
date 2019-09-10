@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
+
 import java.util.List;
 
 @Entity
@@ -17,6 +19,7 @@ import java.util.List;
 public class TCar {
 
   @Id
+  @Size(max=32)
   String plateNo;
 
   @OneToMany(cascade = CascadeType.ALL)

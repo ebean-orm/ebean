@@ -21,7 +21,7 @@ public class HsqldbPlatform extends DatabasePlatform {
     super();
     this.platform = Platform.HSQLDB;
     this.dbEncrypt = new H2DbEncrypt();
-
+    this.truncateTable = "delete from %s";
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
@@ -31,9 +31,8 @@ public class HsqldbPlatform extends DatabasePlatform {
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
-
-    return new H2SequenceIdGenerator(be, ds, seqName, batchSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
+    return new H2SequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
 }

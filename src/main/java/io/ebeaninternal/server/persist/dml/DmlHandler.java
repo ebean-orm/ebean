@@ -3,11 +3,10 @@ package io.ebeaninternal.server.persist.dml;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,37 +23,37 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
   private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 
+  private static final int[] GENERATED_KEY_COLUMNS = new int[]{1};
+  private static final int BATCHED_FIRST = 1;
+  private static final int BATCHED = 2;
+
   /**
    * The originating request.
    */
-  protected final PersistRequestBean<?> persistRequest;
+  final PersistRequestBean<?> persistRequest;
 
-  protected final StringBuilder bindLog;
+  private final StringBuilder bindLog;
 
-  protected final SpiTransaction transaction;
+  final SpiTransaction transaction;
 
-  protected final boolean emptyStringToNull;
+  private final boolean logLevelSql;
 
-  protected final boolean logLevelSql;
-
-  protected final long now;
+  private final long now;
 
   /**
    * The PreparedStatement used for the dml.
    */
-  protected DataBind dataBind;
+  DataBind dataBind;
 
-  protected String sql;
+  BatchedPstmt batchedPstmt;
 
-  /**
-   * The generated value for the @Version property. Must be set after where clause is bound.
-   */
-  protected Object versionValue;
+  String sql;
 
-  protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
+  private short batchedStatus;
+
+  DmlHandler(PersistRequestBean<?> persistRequest) {
     this.now = System.currentTimeMillis();
     this.persistRequest = persistRequest;
-    this.emptyStringToNull = emptyStringToNull;
     this.transaction = persistRequest.getTransaction();
     this.logLevelSql = transaction.isLogSql();
     if (logLevelSql) {
@@ -77,7 +76,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind to the statement returning the DataBind.
    */
-  protected DataBind bind(PreparedStatement stmt) {
+  DataBind bind(PreparedStatement stmt) {
     return new DataBind(persistRequest.getDataTimeZone(), stmt, transaction.getInternalConnection());
   }
 
@@ -96,7 +95,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Check the rowCount.
    */
-  protected void checkRowCount(int rowCount) throws OptimisticLockException {
+  void checkRowCount(int rowCount) throws OptimisticLockException {
     try {
       persistRequest.checkRowCount(rowCount);
       persistRequest.postExecute();
@@ -131,14 +130,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
-   * Return the bind log.
-   */
-  @Override
-  public String getBindLog() {
-    return bindLog == null ? "" : bindLog.toString();
-  }
-
-  /**
    * Set the Id value that was bound. This value is used for logging summary
    * level information.
    */
@@ -150,12 +141,22 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Log the sql to the transaction log.
    */
-  protected void logSql(String sql) {
+  void logSql(String sql) {
     if (logLevelSql) {
-      if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-        sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
+      switch (batchedStatus) {
+        case BATCHED_FIRST: {
+          transaction.logSql(sql);
+          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          return;
+        }
+        case BATCHED: {
+          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          return;
+        }
+        default: {
+          transaction.logSql(Str.add(sql, "; -- bind(", bindLog.toString(), ")"));
+        }
       }
-      transaction.logSql(sql);
     }
   }
 
@@ -173,7 +174,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       } else {
         String sval = value.toString();
         if (sval.length() > 50) {
-          bindLog.append(sval.substring(0, 47)).append("...");
+          bindLog.append(sval, 0, 47).append("...");
         } else {
           bindLog.append(sval);
         }
@@ -185,7 +186,10 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   @Override
   public void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
     if (logLevelSql) {
-      bindLog.append(logPlaceHolder).append(" ");
+      if (bindLog.length() > 0) {
+        bindLog.append(",");
+      }
+      bindLog.append(logPlaceHolder);
     }
     dataBind.setObject(value, sqlType);
   }
@@ -227,41 +231,16 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
-   * Register a generated value on a update. This can not be set to the bean
-   * until after the where clause has been bound for concurrency checking.
-   * <p>
-   * GeneratedProperty values are likely going to be used for optimistic
-   * concurrency checking. This includes 'counter' and 'update timestamp'
-   * generation.
-   * </p>
-   */
-  @Override
-  public void registerGeneratedVersion(Object versionValue) {
-    this.versionValue = versionValue;
-  }
-
-  /**
-   * Set any update generated values to the bean. Must be called after where
-   * clause has been bound.
-   */
-  public void setUpdateGenValues() {
-    if (versionValue != null) {
-      persistRequest.setVersionValue(versionValue);
-    }
-  }
-
-  /**
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
+  PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
 
     Connection conn = t.getInternalConnection();
     if (genKeys) {
       // the Id generated is always the first column
       // Required to stop Oracle10 giving us Oracle rowId??
       // Other jdbc drivers seem fine without this hint.
-      int[] columns = {1};
-      return conn.prepareStatement(sql, columns);
+      return conn.prepareStatement(sql, GENERATED_KEY_COLUMNS);
 
     } else {
       return conn.prepareStatement(sql);
@@ -271,20 +250,20 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Return a prepared statement taking into account batch requirements.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request,
-                                       boolean genKeys) throws SQLException {
+  PreparedStatement getPstmt(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-    PreparedStatement stmt = batch.getStmt(sql, request);
-
-    if (stmt != null) {
-      return stmt;
+    batchedPstmt = batch.getBatchedPstmt(sql, request);
+    if (batchedPstmt != null) {
+      batchedStatus = BATCHED;
+      return batchedPstmt.getStatement();
     }
 
-    stmt = getPstmt(t, sql, genKeys);
+    batchedStatus = BATCHED_FIRST;
+    PreparedStatement stmt = getPstmt(t, sql, genKeys);
 
-    BatchedPstmt bs = new BatchedPstmt(stmt, genKeys, sql, t);
-    batch.addStmt(bs, request);
+    batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);
+    batch.addStmt(batchedPstmt, request);
     return stmt;
   }
 

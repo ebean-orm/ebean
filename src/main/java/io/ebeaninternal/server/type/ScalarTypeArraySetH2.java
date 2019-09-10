@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
+
 /**
  * H2 database support for DB ARRAY.
  */
@@ -28,7 +29,6 @@ class ScalarTypeArraySetH2<T> extends ScalarTypeArraySet<T> {
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public ScalarTypeArraySetH2<?> typeFor(Type valueType) {
       if (valueType.equals(java.util.UUID.class)) {
         return UUID;
@@ -49,12 +49,13 @@ class ScalarTypeArraySetH2<T> extends ScalarTypeArraySet<T> {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes"})
     public ScalarTypeArraySetH2 typeForEnum(ScalarType<?> scalarType) {
       return new ScalarTypeArraySetH2("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private ScalarTypeArraySetH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
     super(arrayType, docPropertyType, converter);
   }

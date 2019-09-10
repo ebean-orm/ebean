@@ -14,17 +14,17 @@ import java.sql.Connection;
 public interface Transaction extends AutoCloseable {
 
   /**
-   * Return the current transaction (of the default server) or null if there is
+   * Return the current transaction (of the default database) or null if there is
    * no current transaction in scope.
    * <p>
-   * This is the same as <code>Ebean.currentTransaction()</code>
+   * This is the same as <code>DB.currentTransaction()</code>
    * </p>
    * <p>
-   * This returns the current transaction for the 'default server'.  If you are using
-   * multiple EbeanServer's then use {@link EbeanServer#currentTransaction()}.
+   * This returns the current transaction for the default database.
    * </p>
-   * @see Ebean#currentTransaction()
-   * @see EbeanServer#currentTransaction()
+   *
+   * @see DB#currentTransaction()
+   * @see Database#currentTransaction()
    */
   static Transaction current() {
     return Ebean.currentTransaction();
@@ -83,7 +83,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This is similar to commit() but leaves the transaction "Active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -99,7 +99,7 @@ public interface Transaction extends AutoCloseable {
    * This performs commit and completes the transaction closing underlying resources and
    * marking the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Flush the JDBC batch buffer</li>
    * <li>Call commit on the underlying JDBC connection</li>
@@ -116,7 +116,7 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This performs rollback, closes underlying resources and marks the transaction as "In active".
    * </p>
-   * <h3>Functions/h3>
+   * <h3>Functions</h3>
    * <ul>
    * <li>Call rollback on the underlying JDBC connection</li>
    * <li>Trigger any registered TransactionCallbacks</li>
@@ -137,6 +137,18 @@ public interface Transaction extends AutoCloseable {
   void rollback(Throwable e) throws PersistenceException;
 
   /**
+   * Set when we want nested transactions to use Savepoint's.
+   * <p>
+   * This means that for a nested transaction:
+   * <ul>
+   * <li>begin transaction maps to creating a savepoint</li>
+   * <li>commit transaction maps to releasing a savepoint</li>
+   * <li>rollback transaction maps to rollback a savepoint</li>
+   * </ul>
+   */
+  void setNestedUseSavepoint();
+
+  /**
    * Mark the transaction for rollback only.
    */
   void setRollbackOnly();
@@ -150,7 +162,6 @@ public interface Transaction extends AutoCloseable {
    * If the transaction is active then perform rollback. Otherwise do nothing.
    */
   void end();
-
 
   /**
    * Synonym for end() to support AutoClosable.
@@ -227,13 +238,12 @@ public interface Transaction extends AutoCloseable {
    * Refer to {@link ServerConfig#setSkipCacheAfterWrite(boolean)} for configuring the default behavior
    * for using the L2 bean cache in transactions spanning multiple query/persist requests.
    * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   // assume Customer has L2 bean caching enabled ...
    *
-   *   Transaction transaction = Ebean.beginTransaction();
-   *   try {
+   *   try (Transaction transaction = DB.beginTransaction()) {
    *
    *     // this uses L2 bean cache as the transaction
    *     // ... is considered "query only" at this point
@@ -241,7 +251,7 @@ public interface Transaction extends AutoCloseable {
    *
    *     // transaction no longer "query only" once
    *     // ... a bean has been saved etc
-   *     Ebean.save(someBean);
+   *     someBean.save();
    *
    *     // will NOT use L2 bean cache as the transaction
    *     // ... is no longer considered "query only"
@@ -261,8 +271,7 @@ public interface Transaction extends AutoCloseable {
    *     Customer.find.byId(99); // skips l2 bean cache
    *
    *
-   *   } finally {
-   *     transaction.end();
+   *     transaction.commit();
    *   }
    *
    * }</pre>
@@ -278,38 +287,68 @@ public interface Transaction extends AutoCloseable {
   boolean isSkipCache();
 
   /**
-   * Turn on or off statement batching. Statement batching can be transparent
-   * for drivers and databases that support getGeneratedKeys. Otherwise you may
-   * wish to specifically control when batching is used via this method.
-   * <p>
-   * Refer to <code>java.sql.PreparedStatement.addBatch();</code>
-   * <p>
-   * Note that you may also wish to use the setPersistCascade method to stop
-   * save and delete cascade behaviour. You may do this to have full control
-   * over the order of execution rather than the normal cascading fashion.
-   * </p>
-   * <p>
-   * Note that the <em>execution order</em> in batch mode may be different from
-   * non batch mode execution order. Also note that <em>insert behaviour</em>
-   * may be different depending on the JDBC driver and its support for
-   * getGeneratedKeys. That is, for JDBC drivers that do not support
-   * getGeneratedKeys you may not get back the generated IDs (used for inserting
-   * associated detail beans etc).
-   * </p>
+   * Turn on or off use of JDBC statement batching.
    * <p>
    * Calls to save(), delete(), insert() and execute() all support batch
-   * processing. This includes normal beans, MapBean, CallableSql and UpdateSql.
+   * processing. This includes normal beans, CallableSql and UpdateSql.
    * </p>
+   *
+   * <pre>{@code
+   *
+   * try (Transaction transaction = server.beginTransaction()) {
+   *
+   *   // turn on JDBC batch
+   *   transaction.setBatchMode(true);
+   *
+   *   // tune the batch size
+   *   transaction.setBatchSize(50);
+   *
+   *   ...
+   *
+   *   transaction.commit();
+   * }
+   *
+   * }</pre>
+   *
+   * <h3>getGeneratedKeys</h3>
    * <p>
-   * The flushing of the batched statements is automatic but you can call
-   * batchFlush when you like. Note that flushing occurs when a query is
-   * executed or when you mix UpdateSql and CallableSql with save and delete of
+   * Often with large batch inserts we want to turn off getGeneratedKeys. We do
+   * this via {@link #setBatchGetGeneratedKeys(boolean)}.
+   * Also note that some JDBC drivers do not support getGeneratedKeys in JDBC batch mode.
+   * </p>
+   * <pre>{@code
+   *
+   * try (Transaction transaction = server.beginTransaction()) {
+   *
+   *   transaction.setBatchMode(true);
+   *   transaction.setBatchSize(100);
+   *   // insert but don't bother getting back the generated keys
+   *   transaction.setBatchGetGeneratedKeys(false);
+   *
+   *
+   *   // perform lots of inserts ...
+   *   ...
+   *
+   *   transaction.commit();
+   * }
+   *
+   * }</pre>
+   *
+   * <h3>Flush</h3>
+   * <p>
+   * The batch is automatically flushed when it hits the batch size and also when we
+   * execute queries or when we mix UpdateSql and CallableSql with save and delete of
    * beans.
    * </p>
    * <p>
-   * Example: batch processing executing every 3 rows
+   * We use {@link #flush()} to explicitly flush the batch and we can use
+   * {@link #setBatchFlushOnQuery(boolean)} and {@link #setBatchFlushOnMixed(boolean)}
+   * to control the automatic flushing behaviour.
    * </p>
    * <p>
+   * Example: batch processing of CallableSql executing every 10 rows
+   * </p>
+   *
    * <pre>{@code
    *
    * String data = "This is a simple test of the batch processing"
@@ -322,24 +361,21 @@ public interface Transaction extends AutoCloseable {
    * CallableSql cs = new CallableSql(sql);
    * cs.registerOut(2, Types.INTEGER);
    *
-   * // (optional) inform eBean this stored procedure
+   * // (optional) inform Ebean this stored procedure
    * // inserts into a table called sp_test
    * cs.addModification("sp_test", true, false, false);
    *
-   * Transaction txn = ebeanServer.beginTransaction();
-   * txn.setBatchMode(true);
-   * txn.setBatchSize(3);
-   * try {
+   * try (Transaction txn = DB.beginTransaction()) {
+   *   txn.setBatchMode(true);
+   *   txn.setBatchSize(10);
+   *
    *   for (int i = 0; i < da.length;) {
    *     cs.setParameter(1, da[i]);
-   *     ebeanServer.execute(cs);
+   *     DB.execute(cs);
    *   }
    *
-   *   // NB: commit implicitly flushes
+   *   // Note: commit implicitly flushes
    *   txn.commit();
-   *
-   * } finally {
-   *   txn.end();
    * }
    *
    * }</pre>
@@ -347,24 +383,12 @@ public interface Transaction extends AutoCloseable {
   void setBatchMode(boolean useBatch);
 
   /**
-   * The JDBC batch mode to use for this transaction.
-   * <p>
-   * If this is NONE then JDBC batch can still be used for each request - save(), insert(), update() or delete()
-   * and this would be useful if the request cascades to detail beans.
-   * </p>
-   *
-   * @param persistBatchMode the batch mode to use for this transaction
-   * @see io.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
-   */
-  void setBatch(PersistBatch persistBatchMode);
-
-  /**
    * Return the batch mode at the transaction level.
    */
-  PersistBatch getBatch();
+  boolean isBatchMode();
 
   /**
-   * Set the JDBC batch mode to use for a save() or delete() request.
+   * Set the JDBC batch mode to use for a save() or delete() when cascading to children.
    * <p>
    * This only takes effect when batch mode on the transaction has not already meant that
    * JDBC batch mode is being used.
@@ -373,16 +397,19 @@ public interface Transaction extends AutoCloseable {
    * This is useful when the single save() or delete() cascades. For example, inserting a 'master' cascades
    * and inserts a collection of 'detail' beans. The detail beans can be inserted using JDBC batch.
    * </p>
+   * <p>
+   * This is effectively already turned on for all platforms apart from older Sql Server.
+   * </p>
    *
-   * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
+   * @param batchMode the batch mode to use per save(), insert(), update() or delete()
    * @see io.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
    */
-  void setBatchOnCascade(PersistBatch batchOnCascadeMode);
+  void setBatchOnCascade(boolean batchMode);
 
   /**
-   * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
+   * Return the batch mode at the request level.
    */
-  PersistBatch getBatchOnCascade();
+  boolean isBatchOnCascade();
 
   /**
    * Specify the number of statements before a batch is flushed automatically.

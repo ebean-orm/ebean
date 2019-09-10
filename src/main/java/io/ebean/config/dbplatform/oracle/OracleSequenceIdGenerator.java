@@ -1,14 +1,14 @@
 package io.ebean.config.dbplatform.oracle;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.config.dbplatform.SequenceIdGenerator;
+import io.ebean.config.dbplatform.SequenceBatchIdGenerator;
 
 import javax.sql.DataSource;
 
 /**
  * Oracle specific sequence Id Generator.
  */
-public class OracleSequenceIdGenerator extends SequenceIdGenerator {
+public class OracleSequenceIdGenerator extends SequenceBatchIdGenerator {
 
   private final String baseSql;
 

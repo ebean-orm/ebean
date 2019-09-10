@@ -11,11 +11,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "migtest_e_basic")
+@Index(columnNames  = { "status" , "indextest1"}, unique = true)
 public class EBasic {
 
   public enum Status {
@@ -50,16 +52,23 @@ public class EBasic {
   @DbDefault("A")
   Status status;
 
+  @Size(max=127)
+  String status2;
+
   @Index(unique = true)
+  @Size(max=127)
   String name;
 
 
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
+  @Size(max=127)
   String description;
 
-  @NotNull
-  @DbDefault("2000-01-01T00:00:00")
+  //@NotNull
+  //@DbDefault("2000-01-01T00:00:00") //- date time literals do not work for each platform yet
+  //@DbDefault("now") //- now does not work for mariaDb
+  // MariaDb requires: ALTER TABLE `migtest_e_basic` CHANGE `some_date` `some_date` DATETIME(6) NULL DEFAULT CURRENT_TIMESTAMP;
   Timestamp someDate;
 
   @NotNull
@@ -75,20 +84,26 @@ public class EBasic {
   @DbDefault("true")
   boolean newBooleanField2;
 
+  @Size(max=127)
   String indextest1;
 
+  @Size(max=127)
   String indextest2;
 
   @Index
+  @Size(max=127)
   String indextest3;
 
   @Index(unique = true)
+  @Size(max=127)
   String indextest4;
 
   @Index(unique = true)
+  @Size(max=127)
   String indextest5;
 
   @Index(unique = false)
+  @Size(max=127)
   String indextest6;
 
   @NotNull
@@ -98,7 +113,6 @@ public class EBasic {
   @DbDefault("42")
   int newInteger;
 
-  @NotNull
   @ManyToOne
   @DbMigration(preAlter= "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
   EUser user;

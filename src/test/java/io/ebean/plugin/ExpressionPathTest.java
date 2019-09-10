@@ -2,9 +2,10 @@ package io.ebean.plugin;
 
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -80,6 +81,8 @@ public class ExpressionPathTest {
   @Test
   public void test_dirty() throws Exception {
 
+    ResetBasicData.reset();
+
     BeanType<Customer> customerBeanType = beanType(Customer.class);
     BeanType<Order> orderBeanType = beanType(Order.class);
 
@@ -113,6 +116,10 @@ public class ExpressionPathTest {
 
     order = server.find(Order.class, order.getId());
     assertThat(order.getCustomer().getName()).isEqualTo("baz");
+
+    // cleanup
+    server.delete(Order.class, order.getId());
+    server.delete(Customer.class, customer.getId());
   }
 
 }

@@ -14,18 +14,48 @@ import java.util.Set;
  */
 public final class DeployPropertyParser extends DeployParser {
 
+  private static final String JOIN = "join";
+
+  private static final String FROM = "from";
 
   private final BeanDescriptor<?> beanDescriptor;
 
   private final Set<String> includes = new HashSet<>();
 
-  public DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
+  private boolean catchFirst;
+
+  private ElPropertyDeploy firstProp;
+
+  DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
     this.beanDescriptor = beanDescriptor;
+  }
+
+  /**
+   * Set to true to catch the first property.
+   */
+  public DeployPropertyParser setCatchFirst(boolean catchFirst) {
+    this.catchFirst = catchFirst;
+    return this;
+  }
+
+  /**
+   * Return the first property found by the parser.
+   */
+  public ElPropertyDeploy getFirstProp() {
+    return firstProp;
   }
 
   @Override
   public Set<String> getIncludes() {
     return includes;
+  }
+
+  /**
+   * Skip if in raw sql expression with from tableName or join tableName.
+   */
+  @Override
+  protected boolean skipWordConvert() {
+    return FROM.equalsIgnoreCase(priorWord) || JOIN.equalsIgnoreCase(priorWord);
   }
 
   @Override
@@ -34,6 +64,9 @@ public final class DeployPropertyParser extends DeployParser {
     if (elProp == null) {
       return null;
     } else {
+      if (catchFirst && firstProp == null) {
+        firstProp = elProp;
+      }
       addIncludes(elProp.getElPrefix());
       return elProp.getElPlaceholder(encrypted);
     }

@@ -44,6 +44,11 @@ public interface SpiUpdate<T> extends Update<T> {
   Class<?> getBeanType();
 
   /**
+   * Return the label (for metrics collection).
+   */
+  String getLabel();
+
+  /**
    * Return the type of this - insert, update or delete.
    */
   OrmUpdateType getOrmUpdateType();

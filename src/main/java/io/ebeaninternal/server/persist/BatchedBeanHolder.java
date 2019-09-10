@@ -5,7 +5,6 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 
 /**
  * Holds lists of persist requests for beans of a given type.
@@ -19,9 +18,7 @@ import java.util.IdentityHashMap;
  * executed. The lowest depth is executed first.
  * </p>
  */
-public class BatchedBeanHolder {
-
-  private static final Object DUMMY = new Object();
+class BatchedBeanHolder {
 
   /**
    * The owning queue.
@@ -49,12 +46,6 @@ public class BatchedBeanHolder {
    * The list of bean delete requests.
    */
   private ArrayList<PersistRequest> deletes;
-
-  /**
-   * Set of beans in this batch. This is used to ensure that a single bean instance is not included
-   * in the batch twice (two separate insert requests etc).
-   */
-  private final IdentityHashMap<Object, Object> persistedBeans = new IdentityHashMap<>();
 
   /**
    * Create a new entry with a given type and depth.
@@ -85,18 +76,20 @@ public class BatchedBeanHolder {
     // Note updates and deletes can result in many PreparedStatements
     // if their where clauses differ via use of IS NOT NULL.
     if (deletes != null && !deletes.isEmpty()) {
-      control.executeNow(deletes);
-      deletes.clear();
+      ArrayList<PersistRequest> bufferedDeletes = deletes;
+      deletes = new ArrayList<>();
+      control.executeNow(bufferedDeletes);
     }
     if (inserts != null && !inserts.isEmpty()) {
-      control.executeNow(inserts);
-      inserts.clear();
+      ArrayList<PersistRequest> bufferedInserts = inserts;
+      inserts = new ArrayList<>();
+      control.executeNow(bufferedInserts);
     }
     if (updates != null && !updates.isEmpty()) {
-      control.executeNow(updates);
-      updates.clear();
+      ArrayList<PersistRequest> bufferedUpdates = updates;
+      updates = new ArrayList<>();
+      control.executeNow(bufferedUpdates);
     }
-    persistedBeans.clear();
   }
 
   @Override
@@ -120,14 +113,6 @@ public class BatchedBeanHolder {
    */
   public int append(PersistRequestBean<?> request) {
 
-    Object alreadyInBatch = persistedBeans.put(request.getEntityBean(), DUMMY);
-    if (alreadyInBatch != null) {
-      // special case where the same bean instance has already been
-      // added to the batch (doesn't really occur with non-batching
-      // as the bean gets changed from dirty to loaded earlier)
-      return 0;
-    }
-
     request.setBatched();
 
     switch (request.getType()) {
@@ -139,7 +124,7 @@ public class BatchedBeanHolder {
         return inserts.size();
 
       case UPDATE:
-      case SOFT_DELETE:
+      case DELETE_SOFT:
         if (updates == null) {
           updates = new ArrayList<>();
         }
@@ -158,10 +143,4 @@ public class BatchedBeanHolder {
     }
   }
 
-  /**
-   * Return true if this is empty containing no batched beans.
-   */
-  public boolean isEmpty() {
-    return persistedBeans.isEmpty();
-  }
 }

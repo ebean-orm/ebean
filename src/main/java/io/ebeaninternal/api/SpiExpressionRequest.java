@@ -1,8 +1,8 @@
 package io.ebeaninternal.api;
 
-import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 
 import java.util.List;
 

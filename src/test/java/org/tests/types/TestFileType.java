@@ -2,18 +2,107 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.types.SomeFileBean;
+import io.ebean.Transaction;
 import org.junit.Test;
+import org.tests.model.types.SomeFileBean;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestFileType extends BaseTestCase {
 
-  File file = getFile("/profile-image.jpg");
-  File file2 = getFile("/java-64.png");
+  private File file = getFile("/profile-image.jpg");
+  private File file2 = getFile("/java-64.png");
+
+  private File newTempFile() throws IOException {
+    File tempFile = File.createTempFile("testfile", "txt");
+    try (PrintStream ps = new PrintStream(tempFile)) {
+      ps.println("Hello World!");
+    }
+    return tempFile;
+  }
+
+  @Test
+  public void test_closeFileStreamUnbatched() throws IOException {
+
+    File tempFile = newTempFile();
+
+    SomeFileBean bean0 = new SomeFileBean();
+    bean0.setName("tempBeanUnbatched");
+    bean0.setContent(tempFile);
+    Ebean.save(bean0);
+
+    assertTrue(tempFile.delete());
+  }
+
+  @Test
+  public void test_closeFileStreamUnbatched_onUpdate() throws IOException {
+
+    SomeFileBean bean0 = new SomeFileBean();
+    bean0.setName("tempBeanUnbatched");
+    bean0.setContent(newTempFile());
+    Ebean.save(bean0);
+
+
+    File updateFile = newTempFile();
+    bean0.setName("tempBeanModified");
+    bean0.setContent(updateFile);
+    Ebean.save(bean0);
+
+    assertTrue(updateFile.delete());
+  }
+
+  @Test
+  public void test_closeFileStreamBatched() throws IOException {
+
+    SomeFileBean bean0 = new SomeFileBean();
+    bean0.setName("tempBeanUnbatched");
+    bean0.setContent(newTempFile());
+    Ebean.save(bean0);
+
+
+    File tempFile = newTempFile();
+
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchSize(30);
+      txn.setBatchMode(true);
+
+      bean0.setName("tempBeanBatchedModified");
+      bean0.setContent(tempFile);
+      Ebean.save(bean0);
+
+      txn.commit();
+    }
+
+    assertTrue(tempFile.delete());
+  }
+
+  @Test
+  public void test_closeFileStreamBatched_update() throws IOException {
+
+    File tempFile = newTempFile();
+
+    try (Transaction txn = Ebean.beginTransaction()) {
+      txn.setBatchSize(30);
+      txn.setBatchMode(true);
+
+      SomeFileBean bean0 = new SomeFileBean();
+      bean0.setName("tempBeanBatched");
+      bean0.setContent(tempFile);
+      Ebean.save(bean0);
+
+      txn.commit();
+    }
+
+    assertTrue(tempFile.delete());
+  }
 
   @Test
   public void test_insertNullFile() {

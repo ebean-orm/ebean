@@ -89,8 +89,7 @@ public class PathProperties implements FetchPath {
   }
 
   Props getProps(String path) {
-    Props props = pathMap.computeIfAbsent(path, p -> new Props(this, null, p));
-    return props;
+    return pathMap.computeIfAbsent(path, p -> new Props(this, null, p));
   }
 
   public Collection<Props> getPathProps() {

@@ -10,41 +10,51 @@ public abstract class DeployParser {
   /**
    * used to identify sql literal.
    */
-  protected static final char SINGLE_QUOTE = '\'';
+  private static final char SINGLE_QUOTE = '\'';
 
   /**
    * used to identify query named parameters.
    */
-  protected static final char COLON = ':';
+  private static final char COLON = ':';
 
   /**
    * Used to determine when a column name terminates.
    */
-  protected static final char UNDERSCORE = '_';
+  private static final char UNDERSCORE = '_';
+
+  private static final char OPEN_SQUARE_BRACKET = '[';
+  private static final char CLOSE_SQUARE_BRACKET = ']';
+  private static final char DOUBLE_QUOTE = '\"';
+  private static final char BACK_QUOTE = '`';
 
   /**
    * Used to determine when a column name terminates.
    */
-  protected static final char PERIOD = '.';
+  private static final char PERIOD = '.';
 
-  protected boolean encrypted;
+  private static final char OPEN_BRACKET = '(';
 
-  protected String source;
+  boolean encrypted;
 
-  protected StringBuilder sb;
+  private String source;
 
-  protected int sourceLength;
+  private StringBuilder sb;
 
-  protected int pos;
+  private int sourceLength;
 
-  protected String word;
+  private int pos;
 
-  protected char wordTerminator;
+  String priorWord;
+
+  String word;
+
+  private char wordTerminator;
+
+  private StringBuilder wordBuffer;
 
   protected abstract String convertWord();
 
   public abstract String getDeployWord(String expression);
-
 
   /**
    * Return the join includes.
@@ -67,10 +77,18 @@ public abstract class DeployParser {
     this.sb = new StringBuilder(source.length() + 20);
 
     while (nextWord()) {
-      String deployWord = convertWord();
-      sb.append(deployWord);
+      if (skipWordConvert()) {
+        sb.append(word);
+        priorWord = word;
+      } else {
+        String deployWord = convertWord();
+        sb.append(deployWord);
+        priorWord = deployWord;
+      }
       if (pos < sourceLength) {
-        sb.append(wordTerminator);
+        if (wordTerminator != OPEN_BRACKET) {
+          sb.append(wordTerminator);
+        }
         if (wordTerminator == SINGLE_QUOTE) {
           readLiteral();
         }
@@ -80,13 +98,17 @@ public abstract class DeployParser {
     return sb.toString();
   }
 
+  boolean skipWordConvert() {
+    return false;
+  }
+
   private boolean nextWord() {
 
     if (!findWordStart()) {
       return false;
     }
 
-    StringBuilder wordBuffer = new StringBuilder();
+    wordBuffer = new StringBuilder();
     wordBuffer.append(source.charAt(pos));
     while (++pos < sourceLength) {
       char ch = source.charAt(pos);
@@ -161,10 +183,15 @@ public abstract class DeployParser {
    * return true if the char is a letter, digit or underscore.
    */
   private boolean isWordPart(char ch) {
-    return Character.isLetterOrDigit(ch) || ch == UNDERSCORE || ch == PERIOD;
+    if (ch == OPEN_BRACKET) {
+      // include in the 'word' such that "count(" formula doesn't clash with property "count"
+      wordBuffer.append(ch);
+      return false;
+    }
+    return Character.isLetterOrDigit(ch) || ch == UNDERSCORE || ch == PERIOD || ch == DOUBLE_QUOTE || ch == CLOSE_SQUARE_BRACKET || ch == BACK_QUOTE;
   }
 
   private boolean isWordStart(char ch) {
-    return Character.isLetter(ch);
+    return Character.isLetter(ch) || ch == UNDERSCORE || ch == DOUBLE_QUOTE || ch == OPEN_SQUARE_BRACKET || ch == BACK_QUOTE;
   }
 }

@@ -8,14 +8,15 @@ import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.BeanQueryRequest;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.CQueryPlanKey;
+import io.ebeaninternal.api.CacheIdLookup;
 import io.ebeaninternal.api.HashQuery;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.api.NaturalKeyQueryData;
@@ -52,7 +53,7 @@ import java.util.function.Predicate;
 /**
  * Wraps the objects involved in executing a Query.
  */
-public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRequest<T>, SpiOrmQueryRequest<T> {
+public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQueryRequest<T> {
 
   private static final Logger log = LoggerFactory.getLogger(OrmQueryRequest.class);
 
@@ -80,6 +81,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private List<T> cacheBeans;
 
+  private BeanPropertyAssocMany<?> manyProperty;
+
+  private boolean inlineCountDistinct;
+
+  private Set<String> dependentTables;
+
   /**
    * Create the InternalQueryRequest.
    */
@@ -90,6 +97,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
+    this.persistenceContext = query.getPersistenceContext();
   }
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {
@@ -97,17 +105,20 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   @Override
-  public void profileLocationById() {
-    if (query.getProfileLocation() == null) {
-      query.setProfileLocation(beanDescriptor.profileLocationById());
+  public boolean isDeleteByStatement() {
+    if (!transaction.isPersistCascade() || beanDescriptor.isDeleteByStatement()) {
+      // plain delete by query
+      return true;
+    } else {
+      // delete by ids due to cascading delete needs
+      queryPlanKey = query.setDeleteByIdsPlan();
+      return false;
     }
   }
 
   @Override
-  public void profileLocationAll() {
-    if (query.getProfileLocation() == null && query.isFindAll()) {
-      query.setProfileLocation(beanDescriptor.profileLocationAll());
-    }
+  public boolean isPadInExpression() {
+    return beanDescriptor.isPadInExpression();
   }
 
   @Override
@@ -204,6 +215,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Prepare the query and calculate the query plan key.
    */
+  @Override
   public void prepareQuery() {
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
@@ -223,7 +235,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     if (query.isRawSql()) {
       return new DeployPropertyParserMap(query.getRawSql().getColumnMapping().getMapping());
     } else {
-      return beanDescriptor.createDeployPropertyParser();
+      return beanDescriptor.parser();
     }
   }
 
@@ -272,6 +284,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Rollback the transaction if it was created for this request.
    */
+  @Override
   public void rollbackTransIfRequired() {
     if (createdTransaction) {
       try {
@@ -343,6 +356,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public void endTransIfRequired() {
     if (createdTransaction && transaction.isActive()) {
       transaction.commit();
+      if (query.getType().isUpdate()) {
+        // for implicit update/delete queries clear the thread local
+        ebeanServer.clearServerTransaction();
+      }
     }
   }
 
@@ -351,6 +368,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public boolean isFindById() {
     return query.getType() == Type.BEAN;
+  }
+
+  /**
+   * Return true if this is a findEach, findIterate type query where we expect many results.
+   */
+  public boolean isFindIterate() {
+    return query.getType() == Type.ITERATE;
   }
 
   /**
@@ -370,10 +394,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   private int notifyCache(int rows, boolean update) {
-    if (rows > 0 && beanDescriptor.isCaching()) {
-      transaction.getEvent().add(beanDescriptor.getBaseTable(), false, update, !update);
+    if (rows > 0) {
+      beanDescriptor.cacheUpdateQuery(update, transaction);
     }
     return rows;
+  }
+
+  @Override
+  public SpiResultSet findResultSet() {
+    return queryEngine.findResultSet(this);
   }
 
   /**
@@ -484,11 +513,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is
-   * not one.
+   * Determine and return the ToMany property that is included in the query.
+   */
+  public BeanPropertyAssocMany<?> determineMany() {
+    manyProperty = beanDescriptor.getManyProperty(query);
+    return manyProperty;
+  }
+
+  /**
+   * Return the many property that is fetched in the query or null if there is not one.
    */
   public BeanPropertyAssocMany<?> getManyProperty() {
-    return beanDescriptor.getManyProperty(query);
+    return manyProperty;
   }
 
   /**
@@ -574,6 +610,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     //    - merge the 2 results and return
     //
 
+    CacheIdLookup<T> idLookup = query.cacheIdLookup();
+    if (idLookup != null) {
+      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
+      // adjust the query (IN clause) based on the cache hits
+      this.cacheBeans = idLookup.removeHits(cacheResult);
+      return idLookup.allHits();
+    }
+
     if (!beanDescriptor.isNaturalKeyCaching()) {
       return false;
     }
@@ -657,8 +701,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
-  public void putToQueryCache(Object queryResult) {
-    beanDescriptor.queryCachePut(cacheKey, queryResult);
+  public void putToQueryCache(Object result) {
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.getStartNanoTime()));
   }
 
   /**
@@ -720,5 +764,22 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public void slowQueryCheck(long executionTimeMicros, int rowCount) {
     ebeanServer.slowQueryCheck(executionTimeMicros, rowCount, query);
+  }
+
+  public void setInlineCountDistinct() {
+    inlineCountDistinct = true;
+  }
+
+  public boolean isInlineCountDistinct() {
+    return inlineCountDistinct;
+  }
+
+  public void addDependentTables(Set<String> tables) {
+    if (tables != null && !tables.isEmpty()) {
+      if (dependentTables == null) {
+        dependentTables = new LinkedHashSet<>();
+      }
+      dependentTables.addAll(tables);
+    }
   }
 }

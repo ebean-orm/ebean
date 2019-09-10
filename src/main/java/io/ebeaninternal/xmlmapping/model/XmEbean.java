@@ -28,13 +28,17 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-  "entity"
+  "entity",
+  "dto"
 })
 @XmlRootElement(name = "ebean")
 public class XmEbean {
 
-  @XmlElement(required = true)
+  @XmlElement(required = false)
   protected List<XmEntity> entity;
+
+  @XmlElement(required = false)
+  protected List<XmDto> dto;
 
   /**
    * Gets the value of the entity property.
@@ -61,6 +65,16 @@ public class XmEbean {
       entity = new ArrayList<>();
     }
     return this.entity;
+  }
+
+  /**
+   * Returns the List of XmDto beans.
+   */
+  public List<XmDto> getDto() {
+    if (dto == null) {
+      dto = new ArrayList<>();
+    }
+    return this.dto;
   }
 
 }

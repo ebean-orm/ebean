@@ -2,12 +2,13 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Transaction;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -18,8 +19,7 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
 
       Ebean.find(Customer.class).findList();
       Ebean.find(Order.class).where().gt("id", 1).findList();
@@ -35,13 +35,11 @@ public class TestLogTransLogOnError extends BaseTestCase {
       Assert.assertEquals(0, list.size());
       // Get here with mysql?
       // Assert.assertTrue(false);
+      txn.commit();
 
     } catch (RuntimeException e) {
       // e.printStackTrace();
       Assert.assertTrue(true);
-
-    } finally {
-      Ebean.endTransaction();
     }
   }
 
@@ -49,8 +47,7 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
       Ebean.find(Customer.class).findList();
 
       EBasicVer newBean = new EBasicVer("aName");
@@ -65,14 +62,11 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
       // never get here
       Assert.assertTrue(false);
+      txn.commit();
 
     } catch (RuntimeException e) {
       // e.printStackTrace();
       Assert.assertTrue(true);
-
-    } finally {
-      Ebean.endTransaction();
     }
-
   }
 }

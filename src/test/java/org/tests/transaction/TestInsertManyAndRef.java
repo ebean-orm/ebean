@@ -14,28 +14,8 @@ public class TestInsertManyAndRef extends BaseTestCase {
   @Test
   public void testMe() {
 
-    // ResetBasicData.reset();
-    //
-    // Customer u = new Customer();
-    // u.setName("Mr Test");
-    //
-    // final List<Order> bookmarks = new ArrayList<Order>();
-    // final Order b1 = new Order();
-    // b1.setCustomer(u);
-    // b1.setStatus(Status.NEW);
-    //
-    // final Order b2 = new Order();
-    // b2.setStatus(Status.NEW);
-    // b2.setCustomer(u);
-    //
-    // bookmarks.add(b1);
-    // bookmarks.add(b2);
-    //
-    // Ebean.save(bookmarks);
-
-    final BBookmarkUser u = new BBookmarkUser();
+    final BBookmarkUser u = new BBookmarkUser("Mr Test");
     u.setEmailAddress("test@test.com");
-    u.setName("Mr Test");
     u.setPassword("password");
 
     final List<BBookmark> bookmarks = new ArrayList<>();

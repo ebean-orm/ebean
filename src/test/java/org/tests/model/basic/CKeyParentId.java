@@ -1,11 +1,13 @@
 package org.tests.model.basic;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Size;
 
 @Embeddable
 public class CKeyParentId {
 
   Integer oneKey;
+  @Size(max = 127)
   String twoKey;
 
   public CKeyParentId() {

@@ -101,5 +101,5 @@ public interface SpiExpression extends Expression {
   /**
    * Check for match to a natural key query returning false if it doesn't match.
    */
-  boolean naturalKey(NaturalKeyQueryData data);
+  boolean naturalKey(NaturalKeyQueryData<?> data);
 }

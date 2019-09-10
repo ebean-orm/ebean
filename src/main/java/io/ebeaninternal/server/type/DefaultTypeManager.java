@@ -2,20 +2,25 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Platform;
 import io.ebean.config.JsonConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.types.Cdir;
+import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -34,6 +39,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
@@ -57,9 +64,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,6 +89,8 @@ public final class DefaultTypeManager implements TypeManager {
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
 
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
+
+  private final ConcurrentHashMap<String, ScalarType<?>> logicalMap;
 
   private final DefaultTypeFactory extraTypeFactory;
 
@@ -109,7 +118,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> shortType = new ScalarTypeShort();
 
-  private final ScalarType<?> integerType = new ScalarTypeInteger();
+  private final ScalarType<?> integerType = ScalarTypeInteger.INSTANCE;
 
   private final ScalarType<?> longType = new ScalarTypeLong();
 
@@ -121,28 +130,30 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final ScalarType<?> timeType = new ScalarTypeTime();
 
-  private final ScalarType<?> dateType = new ScalarTypeDate();
-
-  private final ScalarType<?> inetAddressType = new ScalarTypeInetAddress();
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
   private final ScalarType<?> currencyType = new ScalarTypeCurrency();
   private final ScalarType<?> timeZoneType = new ScalarTypeTimeZone();
 
-  private final ScalarType<?> stringType = new ScalarTypeString();
+  private final ScalarType<?> stringType = ScalarTypeString.INSTANCE;
 
   private final ScalarType<?> classType = new ScalarTypeClass();
 
   private final JsonConfig.DateTime jsonDateTime;
+  private final JsonConfig.Date jsonDate;
 
   private final Object objectMapper;
 
   private final boolean java7Present;
 
+  private final boolean objectMapperPresent;
+
   private final boolean postgres;
 
   private final boolean offlineMigrationGeneration;
+
+  private final EnumType defaultEnumType;
 
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
@@ -177,22 +188,26 @@ public final class DefaultTypeManager implements TypeManager {
 
     this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
+    this.jsonDate = config.getJsonDate();
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
+    this.logicalMap = new ConcurrentHashMap<>();
 
-    boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
+    this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.postgres = isPostgres(config.getDatabasePlatform());
-    this.arrayTypeListFactory = arrayTypeListFactory(postgres, config.getDatabasePlatform());
-    this.arrayTypeSetFactory = arrayTypeSetFactory(postgres, config.getDatabasePlatform());
+    this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
+    this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
 
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
 
-    initialiseStandard(jsonDateTime, config);
-    initialiseJavaTimeTypes(jsonDateTime, config);
-    initialiseJodaTypes(jsonDateTime, config);
+    this.defaultEnumType = config.getDefaultEnumType();
+
+    initialiseStandard(config);
+    initialiseJavaTimeTypes(config);
+    initialiseJodaTypes(config);
     initialiseJacksonTypes(config);
 
     loadTypesFromProviders(config, objectMapper);
@@ -207,8 +222,8 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the factory to use to support DB ARRAY types.
    */
-  private PlatformArrayTypeFactory arrayTypeListFactory(boolean postgres, DatabasePlatform databasePlatform) {
-    if (postgres) {
+  private PlatformArrayTypeFactory arrayTypeListFactory(DatabasePlatform databasePlatform) {
+    if (databasePlatform.isNativeArrayType()) {
       return ScalarTypeArrayList.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArrayListH2.factory();
@@ -220,8 +235,8 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return the factory to use to support DB ARRAY types.
    */
-  private PlatformArrayTypeFactory arrayTypeSetFactory(boolean postgres, DatabasePlatform databasePlatform) {
-    if (postgres) {
+  private PlatformArrayTypeFactory arrayTypeSetFactory(DatabasePlatform databasePlatform) {
+    if (databasePlatform.isNativeArrayType()) {
       return ScalarTypeArraySet.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArraySetH2.factory();
@@ -266,11 +281,12 @@ public final class DefaultTypeManager implements TypeManager {
    * can have many classes if it uses method overrides and we need to register all
    * the variations/classes for the enum.
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
 
     Set<Class<?>> mappedClasses = new HashSet<>();
+    mappedClasses.add(enumClass);
     for (Object value : EnumSet.allOf(enumClass).toArray()) {
       mappedClasses.add(value.getClass());
     }
@@ -286,6 +302,11 @@ public final class DefaultTypeManager implements TypeManager {
       msg += " for [" + scalarType.getType().getName() + "]";
       logger.trace(msg);
     }
+  }
+
+  @Override
+  public ScalarType<?> getScalarType(String cast) {
+    return logicalMap.get(cast);
   }
 
   /**
@@ -338,8 +359,8 @@ public final class DefaultTypeManager implements TypeManager {
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
       if (arrayTypeListFactory != null) {
-        if(isEnumType(valueType)) {
-          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+        if (isEnumType(valueType)) {
+          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeListFactory.typeFor(valueType);
       }
@@ -347,8 +368,8 @@ public final class DefaultTypeManager implements TypeManager {
       return new ScalarTypeJsonList.Varchar(getDocType(valueType));
     } else if (type.equals(Set.class)) {
       if (arrayTypeSetFactory != null) {
-        if(isEnumType(valueType)) {
-          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), EnumType.STRING));
+        if (isEnumType(valueType)) {
+          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
         }
         return arrayTypeSetFactory.typeFor(valueType);
       }
@@ -358,62 +379,76 @@ public final class DefaultTypeManager implements TypeManager {
     throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
   }
 
-  @SuppressWarnings("unchecked")
   private Class<? extends Enum<?>> asEnumClass(Type valueType) {
-    return (Class<? extends Enum<?>>)valueType;
+    return TypeReflectHelper.asEnumClass(valueType);
   }
 
   private boolean isEnumType(Type valueType) {
-    return valueType instanceof Class && ((Class<?>)valueType).isEnum();
+    return TypeReflectHelper.isEnumType(valueType);
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType) {
+  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength) {
+
+    Class<?> type = prop.getPropertyType();
+    Type genericType = prop.getGenericType();
+
+    boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
-      if (isValueTypeSimple(genericType)) {
+      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonList.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
 
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
-      if (isValueTypeSimple(genericType)) {
+      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonSet.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
 
     if (type.equals(Map.class)) {
-      if (isMapValueTypeObject(genericType)) {
+      if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
         return ScalarTypeJsonMap.typeFor(postgres, dbType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType, DocPropertyType.OBJECT);
+        return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
     }
 
-    if (type.equals(JsonNode.class)) {
-      switch (dbType) {
-        case Types.VARCHAR:
-          return jsonNodeVarchar;
-        case Types.BLOB:
-          return jsonNodeBlob;
-        case Types.CLOB:
-          return jsonNodeClob;
-        case DbPlatformType.JSONB:
-          return jsonNodeJsonb;
-        case DbPlatformType.JSON:
-          return jsonNodeJson;
-        default:
-          return jsonNodeJson;
+    if (objectMapperPresent) {
+      if (type.equals(JsonNode.class)) {
+        switch (dbType) {
+          case Types.VARCHAR:
+            return jsonNodeVarchar;
+          case Types.BLOB:
+            return jsonNodeBlob;
+          case Types.CLOB:
+            return jsonNodeClob;
+          case DbPlatformType.JSONB:
+            return jsonNodeJsonb;
+          case DbPlatformType.JSON:
+            return jsonNodeJson;
+          default:
+            return jsonNodeJson;
+        }
       }
     }
 
-    return createJsonObjectMapperType(type, type, dbType, DocPropertyType.OBJECT);
+    return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
+  }
+
+  /**
+   * Returns TRUE, if there is any jackson annotation on that property. All jackson annotations
+   * are annotated with the &#64;JacksonAnnotation meta annotation. So detection is easy.
+   */
+  private boolean checkJacksonAnnotations(DeployBeanProperty prop) {
+    return AnnotationUtil.findAnnotation(prop.getField(), com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
   private DocPropertyType getDocType(Type genericType) {
@@ -429,14 +464,13 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Return true if value parameter type of the map is Object.
    */
-  private boolean isValueTypeSimple(Type genericType) {
-    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-    return String.class.equals(typeArgs[0]) || Long.class.equals(typeArgs[0]);
+  private boolean isValueTypeSimple(Type collectionType) {
+    Type typeArg = TypeReflectHelper.getValueType(collectionType);
+    return String.class.equals(typeArg) || Long.class.equals(typeArg);
   }
 
-  private Type getValueType(Type genericType) {
-    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-    return typeArgs[0];
+  private Type getValueType(Type collectionType) {
+    return TypeReflectHelper.getValueType(collectionType);
   }
 
   /**
@@ -447,11 +481,12 @@ public final class DefaultTypeManager implements TypeManager {
     return Object.class.equals(typeArgs[1]) || "?".equals(typeArgs[1].toString());
   }
 
-  private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType, DocPropertyType docType) {
+  private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
+    Class<?> type = prop.getPropertyType();
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, type, (ObjectMapper) objectMapper, genericType, dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, (AnnotatedField) prop.getJacksonField(), (ObjectMapper) objectMapper, dbType, docType);
   }
 
   /**
@@ -487,7 +522,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
     // a util Date with jdbcType not matching server wide settings
     if (type.equals(java.util.Date.class)) {
-      return extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
+      return extraTypeFactory.createUtilDate(jsonDateTime, jsonDate, jdbcType);
     }
     // a Calendar with jdbcType not matching server wide settings
     if (type.equals(java.util.Calendar.class)) {
@@ -552,11 +587,11 @@ public final class DefaultTypeManager implements TypeManager {
    * Return null if the EnumValue annotations are not present/used.
    * </p>
    */
-  private ScalarType<?> createEnumScalarType2(Class<?> enumType) {
+  private ScalarTypeEnum<?> createEnumScalarType2(Class<?> enumType) {
 
     boolean integerType = true;
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
@@ -590,23 +625,37 @@ public final class DefaultTypeManager implements TypeManager {
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType type) {
 
     ScalarType<?> scalarType = getScalarType(enumType);
-    if (scalarType != null) {
+    if (scalarType instanceof ScalarTypeWrapper) {
+      // no override or further mapping required
       return scalarType;
     }
 
-    scalarType = createEnumScalarTypePerExtentions(enumType);
-    if (scalarType == null) {
-      // use JPA normal Enum type (without mapping)
-      scalarType = createEnumScalarTypePerSpec(enumType, type);
+    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>)scalarType;
+    if (scalarEnum != null && !scalarEnum.isOverrideBy(type)) {
+      if (type != null && !scalarEnum.isCompatible(type)) {
+        throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
+      }
+      return scalarEnum;
     }
-    addEnumType(scalarType, enumType);
-    return scalarType;
+
+    scalarEnum = createEnumScalarTypePerExtentions(enumType);
+    if (scalarEnum == null) {
+      // use JPA normal Enum type (without mapping)
+      scalarEnum = createEnumScalarTypePerSpec(enumType, type);
+    }
+    addEnumType(scalarEnum, enumType);
+    return scalarEnum;
   }
 
-  private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
+  private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
     if (type == null) {
-      // default as per spec is ORDINAL
-      return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+      if(defaultEnumType == EnumType.ORDINAL) {
+        return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
+
+      } else {
+        return new ScalarTypeEnumStandard.StringEnum(enumType);
+      }
 
     } else if (type == EnumType.ORDINAL) {
       return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
@@ -616,17 +665,16 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private ScalarType<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
+  private ScalarTypeEnum<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();
     for (Method method : methods) {
       DbEnumValue dbValue = AnnotationUtil.findAnnotation(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, method, integerValues);
+        return createEnumScalarTypeDbValue(enumType, method, integerValues, dbValue.length());
       }
     }
-
 
     // look for EnumValue annotations instead
     return createEnumScalarType2(enumType);
@@ -638,9 +686,9 @@ public final class DefaultTypeManager implements TypeManager {
    * Return null if the EnumValue annotations are not present/used.
    * </p>
    */
-  private ScalarType<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
+  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length) {
 
-    Map<String, String> nameValueMap = new HashMap<>();
+    Map<String, String> nameValueMap = new LinkedHashMap<>();
 
     Enum<?>[] enumConstants = enumType.getEnumConstants();
     for (Enum<?> enumConstant : enumConstants) {
@@ -656,7 +704,7 @@ public final class DefaultTypeManager implements TypeManager {
       return null;
     }
 
-    return createEnumScalarType(enumType, nameValueMap, integerType, 0);
+    return createEnumScalarType(enumType, nameValueMap, integerType, length);
   }
 
   /**
@@ -664,7 +712,7 @@ public final class DefaultTypeManager implements TypeManager {
    * length create the ScalarType for the Enum.
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private ScalarType<?> createEnumScalarType(Class enumType, Map<String, String> nameValueMap, boolean integerType, int dbColumnLength) {
+  private ScalarTypeEnum<?> createEnumScalarType(Class enumType, Map<String, String> nameValueMap, boolean integerType, int dbColumnLength) {
 
     EnumToDbValueMap<?> beanDbMap = EnumToDbValueMap.create(integerType);
 
@@ -826,7 +874,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJavaTimeTypes(ServerConfig config) {
 
     if (java7Present) {
       typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
@@ -834,52 +882,59 @@ public final class DefaultTypeManager implements TypeManager {
 
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
-      typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
-      typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
-      typeMap.put(OffsetDateTime.class, new ScalarTypeOffsetDateTime(mode));
-      typeMap.put(ZonedDateTime.class, new ScalarTypeZonedDateTime(mode));
-      typeMap.put(Instant.class, new ScalarTypeInstant(mode));
+      addType(java.time.Period.class, new ScalarTypePeriod());
+      addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
+      addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
+      addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
+      addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
+      addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
 
-      typeMap.put(DayOfWeek.class, new ScalarTypeDayOfWeek());
-      typeMap.put(Month.class, new ScalarTypeMonth());
-      typeMap.put(Year.class, new ScalarTypeYear());
-      typeMap.put(YearMonth.class, new ScalarTypeYearMonthDate());
-      typeMap.put(MonthDay.class, new ScalarTypeMonthDay());
-      typeMap.put(OffsetTime.class, new ScalarTypeOffsetTime());
-      typeMap.put(ZoneId.class, new ScalarTypeZoneId());
-      typeMap.put(ZoneOffset.class, new ScalarTypeZoneOffset());
+      addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
+      addType(Month.class, new ScalarTypeMonth());
+      addType(Year.class, new ScalarTypeYear());
+      addType(YearMonth.class, new ScalarTypeYearMonthDate(jsonDate));
+      addType(MonthDay.class, new ScalarTypeMonthDay());
+      addType(OffsetTime.class, new ScalarTypeOffsetTime());
+      addType(ZoneId.class, new ScalarTypeZoneId());
+      addType(ZoneOffset.class, new ScalarTypeZoneOffset());
 
       boolean localTimeNanos = config.isLocalTimeWithNanos();
-      typeMap.put(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
+      addType(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
 
       boolean durationNanos = config.isDurationWithNanos();
-      typeMap.put(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
+      addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
     }
+  }
+
+  private void addType(Class<?> clazz, ScalarType<?> scalarType) {
+    typeMap.put(clazz, scalarType);
+    logicalMap.putIfAbsent(clazz.getSimpleName(), scalarType);
   }
 
   /**
    * Detect if Joda classes are in the classpath and if so register the Joda data types.
    */
   @SuppressWarnings("deprecation")
-  private void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseJodaTypes(ServerConfig config) {
 
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
       logger.debug("Registering Joda data types");
-      typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));
-      typeMap.put(DateTime.class, new ScalarTypeJodaDateTime(mode));
-      typeMap.put(LocalDate.class, new ScalarTypeJodaLocalDate());
-      typeMap.put(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight());
+      addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
+      addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
+      addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
+      addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight(jsonDate));
+      addType(org.joda.time.Period.class, new ScalarTypeJodaPeriod());
 
       String jodaLocalTimeMode = config.getJodaLocalTimeMode();
       if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {
         // use the expected/normal local time zone
-        typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTime());
+        addType(LocalTime.class, new ScalarTypeJodaLocalTime());
         logger.debug("registered ScalarTypeJodaLocalTime");
       } else if ("utc".equalsIgnoreCase(jodaLocalTimeMode)) {
         // use the old UTC based
-        typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTimeUTC());
+        addType(LocalTime.class, new ScalarTypeJodaLocalTimeUTC());
         logger.debug("registered ScalarTypeJodaLocalTimeUTC");
       }
     }
@@ -889,7 +944,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  private void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
+  private void initialiseStandard(ServerConfig config) {
 
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
@@ -897,18 +952,18 @@ public final class DefaultTypeManager implements TypeManager {
 
     nativeMap.put(DbPlatformType.HSTORE, hstoreType);
 
-    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
-    typeMap.put(java.util.Date.class, utilDateType);
+    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(jsonDateTime, jsonDate);
+    addType(java.util.Date.class, utilDateType);
 
-    ScalarType<?> calType = extraTypeFactory.createCalendar(mode);
-    typeMap.put(Calendar.class, calType);
+    ScalarType<?> calType = extraTypeFactory.createCalendar(jsonDateTime);
+    addType(Calendar.class, calType);
 
     ScalarType<?> mathBigIntType = extraTypeFactory.createMathBigInteger();
-    typeMap.put(BigInteger.class, mathBigIntType);
+    addType(BigInteger.class, mathBigIntType);
 
     ScalarTypeBool booleanType = extraTypeFactory.createBoolean();
-    typeMap.put(Boolean.class, booleanType);
-    typeMap.put(boolean.class, booleanType);
+    addType(Boolean.class, booleanType);
+    addType(boolean.class, booleanType);
 
     // register the boolean literals to the platform for DDL default values
     databasePlatform.setDbTrueLiteral(booleanType.getDbTrueLiteral());
@@ -921,34 +976,47 @@ public final class DefaultTypeManager implements TypeManager {
       nativeMap.put(Types.BIT, booleanType);
     }
 
-    ServerConfig.DbUuid dbUuid = config.getDbTypeConfig().getDbUuid();
+    PlatformConfig.DbUuid dbUuid = config.getPlatformConfig().getDbUuid();
 
     if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
-      typeMap.put(UUID.class, new ScalarTypeUUIDNative());
+      addType(UUID.class, new ScalarTypeUUIDNative());
     } else {
       // Store UUID as binary(16) or varchar(40)
-      ScalarType<?> uuidType = dbUuid.useBinary() ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
-      typeMap.put(UUID.class, uuidType);
+      ScalarType<?> uuidType = dbUuid.useBinary() ? new ScalarTypeUUIDBinary(dbUuid.useBinaryOptimized()) : new ScalarTypeUUIDVarchar();
+      addType(UUID.class, uuidType);
     }
 
-    typeMap.put(File.class, fileType);
-    typeMap.put(InetAddress.class, inetAddressType);
-    typeMap.put(Locale.class, localeType);
-    typeMap.put(Currency.class, currencyType);
-    typeMap.put(TimeZone.class, timeZoneType);
-    typeMap.put(URL.class, urlType);
-    typeMap.put(URI.class, uriType);
+    if (offlineMigrationGeneration || (postgres && !config.getPlatformConfig().isDatabaseInetAddressVarchar())) {
+      addInetAddressType(new ScalarTypeInetAddressPostgres());
+    } else {
+      addInetAddressType(new ScalarTypeInetAddress());
+    }
+
+    if (offlineMigrationGeneration || postgres) {
+      addType(Cdir.class, new ScalarTypeCdir.Postgres());
+      addType(Inet.class, new ScalarTypeInet.Postgres());
+    } else {
+      addType(Cdir.class, new ScalarTypeCdir.Varchar());
+      addType(Inet.class, new ScalarTypeInet.Varchar());
+    }
+
+    addType(File.class, fileType);
+    addType(Locale.class, localeType);
+    addType(Currency.class, currencyType);
+    addType(TimeZone.class, timeZoneType);
+    addType(URL.class, urlType);
+    addType(URI.class, uriType);
 
     // String types
-    typeMap.put(char[].class, charArrayType);
-    typeMap.put(char.class, charType);
-    typeMap.put(String.class, stringType);
+    addType(char[].class, charArrayType);
+    addType(char.class, charType);
+    addType(String.class, stringType);
     nativeMap.put(Types.VARCHAR, stringType);
     nativeMap.put(Types.CHAR, stringType);
     nativeMap.put(Types.LONGVARCHAR, longVarcharType);
 
     // Class<?>
-    typeMap.put(Class.class, classType);
+    addType(Class.class, classType);
 
     if (platformClobType == Types.CLOB) {
       nativeMap.put(Types.CLOB, clobType);
@@ -962,7 +1030,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     // Binary type
-    typeMap.put(byte[].class, varbinaryType);
+    addType(byte[].class, varbinaryType);
     nativeMap.put(Types.BINARY, binaryType);
     nativeMap.put(Types.VARBINARY, varbinaryType);
     nativeMap.put(Types.LONGVARBINARY, longVarbinaryType);
@@ -979,44 +1047,52 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     // Number types
-    typeMap.put(Byte.class, byteType);
-    typeMap.put(byte.class, byteType);
+    addType(Byte.class, byteType);
+    addType(byte.class, byteType);
     nativeMap.put(Types.TINYINT, byteType);
 
-    typeMap.put(Short.class, shortType);
-    typeMap.put(short.class, shortType);
+    addType(Short.class, shortType);
+    addType(short.class, shortType);
     nativeMap.put(Types.SMALLINT, shortType);
 
-    typeMap.put(Integer.class, integerType);
-    typeMap.put(int.class, integerType);
+    addType(Integer.class, integerType);
+    addType(int.class, integerType);
     nativeMap.put(Types.INTEGER, integerType);
 
-    typeMap.put(Long.class, longType);
-    typeMap.put(long.class, longType);
+    addType(Long.class, longType);
+    addType(long.class, longType);
     nativeMap.put(Types.BIGINT, longType);
 
-    typeMap.put(Double.class, doubleType);
-    typeMap.put(double.class, doubleType);
+    addType(Double.class, doubleType);
+    addType(double.class, doubleType);
     nativeMap.put(Types.FLOAT, doubleType);// no this is not a bug
     nativeMap.put(Types.DOUBLE, doubleType);
 
-    typeMap.put(Float.class, floatType);
-    typeMap.put(float.class, floatType);
+    addType(Float.class, floatType);
+    addType(float.class, floatType);
     nativeMap.put(Types.REAL, floatType);// no this is not a bug
 
-    typeMap.put(BigDecimal.class, bigDecimalType);
+    addType(BigDecimal.class, bigDecimalType);
     nativeMap.put(Types.DECIMAL, bigDecimalType);
     nativeMap.put(Types.NUMERIC, bigDecimalType);
 
     // Temporal types
-    typeMap.put(Time.class, timeType);
+    addType(Time.class, timeType);
     nativeMap.put(Types.TIME, timeType);
-    typeMap.put(Date.class, dateType);
+
+    ScalarTypeDate dateType = new ScalarTypeDate(jsonDate);
+    addType(Date.class, dateType);
     nativeMap.put(Types.DATE, dateType);
 
-    ScalarType<?> timestampType = new ScalarTypeTimestamp(mode);
-    typeMap.put(Timestamp.class, timestampType);
+    ScalarType<?> timestampType = new ScalarTypeTimestamp(jsonDateTime);
+    addType(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
+  }
+
+  private void addInetAddressType(ScalarType scalarType) {
+    addType(InetAddress.class, scalarType);
+    addType(Inet4Address.class, scalarType);
+    addType(Inet6Address.class, scalarType);
   }
 
 }

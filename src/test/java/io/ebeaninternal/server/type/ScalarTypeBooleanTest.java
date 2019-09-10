@@ -6,7 +6,12 @@ import io.ebean.text.json.JsonContext;
 import org.tests.model.basic.TOne;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.sql.Types;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ScalarTypeBooleanTest {
 
@@ -40,4 +45,13 @@ public class ScalarTypeBooleanTest {
     assertEquals(json, "{\"id\":42,\"active\":false}");
   }
 
+
+  @Test
+  public void IntBoolean_isLogicalBoolean() {
+
+    ScalarTypeBoolean.IntBoolean intBoolean = new ScalarTypeBoolean.IntBoolean(1, 0);
+    assertThat(intBoolean).isInstanceOf(ScalarTypeLogicalType.class);
+
+    assertThat(intBoolean.getLogicalType()).isEqualTo(Types.BOOLEAN);
+  }
 }

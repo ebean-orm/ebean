@@ -4,8 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +15,6 @@ import java.util.Set;
  */
 public class LoadBeanRequest extends LoadRequest {
 
-  private static final Logger logger = LoggerFactory.getLogger(LoadBeanRequest.class);
-
   private final List<EntityBeanIntercept> batch;
 
   private final LoadBeanBuffer loadBuffer;
@@ -27,11 +23,14 @@ public class LoadBeanRequest extends LoadRequest {
 
   private final boolean loadCache;
 
+  private boolean loadedFromCache;
+
   /**
    * Construct for lazy load request.
    */
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, String lazyLoadProperty, boolean loadCache) {
-    this(LoadBuffer, null, true, lazyLoadProperty, loadCache);
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
+    this(LoadBuffer, null, true, ebi.getLazyLoadProperty(), loadCache);
+    this.loadedFromCache = ebi.isLoadedFromCache();
   }
 
   /**
@@ -56,10 +55,16 @@ public class LoadBeanRequest extends LoadRequest {
     return loadBuffer.getBeanDescriptor().getBeanType();
   }
 
-  public boolean isLoadCache() {
-    return loadCache;
+  /**
+   * Return true if the beans invoking lazy loading were previously loaded from cache.
+   */
+  public boolean isLoadedFromCache() {
+    return loadedFromCache;
   }
 
+  private boolean isLoadCache() {
+    return loadCache;
+  }
 
   public String getDescription() {
     return "path:" + loadBuffer.getFullPath() + " batch:" + batch.size();
@@ -75,15 +80,8 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Return the load context.
    */
-  public LoadBeanBuffer getLoadContext() {
+  private LoadBeanBuffer getLoadContext() {
     return loadBuffer;
-  }
-
-  /**
-   * Return the property that invoked the lazy loading.
-   */
-  public String getLazyLoadProperty() {
-    return lazyLoadProperty;
   }
 
   public int getBatchSize() {
@@ -93,30 +91,14 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Return the list of Id values for the beans in the lazy load buffer.
    */
-  public List<Object> getIdList(int batchSize) {
+  public List<Object> getIdList() {
 
-    List<Object> idList = new ArrayList<>(batchSize);
+    List<Object> idList = new ArrayList<>();
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     for (EntityBeanIntercept ebi : batch) {
-      EntityBean bean = ebi.getOwner();
-      idList.add(desc.getId(bean));
+      idList.add(desc.getId(ebi.getOwner()));
     }
-
-
-    if (!desc.isMultiValueIdSupported() && !idList.isEmpty()) {
-      int extraIds = batchSize - batch.size();
-      if (extraIds > 0) {
-        // for performance make up the Id's to the batch size
-        // so we get the same query (for Ebean and the db)
-        Object firstId = idList.get(0);
-        for (int i = 0; i < extraIds; i++) {
-          // just add the first Id again
-          idList.add(firstId);
-        }
-      }
-    }
-
     return idList;
   }
 
@@ -168,13 +150,8 @@ public class LoadBeanRequest extends LoadRequest {
         // necessary but allow processing to continue until it is accessed by client code
         Object id = desc.getId(ebi.getOwner());
         if (!loadedIds.contains(id)) {
-          if (desc.isSoftDelete()) {
-            // assume this is logically deleted (hence not found)
-            desc.setSoftDeleteValue(ebi.getOwner());
-          } else {
-            logger.info("Lazy loading unsuccessful for type:" + desc.getName() + " id:" + id + " - expecting when bean has been deleted");
-            ebi.setLazyLoadFailure(id);
-          }
+          // assume this is logically deleted (hence not found)
+          desc.markAsDeleted(ebi.getOwner());
         }
       }
     }

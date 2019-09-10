@@ -9,14 +9,16 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="sequenceCol" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -65,16 +67,6 @@ public class DropTable {
   }
 
   /**
-   * Gets the value of the sequenceName property.
-   *
-   * @return possible object is
-   * {@link String }
-   */
-  public String getSequenceName() {
-    return sequenceName;
-  }
-
-  /**
    * Sets the value of the sequenceCol property.
    *
    * @param value allowed object is
@@ -82,6 +74,16 @@ public class DropTable {
    */
   public void setSequenceCol(String value) {
     this.sequenceCol = value;
+  }
+
+  /**
+   * Gets the value of the sequenceName property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getSequenceName() {
+    return sequenceName;
   }
 
   /**

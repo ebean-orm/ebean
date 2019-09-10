@@ -1,8 +1,11 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.server.persist.platform.MultiValueBind;
 
 import java.io.IOException;
 
@@ -14,13 +17,19 @@ public class SqlServerDdl extends PlatformDdl {
   public SqlServerDdl(DatabasePlatform platform) {
     super(platform);
     this.identitySuffix = " identity(1,1)";
-    this.foreignKeyRestrict = "";
     this.alterTableIfExists = "";
     this.addColumn = "add";
     this.inlineUniqueWhenNullable = false;
     this.columnSetDefault = "add default";
     this.dropConstraintIfExists = "drop constraint";
     this.historyDdl = new SqlServerHistoryDdl();
+  }
+
+  @Override
+  protected void appendForeignKeyMode(StringBuilder buffer, String onMode, ConstraintMode mode) {
+    if (mode != ConstraintMode.RESTRICT) {
+      super.appendForeignKeyMode(buffer, onMode, mode);
+    }
   }
 
   @Override
@@ -36,7 +45,7 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
     int pos = tableName.lastIndexOf('.');
-    String objectId = fkName;
+    String objectId = maxConstraintName(fkName);
     if (pos != -1) {
       objectId = tableName.substring(0, pos + 1) + fkName;
     }
@@ -50,15 +59,16 @@ public class SqlServerDdl extends PlatformDdl {
 
   @Override
   public String dropIndex(String indexName, String tableName) {
-    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName +"','U') AND name = '" + indexName + "') drop index " + indexName + " ON " + tableName;
+    return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName + "','U') AND name = '"
+        + maxConstraintName(indexName) + "') drop index " + maxConstraintName(indexName) + " ON " + tableName;
   }
   /**
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
-    if (notNull) {
-      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, notNull);
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
+    if (nullableColumns == null || nullableColumns.length == 0) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     }
     if (uqName == null) {
       throw new NullPointerException();
@@ -75,7 +85,7 @@ public class SqlServerDdl extends PlatformDdl {
     }
     sb.append(") where");
     String sep = " ";
-    for (String column : columns) {
+    for (String column : nullableColumns) {
       sb.append(sep).append(column).append(" is not null");
       sep = " and ";
     }
@@ -95,7 +105,7 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     StringBuilder sb = new StringBuilder();
-    sb.append("IF (OBJECT_ID('").append(uniqueConstraintName).append("', 'UQ') IS NOT NULL) ");
+    sb.append("IF (OBJECT_ID('").append(maxConstraintName(uniqueConstraintName)).append("', 'UQ') IS NOT NULL) ");
     sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
     sb.append(dropIndex(uniqueConstraintName, tableName));
     return sb.toString();
@@ -114,9 +124,7 @@ public class SqlServerDdl extends PlatformDdl {
     } else {
       sb.append(" start with 1 ");
     }
-    if (allocationSize > 0 && allocationSize != 50) {
-      // at this stage ignoring allocationSize 50 as this is the 'default' and
-      // not consistent with the way Ebean batch fetches sequence values
+    if (allocationSize > 1) {
       sb.append(" increment by ").append(allocationSize);
     }
     sb.append(";");
@@ -131,23 +139,19 @@ public class SqlServerDdl extends PlatformDdl {
     // a rather complex statement.
     StringBuilder sb = new StringBuilder();
     if (DdlHelp.isDropDefault(defaultValue)) {
-      sb.append("delimiter $$\n");
-      sb.append("DECLARE @Tmp nvarchar(200);");
-      sb.append("select @Tmp = t1.name  from sys.default_constraints t1\n");
-      sb.append("  join sys.columns t2 on t1.object_id = t2.default_object_id\n");
-      sb.append("  where t1.parent_object_id = OBJECT_ID('").append(tableName)
-        .append("') and t2.name = '").append(columnName).append("';\n");
-      sb.append("if @Tmp is not null EXEC('alter table ").append(tableName).append(" drop constraint ' + @Tmp)$$");
+      sb.append("EXEC usp_ebean_drop_default_constraint ").append(tableName).append(", ").append(columnName);
     } else {
       sb.append("alter table ").append(tableName);
-      sb.append(" add default ").append(defaultValue).append(" for ").append(columnName);
+      sb.append(" add default ").append(convertDefaultValue(defaultValue)).append(" for ").append(columnName);
     }
     return sb.toString();
   }
 
   @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
-    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+    if (alter.getType() == null && alter.isNotnull() == null) {
+      // No type change or notNull change
+      // defaultValue change already handled in alterColumnDefaultValue
       return null;
     }
     String tableName = alter.getTableName();
@@ -194,25 +198,50 @@ public class SqlServerDdl extends PlatformDdl {
 
   /**
    * It is rather complex to delete a column on SqlServer as there must not exist any references
-   * (constraints, default values, indices and foreign keys). The list is not yet complete, as
-   * indices over multiple columns will not yet deleted.
-   * (This may be changed to delete all refering objects by using the sys.* tables later)
+   * (constraints, default values, indices and foreign keys). That's why we call a user stored procedure here
    */
   @Override
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
-    buffer.append("-- drop column ").append(tableName).append(".").append(columnName).endOfStatement();
 
-    buffer.append(alterTableDropUniqueConstraint(tableName, naming.uniqueConstraintName(tableName, columnName)));
-    buffer.endOfStatement();
-    buffer.append(alterColumnDefaultValue(tableName, columnName, DdlHelp.DROP_DEFAULT));
-    buffer.endOfStatement();
-    buffer.append(alterTableDropConstraint(tableName, naming.checkConstraintName(tableName, columnName)));
-    buffer.endOfStatement();
-    buffer.append(dropIndex(naming.indexName(tableName, columnName), tableName));
-    buffer.endOfStatement();
-    buffer.append(alterTableDropForeignKey(tableName, naming.foreignKeyConstraintName(tableName, columnName)));
-    buffer.endOfStatement();
-    super.alterTableDropColumn(buffer, tableName, columnName);
+    buffer.append("EXEC usp_ebean_drop_column ").append(tableName).append(", ").append(columnName).endOfStatement();
+  }
+
+  /**
+   * This writes the multi value datatypes needed for {@link MultiValueBind}
+   */
+  @Override
+  public void generateProlog(DdlWrite write) throws IOException {
+    super.generateProlog(write);
+
+    generateTVPDefinitions(write, "bigint");
+    generateTVPDefinitions(write, "float");
+    generateTVPDefinitions(write, "bit");
+    generateTVPDefinitions(write, "date");
+    generateTVPDefinitions(write, "time");
+    //generateTVPDefinitions(write, "datetime2");
+    generateTVPDefinitions(write, "uniqueidentifier");
+    generateTVPDefinitions(write, "nvarchar(max)");
+
+  }
+
+  private void generateTVPDefinitions(DdlWrite write, String definition) throws IOException {
+    int pos = definition.indexOf('(');
+    String name = pos == -1 ? definition : definition.substring(0, pos);
+
+    dropTVP(write.dropAll(), name);
+    //TVPs are included in "I__create_procs.sql"
+    //createTVP(write.apply(), name, definition);
+  }
+
+  private void dropTVP(DdlBuffer ddl, String name) throws IOException {
+    ddl.append("if exists (select name  from sys.types where name = 'ebean_").append(name)
+        .append("_tvp') drop type ebean_").append(name).append("_tvp").endOfStatement();
+  }
+
+  private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
+    ddl.append("if not exists (select name  from sys.types where name = 'ebean_").append(name)
+    .append("_tvp') create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")
+        .endOfStatement();
   }
 
 }

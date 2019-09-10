@@ -45,6 +45,7 @@ public class TestQueryCacheInsert extends BaseTestCase {
     Ebean.save(doda);
 
     ServerCache queryCache = Ebean.getServerCacheManager().getQueryCache(EBasicVer.class);
+    queryCache.getStatistics(true);
 
     Optional<EBasicVer> found0 = Ebean.find(EBasicVer.class)
       .where().eq("description", "OddButUniqueSillyExample")

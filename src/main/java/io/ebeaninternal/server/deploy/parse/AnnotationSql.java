@@ -7,10 +7,10 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 /**
  * Read the class level deployment annotations.
  */
-public class AnnotationSql extends AnnotationParser {
+class AnnotationSql extends AnnotationParser {
 
-  public AnnotationSql(DeployBeanInfo<?> info, boolean javaxValidationAnnotations) {
-    super(info, javaxValidationAnnotations);
+  AnnotationSql(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
   }
 
   @Override

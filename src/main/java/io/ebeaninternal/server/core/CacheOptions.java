@@ -12,29 +12,78 @@ public class CacheOptions {
    */
   public static final CacheOptions NO_CACHING = new CacheOptions();
 
+  private static final String R0 = "r0";
+
+  private static final CacheOptions INVALIDATE_QUERY_CACHE_R0 = new CacheOptions(true);
+
+  private final boolean invalidateQueryCache;
   private final boolean enableBeanCache;
   private final boolean enableQueryCache;
   private final boolean readOnly;
   private final String[] naturalKey;
+  private final String region;
+
+  public static CacheOptions invalidateQueryCache(String region) {
+    if (R0.equals(region)) {
+      return INVALIDATE_QUERY_CACHE_R0;
+    } else {
+      return new CacheOptions(true, region);
+    }
+  }
 
   /**
    * Construct for no caching.
    */
   private CacheOptions() {
-    enableBeanCache = false;
-    enableQueryCache = false;
-    readOnly = false;
-    naturalKey = null;
+    this.invalidateQueryCache = false;
+    this.enableBeanCache = false;
+    this.enableQueryCache = false;
+    this.readOnly = false;
+    this.naturalKey = null;
+    this.region = null;
+  }
+
+  /**
+   * Construct for invalidateQueryCache.
+   */
+  private CacheOptions(boolean invalidateQueryCache) {
+    this(invalidateQueryCache, R0);
+  }
+
+  private CacheOptions(boolean invalidateQueryCache, String region) {
+    this.invalidateQueryCache = invalidateQueryCache;
+    this.enableBeanCache = false;
+    this.enableQueryCache = false;
+    this.readOnly = false;
+    this.naturalKey = null;
+    this.region = region;
   }
 
   /**
    * Construct with cache annotation.
    */
   public CacheOptions(Cache cache, String[] naturalKey) {
-    enableBeanCache = cache.enableBeanCache();
-    enableQueryCache = cache.enableQueryCache();
-    readOnly = cache.readOnly();
+    this.invalidateQueryCache = false;
+    this.enableBeanCache = cache.enableBeanCache();
+    this.enableQueryCache = cache.enableQueryCache();
+    this.readOnly = cache.readOnly();
     this.naturalKey = naturalKey;
+    this.region = cache.region();
+  }
+
+  /**
+   * Return the cache region name.
+   */
+  public String getRegion() {
+    return region;
+  }
+
+  /**
+   * Return true if this is InvalidateQueryCache. A Bean that itself isn't L2
+   * cached but invalidates query cache entries that join to it.
+   */
+  public boolean isInvalidateQueryCache() {
+    return invalidateQueryCache;
   }
 
   /**

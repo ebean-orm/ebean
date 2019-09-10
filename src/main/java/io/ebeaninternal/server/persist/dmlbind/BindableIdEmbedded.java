@@ -2,7 +2,6 @@ package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -15,7 +14,7 @@ import java.util.List;
 /**
  * Bindable for a EmbeddedId.
  */
-public final class BindableIdEmbedded implements BindableId {
+final class BindableIdEmbedded implements BindableId {
 
   private final BeanPropertyAssocOne<?> embId;
 
@@ -23,10 +22,10 @@ public final class BindableIdEmbedded implements BindableId {
 
   private final MatchedImportedProperty[] matches;
 
-  public BindableIdEmbedded(BeanPropertyAssocOne<?> embId, BeanDescriptor<?> desc) {
+  BindableIdEmbedded(BeanPropertyAssocOne<?> embId, MatchedImportedProperty[] matches) {
     this.embId = embId;
     this.props = embId.getProperties();
-    matches = MatchedImportedProperty.build(props, desc);
+    this.matches = matches;
   }
 
   @Override
@@ -67,13 +66,10 @@ public final class BindableIdEmbedded implements BindableId {
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     EntityBean idValue = (EntityBean) embId.getValue(bean);
-
     for (BeanProperty prop : props) {
-
       Object value = prop.getValue(idValue);
       request.bind(value, prop);
     }
-
     request.setIdValue(idValue);
   }
 
@@ -88,7 +84,7 @@ public final class BindableIdEmbedded implements BindableId {
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
 
     if (matches == null) {
-      String m = "Matches for the concatenated key columns where not found?"
+      String m = "No matches for " + embId.getFullBeanName() + " the concatenated key columns where not found?"
         + " I expect that the concatenated key was null, and this bean does"
         + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);
@@ -100,8 +96,8 @@ public final class BindableIdEmbedded implements BindableId {
     EntityBean newId = (EntityBean) embId.createEmbeddedId();
 
     // populate it from the assoc one id values...
-    for (MatchedImportedProperty matche : matches) {
-      matche.populate(bean, newId);
+    for (MatchedImportedProperty match : matches) {
+      match.populate(bean, newId);
     }
 
     // support PropertyChangeSupport

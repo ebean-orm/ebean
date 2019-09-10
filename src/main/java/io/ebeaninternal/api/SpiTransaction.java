@@ -7,7 +7,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
@@ -71,11 +70,6 @@ public interface SpiTransaction extends Transaction {
   void registerDeleteBean(Integer hash);
 
   /**
-   * Unregister the hash of the bean.
-   */
-  void unregisterDeleteBean(Integer hash);
-
-  /**
    * Return true if this is a bean that has already been saved/deleted.
    */
   boolean isRegisteredDeleteBean(Integer hash);
@@ -100,6 +94,11 @@ public interface SpiTransaction extends Transaction {
    * Transaction logging.
    */
   String getId();
+
+  /**
+   * Return the start timestamp for the transaction (JVM side).
+   */
+  long getStartNanoTime();
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.
@@ -179,7 +178,7 @@ public interface SpiTransaction extends Transaction {
    * Return true if this request should be batched. Conversely returns false
    * if this request should be executed immediately.
    */
-  boolean isBatchThisRequest(PersistRequest.Type type);
+  boolean isBatchThisRequest();
 
   /**
    * Return the BatchControl used to batch up persist requests.
@@ -319,4 +318,9 @@ public interface SpiTransaction extends Transaction {
    * Return the profile location for this transaction.
    */
   ProfileLocation getProfileLocation();
+
+  /**
+   * Return true when nested transactions should create Savepoints.
+   */
+  boolean isNestedUseSavepoint();
 }

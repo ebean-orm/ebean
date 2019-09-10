@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelContainerApplyTest {
 
   @Test
-  public void testApply() throws Exception {
+  public void testApply() {
 
     Migration migration = MigrationXmlReader.read("/container/test-create-table.xml");
 

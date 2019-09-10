@@ -2,6 +2,7 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
+import io.ebean.config.ServerConfig;
 import org.tests.model.basic.Article;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
@@ -19,7 +20,10 @@ public class DefaultCacheHolder_getCacheOptions_Test {
     defaultOptions.setMaxSize(10000);
     defaultOptions.setMaxSecsToLive(120);
 
-    this.cacheHolder = new DefaultCacheHolder(null, defaultOptions, defaultOptions, null);
+    CacheManagerOptions builder = new CacheManagerOptions(null, new ServerConfig(), true)
+      .with(defaultOptions, defaultOptions);
+
+    this.cacheHolder = new DefaultCacheHolder(builder);
   }
 
   @Test

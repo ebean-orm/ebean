@@ -22,7 +22,7 @@ public class BeanCascadeInfo {
     }
   }
 
-  private void setType(CascadeType type) {
+  public void setType(CascadeType type) {
     switch (type) {
       case ALL:
         save = true;
@@ -36,8 +36,6 @@ public class BeanCascadeInfo {
         refresh = true;
         break;
       case PERSIST:
-        save = true;
-        break;
       case MERGE:
         save = true;
         break;

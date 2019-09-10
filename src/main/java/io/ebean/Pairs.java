@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ import java.util.List;
  *   pairs.add("sj2", 1001);
  *   pairs.add("pf3", 1000);
  *
- *   List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+ *   List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
  *   .where()
  *   .eq("store", "def")
  *   .inPairs(pairs)       // IN clause with 'pairs' of values
@@ -125,7 +126,7 @@ public class Pairs {
    * Return all the value pairs.
    */
   public List<Entry> getEntries() {
-    return entries;
+    return Collections.unmodifiableList(entries);
   }
 
   /**
@@ -158,6 +159,7 @@ public class Pairs {
     return this;
   }
 
+  @Override
   public String toString() {
     return "p0:" + property0 + " p1:" + property1 + " entries:" + entries;
   }
@@ -183,6 +185,7 @@ public class Pairs {
       this.b = b;
     }
 
+    @Override
     public String toString() {
       return "{" + a + "," + b + "}";
     }

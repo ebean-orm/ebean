@@ -116,7 +116,7 @@ public class OrmUpdateProperties {
   /**
    * The set properties/expressions and their bind values.
    */
-  private LinkedHashMap<String, Value> values = new LinkedHashMap<>();
+  private final LinkedHashMap<String, Value> values = new LinkedHashMap<>();
 
   /**
    * Normal set property.

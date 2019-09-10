@@ -277,7 +277,7 @@ public final class IdBinderEmbedded implements IdBinder {
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
     for (BeanProperty prop : props) {
       Object embFieldValue = prop.getValue((EntityBean) value);
-      sqlUpdate.addParameter(embFieldValue);
+      sqlUpdate.setNextParameter(embFieldValue);
     }
   }
 
@@ -346,19 +346,20 @@ public final class IdBinderEmbedded implements IdBinder {
   public Object read(DbReadContext ctx) throws SQLException {
 
     EntityBean embId = idDesc.createEntityBean();
-    boolean notNull = true;
+    boolean nullValue = true;
 
     for (BeanProperty prop : props) {
-      Object value = prop.readSet(ctx, embId);
-      if (value == null) {
-        notNull = false;
+      Object value = prop.read(ctx);
+      if (value != null) {
+        prop.setValue(embId, value);
+        nullValue = false;
       }
     }
 
-    if (notNull) {
-      return embId;
-    } else {
+    if (nullValue) {
       return null;
+    } else {
+      return embId;
     }
   }
 
@@ -479,4 +480,20 @@ public final class IdBinderEmbedded implements IdBinder {
 
     return idValue;
   }
+
+  @Override
+  public String cacheKey(Object value) {
+
+    EntityBean bean = (EntityBean)value;
+    StringBuilder sb = new StringBuilder();
+    for (BeanProperty prop : props) {
+      Object val = prop.getValue(bean);
+      if (val != null) {
+        sb.append(prop.format(val));
+      }
+      sb.append("|");
+    }
+    return sb.toString();
+  }
+
 }

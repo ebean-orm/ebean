@@ -2,7 +2,6 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 
@@ -11,9 +10,9 @@ import java.util.List;
 
 final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
-  private final BeanPropertyAssocMany<?> manyProp;
+  private final STreePropertyAssocMany manyProp;
 
-  SqlTreeNodeManyRoot(String prefix, BeanPropertyAssocMany<?> prop, SqlTreeProperties props, List<SqlTreeNode> myList,
+  SqlTreeNodeManyRoot(String prefix, STreePropertyAssocMany prop, SqlTreeProperties props, List<SqlTreeNode> myList,
                       SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
     super(prefix, prop, props, myList, true, temporalMode, disableLazyLoad);
     this.manyProp = prop;
@@ -40,6 +39,22 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
       manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, false);
     }
     return detailBean;
+  }
+
+
+  /**
+   * append extraWhere to the join.
+   */
+  @Override
+  protected SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
+    SqlJoinType join = super.appendFromAsJoin(ctx, joinType);
+    super.appendExtraWhere(ctx);
+    return join;
+  }
+
+  @Override
+  protected void appendExtraWhere(DbSqlContext ctx) {
+    // extraWhere is already appended to the tableJoin
   }
 
   /**

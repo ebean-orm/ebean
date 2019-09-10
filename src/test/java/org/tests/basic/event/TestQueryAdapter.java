@@ -3,10 +3,15 @@ package org.tests.basic.event;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.QueryType;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.TOne;
-import org.junit.Assert;
-import org.junit.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryAdapter extends BaseTestCase {
 
@@ -20,16 +25,32 @@ public class TestQueryAdapter extends BaseTestCase {
 
     Ebean.save(o);
 
-    //Ebean.find(TOne.class, o.getId());
-
-    Query<TOne> queryFindId = Ebean.find(TOne.class)
-      .setId(o.getId());
+    Query<TOne> queryFindId = Ebean.find(TOne.class).setId(o.getId());
 
     TOne one = queryFindId.findOne();
-    Assert.assertNotNull(one);
-    Assert.assertEquals(one.getId(), o.getId());
-    String generatedSql = queryFindId.getGeneratedSql();
-    Assert.assertTrue(generatedSql.contains(" 1=1"));
+
+    assertThat(one.getId()).isEqualTo(o.getId());
+    assertThat(sqlOf(queryFindId)).contains(" 1=1");
+
+    Query<TOne> notUsedQuery = Ebean.find(TOne.class);
+    assertThat(notUsedQuery.getQueryType()).isEqualTo(QueryType.FIND);
+
+    LoggedSqlCollector.start();
+
+    Ebean.update(TOne.class)
+      .set("name", "mod")
+      .where().idEq(o.getId())
+      .update();
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql.get(0)).contains(" 2=2");
+
+    Ebean.find(TOne.class)
+      .where().idEq(o.getId())
+      .delete();
+
+    sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains(" 3=3");
 
   }
 }

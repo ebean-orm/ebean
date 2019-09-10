@@ -16,18 +16,90 @@ package io.ebean;
  * notify Ebean of external changes and enable Ebean to maintain it's "L2"
  * server cache.
  * </p>
- * <p>
+ *
  * <pre>{@code
  *
- * // example that uses 'named' parameters
- * String s = "UPDATE f_topic set post_count = :count where id = :id";
- * SqlUpdate update = Ebean.createSqlUpdate(s);
- * update.setParameter("id", 1);
- * update.setParameter("count", 50);
+ *   // example using 'positioned' parameters
  *
- * int modifiedCount = Ebean.execute(update);
+ *   String sql = "insert into audit_log (group, title, description) values (?, ?, ?);
  *
- * String msg = "There were " + modifiedCount + " rows updated";
+ *   int rows =
+ *     DB.sqlUpdate(sql)
+ *       .setParams("login", "new user", "user rob was created")
+ *       .executeNow();
+ *
+ * }</pre>
+ *
+ * <pre>{@code
+ *
+ *   // example using 'named' parameters
+ *
+ *   String sql = "update topic set post_count = :count where id = :id";
+ *
+ *   int rows =
+ *     DB.sqlUpdate(sql)
+ *       .setParameter("id", 1)
+ *       .setParameter("count", 50)
+ *       .execute();
+ *
+ *   String msg = "There were " + rows + " rows updated";
+ *
+ * }</pre>
+ * <p>
+ * <h3>Example: Using setNextParameter()</h3>
+ * <pre>{@code
+ *
+ *  String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
+ *
+ *  SqlUpdate insert = DB.sqlUpdate(sql);
+ *
+ *  try (Transaction txn = DB.beginTransaction()) {
+ *    txn.setBatchMode(true);
+ *
+ *    insert.setNextParameter(10000);
+ *    insert.setNextParameter("hello");
+ *    insert.setNextParameter("rob");
+ *    insert.execute();
+ *
+ *    insert.setNextParameter(10001);
+ *    insert.setNextParameter("goodbye");
+ *    insert.setNextParameter("rob");
+ *    insert.execute();
+ *
+ *    insert.setNextParameter(10002);
+ *    insert.setNextParameter("chow");
+ *    insert.setNextParameter("bob");
+ *    insert.execute();
+ *
+ *    txn.commit();
+ *  }
+ * }</pre>
+ * <p>
+ * An alternative to the batch mode on the transaction is to use addBatch() and executeBatch() like:
+ * </p>
+ * <pre>{@code
+ *
+ *   try (Transaction txn = DB.beginTransaction()) {
+ *
+ *     insert.setNextParameter(10000);
+ *     insert.setNextParameter("hello");
+ *     insert.setNextParameter("rob");
+ *     insert.addBatch();
+ *
+ *     insert.setNextParameter(10001);
+ *     insert.setNextParameter("goodbye");
+ *     insert.setNextParameter("rob");
+ *     insert.addBatch();
+ *
+ *     insert.setNextParameter(10002);
+ *     insert.setNextParameter("chow");
+ *     insert.setNextParameter("bob");
+ *     insert.addBatch();
+ *
+ *     int[] rows = insert.executeBatch();
+ *
+ *     txn.commit();
+ *   }
  *
  * }</pre>
  *
@@ -39,6 +111,11 @@ public interface SqlUpdate {
 
   /**
    * Execute the update returning the number of rows modified.
+   * <p>
+   * Note that if the transaction has batch mode on then this update will use JDBC batch and may not execute until
+   * later - at commit time or a transaction flush. In this case this method returns -1 indicating that the
+   * update has been batched for later execution.
+   * </p>
    * <p>
    * After you have executed the SqlUpdate you can bind new variables using
    * {@link #setParameter(String, Object)} etc and then execute the SqlUpdate
@@ -53,6 +130,42 @@ public interface SqlUpdate {
    * @see Ebean#execute(SqlUpdate)
    */
   int execute();
+
+  /**
+   * Execute the statement now regardless of the JDBC batch mode of the transaction.
+   */
+  int executeNow();
+
+  /**
+   * Execute when addBatch() has been used to batch multiple bind executions.
+   *
+   * @return The row counts for each of the batched statements.
+   */
+  int[] executeBatch();
+
+  /**
+   * Add the statement to batch processing to then later execute via executeBatch().
+   */
+  void addBatch();
+
+  /**
+   * Return the generated key value.
+   */
+  Object getGeneratedKey();
+
+  /**
+   * Execute and return the generated key. This is effectively a short cut for:
+   * <p>
+   * <pre>{@code
+   *
+   *   sqlUpdate.execute();
+   *   Object key = sqlUpdate.getGeneratedKey();
+   *
+   * }</pre>
+   *
+   * @return The generated key value
+   */
+  Object executeGetKey();
 
   /**
    * Return true if eBean should automatically deduce the table modification
@@ -89,6 +202,11 @@ public interface SqlUpdate {
   SqlUpdate setLabel(String label);
 
   /**
+   * Set to true when we want to use getGeneratedKeys with this statement.
+   */
+  SqlUpdate setGetGeneratedKeys(boolean getGeneratedKeys);
+
+  /**
    * Return the sql statement.
    */
   String getSql();
@@ -112,6 +230,40 @@ public interface SqlUpdate {
    * </p>
    */
   SqlUpdate setTimeout(int secs);
+
+  /**
+   * Set one of more positioned parameters.
+   * <p>
+   * This is a convenient alternative to multiple setParameter() calls.
+   *
+   * <pre>{@code
+   *
+   *   String sql = "insert into audit_log (id, name, version) values (?,?,?)";
+   *
+   *   DB.sqlUpdate(sql)
+   *       .setParams(UUID.randomUUID(), "Hello", 1)
+   *       .executeNow();
+   *
+   *
+   *   // is the same as ...
+   *
+   *   DB.sqlUpdate(sql)
+   *       .setParameter(1, UUID.randomUUID())
+   *       .setParameter(2, "Hello")
+   *       .setParameter(3, 1)
+   *       .executeNow();
+   *
+   * }</pre>
+   *
+   */
+  SqlUpdate setParams(Object... values);
+
+  /**
+   * Set the next positioned parameter.
+   *
+   * @param value The value to bind
+   */
+  SqlUpdate setNextParameter(Object value);
 
   /**
    * Set a parameter via its index position.

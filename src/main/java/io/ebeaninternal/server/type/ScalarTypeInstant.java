@@ -26,6 +26,11 @@ public class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
   }
 
   @Override
+  protected Instant fromJsonISO8601(String value) {
+    return Instant.parse(value);
+  }
+
+  @Override
   public long convertToMillis(Instant value) {
     return value.toEpochMilli();
   }
@@ -41,6 +46,11 @@ public class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
   }
 
   @Override
+  public Instant convertFromInstant(Instant ts) {
+    return ts;
+  }
+
+  @Override
   public Timestamp convertToTimestamp(Instant t) {
     return Timestamp.from(t);
   }
@@ -53,7 +63,7 @@ public class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
 
   @Override
   public Instant toBeanType(Object value) {
-    if (value instanceof Instant) return (Instant) value;
-    return convertFromTimestamp((Timestamp) value);
+    if (value instanceof Timestamp) return convertFromTimestamp((Timestamp) value);
+    return (Instant) value;
   }
 }

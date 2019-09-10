@@ -88,4 +88,10 @@ public class DefaultBeanState implements BeanState {
   public void resetForInsert() {
     intercept.setNew();
   }
+
+  @Override
+  public Map<String, Exception> getLoadErrors() {
+    return intercept.getLoadErrors();
+  }
+
 }

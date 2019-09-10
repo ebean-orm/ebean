@@ -1,5 +1,9 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.ebeaninternal.server.query.SqlJoinType;
+
+import javax.persistence.CascadeType;
+
 /**
  * Property mapped to a joined bean.
  */
@@ -9,11 +13,15 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private boolean oneToOneExported;
 
-  private boolean importedPrimaryKey;
+  private boolean primaryKeyJoin;
+
+  private boolean primaryKeyExport;
 
   private DeployBeanEmbedded deployEmbedded;
 
   private String columnPrefix;
+
+  private boolean orphanRemoval;
 
   /**
    * Create the property.
@@ -81,16 +89,10 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
   }
 
   /**
-   * Return true if this is part of the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
-  }
-
-  /**
    * Set to true if this is part of the primary key.
    */
-  void setImportedPrimaryKey(DeployBeanProperty primaryKey) {
+  @Override
+  public void setImportedPrimaryKeyColumn(DeployBeanProperty primaryKey) {
     this.importedPrimaryKey = true;
     String dbColumn = primaryKey.getDbColumn();
     if (dbColumn != null) {
@@ -114,5 +116,48 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   public String getColumnPrefix() {
     return columnPrefix;
+  }
+
+  /**
+   * Mark as PrimaryKeyJoin (we don't know which side is the export side initially).
+   */
+  public void setPrimaryKeyJoin(boolean primaryKeyJoin) {
+    this.primaryKeyJoin = primaryKeyJoin;
+  }
+
+  public boolean isPrimaryKeyJoin() {
+    return primaryKeyJoin;
+  }
+
+  public boolean isPrimaryKeyExport() {
+    return primaryKeyExport;
+  }
+
+  /**
+   * Set as export side of OneToOne with PrimaryKeyJoin.
+   */
+  public void setPrimaryKeyExport() {
+    this.primaryKeyExport = true;
+    this.oneToOneExported = true;
+    if (!cascadeInfo.isSave()) {
+      // we pretty much need to cascade save so turning that on automatically ...
+      cascadeInfo.setType(CascadeType.ALL);
+    }
+  }
+
+  public void setOrphanRemoval(boolean orphanRemoval) {
+    this.orphanRemoval = orphanRemoval;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
+  }
+
+  public void setJoinType(boolean outerJoin) {
+    tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
+  }
+
+  public void setJoinColumns(DeployTableJoinColumn[] columns, boolean reverse) {
+    tableJoin.setColumns(columns, reverse);
   }
 }

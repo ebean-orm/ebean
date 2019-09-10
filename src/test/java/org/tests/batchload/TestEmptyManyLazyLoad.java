@@ -2,11 +2,11 @@ package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 public class TestEmptyManyLazyLoad extends BaseTestCase {
 
@@ -25,6 +25,9 @@ public class TestEmptyManyLazyLoad extends BaseTestCase {
 
     Order o2 = Ebean.find(Order.class, o.getId());
     o2.getDetails().size();
+
+    // cleanup
+    Ebean.delete(o2);
 
   }
 }

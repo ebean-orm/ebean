@@ -10,44 +10,23 @@ public class PropertiesWrapper {
 
   protected final String serverName;
 
-  protected final PropertyMap propertyMap;
+  private final ClassLoadConfig classLoadConfig;
 
   /**
    * Construct with a prefix, serverName and properties.
    */
-  public PropertiesWrapper(String prefix, String serverName, Properties properties) {
+  public PropertiesWrapper(String prefix, String serverName, Properties properties, ClassLoadConfig classLoadConfig) {
     this.serverName = serverName;
     this.prefix = prefix;
-    this.propertyMap = PropertyMapLoader.load(null, properties);
-    this.properties = propertyMap.asProperties();
+    this.properties = properties;
+    this.classLoadConfig = classLoadConfig;
   }
 
   /**
    * Construct without prefix of serverName.
    */
-  public PropertiesWrapper(Properties properties) {
-    this(null, null, properties);
-  }
-
-  /**
-   * Internal copy constructor when changing prefix.
-   */
-  protected PropertiesWrapper(String prefix, String serverName, PropertyMap propertyMap, Properties properties) {
-    this.serverName = serverName;
-    this.prefix = prefix;
-    this.propertyMap = propertyMap;
-    this.properties = properties;
-  }
-
-  /**
-   * Return a PropertiesWrapper instance with a different prefix but same underlying properties.
-   * <p/>
-   * Used when wanting to use "datasource" as the prefix rather than "ebean".
-   * <p/>
-   * The returning instance should only be used in a read only fashion.
-   */
-  public PropertiesWrapper withPrefix(String prefix) {
-    return new PropertiesWrapper(prefix, serverName, propertyMap, properties);
+  public PropertiesWrapper(Properties properties, ClassLoadConfig classLoadConfig) {
+    this(null, null, properties, classLoadConfig);
   }
 
   /**
@@ -55,16 +34,6 @@ public class PropertiesWrapper {
    */
   public String getServerName() {
     return serverName;
-  }
-
-  /**
-   * Return as Properties with lower case keys and after evaluation and additional properties loading has occurred.
-   * <p>
-   * Ebean has historically ignored the case of keys hence returning the Properties with all the keys lower cased.
-   * </p>
-   */
-  public Properties asPropertiesLowerCase() {
-    return properties;
   }
 
   /**
@@ -90,15 +59,19 @@ public class PropertiesWrapper {
 
     String value = null;
     if (serverName != null && prefix != null) {
-      value = propertyMap.get(prefix + "." + serverName + "." + key, null);
+      value = internalGet(prefix + "." + serverName + "." + key);
     }
     if (value == null && prefix != null) {
-      value = propertyMap.get(prefix + "." + key, null);
+      value = internalGet(prefix + "." + key);
     }
     if (value == null) {
-      value = propertyMap.get(key, null);
+      value = internalGet(key);
     }
     return value == null ? defaultValue : value;
+  }
+
+  private String internalGet(String key) {
+    return properties.getProperty(key);
   }
 
   /**
@@ -145,4 +118,30 @@ public class PropertiesWrapper {
     return (level == null) ? defaultValue : Enum.valueOf(enumType, level.toUpperCase());
   }
 
+  /**
+   * Return the instance to use (can be null) for the given plugin.
+   *
+   * @param pluginType the type of plugin
+   * @param key        properties key
+   * @param instance   existing instance
+   */
+  public <T> T createInstance(Class<T> pluginType, String key, T instance) {
+
+    if (instance != null) {
+      return instance;
+    }
+    String classname = get(key, null);
+    return createInstance(pluginType, classname);
+  }
+
+  /**
+   * Return the instance to use (can be null) for the given plugin.
+   *
+   * @param pluginType the type of plugin
+   * @param classname  the implementation class as per properties
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T createInstance(Class<T> pluginType, String classname) {
+    return classname == null ? null : (T) classLoadConfig.newInstance(classname);
+  }
 }

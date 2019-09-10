@@ -20,14 +20,14 @@ public class FactoryId {
     BeanProperty id = desc.getIdProperty();
     if (id == null) {
       return new BindableIdEmpty();
-
     }
     if (!id.isEmbedded()) {
       return new BindableIdScalar(id);
 
     } else {
       BeanPropertyAssocOne<?> embId = (BeanPropertyAssocOne<?>) id;
-      return new BindableIdEmbedded(embId, desc);
+      MatchedImportedProperty[] matches = MatchedImportedFactory.build(embId.getProperties(), desc);
+      return new BindableIdEmbedded(embId, matches);
     }
   }
 }

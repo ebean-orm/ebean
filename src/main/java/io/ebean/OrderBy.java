@@ -1,9 +1,11 @@
 package io.ebean;
 
+import io.ebean.util.StringHelper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents an Order By for a Query.
@@ -75,19 +77,34 @@ public final class OrderBy<T> implements Serializable {
   }
 
   /**
+   * Add a property with ascending order to this OrderBy.
+   */
+  public Query<T> asc(String propertyName, String collation) {
+    list.add(new Property(propertyName, true, collation));
+    return query;
+  }
+
+  /**
    * Add a property with descending order to this OrderBy.
    */
   public Query<T> desc(String propertyName) {
-
     list.add(new Property(propertyName, false));
     return query;
   }
 
   /**
+   * Add a property with descending order to this OrderBy.
+   */
+  public Query<T> desc(String propertyName, String collation) {
+    list.add(new Property(propertyName, false, collation));
+    return query;
+  }
+
+
+  /**
    * Return true if the property is known to be contained in the order by clause.
    */
   public boolean containsProperty(String propertyName) {
-
     for (Property aList : list) {
       if (propertyName.equals(aList.getProperty())) {
         return true;
@@ -140,10 +157,9 @@ public final class OrderBy<T> implements Serializable {
    * Return a copy of the OrderBy.
    */
   public OrderBy<T> copy() {
-
     OrderBy<T> copy = new OrderBy<>();
-    for (Property aList : list) {
-      copy.add(aList.copy());
+    for (Property property : list) {
+      copy.add(property.copy());
     }
     return copy;
   }
@@ -221,6 +237,18 @@ public final class OrderBy<T> implements Serializable {
   }
 
   /**
+   * Return true if this order by can be used in select clause.
+   */
+  public boolean supportsSelect() {
+    for (Property property : list) {
+      if (!property.supportsSelect()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * A property and its ascending descending order.
    */
   public static final class Property implements Serializable {
@@ -230,6 +258,8 @@ public final class OrderBy<T> implements Serializable {
     private String property;
 
     private boolean ascending;
+
+    private String collation;
 
     private String nulls;
 
@@ -247,17 +277,32 @@ public final class OrderBy<T> implements Serializable {
       this.highLow = highLow;
     }
 
+    public Property(String property, boolean ascending, String collation) {
+      this.property = property;
+      this.ascending = ascending;
+      this.collation = collation;
+    }
+
+    public Property(String property, boolean ascending, String collation, String nulls, String highLow) {
+      this.property = property;
+      this.ascending = ascending;
+      this.collation = collation;
+      this.nulls = nulls;
+      this.highLow = highLow;
+    }
+
     /**
      * Return a copy of this Property with the path trimmed.
      */
     public Property copyWithTrim(String path) {
-      return new Property(property.substring(path.length() + 1), ascending, nulls, highLow);
+      return new Property(property.substring(path.length() + 1), ascending, collation, nulls, highLow);
     }
 
     @Override
     public int hashCode() {
       int hc = property.hashCode();
       hc = hc * 92821 + (ascending ? 0 : 1);
+      hc = hc * 92821 + (collation == null ? 0 : collation.hashCode());
       hc = hc * 92821 + (nulls == null ? 0 : nulls.hashCode());
       hc = hc * 92821 + (highLow == null ? 0 : highLow.hashCode());
       return hc;
@@ -274,8 +319,9 @@ public final class OrderBy<T> implements Serializable {
       Property e = (Property) obj;
       if (ascending != e.ascending) return false;
       if (!property.equals(e.property)) return false;
-      if (nulls != null ? !nulls.equals(e.nulls) : e.nulls != null) return false;
-      return highLow != null ? highLow.equals(e.highLow) : e.highLow == null;
+      if (!Objects.equals(collation, e.collation)) return false;
+      if (!Objects.equals(nulls, e.nulls)) return false;
+      return Objects.equals(highLow, e.highLow);
     }
 
     @Override
@@ -284,7 +330,7 @@ public final class OrderBy<T> implements Serializable {
     }
 
     public String toStringFormat() {
-      if (nulls == null) {
+      if (nulls == null && collation == null) {
         if (ascending) {
           return property;
         } else {
@@ -292,11 +338,23 @@ public final class OrderBy<T> implements Serializable {
         }
       } else {
         StringBuilder sb = new StringBuilder();
-        sb.append(property);
+        if (collation != null)  {
+          if (collation.contains("${}")) {
+            // this is a complex collation, e.g. DB2 - we must replace the property
+            sb.append(StringHelper.replaceString(collation, "${}", property));
+          } else {
+            sb.append(property);
+            sb.append(" collate ").append(collation);
+          }
+        } else {
+          sb.append(property);
+        }
         if (!ascending) {
           sb.append(" ").append("desc");
         }
-        sb.append(" ").append(nulls).append(" ").append(highLow);
+        if (nulls != null) {
+          sb.append(" ").append(nulls).append(" ").append(highLow);
+        }
         return sb.toString();
       }
     }
@@ -319,7 +377,7 @@ public final class OrderBy<T> implements Serializable {
      * Return a copy of this property.
      */
     public Property copy() {
-      return new Property(property, ascending, nulls, highLow);
+      return new Property(property, ascending, collation, nulls, highLow);
     }
 
     /**
@@ -350,6 +408,12 @@ public final class OrderBy<T> implements Serializable {
       this.ascending = ascending;
     }
 
+    /**
+     * Support use in select clause if no collation or nulls ordering.
+     */
+    boolean supportsSelect() {
+      return nulls == null;
+    }
   }
 
   private void parse(String orderByClause) {
@@ -360,15 +424,15 @@ public final class OrderBy<T> implements Serializable {
 
     String[] chunks = orderByClause.split(",");
     for (String chunk : chunks) {
-      String[] pairs = chunk.split(" ");
-      Property p = parseProperty(pairs);
+      Property p = parseProperty(chunk);
       if (p != null) {
         list.add(p);
       }
     }
   }
 
-  private Property parseProperty(String[] pairs) {
+  private Property parseProperty(String chunk) {
+    String[] pairs = chunk.split(" ");
     if (pairs.length == 0) {
       return null;
     }
@@ -394,8 +458,7 @@ public final class OrderBy<T> implements Serializable {
       boolean asc = isAscending(wordList.get(1));
       return new Property(wordList.get(0), asc, wordList.get(2), wordList.get(3));
     }
-    String m = "Expecting a 1, 2 or 4 words in [" + Arrays.toString(pairs) + "] but got " + wordList;
-    throw new RuntimeException(m);
+    return new Property(chunk.trim(), true);
   }
 
   private boolean isAscending(String s) {

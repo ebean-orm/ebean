@@ -9,6 +9,7 @@ import io.ebean.text.json.EJson;
 import io.ebean.text.json.JsonIOException;
 import io.ebean.text.json.JsonWriteBeanVisitor;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.util.ArrayStack;
@@ -87,6 +88,11 @@ public class WriteJson implements SpiJsonWriter {
   @Override
   public JsonGenerator gen() {
     return generator;
+  }
+
+  @Override
+  public void flush() throws IOException {
+    generator.flush();
   }
 
   @Override
@@ -373,7 +379,9 @@ public class WriteJson implements SpiJsonWriter {
   public void beginAssocMany(String key) {
     try {
       pathStack.pushPathKey(key);
-      generator.writeFieldName(key);
+      if (key != null) {
+        generator.writeFieldName(key);
+      }
       generator.writeStartArray();
     } catch (IOException e) {
       throw new JsonIOException(e);

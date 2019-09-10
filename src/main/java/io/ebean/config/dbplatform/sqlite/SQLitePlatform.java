@@ -17,14 +17,23 @@ public class SQLitePlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
     this.dbIdentity.setSupportsSequence(false);
     this.dbIdentity.setSelectLastInsertedIdTemplate("select last_insert_rowid()");
-
+    this.truncateTable = "delete from %s";
     this.booleanDbType = Types.INTEGER;
+    this.likeClauseRaw = "like ?";
+    this.likeClauseEscaped = "like ?";
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+    this.dbDefaultValue.setNow("CURRENT_TIMESTAMP");
 
-    dbTypeMap.put(DbType.BIT, new DbPlatformType("int default 0"));
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int default 0"));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("int"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int"));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("integer"));
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("integer"));
+  }
 
+  @Override
+  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
+    sb.append(ch);
   }
 
 }

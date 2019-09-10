@@ -19,9 +19,7 @@ public class FactoryAssocOnes {
    */
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode) {
 
-    BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImported();
-
-    for (BeanPropertyAssocOne<?> one : ones) {
+    for (BeanPropertyAssocOne<?> one : desc.propertiesOneImported()) {
       if (!one.isImportedPrimaryKey()) {
         switch (mode) {
           case INSERT:

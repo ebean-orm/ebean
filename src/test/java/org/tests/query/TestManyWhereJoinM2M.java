@@ -3,6 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.Transaction;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 import org.junit.Assert;
@@ -17,39 +18,39 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.beginTransaction();
+    try (Transaction txn = Ebean.beginTransaction()) {
 
-    MRole r1 = new MRole();
-    r1.setRoleName("role1");
-    Ebean.save(r1);
+      MRole r1 = new MRole();
+      r1.setRoleName("role1");
+      Ebean.save(r1);
 
-    MRole r2 = new MRole();
-    r2.setRoleName("role2special");
-    Ebean.save(r2);
+      MRole r2 = new MRole();
+      r2.setRoleName("role2special");
+      Ebean.save(r2);
 
-    MRole r3 = new MRole();
-    r3.setRoleName("role3");
-    Ebean.save(r3);
+      MRole r3 = new MRole();
+      r3.setRoleName("role3");
+      Ebean.save(r3);
 
-    MUser u0 = new MUser();
-    u0.setUserName("user0");
-    u0.addRole(r1);
-    u0.addRole(r2);
+      MUser u0 = new MUser();
+      u0.setUserName("user0");
+      u0.addRole(r1);
+      u0.addRole(r2);
 
-    Ebean.save(u0);
+      Ebean.save(u0);
 
-    MUser u1 = new MUser();
-    u1.setUserName("user1");
-    u1.addRole(r1);
+      MUser u1 = new MUser();
+      u1.setUserName("user1");
+      u1.addRole(r1);
 
-    Ebean.save(u1);
+      Ebean.save(u1);
 
-    MUser u2 = new MUser();
-    u2.setUserName("user2");
-    Ebean.save(u2);
+      MUser u2 = new MUser();
+      u2.setUserName("user2");
+      Ebean.save(u2);
 
-    Ebean.commitTransaction();
-
+      txn.commit();
+    }
     Query<MUser> query = Ebean.find(MUser.class).fetch("roles")
       // the where on a 'many' (like orders) requires an
       // additional join and distinct which is independent

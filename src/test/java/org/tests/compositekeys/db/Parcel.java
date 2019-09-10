@@ -7,7 +7,7 @@ import javax.persistence.Id;
 @Entity
 public class Parcel {
   @Id
-  @Column(name = "parcelId")
+  @Column(name = "parcelid")
   private Long parcelId;
 
   private String description;

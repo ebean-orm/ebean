@@ -1,16 +1,13 @@
 package io.ebean.config.dbplatform.mysql;
 
-import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
 
-import javax.sql.DataSource;
 import java.sql.Types;
 
 /**
@@ -30,14 +27,19 @@ public class MySqlPlatform extends DatabasePlatform {
     this.platform = Platform.MYSQL;
     this.useExtraTransactionOnIterateSecondaryQueries = true;
     this.selectCountWithAlias = true;
+    this.supportsSavepointId = false;
     this.dbEncrypt = new MySqlDbEncrypt();
     this.historySupport = new MySqlHistorySupport();
     this.columnAliasPrefix = null;
-
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(false);
+
+    this.dbDefaultValue.setNow("now(6)"); // must have same precision as TIMESTAMP
+    this.dbDefaultValue.setFalse("0");
+    this.dbDefaultValue.setTrue("1");
+
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -49,29 +51,19 @@ public class MySqlPlatform extends DatabasePlatform {
     this.openQuote = "`";
     this.closeQuote = "`";
     // use pipe for escaping as it depends if mysql runs in no_backslash_escapes or not.
-    this.likeClauseRaw = "like binary ? escape ''";
-    this.likeClauseEscaped = "like binary ? escape '|'";
+    this.likeClauseRaw = "like ? escape ''";
+    this.likeClauseEscaped = "like ? escape '|'";
 
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
 
-    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1) default 0"));
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1) default 0"));
+    dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1)"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1)"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime(6)"));
     dbTypeMap.put(DbType.CLOB, new MySqlClob());
     dbTypeMap.put(DbType.BLOB, new MySqlBlob());
     dbTypeMap.put(DbType.BINARY, new DbPlatformType("binary", 255));
     dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
-  }
-
-  /**
-   * Return null in case there is a sequence annotation.
-   */
-  @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
-                                                       DataSource ds, String seqName, int batchSize) {
-
-    return null;
   }
 
   @Override
@@ -80,8 +72,4 @@ public class MySqlPlatform extends DatabasePlatform {
     return sql + " for update";
   }
 
-  @Override
-  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
-    sb.append('|').append(ch);
-  }
 }

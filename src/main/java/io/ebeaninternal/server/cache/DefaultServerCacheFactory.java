@@ -2,10 +2,10 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheOptions;
-import io.ebean.cache.ServerCacheType;
-import io.ebean.config.CurrentTenantProvider;
+import io.ebean.cache.ServerCacheNotification;
+import io.ebean.cache.ServerCacheNotify;
 
 
 /**
@@ -18,25 +18,43 @@ class DefaultServerCacheFactory implements ServerCacheFactory {
   /**
    * Construct when l2 cache is disabled.
    */
-  public DefaultServerCacheFactory() {
+  DefaultServerCacheFactory() {
     this.executor = null;
   }
 
   /**
    * Construct with executor service.
    */
-  public DefaultServerCacheFactory(BackgroundExecutor executor) {
+  DefaultServerCacheFactory(BackgroundExecutor executor) {
     this.executor = executor;
   }
 
   @Override
-  public ServerCache createCache(ServerCacheType type, String cacheKey, CurrentTenantProvider tenantProvider, ServerCacheOptions cacheOptions) {
+  public ServerCache createCache(ServerCacheConfig config) {
 
-    DefaultServerCache cache = new DefaultServerCache(cacheKey, tenantProvider, cacheOptions);
+    DefaultServerCache cache;
+    if (config.isQueryCache()) {
+      // use a server cache aware of extra validation and QueryCacheEntry
+      cache = new DefaultServerQueryCache(new DefaultServerCacheConfig(config));
+    } else {
+      cache = new DefaultServerCache(new DefaultServerCacheConfig(config));
+    }
     if (executor != null) {
       cache.periodicTrim(executor);
     }
     return cache;
   }
 
+  @Override
+  public ServerCacheNotify createCacheNotify(ServerCacheNotify listener) {
+    return new NoopServerCacheNotify();
+  }
+
+  private static class NoopServerCacheNotify implements ServerCacheNotify {
+
+    @Override
+    public void notify(ServerCacheNotification notification) {
+      // do nothing
+    }
+  }
 }

@@ -2,11 +2,16 @@ package io.ebeaninternal.server.persist;
 
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A batched statement that is held in BatchedPstmtHolder. It has a list of
@@ -16,6 +21,8 @@ import java.util.ArrayList;
  * </p>
  */
 public class BatchedPstmt implements SpiProfileTransactionEvent {
+
+  private static final Logger log = LoggerFactory.getLogger(BatchedPstmt.class);
 
   /**
    * The underlying statement.
@@ -37,6 +44,10 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   private final SpiTransaction transaction;
 
   private long profileStart;
+
+  private int[] results;
+
+  private List<InputStream> inputStreams;
 
   /**
    * Create with a given statement.
@@ -115,16 +126,19 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   }
 
   private void executeAndCheckRowCounts() throws SQLException {
+    try {
+      results = pstmt.executeBatch();
+      if (results.length != list.size()) {
+        String s = "results array error " + results.length + " " + list.size();
+        throw new SQLException(s);
+      }
 
-    int[] results = pstmt.executeBatch();
-    if (results.length != list.size()) {
-      String s = "results array error " + results.length + " " + list.size();
-      throw new SQLException(s);
-    }
-
-    // check for concurrency exceptions...
-    for (int i = 0; i < results.length; i++) {
-      list.get(i).checkRowCount(results[i]);
+      // check for concurrency exceptions...
+      for (int i = 0; i < results.length; i++) {
+        list.get(i).checkRowCount(results[i]);
+      }
+    } finally {
+      closeInputStreams();
     }
   }
 
@@ -140,4 +154,29 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
     }
   }
 
+  /**
+   * Return the execution results (row counts).
+   */
+  public int[] getResults() {
+    return results;
+  }
+
+  /**
+   * Register any inputStreams that should be closed after execution.
+   */
+  public void registerInputStreams(List<InputStream> inputStreams) {
+    this.inputStreams = inputStreams;
+  }
+
+  private void closeInputStreams() {
+    if (inputStreams != null) {
+      for (InputStream inputStream : inputStreams) {
+        try {
+          inputStream.close();
+        } catch (IOException e) {
+          log.warn("Error closing inputStream ", e);
+        }
+      }
+    }
+  }
 }

@@ -1,8 +1,7 @@
 package org.tests.basic.encrypt;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.SqlQuery;
+import io.ebean.DB;
 import io.ebean.SqlRow;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -26,7 +25,7 @@ public class TestEncrypt extends BaseTestCase {
   public void testQueryBind() {
 
     LoggedSqlCollector.start();
-    Ebean.find(EBasicEncrypt.class)
+    DB.find(EBasicEncrypt.class)
       .where().startsWith("description", "Rob")
       .findList();
 
@@ -39,23 +38,23 @@ public class TestEncrypt extends BaseTestCase {
   @ForPlatform(Platform.H2)
   public void test() {
 
-    Ebean.find(EBasicEncrypt.class).delete();
+    DB.find(EBasicEncrypt.class).delete();
 
     EBasicEncrypt e = new EBasicEncrypt();
     e.setName("testname");
     e.setDescription("testdesc");
     e.setDob(new Date(System.currentTimeMillis() - 100000));
 
-    Ebean.save(e);
+    DB.save(e);
 
-    SqlQuery q = Ebean.createSqlQuery("select * from e_basicenc where id = :id");
-    q.setParameter("id", e.getId());
+    SqlRow row = DB.createSqlQuery("select * from e_basicenc where id = :id")
+      .setParameter("id", e.getId())
+      .findOne();
 
-    SqlRow row = q.findOne();
     row.getString("name");
     row.get("description");
 
-    EBasicEncrypt e1 = Ebean.find(EBasicEncrypt.class, e.getId());
+    EBasicEncrypt e1 = DB.find(EBasicEncrypt.class, e.getId());
 
     e1.getDescription();
 
@@ -63,14 +62,14 @@ public class TestEncrypt extends BaseTestCase {
     e1.setDescription("moddesc");
     e1.setStatus(EBasicEncrypt.Status.ONE);
 
-    Ebean.save(e1);
+    DB.save(e1);
 
-    EBasicEncrypt e2 = Ebean.find(EBasicEncrypt.class, e.getId());
+    EBasicEncrypt e2 = DB.find(EBasicEncrypt.class, e.getId());
 
     assertEquals("moddesc", e2.getDescription());
     assertEquals(EBasicEncrypt.Status.ONE, e2.getStatus());
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     DbEncrypt dbEncrypt = server.getDatabasePlatform().getDbEncrypt();
 
     if (dbEncrypt == null) {
@@ -79,12 +78,12 @@ public class TestEncrypt extends BaseTestCase {
 
     } else {
 
-      List<EBasicEncrypt> list = Ebean.find(EBasicEncrypt.class).where()
+      List<EBasicEncrypt> list = DB.find(EBasicEncrypt.class).where()
         .eq("description", "moddesc").findList();
 
       assertEquals(1, list.size());
 
-      list = Ebean.find(EBasicEncrypt.class).where().startsWith("description", "modde").findList();
+      list = DB.find(EBasicEncrypt.class).where().startsWith("description", "modde").findList();
 
       assertEquals(1, list.size());
     }

@@ -1,8 +1,9 @@
 package io.ebeaninternal.server.loadcontext;
 
 import io.ebean.CacheMode;
+import io.ebean.ProfileLocation;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -12,6 +13,7 @@ import io.ebeaninternal.api.LoadSecondaryQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuerySecondary;
+import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -47,14 +49,16 @@ public class DLoadContext implements LoadContext {
   private final boolean disableLazyLoading;
   private final boolean disableReadAudit;
   private final boolean includeSoftDeletes;
-  protected final boolean useDocStore;
+  final boolean useDocStore;
 
   /**
    * The path relative to the root of the object graph.
    */
   private final String relativePath;
   private final ObjectGraphOrigin origin;
-  private final boolean useProfiling;
+  private final String planLabel;
+  private final ProfileLocation profileLocation;
+  private final ProfilingListener profilingListener;
 
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
 
@@ -83,13 +87,15 @@ public class DLoadContext implements LoadContext {
     this.disableReadAudit = false;
     this.includeSoftDeletes = false;
     this.relativePath = null;
-    this.useProfiling = false;
+    this.planLabel = null;
+    this.profileLocation = null;
+    this.profilingListener = null;
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
   }
 
   private ObjectGraphOrigin initOrigin() {
-    CallStack callStack = ebeanServer.createCallStack();
-    return new ObjectGraphOrigin(0, callStack, rootDescriptor.getFullName());
+    CallOrigin callOrigin = ebeanServer.createCallOrigin();
+    return new ObjectGraphOrigin(0, callOrigin, rootDescriptor.getFullName());
   }
 
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
@@ -109,7 +115,9 @@ public class DLoadContext implements LoadContext {
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.getUseBeanCache();
-    this.useProfiling = query.getProfilingListener() != null;
+    this.profilingListener = query.getProfilingListener();
+    this.planLabel = query.getPlanLabel();
+    this.profileLocation = query.getProfileLocation();
 
     ObjectGraphNode parentNode = query.getParentNode();
     if (parentNode != null) {
@@ -126,6 +134,19 @@ public class DLoadContext implements LoadContext {
     registerSecondaryQueries(secondaryQueries);
   }
 
+  /**
+   * Return the query plan label of the origin query.
+   */
+  String getPlanLabel() {
+    return planLabel;
+  }
+
+  /**
+   * Return the profile location of the origin query.
+   */
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
+  }
 
   /**
    * Register the +query and +lazy secondary queries with their appropriate LoadBeanContext or LoadManyContext.
@@ -159,7 +180,7 @@ public class DLoadContext implements LoadContext {
     registerSecondaryNode(many, props);
   }
 
-  protected boolean isBeanCacheGet() {
+  boolean isBeanCacheGet() {
     return useBeanCache.isGet();
   }
 
@@ -203,18 +224,12 @@ public class DLoadContext implements LoadContext {
    */
   private LoadSecondaryQuery getLoadSecondaryQuery(String path) {
     LoadSecondaryQuery beanLoad = beanMap.get(path);
-    if (beanLoad == null) {
-      beanLoad = manyMap.get(path);
-    }
-    return beanLoad;
+    return beanLoad == null ? manyMap.get(path) : beanLoad;
   }
 
   @Override
   public ObjectGraphNode getObjectGraphNode(String path) {
-
-    ObjectGraphNode node = nodePathMap.computeIfAbsent(path, this::createObjectGraphNode);
-
-    return node;
+    return nodePathMap.computeIfAbsent(path, this::createObjectGraphNode);
   }
 
   private ObjectGraphNode createObjectGraphNode(String path) {
@@ -229,7 +244,7 @@ public class DLoadContext implements LoadContext {
     return new ObjectGraphNode(origin, path);
   }
 
-  protected String getFullPath(String path) {
+  String getFullPath(String path) {
     if (relativePath == null) {
       return path;
     } else {
@@ -277,12 +292,11 @@ public class DLoadContext implements LoadContext {
     getManyContext(path).register(bc);
   }
 
-  protected DLoadBeanContext getBeanContext(String path) {
+  DLoadBeanContext getBeanContext(String path) {
     if (path == null) {
       return rootBeanContext;
     }
-    DLoadBeanContext beanContext = beanMap.computeIfAbsent(path, p -> createBeanContext(p, defaultBatchSize, null));
-    return beanContext;
+    return beanMap.computeIfAbsent(path, p -> createBeanContext(p, defaultBatchSize, null));
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
@@ -303,37 +317,33 @@ public class DLoadContext implements LoadContext {
     }
   }
 
-  protected DLoadManyContext getManyContext(String path) {
+  DLoadManyContext getManyContext(String path) {
     if (path == null) {
       throw new RuntimeException("path is null?");
     }
-    DLoadManyContext ctx = manyMap.computeIfAbsent(path, p -> createManyContext(p, defaultBatchSize, null));
-    return ctx;
+    return manyMap.computeIfAbsent(path, p -> createManyContext(p, defaultBatchSize, null));
   }
 
   private DLoadManyContext createManyContext(String path, int batchSize, OrmQueryProperties queryProps) {
 
     BeanPropertyAssocMany<?> p = (BeanPropertyAssocMany<?>) getBeanProperty(rootDescriptor, path);
-
     return new DLoadManyContext(this, p, path, batchSize, queryProps);
   }
 
   private DLoadBeanContext createBeanContext(String path, int batchSize, OrmQueryProperties queryProps) {
 
     BeanPropertyAssoc<?> p = (BeanPropertyAssoc<?>) getBeanProperty(rootDescriptor, path);
-    BeanDescriptor<?> targetDescriptor = p.getTargetDescriptor();
-
-    return new DLoadBeanContext(this, targetDescriptor, path, batchSize, queryProps);
+    return new DLoadBeanContext(this, p.getTargetDescriptor(), path, batchSize, queryProps);
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {
-    return desc.getBeanPropertyFromPath(path);
+    return desc.findPropertyFromPath(path);
   }
 
   /**
    * Propagate the original query settings (draft, asOf etc) to the secondary queries.
    */
-  public void propagateQueryState(SpiQuery<?> query, boolean docStoreMapped) {
+  void propagateQueryState(SpiQuery<?> query, boolean docStoreMapped) {
     if (useDocStore && docStoreMapped) {
       query.setUseDocStore(true);
     }
@@ -351,8 +361,8 @@ public class DLoadContext implements LoadContext {
     if (disableReadAudit) {
       query.setDisableReadAuditing();
     }
-    if (useProfiling) {
-      query.setAutoTune(true);
+    if (profilingListener != null) {
+      query.setProfilingListener(profilingListener);
     }
     if (tenantId != null) {
       query.setTenantId(tenantId);

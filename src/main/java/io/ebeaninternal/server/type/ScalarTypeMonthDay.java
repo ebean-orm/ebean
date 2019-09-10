@@ -72,6 +72,7 @@ public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   @Override
   public MonthDay toBeanType(Object value) {
     if (value instanceof MonthDay) return (MonthDay) value;
+    if (value == null) return null;
     return convertFromDate((Date) value);
   }
 

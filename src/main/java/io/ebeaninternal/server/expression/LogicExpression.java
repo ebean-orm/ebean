@@ -4,11 +4,11 @@ import io.ebean.Expression;
 import io.ebean.Junction;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ abstract class LogicExpression implements SpiExpression {
   static class And extends LogicExpression {
 
     And(Expression expOne, Expression expTwo) {
-      super(AND, expOne, expTwo);
+      super(true, expOne, expTwo);
     }
 
     @Override
@@ -36,7 +36,7 @@ abstract class LogicExpression implements SpiExpression {
   static class Or extends LogicExpression {
 
     Or(Expression expOne, Expression expTwo) {
-      super(OR, expOne, expTwo);
+      super(false, expOne, expTwo);
     }
 
     @Override
@@ -45,20 +45,20 @@ abstract class LogicExpression implements SpiExpression {
     }
   }
 
-  protected SpiExpression expOne;
+  SpiExpression expOne;
 
-  protected SpiExpression expTwo;
+  SpiExpression expTwo;
 
-  private final String joinType;
+  private final boolean conjunction;
 
-  LogicExpression(String joinType, Expression expOne, Expression expTwo) {
-    this.joinType = joinType;
+  LogicExpression(boolean conjunction, Expression expOne, Expression expTwo) {
+    this.conjunction = conjunction;
     this.expOne = (SpiExpression) expOne;
     this.expTwo = (SpiExpression) expTwo;
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
   }
@@ -71,7 +71,6 @@ abstract class LogicExpression implements SpiExpression {
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
 
-    boolean conjunction = joinType.equals(AND);
     context.startBool(conjunction ? Junction.Type.AND : Junction.Type.OR);
     expOne.writeDocQuery(context);
     expTwo.writeDocQuery(context);
@@ -107,8 +106,19 @@ abstract class LogicExpression implements SpiExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+
+    // get the current state for 'require outer joins'
+    boolean parentOuterJoins = manyWhereJoin.isRequireOuterJoins();
+    if (!conjunction) {
+      // turn on outer joins required for disjunction expressions
+      manyWhereJoin.setRequireOuterJoins(true);
+    }
     expOne.containsMany(desc, manyWhereJoin);
     expTwo.containsMany(desc, manyWhereJoin);
+    if (!conjunction && !parentOuterJoins) {
+      // restore state to not forcing outer joins
+      manyWhereJoin.setRequireOuterJoins(false);
+    }
   }
 
   @Override
@@ -128,9 +138,9 @@ abstract class LogicExpression implements SpiExpression {
 
     request.append("(");
     expOne.addSql(request);
-    request.append(joinType);
+    request.append(conjunction ? AND : OR);
     expTwo.addSql(request);
-    request.append(") ");
+    request.append(")");
   }
 
   @Override
@@ -144,7 +154,7 @@ abstract class LogicExpression implements SpiExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("Logic").append(joinType).append("[");
+    builder.append("Logic").append(conjunction ? AND : OR).append("[");
     expOne.queryPlanHash(builder);
     builder.append(",");
     expTwo.queryPlanHash(builder);

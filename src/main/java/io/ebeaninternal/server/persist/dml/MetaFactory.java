@@ -3,10 +3,12 @@ package io.ebeaninternal.server.persist.dml;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.persist.dmlbind.Bindable;
 import io.ebeaninternal.server.persist.dmlbind.BindableId;
 import io.ebeaninternal.server.persist.dmlbind.BindableList;
+import io.ebeaninternal.server.persist.dmlbind.BindableOrderColumn;
 import io.ebeaninternal.server.persist.dmlbind.BindableUnidirectional;
 import io.ebeaninternal.server.persist.dmlbind.FactoryAssocOnes;
 import io.ebeaninternal.server.persist.dmlbind.FactoryBaseProperties;
@@ -20,7 +22,7 @@ import java.util.List;
 /**
  * Factory for creating InsertMeta UpdateMeta and DeleteMeta.
  */
-public class MetaFactory {
+class MetaFactory {
 
   private final FactoryBaseProperties baseFact;
   private final FactoryEmbedded embeddedFact;
@@ -37,16 +39,11 @@ public class MetaFactory {
 
   private final DatabasePlatform dbPlatform;
 
-  private final boolean emptyStringAsNull;
-
   MetaFactory(DatabasePlatform dbPlatform) {
     this.dbPlatform = dbPlatform;
-    this.emptyStringAsNull = dbPlatform.isTreatEmptyStringsAsNull();
-
     // to bind encryption data before or after the encryption key
     DbEncrypt dbEncrypt = dbPlatform.getDbEncrypt();
     boolean bindEncryptDataFirst = dbEncrypt == null || dbEncrypt.isBindEncryptDataFirst();
-
     this.baseFact = new FactoryBaseProperties(bindEncryptDataFirst);
     this.embeddedFact = new FactoryEmbedded(bindEncryptDataFirst);
   }
@@ -62,13 +59,18 @@ public class MetaFactory {
     embeddedFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     assocOneFact.create(setList, desc, DmlMode.UPDATE);
 
+    BeanProperty orderColumn = desc.getOrderColumn();
+    if (orderColumn != null) {
+      setList.add(new BindableOrderColumn(orderColumn));
+    }
+
     BindableId id = idFact.createId(desc);
     Bindable version = versionFact.create(desc);
     Bindable tenantId = versionFact.createTenantId(desc);
 
     BindableList setBindable = new BindableList(setList);
 
-    return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, version, tenantId);
+    return new UpdateMeta(desc, setBindable, id, version, tenantId);
   }
 
   /**
@@ -79,8 +81,7 @@ public class MetaFactory {
     BindableId id = idFact.createId(desc);
     Bindable version = versionFact.createForDelete(desc);
     Bindable tenantId = versionFact.createTenantId(desc);
-
-    return new DeleteMeta(emptyStringAsNull, desc, id, version, tenantId);
+    return new DeleteMeta(desc, id, version, tenantId);
   }
 
   /**

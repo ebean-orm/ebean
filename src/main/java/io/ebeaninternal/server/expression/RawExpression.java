@@ -12,9 +12,9 @@ import java.util.Collection;
 
 class RawExpression extends NonPrepareExpression {
 
-  private final String sql;
+  final String sql;
 
-  private final Object[] values;
+  final Object[] values;
 
   RawExpression(String sql, Object[] values) {
     this.sql = sql;
@@ -74,7 +74,11 @@ class RawExpression extends NonPrepareExpression {
 
   @Override
   public int queryBindHash() {
-    return sql.hashCode();
+    int hc = sql.hashCode();
+    for (Object value : values) {
+      hc = hc * 92821 + value.hashCode();
+    }
+    return hc;
   }
 
   @Override

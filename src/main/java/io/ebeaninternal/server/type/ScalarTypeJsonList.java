@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -70,11 +71,12 @@ public class ScalarTypeJsonList {
 
     @Override
     public List read(DataReader dataReader) throws SQLException {
+      String json = dataReader.getString();
       try {
         // parse JSON into modifyAware list
-        return EJson.parseList(dataReader.getString(), true);
+        return EJson.parseList(json, true);
       } catch (IOException e) {
-        throw new SQLException("Failed to parse JSON content as List: [" + dataReader.getString() + "]", e);
+        throw new TextException("Failed to parse JSON [{}] as List", json, e);
       }
     }
 
@@ -108,7 +110,7 @@ public class ScalarTypeJsonList {
       try {
         return EJson.parseList(value, false);
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
+        throw new TextException("Failed to parse JSON [{}] as List", value, e);
       }
     }
 

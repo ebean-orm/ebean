@@ -16,7 +16,7 @@ public class OtoBChild {
   String child;
 
   @OneToOne
-  @PrimaryKeyJoinColumn(name = "master_id", referencedColumnName = "id")
+  @PrimaryKeyJoinColumn
   OtoBMaster master;
 
   public Long getId() {

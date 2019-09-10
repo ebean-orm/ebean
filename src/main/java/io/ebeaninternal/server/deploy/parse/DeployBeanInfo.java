@@ -1,27 +1,21 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.RawSql;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
+import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
-import io.ebeaninternal.server.query.SqlJoinType;
-
-import java.util.HashMap;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 /**
  * Wraps information about a bean during deployment parsing.
  */
 public class DeployBeanInfo<T> {
 
-  /**
-   * Holds TableJoins for secondary table properties.
-   */
-  private final HashMap<String, DeployTableJoin> tableJoinMap = new HashMap<>();
-
   private final DeployUtil util;
 
   private final DeployBeanDescriptor<T> descriptor;
+
+  private DeployBeanPropertyAssoc<?> embeddedId;
 
   /**
    * Create with a DeployUtil and BeanDescriptor.
@@ -51,34 +45,6 @@ public class DeployBeanInfo<T> {
   }
 
   /**
-   * Appropriate TableJoin for a property mapped to a secondary table.
-   */
-  public DeployTableJoin getTableJoin(String tableName) {
-
-    String key = tableName.toLowerCase();
-
-    DeployTableJoin tableJoin = tableJoinMap.get(key);
-    if (tableJoin == null) {
-      tableJoin = new DeployTableJoin();
-      tableJoin.setTable(tableName);
-      tableJoin.setType(SqlJoinType.INNER);
-      descriptor.addTableJoin(tableJoin);
-
-      tableJoinMap.put(key, tableJoin);
-    }
-    return tableJoin;
-  }
-
-  /**
-   * Set a the join alias for a assoc one property.
-   */
-  public void setBeanJoinType(DeployBeanPropertyAssocOne<?> beanProp, boolean outerJoin) {
-
-    DeployTableJoin tableJoin = beanProp.getTableJoin();
-    tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
-  }
-
-  /**
    * Add named RawSql from ebean.xml.
    */
   public void addRawSql(String name, RawSql rawSql) {
@@ -90,5 +56,27 @@ public class DeployBeanInfo<T> {
    */
   public void addNamedQuery(String name, String query) {
     descriptor.addNamedQuery(name, query);
+  }
+
+  /**
+   * Set that the PK is also a foreign key.
+   */
+  public void setPrimaryKeyJoin(TableJoin join) {
+    descriptor.setPrimaryKeyJoin(join);
+  }
+
+  /**
+   * This bean type has an embedded Id property.
+   */
+  public void setEmbeddedId(DeployBeanPropertyAssoc<?> embeddedId) {
+    this.embeddedId = embeddedId;
+  }
+
+  public Class<?> getEmbeddedIdType() {
+    return (embeddedId == null) ? null : embeddedId.getTargetType();
+  }
+
+  public boolean isEmbedded() {
+    return descriptor.isEmbedded();
   }
 }

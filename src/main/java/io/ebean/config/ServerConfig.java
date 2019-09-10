@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import io.ebean.EbeanServerFactory;
+import io.ebean.DatabaseFactory;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.Transaction;
@@ -12,6 +12,9 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.properties.PropertiesLoader;
+import io.ebean.datasource.DataSourceConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -28,9 +31,10 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-import org.avaje.datasource.DataSourceConfig;
 
+import javax.persistence.EnumType;
 import javax.sql.DataSource;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,44 +45,46 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
- * The configuration used for creating a EbeanServer.
+ * The configuration used for creating a Database.
  * <p>
- * Used to programmatically construct an EbeanServer and optionally register it
- * with the Ebean singleton.
+ * Used to programmatically construct a Database and optionally register it
+ * with the DB singleton.
  * </p>
  * <p>
- * If you just use Ebean without this programmatic configuration Ebean will read
- * the ebean.properties file and take the configuration from there. This usually
+ * If you just use DB without this programmatic configuration DB will read
+ * the application.properties file and take the configuration from there. This usually
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
  * </p>
  * <pre>{@code
  *
- * ServerConfig c = new ServerConfig();
- * c.setName("db");
+ * ServerConfig config = new ServerConfig();
  *
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
- * c.loadFromProperties();
+ * config.loadFromProperties();
  *
- * // add any classes found in the app.data package
- * c.addPackage("com.myapp.domain");
+ * // explicitly register the entity beans to avoid classpath scanning
+ * config.addClass(Customer.class);
+ * config.addClass(User.class);
  *
- * // register as the 'Default' server
- * c.setDefaultServer(true);
- *
- * EbeanServer server = EbeanServerFactory.create(c);
+ * Database database = DatabaseFactory.create(config);
  *
  * }</pre>
  *
+ * <p>
+ * Note that ServerConfigProvider provides a standard Java ServiceLoader mechanism that can
+ * be used to apply configuration to the ServerConfig.
+ * </p>
+ *
  * @author emcgreal
  * @author rbygrave
- * @see EbeanServerFactory
+ * @see DatabaseFactory
  */
 public class ServerConfig {
 
   /**
-   * The EbeanServer name.
+   * The Database name.
    */
   private String name = "db";
 
@@ -101,12 +107,12 @@ public class ServerConfig {
   private String resourceDirectory;
 
   /**
-   * Set to true to register this EbeanServer with the Ebean singleton.
+   * Set to true to register this Database with the DB singleton.
    */
   private boolean register = true;
 
   /**
-   * Set to true if this is the default/primary server.
+   * Set to true if this is the default/primary database.
    */
   private boolean defaultServer = true;
 
@@ -145,7 +151,7 @@ public class ServerConfig {
   private DocStoreConfig docStoreConfig = new DocStoreConfig();
 
   /**
-   * Set to true when the EbeanServer only uses Document store.
+   * Set to true when the Database only uses Document store.
    */
   private boolean docStoreOnly;
 
@@ -163,7 +169,12 @@ public class ServerConfig {
   /**
    * The JSON format used for DateTime types. Default to millis.
    */
-  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
+  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.ISO8601;
+
+  /**
+   * The JSON format used for Date types. Default to millis.
+   */
+  private JsonConfig.Date jsonDate = JsonConfig.Date.ISO8601;
 
   /**
    * For writing JSON specify if null values or empty collections should be exluded.
@@ -180,11 +191,6 @@ public class ServerConfig {
    * The database platform.
    */
   private DatabasePlatform databasePlatform;
-
-  /**
-   * For DB's using sequences this is the number of sequence values prefetched.
-   */
-  private int databaseSequenceBatchSize = 20;
 
   /**
    * JDBC fetchSize hint when using findList.  Defaults to 0 leaving it up to the JDBC driver.
@@ -229,6 +235,10 @@ public class ServerConfig {
 
   private int persistBatchSize = 20;
 
+  private EnumType defaultEnumType = EnumType.ORDINAL;
+
+  private boolean disableLazyLoading;
+
   /**
    * The default batch size for lazy loading
    */
@@ -249,6 +259,8 @@ public class ServerConfig {
   private boolean ddlGenerate;
 
   private boolean ddlRun;
+
+  private boolean ddlExtra = true;
 
   private boolean ddlCreateOnly;
 
@@ -286,7 +298,7 @@ public class ServerConfig {
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
    * I believe this will default to true in some future release (as it has a nice performance benefit).
-   *
+   * <p>
    * autoReadOnlyDataSource is an unfortunate name for this config option but I haven't come up with a better one.
    */
   private boolean autoReadOnlyDataSource;
@@ -295,6 +307,11 @@ public class ServerConfig {
    * Optional configuration for a read only data source.
    */
   private DataSourceConfig readOnlyDataSourceConfig = new DataSourceConfig();
+
+  /**
+   * Optional - the database schema that should be used to own the tables etc.
+   */
+  private String dbSchema;
 
   /**
    * The db migration config (migration resource path etc).
@@ -324,18 +341,6 @@ public class ServerConfig {
   private String dataSourceJndiName;
 
   /**
-   * The database boolean true value (typically either 1, T, or Y).
-   */
-  private String databaseBooleanTrue;
-
-  /**
-   * The database boolean false value (typically either 0, F or N).
-   */
-  private String databaseBooleanFalse;
-
-  private boolean allQuotedIdentifiers;
-
-  /**
    * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
@@ -353,7 +358,7 @@ public class ServerConfig {
   /**
    * Behaviour of updates in JDBC batch to by default include all properties.
    */
-  private boolean updateAllPropertiesInBatch = true;
+  private boolean updateAllPropertiesInBatch;
 
   /**
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
@@ -361,9 +366,25 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
 
   /**
-   * Database type configuration.
+   * Database platform configuration.
    */
-  private DbTypeConfig dbTypeConfig = new DbTypeConfig();
+  private PlatformConfig platformConfig = new PlatformConfig();
+
+  /**
+   * The UUID version to use.
+   */
+  private UuidVersion uuidVersion = UuidVersion.VERSION4;
+
+  /**
+   * The UUID state file (for Version 1 UUIDs). By default, the file is created in
+   * ${HOME}/.ebean/${servername}-uuid.state
+   */
+  private String uuidStateFile;
+
+  /**
+   * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  private Clock clock = Clock.systemUTC();
 
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
@@ -463,6 +484,25 @@ public class ServerConfig {
    */
   private boolean disableL2Cache;
 
+  private String enabledL2Regions;
+
+  /**
+   * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
+   * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
+   */
+  private boolean useJavaxValidationNotNull = true;
+
+  /**
+   * Generally we want to perform L2 cache notification in the background and not impact
+   * the performance of executing transactions.
+   */
+  private boolean notifyL2CacheInForeground;
+
+  /**
+   * Set to true to support query plan capture.
+   */
+  private boolean collectQueryPlans;
+
   /**
    * The time in millis used to determine when a query is alerted for being slow.
    */
@@ -473,14 +513,46 @@ public class ServerConfig {
    */
   private SlowQueryListener slowQueryListener;
 
-
   private ProfilingConfig profilingConfig = new ProfilingConfig();
 
   /**
-   * Construct a Server Configuration for programmatically creating an EbeanServer.
+   * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
+   */
+  private boolean defaultOrderById;
+
+  /**
+   * The mappingLocations for searching xml mapping.
+   */
+  private List<String> mappingLocations = new ArrayList<>();
+
+  /**
+   * When true we do not need explicit GeneratedValue mapping.
+   */
+  private boolean idGeneratorAutomatic = true;
+
+  private boolean dumpMetricsOnShutdown;
+
+  private String dumpMetricsOptions;
+
+  /**
+   * Construct a Database Configuration for programmatically creating an Database.
    */
   public ServerConfig() {
 
+  }
+
+  /**
+   * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  public Clock getClock() {
+    return clock;
+  }
+
+  /**
+   * Set the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
+   */
+  public void setClock(final Clock clock) {
+    this.clock = clock;
   }
 
   /**
@@ -511,6 +583,22 @@ public class ServerConfig {
     this.slowQueryListener = slowQueryListener;
   }
 
+
+  /**
+   * Deprecated - look to have explicit order by. Sets the default orderById setting for queries.
+   */
+  @Deprecated
+  public void setDefaultOrderById(boolean defaultOrderById) {
+    this.defaultOrderById = defaultOrderById;
+  }
+
+  /**
+   * Returns the default orderById setting for queries.
+   */
+  public boolean isDefaultOrderById() {
+    return defaultOrderById;
+  }
+
   /**
    * Put a service object into configuration such that it can be passed to a plugin.
    * <p>
@@ -526,6 +614,48 @@ public class ServerConfig {
    */
   public Object getServiceObject(String key) {
     return serviceObject.get(key);
+  }
+
+  /**
+   * Put a service object into configuration such that it can be passed to a plugin.
+   *
+   * <pre>{@code
+   *
+   *   JedisPool jedisPool = ..
+   *
+   *   serverConfig.putServiceObject(jedisPool);
+   *
+   * }</pre>
+   */
+  public void putServiceObject(Object configObject) {
+    String key = serviceObjectKey(configObject);
+    serviceObject.put(key, configObject);
+  }
+
+  private String serviceObjectKey(Object configObject) {
+    return serviceObjectKey(configObject.getClass());
+  }
+
+  private String serviceObjectKey(Class<?> cls) {
+    String simpleName = cls.getSimpleName();
+    return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
+  }
+
+  /**
+   * Used by plugins to obtain service objects.
+   *
+   * <pre>{@code
+   *
+   *   JedisPool jedisPool = serverConfig.getServiceObject(JedisPool.class);
+   *
+   * }</pre>
+   *
+   * @param cls The type of the service object to obtain
+   * @return The service object given the class type
+   */
+  @SuppressWarnings("unchecked")
+  public <P> P getServiceObject(Class<P> cls) {
+    return (P) serviceObject.get(serviceObjectKey(cls));
   }
 
   /**
@@ -561,6 +691,20 @@ public class ServerConfig {
   }
 
   /**
+   * Return the JSON format used for Date types.
+   */
+  public JsonConfig.Date getJsonDate() {
+    return jsonDate;
+  }
+
+  /**
+   * Set the JSON format to use for Date types.
+   */
+  public void setJsonDate(JsonConfig.Date jsonDate) {
+    this.jsonDate = jsonDate;
+  }
+
+  /**
    * Return the JSON include mode used when writing JSON.
    */
   public JsonConfig.Include getJsonInclude() {
@@ -578,14 +722,14 @@ public class ServerConfig {
   }
 
   /**
-   * Return the name of the EbeanServer.
+   * Return the name of the Database.
    */
   public String getName() {
     return name;
   }
 
   /**
-   * Set the name of the EbeanServer.
+   * Set the name of the Database.
    */
   public void setName(String name) {
     this.name = name;
@@ -594,8 +738,8 @@ public class ServerConfig {
   /**
    * Return the container / clustering configuration.
    * <p/>
-   * The container holds all the EbeanServer instances and provides clustering communication
-   * services to all the EbeanServer instances.
+   * The container holds all the Database instances and provides clustering communication
+   * services to all the Database instances.
    */
   public ContainerConfig getContainerConfig() {
     return containerConfig;
@@ -604,8 +748,8 @@ public class ServerConfig {
   /**
    * Set the container / clustering configuration.
    * <p/>
-   * The container holds all the EbeanServer instances and provides clustering communication
-   * services to all the EbeanServer instances.
+   * The container holds all the Database instances and provides clustering communication
+   * services to all the Database instances.
    */
   public void setContainerConfig(ContainerConfig containerConfig) {
     this.containerConfig = containerConfig;
@@ -645,8 +789,8 @@ public class ServerConfig {
   }
 
   /**
-   * Set false if you do not want this EbeanServer to be registered as the "default" server
-   * with the Ebean singleton.
+   * Set false if you do not want this Database to be registered as the "default" database
+   * with the DB singleton.
    * <p>
    * This is only used when {@link #setRegister(boolean)} is also true.
    * </p>
@@ -863,6 +1007,30 @@ public class ServerConfig {
     this.queryBatchSize = queryBatchSize;
   }
 
+  public EnumType getDefaultEnumType() {
+    return defaultEnumType;
+  }
+
+  public void setDefaultEnumType(EnumType defaultEnumType) {
+    this.defaultEnumType = defaultEnumType;
+  }
+
+  /**
+   * Return true if lazy loading is disabled on queries by default.
+   */
+  public boolean isDisableLazyLoading() {
+    return disableLazyLoading;
+  }
+
+  /**
+   * Set to true to disable lazy loading by default.
+   * <p>
+   * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
+   */
+  public void setDisableLazyLoading(boolean disableLazyLoading) {
+    this.disableLazyLoading = disableLazyLoading;
+  }
+
   /**
    * Return the default batch size for lazy loading of beans and collections.
    */
@@ -897,7 +1065,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1062,6 +1230,25 @@ public class ServerConfig {
   }
 
   /**
+   * Return the DB schema to use.
+   */
+  public String getDbSchema() {
+    return dbSchema;
+  }
+
+  /**
+   * Set the DB schema to use. This specifies to use this schema for:
+   * <ul>
+   * <li>Running Database migrations - Create and use the DB schema</li>
+   * <li>Testing DDL - Create-all.sql DDL execution creates and uses schema</li>
+   * <li>Testing Docker - Set default schema on connection URL</li>
+   * </ul>
+   */
+  public void setDbSchema(String dbSchema) {
+    this.dbSchema = dbSchema;
+  }
+
+  /**
    * Return the DB migration configuration.
    */
   public DbMigrationConfig getMigrationConfig() {
@@ -1079,14 +1266,14 @@ public class ServerConfig {
    * Return the Geometry SRID.
    */
   public int getGeometrySRID() {
-    return dbTypeConfig.getGeometrySRID();
+    return platformConfig.getGeometrySRID();
   }
 
   /**
    * Set the Geometry SRID.
    */
   public void setGeometrySRID(int geometrySRID) {
-    dbTypeConfig.setGeometrySRID(geometrySRID);
+    platformConfig.setGeometrySRID(geometrySRID);
   }
 
   /**
@@ -1376,29 +1563,35 @@ public class ServerConfig {
    * Return true if all DB column and table names should use quoted identifiers.
    */
   public boolean isAllQuotedIdentifiers() {
-    return allQuotedIdentifiers;
+    return platformConfig.isAllQuotedIdentifiers();
   }
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
-    this.allQuotedIdentifiers = allQuotedIdentifiers;
-    if (allQuotedIdentifiers && namingConvention instanceof UnderscoreNamingConvention) {
+    platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
+    if (allQuotedIdentifiers) {
+      adjustNamingConventionForAllQuoted();
+    }
+  }
+
+  private void adjustNamingConventionForAllQuoted() {
+    if (namingConvention instanceof UnderscoreNamingConvention) {
       // we need to use matching naming convention
       this.namingConvention = new MatchingNamingConvention();
     }
   }
 
   /**
-   * Return true if this EbeanServer is a Document store only instance (has no JDBC DB).
+   * Return true if this Database is a Document store only instance (has no JDBC DB).
    */
   public boolean isDocStoreOnly() {
     return docStoreOnly;
   }
 
   /**
-   * Set to true if this EbeanServer is Document store only instance (has no JDBC DB).
+   * Set to true if this Database is Document store only instance (has no JDBC DB).
    */
   public void setDocStoreOnly(boolean docStoreOnly) {
     this.docStoreOnly = docStoreOnly;
@@ -1599,7 +1792,7 @@ public class ServerConfig {
    * </p>
    */
   public String getDatabaseBooleanTrue() {
-    return databaseBooleanTrue;
+    return platformConfig.getDatabaseBooleanTrue();
   }
 
   /**
@@ -1612,7 +1805,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseBooleanTrue(String databaseTrue) {
-    this.databaseBooleanTrue = databaseTrue;
+    platformConfig.setDatabaseBooleanTrue(databaseTrue);
   }
 
   /**
@@ -1625,7 +1818,7 @@ public class ServerConfig {
    * </p>
    */
   public String getDatabaseBooleanFalse() {
-    return databaseBooleanFalse;
+    return platformConfig.getDatabaseBooleanFalse();
   }
 
   /**
@@ -1638,14 +1831,14 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseBooleanFalse(String databaseFalse) {
-    this.databaseBooleanFalse = databaseFalse;
+    this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
   }
 
   /**
    * Return the number of DB sequence values that should be preallocated.
    */
   public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
+    return platformConfig.getDatabaseSequenceBatchSize();
   }
 
   /**
@@ -1664,7 +1857,7 @@ public class ServerConfig {
    * </p>
    */
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+    this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**
@@ -1691,7 +1884,7 @@ public class ServerConfig {
    * that you don't have access to.
    * </p>
    * <p>
-   * Values are oracle, h2, postgres, mysql, mssqlserver2005.
+   * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
    * </p>
    */
   public void setDatabasePlatformName(String databasePlatformName) {
@@ -1714,6 +1907,20 @@ public class ServerConfig {
    */
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
+  }
+
+  /**
+   * Return the preferred DB platform IdType.
+   */
+  public IdType getIdType() {
+    return platformConfig.getIdType();
+  }
+
+  /**
+   * Set the preferred DB platform IdType.
+   */
+  public void setIdType(IdType idType) {
+    this.platformConfig.setIdType(idType);
   }
 
   /**
@@ -1784,16 +1991,16 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if the EbeanServer instance should be created in offline mode.
+   * Return true if the Database instance should be created in offline mode.
    */
   public boolean isDbOffline() {
     return dbOffline;
   }
 
   /**
-   * Set to true if the EbeanServer instance should be created in offline mode.
+   * Set to true if the Database instance should be created in offline mode.
    * <p>
-   * Typically used to create an EbeanServer instance for DDL Migration generation
+   * Typically used to create an Database instance for DDL Migration generation
    * without requiring a real DataSource / Database to connect to.
    * </p>
    */
@@ -1826,15 +2033,59 @@ public class ServerConfig {
   /**
    * Return the configuration for DB types (such as UUID and custom mappings).
    */
-  public DbTypeConfig getDbTypeConfig() {
-    return dbTypeConfig;
+  public PlatformConfig getPlatformConfig() {
+    return platformConfig;
+  }
+
+  /**
+   * Set the configuration for DB platform (such as UUID and custom mappings).
+   */
+  public void setPlatformConfig(PlatformConfig platformConfig) {
+    this.platformConfig = platformConfig;
   }
 
   /**
    * Set the DB type used to store UUID.
    */
-  public void setDbUuid(DbUuid dbUuid) {
-    this.dbTypeConfig.setDbUuid(dbUuid);
+  public void setDbUuid(PlatformConfig.DbUuid dbUuid) {
+    this.platformConfig.setDbUuid(dbUuid);
+  }
+
+  /**
+   * Returns the UUID version mode.
+   */
+  public UuidVersion getUuidVersion() {
+    return uuidVersion;
+  }
+
+  /**
+   * Sets the UUID version mode.
+   */
+  public void setUuidVersion(UuidVersion uuidVersion) {
+    this.uuidVersion = uuidVersion;
+  }
+
+  /**
+   * Return the UUID state file.
+   */
+  public String getUuidStateFile() {
+    if (uuidStateFile == null || uuidStateFile.isEmpty()) {
+      // by default, add servername...
+      uuidStateFile = name + "-uuid.state";
+      // and store it in the user's home directory
+      String homeDir = System.getProperty("user.home");
+      if (homeDir != null && homeDir.isEmpty()) {
+        uuidStateFile = homeDir + "/.ebean/" + uuidStateFile;
+      }
+    }
+    return uuidStateFile;
+  }
+
+  /**
+   * Set the UUID state file.
+   */
+  public void setUuidStateFile(String uuidStateFile) {
+    this.uuidStateFile = uuidStateFile;
   }
 
   /**
@@ -1875,6 +2126,16 @@ public class ServerConfig {
   }
 
   /**
+   * Set to true to run DB migrations on server start.
+   * <p>
+   * This is the same as serverConfig.getMigrationConfig().setRunMigration(). We have added this method here
+   * as it is often the only thing we need to configure for migrations.
+   */
+  public void setRunMigration(boolean runMigration) {
+    migrationConfig.setRunMigration(runMigration);
+  }
+
+  /**
    * Set to true to generate the "create all" DDL on startup.
    * <p>
    * Typically we want this on when we are running tests locally (and often using H2)
@@ -1893,6 +2154,16 @@ public class ServerConfig {
   public void setDdlRun(boolean ddlRun) {
     this.ddlRun = ddlRun;
   }
+
+  /**
+   * Set to false if you not want to run the extra-ddl.xml scripts. (default = true)
+   * <p>
+   * Typically we want this on when we are running tests.
+   */
+  public void setDdlExtra(boolean ddlExtra) {
+    this.ddlExtra = ddlExtra;
+  }
+
 
   /**
    * Return true if the "drop all ddl" should be skipped.
@@ -1965,6 +2236,13 @@ public class ServerConfig {
   }
 
   /**
+   * Return true, if extra-ddl.xml should be executed.
+   */
+  public boolean isDdlExtra() {
+    return ddlExtra;
+  }
+
+  /**
    * Return true if the class path search should be disabled.
    */
   public boolean isDisableClasspathSearch() {
@@ -1973,7 +2251,7 @@ public class ServerConfig {
 
   /**
    * Set to true to disable the class path search even for the case where no entity bean classes
-   * have been registered. This can be used to start an EbeanServer instance just to use the
+   * have been registered. This can be used to start an Database instance just to use the
    * SQL functions such as SqlQuery, SqlUpdate etc.
    */
   public void setDisableClasspathSearch(boolean disableClasspathSearch) {
@@ -2087,8 +2365,7 @@ public class ServerConfig {
    *
    *   // assume Customer has L2 bean caching enabled ...
    *
-   *   Transaction transaction = Ebean.beginTransaction();
-   *   try {
+   *   try (Transaction transaction = DB.beginTransaction()) {
    *
    *     // this uses L2 bean cache as the transaction
    *     // ... is considered "query only" at this point
@@ -2096,7 +2373,7 @@ public class ServerConfig {
    *
    *     // transaction no longer "query only" once
    *     // ... a bean has been saved etc
-   *     Ebean.save(someBean);
+   *     DB.save(someBean);
    *
    *     // will NOT use L2 bean cache as the transaction
    *     // ... is no longer considered "query only"
@@ -2115,9 +2392,6 @@ public class ServerConfig {
    *     transaction.setSkipCache(true);
    *     Customer.find.byId(99); // skips l2 bean cache
    *
-   *
-   *   } finally {
-   *     transaction.end();
    *   }
    *
    * }</pre>
@@ -2185,7 +2459,7 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
+   * Return true if query statistics should be collected by ObjectGraphNode.
    */
   public boolean isCollectQueryStatsByNode() {
     return collectQueryStatsByNode;
@@ -2262,7 +2536,7 @@ public class ServerConfig {
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition, platform);
+    platformConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
   /**
@@ -2282,7 +2556,7 @@ public class ServerConfig {
    * @param columnDefinition The column definition that should be used
    */
   public void addCustomMapping(DbType type, String columnDefinition) {
-    dbTypeConfig.addCustomMapping(type, columnDefinition);
+    platformConfig.addCustomMapping(type, columnDefinition);
   }
 
   /**
@@ -2551,7 +2825,8 @@ public class ServerConfig {
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    loadFromProperties(PropertyMap.defaultProperties());
+    this.properties = PropertiesLoader.load();
+    configureFromProperties();
   }
 
   /**
@@ -2559,24 +2834,32 @@ public class ServerConfig {
    */
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
-    this.properties = properties;
-    PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
-    loadSettings(p);
+    this.properties = PropertiesLoader.eval(properties);
+    configureFromProperties();
   }
 
   /**
-   * Load settings from test-ebean.properties and do nothing if the properties is not found.
-   * <p>
-   * This is typically used when test-ebean.properties is put into the test class path and used
-   * to configure Ebean for running tests.
-   * </p>
+   * Load the settings from the given properties
    */
-  public void loadTestProperties() {
-    Properties properties = PropertyMap.testProperties();
-    if (!properties.isEmpty()) {
-      PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
-      loadSettings(p);
+  private void configureFromProperties() {
+    List<AutoConfigure> autoConfigures = autoConfiguration();
+    loadSettings(new PropertiesWrapper("ebean", name, properties, classLoadConfig));
+    for (AutoConfigure autoConfigure : autoConfigures) {
+      autoConfigure.postConfigure(this);
     }
+  }
+
+  /**
+   * Use a 'plugin' to provide automatic configuration. Intended for automatic testing
+   * configuration with Docker containers via ebean-test-config.
+   */
+  private List<AutoConfigure> autoConfiguration() {
+    List<AutoConfigure> list = new ArrayList<>();
+    for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
+      autoConfigure.preConfigure(this);
+      list.add(autoConfigure);
+    }
+    return list;
   }
 
   /**
@@ -2584,34 +2867,6 @@ public class ServerConfig {
    */
   public Properties getProperties() {
     return properties;
-  }
-
-  /**
-   * Return the instance to use (can be null) for the given plugin.
-   *
-   * @param properties the properties
-   * @param pluginType the type of plugin
-   * @param key        properties key
-   * @param instance   existing instance
-   */
-  protected <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
-
-    if (instance != null) {
-      return instance;
-    }
-    String classname = properties.get(key, null);
-    return createInstance(pluginType, classname);
-  }
-
-  /**
-   * Return the instance to use (can be null) for the given plugin.
-   *
-   * @param pluginType the type of plugin
-   * @param classname  the implementation class as per properties
-   */
-  @SuppressWarnings("unchecked")
-  protected <T> T createInstance(Class<T> pluginType, String classname) {
-    return classname == null ? null : (T) classLoadConfig.newInstance(classname);
   }
 
   /**
@@ -2623,6 +2878,7 @@ public class ServerConfig {
    */
   protected void loadDataSourceSettings(PropertiesWrapper p) {
     dataSourceConfig.loadSettings(p.properties, name);
+    readOnlyDataSourceConfig.loadSettings(p.properties, name);
   }
 
   /**
@@ -2644,13 +2900,15 @@ public class ServerConfig {
    */
   protected void loadSettings(PropertiesWrapper p) {
 
+    dbSchema = p.get("dbSchema", dbSchema);
+    if (dbSchema != null) {
+      migrationConfig.setDefaultDbSchema(dbSchema);
+    }
     profilingConfig.loadSettings(p, name);
     migrationConfig.loadSettings(p, name);
-
-    boolean quotedIdentifiers = p.getBoolean("allQuotedIdentifiers", allQuotedIdentifiers);
-    if (quotedIdentifiers != allQuotedIdentifiers) {
-      // potentially also set to use matching naming convention
-      setAllQuotedIdentifiers(quotedIdentifiers);
+    platformConfig.loadSettings(p);
+    if (platformConfig.isAllQuotedIdentifiers()) {
+      adjustNamingConventionForAllQuoted();
     }
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {
@@ -2671,36 +2929,37 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
-    int srid = p.getInt("geometrySRID", 0);
-    if (srid > 0) {
-      dbTypeConfig.setGeometrySRID(srid);
-    }
-
+    maxCallStack = p.getInt("maxCallStack", maxCallStack);
+    dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
+    dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
+    collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
+    enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
+    notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
+    useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
+    idGeneratorAutomatic = p.getBoolean("idGeneratorAutomatic", idGeneratorAutomatic);
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
     backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
-    currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
-    databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform", databasePlatform);
-    encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
-    encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
-    encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
-    dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
+    currentUserProvider = p.createInstance(CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
+    databasePlatform = p.createInstance(DatabasePlatform.class, "databasePlatform", databasePlatform);
+    encryptKeyManager = p.createInstance(EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
+    encryptDeployManager = p.createInstance(EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
+    encryptor = p.createInstance(Encryptor.class, "encryptor", encryptor);
+    dbEncrypt = p.createInstance(DbEncrypt.class, "dbEncrypt", dbEncrypt);
     dbOffline = p.getBoolean("dbOffline", dbOffline);
-    serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
+    serverCachePlugin = p.createInstance(ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
-    if (packages != null) {
-      String packagesProp = p.get("search.packages", p.get("packages", null));
-      packages = getSearchJarsPackages(packagesProp);
-    }
+    String packagesProp = p.get("search.packages", p.get("packages", null));
+    packages = getSearchList(packagesProp, packages);
 
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
@@ -2736,44 +2995,55 @@ public class ServerConfig {
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
-    databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
-    databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
+    defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
-    DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
-    if (dbUuid != null) {
-      dbTypeConfig.setDbUuid(dbUuid);
-    }
-    if (p.getBoolean("uuidStoreAsBinary", false)) {
-      dbTypeConfig.setDbUuid(DbUuid.BINARY);
-    }
+    uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
+    uuidStateFile = p.get("uuidStateFile", uuidStateFile);
+
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
+    defaultEnumType = p.getEnum(EnumType.class, "defaultEnumType", defaultEnumType);
+    disableLazyLoading = p.getBoolean("disableLazyLoading", disableLazyLoading);
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
-    String jsonDateTimeFormat = p.get("jsonDateTime", null);
-    if (jsonDateTimeFormat != null) {
-      jsonDateTime = JsonConfig.DateTime.valueOf(jsonDateTimeFormat);
-    } else {
-      jsonDateTime = JsonConfig.DateTime.MILLIS;
-    }
+    jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
+    jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
 
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
+    ddlExtra = p.getBoolean("ddl.extra", ddlExtra);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
+    // read tenant-configuration from config:
+    // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
+    String mode = p.get("tenant.mode");
+    if (mode != null) {
+      for (TenantMode value : TenantMode.values()) {
+        if (value.name().equalsIgnoreCase(mode)) {
+          tenantMode = value;
+          break;
+        }
+      }
+    }
+
+    currentTenantProvider = p.createInstance(CurrentTenantProvider.class, "tenant.currentTenantProvider", currentTenantProvider);
+    tenantCatalogProvider = p.createInstance(TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
+    tenantSchemaProvider = p.createInstance(TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
+    tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
     classes = getClasses(p);
+
+    String mappingsProp = p.get("mappingLocations", null);
+    mappingLocations = getSearchList(mappingsProp, mappingLocations);
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
-
-    NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention", null);
+    NamingConvention nc = properties.createInstance(NamingConvention.class, "namingConvention", null);
     return (nc != null) ? nc : namingConvention;
   }
 
@@ -2806,17 +3076,17 @@ public class ServerConfig {
     return classes;
   }
 
-  private List<String> getSearchJarsPackages(String searchPackages) {
+  private List<String> getSearchList(String searchNames, List<String> defaultValue) {
 
-    if (searchPackages != null) {
-      String[] entries = StringHelper.splitNames(searchPackages);
+    if (searchNames != null) {
+      String[] entries = StringHelper.splitNames(searchNames);
 
       List<String> hitList = new ArrayList<>(entries.length);
       Collections.addAll(hitList, entries);
 
       return hitList;
     } else {
-      return new ArrayList<>();
+      return defaultValue;
     }
   }
 
@@ -2887,6 +3157,20 @@ public class ServerConfig {
   }
 
   /**
+   * Return the enabled L2 cache regions.
+   */
+  public String getEnabledL2Regions() {
+    return enabledL2Regions;
+  }
+
+  /**
+   * Set the enabled L2 cache regions (comma delimited).
+   */
+  public void setEnabledL2Regions(String enabledL2Regions) {
+    this.enabledL2Regions = enabledL2Regions;
+  }
+
+  /**
    * Return true if L2 cache is disabled.
    */
   public boolean isDisableL2Cache() {
@@ -2898,6 +3182,44 @@ public class ServerConfig {
    */
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+  }
+
+  /**
+   * Returns if we use javax.validation.constraints.NotNull
+   */
+  public boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
+
+  /**
+   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code>
+   * with respect to generating a <code>NOT NULL</code> column.
+   * <p>
+   * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
+   * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
+   * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
+   */
+  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
+    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
+  }
+
+  /**
+   * Return true if L2 cache notification should run in the foreground.
+   */
+  public boolean isNotifyL2CacheInForeground() {
+    return notifyL2CacheInForeground;
+  }
+
+  /**
+   * Set this to true to run L2 cache notification in the foreground.
+   * <p>
+   * In general we don't want to do that as when we use a distributed cache (like Ignite, Hazelcast etc)
+   * we are making network calls and we prefer to do this in background and not impact the response time
+   * of the executing transaction.
+   * </p>
+   */
+  public void setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
+    this.notifyL2CacheInForeground = notifyL2CacheInForeground;
   }
 
   /**
@@ -2926,50 +3248,118 @@ public class ServerConfig {
   }
 
   /**
-   * Specify how UUID is stored.
+   * Create a new PlatformConfig based of the one held but with overridden properties by reading
+   * properties with the given path and prefix.
+   * <p>
+   * Typically used in Db Migration generation for many platform targets that might have different
+   * configuration for IdType, UUID, quoted identifiers etc.
+   * </p>
+   *
+   * @param propertiesPath The properties path used for loading and setting properties
+   * @param platformPrefix The prefix used for loading and setting properties
+   * @return A copy of the PlatformConfig with overridden properties
    */
-  public enum DbUuid {
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
-     */
-    AUTO_VARCHAR(true, false),
-
-    /**
-     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
-     */
-    AUTO_BINARY(true, true),
-
-    /**
-     * Store using DB VARCHAR(40).
-     */
-    VARCHAR(false, false),
-
-    /**
-     * Store using DB BINARY(16).
-     */
-    BINARY(false, true);
-
-    boolean nativeType;
-    boolean binary;
-
-    DbUuid(boolean nativeType, boolean binary) {
-      this.nativeType = nativeType;
-      this.binary = binary;
+  public PlatformConfig newPlatformConfig(String propertiesPath, String platformPrefix) {
+    if (properties == null) {
+      properties = new Properties();
     }
+    PropertiesWrapper p = new PropertiesWrapper(propertiesPath, platformPrefix, properties, classLoadConfig);
+    PlatformConfig config = new PlatformConfig(platformConfig);
+    config.loadSettings(p);
+    return config;
+  }
 
-    /**
-     * Return true if native UUID type is preferred.
-     */
-    public boolean useNativeType() {
-      return nativeType;
+  /**
+   * Add a mapping location to search for xml mapping via class path search.
+   */
+  public void addMappingLocation(String mappingLocation) {
+    if (mappingLocations == null) {
+      mappingLocations = new ArrayList<>();
     }
+    mappingLocations.add(mappingLocation);
+  }
 
-    /**
-     * Return true if BINARY(16) storage is preferred over VARCHAR(40).
-     */
-    public boolean useBinary() {
-      return binary;
-    }
+  /**
+   * Return mapping locations to search for xml mapping via class path search.
+   */
+  public List<String> getMappingLocations() {
+    return mappingLocations;
+  }
+
+  /**
+   * Set mapping locations to search for xml mapping via class path search.
+   * <p>
+   * This is only used if classes have not been explicitly specified.
+   * </p>
+   */
+  public void setMappingLocations(List<String> mappingLocations) {
+    this.mappingLocations = mappingLocations;
+  }
+
+  /**
+   * When false we need explicit <code>@GeneratedValue</code> mapping to assign
+   * Identity or Sequence generated values. When true Id properties are automatically
+   * assigned Identity or Sequence without the GeneratedValue mapping.
+   */
+  public boolean isIdGeneratorAutomatic() {
+    return idGeneratorAutomatic;
+  }
+
+  /**
+   * Set to false such that Id properties require explicit <code>@GeneratedValue</code>
+   * mapping before they are assigned Identity or Sequence generation based on platform.
+   */
+  public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
+    this.idGeneratorAutomatic = idGeneratorAutomatic;
+  }
+
+  /**
+   * Return true if query plan capture is enabled.
+   */
+  public boolean isCollectQueryPlans() {
+    return collectQueryPlans;
+  }
+
+  /**
+   * Set to true to enable query plan capture.
+   */
+  public void setCollectQueryPlans(boolean collectQueryPlans) {
+    this.collectQueryPlans = collectQueryPlans;
+  }
+
+  /**
+   * Return true if metrics should be dumped when the server is shutdown.
+   */
+  public boolean isDumpMetricsOnShutdown() {
+    return dumpMetricsOnShutdown;
+  }
+
+  /**
+   * Set to true if metrics should be dumped when the server is shutdown.
+   */
+  public void setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
+    this.dumpMetricsOnShutdown = dumpMetricsOnShutdown;
+  }
+
+  /**
+   * Return the options for dumping metrics.
+   */
+  public String getDumpMetricsOptions() {
+    return dumpMetricsOptions;
+  }
+
+  /**
+   * Include 'sql' or 'hash' in options such that they are included in the output.
+   *
+   * @param dumpMetricsOptions Example "sql,hash", "sql"
+   */
+  public void setDumpMetricsOptions(String dumpMetricsOptions) {
+    this.dumpMetricsOptions = dumpMetricsOptions;
+  }
+
+  public enum UuidVersion {
+    VERSION4,
+    VERSION1,
+    VERSION1RND
   }
 }

@@ -1,8 +1,12 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.bean.BeanCollection.ModifyListenMode;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.type.TypeReflectHelper;
+
+import java.lang.reflect.Type;
 
 /**
  * Property mapped to a List Set or Map.
@@ -12,35 +16,46 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   /**
    * The type of the many, set, list or map.
    */
-  final ManyType manyType;
+  private final ManyType manyType;
 
   ModifyListenMode modifyListenMode = ModifyListenMode.NONE;
 
   /**
    * Flag to indicate manyToMany relationship.
    */
-  boolean manyToMany;
+  private boolean manyToMany;
+
+  private boolean o2mJoinTable;
+
+  private boolean elementCollection;
 
   /**
    * Flag to indicate this is a unidirectional relationship.
    */
-  boolean unidirectional;
+  private boolean unidirectional;
 
   /**
    * Join for manyToMany intersection table.
    */
-  DeployTableJoin intersectionJoin;
+  private DeployTableJoin intersectionJoin;
 
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
    */
-  DeployTableJoin inverseJoin;
+  private DeployTableJoin inverseJoin;
 
-  String fetchOrderBy;
+  private String fetchOrderBy;
 
-  String mapKey;
+  private String mapKey;
 
-  String intersectionDraftTable;
+  private String intersectionDraftTable;
+
+  private DeployOrderColumn orderColumn;
+
+  /**
+   * Effectively the dynamically created target descriptor (that doesn't have a mapped type/class per say).
+   */
+  private BeanDescriptor<?> elementDescriptor;
 
   /**
    * Create this property.
@@ -168,6 +183,14 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   }
 
   /**
+   * Return the type of the map key (valid only when this property is a Map).
+   */
+  public Class<?> getMapKeyType() {
+    Type genericType = getField().getGenericType();
+    return TypeReflectHelper.getMapKeyType(genericType);
+  }
+
+  /**
    * Return the default mapKey when returning a Map.
    */
   public String getMapKey() {
@@ -206,4 +229,45 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   public void setIntersectionDraftTable() {
     this.intersectionDraftTable = intersectionJoin.getTable() + "_draft";
   }
+
+  public void setOrderColumn(DeployOrderColumn orderColumn) {
+    this.orderColumn = orderColumn;
+  }
+
+  public DeployOrderColumn getOrderColumn() {
+    return orderColumn;
+  }
+
+  public boolean hasOrderColumn() {
+    return orderColumn != null;
+  }
+
+  public boolean isO2mJoinTable() {
+    return o2mJoinTable;
+  }
+
+  public void setO2mJoinTable() {
+    this.o2mJoinTable = true;
+    setModifyListenMode(ModifyListenMode.ALL);
+  }
+
+  public void setElementCollection() {
+    elementCollection = true;
+    cascadeInfo.setSaveDelete(true, true);
+    setModifyListenMode(ModifyListenMode.ALL);
+  }
+
+  public boolean isElementCollection() {
+    return elementCollection;
+  }
+
+  public void setElementDescriptor(BeanDescriptor<?> elementDescriptor) {
+    this.elementDescriptor = elementDescriptor;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <A> BeanDescriptor<A> getElementDescriptor() {
+    return (BeanDescriptor<A>)elementDescriptor;
+  }
 }
+

@@ -2,24 +2,33 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.meta.MetaTimedMetric;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.m2m.Permission;
 import org.tests.model.m2m.Role;
 import org.tests.model.m2m.Tenant;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestM2mDeleteObject extends BaseTestCase {
 
   @Test
   public void test() {
 
-    Ebean.createUpdate(Permission.class, "delete from Permission").execute();
+    resetAllMetrics();
+
+    Ebean.createUpdate(Permission.class, "delete from Permission").setLabel("deleteAllPermissions").execute();
     Ebean.createUpdate(Tenant.class, "delete from Tenant").execute();
     Ebean.createUpdate(Role.class, "delete from Role").execute();
+
+    List<MetaTimedMetric> sqlMetrics = sqlMetrics();
+    assertThat(sqlMetrics).hasSize(1);
+    assertThat(sqlMetrics.get(0).getName()).isEqualTo("orm.update.deleteAllPermissions");
 
     Tenant t = new Tenant("tenant");
 

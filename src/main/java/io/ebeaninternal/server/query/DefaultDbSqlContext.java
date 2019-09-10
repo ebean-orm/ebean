@@ -26,6 +26,8 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   private final ArrayStack<String> prefixStack = new ArrayStack<>();
 
+  private final String fromForUpdate;
+
   private boolean useColumnAlias;
 
   private int columnIndex;
@@ -55,7 +57,8 @@ class DefaultDbSqlContext implements DbSqlContext {
    * Construct for SELECT clause (with column alias settings).
    */
   DefaultDbSqlContext(SqlTreeAlias alias, CQueryBuilder builder,
-                      boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+                      boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport,
+                      CQueryDraftSupport draftSupport, String fromForUpdate) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = builder.tableAliasPlaceHolder;
@@ -64,6 +67,19 @@ class DefaultDbSqlContext implements DbSqlContext {
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
+    this.fromForUpdate = fromForUpdate;
+  }
+
+  @Override
+  public boolean isIncludeSoftDelete() {
+    return alias.isIncludeSoftDelete();
+  }
+
+  @Override
+  public void appendFromForUpdate() {
+    if (fromForUpdate != null) {
+      append(" ").append(fromForUpdate);
+    }
   }
 
   @Override
@@ -85,12 +101,7 @@ class DefaultDbSqlContext implements DbSqlContext {
       return null;
     }
 
-    return encryptedProps.toArray(new BeanProperty[encryptedProps.size()]);
-  }
-
-  @Override
-  public String peekJoin() {
-    return joinStack.peek();
+    return encryptedProps.toArray(new BeanProperty[0]);
   }
 
   @Override
@@ -196,11 +207,6 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void pushSecondaryTableAlias(String alias) {
-    tableAliasStack.push(alias);
-  }
-
-  @Override
   public String getRelativePrefix(String propName) {
 
     return currentPrefix == null ? propName : currentPrefix + "." + propName;
@@ -221,12 +227,6 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public DefaultDbSqlContext append(String s) {
-    sb.append(s);
-    return this;
-  }
-
-  @Override
-  public DefaultDbSqlContext append(char s) {
     sb.append(s);
     return this;
   }
@@ -263,12 +263,22 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
+  public void appendParseSelect(String parseSelect, String columnAlias) {
+    String converted = this.alias.parse(parseSelect);
+    sb.append(COMMA);
+    sb.append(converted);
+    if (columnAlias != null) {
+      sb.append(" ").append(columnAlias);
+    } else {
+      appendColumnAlias();
+    }
+  }
+
+  @Override
   public void appendFormulaSelect(String sqlFormulaSelect) {
 
     String tableAlias = tableAliasStack.peek();
-    String converted = StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder,
-      tableAlias);
-
+    String converted = StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder, tableAlias);
     sb.append(COMMA);
     sb.append(converted);
 

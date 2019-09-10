@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.bean.ObjectGraphNode;
-import io.ebean.meta.MetaObjectGraphNodeStats;
+import io.ebean.meta.MetaOrmQueryNode;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
@@ -35,7 +35,7 @@ public class CObjectGraphNodeStatistics {
     totalBeans.add(beanCount);
   }
 
-  public MetaObjectGraphNodeStats get(boolean reset) {
+  public MetaOrmQueryNode get(boolean reset) {
     if (reset) {
       return new Snapshot(node, startTime.getAndSet(System.currentTimeMillis()), count.sumThenReset(),
         totalTime.sumThenReset(), totalBeans.sumThenReset());
@@ -44,7 +44,7 @@ public class CObjectGraphNodeStatistics {
     }
   }
 
-  private static class Snapshot implements MetaObjectGraphNodeStats {
+  private static class Snapshot implements MetaOrmQueryNode {
 
     private final ObjectGraphNode node;
     private final long startTime;

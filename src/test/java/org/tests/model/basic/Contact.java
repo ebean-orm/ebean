@@ -9,10 +9,13 @@ import io.ebean.annotation.Index;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+import javax.validation.constraints.Size;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -23,10 +26,13 @@ import java.util.List;
 @Cache(naturalKey = "email")
 public class Contact {
 
-  @Id
+  @Id @GeneratedValue
   int id;
 
+  @Size(max=127)
   String firstName;
+
+  @Size(max=127)
   String lastName;
 
   String phone;

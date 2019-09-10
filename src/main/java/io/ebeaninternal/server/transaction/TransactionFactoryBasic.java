@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.util.JdbcClose;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -52,7 +52,7 @@ class TransactionFactoryBasic extends TransactionFactory {
   }
 
   private SpiTransaction create(boolean explicit, Connection c) {
-    return manager.createTransaction(explicit, c, counter.incrementAndGet());
+    return manager.createTransaction(explicit, c);
   }
 
 }

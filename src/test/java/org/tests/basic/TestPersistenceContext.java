@@ -52,14 +52,13 @@ public class TestPersistenceContext extends BaseTestCase {
     Assert.assertTrue(oAfter != oBefore);
     Assert.assertTrue(oAfter != order);
 
-
-    Order testOrder = ResetBasicData.createOrderCustAndOrder("testPC");
-    Integer id = testOrder.getCustomer().getId();
-    Integer orderId = testOrder.getId();
-
     // start a persistence context
     Ebean.beginTransaction();
     try {
+      Order testOrder = ResetBasicData.createOrderCustAndOrder("testPC");
+      Integer id = testOrder.getCustomer().getId();
+      Integer orderId = testOrder.getId();
+
       Customer customer = Ebean.find(Customer.class)
         .setUseCache(false)
         .setId(id)

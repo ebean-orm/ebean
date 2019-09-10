@@ -23,9 +23,9 @@ public class H2Platform extends DatabasePlatform {
     this.dbEncrypt = new H2DbEncrypt();
     this.historySupport = new H2HistorySupport();
     this.nativeUuidType = true;
+    this.supportsDeleteTableAlias = true;
     this.dbDefaultValue.setNow("now()");
     this.columnAliasPrefix = null;
-
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("50200","HYT00")
@@ -46,10 +46,8 @@ public class H2Platform extends DatabasePlatform {
    * sequence values.
    */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds,
-                                                       String seqName, int batchSize) {
-
-    return new H2SequenceIdGenerator(be, ds, seqName, batchSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
+    return new H2SequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
   @Override

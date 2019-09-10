@@ -27,7 +27,7 @@ public class SqlAnywherePlatform extends DatabasePlatform {
     this.dbIdentity.setSelectLastInsertedIdTemplate("select @@IDENTITY as X");
     this.dbIdentity.setSupportsIdentity(true);
 
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit default 0"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("float(16)"));
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));

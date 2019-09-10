@@ -18,10 +18,9 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.type.DataEncryptSupport;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeArray;
+import io.ebeaninternal.server.type.ScalarTypeWrapper;
 import io.ebeaninternal.server.type.SimpleAesEncryptor;
 import io.ebeaninternal.server.type.TypeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,8 +31,6 @@ import java.sql.Types;
  * Utility object to help processing deployment information.
  */
 public class DeployUtil {
-
-  private static final Logger logger = LoggerFactory.getLogger(DeployUtil.class);
 
   /**
    * Assumes CLOB rather than LONGVARCHAR.
@@ -60,6 +57,8 @@ public class DeployUtil {
 
   private final Encryptor bytesEncryptor;
 
+  private final boolean useJavaxValidationNotNull;
+
   public DeployUtil(TypeManager typeMgr, ServerConfig serverConfig) {
 
     this.typeManager = typeMgr;
@@ -70,6 +69,7 @@ public class DeployUtil {
 
     Encryptor be = serverConfig.getEncryptor();
     this.bytesEncryptor = be != null ? be : new SimpleAesEncryptor();
+    this.useJavaxValidationNotNull = serverConfig.isUseJavaxValidationNotNull();
   }
 
   public TypeManager getTypeManager() {
@@ -87,55 +87,41 @@ public class DeployUtil {
   /**
    * Check that the EncryptKeyManager has been defined.
    */
-  public void checkEncryptKeyManagerDefined(String fullPropName) {
+  void checkEncryptKeyManagerDefined(String fullPropName) {
     if (encryptKeyManager == null) {
       String msg = "Using encryption on " + fullPropName + " but no EncryptKeyManager defined!";
       throw new PersistenceException(msg);
     }
   }
 
-  public EncryptDeploy getEncryptDeploy(TableName table, String column) {
+  EncryptDeploy getEncryptDeploy(TableName table, String column) {
     if (encryptDeployManager == null) {
       return EncryptDeploy.ANNOTATION;
     }
     return encryptDeployManager.getEncryptDeploy(table, column);
   }
 
-  public DataEncryptSupport createDataEncryptSupport(String table, String column) {
+  DataEncryptSupport createDataEncryptSupport(String table, String column) {
     return new DataEncryptSupport(encryptKeyManager, bytesEncryptor, table, column);
   }
 
   @SuppressWarnings("unchecked")
-  public void setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
+  void setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
 
     Class<?> enumType = prop.getPropertyType();
     if (!enumType.isEnum()) {
       throw new IllegalArgumentException("Class [" + enumType + "] is Not a Enum?");
     }
-    ScalarType<?> scalarType = typeManager.getScalarType(enumType);
-    if (enumOverrideDefaultMapping(enumerated, scalarType)) {
-      logger.debug("override default enum mapping for type {}", enumType);
-      scalarType = null;
-    }
-    if (scalarType == null) {
-      // look for @DbEnumValue or @EnumValue annotations etc
+    try {
       Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
       EnumType type = enumerated != null ? enumerated.value() : null;
-      scalarType = typeManager.createEnumScalarType(enumClass, type);
-    }
-    prop.setScalarType(scalarType);
-    prop.setDbType(scalarType.getJdbcType());
-  }
+      ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
+      prop.setScalarType(scalarType);
+      prop.setDbType(scalarType.getJdbcType());
 
-  /**
-   * Return true if there is an existing default mapping for the enum that needs
-   * to be overridden (for example, DayOfWeek defaults to Integer mapping 1 to 7
-   * and some might want this mapped to 'MONDAY' etc).
-   */
-  private boolean enumOverrideDefaultMapping(Enumerated enumerated, ScalarType<?> scalarType) {
-    return enumerated != null && scalarType != null
-      && enumerated.value() == EnumType.STRING
-      && scalarType.getJdbcType() != Types.VARCHAR;
+    } catch (IllegalStateException e) {
+      throw new PersistenceException("Error mapping property " + prop.getFullBeanName() + " - " + e.getMessage());
+    }
   }
 
   /**
@@ -169,19 +155,10 @@ public class DeployUtil {
     Class<?> propType = property.getPropertyType();
     try {
       ScalarType<?> scalarType = typeManager.getScalarType(propType, property.getDbType());
-      if (scalarType != null) {
+      if (scalarType != null || property.isTransient()) {
         return scalarType;
       }
-
-      String msg = property.getFullBeanName() + " has no ScalarType - type[" + propType.getName() + "]";
-      if (!property.isTransient()) {
-        throw new PersistenceException(msg);
-
-      } else {
-        // this is ok...
-        logger.trace("... transient property {}", msg);
-        return null;
-      }
+      throw new PersistenceException(property.getFullBeanName() + " has no ScalarType - type[" + propType.getName() + "]");
     } catch (IllegalArgumentException e) {
       if (property.isTransient()) {
         // expected for transient properties with unknown/non-mapped types
@@ -194,7 +171,7 @@ public class DeployUtil {
   /**
    * Map to Postgres HSTORE type (with fallback to JSON storage in VARCHAR).
    */
-  public void setDbHstore(DeployBeanProperty prop, DbHstore dbHstore) {
+  void setDbHstore(DeployBeanProperty prop, DbHstore dbHstore) {
 
     ScalarType<?> scalarType = typeManager.getHstoreScalarType();
     int dbType = scalarType.getJdbcType();
@@ -211,7 +188,7 @@ public class DeployUtil {
   /**
    * Set the DbArray type (effectively Postgres only).
    */
-  public void setDbArray(DeployBeanProperty prop, DbArray dbArray) {
+  void setDbArray(DeployBeanProperty prop, DbArray dbArray) {
 
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType());
@@ -237,22 +214,21 @@ public class DeployUtil {
   /**
    * This property is marked as a Lob object.
    */
-  public void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
+  void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
 
     int dbType = getDbJsonStorage(dbJsonType.storage());
     setDbJsonType(prop, dbType, dbJsonType.length());
   }
 
-  public void setDbJsonBType(DeployBeanProperty prop, DbJsonB dbJsonB) {
+  void setDbJsonBType(DeployBeanProperty prop, DbJsonB dbJsonB) {
     setDbJsonType(prop, DbPlatformType.JSONB, dbJsonB.length());
   }
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
 
-    Class<?> type = prop.getPropertyType();
-    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType, dbLength, prop.getGenericType());
+    ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for JSON type [" + type + "] [" + dbType + "]");
+      throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
     }
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
@@ -269,8 +245,6 @@ public class DeployUtil {
   private int getDbJsonStorage(DbJsonType dbJsonType) {
 
     switch (dbJsonType) {
-      case JSON:
-        return DbPlatformType.JSON;
       case JSONB:
         return DbPlatformType.JSONB;
       case VARCHAR:
@@ -287,25 +261,34 @@ public class DeployUtil {
   /**
    * This property is marked as a Lob object.
    */
-  public void setLobType(DeployBeanProperty prop) {
+  void setLobType(DeployBeanProperty prop) {
 
-    // is String or byte[] ? used to determine if its a CLOB or BLOB
-    Class<?> type = prop.getPropertyType();
+    ScalarType<?> scalarType = prop.getScalarType();
 
-    // this also sets the lob flag on DeployBeanProperty
-    int lobType = isClobType(type) ? dbCLOBType : dbBLOBType;
+    if (scalarType instanceof ScalarTypeWrapper) {
+      int lobType = scalarType.getJdbcType() == Types.VARCHAR ? dbCLOBType : dbBLOBType;
+      prop.setDbType(lobType);
+    } else {
+      // is String or byte[] ? used to determine if its a CLOB or BLOB
+      Class<?> type = prop.getPropertyType();
+      // this also sets the lob flag on DeployBeanProperty
+      int lobType = isClobType(type) ? dbCLOBType : dbBLOBType;
 
-    ScalarType<?> scalarType = typeManager.getScalarType(type, lobType);
-    if (scalarType == null) {
-      // this should never occur actually
-      throw new RuntimeException("No ScalarType for LOB type [" + type + "] [" + lobType + "]");
+      scalarType = typeManager.getScalarType(type, lobType);
+      if (scalarType == null) {
+        // this should never occur actually
+        throw new RuntimeException("No ScalarType for LOB type [" + type + "] [" + lobType + "]");
+      }
+      prop.setDbType(lobType);
+      prop.setScalarType(scalarType);
     }
-    prop.setDbType(lobType);
-    prop.setScalarType(scalarType);
   }
 
-  public boolean isClobType(Class<?> type) {
+  private boolean isClobType(Class<?> type) {
     return type.equals(String.class);
   }
 
+  boolean isUseJavaxValidationNotNull() {
+    return useJavaxValidationNotNull;
+  }
 }

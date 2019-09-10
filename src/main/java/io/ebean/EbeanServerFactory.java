@@ -33,6 +33,10 @@ public class EbeanServerFactory {
 
   private static SpiContainer container;
 
+  static {
+    EbeanVersion.getVersion(); // initalizes the version class and logs the version.
+  }
+
   /**
    * Initialise the container with clustering configuration.
    * <p>
@@ -65,10 +69,8 @@ public class EbeanServerFactory {
 
     EbeanServer server = createInternal(config);
 
-    if (config.isDefaultServer()) {
-      PrimaryServer.setSkip(true);
-    }
     if (config.isRegister()) {
+      PrimaryServer.setSkip(true);
       Ebean.register(server, config.isDefaultServer());
     }
 

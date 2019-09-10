@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerPlatform;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -16,10 +16,13 @@ public class MatchingNamingConventionTest {
   }
 
   @Test
-  public void getColumnFromProperty_when_allQuoted() throws Exception {
+  public void getColumnFromProperty_when_allQuoted() {
 
-    SqlServerPlatform platform = new SqlServerPlatform();
-    platform.configure(new DbTypeConfig(), true);
+    SqlServer17Platform platform = new SqlServer17Platform();
+
+    PlatformConfig config = new PlatformConfig();
+    config.setAllQuotedIdentifiers(true);
+    platform.configure(config);
 
     NamingConvention nc = new MatchingNamingConvention();
     nc.setDatabasePlatform(platform);
@@ -29,7 +32,7 @@ public class MatchingNamingConventionTest {
   }
 
   @Test
-  public void getColumnFromProperty() throws Exception {
+  public void getColumnFromProperty() {
 
     String fkCol = "bridgetab_userId";
     String col = namingConvention.getColumnFromProperty(null, fkCol);

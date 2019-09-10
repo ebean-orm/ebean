@@ -5,12 +5,17 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import java.nio.file.Path;
+import java.sql.Date;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
@@ -38,6 +43,11 @@ public class SomeNewTypesBean {
   @Column(name = "yr_mth")
   YearMonth yearMonth;
 
+  @Column(name = "month_day")
+  MonthDay monthDay;
+
+  java.sql.Date sqlDate;
+
   LocalDate localDate;
 
   LocalDateTime localDateTime;
@@ -46,6 +56,8 @@ public class SomeNewTypesBean {
 
   ZonedDateTime zonedDateTime;
 
+  LocalTime localTime;
+
   Instant instant;
 
   ZoneId zoneId;
@@ -53,6 +65,10 @@ public class SomeNewTypesBean {
   ZoneOffset zoneOffset;
 
   Path path;
+
+  Period period;
+
+  Duration duration;
 
   public Long getId() {
     return id;
@@ -102,6 +118,22 @@ public class SomeNewTypesBean {
     this.yearMonth = yearMonth;
   }
 
+  public MonthDay getMonthDay() {
+    return monthDay;
+  }
+
+  public void setMonthDay(MonthDay monthDay) {
+    this.monthDay = monthDay;
+  }
+
+  public Date getSqlDate() {
+    return sqlDate;
+  }
+
+  public void setSqlDate(Date sqlDate) {
+    this.sqlDate = sqlDate;
+  }
+
   public LocalDate getLocalDate() {
     return localDate;
   }
@@ -134,6 +166,14 @@ public class SomeNewTypesBean {
     this.zonedDateTime = zonedDateTime;
   }
 
+  public LocalTime getLocalTime() {
+    return localTime;
+  }
+
+  public void setLocalTime(LocalTime localTime) {
+    this.localTime = localTime;
+  }
+
   public Instant getInstant() {
     return instant;
   }
@@ -164,5 +204,21 @@ public class SomeNewTypesBean {
 
   public void setPath(Path path) {
     this.path = path;
+  }
+
+  public Period getPeriod() {
+    return period;
+  }
+
+  public void setPeriod(Period period) {
+    this.period = period;
+  }
+
+  public Duration getDuration() {
+    return duration;
+  }
+
+  public void setDuration(Duration duration) {
+    this.duration = duration;
   }
 }

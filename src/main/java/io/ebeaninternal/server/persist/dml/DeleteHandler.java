@@ -14,9 +14,14 @@ public class DeleteHandler extends DmlHandler {
 
   private final DeleteMeta meta;
 
-  public DeleteHandler(PersistRequestBean<?> persist, DeleteMeta meta) {
-    super(persist, meta.isEmptyStringAsNull());
+  DeleteHandler(PersistRequestBean<?> persist, DeleteMeta meta) {
+    super(persist);
     this.meta = meta;
+  }
+
+  @Override
+  public boolean isUpdate() {
+    return false;
   }
 
   /**

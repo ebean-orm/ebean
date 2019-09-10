@@ -1,16 +1,16 @@
 package org.tests.batchload;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
+import io.ebean.QueryIterator;
+import io.ebean.TransactionalTestCase;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
 
-import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,12 +18,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestSecondaryQueries extends BaseTestCase {
+public class TestSecondaryQueries extends TransactionalTestCase {
 
   @Test
   public void fetchQuery() {
-
-    ResetBasicData.reset();
 
     LoggedSqlCollector.start();
 
@@ -43,8 +41,6 @@ public class TestSecondaryQueries extends BaseTestCase {
   @Test
   public void fetchLazy() {
 
-    ResetBasicData.reset();
-
     LoggedSqlCollector.start();
 
     List<Order> orders = Ebean.find(Order.class)
@@ -58,7 +54,7 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status, t0.kcustomer_id from o_order t0 order by t0.id");
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status, t0.kcustomer_id from o_order t0");
     } else {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
     }
@@ -79,23 +75,23 @@ public class TestSecondaryQueries extends BaseTestCase {
   @Test
   public void fetchIterate() {
 
-    ResetBasicData.reset();
-
     LoggedSqlCollector.start();
 
-    Iterator<Order> orders = Ebean.find(Order.class)
-      .select("status")
-      .setMaxRows(10)
-      .setUseCache(false)
-      .findIterate();
-    while (orders.hasNext()) {
-      orders.next(); // dummy read
+    try (QueryIterator<Order> orders =
+           Ebean.find(Order.class).select("status")
+        .setMaxRows(10)
+        .setUseCache(false)
+        .findIterate()) {
+
+      while (orders.hasNext()) {
+        orders.next(); // dummy read
+      }
     }
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0 order by t0.id");
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0");
     } else {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status from o_order t0");
     }
@@ -103,8 +99,6 @@ public class TestSecondaryQueries extends BaseTestCase {
   }
   @Test
   public void testSecQueryOneToMany() {
-
-    ResetBasicData.reset();
 
     Order testOrder = ResetBasicData.createOrderCustAndOrder("testSecQry10");
     Integer custId = testOrder.getCustomer().getId();
@@ -133,8 +127,6 @@ public class TestSecondaryQueries extends BaseTestCase {
   @Test
   public void testManyToOneWithManyPlusOneToMany() {
 
-    ResetBasicData.reset();
-
     Query<Order> query = Ebean.find(Order.class)
       .select("status")
       .fetch("customer", "name, status", new FetchConfig().query())
@@ -157,7 +149,7 @@ public class TestSecondaryQueries extends BaseTestCase {
 
     String generatedSql = sqlOf(query, 2);
     //select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0 where t0.status = ? ; --bind(NEW)
-    assertEquals("select t0.id, t0.status, t0.kcustomer_id from o_order t0 where t0.status = ? ", generatedSql);
+    assertEquals("select t0.id, t0.status, t0.kcustomer_id from o_order t0 where t0.status = ?", generatedSql);
 
 
     //List<SpiQuery<?>> secondaryQueries = spiQuery.getLoggedSecondaryQueries();

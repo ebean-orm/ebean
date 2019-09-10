@@ -5,15 +5,21 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.BeanState;
 import io.ebean.CallableSql;
 import io.ebean.DocumentStore;
+import io.ebean.DtoQuery;
 import io.ebean.ExpressionFactory;
+import io.ebean.ExtendedServer;
 import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
+import io.ebean.MergeOptions;
 import io.ebean.PagedList;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.RowConsumer;
+import io.ebean.RowMapper;
+import io.ebean.ScriptRunner;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
@@ -26,7 +32,7 @@ import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.cache.ServerCacheManager;
@@ -35,10 +41,13 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetricVisitor;
+import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
@@ -47,7 +56,9 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.lang.reflect.Type;
+import java.time.Clock;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -72,13 +83,43 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void shutdownManaged() {
+  public ExtendedServer extended() {
+    return this;
+  }
 
+  @Override
+  public long clockNow() {
+    return System.currentTimeMillis();
+  }
+
+  @Override
+  public void setClock(Clock clock) {
+  }
+
+  @Override
+  public SpiLogManager log() {
+    return null;
+  }
+
+  @Override
+  public void shutdownManaged() {
+  }
+
+  @Override
+  public ScriptRunner script() {
+    return null;
+  }
+
+  @Override
+  public void truncate(String... tables) {
+  }
+
+  @Override
+  public void truncate(Class<?>... tables) {
   }
 
   @Override
   public void scopedTransactionEnter(TxScope txScope) {
-
   }
 
   @Override
@@ -127,7 +168,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public CallStack createCallStack() {
+  public CallOrigin createCallOrigin() {
     return null;
   }
 
@@ -192,6 +233,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void clearServerTransaction() {
+  }
+
+  @Override
   public SpiTransaction beginServerTransaction() {
     return null;
   }
@@ -208,7 +253,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void remoteTransactionEvent(RemoteTransactionEvent event) {
-
   }
 
   @Override
@@ -232,6 +276,18 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void merge(Object bean) {
+  }
+
+  @Override
+  public void merge(Object bean, MergeOptions options) {
+  }
+
+  @Override
+  public void merge(Object bean, MergeOptions options, Transaction transaction) {
+  }
+
+  @Override
   public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
     return null;
   }
@@ -248,12 +304,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void loadBean(LoadBeanRequest loadRequest) {
-
   }
 
   @Override
   public void loadMany(LoadManyRequest loadRequest) {
-
   }
 
   @Override
@@ -268,22 +322,22 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros) {
+  }
 
+  @Override
+  public void visitMetrics(MetricVisitor visitor) {
   }
 
   @Override
   public void loadMany(BeanCollection<?> collection, boolean onlyIds) {
-
   }
 
   @Override
   public void loadBean(EntityBeanIntercept ebi) {
-
   }
 
   @Override
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
-
   }
 
   @Override
@@ -378,7 +432,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> void sort(List<T> list, String sortByClause) {
-
   }
 
   @Override
@@ -387,13 +440,85 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer) {
+  }
+
+  @Override
+  public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
+  }
+
+  @Override
+  public <T> List<T> findDtoList(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <T> T findDtoOne(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, String sql) {
+    return null;
+  }
+
+  @Override
+  public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
+    return null;
+  }
+
+  @Override
+  public <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery) {
+    return null;
+  }
+
+  @Override
+  public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls) {
+    return null;
+  }
+
+  @Override
+  public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
+    return null;
+  }
+
+  @Override
+  public <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper) {
+    return null;
+  }
+
+  @Override
+  public <T> List<T> findListMapper(SpiSqlQuery query, RowMapper<T> mapper) {
+    return null;
+  }
+
+  @Override
+  public void findEachRow(SpiSqlQuery query, RowConsumer consumer) {
+  }
+
+  @Override
+  public SqlQuery sqlQuery(String sql) {
+    return null;
+  }
+
+  @Override
   public SqlQuery createSqlQuery(String sql) {
+    return sqlQuery(sql);
+  }
+
+  @Override
+  public SqlUpdate sqlUpdate(String sql) {
     return null;
   }
 
   @Override
   public SqlUpdate createSqlUpdate(String sql) {
-    return null;
+    return sqlUpdate(sql);
   }
 
   @Override
@@ -403,7 +528,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void register(TransactionCallback transactionCallback) throws PersistenceException {
-
   }
 
   @Override
@@ -478,32 +602,36 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void flush() {
-
   }
 
   @Override
   public void commitTransaction() {
-
   }
 
   @Override
   public void rollbackTransaction() {
-
   }
 
   @Override
   public void endTransaction() {
-
   }
 
   @Override
   public void refresh(Object bean) {
-
   }
 
   @Override
   public void refreshMany(Object bean, String propertyName) {
+  }
 
+  @Override
+  public boolean exists(Class<?> beanType, Object beanId, Transaction transaction) {
+    return false;
+  }
+
+  @Override
+  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+    return false;
   }
 
   @Override
@@ -533,12 +661,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction) {
-
   }
 
   @Override
   public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction) {
-
   }
 
   @Override
@@ -611,7 +737,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void save(Object bean) throws OptimisticLockException {
-
   }
 
   @Override
@@ -661,7 +786,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void externalModification(String tableName, boolean inserted, boolean updated, boolean deleted) {
-
   }
 
   @Override
@@ -671,37 +795,30 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void save(Object bean, Transaction transaction) throws OptimisticLockException {
-
   }
 
   @Override
   public void markAsDirty(Object bean) {
-
   }
 
   @Override
   public void update(Object bean) throws OptimisticLockException {
-
   }
 
   @Override
   public void update(Object bean, Transaction t) throws OptimisticLockException {
-
   }
 
   @Override
   public void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException {
-
   }
 
   @Override
   public void insert(Object bean) {
-
   }
 
   @Override
   public void insert(Object bean, Transaction t) {
-
   }
 
   @Override
@@ -735,18 +852,30 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public int executeNow(SpiSqlUpdate sqlUpdate) {
+    return 0;
+  }
+
+  @Override
+  public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+  }
+
+  @Override
+  public int[] executeBatch(SpiSqlUpdate defaultSqlUpdate, SpiTransaction transaction) {
+    return new int[0];
+  }
+
+  @Override
   public int execute(CallableSql callableSql, Transaction t) {
     return 0;
   }
 
   @Override
   public void execute(TxScope scope, Runnable r) {
-
   }
 
   @Override
   public void execute(Runnable r) {
-
   }
 
   @Override
@@ -821,26 +950,31 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void updateAll(Collection<?> beans) throws OptimisticLockException {
-
   }
 
   @Override
   public void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
-
   }
 
   @Override
   public void insertAll(Collection<?> beans) {
-
   }
 
   @Override
   public void insertAll(Collection<?> beans, Transaction transaction) {
-
   }
 
   @Override
   public void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query) {
+  }
 
+  @Override
+  public Set<Property> checkUniqueness(Object bean) {
+    return Collections.emptySet();
+  }
+
+  @Override
+  public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+    return Collections.emptySet();
   }
 }

@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -176,7 +179,7 @@ public final class BasicTypeConverter implements Serializable {
   /**
    * Convert the value to a UUID.
    */
-  public static UUID toUUID(Object value) {
+  public static UUID toUUID(Object value, boolean optimizedBinary) {
 
     if (value == null) {
       return null;
@@ -188,7 +191,7 @@ public final class BasicTypeConverter implements Serializable {
       return UUID.fromString((String) value);
     }
     if (value instanceof byte[]) {
-      return ScalarTypeUUIDBinary.convertFromBytes((byte[]) value);
+      return ScalarTypeUUIDBinary.convertFromBytes((byte[]) value, optimizedBinary);
     }
     return UUID.fromString(value.toString());
   }
@@ -341,6 +344,9 @@ public final class BasicTypeConverter implements Serializable {
     } else if (value instanceof String) {
       return Timestamp.valueOf((String) value);
 
+    } else if (value instanceof LocalDateTime) {
+      return Timestamp.valueOf((LocalDateTime) value);
+
     } else if (value instanceof Number) {
       return new Timestamp(((Number) value).longValue());
 
@@ -360,6 +366,9 @@ public final class BasicTypeConverter implements Serializable {
 
     } else if (value instanceof String) {
       return java.sql.Time.valueOf((String) value);
+
+    } else if (value instanceof LocalTime) {
+      return java.sql.Time.valueOf((LocalTime) value);
 
     } else {
       String m = "Unable to convert [" + value.getClass().getName() + "] into a java.sql.Date.";
@@ -389,6 +398,9 @@ public final class BasicTypeConverter implements Serializable {
 
     } else if (value instanceof Number) {
       return new java.sql.Date(((Number) value).longValue());
+
+    } else if (value instanceof LocalDate) {
+      return java.sql.Date.valueOf((LocalDate)value);
 
     } else {
       String m = "Unable to convert [" + value.getClass().getName() + "] into a java.sql.Date.";

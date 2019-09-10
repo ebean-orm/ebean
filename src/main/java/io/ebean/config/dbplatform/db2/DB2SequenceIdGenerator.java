@@ -1,14 +1,14 @@
 package io.ebean.config.dbplatform.db2;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.config.dbplatform.SequenceIdGenerator;
+import io.ebean.config.dbplatform.SequenceBatchIdGenerator;
 
 import javax.sql.DataSource;
 
 /**
  * DB2 specific sequence Id Generator.
  */
-public class DB2SequenceIdGenerator extends SequenceIdGenerator {
+public class DB2SequenceIdGenerator extends SequenceBatchIdGenerator {
 
   private final String baseSql;
   private final String unionBaseSql;

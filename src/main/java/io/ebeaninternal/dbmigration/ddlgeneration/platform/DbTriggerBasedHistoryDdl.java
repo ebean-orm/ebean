@@ -29,11 +29,11 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected String viewSuffix;
   protected String historySuffix;
 
-
-  protected String currentTimestamp = "now(6)";
   protected String sysPeriodType = "datetime(6)";
+  protected String now = "now(6)";
+  protected String sysPeriodEndValue = "now(6)";
 
-  public DbTriggerBasedHistoryDdl() {
+  DbTriggerBasedHistoryDdl() {
   }
 
   @Override
@@ -69,7 +69,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    */
   protected void updateTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
 
-    writer.applyHistory().append("-- changes: ").append(update.description()).newLine();
+    writer.applyHistoryTrigger().append("-- changes: ").append(update.description()).newLine();
 
     updateHistoryTriggers(createDbTriggerUpdate(writer, table));
   }
@@ -154,7 +154,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     String baseTableName = table.getName();
 
-    DdlBuffer apply = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistoryView();
 
     addSysPeriodColumns(apply, baseTableName, whenCreatedColumn);
     createHistoryTable(apply, table);
@@ -164,7 +164,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected void addSysPeriodColumns(DdlBuffer apply, String baseTableName, String whenCreatedColumn) throws IOException {
 
     apply.append("alter table ").append(baseTableName).append(" add column ")
-      .append(sysPeriodStart).append(" ").append(sysPeriodType).append(" default ").append(currentTimestamp).endOfStatement();
+      .append(sysPeriodStart).append(" ").append(sysPeriodType).append(" default ").append(now).endOfStatement();
     apply.append("alter table ").append(baseTableName).append(" add column ")
       .append(sysPeriodEnd).append(" ").append(sysPeriodType).endOfStatement();
 
@@ -175,7 +175,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected void createHistoryTable(DdlBuffer apply, MTable table) throws IOException {
 
-    apply.append("create table ").append(table.getName()).append(historySuffix).append("(").newLine();
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(table.getName()).append(historySuffix).append("(").newLine();
 
     Collection<MColumn> cols = table.allColumns();
     for (MColumn column : cols) {
@@ -210,19 +210,19 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
       .endOfStatement().end();
   }
 
-  /**
-   * Create or replace the with_history view with explicit columns.
-   */
-  protected void createWithHistoryView(DbTriggerUpdate update) throws IOException {
 
-    DdlBuffer apply = update.historyBuffer();
-    apply.append("create or replace view ").append(update.getBaseTable()).append(viewSuffix).append(" as select ");
-    appendColumnNames(apply, update.getColumns(), "");
-    appendSysPeriodColumns(apply, ", ");
-    apply.append(" from ").append(update.getBaseTable()).append(" union all select ");
-    appendColumnNames(apply, update.getColumns(), "");
-    appendSysPeriodColumns(apply, ", ");
-    apply.append(" from ").append(update.getHistoryTable()).endOfStatement().end();
+  /**
+   * For postgres/h2/mysql we need to drop and recreate the view. Well, we could add columns to the end of the view
+   * but otherwise we need to drop and create it.
+   */
+  protected void recreateHistoryView(DbTriggerUpdate update) throws IOException {
+
+    DdlBuffer buffer = update.dropDependencyBuffer();
+    // we need to drop the view early/first before any changes to the tables etc
+    buffer.append("drop view if exists ").append(update.getBaseTable()).append(viewSuffix).endOfStatement();
+
+    // recreate the view after all ddl modifications - the view requires ALL columns, also the historyExclude ones.
+    createWithHistoryView(update.historyViewBuffer(), update.getBaseTable());
   }
 
   protected void appendSysPeriodColumns(DdlBuffer apply, String prefix) throws IOException {
@@ -238,21 +238,20 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void dropSysPeriodColumns(DdlBuffer buffer, String baseTableName) throws IOException {
-    buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriodStart).endOfStatement();
-    buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriodEnd).endOfStatement();
+    platformDdl.alterTableDropColumn(buffer, baseTableName, sysPeriodStart);
+    platformDdl.alterTableDropColumn(buffer, baseTableName, sysPeriodEnd);
   }
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) throws IOException {
 
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriodStart).append(",").append(sysPeriodEnd).append(",");
     appendColumnNames(buffer, columns, "");
-    buffer.append(") values (OLD.").append(sysPeriodStart).append(", ").append(currentTimestamp).append(",");
+    buffer.append(") values (OLD.").append(sysPeriodStart).append(", ").append(sysPeriodEndValue).append(",");
     appendColumnNames(buffer, columns, "OLD.");
     buffer.append(");").newLine();
   }
 
-  protected void appendColumnNames(DdlBuffer buffer, List<String> columns, String columnPrefix) throws IOException {
-
+  void appendColumnNames(DdlBuffer buffer, List<String> columns, String columnPrefix) throws IOException {
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         buffer.append(", ");
@@ -265,8 +264,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   /**
    * Append a single column to the buffer if it is not null.
    */
-  protected void appendColumnName(DdlBuffer buffer, String prefix, String columnName) throws IOException {
-
+  void appendColumnName(DdlBuffer buffer, String prefix, String columnName) throws IOException {
     if (columnName != null) {
       buffer.append(prefix).append(columnName);
     }
@@ -280,8 +278,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    * the column.
    * </p>
    */
-  protected List<String> columnNamesForApply(MTable table) {
-
+  List<String> columnNamesForApply(MTable table) {
     return table.allHistoryColumns(true);
   }
 

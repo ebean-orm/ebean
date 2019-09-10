@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.rawsql;
 
-import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import io.ebeaninternal.server.querydefn.SimpleTextParser;
+import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 
 /**
  * Parses sql-select queries to try and determine the location where WHERE and
@@ -55,11 +55,7 @@ class DRawSqlParser {
 
   private Sql parse() {
 
-    if (!hasPlaceHolders()) {
-      // parse the sql for the keywords...
-      // select, from, where, having, group by, order by
-      parseSqlFindKeywords(true);
-    }
+    parseSqlFindKeywords();
 
     whereExprPos = findWhereExprPosition();
     havingExprPos = findHavingExprPosition();
@@ -169,7 +165,7 @@ class DRawSqlParser {
     }
   }
 
-  private void parseSqlFindKeywords(boolean allKeywords) {
+  private void parseSqlFindKeywords() {
 
     selectPos = textParser.findWordLower("select");
     if (selectPos == -1) {
@@ -186,10 +182,6 @@ class DRawSqlParser {
     if (fromPos == -1) {
       String msg = "Error parsing sql, can not find FROM keyword in:";
       throw new RuntimeException(msg + sql);
-    }
-
-    if (!allKeywords) {
-      return;
     }
 
     wherePos = textParser.findWordLower("where");

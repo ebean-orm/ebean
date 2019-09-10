@@ -8,26 +8,20 @@ import io.ebeaninternal.api.SpiTransactionScopeManager;
  */
 public abstract class TransactionScopeManager implements SpiTransactionScopeManager {
 
-  protected final String serverName;
-
-  public TransactionScopeManager(String serverName) {
-    this.serverName = serverName;
-  }
-
   /**
    * Register the transaction manager (for use by external transaction scopes).
    */
   public abstract void register(TransactionManager manager);
 
   /**
-   * Return the current Transaction allowing it to be inactive.
+   * Return the current Transaction from internal Ebean scope.
    */
-  public abstract SpiTransaction getMaybeInactive();
+  public abstract SpiTransaction getInScope();
 
   /**
-   * Return the current Transaction for this serverName and Thread.
+   * Return the current Transaction potentially looking in external scope (like Spring).
    */
-  public abstract SpiTransaction get();
+  public abstract SpiTransaction getActive();
 
   /**
    * Set a new Transaction for this serverName and Thread.
@@ -35,20 +29,15 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
   public abstract void set(SpiTransaction trans);
 
   /**
-   * Commit the current transaction.
+   * Clears the current Transaction from thread local scope (for implicit transactions).
    */
-  public abstract void commit();
+  public abstract void clear();
 
   /**
-   * Rollback the current transaction.
+   * Clears the current Transaction from thread local scope without any check for active
+   * transactions. Intended for use with external transactions.
    */
-  public abstract void rollback();
-
-
-  /**
-   * Rollback if required.
-   */
-  public abstract void end();
+  public abstract void clearExternal();
 
   /**
    * Replace the current transaction with this one.

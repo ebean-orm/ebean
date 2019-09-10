@@ -54,6 +54,7 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
 
   @Override
   public char[] toBeanType(Object value) {
+    if (value == null) return null;
     String s = BasicTypeConverter.toString(value);
     return s.toCharArray();
   }

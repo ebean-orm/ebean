@@ -2,15 +2,15 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
 
+import javax.persistence.PersistenceException;
+
 /**
  * Manages the transaction scoping using a Ebean thread local.
  */
 public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
 
-  public DefaultTransactionScopeManager(String serverName) {
-    super(serverName);
-  }
+  private final ThreadLocal<SpiTransaction> local = new ThreadLocal<>();
 
   @Override
   public void register(TransactionManager manager) {
@@ -18,23 +18,13 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public void commit() {
-    DefaultTransactionThreadLocal.commit(serverName);
+  public SpiTransaction getInScope() {
+    return local.get();
   }
 
   @Override
-  public void end() {
-    DefaultTransactionThreadLocal.end(serverName);
-  }
-
-  @Override
-  public SpiTransaction getMaybeInactive() {
-    return DefaultTransactionThreadLocal.get(serverName);
-  }
-
-  @Override
-  public SpiTransaction get() {
-    SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
+  public SpiTransaction getActive() {
+    SpiTransaction t = local.get();
     if (t == null || !t.isActive()) {
       return null;
     } else {
@@ -44,18 +34,36 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
   @Override
   public void replace(SpiTransaction trans) {
-    DefaultTransactionThreadLocal.replace(serverName, trans);
-  }
-
-  @Override
-  public void rollback() {
-    DefaultTransactionThreadLocal.rollback(serverName);
+    if (trans == null) {
+      throw new IllegalStateException("Setting a null transaction?");
+    }
+    local.set(trans);
   }
 
   @Override
   public void set(SpiTransaction trans) {
-    DefaultTransactionThreadLocal.set(serverName, trans);
+    if (trans == null) {
+      throw new IllegalStateException("Setting a null transaction?");
+    }
+    checkForActiveTransaction();
+    local.set(trans);
   }
 
+  @Override
+  public void clear() {
+    checkForActiveTransaction();
+    local.remove();
+  }
 
+  @Override
+  public void clearExternal() {
+    local.remove();
+  }
+
+  private void checkForActiveTransaction() {
+    SpiTransaction transaction = local.get();
+    if (transaction != null && transaction.isActive()) {
+      throw new PersistenceException("Invalid state - there is an existing Active transaction " + transaction);
+    }
+  }
 }

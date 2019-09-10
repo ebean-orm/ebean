@@ -15,7 +15,6 @@ import io.ebean.event.BeanPostLoad;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
-import io.ebean.util.CamelCaseHelper;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -25,15 +24,19 @@ import io.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
+import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.PartitionMeta;
+import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
-import io.ebeaninternal.server.idgen.UuidIdGenerator;
+import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
+import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
+import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -55,10 +58,7 @@ public class DeployBeanDescriptor<T> {
 
     @Override
     public int compare(DeployBeanProperty o1, DeployBeanProperty o2) {
-
-      int v2 = o1.getSortOrder();
-      int v1 = o2.getSortOrder();
-      return (v1 < v2 ? -1 : (v1 == v2 ? 0 : 1));
+      return Integer.compare(o2.getSortOrder(), o1.getSortOrder());
     }
   }
 
@@ -83,10 +83,16 @@ public class DeployBeanDescriptor<T> {
 
   private DeployBeanPropertyAssocOne<?> unidirectional;
 
+  private DeployBeanProperty orderColumn;
+
   /**
    * Type of Identity generation strategy used.
    */
   private IdType idType;
+
+  private Class<?> idClass;
+
+  private DeployBeanPropertyAssocOne<?> idClassProperty;
 
   /**
    * Set to true if the identity is default for the platform.
@@ -101,18 +107,24 @@ public class DeployBeanDescriptor<T> {
   private PlatformIdGenerator idGenerator;
 
   /**
+   * Set true when explicit auto generated Id.
+   */
+  private boolean idGeneratedValue;
+
+  /**
    * The database sequence name (optional).
    */
   private String sequenceName;
 
   private int sequenceInitialValue;
 
-  private int sequenceAllocationSize;
+  private int sequenceAllocationSize = 50;
 
   /**
    * Used with Identity columns but no getGeneratedKeys support.
    */
   private String selectLastInsertedId;
+  private String selectLastInsertedIdDraft;
 
   /**
    * The concurrency mode for beans of this type.
@@ -122,6 +134,8 @@ public class DeployBeanDescriptor<T> {
   private boolean updateChangesOnly;
 
   private List<IndexDefinition> indexDefinitions;
+
+  private String storageEngine;
 
   /**
    * The base database table.
@@ -167,11 +181,6 @@ public class DeployBeanDescriptor<T> {
   private BeanFindController beanFinder;
 
   /**
-   * The table joins for this bean. Server side only.
-   */
-  private final ArrayList<DeployTableJoin> tableJoinList = new ArrayList<>(2);
-
-  /**
    * Inheritance information. Server side only.
    */
   private InheritInfo inheritInfo;
@@ -181,6 +190,8 @@ public class DeployBeanDescriptor<T> {
   private ChangeLogFilter changeLogFilter;
 
   private String dbComment;
+
+  private PartitionMeta partitionMeta;
 
   /**
    * One of NONE, INDEX or EMBEDDED.
@@ -202,9 +213,12 @@ public class DeployBeanDescriptor<T> {
   private DocStoreMode docStoreUpdate;
   private DocStoreMode docStoreDelete;
 
-  private List<DeployBeanProperty> idProperties;
+  private DeployBeanProperty idProperty;
+  private TableJoin primaryKeyJoin;
 
   private short profileId;
+
+  private Object jacksonAnnotatedClass;
 
   /**
    * Construct the BeanDescriptor.
@@ -216,17 +230,46 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
+   * Set the IdClass to use.
+   */
+  public void setIdClass(Class idClass) {
+    this.idClass = idClass;
+  }
+
+  /**
+   * Return true if there is a IdClass set.
+   */
+  boolean isIdClass() {
+    return idClass != null;
+  }
+
+  /**
+   * PK is also a FK.
+   */
+  public void setPrimaryKeyJoin(TableJoin join) {
+    this.primaryKeyJoin = join;
+    this.idType = IdType.EXTERNAL;
+    this.idGeneratorName = null;
+    this.idGenerator = null;
+  }
+
+  public TableJoin getPrimaryKeyJoin() {
+    return primaryKeyJoin;
+  }
+
+  /**
    * Return the DeployBeanInfo for the given bean class.
    */
   DeployBeanInfo<?> getDeploy(Class<?> cls) {
     return manager.getDeploy(cls);
   }
 
-  /**
-   * Return true if this beanType is an abstract class.
-   */
-  public boolean isAbstract() {
-    return Modifier.isAbstract(beanType.getModifiers());
+  public void setStorageEngine(String storageEngine) {
+    this.storageEngine = storageEngine;
+  }
+
+  public String getStorageEngine() {
+    return storageEngine;
   }
 
   /**
@@ -263,6 +306,20 @@ public class DeployBeanDescriptor<T> {
 
   public String getDbComment() {
     return dbComment;
+  }
+
+  public void setPartitionMeta(PartitionMeta partitionMeta) {
+    this.partitionMeta = partitionMeta;
+  }
+
+  public PartitionMeta getPartitionMeta() {
+    if (partitionMeta != null) {
+      DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
+      if (beanProperty != null) {
+        partitionMeta.setProperty(beanProperty.getDbColumn());
+      }
+    }
+    return partitionMeta;
   }
 
   public void setDraftable() {
@@ -317,7 +374,7 @@ public class DeployBeanDescriptor<T> {
 
     DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
     beanTable.setBaseTable(baseTable);
-    beanTable.setIdProperties(propertiesId());
+    beanTable.setIdProperty(idProperty());
 
     return beanTable;
   }
@@ -401,6 +458,13 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
+   * Set that this type invalidates query caches.
+   */
+  public void setInvalidateQueryCache(String region) {
+    this.cacheOptions = CacheOptions.invalidateQueryCache(region);
+  }
+
+  /**
    * Enable L2 bean and query caching based on Cache annotation.
    */
   public void setCache(Cache cache) {
@@ -425,12 +489,24 @@ public class DeployBeanDescriptor<T> {
     return cacheOptions;
   }
 
+  DeployBeanPropertyAssocOne<?> getIdClassProperty() {
+    return idClassProperty;
+  }
+
   public DeployBeanPropertyAssocOne<?> getUnidirectional() {
     return unidirectional;
   }
 
   public void setUnidirectional(DeployBeanPropertyAssocOne<?> unidirectional) {
     this.unidirectional = unidirectional;
+  }
+
+  public void setOrderColumn(DeployBeanProperty orderColumn) {
+    this.orderColumn = orderColumn;
+  }
+
+  DeployBeanProperty getOrderColumn() {
+    return orderColumn;
   }
 
   /**
@@ -472,7 +548,7 @@ public class DeployBeanDescriptor<T> {
     if (indexDefinitions == null) {
       return null;
     } else {
-      return indexDefinitions.toArray(new IndexDefinition[indexDefinitions.size()]);
+      return indexDefinitions.toArray(new IndexDefinition[0]);
     }
   }
 
@@ -658,6 +734,15 @@ public class DeployBeanDescriptor<T> {
     }
   }
 
+  public void postAnnotations() {
+    if (idClass != null) {
+      idClassProperty = new DeployBeanPropertyAssocOne<>(this, idClass);
+      idClassProperty.setName("_idClass");
+      idClassProperty.setEmbedded();
+      idClassProperty.setNullable(false);
+    }
+  }
+
   /**
    * Add a bean property.
    */
@@ -665,32 +750,8 @@ public class DeployBeanDescriptor<T> {
     return propMap.put(prop.getName(), prop);
   }
 
-  /**
-   * Find the matching property for a given property name or dbColumn.
-   * <p>
-   * This is primarily to find imported primary key columns (ManyToOne that also match the PK).
-   * </p>
-   */
-  DeployBeanProperty findMatch(String propertyName, String dbColumn) {
-
-    DeployBeanProperty prop = propMap.get(propertyName);
-    if (prop != null) {
-      return prop;
-    }
-    if (dbColumn != null) {
-      String asCamel = CamelCaseHelper.toCamelFromUnderscore(dbColumn);
-      prop = propMap.get(asCamel);
-      if (prop != null) {
-        return prop;
-      }
-      // scan looking for dbColumn match
-      for (DeployBeanProperty property : propMap.values()) {
-        if (dbColumn.equals(property.getDbColumn())) {
-          return property;
-        }
-      }
-    }
-    return null;
+  public Collection<DeployBeanProperty> properties() {
+    return propMap.values();
   }
 
   /**
@@ -777,11 +838,16 @@ public class DeployBeanDescriptor<T> {
     return selectLastInsertedId;
   }
 
+  public String getSelectLastInsertedIdDraft() {
+    return selectLastInsertedIdDraft;
+  }
+
   /**
    * Set the SQL used to return the last inserted Id.
    */
-  public void setSelectLastInsertedId(String selectLastInsertedId) {
+  public void setSelectLastInsertedId(String selectLastInsertedId, String selectLastInsertedIdDraft) {
     this.selectLastInsertedId = selectLastInsertedId;
+    this.selectLastInsertedIdDraft = selectLastInsertedIdDraft;
   }
 
   /**
@@ -817,12 +883,40 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
+   * Return true for automatic Id generation strategy.
+   */
+  public boolean isIdGeneratedValue() {
+    return idGeneratedValue;
+  }
+
+  /**
+   * Set when GeneratedValue explicitly mapped on Id property.
+   */
+  public void setIdGeneratedValue() {
+    this.idGeneratedValue = true;
+  }
+
+  /**
    * Assign the standard UUID generator.
    */
   public void setUuidGenerator() {
     this.idType = IdType.EXTERNAL;
-    this.idGeneratorName = UuidIdGenerator.AUTO_UUID;
-    this.idGenerator = UuidIdGenerator.INSTANCE;
+    this.idGeneratorName = PlatformIdGenerator.AUTO_UUID;
+
+    switch (serverConfig.getUuidVersion()) {
+      case VERSION1:
+        this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
+        break;
+
+      case VERSION1RND:
+        this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
+        break;
+
+      case VERSION4:
+      default:
+        this.idGenerator = UuidV4IdGenerator.INSTANCE;
+        break;
+    }
   }
 
   /**
@@ -840,17 +934,6 @@ public class DeployBeanDescriptor<T> {
   @Override
   public String toString() {
     return getFullName();
-  }
-
-  /**
-   * Add a TableJoin to this type of bean. For Secondary table properties.
-   */
-  public void addTableJoin(DeployTableJoin join) {
-    tableJoinList.add(join);
-  }
-
-  List<DeployTableJoin> getTableJoins() {
-    return tableJoinList;
   }
 
   /**
@@ -895,16 +978,14 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isPrimaryKeyCompoundOrNonNumeric() {
 
-    List<DeployBeanProperty> ids = propertiesId();
-    if (ids.size() != 1) {
-      // compound key
-      return true;
+    DeployBeanProperty id = idProperty();
+    if (id == null) {
+      return false;
     }
-    DeployBeanProperty p = ids.get(0);
-    if (p instanceof DeployBeanPropertyAssocOne<?>) {
-      return ((DeployBeanPropertyAssocOne<?>) p).isCompound();
+    if (id instanceof DeployBeanPropertyAssocOne<?>) {
+      return ((DeployBeanPropertyAssocOne<?>) id).isCompound();
     } else {
-      return !p.isDbNumberType();
+      return !id.isDbNumberType();
     }
   }
 
@@ -913,37 +994,32 @@ public class DeployBeanDescriptor<T> {
    * compound). This is for the purpose of defining a sequence name.
    */
   public String getSinglePrimaryKeyColumn() {
-    List<DeployBeanProperty> ids = propertiesId();
-    if (ids.size() == 1) {
-      DeployBeanProperty p = ids.get(0);
-      if (p instanceof DeployBeanPropertyAssoc<?>) {
+    DeployBeanProperty id = idProperty();
+    if (id != null) {
+      if (id instanceof DeployBeanPropertyAssoc<?>) {
         // its a compound primary key
         return null;
       } else {
-        return p.getDbColumn();
+        return id.getDbColumn();
       }
     }
     return null;
   }
 
   /**
-   * Return the BeanProperty that make up the unique id.
-   * <p>
-   * The order of these properties can be relied on to be consistent if the bean
-   * itself doesn't change or the xml deployment order does not change.
-   * </p>
+   * Return the BeanProperty that is the Id.
    */
-  public List<DeployBeanProperty> propertiesId() {
-
-    if (idProperties == null) {
-      idProperties = new ArrayList<>(2);
-      for (DeployBeanProperty prop : propMap.values()) {
-        if (prop.isId()) {
-          idProperties.add(prop);
-        }
+  public DeployBeanProperty idProperty() {
+    if (idProperty != null) {
+      return idProperty;
+    }
+    for (DeployBeanProperty prop : propMap.values()) {
+      if (prop.isId()) {
+        idProperty = prop;
+        return idProperty;
       }
     }
-    return idProperties;
+    return null;
   }
 
   public DeployBeanPropertyAssocOne<?> findJoinToTable(String tableName) {
@@ -1128,5 +1204,50 @@ public class DeployBeanDescriptor<T> {
       namedRawSql = new HashMap<>();
     }
     namedRawSql.put(name, rawSql);
+  }
+
+  /**
+   * Parse the aggregation formula into expressions with table alias placeholders.
+   */
+  public String parse(String aggregation) {
+    return new Parser(this).parse(aggregation);
+  }
+
+  /**
+   * Parser for top level properties into EL expressions (table alias placeholders).
+   */
+  private static class Parser extends DeployPropertyParserMap {
+
+    private final DeployBeanDescriptor<?> descriptor;
+
+    Parser(DeployBeanDescriptor<?> descriptor) {
+      super(null);
+      this.descriptor = descriptor;
+    }
+
+    @Override
+    public String getDeployWord(String expression) {
+      return descriptor.getDeployWord(expression);
+    }
+  }
+
+  private String getDeployWord(String expression) {
+    if (expression.charAt(expression.length() - 1) == '(') {
+      return null;
+    }
+    // use 'current' table alias - refer BeanProperty appendSelect() for aggregation
+    DeployBeanProperty property = propMap.get(expression);
+    return (property == null) ? null : "${ta}." + property.getDbColumn();
+  }
+
+  /**
+   * Returns the jackson annotated class, if jackson is present.
+   */
+  @SuppressWarnings("unchecked")
+  Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
+    if (jacksonAnnotatedClass == null) {
+      jacksonAnnotatedClass = new DeployBeanObtainJackson(serverConfig, beanType).obtain();
+    }
+    return jacksonAnnotatedClass;
   }
 }

@@ -2,10 +2,11 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.cache.TenantAwareKey;
-import io.ebean.config.CurrentTenantProvider;
+import io.ebean.meta.MetricVisitor;
+import io.ebean.metric.CountMetric;
+import io.ebean.metric.MetricFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,9 +16,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
+
+import static io.ebean.meta.MetricType.L2;
 
 /**
  * The default cache implementation.
@@ -40,72 +41,45 @@ public class DefaultServerCache implements ServerCache {
    */
   protected final Map<Object, CacheEntry> map;
 
-  protected final LongAdder missCount = new LongAdder();
-  protected final LongAdder hitCount = new LongAdder();
-  protected final LongAdder insertCount = new LongAdder();
-  protected final LongAdder updateCount = new LongAdder();
-  protected final LongAdder removeCount = new LongAdder();
-  protected final LongAdder clearCount = new LongAdder();
-
-  protected final LongAdder evictByIdle = new LongAdder();
-  protected final LongAdder evictByTTL = new LongAdder();
-  protected final LongAdder evictByLRU = new LongAdder();
-  protected final LongAdder evictCount = new LongAdder();
-  protected final LongAdder evictMicros = new LongAdder();
+  protected final CountMetric hitCount;
+  protected final CountMetric missCount;
+  protected final CountMetric putCount;
+  protected final CountMetric removeCount;
+  protected final CountMetric clearCount;
+  protected final CountMetric evictCount;
 
   protected final String name;
+  protected final String shortName;
 
-  protected int maxSize;
+  private int maxSize;
 
-  protected final int trimFrequency;
+  private final int trimFrequency;
 
-  protected int maxIdleSecs;
+  private int maxIdleSecs;
 
-  protected int maxSecsToLive;
+  private int maxSecsToLive;
 
-  protected TenantAwareKey tenantAwareKey;
+  private TenantAwareKey tenantAwareKey;
 
-  /**
-   * Construct using a ConcurrentHashMap and cache options.
-   */
-  public DefaultServerCache(String name, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
-    this(name, new ConcurrentHashMap<>(), tenantProvider, options);
-  }
+  public DefaultServerCache(DefaultServerCacheConfig config) {
+    this.name = config.getName();
+    this.shortName = config.getShortName();
+    this.map = config.getMap();
+    this.maxSize = config.getMaxSize();
+    this.tenantAwareKey = new TenantAwareKey(config.getTenantProvider());
+    this.maxIdleSecs = config.getMaxIdleSecs();
+    this.maxSecsToLive = config.getMaxSecsToLive();
+    this.trimFrequency = config.determineTrimFrequency();
 
-  /**
-   * Construct passing in name, map and base eviction controls as ServerCacheOptions.
-   */
-  public DefaultServerCache(String name, Map<Object, CacheEntry> map, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
-    this(name, map, tenantProvider, options.getMaxSize(), options.getMaxIdleSecs(), options.getMaxSecsToLive(), options.getTrimFrequency());
-  }
+    MetricFactory factory = MetricFactory.get();
 
-  /**
-   * Construct passing in name, map and base eviction controls.
-   */
-  public DefaultServerCache(String name, Map<Object, CacheEntry> map, CurrentTenantProvider tenantProvider, int maxSize, int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
-    this.name = name;
-    this.map = map;
-    this.maxSize = maxSize;
-    this.tenantAwareKey = new TenantAwareKey(tenantProvider);
-    this.maxIdleSecs = maxIdleSecs;
-    this.maxSecsToLive = maxSecsToLive;
-    this.trimFrequency = determineTrim(maxIdleSecs, maxSecsToLive, trimFrequency);
-  }
-
-  /**
-   * Determine a good trimFrequency as half of maxIdleSecs (or maxSecsToLive).
-   */
-  int determineTrim(int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
-    if (trimFrequency > 0) {
-      return trimFrequency;
-    }
-    if (maxIdleSecs > 0) {
-      return maxIdleSecs / 2 - 1;
-    }
-    if (maxSecsToLive > 0) {
-      return maxSecsToLive / 2 - 1;
-    }
-    return 0;
+    String prefix = "l2n.";
+    this.hitCount = factory.createCountMetric(L2, prefix + shortName + ".hit");
+    this.missCount = factory.createCountMetric(L2, prefix + shortName + ".miss");
+    this.putCount = factory.createCountMetric(L2, prefix + shortName + ".put");
+    this.removeCount = factory.createCountMetric(L2, prefix + shortName + ".remove");
+    this.clearCount = factory.createCountMetric(L2, prefix + shortName + ".clear");
+    this.evictCount = factory.createCountMetric(L2, prefix + shortName + ".evict");
   }
 
   public void periodicTrim(BackgroundExecutor executor) {
@@ -118,53 +92,52 @@ public class DefaultServerCache implements ServerCache {
   }
 
   @Override
+  public void visit(MetricVisitor visitor) {
+    hitCount.visit(visitor);
+    missCount.visit(visitor);
+    putCount.visit(visitor);
+    removeCount.visit(visitor);
+    clearCount.visit(visitor);
+    evictCount.visit(visitor);
+  }
+
+  @Override
   public ServerCacheStatistics getStatistics(boolean reset) {
 
     ServerCacheStatistics cacheStats = new ServerCacheStatistics();
     cacheStats.setCacheName(name);
     cacheStats.setMaxSize(maxSize);
 
-    // these counters won't necessarily be consistent with
-    // respect to each other as activity can occur while
-    // they are being calculated here but they should be good enough
-    // and we don't want to reduce concurrent use to make them consistent
-    long clear = reset ? clearCount.sumThenReset() : clearCount.sum();
-    long remove = reset ? removeCount.sumThenReset() : removeCount.sum();
-    long update = reset ? updateCount.sumThenReset() : updateCount.sum();
-    long insert = reset ? insertCount.sumThenReset() : insertCount.sum();
-    long miss = reset ? missCount.sumThenReset() : missCount.sum();
-    long hit = reset ? hitCount.sumThenReset() : hitCount.sum();
-
-    long evict = reset ? evictCount.sumThenReset() : evictCount.sum();
-    long evictTime = reset ? evictMicros.sumThenReset() : evictMicros.sum();
-    long evictIdle = reset ? evictByIdle.sumThenReset() : evictByIdle.sum();
-    long evictTTL = reset ? evictByTTL.sumThenReset() : evictByTTL.sum();
-    long evictLRU = reset ? evictByLRU.sumThenReset() : evictByLRU.sum();
-
-    int size = size();
-
-    cacheStats.setSize(size);
-    cacheStats.setHitCount(hit);
-    cacheStats.setMissCount(miss);
-    cacheStats.setInsertCount(insert);
-    cacheStats.setUpdateCount(update);
-    cacheStats.setRemoveCount(remove);
-    cacheStats.setClearCount(clear);
-
-    cacheStats.setEvictionRunCount(evict);
-    cacheStats.setEvictionRunMicros(evictTime);
-    cacheStats.setEvictByIdle(evictIdle);
-    cacheStats.setEvictByTTL(evictTTL);
-    cacheStats.setEvictByLRU(evictLRU);
+    cacheStats.setSize(size());
+    cacheStats.setHitCount(hitCount.get(reset));
+    cacheStats.setMissCount(missCount.get(reset));
+    cacheStats.setPutCount(putCount.get(reset));
+    cacheStats.setRemoveCount(removeCount.get(reset));
+    cacheStats.setClearCount(clearCount.get(reset));
+    cacheStats.setEvictCount(evictCount.get(reset));
 
     return cacheStats;
+  }
+
+  /**
+   * Return the count of get hits.
+   */
+  public long getHitCount() {
+    return hitCount.get(false);
+  }
+
+  /**
+   * Return the count of get misses.
+   */
+  public long getMissCount() {
+    return missCount.get(false);
   }
 
   @Override
   public int getHitRatio() {
 
-    long mc = missCount.sum();
-    long hc = hitCount.sum();
+    long mc = missCount.get(false);
+    long hc = hitCount.get(false);
 
     long totalCount = hc + mc;
     if (totalCount == 0) {
@@ -181,6 +154,10 @@ public class DefaultServerCache implements ServerCache {
     return name;
   }
 
+  public String getShortName() {
+    return shortName;
+  }
+
   /**
    * Clear the cache.
    */
@@ -193,7 +170,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Return the tenant aware key.
    */
-  private Object key(Object id) {
+  protected Object key(Object id) {
     return tenantAwareKey.key(id);
   }
 
@@ -203,17 +180,28 @@ public class DefaultServerCache implements ServerCache {
   @Override
   public Object get(Object id) {
 
-    CacheEntry entry = map.get(key(id));
+    CacheEntry entry = getCacheEntry(id);
     if (entry == null) {
       missCount.increment();
       return null;
-
     } else {
-      // Important that hitCount.increment() MUST be low latency under concurrent
-      // use hence must use LongAdder or better here
       hitCount.increment();
-      return entry.getValue();
+      return unwrapEntry(entry);
     }
+  }
+
+  /**
+   * Unwrap the cache entry - override for query cache to unwrap to the query result.
+   */
+  protected Object unwrapEntry(CacheEntry entry) {
+    return entry.getValue();
+  }
+
+  /**
+   * Get the cache entry - override for query cache to validate dependent tables.
+   */
+  protected CacheEntry getCacheEntry(Object id) {
+    return map.get(key(id));
   }
 
   @Override
@@ -226,14 +214,9 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public void put(Object id, Object value) {
-
     Object key = key(id);
-    CacheEntry entry = map.put(key, new CacheEntry(key, value));
-    if (entry == null) {
-      insertCount.increment();
-    } else {
-      updateCount.increment();
-    }
+    map.put(key, new CacheEntry(key, value));
+    putCount.increment();
   }
 
   /**
@@ -241,7 +224,6 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public void remove(Object id) {
-
     CacheEntry entry = map.remove(key(id));
     if (entry != null) {
       removeCount.increment();
@@ -291,7 +273,7 @@ public class DefaultServerCache implements ServerCache {
 
     List<CacheEntry> activeList = new ArrayList<>(map.size());
 
-    long idleExpireNano =  startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
+    long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
     long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
 
     Iterator<CacheEntry> it = map.values().iterator();
@@ -323,17 +305,12 @@ public class DefaultServerCache implements ServerCache {
       }
     }
 
-    long exeNanos = System.nanoTime() - startNanos;
-    long exeMicros = TimeUnit.MICROSECONDS.convert(exeNanos, TimeUnit.NANOSECONDS);
-
-    // increment the eviction statistics
-    evictMicros.add(exeMicros);
-    evictCount.increment();
-    evictByIdle.add(trimmedByIdle);
-    evictByTTL.add(trimmedByTTL);
-    evictByLRU.add(trimmedByLRU);
+    evictCount.add(trimmedByIdle);
+    evictCount.add(trimmedByTTL);
+    evictCount.add(trimmedByLRU);
 
     if (logger.isTraceEnabled()) {
+      long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
       logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
         , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
     }

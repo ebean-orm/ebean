@@ -3,6 +3,7 @@ package org.tests.model.basic.xtra;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -11,8 +12,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
   private void init() {
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
       String sql;
       SqlUpdate delete;
 
@@ -48,9 +48,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
       Ebean.save(extendedParent);
 
-      Ebean.commitTransaction();
-    } finally {
-      Ebean.endTransaction();
+      txn.commit();
     }
   }
 
@@ -59,15 +57,12 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
     init();
 
-    Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
       EdParent parent = Ebean.find(EdParent.class).where().eq("name", "MyComputer").findOne();
       // // Works only if the following statement is included
       // int x = parent.getChildren().size();
       Ebean.delete(parent);
-      Ebean.commitTransaction();
-    } finally {
-      Ebean.endTransaction();
+      txn.commit();
     }
   }
 

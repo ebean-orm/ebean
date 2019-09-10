@@ -30,9 +30,9 @@ import java.util.Map;
  *     Expr.or(Expr.eq("status", Order.Status.NEW),
  *             Expr.gt("orderDate", lastWeek));
  *
- * Query<Order> query = Ebean.createQuery(Order.class);
- * query.where().add(newOrLastWeek);
- * List<Order> list = query.findList();
+ * List<Order> list = DB.find(Order.class)
+ *   .where().add(newOrLastWeek)
+ *   .findList();
  * ...
  * }</pre>
  *
@@ -123,6 +123,11 @@ public interface ExpressionFactory {
   Expression eq(String propertyName, Object value);
 
   /**
+   * Equal To or Null - property equal to the given value or null.
+   */
+  Expression eqOrNull(String propertyName, Object value);
+
+  /**
    * Not Equal To - property not equal to the given value.
    */
   Expression ne(String propertyName, Object value);
@@ -134,9 +139,47 @@ public interface ExpressionFactory {
   Expression ieq(String propertyName, String value);
 
   /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  Expression ine(String propertyName, String value);
+
+  /**
    * Case Insensitive Equal To that allows for named parameter use.
    */
   Expression ieqObject(String propertyName, Object value);
+
+  /**
+   * Case Insensitive Not Equal To that allows for named parameter use.
+   */
+  Expression ineObject(String propertyName, Object value);
+
+  /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  Expression inRange(String propertyName, Object value1, Object value2);
+
+  /**
+   * Value in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .startDate.inRangeWith(endDate, now)
+   *
+   *    // which equates to
+   *    startDate <= now and (endDate > now or endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   * The most common use of this could be called "effective dating" where 2 date or
+   * timestamp columns represent the date range in which
+   */
+  Expression inRangeWith(String lowProperty, String highProperty, Object value);
 
   /**
    * Between - property between the two given values.
@@ -149,6 +192,14 @@ public interface ExpressionFactory {
   Expression betweenProperties(String lowProperty, String highProperty, Object value);
 
   /**
+   * Greater Than Or Null - property greater than the given value or null.
+   * <p>
+   * A convenient expression combining GT and Is Null.  Most often useful for range
+   * expressions where the top range value is nullable.
+   */
+  Expression gtOrNull(String propertyName, Object value);
+
+  /**
    * Greater Than - property greater than the given value.
    */
   Expression gt(String propertyName, Object value);
@@ -158,6 +209,14 @@ public interface ExpressionFactory {
    * value.
    */
   Expression ge(String propertyName, Object value);
+
+  /**
+   * Less Than or Null - property less than the given value or null.
+   * <p>
+   * A convenient expression combining LT and Is Null.  Most often useful for range
+   * expressions where the bottom range value is nullable.
+   */
+  Expression ltOrNull(String propertyName, Object value);
 
   /**
    * Less Than - property less than the given value.
@@ -267,6 +326,41 @@ public interface ExpressionFactory {
   Expression in(String propertyName, Collection<?> values);
 
   /**
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   * <p>
+   * Without this we typically need to code an <code>if</code> block to only add
+   * the IN predicate if the collection is not empty like:
+   * </p>
+   *
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   if (ids != null && !ids.isEmpty()) {
+   *     query.where().in("customer.id", ids);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .inOrEmpty("customer.id", ids)
+   *     .findList();
+   *
+   * }</pre>
+   */
+  Expression inOrEmpty(String propertyName, Collection<?> values);
+
+  /**
    * Not In - property has a value in the array of values.
    */
   Expression notIn(String propertyName, Object[] values);
@@ -326,6 +420,30 @@ public interface ExpressionFactory {
    * @param propertyMap a map keyed by property names.
    */
   Expression allEq(Map<String, Object> propertyMap);
+
+  /**
+   * Add expression for ANY of the given bit flags to be set.
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  Expression bitwiseAny(String propertyName, long flags);
+
+  /**
+   * Add expression for ALL of the given bit flags to be set.
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  Expression bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add bitwise AND expression of the given bit flags to compare with the match/mask.
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  Expression bitwiseAnd(String propertyName, long flags, long match);
 
   /**
    * Add raw expression with a single parameter.
@@ -418,4 +536,12 @@ public interface ExpressionFactory {
    */
   <T> Junction<T> junction(Junction.Type type, Query<T> query, ExpressionList<T> parent);
 
+  /**
+   * Add the expressions to the given expression list.
+   *
+   * @param where       The expression list to add the expressions to
+   * @param expressions The expressions that are parsed
+   * @param params      Bind parameters to match ? or ?1 bind positions.
+   */
+  <T> void where(ExpressionList<T> where, String expressions, Object[] params);
 }

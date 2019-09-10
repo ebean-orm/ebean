@@ -1,6 +1,11 @@
 package io.ebean;
 
-import io.ebean.config.*;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.ServerConfig;
+import io.ebean.config.TenantCatalogProvider;
+import io.ebean.config.TenantDataSourceProvider;
+import io.ebean.config.TenantMode;
+import io.ebean.config.TenantSchemaProvider;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.Test;
@@ -27,7 +32,6 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     ServerConfig config = new ServerConfig();
     config.setName("multiTenantDb");
     config.loadFromProperties();
-    config.loadTestProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
 
@@ -62,7 +66,6 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     ServerConfig config = new ServerConfig();
     config.setName("h2");
     config.loadFromProperties();
-    config.loadTestProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
 
@@ -92,7 +95,6 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     ServerConfig config = new ServerConfig();
     config.setName("h2");
     config.loadFromProperties();
-    config.loadTestProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
 

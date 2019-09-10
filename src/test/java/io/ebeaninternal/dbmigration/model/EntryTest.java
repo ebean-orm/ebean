@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
-import javax.annotation.Nonnull;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;

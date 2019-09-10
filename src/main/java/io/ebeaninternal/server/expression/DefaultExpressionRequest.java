@@ -2,10 +2,10 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.server.core.DbExpressionHandler;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.DeployParser;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
 

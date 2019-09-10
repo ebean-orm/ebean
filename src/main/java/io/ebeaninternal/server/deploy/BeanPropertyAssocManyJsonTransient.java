@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.text.json.ReadJson;
+import io.ebeaninternal.api.json.SpiJsonReader;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -14,12 +14,12 @@ import java.util.LinkedHashMap;
 /**
  * Helper used to read transient many properties using Jackson ObjectMapper.
  */
-public class BeanPropertyAssocManyJsonTransient {
+class BeanPropertyAssocManyJsonTransient {
 
   /**
    * Use Jackson ObjectMapper to read the transient 'many' property.
    */
-  public void jsonReadUsingObjectMapper(BeanPropertyAssocMany<?> many, ReadJson readJson, EntityBean parentBean) throws IOException {
+  void jsonReadUsingObjectMapper(BeanPropertyAssocMany<?> many, SpiJsonReader readJson, EntityBean parentBean) throws IOException {
 
     ObjectMapper mapper = readJson.getObjectMapper();
 

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Utility to help isSame methods.
@@ -12,14 +13,14 @@ public class Same {
    * Return true if both values are null or both an not null.
    */
   public static boolean sameByNull(Object v1, Object v2) {
-    return v1 == null ? v2 == null : v2 != null;
+    return (v1 == null) == (v2 == null);
   }
 
   /**
    * Null safe equals check.
    */
   public static boolean sameByValue(Object v1, Object v2) {
-    return v1 == null ? v2 == null : v1.equals(v2);
+    return Objects.equals(v1, v2);
   }
 
   /**

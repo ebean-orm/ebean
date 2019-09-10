@@ -6,7 +6,6 @@ import org.avaje.classpath.scanner.ClassPathScannerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
 
 /**
  * Utility to finds and return the list of ClassPathScanner services.
@@ -19,13 +18,9 @@ public class ClassPathScanners {
   public static List<ClassPathScanner> find(ServerConfig serverConfig) {
 
     List<ClassPathScanner> scanners = new ArrayList<>();
-
-    ServiceLoader<ClassPathScannerFactory> scannerLoader = serverConfig.serviceLoad(ClassPathScannerFactory.class);
-    for (ClassPathScannerFactory factory : scannerLoader) {
-      ClassPathScanner scanner = factory.createScanner(serverConfig.getClassLoadConfig().getClassLoader());
-      scanners.add(scanner);
+    for (ClassPathScannerFactory factory : serverConfig.serviceLoad(ClassPathScannerFactory.class)) {
+      scanners.add(factory.createScanner(serverConfig.getClassLoadConfig().getClassLoader()));
     }
-
     return scanners;
   }
 }

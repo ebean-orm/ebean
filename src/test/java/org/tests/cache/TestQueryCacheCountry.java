@@ -63,6 +63,60 @@ public class TestQueryCacheCountry extends BaseTestCase {
   }
 
   @Test
+  public void rawExpression() {
+
+    ResetBasicData.reset();
+    awaitL2Cache();
+    clearCache();
+
+    List<Country> countryList0 = Ebean.find(Country.class)
+      .setUseQueryCache(true)
+      .where().raw("code = ?", "NZ")
+      .findList();
+
+    assertThat(countryList0.get(0).getName()).isEqualTo("New Zealand");
+
+    List<Country> countryList1 = Ebean.find(Country.class)
+      .setUseQueryCache(true)
+      .where().raw("code = ?", "AU")
+      .findList();
+
+    assertThat(countryList1.get(0).getName()).isEqualTo("Australia");
+
+    ServerCacheStatistics queryStats1 = queryCache.getStatistics(false);
+    assertEquals(2, queryStats1.getMissCount());
+    assertEquals(2, queryStats1.getSize());
+    assertEquals(0, queryStats1.getHitCount()); // no hits yet
+
+
+    // we get a hit this time
+    List<Country> countryList2 = Ebean.find(Country.class)
+      .setUseQueryCache(true)
+      .where().raw("code = ?", "NZ")
+      .findList();
+
+    assertThat(countryList2.get(0).getName()).isEqualTo("New Zealand");
+
+    ServerCacheStatistics queryStats2 = queryCache.getStatistics(false);
+    assertEquals(2, queryStats2.getMissCount());
+    assertEquals(2, queryStats2.getSize());
+    assertEquals(1, queryStats2.getHitCount()); // got a hit
+
+    // we get a hit on AU
+    List<Country> countryList3 = Ebean.find(Country.class)
+      .setUseQueryCache(true)
+      .where().raw("code = ?", "AU")
+      .findList();
+
+    assertThat(countryList3.get(0).getName()).isEqualTo("Australia");
+
+    ServerCacheStatistics queryStats3 = queryCache.getStatistics(false);
+    assertEquals(2, queryStats3.getMissCount());
+    assertEquals(2, queryStats3.getSize());
+    assertEquals(2, queryStats3.getHitCount()); // got another hit
+  }
+
+  @Test
   public void test() {
 
     ResetBasicData.reset();
@@ -104,6 +158,10 @@ public class TestQueryCacheCountry extends BaseTestCase {
       .findList();
 
     assertNotSame(countryList2, countryList0);
+
+    nz = Ebean.find(Country.class, "NZ");
+    nz.setName("New Zealand");
+    Ebean.save(nz);
   }
 
 }

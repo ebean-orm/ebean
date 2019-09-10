@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.Model;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbHstore;
 import io.ebean.annotation.DbJson;
@@ -68,13 +69,14 @@ public class DeployCreateProperties {
       // ignore Ebean internal fields
       return true;
     }
-    if (fieldName.startsWith("ajc$instance$")) {
-      // ignore AspectJ internal fields
-      return true;
-    }
+    // ignore AspectJ internal fields
+    return fieldName.startsWith("ajc$instance$");
+  }
 
-    // we are interested in this field
-    return false;
+  private boolean ignoreField(Field field) {
+    return Modifier.isStatic(field.getModifiers())
+      || Modifier.isTransient(field.getModifiers())
+      || ignoreFieldByName(field.getName());
   }
 
   /**
@@ -83,6 +85,10 @@ public class DeployCreateProperties {
    */
   private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level) {
 
+    if (beanType.equals(Model.class)) {
+      // ignore all fields on model (_$dbName)
+      return;
+    }
     boolean scalaObject = desc.isScalaObject();
 
     try {
@@ -92,16 +98,7 @@ public class DeployCreateProperties {
       for (int i = 0; i < fields.length; i++) {
 
         Field field = fields[i];
-        if (Modifier.isStatic(field.getModifiers())) {
-          // not interested in static fields
-          logger.trace("Skipping static field {} in {}", field.getName(), beanType.getName());
-
-        } else if (Modifier.isTransient(field.getModifiers())) {
-          // not interested in transient fields
-          logger.trace("Skipping transient field {} in {}", field.getName(), beanType.getName());
-
-        } else if (!ignoreFieldByName(field.getName())) {
-
+        if (!ignoreField(field)) {
           String fieldName = getFieldName(field, beanType);
           String initFieldName = initCap(fieldName);
 
@@ -202,7 +199,7 @@ public class DeployCreateProperties {
     return null;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
 
     try {
@@ -213,11 +210,10 @@ public class DeployCreateProperties {
     } catch (NullPointerException e) {
       logger.debug("expected non-scalar type {}", e.getMessage());
     }
-    // TODO: Handle Collection of CompoundType and Embedded Type
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();
@@ -317,9 +313,16 @@ public class DeployCreateProperties {
 
       Type[] typeArgs = ptype.getActualTypeArguments();
       if (typeArgs.length == 1) {
-        // probably a Set or List
+        // expecting set or list
         if (typeArgs[0] instanceof Class<?>) {
           return (Class<?>) typeArgs[0];
+        }
+        if (typeArgs[0] instanceof WildcardType) {
+          final Type[] upperBounds = ((WildcardType) typeArgs[0]).getUpperBounds();
+          if (upperBounds.length == 1 && upperBounds[0] instanceof Class<?>) {
+            // kotlin generated wildcard type
+            return (Class<?>) upperBounds[0];
+          }
         }
         // throw new RuntimeException("Unexpected Parameterised Type? "+typeArgs[0]);
         return null;

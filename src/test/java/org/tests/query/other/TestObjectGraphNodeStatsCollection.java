@@ -3,16 +3,17 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaInfoManager;
-import io.ebean.meta.MetaObjectGraphNodeStats;
-import io.ebean.meta.MetaQueryPlanStatistic;
+import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaOrmQueryNode;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -30,19 +31,19 @@ public class TestObjectGraphNodeStatsCollection extends BaseTestCase {
     server.find(Order.class).findCount();
 
     infoManager.collectNodeStatistics(true);
-    infoManager.collectQueryPlanStatistics(true);
+    infoManager.resetAllMetrics();
 
     runFindOrderQuery(server);
     runFindCustomerQuery(server);
 
-    List<MetaObjectGraphNodeStats> nodeStatistics = infoManager.collectNodeStatistics(true);
-    for (MetaObjectGraphNodeStats stat : nodeStatistics) {
-      stat.toString();
+    List<MetaOrmQueryNode> nodeStatistics = infoManager.collectNodeStatistics(true);
+    for (MetaOrmQueryNode stat : nodeStatistics) {
+      System.out.println(stat);
     }
 
-    List<MetaQueryPlanStatistic> planStatistics = infoManager.collectQueryPlanStatistics(true);
-    for (MetaQueryPlanStatistic planStatistic : planStatistics) {
-      planStatistic.getSql();
+    BasicMetricVisitor basic = infoManager.visitBasic();
+    for (MetaOrmQueryMetric queryMetric : basic.getOrmQueryMetrics()) {
+      System.out.println(queryMetric);
     }
 
   }

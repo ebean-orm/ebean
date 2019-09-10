@@ -28,9 +28,17 @@ public class DbTriggerUpdate {
   /**
    * Return the appropriate buffer for the current mode.
    */
-  public DdlBuffer historyBuffer() {
-    return writer.applyHistory();
+  public DdlBuffer historyViewBuffer() {
+    return writer.applyHistoryView();
   }
+
+  /**
+   * Return the appropriate buffer for the current mode.
+   */
+  public DdlBuffer historyTriggerBuffer() {
+    return writer.applyHistoryTrigger();
+  }
+
 
   /**
    * Return the appropriate drop dependency buffer for the current mode.

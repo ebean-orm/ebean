@@ -1,13 +1,11 @@
 package io.ebeaninternal.server.persist.dml;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.persist.DmlUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -16,12 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Insert bean handler.
  */
 public class InsertHandler extends DmlHandler {
-
-  private static final Logger logger = LoggerFactory.getLogger(InsertHandler.class);
 
   /**
    * The associated InsertMeta data.
@@ -42,15 +40,20 @@ public class InsertHandler extends DmlHandler {
    * A SQL Select used to fetch back the Id where generatedKeys is not
    * supported.
    */
-  private String selectLastInsertedId;
+  private boolean useSelectLastInsertedId;
 
   /**
    * Create to handle the insert execution.
    */
   public InsertHandler(PersistRequestBean<?> persist, InsertMeta meta) {
-    super(persist, meta.isEmptyStringToNull());
+    super(persist);
     this.meta = meta;
     this.concatinatedKey = meta.isConcatenatedKey();
+  }
+
+  @Override
+  public boolean isUpdate() {
+    return false;
   }
 
   /**
@@ -64,7 +67,7 @@ public class InsertHandler extends DmlHandler {
 
     Object idValue = desc.getId(bean);
 
-    boolean withId = !DmlUtil.isNullOrZero(idValue);
+    boolean withId = !isNullOrZero(idValue);
 
     // check to see if we are going to use generated keys
     if (!withId) {
@@ -72,13 +75,12 @@ public class InsertHandler extends DmlHandler {
         // expecting a concatenated key that can
         // be built from supplied AssocOne beans
         withId = meta.deriveConcatenatedId(persistRequest);
-
       } else if (meta.supportsGetGeneratedKeys()) {
         // Identity with getGeneratedKeys
         useGeneratedKeys = true;
       } else {
         // use a query to get the last inserted id
-        selectLastInsertedId = meta.getSelectLastInsertedId();
+        useSelectLastInsertedId = meta.supportsSelectLastInsertedId();
       }
     }
 
@@ -95,7 +97,9 @@ public class InsertHandler extends DmlHandler {
     }
     dataBind = bind(pstmt);
     meta.bind(this, bean, withId, persistRequest.isPublish());
-
+    if (persistRequest.isBatched()) {
+      batchedPstmt.registerInputStreams(dataBind.getInputStreams());
+    }
     logSql(sql);
   }
 
@@ -103,7 +107,7 @@ public class InsertHandler extends DmlHandler {
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   @Override
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean useGeneratedKeys) throws SQLException {
+  PreparedStatement getPstmt(SpiTransaction t, String sql, boolean useGeneratedKeys) throws SQLException {
     Connection conn = t.getInternalConnection();
     if (useGeneratedKeys) {
       return conn.prepareStatement(sql, meta.getIdentityDbColumns());
@@ -114,8 +118,7 @@ public class InsertHandler extends DmlHandler {
   }
 
   /**
-   * Execute the insert in a normal non batch fashion. Additionally using
-   * getGeneratedKeys if required.
+   * Execute non batched insert additionally using getGeneratedKeys if required.
    */
   @Override
   public int execute() throws SQLException, OptimisticLockException {
@@ -124,7 +127,7 @@ public class InsertHandler extends DmlHandler {
       // get the auto-increment value back and set into the bean
       getGeneratedKeys();
 
-    } else if (selectLastInsertedId != null) {
+    } else if (useSelectLastInsertedId) {
       // fetch back the Id using a query
       fetchGeneratedKeyUsingSelect();
     }
@@ -142,12 +145,7 @@ public class InsertHandler extends DmlHandler {
     try {
       setGeneratedKey(rset);
     } finally {
-      try {
-        rset.close();
-      } catch (SQLException ex) {
-        String msg = "Error closing rset for returning generatedKeys?";
-        logger.warn(msg, ex);
-      }
+      JdbcClose.close(rset);
     }
   }
 
@@ -169,29 +167,15 @@ public class InsertHandler extends DmlHandler {
    */
   private void fetchGeneratedKeyUsingSelect() throws SQLException {
 
-    Connection conn = transaction.getConnection();
-
     PreparedStatement stmt = null;
     ResultSet rset = null;
     try {
-      stmt = conn.prepareStatement(selectLastInsertedId);
+      stmt = transaction.getConnection().prepareStatement(persistRequest.getSelectLastInsertedId());
       rset = stmt.executeQuery();
       setGeneratedKey(rset);
     } finally {
-      try {
-        if (rset != null) {
-          rset.close();
-        }
-      } catch (SQLException ex) {
-        logger.warn("Error closing ResultSet for fetchGeneratedKeyUsingSelect?", ex);
-      }
-      try {
-        if (stmt != null) {
-          stmt.close();
-        }
-      } catch (SQLException ex) {
-        logger.warn("Error closing Statement for fetchGeneratedKeyUsingSelect?", ex);
-      }
+      JdbcClose.close(rset);
+      JdbcClose.close(stmt);
     }
   }
 

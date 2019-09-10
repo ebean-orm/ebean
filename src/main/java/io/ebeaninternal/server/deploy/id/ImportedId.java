@@ -4,6 +4,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.deploy.IntersectionBuilder;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
@@ -66,4 +67,14 @@ public interface ImportedId {
    * Return the set importedId clause.
    */
   String importedIdClause();
+
+  /**
+   * Add DB columns to the intersection builder.
+   */
+  void buildImport(IntersectionBuilder row);
+
+  /**
+   * Bind values to the intersection SqlUpdate.
+   */
+  void bindImport(SqlUpdate sql, EntityBean other);
 }

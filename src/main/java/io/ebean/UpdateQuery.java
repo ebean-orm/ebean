@@ -12,8 +12,7 @@ package io.ebean;
  * <p>
  * <pre>{@code
  *
- *  int rows = ebeanServer
- *      .update(Customer.class)
+ *  int rows = DB.update(Customer.class)
  *      .set("status", Customer.Status.ACTIVE)
  *      .set("updtime", new Timestamp(System.currentTimeMillis()))
  *      .where()
@@ -39,8 +38,7 @@ package io.ebean;
  * <p>
  * <pre>{@code
  *
- *   int rows = ebeanServer
- *       .update(Customer.class)
+ *   int rows = DB.update(Customer.class)
  *       .set("status", Customer.Status.ACTIVE)
  *       .set("updtime", new Timestamp(System.currentTimeMillis()))
  *       .where()
@@ -73,8 +71,7 @@ public interface UpdateQuery<T> {
    * <p>
    * <pre>{@code
    *
-   *   int rows = ebeanServer
-   *      .update(Customer.class)
+   *   int rows = DB.update(Customer.class)
    *      .set("status", Customer.Status.ACTIVE)
    *      .set("updtime", new Timestamp(System.currentTimeMillis()))
    *      .where()
@@ -93,8 +90,7 @@ public interface UpdateQuery<T> {
    * <p>
    * <pre>{@code
    *
-   *   int rows = ebeanServer
-   *      .update(Customer.class)
+   *   int rows = DB.update(Customer.class)
    *      .setNull("notes")
    *      .where()
    *      .gt("id", 1000)
@@ -114,8 +110,7 @@ public interface UpdateQuery<T> {
    * <p>
    * <pre>{@code
    *
-   *   int rows = ebeanServer
-   *      .update(Customer.class)
+   *   int rows = DB.update(Customer.class)
    *      .setRaw("status = coalesce(status, 'A')")
    *      .where()
    *      .gt("id", 1000)
@@ -134,8 +129,7 @@ public interface UpdateQuery<T> {
    * </p>
    * <pre>{@code
    *
-   *   int rows = ebeanServer
-   *      .update(Customer.class)
+   *   int rows = DB.update(Customer.class)
    *      .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
    *      .where()
    *      .gt("id", 1000)
@@ -155,8 +149,18 @@ public interface UpdateQuery<T> {
   UpdateQuery<T> setProfileLocation(ProfileLocation profileLocation);
 
   /**
+   * Set the label on the update query.
+   */
+  UpdateQuery<T> setLabel(String label);
+
+  /**
    * Return the query expression list to add predicates to.
    */
   ExpressionList<T> where();
+
+  /**
+   * Execute the update returning the number of rows updated.
+   */
+  int update();
 
 }

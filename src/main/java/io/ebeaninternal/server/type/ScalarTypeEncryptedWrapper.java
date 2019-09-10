@@ -9,7 +9,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
+public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, LocalEncryptedType {
 
   private final ScalarType<T> wrapped;
 
@@ -21,6 +21,12 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
     this.wrapped = wrapped;
     this.byteArrayType = byteArrayType;
     this.dataEncryptSupport = dataEncryptSupport;
+  }
+
+  @Override
+  public Object localEncrypt(Object value) {
+    String formatValue = wrapped.format(value);
+    return dataEncryptSupport.encryptObject(formatValue);
   }
 
   @Override

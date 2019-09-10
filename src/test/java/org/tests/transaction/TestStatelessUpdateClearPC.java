@@ -15,24 +15,25 @@ public class TestStatelessUpdateClearPC extends BaseTestCase {
 
 
     Ebean.beginTransaction();
+    try {
+      EBasic newUser = new EBasic();
+      newUser.setName("any@email.com");
+      Ebean.save(newUser);
 
-    EBasic newUser = new EBasic();
-    newUser.setName("any@email.com");
-    Ebean.save(newUser);
+      // load the bean into the persistence context
+      EBasic dummyLoadedUser = Ebean.find(EBasic.class, newUser.getId()); // This row is added
+      assertNotNull(dummyLoadedUser);
 
-    // load the bean into the persistence context
-    EBasic dummyLoadedUser = Ebean.find(EBasic.class, newUser.getId()); // This row is added
-    assertNotNull(dummyLoadedUser);
+      // stateless update (should clear the bean from the persistence context)
+      EBasic updateUser = new EBasic();
+      updateUser.setId(newUser.getId());
+      updateUser.setName("anyNew@email.com");
+      Ebean.update(updateUser);
 
-    // stateless update (should clear the bean from the persistence context)
-    EBasic updateUser = new EBasic();
-    updateUser.setId(newUser.getId());
-    updateUser.setName("anyNew@email.com");
-    Ebean.update(updateUser);
-
-    EBasic loadedUser = Ebean.find(EBasic.class, newUser.getId());
-    assertEquals("anyNew@email.com", loadedUser.getName());
-
-    Ebean.rollbackTransaction();
+      EBasic loadedUser = Ebean.find(EBasic.class, newUser.getId());
+      assertEquals("anyNew@email.com", loadedUser.getName());
+    } finally {
+      Ebean.rollbackTransaction();
+    }
   }
 }

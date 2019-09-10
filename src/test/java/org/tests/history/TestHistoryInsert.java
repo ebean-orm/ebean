@@ -4,7 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import io.ebean.Transaction;
 import io.ebean.Version;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+
 import org.tests.model.converstation.User;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -20,11 +24,8 @@ public class TestHistoryInsert extends BaseTestCase {
   private final Logger logger = LoggerFactory.getLogger(TestHistoryInsert.class);
 
   @Test
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
   public void test() throws InterruptedException {
-
-    if (!isH2() && !isPostgres()) {
-      return;
-    }
 
     User user = new User();
     user.setName("Jim");
@@ -34,7 +35,7 @@ public class TestHistoryInsert extends BaseTestCase {
     Ebean.save(user);
     logger.info("-- initial save");
 
-    Thread.sleep(100);
+    Thread.sleep(DB_CLOCK_DELTA); // wait, so that our system clock can catch up
     Timestamp afterInsert = new Timestamp(System.currentTimeMillis());
 
     List<SqlRow> history = fetchHistory(user);
@@ -91,6 +92,52 @@ public class TestHistoryInsert extends BaseTestCase {
 
     versions = Ebean.find(User.class).setId(user.getId()).findVersions();
     assertThat(versions).hasSize(3);
+  }
+
+  @Test
+  @ForPlatform({Platform.POSTGRES})
+  public void test_singleTransaction_multipleHistory() {
+
+    User user = new User();
+    user.setName("First");
+    user.setEmail("first@email.com");
+    user.setPasswordHash("someHash");
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      // insert and many updates inside transaction
+      Ebean.save(user);
+      user.setEmail("first2@email.com");
+      Ebean.save(user);
+      user.setEmail("first3@email.com");
+      Ebean.save(user);
+      user.setEmail("first4@email.com");
+      Ebean.save(user);
+
+      transaction.commit();
+    }
+
+    // a couple more updates outside of the first transaction
+    user.setEmail("first5@email.com");
+    Ebean.save(user);
+
+    user.setEmail("first6@email.com");
+    Ebean.save(user);
+
+    List<SqlRow> sqlRows =
+      Ebean.createSqlQuery("select lower(sys_period) lowerBound, upper(sys_period) upperBound from c_user_history where id = :id order by when_modified")
+        .setParameter("id", user.getId())
+        .findList();
+
+    Timestamp previousUpper = null;
+
+    for (SqlRow sqlRow : sqlRows) {
+      Timestamp nextLower = sqlRow.getTimestamp("lowerBound");
+      Timestamp nextUpper = sqlRow.getTimestamp("upperBound");
+      if (previousUpper != null) {
+        assertThat(previousUpper).isEqualTo(nextLower);
+      }
+      previousUpper = nextUpper;
+    }
   }
 
   /**

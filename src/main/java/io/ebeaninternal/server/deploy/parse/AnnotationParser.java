@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
 import javax.persistence.AttributeOverride;
@@ -11,23 +12,27 @@ import javax.persistence.Column;
 import javax.validation.groups.Default;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Base class for reading deployment annotations.
  */
 public abstract class AnnotationParser extends AnnotationBase {
 
-  protected final DeployBeanInfo<?> info;
+  final DeployBeanInfo<?> info;
 
-  protected final DeployBeanDescriptor<?> descriptor;
+  final DeployBeanDescriptor<?> descriptor;
 
-  protected final Class<?> beanType;
+  final Class<?> beanType;
 
-  protected final boolean validationAnnotations;
+  final boolean validationAnnotations;
 
-  public AnnotationParser(DeployBeanInfo<?> info, boolean validationAnnotations) {
+  final ReadAnnotationConfig readConfig;
+
+  AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info.getUtil());
-    this.validationAnnotations = validationAnnotations;
+    this.readConfig = readConfig;
+    this.validationAnnotations = readConfig.isJavaxValidationAnnotations();
     this.info = info;
     this.beanType = info.getDescriptor().getBeanType();
     this.descriptor = info.getDescriptor();
@@ -40,9 +45,40 @@ public abstract class AnnotationParser extends AnnotationBase {
   public abstract void parse();
 
   /**
+   * Read the Id annotation on an embeddedId.
+   */
+  void readIdAssocOne(DeployBeanPropertyAssoc<?> prop) {
+    prop.setNullable(false);
+    if (prop.isIdClass()) {
+      prop.setImportedPrimaryKey();
+    } else {
+      prop.setId();
+      prop.setEmbedded();
+      info.setEmbeddedId(prop);
+    }
+  }
+
+  /**
+   * Read the Id annotation on scalar property.
+   */
+  void readIdScalar(DeployBeanProperty prop) {
+    prop.setNullable(false);
+    if (prop.isIdClass()) {
+      prop.setImportedPrimaryKey();
+    } else {
+      prop.setId();
+      if (prop.getPropertyType().equals(UUID.class)) {
+        if (readConfig.isIdGeneratorAutomatic() && descriptor.getIdGeneratorName() == null) {
+          descriptor.setUuidGenerator();
+        }
+      }
+    }
+  }
+
+  /**
    * Helper method to set cascade types to the CascadeInfo on BeanProperty.
    */
-  protected void setCascadeTypes(CascadeType[] cascadeTypes, BeanCascadeInfo cascadeInfo) {
+  void setCascadeTypes(CascadeType[] cascadeTypes, BeanCascadeInfo cascadeInfo) {
     if (cascadeTypes != null && cascadeTypes.length > 0) {
       cascadeInfo.setTypes(cascadeTypes);
     }
@@ -51,7 +87,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   /**
    * Read an AttributeOverrides if they exist for this embedded bean.
    */
-  protected void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
+  void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
 
     Set<AttributeOverride> attrOverrides = getAll(prop, AttributeOverride.class);
     if (!attrOverrides.isEmpty()) {
@@ -64,7 +100,7 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   }
 
-  protected void readColumn(Column columnAnn, DeployBeanProperty prop) {
+  void readColumn(Column columnAnn, DeployBeanProperty prop) {
 
     if (!isEmpty(columnAnn.name())) {
       String dbColumn = databasePlatform.convertQuotedIdentifiers(columnAnn.name());
@@ -96,11 +132,10 @@ public abstract class AnnotationParser extends AnnotationBase {
    * Return true if the validation groups are {@link Default} (respectively empty)
    * can be applied to DDL generation.
    */
-  protected boolean isEbeanValidationGroups(Class<?>[] groups) {
-    if (groups.length == 0
-      || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
-      return true;
+  boolean isEbeanValidationGroups(Class<?>[] groups) {
+    if (!util.isUseJavaxValidationNotNull()) {
+      return false;
     }
-    return false;
+    return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
   }
 }

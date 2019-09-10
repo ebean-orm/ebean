@@ -1,7 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.DbTypeConfig;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
@@ -27,7 +26,7 @@ public class OraclePlatformTest {
     assertThat(ddl.convert("varchar(20)", false)).isEqualTo("varchar2(20)");
     assertThat(ddl.convert("decimal(10)", false)).isEqualTo("number(10)");
     assertThat(ddl.convert("decimal(8,4)", false)).isEqualTo("number(8,4)");
-    assertThat(ddl.convert("boolean", false)).isEqualTo("number(1) default 0");
+    assertThat(ddl.convert("boolean", false)).isEqualTo("number(1)");
     assertThat(ddl.convert("bit", false)).isEqualTo("bit");
     assertThat(ddl.convert("tinyint", false)).isEqualTo("number(3)");
     assertThat(ddl.convert("binary(16)", false)).isEqualTo("raw(16)");
@@ -37,7 +36,7 @@ public class OraclePlatformTest {
   public void uuid_default() {
 
     OraclePlatform platform = new OraclePlatform();
-    platform.configure(new DbTypeConfig(), false);
+    platform.configure(new PlatformConfig(), false);
     DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
 
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar2(40)");
@@ -48,8 +47,8 @@ public class OraclePlatformTest {
   public void uuid_as_binary() {
 
     OraclePlatform platform = new OraclePlatform();
-    DbTypeConfig config = new DbTypeConfig();
-    config.setDbUuid(ServerConfig.DbUuid.AUTO_BINARY);
+    PlatformConfig config = new PlatformConfig();
+    config.setDbUuid(PlatformConfig.DbUuid.AUTO_BINARY);
 
     platform.configure(config, false);
 

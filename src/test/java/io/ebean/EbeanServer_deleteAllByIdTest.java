@@ -17,7 +17,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     List<EBasicVer> someBeans = beans(3);
 
-    Ebean.saveAll(someBeans);
+    DB.saveAll(someBeans);
     List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
@@ -25,7 +25,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    Ebean.deleteAll(EBasicVer.class, ids);
+    DB.deleteAll(EBasicVer.class, ids);
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -37,21 +37,18 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     List<EBasicVer> someBeans = beans(3);
 
-    Ebean.saveAll(someBeans);
+    DB.saveAll(someBeans);
     List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
     }
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database db = DB.getDefault();
     // act
     LoggedSqlCollector.start();
-    Transaction txn = server.beginTransaction();
-    try {
-      server.deleteAll(EBasicVer.class, ids, txn);
+    try (Transaction txn = db.beginTransaction()) {
+      db.deleteAll(EBasicVer.class, ids, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -63,7 +60,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     List<EBasicVer> someBeans = beans(3);
 
-    Ebean.saveAll(someBeans);
+    DB.saveAll(someBeans);
     List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
@@ -71,7 +68,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.deleteAllPermanent(EBasicVer.class, ids);
+    DB.deleteAllPermanent(EBasicVer.class, ids);
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -84,21 +81,18 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     List<EBasicVer> someBeans = beans(3);
 
-    Ebean.saveAll(someBeans);
+    DB.saveAll(someBeans);
     List<Integer> ids = new ArrayList<>();
     for (EBasicVer someBean : someBeans) {
       ids.add(someBean.getId());
     }
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database db = DB.getDefault();
     // act
     LoggedSqlCollector.start();
-    Transaction txn = server.beginTransaction();
-    try {
-      server.deleteAllPermanent(EBasicVer.class, ids, txn);
+    try (Transaction txn = db.beginTransaction()) {
+      db.deleteAllPermanent(EBasicVer.class, ids, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);

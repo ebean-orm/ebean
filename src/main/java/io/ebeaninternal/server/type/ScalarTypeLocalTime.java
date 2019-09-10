@@ -51,6 +51,7 @@ public class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
   @Override
   public LocalTime toBeanType(Object value) {
     if (value instanceof LocalTime) return (LocalTime) value;
+    if (value == null) return null;
     return BasicTypeConverter.toTime(value).toLocalTime();
   }
 

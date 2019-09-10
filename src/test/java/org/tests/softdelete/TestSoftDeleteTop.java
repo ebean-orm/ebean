@@ -4,11 +4,10 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import io.ebean.annotation.PersistBatch;
+import org.junit.Test;
 import org.tests.model.softdelete.ESoftDelMid;
 import org.tests.model.softdelete.ESoftDelTop;
 import org.tests.model.softdelete.ESoftDelUp;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,7 @@ public class TestSoftDeleteTop extends BaseTestCase {
 
     Transaction transaction = Ebean.beginTransaction();
     try {
-      transaction.setBatch(PersistBatch.ALL);
+      transaction.setBatchMode(true);
       Ebean.delete(up1);
       Ebean.delete(up2);
       transaction.commit();

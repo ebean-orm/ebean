@@ -13,13 +13,13 @@
       <column name="id"         type="integer"          primaryKey="true" identity="true"/>
       <column name="something"  type="varchar(255)"     />
       <column name="one_key"    type="integer"          />
-      <column name="two_key"    type="varchar(255)"     />
+      <column name="two_key"    type="varchar(127)"     />
       <foreignKey name="fk_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="ckey_parent" indexName="ix_ckey_detail_parent"/>
     </createTable>
     
     <createTable name="ckey_parent" pkName="pk_ckey_parent">
       <column name="one_key"    type="integer"         primaryKey="true" />
-      <column name="two_key"    type="varchar(255)"    primaryKey="true" />
+      <column name="two_key"    type="varchar(127)"    primaryKey="true" />
       <column name="name"       type="varchar(255)"    />
       <column name="assoc_id"   type="integer"         references="ckey_assoc.id" foreignKeyName="fk_ckey_parent_assoc_id" foreignKeyIndex="ix_ckey_parent_assoc_id"/>
       <column name="version"    type="integer"         notnull="true" />

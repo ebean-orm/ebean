@@ -25,6 +25,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.JsonIgnore;
 import io.ebean.annotation.Length;
 import io.ebean.annotation.SoftDelete;
+import io.ebean.annotation.Sum;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.UnmappedJson;
 import io.ebean.annotation.UpdatedTimestamp;
@@ -91,14 +92,11 @@ public class AnnotationFields extends AnnotationParser {
    */
   private FetchType defaultLobFetchType = FetchType.LAZY;
 
-  public AnnotationFields(GeneratedPropertyFactory generatedPropFactory, DeployBeanInfo<?> info,
-                          boolean javaxValidationAnnotations, boolean jacksonAnnotationsPresent, boolean eagerFetchLobs) {
-
-    super(info, javaxValidationAnnotations);
-    this.jacksonAnnotationsPresent = jacksonAnnotationsPresent;
-    this.generatedPropFactory = generatedPropFactory;
-
-    if (eagerFetchLobs) {
+  AnnotationFields(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+    super(info, readConfig);
+    this.jacksonAnnotationsPresent = readConfig.isJacksonAnnotations();
+    this.generatedPropFactory = readConfig.getGeneratedPropFactory();
+    if (readConfig.isEagerFetchLobs()) {
       defaultLobFetchType = FetchType.EAGER;
     }
   }
@@ -127,8 +125,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setId();
-      prop.setNullable(false);
+      readIdAssocOne(prop);
     }
 
     EmbeddedId embeddedId = get(prop, EmbeddedId.class);
@@ -136,6 +133,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
+      info.setEmbeddedId(prop);
     }
 
     DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
@@ -211,7 +209,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      readId(prop);
+      readIdScalar(prop);
     }
 
     // determine the JDBC type using Lob/Temporal
@@ -288,6 +286,10 @@ public class AnnotationFields extends AnnotationParser {
     if (aggregation != null) {
       prop.setAggregation(aggregation.value());
     }
+    Sum sum = get(prop, Sum.class);
+    if (sum != null) {
+      prop.setAggregation("sum(" + prop.getName() + ")");
+    }
 
     Version version = get(prop, Version.class);
     if (version != null) {
@@ -326,7 +328,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbLength(length.value());
     }
 
-    io.ebean.annotation.NotNull nonNull  = get(prop, io.ebean.annotation.NotNull.class);
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
     if (nonNull != null) {
       prop.setNullable(false);
     }
@@ -393,7 +395,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Set<DbMigration> dbMigration = getAll(prop, DbMigration.class);
     dbMigration.forEach(ann -> prop.addDbMigrationInfo(
-       new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
+      new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
   }
 
   private void addIndex(DeployBeanProperty prop, Index index) {
@@ -494,7 +496,7 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private ScalarTypeEncryptedWrapper<?> createScalarType(DeployBeanProperty prop, ScalarType<?> st) {
 
     // Use Java Encryptor wrapping the logical scalar type
@@ -517,20 +519,9 @@ public class AnnotationFields extends AnnotationParser {
     return util.createDataEncryptSupport(table, column);
   }
 
-  private void readId(DeployBeanProperty prop) {
-
-    prop.setId();
-    prop.setNullable(false);
-
-    if (prop.getPropertyType().equals(UUID.class)) {
-      if (descriptor.getIdGeneratorName() == null) {
-        descriptor.setUuidGenerator();
-      }
-    }
-  }
-
   private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {
 
+    descriptor.setIdGeneratedValue();
     String genName = gen.generator();
 
     SequenceGenerator sequenceGenerator = find(prop, SequenceGenerator.class);

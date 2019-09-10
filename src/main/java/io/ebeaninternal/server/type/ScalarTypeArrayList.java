@@ -3,6 +3,7 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -10,7 +11,6 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.UUID;
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
 @SuppressWarnings("rawtypes")
-public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implements ScalarTypeArray {
+public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTypeArray {
 
   private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
   private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
@@ -59,9 +59,20 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType) {
-      return new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+      final String arrayType;
+      switch (scalarType.getJdbcType()) {
+        case Types.INTEGER:
+          arrayType = "integer";
+          break;
+        case Types.VARCHAR:
+          arrayType = "varchar";
+          break;
+        default:
+          throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
+      }
+
+      return new ScalarTypeArrayList(arrayType, scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
@@ -89,7 +100,8 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
   }
 
   @SuppressWarnings("unchecked")
-  private List fromArray(Object[] array1) {
+  @Override
+  protected List fromArray(Object[] array1) {
     List list = new ArrayList(array1.length);
     for (Object element : array1) {
       list.add(converter.toElement(element));
@@ -99,16 +111,6 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
 
   protected Object[] toArray(List value) {
     return converter.toDbArray(value.toArray());
-  }
-
-  @Override
-  public List read(DataReader reader) throws SQLException {
-    Array array = reader.getArray();
-    if (array == null) {
-      return null;
-    } else {
-      return fromArray((Object[]) array.getArray());
-    }
   }
 
   @Override
@@ -134,7 +136,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> implemen
     try {
       return EJson.parseList(value, false);
     } catch (IOException e) {
-      throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
+      throw new TextException("Failed to parse JSON [{}] as List", value, e);
     }
   }
 

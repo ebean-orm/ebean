@@ -27,7 +27,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
   public PersistRequestOrmUpdate(SpiEbeanServer server, BeanManager<?> mgr, SpiUpdate<?> ormUpdate,
                                  SpiTransaction t, PersistExecute persistExecute) {
 
-    super(server, t, persistExecute);
+    super(server, t, persistExecute, ormUpdate.getLabel());
     this.beanDescriptor = mgr.getBeanDescriptor();
     this.ormUpdate = ormUpdate;
   }
@@ -86,7 +86,9 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
    */
   @Override
   public void postExecute() {
-
+    if (startNanos > 0) {
+      persistExecute.collectOrmUpdate(label, startNanos, rowCount);
+    }
     OrmUpdateType ormUpdateType = ormUpdate.getOrmUpdateType();
     String tableName = ormUpdate.getBaseTable();
 

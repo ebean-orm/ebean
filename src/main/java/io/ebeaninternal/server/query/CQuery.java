@@ -10,14 +10,14 @@ import io.ebean.bean.NodeUsageListener;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanCollectionHelp;
 import io.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -34,10 +34,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -54,6 +54,8 @@ import java.util.NoSuchElementException;
 public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
+
+  private static final CQueryCollectionAddNoop NOOP_ADD = new CQueryCollectionAddNoop();
 
   /**
    * The resultSet rows read.
@@ -98,7 +100,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * The help for the 'master' collection.
    */
-  private final BeanCollectionHelp<T> help;
+  private final CQueryCollectionAdd help;
 
   /**
    * The overall find request wrapper object.
@@ -146,7 +148,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * For master detail query.
    */
-  private final BeanPropertyAssocMany<?> manyProperty;
+  private final STreePropertyAssocMany manyProperty;
 
   private DataReader dataReader;
 
@@ -179,20 +181,27 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   private long executionTimeMicros;
 
   /**
-   * Flag set when findIterate is being read audited.
+   * Flag set when read auditing.
+   */
+  private final boolean audit;
+
+  /**
+   * Flag set when findIterate is being read audited meaning we log in batches.
    */
   private boolean auditFindIterate;
 
   /**
    * A buffer of Ids collected for findIterate auditing.
    */
-  private List<Object> auditFindIterateIds;
+  private List<Object> auditIds;
 
   /**
    * Create the Sql select based on the request.
    */
+  @SuppressWarnings("unchecked")
   public CQuery(OrmQueryRequest<T> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
+    this.audit = request.isAuditReads();
     this.queryPlan = queryPlan;
     this.query = request.getQuery();
     this.queryMode = query.getMode();
@@ -219,11 +228,15 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.logWhereSql = queryPlan.getLogWhereSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-    this.help = createHelp(request);
+    if (lazyLoadManyProperty != null) {
+      this.help = NOOP_ADD;
+    } else {
+      this.help = createHelp(request);
+    }
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
-  private BeanCollectionHelp<T> createHelp(OrmQueryRequest<T> request) {
+  private CQueryCollectionAdd<T> createHelp(OrmQueryRequest<T> request) {
     if (request.isFindById()) {
       return null;
     } else {
@@ -232,7 +245,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         // subQuery compiled for InQueryExpression
         return null;
       }
-      return BeanCollectionHelpFactory.create(request);
+      return BeanCollectionHelpFactory.create(manyType, request);
     }
   }
 
@@ -309,11 +322,21 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   private boolean prepareBindExecuteQueryWithOption(boolean forwardOnlyHint) throws SQLException {
 
+    ResultSet resultSet = prepareResultSet(forwardOnlyHint);
+    if (resultSet == null) {
+      return false;
+    }
+    dataReader = queryPlan.createDataReader(resultSet);
+    return true;
+  }
+
+  ResultSet prepareResultSet(boolean forwardOnlyHint) throws SQLException {
+
     synchronized (this) {
       if (cancelled || query.isCancelled()) {
         // cancelled before we started
         cancelled = true;
-        return false;
+        return null;
       }
 
       startNano = System.nanoTime();
@@ -327,9 +350,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         ResultSet suppliedResultSet = query.getRawSql().getResultSet();
         if (suppliedResultSet != null) {
           // this is a user supplied ResultSet so use that
-          dataReader = queryPlan.createDataReader(suppliedResultSet);
           bindLog = "";
-          return true;
+          return suppliedResultSet;
         }
       }
 
@@ -352,10 +374,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       bindLog = predicates.bind(dataBind);
 
       // executeQuery
-      ResultSet rset = pstmt.executeQuery();
-      dataReader = queryPlan.createDataReader(rset);
-
-      return true;
+      return pstmt.executeQuery();
     }
   }
 
@@ -367,7 +386,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   public void close() {
     try {
-      if (auditFindIterateIds != null && !auditFindIterateIds.isEmpty()) {
+      if (auditFindIterate && auditIds != null && !auditIds.isEmpty()) {
         auditIterateLogMessage();
       }
     } catch (Throwable e) {
@@ -381,14 +400,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     } catch (SQLException e) {
       logger.error("Error closing dataReader", e);
     }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-        pstmt = null;
-      }
-    } catch (SQLException e) {
-      logger.error("Error closing preparedStatement", e);
-    }
+    JdbcClose.close(pstmt);
+    pstmt = null;
   }
 
   /**
@@ -508,9 +521,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return result;
   }
 
-  protected EntityBean next() {
-    if (auditFindIterate) {
-      auditIterateNextBean();
+  EntityBean next() {
+    if (audit) {
+      auditNextBean();
     }
     hasNextCache = false;
     if (nextBean == null) {
@@ -519,7 +532,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return nextBean;
   }
 
-  protected boolean hasNext() throws SQLException {
+  boolean hasNext() throws SQLException {
 
     synchronized (this) {
       if (noMoreRows || cancelled) {
@@ -557,13 +570,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   BeanCollection<T> readCollection() throws SQLException {
-
     while (hasNext()) {
-      EntityBean bean = next();
-      help.add(collection, bean, false);
+      help.add(collection, next(), false);
     }
-
     updateExecutionStatistics();
     return collection;
   }
@@ -571,7 +582,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Update execution stats and check for slow query.
    */
-  void updateExecutionStatistics() {
+  private void updateExecutionStatistics() {
     updateStatistics();
     request.slowQueryCheck(executionTimeMicros, rowCount);
   }
@@ -589,7 +600,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       if (autoTuneProfiling) {
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
-      queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
+      if (queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode)) {
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
+      }
       getTransaction().profileEvent(this);
     } catch (Exception e) {
       logger.error("Error updating execution statistics", e);
@@ -655,7 +668,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * per SqlSelect. This can be null.
    */
   @Override
-  public BeanPropertyAssocMany<?> getManyProperty() {
+  public STreePropertyAssocMany getManyProperty() {
     return manyProperty;
   }
 
@@ -746,30 +759,25 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   void auditFindMany() {
 
-    if (!collection.isEmpty()) {
+    if (auditIds != null && !auditIds.isEmpty()) {
       // get the id values of the underlying collection
-      List<Object> ids = new ArrayList<>(collection.size());
-      Collection<T> underlyingBeans = collection.getActualDetails();
-      for (T underlyingBean : underlyingBeans) {
-        ids.add(desc.getIdForJson(underlyingBean));
-      }
       ReadEvent futureReadEvent = query.getFutureFetchAudit();
       if (futureReadEvent == null) {
         // normal query execution
-        desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, ids);
+        desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditIds);
       } else {
         // this query was executed via findFutureList() and the prepare()
         // has already been called so set the details and log
         futureReadEvent.setQueryKey(queryPlan.getAuditQueryKey());
         futureReadEvent.setBindLog(bindLog);
-        futureReadEvent.setIds(ids);
+        futureReadEvent.setIds(auditIds);
         desc.readAuditFutureMany(futureReadEvent);
       }
     }
   }
 
   /**
-   * Indicate that read auditing is occurring on a this findIterate query.
+   * Indicate that read auditing is occurring on this findIterate query.
    */
   void auditFindIterate() {
     auditFindIterate = true;
@@ -779,23 +787,38 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Send the current buffer of findIterate collected ids to the audit log.
    */
   private void auditIterateLogMessage() {
-    desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditFindIterateIds);
+    desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditIds);
     // create a new list on demand with the next bean/id
-    auditFindIterateIds = null;
+    auditIds = null;
   }
 
   /**
    * Add the id to the audit id buffer and flush if needed in batches of 100.
    */
-  private void auditIterateNextBean() {
+  private void auditNextBean() {
 
-    if (auditFindIterateIds == null) {
-      auditFindIterateIds = new ArrayList<>(100);
+    if (auditIds == null) {
+      auditIds = new ArrayList<>(100);
     }
-    auditFindIterateIds.add(desc.getIdForJson(nextBean));
-    if (auditFindIterateIds.size() >= 100) {
+    auditIds.add(desc.getIdForJson(nextBean));
+    if (auditFindIterate && auditIds.size() >= 100) {
       auditIterateLogMessage();
     }
   }
 
+  /**
+   * Return the underlying PreparedStatement.
+   */
+  PreparedStatement getPstmt() {
+    return pstmt;
+  }
+
+  @Override
+  public void handleLoadError(String fullName, Exception e) {
+    query.handleLoadError(fullName, e);
+  }
+
+  public Set<String> getDependentTables() {
+    return queryPlan.getDependentTables();
+  }
 }

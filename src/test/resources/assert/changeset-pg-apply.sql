@@ -158,13 +158,13 @@ create table ckey_detail (
   id                            serial not null,
   something                     varchar(255),
   one_key                       integer,
-  two_key                       varchar(255),
+  two_key                       varchar(127),
   constraint pk_ckey_detail primary key (id)
 );
 
 create table ckey_parent (
   one_key                       integer not null,
-  two_key                       varchar(255) not null,
+  two_key                       varchar(127) not null,
   name                          varchar(255),
   assoc_id                      integer,
   version                       integer not null,
@@ -777,10 +777,10 @@ create table item (
   units                         varchar(255),
   type                          integer,
   region                        integer,
-  DATE_MODIFIED                 timestamp,
-  DATE_CREATED                  timestamp,
-  MODIFIED_BY                   varchar(255),
-  CREATED_BY                    varchar(255),
+  date_modified                 timestamp,
+  date_created                  timestamp,
+  modified_by                   varchar(255),
+  created_by                    varchar(255),
   version                       bigint not null,
   constraint pk_item primary key (customer,itemNumber)
 );

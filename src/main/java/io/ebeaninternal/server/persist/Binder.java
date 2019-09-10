@@ -2,12 +2,15 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.server.core.DbExpressionHandler;
+import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
-import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.PostgresHelper;
+import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
@@ -18,6 +21,7 @@ import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -48,7 +52,7 @@ public class Binder {
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
+  public Binder(TypeManager typeManager, SpiLogManager logManager, int asOfBindCount, boolean asOfStandardsBased,
                 DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueBind multiValueBind) {
 
     this.typeManager = typeManager;
@@ -57,12 +61,7 @@ public class Binder {
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
     this.multiValueBind = multiValueBind;
-    this.enableBindLog = enableBindLog();
-  }
-
-  private boolean enableBindLog() {
-    return TransactionManager.SQL_LOGGER.isDebugEnabled()
-      || TransactionManager.SUM_LOGGER.isDebugEnabled();
+    this.enableBindLog = logManager.sql().isDebug();
   }
 
   /**
@@ -109,7 +108,7 @@ public class Binder {
         if (isLob(dt)) {
           bindBuf.append("[LOB]");
         } else {
-          bindBuf.append(String.valueOf(val));
+          bindBuf.append(val);
         }
       }
     }
@@ -125,7 +124,7 @@ public class Binder {
   /**
    * Bind the list of positionedParameters in BindParams.
    */
-  public String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
+  private String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
 
     StringBuilder bindLog = new StringBuilder();
     bind(bindParams, dataBind, bindLog);
@@ -143,7 +142,7 @@ public class Binder {
   /**
    * Bind the list of parameters..
    */
-  public void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog) throws SQLException {
+  private void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog) throws SQLException {
 
     CallableStatement cstmt = null;
 
@@ -201,7 +200,7 @@ public class Binder {
     }
   }
 
-  private ScalarType<?> getScalarType(Class<?> clazz) {
+  public ScalarType<?> getScalarType(Class<?> clazz) {
     ScalarType<?> type = typeManager.getScalarType(clazz);
     if (type == null) {
       throw new PersistenceException("No ScalarType registered for " + clazz);
@@ -262,7 +261,7 @@ public class Binder {
    * default is that both are converted to java.sql.Timestamp.
    * </p>
    */
-  public void bindObject(DataBind dataBind, Object data, int dbType) throws SQLException {
+  private void bindObject(DataBind dataBind, Object data, int dbType) throws SQLException {
 
     if (data == null) {
       dataBind.setNull(dbType);
@@ -299,8 +298,6 @@ public class Binder {
     try {
       switch (dataType) {
         case java.sql.Types.BOOLEAN:
-          b.setBoolean((Boolean) data);
-          break;
         case java.sql.Types.BIT:
           // Types.BIT should map to Java Boolean
           b.setBoolean((Boolean) data);
@@ -335,18 +332,12 @@ public class Binder {
           break;
 
         case java.sql.Types.FLOAT:
+        case java.sql.Types.DOUBLE:
           // DB Float in theory maps to Java Double type
           b.setDouble((Double) data);
           break;
 
-        case java.sql.Types.DOUBLE:
-          b.setDouble((Double) data);
-          break;
-
         case java.sql.Types.NUMERIC:
-          b.setBigDecimal((BigDecimal) data);
-          break;
-
         case java.sql.Types.DECIMAL:
           b.setBigDecimal((BigDecimal) data);
           break;
@@ -364,25 +355,24 @@ public class Binder {
           break;
 
         case java.sql.Types.BINARY:
-          b.setBytes((byte[]) data);
-          break;
-
         case java.sql.Types.VARBINARY:
           b.setBytes((byte[]) data);
           break;
 
         case DbPlatformType.UUID:
+        case java.sql.Types.JAVA_OBJECT:
+          // Not too sure about this.
           // native UUID support in H2 and Postgres
           b.setObject(data);
           break;
 
-        case java.sql.Types.OTHER:
-          b.setObject(data, dataType);
+        case DbPlatformType.INET:
+          // data is always a String at this point
+          b.setObject(PostgresHelper.asInet(data.toString()));
           break;
 
-        case java.sql.Types.JAVA_OBJECT:
-          // Not too sure about this.
-          b.setObject(data);
+        case java.sql.Types.OTHER:
+          b.setObject(data, dataType);
           break;
 
         default:
@@ -436,12 +426,9 @@ public class Binder {
   private boolean isLob(int dbType) {
     switch (dbType) {
       case Types.CLOB:
-        return true;
-      case Types.LONGVARCHAR:
-        return true;
-      case Types.BLOB:
-        return true;
       case Types.LONGVARBINARY:
+      case Types.BLOB:
+      case Types.LONGVARCHAR:
         return true;
 
       default:
@@ -461,5 +448,9 @@ public class Binder {
    */
   public DataBind dataBind(PreparedStatement stmt, Connection connection) {
     return new DataBind(dataTimeZone, stmt, connection);
+  }
+
+  public DataReader createDataReader(ResultSet resultSet) {
+    return new RsetDataReader(dataTimeZone, resultSet);
   }
 }

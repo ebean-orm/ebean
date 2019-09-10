@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * Executes the select row count query.
@@ -123,8 +125,10 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       rowCount = rset.getInt(1);
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
-      queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode());
       request.slowQueryCheck(executionTimeMicros, rowCount);
+      if (queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode())) {
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
+      }
       getTransaction().profileEvent(this);
       return rowCount;
 
@@ -141,8 +145,8 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
    * Close the resources.
    */
   private void close() {
-    UtilJdbc.close(rset);
-    UtilJdbc.close(pstmt);
+    JdbcClose.close(rset);
+    JdbcClose.close(pstmt);
     rset = null;
     pstmt = null;
   }
@@ -152,5 +156,9 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
     getTransaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.getProfileId(), rowCount, query.getProfileId());
+  }
+
+  Set<String> getDependentTables() {
+    return queryPlan.getDependentTables();
   }
 }

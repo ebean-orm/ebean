@@ -7,9 +7,11 @@ import io.ebeaninternal.server.deploy.parse.DeployInheritInfo;
 import io.ebeaninternal.server.query.SqlTreeProperties;
 
 import javax.persistence.PersistenceException;
+import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,7 +34,7 @@ public class InheritInfo {
 
   private final Class<?> type;
 
-  private final ArrayList<InheritInfo> children = new ArrayList<>();
+  private final List<InheritInfo> children = new ArrayList<>();
 
   /**
    * Map of discriminator values to InheritInfo.
@@ -110,7 +112,7 @@ public class InheritInfo {
    * return true if anything in the inheritance hierarchy has a relationship with a save cascade on
    * it.
    */
-  public boolean isSaveRecurseSkippable() {
+  boolean isSaveRecurseSkippable() {
     return root.isNodeSaveRecurseSkippable();
   }
 
@@ -130,7 +132,7 @@ public class InheritInfo {
    * return true if anything in the inheritance hierarchy has a relationship with a delete cascade
    * on it.
    */
-  public boolean isDeleteRecurseSkippable() {
+  boolean isDeleteRecurseSkippable() {
     return root.isNodeDeleteRecurseSkippable();
   }
 
@@ -150,7 +152,6 @@ public class InheritInfo {
    * Set the descriptor for this node.
    */
   public void setDescriptor(BeanDescriptor<?> descriptor) {
-
     this.descriptor = descriptor;
   }
 
@@ -171,20 +172,30 @@ public class InheritInfo {
   /**
    * Return the children.
    */
-  public ArrayList<InheritInfo> getChildren() {
+  public List<InheritInfo> getChildren() {
     return children;
+  }
+
+  /**
+   * Return true if this node has children.
+   * <p>
+   * When an inheritance node has no children then we don't need
+   * the discriminator column as the type is effectively known.
+   */
+  public boolean hasChildren() {
+    return !children.isEmpty();
   }
 
   /**
    * Get the bean property additionally looking in the sub types.
    */
-  public BeanProperty findSubTypeProperty(String propertyName) {
+  BeanProperty findSubTypeProperty(String propertyName) {
 
     BeanProperty prop;
 
     for (InheritInfo childInfo : children) {
       // recursively search this child bean descriptor
-      prop = childInfo.desc().findBeanProperty(propertyName);
+      prop = childInfo.desc().findProperty(propertyName);
       if (prop != null) {
         return prop;
       }
@@ -200,7 +211,6 @@ public class InheritInfo {
 
     for (InheritInfo childInfo : children) {
       selectProps.add(childInfo.descriptor.propertiesLocal());
-
       childInfo.addChildrenProperties(selectProps);
     }
   }
@@ -209,15 +219,16 @@ public class InheritInfo {
    * Return the associated InheritInfo for this DB row read.
    */
   public InheritInfo readType(DbReadContext ctx) throws SQLException {
-
-    String discValue = ctx.getDataReader().getString();
-    return readType(discValue);
+    if (!hasChildren()) {
+      return this;
+    }
+    return readType(ctx.getDataReader().getString());
   }
 
   /**
    * Return the associated InheritInfo for this discriminator value.
    */
-  public InheritInfo readType(String discValue) {
+  InheritInfo readType(String discValue) {
 
     if (discValue == null) {
       return null;
@@ -291,7 +302,7 @@ public class InheritInfo {
    * Return true if this is considered a concrete type in the inheritance hierarchy.
    */
   public boolean isConcrete() {
-    return discriminatorValue != null;
+    return !Modifier.isAbstract(type.getModifiers());
   }
 
   /**
@@ -327,7 +338,6 @@ public class InheritInfo {
    * Return the derived where for the discriminator.
    */
   public String getWhere() {
-
     return where;
   }
 
@@ -362,7 +372,7 @@ public class InheritInfo {
   /**
    * Return the discriminator value for this node.
    */
-  public String getDiscriminatorStringValue() {
+  String getDiscriminatorStringValue() {
     return discriminatorStringValue;
   }
 

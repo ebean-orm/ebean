@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class BindableProperty implements Bindable {
 
-  protected final BeanProperty prop;
+  final BeanProperty prop;
 
   public BindableProperty(BeanProperty prop) {
     this.prop = prop;
@@ -54,15 +54,4 @@ public class BindableProperty implements Bindable {
     request.bind(value, prop);
   }
 
-  /**
-   * For compound types bind one of the underlying scalar values for a compound type.
-   */
-  public void dmlBindObject(BindableRequest request, Object bean) throws SQLException {
-
-    Object value = null;
-    if (bean != null) {
-      value = prop.getValueObject(bean);
-    }
-    request.bind(value, prop);
-  }
 }

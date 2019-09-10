@@ -9,6 +9,7 @@ import io.ebean.search.TextSimple;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -121,6 +122,46 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
+   * Convert the query to a DTO bean query.
+   * <p>
+   * We effectively use the underlying ORM query to build the SQL and then execute
+   * and map it into DTO beans.
+   */
+  <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
+   * Return the underlying query as an UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -147,6 +188,16 @@ public interface ExpressionList<T> {
   Query<T> setIncludeSoftDeletes();
 
   /**
+   * Execute the query using the given transaction.
+   */
+  Query<T> usingTransaction(Transaction transaction);
+
+  /**
+   * Execute the query using the given connection.
+   */
+  Query<T> usingConnection(Connection connection);
+
+  /**
    * Execute as a delete query deleting the 'root level' beans that match the predicates
    * in the query.
    * <p>
@@ -159,12 +210,58 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
+   * Execute as a delete query deleting the 'root level' beans that match the predicates
+   * in the query.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of rows that were deleted.
+   */
+  int delete(Transaction transaction);
+
+  /**
    * Execute as a update query.
    *
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
   int update();
+
+  /**
+   * Execute as a update query with the given transaction.
+   *
+   * @return the number of rows that were updated.
+   * @see UpdateQuery
+   */
+  int update(Transaction transaction);
+
+  /**
+   * Execute the query returning true if a row is found.
+   * <p>
+   * The query is executed using max rows of 1 and will only select the id property.
+   * This method is really just a convenient way to optimise a query to perform a
+   * 'does a row exist in the db' check.
+   * </p>
+   *
+   * <h2>Example:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = query().where().eq("email", "rob@foo.com").exists();
+   *
+   * }</pre>
+   *
+   * <h2>Example using a query bean:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = new QContact().email.equalTo("rob@foo.com").exists();
+   *
+   * }</pre>
+   *
+   * @return True if the query finds a matching row in the database
+   */
+  boolean exists();
 
   /**
    * Execute the query iterating over the results.
@@ -230,23 +327,23 @@ public interface ExpressionList<T> {
 
   /**
    * Execute the query returning a list of values for a single property.
-   * <p>
+   *
    * <h3>Example 1:</h3>
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .orderBy().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
-   * <p>
+   *
    * <h3>Example 2:</h3>
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
@@ -263,11 +360,10 @@ public interface ExpressionList<T> {
 
   /**
    * Execute a query returning a single value of a single property/column.
-   * <p>
    * <pre>{@code
    *
    *  String name =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .where().eq("id", 42)
    *      .findSingleAttribute();
@@ -348,10 +444,9 @@ public interface ExpressionList<T> {
    * If maxRows is not set on the query prior to calling findPagedList() then a
    * PersistenceException is thrown.
    * </p>
-   * <p>
    * <pre>{@code
    *
-   *  PagedList<Order> pagedList = Ebean.find(Order.class)
+   *  PagedList<Order> pagedList = DB.find(Order.class)
    *       .setFirstRow(50)
    *       .setMaxRows(20)
    *       .findPagedList();
@@ -394,7 +489,26 @@ public interface ExpressionList<T> {
    * Add some filter predicate expressions to the many property.
    */
   @Nonnull
-  ExpressionList<T> filterMany(String prop);
+  ExpressionList<T> filterMany(String manyProperty);
+
+  /**
+   * Add filter expressions to the many property.
+   *
+   * <pre>{@code
+   *
+   *   DB.find(Customer.class)
+   *   .where()
+   *   .eq("name", "Rob")
+   *   .filterMany("orders", "status = ?", Status.NEW)
+   *   .findList();
+   *
+   * }</pre>
+   *
+   * @param manyProperty The many property
+   * @param expressions  Filter expressions with and, or and ? or ?1 type bind parameters
+   * @param params       Bind parameters used in the expressions
+   */
+  Query<T> filterMany(String manyProperty, String expressions, Object... params);
 
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial
@@ -405,6 +519,11 @@ public interface ExpressionList<T> {
   Query<T> select(String properties);
 
   /**
+   * Apply the fetchGroup which defines what part of the object graph to load.
+   */
+  Query<T> select(FetchGroup<T> fetchGroup);
+
+  /**
    * Set whether this query uses DISTINCT.
    * <p>
    * The select() clause MUST be specified when setDistinct(true) is set. The reason for this is that
@@ -413,7 +532,7 @@ public interface ExpressionList<T> {
    * <pre>{@code
    *
    *   List<Customer> customers =
-   *       Ebean.find(Customer.class)
+   *       DB.find(Customer.class)
    *          .setDistinct(true)
    *          .select("name")     // only select the customer name
    *          .findList();
@@ -481,6 +600,35 @@ public interface ExpressionList<T> {
   Query<T> setUseQueryCache(CacheMode useCache);
 
   /**
+   * Extended version for setDistinct in conjunction with "findSingleAttributeList";
+   * <pre>{@code
+   *
+   *  List<CountedValue<Order.Status>> orderStatusCount =
+   *
+   *     DB.find(Order.class)
+   *      .select("status")
+   *      .where()
+   *      .gt("orderDate", LocalDate.now().minusMonths(3))
+   *
+   *      // fetch as single attribute with a COUNT
+   *      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+   *      .findSingleAttributeList();
+   *
+   *     for (CountedValue<Order.Status> entry : orderStatusCount) {
+   *       System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+   *     }
+   *
+   *   // produces
+   *
+   *   count:3 orderStatus:NEW
+   *   count:1 orderStatus:SHIPPED
+   *   count:1 orderStatus:COMPLETE
+   *
+   * }</pre>
+   */
+  Query<T> setCountDistinct(CountDistinctOrder orderBy);
+
+  /**
    * Calls {@link #setUseQueryCache(CacheMode)} with <code>ON</code> or <code>OFF</code>.
    *
    * @see Query#setUseQueryCache(CacheMode)
@@ -516,6 +664,11 @@ public interface ExpressionList<T> {
   Query<T> setDisableReadAuditing();
 
   /**
+   * Set a label on the query (to help identify query execution statistics).
+   */
+  Query<T> setLabel(String label);
+
+  /**
    * Add expressions to the having clause.
    * <p>
    * The having clause is only used for queries based on raw sql (via SqlSelect
@@ -528,6 +681,14 @@ public interface ExpressionList<T> {
    * Add another expression to the where clause.
    */
   ExpressionList<T> where();
+
+  /**
+   * Add the expressions to this expression list.
+   *
+   * @param expressions The expressions that are parsed and added to this expression list
+   * @param params      Bind parameters to match ? or ?1 bind positions.
+   */
+  ExpressionList<T> where(String expressions, Object... params);
 
   /**
    * Path exists - for the given path in a JSON document.
@@ -557,7 +718,6 @@ public interface ExpressionList<T> {
 
   /**
    * Equal to expression for the value at the given path in the JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonEqualTo("content", "path.other", 34)
@@ -572,7 +732,6 @@ public interface ExpressionList<T> {
 
   /**
    * Not Equal to - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonNotEqualTo("content", "path.other", 34)
@@ -587,7 +746,6 @@ public interface ExpressionList<T> {
 
   /**
    * Greater than - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonGreaterThan("content", "path.other", 34)
@@ -598,7 +756,6 @@ public interface ExpressionList<T> {
 
   /**
    * Greater than or equal to - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonGreaterOrEqual("content", "path.other", 34)
@@ -609,7 +766,6 @@ public interface ExpressionList<T> {
 
   /**
    * Less than - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonLessThan("content", "path.other", 34)
@@ -620,7 +776,6 @@ public interface ExpressionList<T> {
 
   /**
    * Less than or equal to - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonLessOrEqualTo("content", "path.other", 34)
@@ -631,7 +786,6 @@ public interface ExpressionList<T> {
 
   /**
    * Between - for the given path in a JSON document.
-   * <p>
    * <pre>{@code
    *
    *   where().jsonBetween("content", "orderDate", lowerDateTime, upperDateTime)
@@ -642,21 +796,6 @@ public interface ExpressionList<T> {
 
   /**
    * Add an Expression to the list.
-   * <p>
-   * This returns the list so that add() can be chained.
-   * </p>
-   * <p>
-   * <pre>{@code
-   *
-   * Query<Customer> query = Ebean.find(Customer.class);
-   * query.where()
-   *     .like("name","Rob%")
-   *     .eq("status", Customer.ACTIVE);
-   *
-   * List<Customer> list = query.findList();
-   * ...
-   *
-   * }</pre>
    */
   ExpressionList<T> add(Expression expr);
 
@@ -671,6 +810,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> eq(String propertyName, Object value);
 
   /**
+   * Equal To or Null - property is equal to a given value or null.
+   */
+  ExpressionList<T> eqOrNull(String propertyName, Object value);
+
+  /**
    * Not Equal To - property not equal to the given value.
    */
   ExpressionList<T> ne(String propertyName, Object value);
@@ -680,6 +824,39 @@ public interface ExpressionList<T> {
    * using a lower() function to make it case insensitive).
    */
   ExpressionList<T> ieq(String propertyName, String value);
+
+  /**
+   * Case Insensitive Not Equal To - property not equal to the given value (typically
+   * using a lower() function to make it case insensitive).
+   */
+  ExpressionList<T> ine(String propertyName, String value);
+
+  /**
+   * Value in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .startDate.inRangeWith(endDate, now)
+   *
+   *    // which equates to
+   *    startDate <= now and (endDate > now or endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   * The most common use of this could be called "effective dating" where 2 date or
+   * timestamp columns represent the date range in which
+   */
+  ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value);
+
+  /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  ExpressionList<T> inRange(String propertyName, Object value1, Object value2);
 
   /**
    * Between - property between the two given values.
@@ -697,6 +874,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> gt(String propertyName, Object value);
 
   /**
+   * Greater Than or Null - property greater than the given value or null.
+   */
+  ExpressionList<T> gtOrNull(String propertyName, Object value);
+
+  /**
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
    */
@@ -706,6 +888,11 @@ public interface ExpressionList<T> {
    * Less Than - property less than the given value.
    */
   ExpressionList<T> lt(String propertyName, Object value);
+
+  /**
+   * Less Than or Null - property less than the given value or null.
+   */
+  ExpressionList<T> ltOrNull(String propertyName, Object value);
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.
@@ -736,7 +923,6 @@ public interface ExpressionList<T> {
    * To get control over the options you can create an ExampleExpression and set
    * those options such as case insensitive etc.
    * </p>
-   * <p>
    * <pre>{@code
    *
    * // create an example bean and set the properties
@@ -745,16 +931,15 @@ public interface ExpressionList<T> {
    * example.setName("Rob%");
    * example.setNotes("%something%");
    *
-   * List&lt;Customer&gt; list = Ebean.find(Customer.class).where()
-   *     // pass the bean into the where() clause
-   *     .exampleLike(example)
-   *     // you can add other expressions to the same query
-   *     .gt("id", 2).findList();
+   * List<Customer> list =
+   *   DB.find(Customer.class)
+   *     .where().exampleLike(example)
+   *     .findList();
    *
    * }</pre>
    * <p>
    * Similarly you can create an ExampleExpression
-   * <p>
+   * </p>
    * <pre>{@code
    *
    * Customer example = new Customer();
@@ -764,7 +949,7 @@ public interface ExpressionList<T> {
    * // create a ExampleExpression with more control
    * ExampleExpression qbe = new ExampleExpression(example, true, LikeType.EQUAL_TO).includeZeros();
    *
-   * List<Customer> list = Ebean.find(Customer.class).where().add(qbe).findList();
+   * List<Customer> list = DB.find(Customer.class).where().add(qbe).findList();
    *
    * }</pre>
    */
@@ -842,8 +1027,43 @@ public interface ExpressionList<T> {
   ExpressionList<T> in(String propertyName, Collection<?> values);
 
   /**
-   * In - using a subQuery.
+   * In where null or empty values means that no predicate is added to the query.
+   * <p>
+   * That is, only add the IN predicate if the values are not null or empty.
+   * <p>
+   * Without this we typically need to code an <code>if</code> block to only add
+   * the IN predicate if the collection is not empty like:
+   * </p>
    *
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   if (ids != null && !ids.isEmpty()) {
+   *     query.where().in("customer.id", ids);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .inOrEmpty("customer.id", ids)
+   *     .findList();
+   *
+   * }</pre>
+   */
+  ExpressionList<T> inOrEmpty(String propertyName, Collection<?> values);
+
+  /**
+   * In - using a subQuery.
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -853,7 +1073,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - property has a value in the array of values.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -863,7 +1083,7 @@ public interface ExpressionList<T> {
 
   /**
    * In - property has a value in the collection of values.
-   *
+   * <p>
    * This is exactly the same as in() and provided due to "in" being a Kotlin keyword
    * (and hence to avoid the slightly ugly escaping when using in() in Kotlin)
    */
@@ -962,6 +1182,65 @@ public interface ExpressionList<T> {
   ExpressionList<T> arrayIsNotEmpty(String propertyName);
 
   /**
+   * Add expression for ANY of the given bit flags to be set.
+   * <pre>{@code
+   *
+   * where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAny(String propertyName, long flags);
+
+  /**
+   * Add expression for ALL of the given bit flags to be set.
+   * <pre>{@code
+   *
+   * where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAll(String propertyName, long flags);
+
+  /**
+   * Add expression for the given bit flags to be NOT set.
+   * <pre>{@code
+   *
+   * where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseNot(String propertyName, long flags);
+
+  /**
+   * Add bitwise AND expression of the given bit flags to compare with the match/mask.
+   * <p>
+   * <pre>{@code
+   *
+   * // Flags Bulk + Size = Size
+   * // ... meaning Bulk is not set and Size is set
+   *
+   * long selectedFlags = BwFlags.HAS_BULK + BwFlags.HAS_SIZE;
+   * long mask = BwFlags.HAS_SIZE; // Only Size flag set
+   *
+   * where().bitwiseAnd("flags", selectedFlags, mask)
+   *
+   * }</pre>
+   *
+   * @param propertyName The property that holds the flags value
+   * @param flags        The flags we are looking for
+   */
+  ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match);
+
+  /**
    * Add raw expression with a single parameter.
    * <p>
    * The raw expression should contain a single ? at the location of the
@@ -978,6 +1257,13 @@ public interface ExpressionList<T> {
    *
    *   // use a database function
    *   raw("add_days(orderDate, 10) < ?", someDate)
+   *
+   * }</pre>
+   *
+   * <h4>Subquery example:</h4>
+   * <pre>{@code
+   *
+   *   .raw("t0.customer_id in (select customer_id from customer_group where group_id = any(?::uuid[]))", groupIds)
    *
    * }</pre>
    */
@@ -1004,14 +1290,82 @@ public interface ExpressionList<T> {
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
-   * <p>
    * <pre>{@code
    *
    *   raw("orderQty < shipQty")
    *
    * }</pre>
+   *
+   * <h4>Subquery example:</h4>
+   * <pre>{@code
+   *
+   *   .raw("t0.customer_id in (select customer_id from customer_group where group_id = any(?::uuid[]))", groupIds)
+   *
+   * }</pre>
    */
   ExpressionList<T> raw(String raw);
+
+  /**
+   * Only add the raw expression if the values is not null or empty.
+   * <p>
+   * This is a pure convenience expression to make it nicer to deal with the pattern where we use
+   * raw() expression with a subquery and only want to add the subquery predicate when the collection
+   * of values is not empty.
+   * </p>
+   * <h3>Without inOrEmpty()</h3>
+   * <pre>{@code
+   *
+   *   query.where() // add some predicates
+   *     .eq("status", Status.NEW);
+   *
+   *   // common pattern - we can use rawOrEmpty() instead
+   *   if (orderIds != null && !orderIds.isEmpty()) {
+   *     query.where().raw("t0.customer_id in (select o.customer_id from orders o where o.id in (?1))", orderIds);
+   *   }
+   *
+   *   query.findList();
+   *
+   * }</pre>
+   *
+   * <h3>Using rawOrEmpty()</h3>
+   * Note that in the example below we use the <code>?1</code> bind parameter to get  "parameter expansion"
+   * for each element in the collection.
+   *
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     // only add the expression if orderIds is not empty
+   *     .rawOrEmpty("t0.customer_id in (select o.customer_id from orders o where o.id in (?1))", orderIds);
+   *     .findList();
+   *
+   * }</pre>
+   *
+   * <h3>Postgres ANY</h3>
+   * With Postgres we would often use the SQL <code>ANY</code> expression and array parameter binding
+   * rather than <code>IN</code>.
+   *
+   * <pre>{@code
+   *
+   *   query.where()
+   *     .eq("status", Status.NEW)
+   *     .rawOrEmpty("t0.customer_id in (select o.customer_id from orders o where o.id = any(?))", orderIds);
+   *     .findList();
+   *
+   * }</pre>
+   * <p>
+   * Note that we need to cast the Postgres array for UUID types like:
+   * </p>
+   * <pre>{@code
+   *
+   *   " ... = any(?::uuid[])"
+   *
+   * }</pre>
+   *
+   * @param raw    The raw expression that is typically a subquery
+   * @param values The values which is typically a list or set of id values.
+   */
+  ExpressionList<T> rawOrEmpty(String raw, Collection<?> values);
 
   /**
    * Add a match expression.
@@ -1083,12 +1437,10 @@ public interface ExpressionList<T> {
    * typically you only explicitly need to use the and() junction
    * when it is nested inside an or() or not() junction.
    * </p>
-   * <p>
    * <pre>{@code
    *
    *  // Example: Nested and()
    *
-   *  Ebean.find(Customer.class)
    *    .where()
    *    .or()
    *      .and() // nested and
@@ -1109,16 +1461,27 @@ public interface ExpressionList<T> {
    * Return a list of expressions that will be joined by OR's.
    * This is exactly the same as disjunction();
    * <p>
-   * <p>
    * Use endOr() or endJunction() to end the OR junction.
    * </p>
-   * <p>
+   *
+   * <pre>{@code
+   *
+   *  // Example: (status active OR anniversary is null)
+   *
+   *    .where()
+   *    .or()
+   *      .eq("status", Customer.Status.ACTIVE)
+   *      .isNull("anniversary")
+   *    .orderBy().asc("name")
+   *    .findList();
+   *
+   * }</pre>
+   *
    * <pre>{@code
    *
    *  // Example: Use or() to join
    *  // two nested and() expressions
    *
-   *  Ebean.find(Customer.class)
    *    .where()
    *    .or()
    *      .and()
@@ -1142,8 +1505,8 @@ public interface ExpressionList<T> {
    * Use endNot() or endJunction() to end expressions being added to the
    * NOT expression list.
    * </p>
-   * <p>
-   * <pre>@{code
+   *
+   * <pre>{@code
    *
    *    .where()
    *      .not()
@@ -1152,12 +1515,11 @@ public interface ExpressionList<T> {
    *        .endNot()
    *
    * }</pre>
-   * <p>
-   * <pre>@{code
+   *
+   * <pre>{@code
    *
    * // Example: nested not()
    *
-   * Ebean.find(Customer.class)
    *   .where()
    *     .eq("status", Customer.Status.ACTIVE)
    *     .not()

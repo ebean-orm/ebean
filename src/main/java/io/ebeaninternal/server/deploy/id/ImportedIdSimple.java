@@ -7,6 +7,7 @@ import io.ebeaninternal.server.deploy.BeanFkeyProperty;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.deploy.IntersectionBuilder;
 import io.ebeaninternal.server.deploy.IntersectionRow;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
@@ -34,25 +35,39 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   private static final EntryComparator COMPARATOR = new EntryComparator();
 
-  protected final BeanPropertyAssoc<?> owner;
+  final BeanPropertyAssoc<?> owner;
 
-  protected final String localDbColumn;
+  final String localDbColumn;
 
-  protected final String localSqlFormula;
+  private final String localSqlFormula;
 
-  protected final String logicalName;
+  final BeanProperty foreignProperty;
 
-  protected final BeanProperty foreignProperty;
+  private final int position;
 
-  protected final int position;
+  /**
+   * If true include in insert.
+   */
+  private final boolean insertable;
 
-  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
+  /**
+   * If true include in update.
+   */
+  private final boolean updateable;
+
+  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position,
+                          boolean insertable, boolean updateable) {
     this.owner = owner;
     this.localDbColumn = InternString.intern(localDbColumn);
     this.localSqlFormula = InternString.intern(localSqlFormula);
     this.foreignProperty = foreignProperty;
     this.position = position;
-    this.logicalName = InternString.intern(owner.getName() + "." + foreignProperty.getName());
+    this.insertable = insertable;
+    this.updateable = updateable;
+  }
+
+  public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
+    this(owner, localDbColumn, localSqlFormula, foreignProperty, position, true, true);
   }
 
   /**
@@ -60,11 +75,18 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
    */
   public static ImportedIdSimple[] sort(List<ImportedIdSimple> list) {
 
-    ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[list.size()]);
+    ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[0]);
 
     // sort into the same order as the BeanProperties
     Arrays.sort(importedIds, COMPARATOR);
     return importedIds;
+  }
+
+  /**
+   * Return true if it should be included in the update (or insert).
+   */
+  boolean isInclude(boolean update) {
+    return (update) ? updateable : insertable;
   }
 
   @Override
@@ -75,7 +97,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public int compareTo(ImportedIdSimple other) {
-    return (position < other.position ? -1 : (position == other.position ? 0 : 1));
+    return Integer.compare(position, other.position);
   }
 
   @Override
@@ -99,6 +121,20 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   }
 
   @Override
+  public void buildImport(IntersectionBuilder row) {
+    row.addColumn(localDbColumn);
+  }
+
+  @Override
+  public void bindImport(SqlUpdate sql, EntityBean other) {
+    Object value = getIdValue(other);
+    if (value == null) {
+      throw new PersistenceException("Foreign Key value null?");
+    }
+    sql.setNextParameter(value);
+  }
+
+  @Override
   public void buildImport(IntersectionRow row, EntityBean other) {
 
     Object value = getIdValue(other);
@@ -118,7 +154,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
       ctx.appendColumn(localDbColumn);
     }
   }
-
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {

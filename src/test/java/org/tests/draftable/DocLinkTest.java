@@ -175,7 +175,7 @@ public class DocLinkTest extends BaseTestCase {
 
     Link linkLive = server.publish(Link.class, link1.getId(), null);
     StrictAssertions.assertThat(linkLive.getComment()).isEqualTo(comment);
-    StrictAssertions.assertThat(linkLive.getWhenPublish()).isEqualTo(when);
+    StrictAssertions.assertThat(linkLive.getWhenPublish()).isEqualToIgnoringMillis(when);
 
     Link draft1b = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
     StrictAssertions.assertThat(draft1b.isDirty()).isFalse();

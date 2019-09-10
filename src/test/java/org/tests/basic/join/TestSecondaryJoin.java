@@ -1,7 +1,8 @@
 package org.tests.basic.join;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.TransactionalTestCase;
+
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;
 import org.tests.model.basic.ResetBasicData;
@@ -9,7 +10,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class TestSecondaryJoin extends BaseTestCase {
+public class TestSecondaryJoin extends TransactionalTestCase {
 
   @Test
   public void test() {

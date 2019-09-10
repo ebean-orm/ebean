@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -23,11 +24,12 @@ public class ROrder {
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumns({
     @JoinColumn(name = "company", referencedColumnName = "company", insertable = false, updatable = false),
-    @JoinColumn(name = "customerName", referencedColumnName = "name", insertable = false, updatable = false)
+    @JoinColumn(name = "customername", referencedColumnName = "name", insertable = false, updatable = false)
   })
   private RCustomer customer;
 
-  @Column(name = "customerName")
+  @Column(name = "customername")
+  @Size(max=127)
   private String customerName;
 
   private String item;

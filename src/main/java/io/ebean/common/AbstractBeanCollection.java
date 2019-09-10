@@ -6,7 +6,6 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 
-import javax.persistence.PersistenceException;
 import java.util.Set;
 
 /**
@@ -21,7 +20,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   protected boolean disableLazyLoad;
 
   /**
-   * The EbeanServer this is associated with. (used for lazy fetch).
+   * The Database this is associated with. (used for lazy fetch).
    */
   protected transient BeanCollectionLoader loader;
 
@@ -64,7 +63,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.ebeanServerName = loader.getName();
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;
-    this.readOnly = ownerBean._ebean_getIntercept().isReadOnly();
+    this.readOnly = ownerBean != null && ownerBean._ebean_getIntercept().isReadOnly();
   }
 
   @Override
@@ -96,13 +95,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     if (loader == null) {
       loader = (BeanCollectionLoader) Ebean.getServer(ebeanServerName);
     }
-    if (loader == null) {
-      String msg = "Lazy loading but LazyLoadEbeanServer is null?"
-        + " The LazyLoadEbeanServer needs to be set after deserialization"
-        + " to support lazy loading.";
-      throw new PersistenceException(msg);
-    }
-
     loader.loadMany(this, onlyIds);
     checkEmptyLazyLoad();
   }
@@ -139,6 +131,11 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   // ---------------------------------------------------------
   // Support for modify additions deletions etc - ManyToMany
   // ---------------------------------------------------------
+
+  @Override
+  public ModifyListenMode getModifyListening() {
+    return modifyListenMode;
+  }
 
   /**
    * set modifyListening to be on or off.
@@ -210,13 +207,18 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * Return true if there are underlying additions or removals.
    */
-  boolean holdsModifications() {
+  @Override
+  public boolean holdsModifications() {
     return modifyHolder != null && modifyHolder.hasModifications();
   }
-  
+
+  @Override
+  public boolean wasTouched() {
+    return modifyHolder != null && modifyHolder.wasTouched();
+  }
+
   /**
    * Copies all relevant properties for a clone. See {@link #getShallowCopy()}
-   * @param other
    */
   protected void setFromOriginal(AbstractBeanCollection<E> other) {
     this.disableLazyLoad = other.disableLazyLoad;

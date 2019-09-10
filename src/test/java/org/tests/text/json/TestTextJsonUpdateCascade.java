@@ -1,8 +1,8 @@
 package org.tests.text.json;
 
-import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.TransactionalTestCase;
 import io.ebean.text.json.JsonContext;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.MRole;
@@ -18,12 +18,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class TestTextJsonUpdateCascade extends BaseTestCase {
+public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
   @Test
   public void test() throws IOException {
-
-    ResetBasicData.reset();
 
     Customer c0 = ResetBasicData.createCustAndOrder("Test Json");
 

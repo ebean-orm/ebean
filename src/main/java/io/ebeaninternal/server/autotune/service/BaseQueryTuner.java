@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.autotune.service;
 
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.AutoTuneConfig;
 import io.ebean.config.AutoTuneMode;
@@ -41,7 +41,7 @@ public class BaseQueryTuner {
    */
   private final boolean skipAll;
 
-  public BaseQueryTuner(AutoTuneConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
+  BaseQueryTuner(AutoTuneConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
     this.server = server;
     this.profilingListener = profilingListener;
     this.mode = config.getMode();
@@ -84,15 +84,20 @@ public class BaseQueryTuner {
   /**
    * Auto tune the query and enable profiling.
    */
-  public boolean tuneQuery(SpiQuery<?> query) {
+  boolean tuneQuery(SpiQuery<?> query) {
 
     if (skipAll || !tunableQuery(query)) {
       return false;
     }
 
+    if (query.getProfilingListener() != null) {
+      // profiling secondary query
+      return false;
+    }
+
     if (!useTuning(query)) {
       if (profiling) {
-        profiling(query, server.createCallStack());
+        profiling(query, server.createCallOrigin());
       }
       return false;
     }
@@ -105,8 +110,8 @@ public class BaseQueryTuner {
     }
 
     // create a query point to identify the query
-    CallStack stack = server.createCallStack();
-    ObjectGraphNode origin = query.setOrigin(stack);
+    CallOrigin callOrigin = server.createCallOrigin();
+    ObjectGraphNode origin = query.setOrigin(callOrigin);
 
     if (profiling) {
       if (profilingListener.isProfileRequest(origin, query)) {
@@ -138,20 +143,21 @@ public class BaseQueryTuner {
     switch (type) {
       case COUNT:
       case ID_LIST:
+      case UPDATE:
       case DELETE:
       case SUBQUERY:
         return false;
       default:
         // not using autoTune when explicitly loading the l2 bean cache
         // or when using Versions query
-        return !query.isBeanCacheReload() && SpiQuery.TemporalMode.VERSIONS != query.getTemporalMode();
+        return !query.isForceHitDatabase() && SpiQuery.TemporalMode.VERSIONS != query.getTemporalMode();
     }
   }
 
-  private void profiling(SpiQuery<?> query, CallStack stack) {
+  private void profiling(SpiQuery<?> query, CallOrigin call) {
 
     // create a query point to identify the query
-    ObjectGraphNode origin = query.setOrigin(stack);
+    ObjectGraphNode origin = query.setOrigin(call);
     if (profilingListener.isProfileRequest(origin, query)) {
       // collect more profiling based on profiling rate etc
       query.setProfilingListener(profilingListener);

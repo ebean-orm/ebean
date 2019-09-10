@@ -1,13 +1,13 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Where;
 import io.ebean.util.AnnotationUtil;
-import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import org.tests.model.basic.ValidationGroupSomething;
 import org.junit.Test;
+import org.tests.model.basic.ValidationGroupSomething;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
@@ -125,23 +125,23 @@ public class TestAnnotationBase extends BaseTestCase {
 
 
   @Test
-  public void testFindMaxSize() throws NoSuchFieldException, SecurityException {
+  public void testFindMaxSize() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
-    BeanProperty bp = descriptor.findBeanProperty("constraintAnnotation");
+    BeanProperty bp = descriptor.findProperty("constraintAnnotation");
     assertEquals(40, bp.getDbLength());
   }
 
   @Test
-  public void testNotNullWithGroup() throws NoSuchFieldException, SecurityException {
+  public void testNotNullWithGroup() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
 
-    BeanProperty bp = descriptor.findBeanProperty("null1");
+    BeanProperty bp = descriptor.findProperty("null1");
     assertFalse(bp.isNullable());
 
-    bp = descriptor.findBeanProperty("null2");
+    bp = descriptor.findProperty("null2");
     assertTrue(bp.isNullable());
 
-    bp = descriptor.findBeanProperty("null3");
+    bp = descriptor.findProperty("null3");
     assertTrue(bp.isNullable());
   }
 

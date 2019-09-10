@@ -20,6 +20,9 @@ public class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
     if (value == null) {
       return null;
     }
+    if (value instanceof String) {
+      return UUID.fromString((String) value);
+    }
     return (UUID) value;
   }
 

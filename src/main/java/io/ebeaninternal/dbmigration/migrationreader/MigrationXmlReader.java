@@ -24,12 +24,14 @@ public class MigrationXmlReader {
    */
   public static Migration read(String resourcePath) {
 
-    InputStream is = MigrationXmlReader.class.getResourceAsStream(resourcePath);
-    if (is == null) {
-      throw new IllegalArgumentException("No resource found for path [" + resourcePath + "]");
+    try (InputStream is = MigrationXmlReader.class.getResourceAsStream(resourcePath)) {
+      if (is == null) {
+        throw new IllegalArgumentException("No resource found for path [" + resourcePath + "]");
+      }
+      return read(is);
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Failed to auto close resource " + resourcePath, e);
     }
-
-    return read(is);
   }
 
   /**

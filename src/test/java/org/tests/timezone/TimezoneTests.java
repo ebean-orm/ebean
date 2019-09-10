@@ -44,22 +44,21 @@ public class TimezoneTests {
   }
 
   private void fetch() throws SQLException {
-    Transaction transaction = Ebean.beginTransaction();
-    Connection connection = transaction.getConnection();
+    try (
+        Transaction transaction = Ebean.beginTransaction();
+        Connection connection = transaction.getConnection();
+        PreparedStatement statement = connection.prepareStatement("select * from tztest");
+        ResultSet resultSet = statement.executeQuery()) {
 
-    PreparedStatement statement = connection.prepareStatement("select * from tztest");
-    ResultSet resultSet = statement.executeQuery();
-    while (resultSet.next()) {
-      System.out.println(" zone:" + resultSet.getString("zone"));
-      System.out.println("   ts:" + tsof(resultSet.getTimestamp("ts")));
-      System.out.println(" tstz:" + tsof(resultSet.getTimestamp("tstz")));
-      System.out.println("  ts1:" + tsof(resultSet.getTimestamp("ts1", cal())));
-      System.out.println("tstz1:" + tsof(resultSet.getTimestamp("tstz1", cal())));
+      while (resultSet.next()) {
+        System.out.println(" zone:" + resultSet.getString("zone"));
+        System.out.println("   ts:" + tsof(resultSet.getTimestamp("ts")));
+        System.out.println(" tstz:" + tsof(resultSet.getTimestamp("tstz")));
+        System.out.println("  ts1:" + tsof(resultSet.getTimestamp("ts1", cal())));
+        System.out.println("tstz1:" + tsof(resultSet.getTimestamp("tstz1", cal())));
+      }
+      System.out.println("");
     }
-    System.out.println("");
-    resultSet.close();
-    statement.close();
-    transaction.end();
   }
 
   private String tsof(Timestamp timestamp) {
@@ -79,17 +78,19 @@ public class TimezoneTests {
       setZone(zone);
     }
 
-    Transaction transaction = Ebean.beginTransaction();
-    Connection connection = transaction.getConnection();
-    PreparedStatement statement = connection.prepareStatement(insert);
-    statement.setString(1, zone);
-    statement.setTimestamp(2, nowTs);
-    statement.setTimestamp(3, nowTs);
-    statement.setTimestamp(4, nowTs, cal());
-    statement.setTimestamp(5, nowTs, cal());
-    statement.executeUpdate();
+    try (
+        Transaction transaction = Ebean.beginTransaction();
+        Connection connection = transaction.getConnection();
+        PreparedStatement statement = connection.prepareStatement(insert)) {
+      statement.setString(1, zone);
+      statement.setTimestamp(2, nowTs);
+      statement.setTimestamp(3, nowTs);
+      statement.setTimestamp(4, nowTs, cal());
+      statement.setTimestamp(5, nowTs, cal());
+      statement.executeUpdate();
 
-    transaction.commit();
+      transaction.commit();
+    }
   }
 
   private Calendar cal() {

@@ -2,10 +2,12 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
-import io.ebean.config.DbTypeConfig;
+import io.ebean.config.PlatformConfig;
+import io.ebean.util.JdbcClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 
 /**
@@ -46,10 +49,14 @@ public class DatabasePlatform {
    */
   protected boolean useExtraTransactionOnIterateSecondaryQueries;
 
+  protected boolean supportsDeleteTableAlias;
+
+  protected boolean supportsSavepointId = true;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
-  protected OnQueryOnly onQueryOnly = OnQueryOnly.ROLLBACK;
+  protected OnQueryOnly onQueryOnly = OnQueryOnly.COMMIT;
 
   /**
    * The open quote used by quoted identifiers.
@@ -61,12 +68,12 @@ public class DatabasePlatform {
    */
   protected String closeQuote = "\"";
 
-  protected String concatOperator = "||";
-
   /**
    * When set to true all db column names and table names use quoted identifiers.
    */
   protected boolean allQuotedIdentifiers;
+
+  protected boolean caseSensitiveCollation = true;
 
   /**
    * For limit/offset, row_number etc limiting of SQL queries.
@@ -98,6 +105,10 @@ public class DatabasePlatform {
    */
   protected DbIdentity dbIdentity = new DbIdentity();
 
+  protected boolean sequenceBatchMode = true;
+
+  protected int sequenceBatchSize = 20;
+
   /**
    * The history support for this database platform.
    */
@@ -127,6 +138,8 @@ public class DatabasePlatform {
    * The database platform name.
    */
   protected Platform platform = Platform.GENERIC;
+
+  protected String truncateTable = "truncate table %s";
 
   protected String columnAliasPrefix = "c";
 
@@ -173,7 +186,15 @@ public class DatabasePlatform {
   protected boolean forwardOnlyHintOnFindIterate;
 
   /**
-   * By default we use JDBC batch when cascading (except for SQL Server).
+   * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
+   *
+   * This is {@code false} for HANA
+   */
+  protected boolean supportsResultSetConcurrencyModeUpdatable = true;
+
+
+  /**
+   * By default we use JDBC batch when cascading (except for SQL Server and HANA).
    */
   protected PersistBatch persistBatchOnCascade = PersistBatch.ALL;
 
@@ -207,9 +228,19 @@ public class DatabasePlatform {
   }
 
   /**
+   * Configure the platform given the server configuration.
+   */
+  public void configure(PlatformConfig config) {
+    this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
+    this.caseSensitiveCollation = config.isCaseSensitiveCollation();
+    configureIdType(config.getIdType());
+    configure(config, config.isAllQuotedIdentifiers());
+  }
+
+  /**
    * Configure UUID Storage etc based on ServerConfig settings.
    */
-  public void configure(DbTypeConfig config, boolean allQuotedIdentifiers) {
+  protected void configure(PlatformConfig config, boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;
     addGeoTypes(config.getGeometrySRID());
     configureIdType(config.getIdType());
@@ -264,10 +295,48 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return true if we are using Sequence batch mode rather than STEP.
+   */
+  public boolean isSequenceBatchMode() {
+    return sequenceBatchMode;
+  }
+
+  /**
+   * Set to false to not use sequence batch mode but instead STEP mode.
+   */
+  public void setSequenceBatchMode(boolean sequenceBatchMode) {
+    this.sequenceBatchMode = sequenceBatchMode;
+  }
+
+  /**
    * Return true if this database platform supports native ILIKE expression.
    */
   public boolean isSupportsNativeIlike() {
     return supportsNativeIlike;
+  }
+
+  /**
+   * Return true if the platform supports delete statements with table alias.
+   */
+  public boolean isSupportsDeleteTableAlias() {
+    return supportsDeleteTableAlias;
+  }
+
+  /**
+   * Return true if the collation is case sensitive.
+   * <p>
+   * This is expected to be used for testing only.
+   * </p>
+   */
+  public boolean isCaseSensitiveCollation() {
+    return caseSensitiveCollation;
+  }
+
+  /**
+   * Return true if the platform supports SavepointId values.
+   */
+  public boolean isSupportsSavepointId() {
+    return supportsSavepointId;
   }
 
   /**
@@ -304,10 +373,10 @@ public class DatabasePlatform {
    * @param be        the BackgroundExecutor that can be used to load the sequence if
    *                  desired
    * @param ds        the DataSource
+   * @param stepSize  the sequence allocation size as defined by mapping (defaults to 50)
    * @param seqName   the name of the sequence
-   * @param batchSize the number of sequences that should be loaded
    */
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
     return null;
   }
 
@@ -351,6 +420,13 @@ public class DatabasePlatform {
    */
   public void setHistorySupport(DbHistorySupport historySupport) {
     this.historySupport = historySupport;
+  }
+
+  /**
+   * So no except for Postgres and CockroachDB.
+   */
+  public boolean isNativeArrayType() {
+    return false;
   }
 
   /**
@@ -419,13 +495,6 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return the DB concat operator.
-   */
-  public String getConcatOperator() {
-    return concatOperator;
-  }
-
-  /**
    * Return the JDBC type used to store booleans.
    */
   public int getBooleanDbType() {
@@ -487,6 +556,31 @@ public class DatabasePlatform {
    */
   public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
+  }
+
+  /**
+   * Return true if the ResultSet CONCUR_UPDATABLE Hint should be used on
+   * createNativeSqlTree() PreparedStatements.
+   * <p>
+   * This specifically is required for Hana which doesn't support CONCUR_UPDATABLE
+   * </p>
+   */
+  public boolean isSupportsResultSetConcurrencyModeUpdatable() {
+    return supportsResultSetConcurrencyModeUpdatable;
+  }
+
+  /**
+   * Set to true if the ResultSet CONCUR_UPDATABLE Hint should be used by default on createNativeSqlTree() PreparedStatements.
+   */
+  public void setSupportsResultSetConcurrencyModeUpdatable(boolean supportsResultSetConcurrencyModeUpdatable) {
+    this.supportsResultSetConcurrencyModeUpdatable = supportsResultSetConcurrencyModeUpdatable;
+  }
+
+  /**
+   * Normally not needed - overridden in CockroachPlatform.
+   */
+  public boolean isDdlAutoCommit() {
+    return false;
   }
 
   /**
@@ -586,6 +680,14 @@ public class DatabasePlatform {
     return sql;
   }
 
+  /**
+   * For update hint on the FROM clause (SQL server only).
+   */
+  public String fromForUpdate(Query.ForUpdate forUpdateMode) {
+    // return null except for sql server
+    return null;
+  }
+
   protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     // silently assume the database does not support the "for update" clause.
     logger.info("it seems your database does not support the 'for update' clause");
@@ -609,6 +711,46 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return a statement to truncate a table.
+   */
+  public String truncateStatement(String table) {
+    return String.format(truncateTable, table);
+  }
+
+  /**
+   * Create the DB schema if it does not exist.
+   */
+  public void createSchemaIfNotExists(String dbSchema, Connection connection) throws SQLException {
+    if (!schemaExists(dbSchema, connection)) {
+      Statement query = connection.createStatement();
+      try {
+        logger.info("create schema:{}", dbSchema);
+        query.executeUpdate("create schema " + dbSchema);
+      } finally {
+        JdbcClose.close(query);
+      }
+    }
+  }
+
+  /**
+   * Return true if the schema exists.
+   */
+  public boolean schemaExists(String dbSchema, Connection connection) throws SQLException {
+    ResultSet schemas = connection.getMetaData().getSchemas();
+    try {
+      while (schemas.next()) {
+        String schema = schemas.getString(1);
+        if (schema.equalsIgnoreCase(dbSchema)) {
+          return true;
+        }
+      }
+    } finally {
+      JdbcClose.close(schemas);
+    }
+    return false;
+  }
+
+  /**
    * Return true if the table exists.
    */
   public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
@@ -618,19 +760,22 @@ public class DatabasePlatform {
     try {
       return tables.next();
     } finally {
-      close(tables);
+      JdbcClose.close(tables);
     }
   }
 
   /**
-   * Close the resultSet.
+   * Return true if partitions exist for the given table.
    */
-  protected void close(ResultSet resultSet) {
-    try {
-      resultSet.close();
-    } catch (SQLException e) {
-      logger.error("Error closing resultSet", e);
-    }
+  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
+    return true;
+  }
+
+  /**
+   * Return the SQL to create an initial partition for the given table.
+   */
+  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String singlePrimaryKey) {
+    return null;
   }
 
   /**

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.PersistenceIOException;
 import io.ebean.bean.BeanDiffVisitor;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.util.ArrayStack;
 
 import java.io.IOException;
@@ -82,10 +82,10 @@ class BeanChangeJson implements BeanDiffVisitor {
   void flush() {
     try {
       newJson.writeEndObject();
-      newJson.gen().flush();
+      newJson.flush();
       if (oldJson != null) {
         oldJson.writeEndObject();
-        oldJson.gen().flush();
+        oldJson.flush();
       }
     } catch (IOException e) {
       throw new PersistenceIOException(e);

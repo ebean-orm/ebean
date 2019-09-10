@@ -3,23 +3,39 @@ package io.ebean.meta;
 import java.util.List;
 
 /**
- * Provides access to the meta data in EbeanServer such as query execution statistics.
+ * Provides access to the meta data in Database such as query execution statistics.
  */
 public interface MetaInfoManager {
 
   /**
-   * Collect and return the transaction execution metrics.
-   */
-  List<MetaTimedMetric> collectTransactionStatistics(boolean reset);
-
-  /**
-   * Collect and return the non-empty query plan statistics for all the beans.
+   * Return the metrics for the database instance.
    * <p>
-   * Note that this excludes the query plan statistics where there has been no
-   * executions (since the last collection with reset).
+   * This will reset the metrics (reset counters back to zero etc) and
+   * will only return the non-empty metrics.
    * </p>
    */
-  List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
+  ServerMetrics collectMetrics();
+
+  /**
+   * Collect query plans.
+   */
+  List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request);
+
+  /**
+   * Visit the metrics resetting and collecting/reporting as desired.
+   */
+  void visitMetrics(MetricVisitor visitor);
+
+  /**
+   * Run a visit collecting all the metrics and returning BasicMetricVisitor
+   * which holds all the metrics in simple lists.
+   */
+  BasicMetricVisitor visitBasic();
+
+  /**
+   * Just reset all the metrics. Maybe only useful for testing purposes.
+   */
+  void resetAllMetrics();
 
   /**
    * Collect and return the ObjectGraphNode statistics.
@@ -31,6 +47,6 @@ public interface MetaInfoManager {
    *
    * @param reset Set to true to reset the underlying statistics after collection.
    */
-  List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset);
+  List<MetaOrmQueryNode> collectNodeStatistics(boolean reset);
 
 }

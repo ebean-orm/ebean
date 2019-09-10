@@ -22,6 +22,7 @@ public class DB2Platform extends DatabasePlatform {
     this.platform = Platform.DB2;
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
+    this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.sqlLimiter = new Db2SqlLimiter();
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
@@ -46,19 +47,14 @@ public class DB2Platform extends DatabasePlatform {
     persistBatchOnCascade = PersistBatch.NONE;
   }
 
-  @Override
-  protected void escapeLikeCharacter(char ch, StringBuilder sb) {
-    sb.append('|').append(ch);
-  }
   /**
    * Return a DB2 specific sequence IdGenerator that supports batch fetching
    * sequence values.
    */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
-                                                       DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
 
-    return new DB2SequenceIdGenerator(be, ds, seqName, batchSize);
+    return new DB2SequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
 }

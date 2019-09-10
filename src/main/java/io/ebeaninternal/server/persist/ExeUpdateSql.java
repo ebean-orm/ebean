@@ -1,24 +1,22 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
 import io.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * Executes the UpdateSql requests.
  */
-public class ExeUpdateSql {
-
-  private static final Logger logger = LoggerFactory.getLogger(ExeUpdateSql.class);
+class ExeUpdateSql {
 
   private final Binder binder;
 
@@ -27,7 +25,7 @@ public class ExeUpdateSql {
   /**
    * Create with a given binder.
    */
-  public ExeUpdateSql(Binder binder) {
+  ExeUpdateSql(Binder binder) {
     this.binder = binder;
     this.pstmtFactory = new PstmtFactory();
   }
@@ -51,46 +49,55 @@ public class ExeUpdateSql {
       } else {
         int rowCount = pstmt.executeUpdate();
         request.checkRowCount(rowCount);
+        if (request.isGetGeneratedKeys()) {
+          readGeneratedKeys(pstmt, request);
+        }
         request.postExecute();
         return rowCount;
       }
-    } catch (SQLException ex) {
-      throw new PersistenceException(ex);
+    } catch (SQLException e) {
+      throw request.translateSqlException(e);
 
     } finally {
-      if (!batchThisRequest && pstmt != null) {
-        try {
-          pstmt.close();
-        } catch (SQLException e) {
-          logger.error(null, e);
-        }
+      if (!batchThisRequest) {
+        JdbcClose.close(pstmt);
       }
     }
   }
 
+  private void readGeneratedKeys(PreparedStatement stmt, PersistRequestUpdateSql request) {
+
+    ResultSet resultSet = null;
+      try {
+        resultSet = stmt.getGeneratedKeys();
+        if (resultSet.next()) {
+          request.setGeneratedKey(resultSet.getObject(1));
+        }
+      } catch (SQLException ex) {
+        throw new PersistenceException(ex);
+
+      } finally {
+        JdbcClose.close(resultSet);
+      }
+  }
+
   private PreparedStatement bindStmt(PersistRequestUpdateSql request, boolean batchThisRequest) throws SQLException {
 
+    request.startBind(batchThisRequest);
     SpiSqlUpdate updateSql = request.getUpdateSql();
     SpiTransaction t = request.getTransaction();
-
-    String sql = updateSql.getSql();
 
     BindParams bindParams = updateSql.getBindParams();
 
     // process named parameters if required
+    String sql = updateSql.getBaseSql();
     sql = BindParamsParser.parse(bindParams, sql);
-    updateSql.setGeneratedSql(sql);
-
-    boolean logSql = request.isLogSql();
 
     PreparedStatement pstmt;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmt(t, logSql, sql, request);
+      pstmt = pstmtFactory.getPstmt(t, request.isLogSql(), sql, request);
     } else {
-      if (logSql) {
-        t.logSql(TrimLogSql.trim(sql));
-      }
-      pstmt = pstmtFactory.getPstmt(t, sql);
+      pstmt = pstmtFactory.getPstmt(t, sql, request.isGetGeneratedKeys());
     }
 
     if (updateSql.getTimeout() > 0) {
@@ -103,9 +110,13 @@ public class ExeUpdateSql {
     }
 
     request.setBindLog(bindLog);
+    updateSql.setGeneratedSql(sql);
 
     // derive the statement type (for TransactionEvent)
     parseUpdate(sql, request);
+    if (batchThisRequest) {
+      request.logSqlBatchBind();
+    }
     return pstmt;
   }
 
@@ -113,16 +124,16 @@ public class ExeUpdateSql {
   private void determineType(String word1, String word2, String word3, PersistRequestUpdateSql request) {
 
     if (word1.equalsIgnoreCase("UPDATE")) {
-      request.setType(SqlType.SQL_UPDATE, word2, "UpdateSql");
+      request.setType(SqlType.SQL_UPDATE, word2);
 
     } else if (word1.equalsIgnoreCase("DELETE")) {
-      request.setType(SqlType.SQL_DELETE, word3, "DeleteSql");
+      request.setType(SqlType.SQL_DELETE, word3);
 
     } else if (word1.equalsIgnoreCase("INSERT")) {
-      request.setType(SqlType.SQL_INSERT, word3, "InsertSql");
+      request.setType(SqlType.SQL_INSERT, word3);
 
     } else {
-      request.setType(SqlType.SQL_UNKNOWN, null, "UnknownSql");
+      request.setType(SqlType.SQL_UNKNOWN, null);
     }
   }
 
@@ -146,7 +157,7 @@ public class ExeUpdateSql {
     if (spaceCount < 2) {
       // unknown so no automatic L2 cache invalidation performed (so it should instead)
       // be done explicitly via the server.externalModification() method
-      request.setType(SqlType.SQL_UNKNOWN, null, "UnknownSql");
+      request.setType(SqlType.SQL_UNKNOWN, null);
 
     } else {
       // try to determine if it is insert, update or delete and the table involved

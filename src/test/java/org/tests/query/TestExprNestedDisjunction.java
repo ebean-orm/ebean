@@ -3,9 +3,9 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     String s = q.getGeneratedSql();
 
     assertThat(s).contains("(t0.name like ");
-    assertThat(s).contains(" and t0.anniversary = ? )  or (t0.status = ?  and t0.id > ? )");
+    assertThat(s).contains(" and t0.anniversary = ?) or (t0.status = ? and t0.id > ?)");
   }
 
 
@@ -52,7 +52,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     String s = q.getGeneratedSql();
 
     assertThat(s).contains("(t0.name like ");
-    assertThat(s).contains(" and t0.anniversary = ? )  or (t0.status = ?  and t0.id > ? )");
+    assertThat(s).contains(" and t0.anniversary = ?) or (t0.status = ? and t0.id > ?)");
   }
 
   @Test
@@ -73,7 +73,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     q.findList();
     String s = q.getGeneratedSql();
 
-    assertThat(s).contains("where not (t0.id > ?  and t0.anniversary = ? )  order by t0.name");
+    assertThat(s).contains("where not (t0.id > ? and t0.anniversary = ?) order by t0.name");
   }
 
   @Test
@@ -95,7 +95,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     q.findList();
     String s = q.getGeneratedSql();
 
-    assertThat(s).contains("where (t0.status = ?  or not (t0.id > ?  and t0.anniversary = ? ) )");
+    assertThat(s).contains("where (t0.status = ? or not (t0.id > ? and t0.anniversary = ?))");
   }
 
   @Test
@@ -119,6 +119,6 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     q.findList();
     String s = q.getGeneratedSql();
 
-    assertThat(s).contains("where (t0.status = ?  or not (t0.id > ?  and t0.anniversary = ? ) )");
+    assertThat(s).contains("where (t0.status = ? or not (t0.id > ? and t0.anniversary = ?))");
   }
 }

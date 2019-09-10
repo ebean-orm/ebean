@@ -24,21 +24,15 @@ public class FactoryEmbedded {
    */
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
 
-    BeanPropertyAssocOne<?>[] embedded = desc.propertiesEmbedded();
-
-    for (BeanPropertyAssocOne<?> anEmbedded : embedded) {
-
+    for (BeanPropertyAssocOne<?> anEmbedded : desc.propertiesEmbedded()) {
       BeanProperty[] props = anEmbedded.getProperties();
-
       List<Bindable> bindList = new ArrayList<>(props.length);
-
       for (BeanProperty prop : props) {
-        Bindable item = factoryProperty.create(prop, mode, withLobs);
+        Bindable item = factoryProperty.create(prop, mode, withLobs, true);
         if (item != null) {
           bindList.add(item);
         }
       }
-
       list.add(new BindableEmbedded(anEmbedded, bindList));
     }
   }

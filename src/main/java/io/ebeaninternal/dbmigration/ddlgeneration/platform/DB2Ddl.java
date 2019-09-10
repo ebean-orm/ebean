@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
 /**
@@ -18,13 +19,18 @@ public class DB2Ddl extends PlatformDdl {
   }
 
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, boolean notNull) {
-    if (notNull) {
-      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, true);
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
+    if (nullableColumns == null || nullableColumns.length == 0) {
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     } else {
       // Hmm: Complex workaround: https://www.ibm.com/developerworks/mydeveloperworks/blogs/SQLTips4DB2LUW/entry/unique_where_not_null_indexes26?lang=en
-      return "-- NOT SUPPORTED " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, true);
+      return "-- NOT SUPPORTED " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
     }
+  }
+
+  @Override
+  protected void appendForeignKeyOnUpdate(StringBuilder buffer, ConstraintMode mode) {
+    // do nothing, no on update clause for db2
   }
 
 }

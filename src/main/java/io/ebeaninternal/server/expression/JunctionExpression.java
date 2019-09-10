@@ -1,8 +1,11 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.CacheMode;
+import io.ebean.CountDistinctOrder;
+import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionList;
+import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
@@ -13,6 +16,8 @@ import io.ebean.PagedList;
 import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -29,6 +34,7 @@ import io.ebeaninternal.api.SpiJunction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +67,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public boolean naturalKey(NaturalKeyQueryData data) {
+  public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
   }
@@ -187,7 +193,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
         }
         item.addSql(request);
       }
-      request.append(") ");
+      request.append(")");
     }
   }
 
@@ -276,6 +282,16 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value) {
+    return exprList.inRangeWith(lowProperty, highProperty, value);
+  }
+
+  @Override
+  public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
+    return exprList.inRange(propertyName, value1, value2);
+  }
+
+  @Override
   public ExpressionList<T> between(String propertyName, Object value1, Object value2) {
     return exprList.between(propertyName, value1, value2);
   }
@@ -301,8 +317,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> eqOrNull(String propertyName, Object value) {
+    return exprList.eqOrNull(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> exampleLike(Object example) {
     return exprList.exampleLike(example);
+  }
+
+  @Override
+  public ExpressionList<T> where(String expressions, Object... params) {
+    throw new IllegalStateException("where not allowed on Junction expression list");
   }
 
   @Override
@@ -311,13 +337,38 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public Query<T> filterMany(String manyProperty, String expressions, Object... params) {
+    throw new IllegalStateException("filterMany not allowed on Junction expression list");
+  }
+
+  @Override
+  public Query<T> usingTransaction(Transaction transaction) {
+    return exprList.usingTransaction(transaction);
+  }
+
+  @Override
+  public Query<T> usingConnection(Connection connection) {
+    return exprList.usingConnection(connection);
+  }
+
+  @Override
   public int delete() {
     return exprList.delete();
   }
 
   @Override
+  public int delete(Transaction transaction) {
+    return exprList.delete(transaction);
+  }
+
+  @Override
   public int update() {
     return exprList.update();
+  }
+
+  @Override
+  public int update(Transaction transaction) {
+    return exprList.update(transaction);
   }
 
   @Override
@@ -328,6 +379,16 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> asDraft() {
     return exprList.asDraft();
+  }
+
+  @Override
+  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+    return exprList.asDto(dtoClass);
+  }
+
+  @Override
+  public UpdateQuery<T> asUpdate() {
+    return exprList.asUpdate();
   }
 
   @Override
@@ -348,6 +409,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> apply(FetchPath fetchPath) {
     return exprList.apply(fetchPath);
+  }
+
+  @Override
+  public boolean exists() {
+    return exprList.exists();
   }
 
   @Override
@@ -533,6 +599,26 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
+    return exprList.bitwiseAny(propertyName, flags);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
+    return exprList.bitwiseAll(propertyName, flags);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
+    return exprList.bitwiseAnd(propertyName, flags, match);
+  }
+
+  @Override
+  public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
+    return exprList.bitwiseNot(propertyName, flags);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
   }
@@ -540,6 +626,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> gt(String propertyName, Object value) {
     return exprList.gt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> gtOrNull(String propertyName, Object value) {
+    return exprList.gtOrNull(propertyName, value);
   }
 
   @Override
@@ -578,6 +669,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> ine(String propertyName, String value) {
+    return exprList.ine(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> iexampleLike(Object example) {
     return exprList.iexampleLike(example);
   }
@@ -595,6 +691,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> in(String propertyName, Collection<?> values) {
     return exprList.in(propertyName, values);
+  }
+
+  @Override
+  public ExpressionList<T> inOrEmpty(String propertyName, Collection<?> values) {
+    return exprList.inOrEmpty(propertyName, values);
   }
 
   @Override
@@ -639,7 +740,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public ExpressionList<T> notExists(Query<?> subQuery) {
-    return exprList.exists(subQuery);
+    return exprList.notExists(subQuery);
   }
 
   @Override
@@ -670,6 +771,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> lt(String propertyName, Object value) {
     return exprList.lt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> ltOrNull(String propertyName, Object value) {
+    return exprList.ltOrNull(propertyName, value);
   }
 
   @Override
@@ -723,6 +829,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> rawOrEmpty(String raw, Collection<?> values) {
+    return exprList.rawOrEmpty(raw, values);
+  }
+
+  @Override
   public ExpressionList<T> raw(String raw) {
     return exprList.raw(raw);
   }
@@ -730,6 +841,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> select(String properties) {
     return exprList.select(properties);
+  }
+
+  @Override
+  public Query<T> select(FetchGroup fetchGroup) {
+    return exprList.select(fetchGroup);
   }
 
   @Override
@@ -790,6 +906,16 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public Query<T> setDisableReadAuditing() {
     return exprList.setDisableReadAuditing();
+  }
+
+  @Override
+  public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
+    return exprList.setCountDistinct(orderBy);
+  }
+
+  @Override
+  public Query<T> setLabel(String label) {
+    return exprList.setLabel(label);
   }
 
   @Override

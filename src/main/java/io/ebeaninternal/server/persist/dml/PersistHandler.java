@@ -5,12 +5,7 @@ import java.sql.SQLException;
 /**
  * Implementation API for insert update and delete handlers.
  */
-public interface PersistHandler {
-
-  /**
-   * Return the bind log.
-   */
-  String getBindLog();
+interface PersistHandler {
 
   /**
    * Get the sql and bind the statement.

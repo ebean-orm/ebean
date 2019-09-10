@@ -14,7 +14,7 @@ public class PrimaryServerTest extends BaseTestCase {
 
 
   @Test
-  public void testIsSkipPrimaryServer() throws Exception {
+  public void testIsSkipPrimaryServer() {
     PrimaryServer.setSkip(true);
     assertTrue(PrimaryServer.isSkip());
     PrimaryServer.setSkip(false);
@@ -23,14 +23,14 @@ public class PrimaryServerTest extends BaseTestCase {
 
   @Test
   @ForPlatform(Platform.H2)
-  public void testGetPrimaryServerName() throws Exception {
+  public void testGetPrimaryServerName() {
 
     String primaryServerName = PrimaryServer.getDefaultServerName();
     assertEquals("h2", primaryServerName);
   }
 
   @Test
-  public void testLoadProperties() throws Exception {
+  public void testLoadProperties() {
 
     Properties properties = PrimaryServer.getProperties();
     assertTrue(!properties.isEmpty());

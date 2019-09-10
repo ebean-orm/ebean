@@ -4,6 +4,7 @@ import io.ebean.config.JsonConfig;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -42,6 +43,11 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
   }
 
   @Override
+  public LocalDateTime convertFromInstant(Instant ts) {
+    return LocalDateTime.ofInstant(ts, ZoneId.systemDefault());
+  }
+
+  @Override
   public Timestamp convertToTimestamp(LocalDateTime dateTime) {
     return Timestamp.valueOf(dateTime);
   }
@@ -54,7 +60,7 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
 
   @Override
   public LocalDateTime toBeanType(Object value) {
-    if (value instanceof LocalDateTime) return (LocalDateTime) value;
-    return convertFromTimestamp((Timestamp) value);
+    if (value instanceof Timestamp) return convertFromTimestamp((Timestamp) value);
+    return (LocalDateTime) value;
   }
 }

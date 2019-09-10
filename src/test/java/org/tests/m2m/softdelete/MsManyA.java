@@ -18,6 +18,16 @@ public class MsManyA {
   @SoftDelete
   boolean deleted;
 
+  /**
+   * Name clash with M2M intersection table name.
+   */
+  boolean ms_many_a_many_b;
+
+  /**
+   * Name clash with other side table name.
+   */
+  boolean ms_many_b;
+
   @ManyToMany
   List<MsManyB> manybs;
 

@@ -1,31 +1,33 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServer;
-import io.ebean.Query;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.BeanCollectionAdd;
-import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.PersistenceContext;
+import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.text.PathProperties;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.core.DefaultSqlUpdate;
+import io.ebeaninternal.api.json.SpiJsonReader;
+import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.SqlBeanLoad;
-import io.ebeaninternal.server.text.json.ReadJson;
-import io.ebeaninternal.server.text.json.SpiJsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -35,7 +37,7 @@ import java.util.Map;
 /**
  * Property mapped to a List Set or Map.
  */
-public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
+public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocMany, PropertyAssocMany {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssocMany.class);
 
@@ -48,20 +50,36 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   private final String intersectionPublishTable;
   private final String intersectionDraftTable;
 
+  private IntersectionTable intersectionTable;
+
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
    */
-  private final TableJoin inverseJoin;
+  final TableJoin inverseJoin;
 
   /**
    * Flag to indicate that this is a unidirectional relationship.
    */
   private final boolean unidirectional;
 
+  private final boolean o2mJoinTable;
+
+  /**
+   * Flag to indicate that the target has a order column to auto populate.
+   */
+  private final boolean hasOrderColumn;
+
   /**
    * Flag to indicate manyToMany relationship.
    */
   private final boolean manyToMany;
+
+  private final boolean elementCollection;
+
+  /**
+   * Descriptor for the 'target' when the property maps to an element collection.
+   */
+  final BeanDescriptor<T> elementDescriptor;
 
   /**
    * Order by used when fetch joining the associated many.
@@ -84,12 +102,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   private BeanProperty mapKeyProperty;
 
-  private String exportedPropertyBindProto = "?";
-
   /**
    * Property on the 'child' bean that links back to the 'master'.
    */
-  protected BeanPropertyAssocOne<?> childMasterProperty;
+  private BeanPropertyAssocOne<?> childMasterProperty;
 
   private String childMasterIdProperty;
 
@@ -99,9 +115,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   private ImportedId importedId;
 
-  private String deleteByParentIdSql;
-
-  private String deleteByParentIdInSql;
+  private BeanPropertyAssocManySqlHelp<T> sqlHelp;
 
   /**
    * Create this property.
@@ -109,7 +123,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public BeanPropertyAssocMany(BeanDescriptor<?> descriptor, DeployBeanPropertyAssocMany<T> deploy) {
     super(descriptor, deploy);
     this.unidirectional = deploy.isUnidirectional();
+    this.o2mJoinTable = deploy.isO2mJoinTable();
+    this.hasOrderColumn = deploy.hasOrderColumn();
     this.manyToMany = deploy.isManyToMany();
+    this.elementCollection = deploy.isElementCollection();
+    this.elementDescriptor = deploy.getElementDescriptor();
     this.manyType = deploy.getManyType();
     this.mapKey = deploy.getMapKey();
     this.fetchOrderBy = deploy.getFetchOrderBy();
@@ -127,14 +145,28 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void initialise() {
-    super.initialise();
+  public void initialise(BeanDescriptorInitContext initContext) {
+    super.initialise(initContext);
+    initialiseAssocMany();
+    if (elementCollection) {
+      // initialise all non-id properties (we don't have an Id property)
+      elementDescriptor.initialiseOther(initContext);
+    }
+  }
 
+  @Override
+  void initialiseTargetDescriptor(BeanDescriptorInitContext initContext) {
+    if (elementCollection) {
+      targetDescriptor = elementDescriptor;
+    } else {
+      super.initialiseTargetDescriptor(initContext);
+    }
+  }
+
+  private void initialiseAssocMany() {
     if (!isTransient) {
       this.help = BeanCollectionHelpFactory.create(this);
-
-      if (manyToMany) {
-        // only manyToMany's have imported properties
+      if (hasJoinTable() || elementCollection) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
 
       } else {
@@ -151,50 +183,54 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       }
 
       exportedProperties = createExported();
+      this.sqlHelp = new BeanPropertyAssocManySqlHelp<>(this, exportedProperties);
+
       if (exportedProperties.length > 0) {
         embeddedExportedProperties = exportedProperties[0].isEmbedded();
-        exportedPropertyBindProto = deriveExportedPropertyBindProto();
-
         if (fetchOrderBy != null) {
-          // derive lazyFetchOrderBy
-          StringBuilder sb = new StringBuilder(50);
-          for (int i = 0; i < exportedProperties.length; i++) {
-            if (i > 0) {
-              sb.append(", ");
-            }
-            // these fk columns are either on the intersection (int_) or base table (t0)
-            String fkTableAlias = isManyToMany() ? "int_" : "t0";
-            sb.append(fkTableAlias).append(".").append(exportedProperties[i].getForeignDbColumn());
-          }
-          sb.append(", ").append(fetchOrderBy);
-          lazyFetchOrderBy = sb.toString().trim();
+          lazyFetchOrderBy = sqlHelp.lazyFetchOrderBy(fetchOrderBy);
         }
       }
-
-      String delStmt;
-      if (manyToMany) {
-        delStmt = "delete from " + inverseJoin.getTable() + " where ";
-      } else {
-        delStmt = "delete from " + targetDescriptor.getBaseTable() + " where ";
-      }
-      deleteByParentIdSql = delStmt + deriveWhereParentIdSql(false, "");
-      deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true, "");
     }
+  }
+
+  String targetTable() {
+    return beanTable.getBaseTable();
   }
 
   /**
    * Initialise after the target bean descriptors have been all set.
    */
-  public void initialisePostTarget() {
+  void initialisePostTarget() {
     if (childMasterProperty != null) {
       BeanProperty masterId = childMasterProperty.getTargetDescriptor().getIdProperty();
-      childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      if (masterId != null) { // in docstore only, the master-id may be not available
+        childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      }
     }
+  }
+
+  @Override
+  public boolean isManyToManyWithHistory() {
+    return manyToMany && !excludedFromHistory && descriptor.isHistorySupport();
   }
 
   @Override
   protected void docStoreIncludeByDefault(PathProperties pathProps) {
     // by default not including "Many" properties in document store
+  }
+
+  @Override
+  public void registerColumn(BeanDescriptor<?> desc, String prefix) {
+    if (targetDescriptor != null) {
+      desc.registerTable(targetDescriptor.getBaseTable(), this);
+    }
+  }
+  /**
+   * Return the underlying collection of beans.
+   */
+  public Collection getRawCollection(EntityBean bean) {
+    return help.underlying(getVal(bean));
   }
 
   /**
@@ -221,6 +257,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Add the bean to the appropriate collection on the parent bean.
    */
+  @Override
   public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean, boolean withCheck) {
     BeanCollection<?> bc = (BeanCollection<?>) super.getValue(parentBean);
     if (bc == null) {
@@ -280,42 +317,21 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   public SqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
     if (parentId != null) {
-      return deleteByParentId(parentId);
+      return sqlHelp.deleteByParentId(parentId);
     } else {
-      return deleteByParentIdList(parentIdist);
+      return sqlHelp.deleteByParentIdList(parentIdist);
     }
-  }
-
-  private SqlUpdate deleteByParentId(Object parentId) {
-    DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(deleteByParentIdSql);
-    bindParentId(sqlDelete, parentId);
-    return sqlDelete;
   }
 
   /**
    * Find the Id's of detail beans given a parent Id or list of parent Id's.
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds) {
+  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds, boolean hard) {
     if (parentId != null) {
-      return findIdsByParentId(parentId, t, excludeDetailIds);
+      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds, hard);
     } else {
-      return findIdsByParentIdList(parentIdList, t, excludeDetailIds);
+      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds, hard);
     }
-  }
-
-  private List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds) {
-
-    String rawWhere = deriveWhereParentIdSql(false, "");
-
-    EbeanServer server = server();
-    Query<?> q = server.find(getPropertyType());
-    bindParentIdEq(rawWhere, parentId, q);
-
-    if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
-    }
-
-    return server.findIds(q, t);
   }
 
   /**
@@ -327,101 +343,56 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return false;
   }
 
+  /**
+   * Add the loaded current bean to its associated parent.
+   *
+   * Helper method used by Elastic integration when loading with a persistence context.
+   */
+  @Override
+  public void lazyLoadMany(EntityBean current) {
+    EntityBean parentBean = childMasterProperty.getValueAsEntityBean(current);
+    if (parentBean != null) {
+      addBeanToCollectionWithCreate(parentBean, current, true);
+    }
+  }
+
   public void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds, boolean useDocStore) {
     if (useDocStore) {
       // assumes the ManyToOne property is included
       query.where().in(childMasterIdProperty, parentIds);
     } else {
-      addWhereParentIdIn(query, parentIds);
+      sqlHelp.addWhereParentIdIn(query, parentIds);
     }
-  }
-
-  /**
-   * Add a where clause to the query for a given list of parent Id's.
-   */
-  private void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds) {
-
-    String tableAlias = manyToMany ? "int_." : "t0.";
-    if (manyToMany) {
-      query.setM2MIncludeJoin(inverseJoin);
-    }
-    String rawWhere = deriveWhereParentIdSql(true, tableAlias);
-    String expr = descriptor.getParentIdInExpr(parentIds.size(), rawWhere);
-
-    bindParentIdsIn(expr, parentIds, query);
-  }
-
-  private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds) {
-
-    String rawWhere = deriveWhereParentIdSql(true, "");
-    String inClause = buildInClauseBinding(parentIds.size(), exportedPropertyBindProto);
-
-    String expr = rawWhere + inClause;
-
-    EbeanServer server = descriptor.getEbeanServer();
-    Query<?> q = server.find(propertyType);
-    bindParentIdsIn(expr, parentIds, q);
-
-    if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
-    }
-
-    return server.findIds(q, t);
-  }
-
-  private SqlUpdate deleteByParentIdList(List<Object> parentIds) {
-
-    StringBuilder sb = new StringBuilder(100);
-    sb.append(deleteByParentIdInSql);
-    sb.append(buildInClauseBinding(parentIds.size(), exportedPropertyBindProto));
-
-    DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    bindParentIds(delete, parentIds);
-    return delete;
-  }
-
-  private String deriveExportedPropertyBindProto() {
-    if (exportedProperties.length == 1) {
-      return "?";
-    }
-    StringBuilder sb = new StringBuilder();
-    sb.append("(");
-    for (int i = 0; i < exportedProperties.length; i++) {
-      if (i > 0) {
-        sb.append(",");
-      }
-      sb.append("?");
-    }
-    sb.append(")");
-    return sb.toString();
-  }
-
-  private String buildInClauseBinding(int size, String bindProto) {
-
-    if (descriptor.isSimpleId()) {
-      return descriptor.getIdBinder().getIdInValueExpr(false, size);
-    }
-    StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
-    sb.append(" in");
-    sb.append(" (");
-    for (int i = 0; i < size; i++) {
-      if (i > 0) {
-        sb.append(",");
-      }
-      sb.append(bindProto);
-    }
-    sb.append(") ");
-    return sb.toString();
   }
 
   /**
    * Set the lazy load server to help create reference collections (that lazy
    * load on demand).
    */
-  public void setLoader(BeanCollectionLoader loader) {
+  public void setEbeanServer(SpiEbeanServer server) {
     if (help != null) {
-      help.setLoader(loader);
+      help.setLoader(server);
     }
+    if (manyToMany) {
+      intersectionTable = initIntersectionTable();
+    }
+  }
+
+  private IntersectionTable initIntersectionTable() {
+
+    IntersectionBuilder row = new IntersectionBuilder(intersectionPublishTable, intersectionDraftTable);
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      row.addColumn(exportedProperty.getForeignDbColumn());
+    }
+    importedId.buildImport(row);
+    return row.build();
+  }
+
+  /**
+   * Return the intersection table helper.
+   */
+  public IntersectionTable intersectionTable() {
+    return intersectionTable;
   }
 
   /**
@@ -449,12 +420,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean) {
     return null;
   }
 
   @Override
-  public Object read(DbReadContext ctx) throws SQLException {
+  public Object read(DbReadContext ctx) {
     return null;
   }
 
@@ -469,12 +440,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     StringBuilder sb = new StringBuilder(50);
     SpiQuery<?> query = request.getQueryRequest().getQuery();
-    if (manyToMany) {
+    if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
-    if (softDelete && manyToMany) {
+    if (softDelete && hasJoinTable()) {
       sb.append(" x join ");
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
       sb.append(" x2 on ");
@@ -491,7 +462,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       exportedProperties[i].appendWhere(sb, "x.", path);
     }
     if (softDelete) {
-      String alias = (manyToMany) ? "x2" : "x";
+      String alias = hasJoinTable() ? "x2" : "x";
       sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate(alias));
     }
     return sb.toString();
@@ -534,6 +505,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return true;
   }
 
+  public boolean hasOrderColumn() {
+    return hasOrderColumn;
+  }
+
   @Override
   public boolean isAssocMany() {
     return true;
@@ -567,13 +542,33 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Return true if this is many to many.
    */
+  @Override
+  public boolean hasJoinTable() {
+    return manyToMany || o2mJoinTable;
+  }
+
+  /**
+   * Return true if this is a one to many with a join table.
+   */
+  public boolean isO2mJoinTable() {
+    return o2mJoinTable;
+  }
+
+  /**
+   * Return true if this is many to many.
+   */
   public boolean isManyToMany() {
     return manyToMany;
+  }
+
+  public boolean isElementCollection() {
+    return elementCollection;
   }
 
   /**
    * ManyToMany only, join from local table to intersection table.
    */
+  @Override
   public TableJoin getIntersectionTableJoin() {
     return intersectionJoin;
   }
@@ -617,8 +612,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return mapKey;
   }
 
-  public BeanCollection<?> createReferenceIfNull(EntityBean parentBean) {
+  @Override
+  public BeanCollection<?> createReference(EntityBean localBean, boolean forceNewReference) {
+    return forceNewReference ? createReference(localBean) : createReferenceIfNull(localBean);
+  }
 
+  @Override
+  public BeanCollection<?> createReferenceIfNull(EntityBean parentBean) {
     Object v = getValue(parentBean);
     if (v instanceof BeanCollection<?>) {
       BeanCollection<?> bc = (BeanCollection<?>) v;
@@ -631,7 +631,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   public BeanCollection<?> createReference(EntityBean parentBean) {
-
     BeanCollection<?> ref = help.createReference(parentBean);
     setValue(parentBean, ref);
     return ref;
@@ -641,17 +640,18 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return help.createEmpty(parentBean);
   }
 
-  public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
-    return help.getBeanCollectionAdd(bc, mapKey);
+  private BeanCollectionAdd getBeanCollectionAdd(Object bc) {
+    return help.getBeanCollectionAdd(bc, null);
   }
 
   public Object getParentId(EntityBean parentBean) {
     return descriptor.getId(parentBean);
   }
 
+  @Override
   public void addSelectExported(DbSqlContext ctx, String tableAlias) {
 
-    String alias = manyToMany ? "int_" : tableAlias;
+    String alias = hasJoinTable() ? "int_" : tableAlias;
     if (alias == null) {
       alias = "t0";
     }
@@ -659,69 +659,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       ctx.appendColumn(alias, exportedProperty.getForeignDbColumn());
     }
   }
-
-  private String deriveWhereParentIdSql(boolean inClause, String tableAlias) {
-
-    StringBuilder sb = new StringBuilder();
-
-    if (inClause) {
-      sb.append("(");
-    }
-    for (int i = 0; i < exportedProperties.length; i++) {
-      String fkColumn = exportedProperties[i].getForeignDbColumn();
-      if (i > 0) {
-        String s = inClause ? "," : " and ";
-        sb.append(s);
-      }
-      sb.append(tableAlias).append(fkColumn);
-      if (!inClause) {
-        sb.append("=? ");
-      }
-    }
-    if (inClause) {
-      sb.append(")");
-    }
-    return sb.toString();
-  }
-
-//	public void setPredicates(SpiQuery<?> query, EntityBean parentBean) {
-//
-//		if (manyToMany){
-//			// for ManyToMany lazy loading we need to include a
-//			// join to the intersection table. The predicate column
-//			// is not on the 'destination many table'.
-//			query.setIncludeTableJoin(inverseJoin);
-//		}
-//
-//		if (embeddedExportedProperties) {
-//			// use the EmbeddedId object instead of the parentBean
-//			BeanProperty idProp = descriptor.getIdProperty();
-//			parentBean = (EntityBean)idProp.getValue(parentBean);
-//		}
-//
-//		for (int i = 0; i < exportedProperties.length; i++) {
-//			Object val = exportedProperties[i].getValue(parentBean);
-//			String fkColumn = exportedProperties[i].getForeignDbColumn();
-//			if (!manyToMany){
-//				fkColumn = targetDescriptor.getBaseTableAlias()+"."+fkColumn;
-//			} else {
-//				// use hard coded alias for intersection table
-//				fkColumn = "int_."+fkColumn;
-//			}
-//			query.where().eq(fkColumn, val);
-//		}
-//
-//		if (extraWhere != null){
-//			// replace the table alias place holder
-//			String ta = targetDescriptor.getBaseTableAlias();
-//			String where = StringHelper.replaceString(extraWhere, "${ta}", ta);
-//			query.where().raw(where);
-//		}
-//
-//		if (fetchOrderBy != null){
-//			query.order(fetchOrderBy);
-//		}
-//	}
 
   /**
    * Create the array of ExportedProperty used to build reference objects.
@@ -735,12 +672,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (idProp != null && idProp.isEmbedded()) {
 
       BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) idProp;
-      BeanDescriptor<?> targetDesc = one.getTargetDescriptor();
-      BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
       try {
-        for (BeanProperty emId : emIds) {
-          ExportedProperty expProp = findMatch(true, emId);
-          list.add(expProp);
+        for (BeanProperty emId : one.getTargetDescriptor().propertiesBaseScalar()) {
+          list.add(findMatch(true, emId));
         }
       } catch (PersistenceException e) {
         // not found as individual scalar properties
@@ -749,12 +683,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     } else {
       if (idProp != null) {
-        ExportedProperty expProp = findMatch(false, idProp);
-        list.add(expProp);
+        list.add(findMatch(false, idProp));
       }
     }
 
-    return list.toArray(new ExportedProperty[list.size()]);
+    return list.toArray(new ExportedProperty[0]);
   }
 
   /**
@@ -762,32 +695,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   private ExportedProperty findMatch(boolean embedded, BeanProperty prop) {
 
-    String matchColumn = prop.getDbColumn();
-
-    String searchTable;
-    TableJoinColumn[] columns;
-    if (manyToMany) {
+    if (hasJoinTable()) {
       // look for column going to intersection
-      columns = intersectionJoin.columns();
-      searchTable = intersectionJoin.getTable();
-
+      return findMatch(embedded, prop, prop.getDbColumn(), intersectionJoin);
     } else {
-      columns = tableJoin.columns();
-      searchTable = tableJoin.getTable();
+      return findMatch(embedded, prop, prop.getDbColumn(), tableJoin);
     }
-    for (TableJoinColumn column : columns) {
-      String matchTo = column.getLocalDbColumn();
-
-      if (matchColumn.equalsIgnoreCase(matchTo)) {
-        String foreignCol = column.getForeignDbColumn();
-        return new ExportedProperty(embedded, foreignCol, prop);
-      }
-    }
-
-    String msg = "Error with the Join on [" + getFullBeanName()
-      + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
-      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
-    throw new PersistenceException(msg);
   }
 
   /**
@@ -807,8 +720,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     Class<?> beanType = descriptor.getBeanType();
     BeanDescriptor<?> targetDesc = getTargetDescriptor();
 
-    BeanPropertyAssocOne<?>[] ones = targetDesc.propertiesOne();
-    for (BeanPropertyAssocOne<?> prop : ones) {
+    for (BeanPropertyAssocOne<?> prop : targetDesc.propertiesOne()) {
       if (mappedBy != null) {
         // match using mappedBy as property name
         if (mappedBy.equalsIgnoreCase(prop.getName())) {
@@ -874,9 +786,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Register the mapping of intersection table to associated draft table.
    */
-  public void registerDraftIntersectionTable(Map<String, String> draftTableMap) {
+  void registerDraftIntersectionTable(BeanDescriptorInitContext initContext) {
     if (hasDraftIntersection()) {
-      draftTableMap.put(intersectionPublishTable, intersectionDraftTable);
+      initContext.addDraftIntersection(intersectionPublishTable, intersectionDraftTable);
     }
   }
 
@@ -885,6 +797,20 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   private boolean hasDraftIntersection() {
     return intersectionDraftTable != null && !intersectionDraftTable.equals(intersectionPublishTable);
+  }
+
+  /**
+   * Bind the two side of a many to many to the given SqlUpdate.
+   */
+  public void intersectionBind(SqlUpdate sql, EntityBean parentBean, EntityBean other) {
+    if (embeddedExportedProperties) {
+      BeanProperty idProp = descriptor.getIdProperty();
+      parentBean = (EntityBean) idProp.getValue(parentBean);
+    }
+    for (ExportedProperty exportedProperty : exportedProperties) {
+      sql.setNextParameter(exportedProperty.getValue(parentBean));
+    }
+    importedId.bindImport(sql, other);
   }
 
   private void buildExport(IntersectionRow row, EntityBean parentBean) {
@@ -922,7 +848,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    * Skip JSON write value for ToMany property.
    */
   @Override
-  public void jsonWriteValue(SpiJsonWriter writeJson, Object value) throws IOException {
+  public void jsonWriteValue(SpiJsonWriter writeJson, Object value) {
     // do nothing, exclude ToMany properties
   }
 
@@ -940,7 +866,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (value != null) {
       ctx.pushParentBeanMany(bean);
       if (help != null) {
-        help.jsonWrite(ctx, name, value, include != null);
+        jsonWriteCollection(ctx, name, value, include != null);
       } else {
         if (isTransient && targetDescriptor == null) {
           ctx.writeValueUsingObjectMapper(name, value);
@@ -956,12 +882,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
+  public void jsonRead(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     jsonHelp.jsonRead(readJson, parentBean);
   }
 
   @SuppressWarnings("unchecked")
-  public void publishMany(EntityBean draft, EntityBean live) {
+  void publishMany(EntityBean draft, EntityBean live) {
 
     // collections will not be null due to enhancement
     BeanCollection<T> draftVal = (BeanCollection<T>) getValueIntercept(draft);
@@ -980,7 +906,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       if (isManyToMany()) {
         if (liveBean == null) {
           // add new relationship (Map not allowed here)
-          liveVal.addBean(targetDescriptor.createReference(Boolean.FALSE, false, id, null));
+          liveVal.addBean(targetDescriptor.createReference(id, null));
         }
 
       } else {
@@ -1014,4 +940,126 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return liveMap;
   }
 
+  public boolean isIncludeCascadeSave() {
+    // Note ManyToMany always included as we always 'save'
+    // the relationship via insert/delete of intersection table
+    // REMOVALS means including PrivateOwned relationships
+    return cascadeInfo.isSave() || hasJoinTable() || ModifyListenMode.REMOVALS == modifyListenMode;
+  }
+
+  public boolean isIncludeCascadeDelete() {
+    return cascadeInfo.isDelete() || o2mJoinTable || ModifyListenMode.REMOVALS == modifyListenMode;
+  }
+
+  public String insertElementCollection() {
+    return sqlHelp.insertElementCollection();
+  }
+
+  public boolean isTargetDocStoreMapped() {
+    return targetDescriptor.isDocStoreMapped();
+  }
+
+  void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
+    elementDescriptor.jsonWriteMapEntry(ctx, entry);
+  }
+
+  void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
+    elementDescriptor.jsonWriteElement(ctx, element);
+  }
+
+  /**
+   * A Many (element collection) property in bean cache to held as JSON.
+   */
+  @Override
+  public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
+    try {
+      String asJson = (String) cacheData;
+      if (asJson != null && !asJson.isEmpty()) {
+        Object collection = jsonReadCollection(asJson);
+        setValue(bean, collection);
+      }
+    } catch (Exception e) {
+      logger.error("Error setting value from L2 cache", e);
+    }
+  }
+
+  @Override
+  public Object getCacheDataValue(EntityBean bean) {
+    try {
+      Object collection = getValue(bean);
+      if (collection == null) {
+        return null;
+      }
+      return jsonWriteCollection(collection);
+    } catch (Exception e) {
+      logger.error("Error building value element collection json for L2 cache", e);
+      return null;
+    }
+  }
+
+  /**
+   * Write the collection to JSON.
+   */
+  public String jsonWriteCollection(Object value) throws IOException {
+    StringWriter writer = new StringWriter(300);
+    SpiJsonWriter ctx = descriptor.createJsonWriter(writer);
+    help.jsonWrite(ctx, null, value, true);
+    ctx.flush();
+    return writer.toString();
+  }
+
+  /**
+   * Read the collection as JSON.
+   */
+  private Object jsonReadCollection(String json) throws IOException {
+    SpiJsonReader ctx = descriptor.createJsonReader(json);
+    JsonParser parser = ctx.getParser();
+    JsonToken event = parser.nextToken();
+    if (JsonToken.VALUE_NULL == event) {
+      return null;
+    }
+    return jsonReadCollection(ctx, null);
+  }
+
+  /**
+   * Write the collection to JSON.
+   */
+  private void jsonWriteCollection(SpiJsonWriter ctx, String name, Object value, boolean explicitInclude) throws IOException {
+    help.jsonWrite(ctx, name, value, explicitInclude);
+  }
+
+  /**
+   * Read the collection (JSON Array) containing entity beans.
+   */
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
+
+    if (elementDescriptor != null && manyType.isMap()) {
+      return elementDescriptor.jsonReadCollection(readJson, parentBean);
+    }
+
+    BeanCollection<?> collection = createEmpty(parentBean);
+    BeanCollectionAdd add = getBeanCollectionAdd(collection);
+    do {
+      EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name);
+      if (detailBean == null) {
+        // read the entire array
+        break;
+      }
+      add.addEntityBean(detailBean);
+
+      if (parentBean != null && childMasterProperty != null) {
+        // bind detail bean back to master via mappedBy property
+        childMasterProperty.setValue(detailBean, parentBean);
+      }
+    } while (true);
+
+    return collection;
+  }
+
+  /**
+   * Bind all the property values to the SqlUpdate.
+   */
+  public void bindElementValue(SqlUpdate insert, Object value) {
+    targetDescriptor.bindElementValue(insert, value);
+  }
 }

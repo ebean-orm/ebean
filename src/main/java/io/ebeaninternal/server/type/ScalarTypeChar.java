@@ -51,6 +51,7 @@ public class ScalarTypeChar extends ScalarTypeBaseVarchar<Character> {
 
   @Override
   public Character toBeanType(Object value) {
+    if (value == null) return null;
     String s = BasicTypeConverter.toString(value);
     return s.charAt(0);
   }

@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.PlatformConfig;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -10,7 +10,25 @@ import java.util.Map;
  */
 public class DbPlatformTypeMapping {
 
-  private static DbPlatformTypeLookup lookup = new DbPlatformTypeLookup();
+  /**
+   * Boolean type used for logical model.
+   */
+  private static class BooleanLogicalType extends DbPlatformType {
+    BooleanLogicalType() {
+      super("boolean", false);
+    }
+    @Override
+    protected void renderLengthScale(int deployLength, int deployScale, StringBuilder sb) {
+      // do not have length - even if platform boolean type does like integer(1)
+    }
+  }
+
+  private static final DbPlatformTypeLookup lookup = new DbPlatformTypeLookup();
+
+  private static final DbPlatformType BOOLEAN_LOGICAL = new BooleanLogicalType();
+
+  private static final DbPlatformType INET_NATIVE = new DbPlatformType("inet", false);
+  private static final DbPlatformType INET_VARCHAR = new DbPlatformType("varchar", 50);
 
   private static final DbPlatformType UUID_NATIVE = new DbPlatformType("uuid", false);
   @SuppressWarnings("unused")
@@ -51,7 +69,7 @@ public class DbPlatformTypeMapping {
    */
   private void loadDefaults(boolean logicalTypes) {
 
-    put(DbType.BOOLEAN);
+    put(DbType.BOOLEAN, BOOLEAN_LOGICAL);
     put(DbType.BIT);
     put(DbType.INTEGER);
     put(DbType.BIGINT);
@@ -91,6 +109,7 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONBLOB, new DbPlatformType("jsonblob"));
       put(DbType.JSONVARCHAR, new DbPlatformType("jsonvarchar", 1000));
       put(DbType.UUID, UUID_NATIVE);
+      put(DbType.INET, INET_NATIVE);
 
     } else {
       put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
@@ -104,8 +123,9 @@ public class DbPlatformTypeMapping {
       put(DbType.JSONCLOB, JSON_CLOB_PLACEHOLDER);
       put(DbType.JSONBLOB, JSON_BLOB_PLACEHOLDER);
       put(DbType.JSONVARCHAR, JSON_VARCHAR_PLACEHOLDER);
-      // use reasonable default of varchar(40) - ideally set via DatabasePlatform.configure(DbTypeConfig)
-      put(DbType.UUID, get(DbType.VARCHAR).withLength(40));
+      // default to native UUID and override on platform configure()
+      put(DbType.UUID, UUID_NATIVE);
+      put(DbType.INET, INET_VARCHAR);
     }
   }
 
@@ -183,9 +203,9 @@ public class DbPlatformTypeMapping {
   /**
    * Map the UUID appropriately based on native DB support and ServerConfig.DbUuid.
    */
-  public void config(boolean nativeUuidType, ServerConfig.DbUuid dbUuid) {
+  public void config(boolean nativeUuidType, PlatformConfig.DbUuid dbUuid) {
     if (nativeUuidType && dbUuid.useNativeType()) {
-      put(DbType.UUID, UUID_NATIVE);
+      // native UUID already set by default
     } else if (dbUuid.useBinary()) {
       put(DbType.UUID, get(DbType.BINARY).withLength(16));
     } else {

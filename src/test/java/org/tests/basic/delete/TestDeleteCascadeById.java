@@ -32,7 +32,9 @@ public class TestDeleteCascadeById extends BaseTestCase {
     Order o = orders.get(0);
     Assert.assertNotNull(o);
 
+    // cleanup
     Ebean.delete(o);
+    Ebean.delete(cust);
 
   }
 }

@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.server.deploy.BeanProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,14 +13,9 @@ import java.util.List;
 public class SqlTreeProperties {
 
   /**
-   * True if this node of the tree should have read only entity beans.
-   */
-  private boolean readOnly;
-
-  /**
    * The bean properties in order.
    */
-  private final List<BeanProperty> propsList = new ArrayList<>();
+  private final List<STreeProperty> propsList = new ArrayList<>();
 
   /**
    * Maintain a list of property names to detect embedded bean additions.
@@ -30,7 +24,11 @@ public class SqlTreeProperties {
 
   private boolean allProperties;
 
+  private boolean aggregationManyToOne;
+
   private boolean aggregation;
+
+  private String aggregationPath;
 
   SqlTreeProperties() {
   }
@@ -39,29 +37,30 @@ public class SqlTreeProperties {
     return propNames.contains(propName);
   }
 
-  public void add(BeanProperty[] props) {
+  public void add(STreeProperty[] props) {
     propsList.addAll(Arrays.asList(props));
   }
 
-  public void add(BeanProperty prop) {
+  public void add(STreeProperty prop) {
     propsList.add(prop);
     propNames.add(prop.getName());
+    if (prop.isAggregation()) {
+      if (!aggregation) {
+        aggregation = true;
+        aggregationPath = prop.getElPrefix();
+      }
+      if (prop.isAggregationManyToOne()) {
+        aggregationManyToOne = true;
+      }
+    }
   }
 
-  public BeanProperty[] getProps() {
-    return propsList.toArray(new BeanProperty[propsList.size()]);
+  public STreeProperty[] getProps() {
+    return propsList.toArray(new STreeProperty[0]);
   }
 
   boolean isPartialObject() {
     return !allProperties;
-  }
-
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
   }
 
   void setAllProperties() {
@@ -77,12 +76,18 @@ public class SqlTreeProperties {
   boolean requireSqlDistinct(ManyWhereJoins manyWhereJoins) {
     String joinProperty = aggregationJoin();
     if (joinProperty != null) {
-      aggregation = true;
       manyWhereJoins.addAggregationJoin(joinProperty);
       return false;
     } else {
       return manyWhereJoins.requireSqlDistinct();
     }
+  }
+
+  /**
+   * Return true if this is an aggregation formula on a ManyToOne.
+   */
+  boolean isAggregationManyToOne() {
+    return aggregationManyToOne;
   }
 
   /**
@@ -96,13 +101,13 @@ public class SqlTreeProperties {
    * Return the property to join for aggregation.
    */
   private String aggregationJoin() {
-    if (!allProperties) {
-      for (BeanProperty beanProperty : propsList) {
-        if (beanProperty.isAggregation()) {
-          return beanProperty.getElPrefix();
-        }
-      }
-    }
-    return null;
+    return aggregationPath;
+  }
+
+  /**
+   * Return true if a top level aggregation which means the Id property must be excluded.
+   */
+  boolean isAggregationRoot() {
+    return aggregation && (aggregationPath == null);
   }
 }

@@ -3,13 +3,16 @@ package org.tests.query.orderby;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 import org.tests.model.basic.MUserType;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 import java.util.Set;
@@ -35,6 +38,57 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     assertThat(unknownProperties).hasSize(2);
     assertThat(unknownProperties).contains("junk", "path.that.does.not.exist");
 
+  }
+
+  @Test
+  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER, Platform.NUODB}) // do not support nulls first/last
+  public void testDistinctOn() {
+
+    MRole role = Ebean.getReference(MRole.class, 1);
+
+    Query<MUser> query = Ebean.find(MUser.class)
+      .where()
+      .eq("roles", role)
+      .orderBy("userName asc nulls first");
+
+    query.findList();
+
+    String sql = sqlOf(query);
+    if (isPostgres()) {
+      assertThat(sql).contains("select distinct on (t0.user_name, t0.userid) t0.userid,");
+    } else if (isH2()) {
+      assertThat(sql).contains("select distinct t0.userid, t0.user_name, t0.user_type_id from muser t0");
+    }
+
+  }
+
+
+  @Test
+  public void testOrderByWithDistinct() {
+    Query<MUser> query = Ebean.find(MUser.class);
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain("order by");
+    assertThat(query.getGeneratedSql()).doesNotContain("select distinct");
+
+    query.setMaxRows(1000);
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("from muser t0 limit 1000");
+    }
+    query = Ebean.find(MUser.class)
+        .where()
+        .eq("roles.roleName", "A")
+        .query();
+    query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain("order by");
+    assertThat(query.getGeneratedSql()).contains("select distinct");
+
+    query.setMaxRows(1000);
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where u1.role_name = ? limit 1000");
+    }
   }
 
   @Test

@@ -3,9 +3,14 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
+import io.ebean.meta.MetaTimedMetric;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.tests.idkeys.db.AuditLog;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,15 +41,93 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
   }
 
   @Test
+  public void testExecute_inTransaction_withBatch() {
+
+    LoggedSqlCollector.start();
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999);
+
+      int row = sqlUpdate.execute();
+      // update statement using JDBC batch so not executed yet
+      assertThat(row).isEqualTo(-1);
+
+      sqlUpdate.setParameter(1, 999998);
+      sqlUpdate.execute();
+
+      transaction.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("update audit_log set description = description where id = ?");
+    assertSqlBind(sql, 1, 2);
+  }
+
+  @Test
+  public void testExecute_inTransaction_withoutBatch() {
+
+    LoggedSqlCollector.start();
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setBatchMode(false);
+
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999);
+
+      int row0 = sqlUpdate.execute();
+      assertThat(row0).isEqualTo(0);
+
+      sqlUpdate.setParameter(1, 999998);
+      int row1 = sqlUpdate.execute();
+      assertThat(row1).isEqualTo(0);
+
+      transaction.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("update audit_log set description = description where id = ?; -- bind(999999)");
+    assertThat(sql.get(1)).contains("update audit_log set description = description where id = ?; -- bind(999998)");
+  }
+
+  @Test
+  public void testExecuteNow_inTransaction_withBatch() {
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      int row = Ebean.createSqlUpdate("update audit_log set description = description where id = ?")
+        .setParameter(1, 999999)
+        .executeNow();
+
+      // update statement executed even though JDBC batch mode is on
+      assertThat(row).isEqualTo(0);
+
+      transaction.commit();
+    }
+  }
+
+  @Test
   public void testSqlUpdateWithWhitespace() {
 
     String sql = "   \nupdate audit_log \nset description = description \nwhere id = id";
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    resetAllMetrics();
+
+    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql).setLabel("auditLargeUpdate");
     sqlUpdate.execute();
 
     assertThat(sqlUpdate.getSql()).isEqualTo(sql.trim());
     assertThat(sqlUpdate.getGeneratedSql()).isEqualTo(sql.trim());
+
+    List<MetaTimedMetric> sqlMetrics = sqlMetrics();
+    assertThat(sqlMetrics).hasSize(1);
+    assertThat(sqlMetrics.get(0).getName()).isEqualTo("sql.update.auditLargeUpdate");
+    assertThat(sqlMetrics.get(0).getCount()).isEqualTo(1);
   }
 
   @Test
@@ -96,18 +179,20 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
 
 
     Ebean.beginTransaction();
+    try {
+      SqlUpdate update = Ebean.createSqlUpdate(updateDml);
+      update.setParameter("desc", "foo4");
+      update.setParameter("id", id);
+      update.execute();
 
-    SqlUpdate update = Ebean.createSqlUpdate(updateDml);
-    update.setParameter("desc", "foo4");
-    update.setParameter("id", id);
-    update.execute();
+      updateMod = Ebean.createSqlUpdate(updateModDml);
+      updateMod.setParameter("desc", "mod2");
+      updateMod.execute();
 
-    updateMod = Ebean.createSqlUpdate(updateModDml);
-    updateMod.setParameter("desc", "mod2");
-    updateMod.execute();
-
-    Ebean.commitTransaction();
-
+      Ebean.commitTransaction();
+    } finally {
+      Ebean.endTransaction();
+    }
     AuditLog log5 = Ebean.find(AuditLog.class, log.getId());
     Assert.assertEquals("foo4", log5.getDescription());
     Assert.assertEquals("mod2", log5.getModifiedDescription());

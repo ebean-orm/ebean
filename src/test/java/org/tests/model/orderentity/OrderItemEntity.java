@@ -6,6 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -18,6 +20,7 @@ public class OrderItemEntity {
    */
   @Id
   @Column(name = "uuid")
+  @Size(max=40)
   private String id;
 
   @Column(name = "product_variant_uuid")

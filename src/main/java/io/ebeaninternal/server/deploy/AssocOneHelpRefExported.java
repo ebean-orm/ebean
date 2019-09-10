@@ -7,8 +7,14 @@ import io.ebeaninternal.server.query.SqlJoinType;
  */
 class AssocOneHelpRefExported extends AssocOneHelp {
 
-  public AssocOneHelpRefExported(BeanPropertyAssocOne<?> property) {
+  private final boolean softDelete;
+
+  private final String softDeletePredicate;
+
+  AssocOneHelpRefExported(BeanPropertyAssocOne<?> property) {
     super(property);
+    this.softDelete = property.targetDescriptor.isSoftDelete();
+    this.softDeletePredicate = (softDelete) ? property.targetDescriptor.getSoftDeletePredicate("") : null;
   }
 
   /**
@@ -28,6 +34,10 @@ class AssocOneHelpRefExported extends AssocOneHelp {
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 
     String relativePrefix = ctx.getRelativePrefix(property.getName());
-    property.tableJoin.addJoin(joinType, relativePrefix, ctx);
+    if (softDelete && !ctx.isIncludeSoftDelete()) {
+      property.tableJoin.addJoin(joinType, relativePrefix, ctx, softDeletePredicate);
+    } else {
+      property.tableJoin.addJoin(joinType, relativePrefix, ctx);
+    }
   }
 }

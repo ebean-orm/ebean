@@ -1,6 +1,7 @@
 package org.tests.model.draftable;
 
 import io.ebean.Finder;
+import io.ebean.annotation.Draft;
 import io.ebean.annotation.DraftOnly;
 import io.ebean.annotation.Draftable;
 
@@ -8,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -19,9 +21,13 @@ public class Document extends BaseDomain {
   public static DocumentFinder find = new DocumentFinder();
 
   @Column(unique = true)
+  @Size(max=127)
   String title;
 
   String body;
+
+  @Draft
+  boolean draft;
 
   @DraftOnly
   Timestamp whenPublish;
@@ -50,6 +56,14 @@ public class Document extends BaseDomain {
 
   public void setBody(String body) {
     this.body = body;
+  }
+
+  public boolean isDraft() {
+    return draft;
+  }
+
+  public void setDraft(boolean draft) {
+    this.draft = draft;
   }
 
   public Organisation getOrganisation() {
