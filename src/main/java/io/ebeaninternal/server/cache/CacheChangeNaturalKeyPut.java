@@ -8,17 +8,17 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 class CacheChangeNaturalKeyPut implements CacheChange {
 
   private final BeanDescriptor<?> descriptor;
-  private final Object id;
-  private final Object newKey;
+  private final String key;
+  private final String newKey;
 
-  CacheChangeNaturalKeyPut(BeanDescriptor<?> descriptor, Object id, Object newKey) {
+  CacheChangeNaturalKeyPut(BeanDescriptor<?> descriptor, String key, String newKey) {
     this.descriptor = descriptor;
-    this.id = id;
+    this.key = key;
     this.newKey = newKey;
   }
 
   @Override
   public void apply() {
-    descriptor.cacheNaturalKeyPut(id, newKey);
+    descriptor.cacheNaturalKeyPut(key, newKey);
   }
 }

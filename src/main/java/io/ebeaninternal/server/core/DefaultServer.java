@@ -35,7 +35,7 @@ import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
@@ -54,13 +54,16 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
 import io.ebeaninternal.api.ScopedTransaction;
@@ -99,7 +102,7 @@ import io.ebeaninternal.server.query.LimitOffsetPagedList;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
 import io.ebeaninternal.server.query.QueryFutureRowCount;
-import io.ebeaninternal.server.query.dto.DtoQueryEngine;
+import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.querydefn.DefaultDtoQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmUpdate;
@@ -120,7 +123,11 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -155,9 +162,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Clock to use for WhenModified and WhenCreated.
    */
-  private ClockService clockService;
+  private final ClockService clockService;
 
-  private final CallStackFactory callStackFactory;
+  private final CallOriginFactory callStackFactory;
 
   /**
    * Handles the save, delete, updateSql CallableSql.
@@ -305,12 +312,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Create the CallStackFactory depending if AutoTune is being used.
    */
-  private CallStackFactory initCallStackFactory(ServerConfig serverConfig) {
+  private CallOriginFactory initCallStackFactory(ServerConfig serverConfig) {
     if (!serverConfig.getAutoTuneConfig().isActive()) {
       // use a common CallStack for performance as we don't care with no AutoTune
-      return new NoopCallStackFactory();
+      return new NoopCallOriginFactory();
     }
-    return new DefaultCallStackFactory(serverConfig.getMaxCallStack());
+    return new DefaultCallOriginFactory(serverConfig.getMaxCallStack());
   }
 
   private void configureServerPlugins() {
@@ -441,6 +448,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (encryptKeyManager != null) {
       encryptKeyManager.initialise();
     }
+    serverCacheManager.setEnabledRegions(serverConfig.getEnabledL2Regions());
   }
 
   /**
@@ -479,7 +487,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
 
-    logger.debug("Shutting down EbeanServer {}", serverName);
+    logger.debug("Shutting down instance:{}", serverName);
     if (shutdown) {
       // already shutdown
       return;
@@ -499,6 +507,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private void shutdownPlugins() {
+
+    if (serverConfig.isDumpMetricsOnShutdown()) {
+      new DumpMetrics(this, serverConfig.getDumpMetricsOptions()).dump();
+    }
 
     for (Plugin plugin : serverPlugins) {
       try {
@@ -558,37 +570,31 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void refreshMany(Object parentBean, String propertyName) {
-
     beanLoader.refreshMany(checkEntityBean(parentBean), propertyName);
   }
 
   @Override
   public void loadMany(LoadManyRequest loadRequest) {
-
     beanLoader.loadMany(loadRequest);
   }
 
   @Override
   public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-
     beanLoader.loadMany(bc, onlyIds);
   }
 
   @Override
   public void refresh(Object bean) {
-
     beanLoader.refresh(checkEntityBean(bean));
   }
 
   @Override
   public void loadBean(LoadBeanRequest loadRequest) {
-
     beanLoader.loadBean(loadRequest);
   }
 
   @Override
   public void loadBean(EntityBeanIntercept ebi) {
-
     beanLoader.loadBean(ebi);
   }
 
@@ -629,6 +635,36 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     externalModification(evt);
   }
 
+  @Override
+  public void truncate(Class<?>... types) {
+    List<String> tableNames = new ArrayList<>();
+    for (Class<?> type : types) {
+      tableNames.add(getBeanDescriptor(type).getBaseTable());
+    }
+    truncate(tableNames.toArray(new String[0]));
+  }
+
+  @Override
+  public void truncate(String... tables) {
+    try (Connection connection = getDataSource().getConnection()) {
+      for (String table : tables) {
+        executeSql(connection, databasePlatform.truncateStatement(table));
+      }
+      connection.commit();
+    } catch(SQLException e) {
+      throw new PersistenceException("Error executing truncate", e);
+    }
+  }
+
+  private void executeSql(Connection connection, String sql) throws SQLException {
+    if (sql != null) {
+      try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        transactionManager.log().sql().debug(sql);
+        stmt.execute();
+      }
+    }
+  }
+
   /**
    * Clear the query execution statistics.
    */
@@ -648,10 +684,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * </p>
    */
   @Override
-  @SuppressWarnings("unchecked")
   public <T> T createEntityBean(Class<T> type) {
-    BeanDescriptor<T> desc = getBeanDescriptor(type);
-    return (T) desc.createEntityBean(true);
+    return getBeanDescriptor(type).createBean();
   }
 
   /**
@@ -781,23 +815,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     transactionManager.exitScopedTransaction(returnOrThrowable, opCode);
   }
 
-  /**
-   * Returns the current transaction (or null) from the scope.
-   */
   @Override
   public SpiTransaction currentServerTransaction() {
     return transactionManager.getActive();
   }
 
-  /**
-   * Start a transaction with 'REQUIRED' semantics.
-   * <p>
-   * If a transaction already exists that transaction will be used.
-   * </p>
-   * <p>
-   * Note that the transaction is stored in a ThreadLocal variable.
-   * </p>
-   */
   @Override
   public Transaction beginTransaction() {
     return beginTransaction(TxScope.required());
@@ -808,12 +830,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return transactionManager.beginScopedTransaction(txScope);
   }
 
-  /**
-   * Start a transaction with a specific Isolation Level.
-   * <p>
-   * Note that the transaction is stored in a ThreadLocal variable.
-   * </p>
-   */
   @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     // start an explicit transaction
@@ -828,10 +844,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return t;
   }
 
-  /**
-   * Return the current transaction or null if there is not one currently in
-   * scope.
-   */
   @Override
   public Transaction currentTransaction() {
     return transactionManager.getActive();
@@ -842,50 +854,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     currentTransaction().flush();
   }
 
-  /**
-   * Commit the current transaction.
-   */
   @Override
   public void commitTransaction() {
     currentTransaction().commit();
   }
 
-  /**
-   * Rollback the current transaction.
-   */
   @Override
   public void rollbackTransaction() {
     currentTransaction().rollback();
   }
 
-  /**
-   * If the current transaction has already been committed do nothing otherwise
-   * rollback the transaction.
-   * <p>
-   * Useful to put in a finally block to ensure the transaction is ended, rather
-   * than a rollbackTransaction() in each catch block.
-   * </p>
-   * <p>
-   * Code example:<br />
-   * <p>
-   * <pre>
-   * &lt;code&gt;
-   * Ebean.startTransaction();
-   * try {
-   * 	// do some fetching and or persisting
-   *
-   * 	// commit at the end
-   * 	Ebean.commitTransaction();
-   *
-   * } finally {
-   * 	// if commit didn't occur then rollback the transaction
-   * 	Ebean.endTransaction();
-   * }
-   * &lt;/code&gt;
-   * </pre>
-   * <p>
-   * </p>
-   */
   @Override
   public void endTransaction() {
     Transaction transaction = transactionManager.getInScope();
@@ -894,13 +872,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  /**
-   * return the next unique identity value.
-   * <p>
-   * Uses the BeanDescriptor deployment information to determine the sequence to
-   * use.
-   * </p>
-   */
   @Override
   public Object nextId(Class<?> beanType) {
     BeanDescriptor<?> desc = getBeanDescriptor(beanType);
@@ -1078,13 +1049,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public SqlQuery createSqlQuery(String sql) {
+  public SqlQuery sqlQuery(String sql) {
     return new DefaultRelationalQuery(this, sql.trim());
   }
 
   @Override
-  public SqlUpdate createSqlUpdate(String sql) {
+  public SqlQuery createSqlQuery(String sql) {
+    return sqlQuery(sql);
+  }
+
+  @Override
+  public SqlUpdate sqlUpdate(String sql) {
     return new DefaultSqlUpdate(this, sql.trim());
+  }
+
+  @Override
+  public SqlUpdate createSqlUpdate(String sql) {
+    return sqlUpdate(sql);
   }
 
   @Override
@@ -1114,14 +1095,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
 
+    SpiOrmQueryRequest<T> request = buildQueryRequest(type, query, t);
+    request.prepareQuery();
+    return request;
+  }
+
+  <T> SpiOrmQueryRequest<T> buildQueryRequest(Type type, Query<T> query, Transaction t) {
+
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(type);
     spiQuery.checkNamedParameters();
 
-    return createQueryRequest(spiQuery, t);
+    return buildQueryRequest(spiQuery, t);
   }
 
-  private <T> SpiOrmQueryRequest<T> createQueryRequest(SpiQuery<T> query, Transaction t) {
+  private <T> SpiOrmQueryRequest<T> buildQueryRequest(SpiQuery<T> query, Transaction t) {
 
     if (t == null) {
       t = currentServerTransaction();
@@ -1141,13 +1129,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
-      query.setOrigin(createCallStack());
+      query.setOrigin(createCallOrigin());
     }
 
-    OrmQueryRequest<T> request = new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) t);
-    request.prepareQuery();
-
-    return request;
+    return new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) t);
   }
 
   /**
@@ -1218,8 +1203,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
-    request.profileLocationById();
+    SpiOrmQueryRequest<T> request = buildQueryRequest(spiQuery, t);
+    request.prepareQuery();
     if (request.isUseDocStore()) {
       return docStore().find(request);
     }
@@ -1359,6 +1344,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+
+    ormQuery.setMaxRows(1);
+    SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, ormQuery, transaction);
+    try {
+      request.initTransIfRequired();
+      List<Object> ids = request.findIds();
+      return !ids.isEmpty();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
   public <A, T> List<A> findIds(Query<T> query, Transaction t) {
 
     return findIdsWithCopy(((SpiQuery<T>) query).copy(), t);
@@ -1437,10 +1437,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     backgroundExecutor.execute(queryFuture.getFutureTask());
 
     return queryFuture;
-  }
-
-  public <T> FutureRowCount<T> findFutureRowCount(Query<T> q, Transaction t) {
-    return findFutureCount(q, t);
   }
 
   @Override
@@ -1561,15 +1557,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @SuppressWarnings("unchecked")
   private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
-    request.profileLocationAll();
+    SpiOrmQueryRequest<T> request = buildQueryRequest(Type.LIST, query, t);
     request.resetBeanCacheAutoMode(findOne);
+    if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
+      // hit bean cache and got all results from cache
+      return request.getBeanCacheHits();
+    }
+
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (List<T>) result;
-    }
-    if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
-      return request.getBeanCacheHits();
     }
     if (request.isUseDocStore()) {
       return docStore().findList(request);
@@ -2261,6 +2259,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (RuntimeException e) {
       wrap.endIfCreated();
       throw e;
+    } finally {
+      wrap.clearIfCreated();
     }
   }
 
@@ -2281,6 +2281,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public void clearServerTransaction() {
+    transactionManager.clearServerTransaction();
+  }
+
+  @Override
   public SpiTransaction beginServerTransaction() {
     return transactionManager.beginServerTransaction();
   }
@@ -2298,8 +2303,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * </p>
    */
   @Override
-  public CallStack createCallStack() {
-    return callStackFactory.createCallStack();
+  public CallOrigin createCallOrigin() {
+    return callStackFactory.createCallOrigin();
   }
 
   @Override
@@ -2335,10 +2340,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
-    if (timeMicros > slowQueryMicros) {
-      if (slowQueryListener != null) {
-        slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
-      }
+    if (timeMicros > slowQueryMicros && slowQueryListener != null) {
+      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
     }
   }
 
@@ -2417,6 +2420,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (visitor.isCollectTransactionMetrics()) {
       transactionManager.visitMetrics(visitor);
     }
+    if (visitor.isCollectL2Metrics()) {
+      serverCacheManager.visitMetrics(visitor);
+    }
     if (visitor.isCollectQueryMetrics()) {
       beanDescriptorManager.visitMetrics(visitor);
       dtoBeanManager.visitMetrics(visitor);
@@ -2424,5 +2430,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       persister.visitMetrics(visitor);
     }
     visitor.visitEnd();
+  }
+
+  public List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request) {
+    Connection connection = null;
+    try {
+      connection = getDataSource().getConnection();
+      request.setConnection(connection);
+      beanDescriptorManager.collectQueryPlans(request);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+
+    } finally {
+      JdbcClose.close(connection);
+    }
+    return request.getPlans();
   }
 }

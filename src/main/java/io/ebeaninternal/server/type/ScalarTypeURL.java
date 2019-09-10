@@ -38,7 +38,7 @@ public class ScalarTypeURL extends ScalarTypeBaseVarchar<URL> {
     try {
       return new URL(value);
     } catch (MalformedURLException e) {
-      throw new TextException(e);
+      throw new TextException("Error with URL [{}]", value, e);
     }
   }
 

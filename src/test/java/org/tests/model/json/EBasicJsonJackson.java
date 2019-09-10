@@ -1,14 +1,12 @@
 package org.tests.model.json;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

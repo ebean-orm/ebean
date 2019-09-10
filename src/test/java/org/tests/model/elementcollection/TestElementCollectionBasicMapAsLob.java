@@ -23,9 +23,10 @@ public class TestElementCollectionBasicMapAsLob extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(4);
       assertThat(sql.get(0)).contains("insert into ecmc_person");
       assertThat(sql.get(1)).contains("insert into ecmc_person_phone");
+      assertSqlBind(sql, 2, 3);
     } else {
       assertThat(sql).hasSize(3);
       assertThat(sql.get(0)).contains("insert into ecmc_person");

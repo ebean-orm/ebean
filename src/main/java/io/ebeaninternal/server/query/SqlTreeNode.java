@@ -5,7 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebeaninternal.server.type.ScalarDataReader;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -19,6 +19,10 @@ interface SqlTreeNode {
    * Build the select chain for a RawSql query.
    */
   void buildRawSqlSelectChain(List<String> selectChain);
+
+  default boolean isSqlDistinct() {
+    return false;
+  }
 
   /**
    * Return true if this node includes an aggregation.
@@ -80,9 +84,9 @@ interface SqlTreeNode {
   boolean hasMany();
 
   /**
-   * Return the property for singleAttribute query.
+   * Return the reader for the single attribute query.
    */
-  ScalarType<?> getSingleAttributeScalarType();
+  ScalarDataReader<?> getSingleAttributeReader();
 
   /**
    * Return true if the query is known to only have a single property selected.

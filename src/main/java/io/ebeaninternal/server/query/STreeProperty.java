@@ -2,6 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
+import io.ebeaninternal.server.type.ScalarDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * <p>
  * A BeanProperty or a dynamically created property based on formula.
  */
-public interface STreeProperty {
+public interface STreeProperty extends ScalarDataReader<Object> {
 
   /**
    * Return the property name.
@@ -37,6 +38,13 @@ public interface STreeProperty {
    * Return true if the property is an aggregation.
    */
   boolean isAggregation();
+
+  /**
+   * Return true if the property is an aggregation on a ManyToOne.
+   */
+  default boolean isAggregationManyToOne() {
+    return false;
+  }
 
   /**
    * Return true if the property is a formula.

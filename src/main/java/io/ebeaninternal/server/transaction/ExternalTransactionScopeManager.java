@@ -13,8 +13,7 @@ public class ExternalTransactionScopeManager extends DefaultTransactionScopeMana
   /**
    * Instantiates  transaction scope manager.
    */
-  public ExternalTransactionScopeManager(String serverName, ExternalTransactionManager externalManager) {
-    super(serverName);
+  public ExternalTransactionScopeManager(ExternalTransactionManager externalManager) {
     this.externalManager = externalManager;
   }
 

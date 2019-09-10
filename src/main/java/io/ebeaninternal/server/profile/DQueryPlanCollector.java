@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetaQueryMetric;
-import io.ebeaninternal.metric.QueryPlanCollector;
+import io.ebean.metric.QueryPlanCollector;
 
 import java.util.ArrayList;
 import java.util.List;

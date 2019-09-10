@@ -25,14 +25,13 @@ public class ModelBuild_compoundKeyTest extends BaseTestCase {
 
   private SpiEbeanServer getServer() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");
     config.setDdlGenerate(false);
     config.setDdlRun(false);
+    config.setDdlExtra(false);
     config.setDefaultServer(false);
     config.setRegister(false);
 

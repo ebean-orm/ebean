@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
 
 import java.io.IOException;
 
@@ -66,7 +66,7 @@ class NullExpression extends AbstractExpression {
       return;
     }
 
-    String nullExpr = notNull ? " is not null " : " is null ";
+    String nullExpr = notNull ? " is not null" : " is null";
     if (elProperty != null && elProperty.isAssocId()) {
       request.append(elProperty.getAssocIdExpression(propName, nullExpr));
     } else {

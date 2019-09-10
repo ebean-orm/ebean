@@ -25,6 +25,11 @@ public enum MetricType {
    * <p>
    * SqlQuery and SqlUpdate without a label have no metrics collected.
    */
-  SQL
+  SQL,
+
+  /**
+   * L2 cache metrics.
+   */
+  L2
 
 }

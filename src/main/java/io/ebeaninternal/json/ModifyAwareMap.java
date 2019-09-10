@@ -38,14 +38,18 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ModifyAwareMap)) return false;
-    ModifyAwareMap<?, ?> that = (ModifyAwareMap<?, ?>) o;
-    return Objects.equals(map, that.map);
+    if (o instanceof ModifyAwareMap) {
+      ModifyAwareMap<?,?> that = (ModifyAwareMap<?,?>) o;
+      return Objects.equals(map, that.map);
+    }
+    if (!(o instanceof Map)) return false;
+    Map<?,?> that = (Map<?,?>) o;
+    return Objects.equals(map, that);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(map);
+    return map.hashCode();
   }
 
   @Override

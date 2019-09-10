@@ -147,7 +147,11 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
 
-    visitScalar(p);
+    if (p instanceof BeanPropertyAssocOne) {
+      visitOneImported((BeanPropertyAssocOne)p);
+    } else {
+      visitScalar(p);
+    }
     if (embedded.isId()) {
       // compound primary key
       lastColumn.setPrimaryKey(true);
@@ -165,8 +169,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     ImportedId importedId = p.getImportedId();
 
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
-
-    PropertyForeignKey foreignKey = p.getForeignKey();
 
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {
@@ -192,7 +194,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setDbMigrationInfos(p.getDbMigrationInfos());
       col.setDefaultValue(p.getDbColumnDefault());
       if (columns.length == 1) {
-        if (p.hasForeignKey() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
+        if (p.hasForeignKeyConstraint() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
           // single references column (put it on the column)
           String refTable = importedProperty.getBeanDescriptor().getBaseTable();
           if (refTable == null) {
@@ -204,6 +206,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
           if (p.hasForeignKeyIndex()) {
             col.setForeignKeyIndex(determineForeignKeyIndexName(col.getName()));
           }
+          PropertyForeignKey foreignKey = p.getForeignKey();
           if (foreignKey != null) {
             col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
           }
@@ -252,9 +255,15 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
       TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
       if (primaryKeyJoin != null && !table.isPartitioned()) {
-        TableJoinColumn[] columns = primaryKeyJoin.columns();
-        col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
-        col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
+        final PropertyForeignKey foreignKey = primaryKeyJoin.getForeignKey();
+        if (foreignKey == null || !foreignKey.isNoConstraint()) {
+          TableJoinColumn[] columns = primaryKeyJoin.columns();
+          col.setReferences(primaryKeyJoin.getTable() + "." + columns[0].getForeignDbColumn());
+          col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
+          if (foreignKey != null) {
+            col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
+          }
+        }
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());

@@ -1,8 +1,5 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import java.io.IOException;
-import java.util.List;
-
 import io.ebean.config.PropertiesWrapper;
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -11,6 +8,9 @@ import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
+
+import java.io.IOException;
+import java.util.List;
 
 public class HanaTableDdl extends BaseTableDdl {
 
@@ -30,10 +30,7 @@ public class HanaTableDdl extends BaseTableDdl {
 
   @Override
   protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) throws IOException {
-    String ddl = platformDdl.alterColumnBaseAttributes(alter);
-    if (hasValue(ddl)) {
-      writer.apply().append(ddl).endOfStatement();
-    }
+    // done in alterColumnBaseAttributes
   }
 
   @Override

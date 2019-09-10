@@ -30,6 +30,11 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   BeanDescriptor<T> getBeanDescriptor();
 
   /**
+   * Prepare the query for execution.
+   */
+  void prepareQuery();
+
+  /**
    * This will create a local (readOnly) transaction if no current transaction
    * exists.
    * <p>
@@ -161,16 +166,6 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    * Return true if this query is expected to use the doc store.
    */
   boolean isUseDocStore();
-
-  /**
-   * Set profile location for "find by id" if not set.
-   */
-  void profileLocationById();
-
-  /**
-   * Set profile location for "find all" if not set.
-   */
-  void profileLocationAll();
 
   /**
    * Return true if delete by statement is allowed for this type given cascade rules etc.

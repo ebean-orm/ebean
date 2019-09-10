@@ -7,7 +7,7 @@ import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
@@ -54,67 +54,69 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     /**
      * Find by Id or unique returning a single bean.
      */
-    BEAN(FIND_ONE),
+    BEAN(FIND_ONE, "byId"),
 
     /**
      * Find returning a List.
      */
-    LIST(FIND_MANY),
+    LIST(FIND_MANY, "findList"),
 
     /**
      * Find returning a Set.
      */
-    SET(FIND_MANY),
+    SET(FIND_MANY, "findSet"),
 
     /**
      * Find returning a Map.
      */
-    MAP(FIND_MANY),
+    MAP(FIND_MANY, "findMap"),
 
     /**
      * Find iterate type query - findEach(), findIterate() etc.
      */
-    ITERATE(FIND_ITERATE),
+    ITERATE(FIND_ITERATE, "findEach"),
 
     /**
      * Find the Id's.
      */
-    ID_LIST(FIND_ID_LIST),
+    ID_LIST(FIND_ID_LIST, "findIds"),
 
     /**
      * Find single attribute.
      */
-    ATTRIBUTE(FIND_ATTRIBUTE),
+    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute"),
 
     /**
      * Find rowCount.
      */
-    COUNT(FIND_COUNT),
+    COUNT(FIND_COUNT, "findCount"),
 
     /**
      * A subquery used as part of a where clause.
      */
-    SUBQUERY(FIND_SUBQUERY),
+    SUBQUERY(FIND_SUBQUERY, "subquery"),
 
     /**
      * Delete query.
      */
-    DELETE(FIND_DELETE, true),
+    DELETE(FIND_DELETE, "delete", true),
 
     /**
      * Update query.
      */
-    UPDATE(FIND_UPDATE, true);
+    UPDATE(FIND_UPDATE, "update", true);
 
-    boolean update;
-    String profileEventId;
+    private final boolean update;
+    private final String profileEventId;
+    private final String label;
 
-    Type(String profileEventId) {
-      this(profileEventId, false);
+    Type(String profileEventId, String label) {
+      this(profileEventId, label, false);
     }
 
-    Type(String profileEventId, boolean update) {
+    Type(String profileEventId, String label, boolean update) {
       this.profileEventId = profileEventId;
+      this.label = label;
       this.update = update;
     }
 
@@ -127,6 +129,10 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
 
     public String profileEventId() {
       return profileEventId;
+    }
+
+    public String label() {
+      return label;
     }
   }
 
@@ -196,6 +202,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return the label set on the query.
    */
   String getLabel();
+
+  /**
+   * Return the label manually set on the query or from the profile location.
+   */
+  String getPlanLabel();
 
   /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
@@ -277,6 +288,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * invoking a lazy load was included in the query.
    */
   boolean selectAllForLazyLoadProperty();
+
+  /**
+   * Set the on a secondary query given the label, relativePath and profile location of the parent query.
+   */
+  void setProfilePath(String label, String relativePath, ProfileLocation profileLocation);
 
   /**
    * Set the query mode.
@@ -419,6 +435,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   void resetBeanCacheAutoMode(boolean findOne);
 
   /**
+   * Bean cache lookup for find by ids.
+   */
+  CacheIdLookup<T> cacheIdLookup();
+
+  /**
    * Collect natural key data for this query or null if the query does not match
    * the requirements of natural key lookup.
    */
@@ -438,6 +459,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Set the query to be a delete query.
    */
   void setDelete();
+
+  /**
+   * Set the query to be delete by ids due to cascading delete.
+   */
+  CQueryPlanKey setDeleteByIdsPlan();
 
   /**
    * Set the query to select the id property only.
@@ -537,7 +563,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * because the queryPlanHash is used to identify the query point.
    * </p>
    */
-  ObjectGraphNode setOrigin(CallStack callStack);
+  ObjectGraphNode setOrigin(CallOrigin callOrigin);
 
   /**
    * Set the profile point of the bean or collection that is lazy loading.
@@ -750,23 +776,6 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isDisableLazyLoading();
 
   /**
-   * Internally set by Ebean when this query must use the DISTINCT keyword.
-   * <p>
-   * This does not exclude/remove the use of the id property.
-   */
-  void setSqlDistinct(boolean sqlDistinct);
-
-  /**
-   * Return true if this query has been specified by a user or internally by Ebean to use DISTINCT.
-   */
-  boolean isDistinctQuery();
-
-  /**
-   * Return true if this was internally set to sql distinct (ie. many where predicate).
-   */
-  boolean isSqlDistinct();
-
-  /**
    * Return true if this query has been specified by a user to use DISTINCT.
    */
   boolean isDistinct();
@@ -838,6 +847,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   boolean isCancelled();
 
   /**
+   * Return the base table to use if user defined on the query.
+   */
+  String getBaseTable();
+
+  /**
    * Return root table alias set by {@link #alias(String)} command.
    */
   String getAlias();
@@ -861,4 +875,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Returns the count distinct order setting.
    */
   CountDistinctOrder getCountDistinctOrder();
+
+  /**
+   * Handles load errors.
+   */
+  void handleLoadError(String fullName, Exception e);
 }

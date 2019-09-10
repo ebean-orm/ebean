@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.server.query.SqlBeanLoad;
+import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
@@ -14,7 +15,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   private final boolean aggregate;
 
-  private final BeanProperty asTarget;
+  final BeanProperty asTarget;
 
   private final String alias;
 
@@ -37,16 +38,25 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   }
 
   @Override
-  public void load(SqlBeanLoad sqlBeanLoad) {
-
+  public Object read(DataReader dataReader) {
     try {
-      Object value = scalarType.read(sqlBeanLoad.ctx().getDataReader());
-      if (asTarget != null) {
-        sqlBeanLoad.load(asTarget, value);
-      }
-
+      return scalarType.read(dataReader);
     } catch (Exception e) {
       throw new PersistenceException("Error loading on " + fullName, e);
+    }
+  }
+
+  @Override
+  public void load(SqlBeanLoad sqlBeanLoad) {
+    Object value;
+    try {
+      value = scalarType.read(sqlBeanLoad.ctx().getDataReader());
+    } catch (Exception e) {
+      sqlBeanLoad.ctx().handleLoadError(fullName, e);
+      return;
+    }
+    if (asTarget != null) {
+      sqlBeanLoad.load(asTarget, value);
     }
   }
 

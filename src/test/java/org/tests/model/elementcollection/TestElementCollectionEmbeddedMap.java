@@ -24,11 +24,11 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(4);
       assertThat(sql.get(0)).contains("insert into ecbm_person");
       assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers");
-    }
-    else {
+      assertSqlBind(sql, 2, 3);
+    } else {
       assertThat(sql).hasSize(3);
       assertThat(sql.get(0)).contains("insert into ecbm_person");
       assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers");
@@ -96,12 +96,12 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(3);
+      assertThat(sql).hasSize(6);
       assertThat(sql.get(0)).contains("update ecbm_person set name=?, version=? where id=? and version=?");
       assertThat(sql.get(1)).contains("delete from ecbm_person_phone_numbers where person_id=?");
       assertThat(sql.get(2)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number)");
-    }
-    else {
+      assertSqlBind(sql, 3, 5);
+    } else {
       assertThat(sql).hasSize(5);
       assertThat(sql.get(0)).contains("update ecbm_person set name=?, version=? where id=? and version=?");
       assertThat(sql.get(1)).contains("delete from ecbm_person_phone_numbers where person_id=?");
@@ -130,11 +130,11 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(6);
       assertThat(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
       assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
-    }
-    else {
+      assertSqlBind(sql, 2, 5);
+    } else {
       assertThat(sql).hasSize(5);
       assertThat(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
       assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");

@@ -3,6 +3,7 @@ package io.ebean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,7 @@ import java.util.function.Predicate;
  * <p>
  * <pre>{@code
  *
- * List<Order> orderList =
- *   ebeanServer.find(Order.class)
- *     .fetch("customer")
- *     .fetch("details")
+ * List<Order> orderList = DB.find(Order.class)
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
@@ -38,29 +36,14 @@ import java.util.function.Predicate;
  * <pre>{@code
  *
  * String oql =
- *   	+" fetch customer "
- *   	+" fetch details "
  *   	+" where customer.name like :custName and orderDate > :minOrderDate "
  *   	+" order by customer.id, id desc "
  *   	+" limit 50 ";
  *
- * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
- * query.setParameter("custName", "Rob%");
- * query.setParameter("minOrderDate", lastWeek);
- *
- * List<Order> orderList = query.findList();
- * ...
- * }</pre>
- * <p>
- * Example: Using a named query called "with.cust.and.details"
- * </p>
- * <pre>{@code
- *
- * Query<Order> query = ebeanServer.createNamedQuery(Order.class,"with.cust.and.details");
- * query.setParameter("custName", "Rob%");
- * query.setParameter("minOrderDate", lastWeek);
- *
- * List<Order> orderList = query.findList();
+ * List<Order> orderList = DB.createQuery(Order.class, oql)
+ *   .setParameter("custName", "Rob%")
+ *   .setParameter("minOrderDate", lastWeek)
+ *   .findList();
  * ...
  * }</pre>
  * <h3>AutoTune</h3>
@@ -245,6 +228,38 @@ public interface Query<T> {
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Convert the query to a UpdateQuery.
+   * <p>
+   * Typically this is used with query beans to covert a query bean
+   * query into an UpdateQuery like the examples below.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  int rowsUpdated = new QCustomer()
+   *       .name.startsWith("Rob")
+   *       .asUpdate()
+   *       .set("active", false)
+   *       .update();;
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   int rowsUpdated = new QContact()
+   *       .notes.note.startsWith("Make Inactive")
+   *       .email.endsWith("@foo.com")
+   *       .customer.id.equalTo(42)
+   *       .asUpdate()
+   *       .set("inactive", true)
+   *       .setRaw("email = lower(email)")
+   *       .update();
+   *
+   * }</pre>
+   */
+  UpdateQuery<T> asUpdate();
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
@@ -341,6 +356,27 @@ public interface Query<T> {
   Query<T> setAutoTune(boolean autoTune);
 
   /**
+   * Execute the query allowing properties with invalid JSON to be collected and not fail the query.
+   * <pre>{@code
+   *
+   *   // fetch a bean with JSON content
+   *   EBasicJsonList bean= DB.find(EBasicJsonList.class)
+   *       .setId(42)
+   *       .setAllowLoadErrors()  // collect errors into bean state if we have invalid JSON
+   *       .findOne();
+   *
+   *
+   *   // get the invalid JSON errors from the bean state
+   *   Map<String, Exception> errors = server().getBeanState(bean).getLoadErrors();
+   *
+   *   // If this map is not empty tell we have invalid JSON
+   *   // and should try and fix the JSON content or inform the user
+   *
+   * }</pre>
+   */
+  Query<T> setAllowLoadErrors();
+
+  /**
    * Set the default lazy loading batch size to use.
    * <p>
    * When lazy loading is invoked on beans loaded by this query then this sets the
@@ -383,8 +419,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     // Only fetch the customer id, name and status.
    *     // This is described as a "Partial Object"
    *     .select("name, status")
@@ -412,8 +447,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // query orders...
-   * List<Order> orders =
-   *     ebeanServer.find(Order.class)
+   * List<Order> orders = DB.find(Order.class)
    *       // fetch the customer...
    *       // ... getting the customers name and phone number
    *       .fetch("customer", "name, phoneNumber")
@@ -428,8 +462,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .select("name, status")
    *     .fetch("contacts", "firstName,lastName,email")
    *     .findList();
@@ -469,6 +502,14 @@ public interface Query<T> {
   Query<T> fetchQuery(String path, String fetchProperties);
 
   /**
+   * Fetch the path and properties using L2 bean cache.
+   *
+   * @param path            The path of the beans we are fetching from L2 cache.
+   * @param fetchProperties The properties that should be loaded.
+   */
+  Query<T> fetchCache(String path, String fetchProperties);
+
+  /**
    * Fetch the path and properties lazily (via batch lazy loading).
    * <p>
    * This is the same as:
@@ -498,8 +539,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .select("name, status")
    *     .fetch("contacts", "firstName,lastName,email", new FetchConfig().lazy(10))
    *     .findList();
@@ -520,8 +560,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     // eager fetch the contacts
    *     .fetch("contacts")
    *     .findList();
@@ -557,6 +596,11 @@ public interface Query<T> {
   Query<T> fetchQuery(String path);
 
   /**
+   * Fetch the path eagerly using L2 cache.
+   */
+  Query<T> fetchCache(String path);
+
+  /**
    * Fetch the path lazily (via batch lazy loading).
    * <p>
    * This is the same as:
@@ -584,8 +628,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     // lazy fetch contacts with a batch size of 100
    *     .fetch("contacts", new FetchConfig().lazy(100))
    *     .findList();
@@ -603,9 +646,19 @@ public interface Query<T> {
   Query<T> apply(FetchPath fetchPath);
 
   /**
+   * Execute the query using the given transaction.
+   */
+  Query<T> usingTransaction(Transaction transaction);
+
+  /**
+   * Execute the query using the given connection.
+   */
+  Query<T> usingConnection(Connection connection);
+
+  /**
    * Execute the query returning the list of Id's.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    */
   @Nonnull
@@ -627,24 +680,21 @@ public interface Query<T> {
    * the jdbc statement and resultSet are closed at the end of the iteration.
    * </p>
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <pre>{@code
    *
-   *  Query<Customer> query =
-   *    ebeanServer.find(Customer.class)
+   *  Query<Customer> query = DB.find(Customer.class)
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id");
    *
-   *  QueryIterator<Customer> it = query.findIterate();
-   *  try {
+   *  // use try with resources to ensure QueryIterator is closed
+   *
+   *  try (QueryIterator<Customer> it = query.findIterate()) {
    *    while (it.hasNext()) {
    *      Customer customer = it.next();
    *      // do something with customer ...
    *    }
-   *  } finally {
-   *    // close the underlying resources
-   *    it.close();
    *  }
    *
    * }</pre>
@@ -681,7 +731,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  ebeanServer.find(Customer.class)
+   *  DB.find(Customer.class)
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
    *     .findEach((Customer customer) -> {
@@ -710,7 +760,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  ebeanServer.find(Customer.class)
+   *  DB.find(Customer.class)
    *     .fetch("contacts", new FetchConfig().query(2))
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
@@ -733,12 +783,11 @@ public interface Query<T> {
   /**
    * Execute the query returning the list of objects.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <pre>{@code
    *
-   * List<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * List<Customer> customers = DB.find(Customer.class)
    *     .where().ilike("name", "rob%")
    *     .findList();
    *
@@ -750,12 +799,11 @@ public interface Query<T> {
   /**
    * Execute the query returning the set of objects.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <pre>{@code
    *
-   * Set<Customer> customers =
-   *     ebeanServer.find(Customer.class)
+   * Set<Customer> customers = DB.find(Customer.class)
    *     .where().ilike("name", "rob%")
    *     .findSet();
    *
@@ -767,7 +815,7 @@ public interface Query<T> {
   /**
    * Execute the query returning a map of the objects.
    * <p>
-   * This query will execute against the EbeanServer that was used to create it.
+   * This query will execute against the Database that was used to create it.
    * </p>
    * <p>
    * You can use setMapKey() so specify the property values to be used as keys
@@ -775,8 +823,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * Map<String, Product> map =
-   *   ebeanServer.find(Product.class)
+   * Map<String, Product> map = DB.find(Product.class)
    *     .setMapKey("sku")
    *     .findMap();
    *
@@ -792,7 +839,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .orderBy().asc("name")
    *      .findSingleAttributeList();
@@ -803,7 +850,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  List<String> names =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
@@ -824,7 +871,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  String name =
-   *    Ebean.find(Customer.class)
+   *    DB.find(Customer.class)
    *      .select("name")
    *      .where().eq("id", 42)
    *      .findSingleAttribute();
@@ -837,6 +884,37 @@ public interface Query<T> {
    * Return true if this is countDistinct query.
    */
   boolean isCountDistinct();
+
+  /**
+   * Execute the query returning true if a row is found.
+   * <p>
+   * The query is executed using max rows of 1 and will only select the id property.
+   * This method is really just a convenient way to optimise a query to perform a
+   * 'does a row exist in the db' check.
+   * </p>
+   *
+   * <h2>Example using a query bean:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists =
+   *     new QContact()
+   *       .email.equalTo("rob@foo.com")
+   *       .exists();
+   *
+   * }</pre>
+   *
+   * <h2>Example:</h2>
+   * <pre>{@code
+   *
+   *   boolean userExists = query()
+   *     .where().eq("email", "rob@foo.com")
+   *     .exists();
+   *
+   * }</pre>
+   *
+   * @return True if the query finds a matching row in the database
+   */
+  boolean exists();
 
   /**
    * Execute the query returning either a single bean or null (if no matching
@@ -852,8 +930,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // assuming the sku of products is unique...
-   * Product product =
-   *     ebeanServer.find(Product.class)
+   * Product product = DB.find(Product.class)
    *         .where().eq("sku", "aa113")
    *         .findOne();
    * ...
@@ -865,8 +942,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    * // Fetch order 1 and additionally fetch join its order details...
-   * Order order =
-   *     ebeanServer.find(Order.class)
+   * Order order = DB.find(Order.class)
    *       .setId(1)
    *       .fetch("details")
    *       .findOne();
@@ -1007,7 +1083,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  PagedList<Order> pagedList = Ebean.find(Order.class)
+   *  PagedList<Order> pagedList = DB.find(Order.class)
    *       .setFirstRow(50)
    *       .setMaxRows(20)
    *       .findPagedList();
@@ -1032,11 +1108,9 @@ public interface Query<T> {
    * // a query with a named parameter
    * String oql = "find order where status = :orderStatus";
    *
-   * Query<Order> query = ebeanServer.find(Order.class, oql);
-   *
-   * // bind the named parameter
-   * query.bind("orderStatus", OrderStatus.NEW);
-   * List<Order> list = query.findList();
+   * List<Order> list = DB.find(Order.class, oql)
+   *   .setParameter("orderStatus", OrderStatus.NEW)
+   *   .findList();
    *
    * }</pre>
    *
@@ -1054,12 +1128,9 @@ public interface Query<T> {
    * // a query with a positioned parameter
    * String oql = "where status = ? order by id desc";
    *
-   * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
-   *
-   * // bind the parameter
-   * query.setParameter(1, OrderStatus.NEW);
-   *
-   * List<Order> list = query.findList();
+   * List<Order> list = DB.createQuery(Order.class, oql)
+   *   .setParameter(1, OrderStatus.NEW)
+   *   .findList();
    *
    * }</pre>
    *
@@ -1076,8 +1147,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * Order order =
-   *     ebeanServer.find(Order.class)
+   * Order order = DB.find(Order.class)
    *     .setId(1)
    *     .fetch("details")
    *     .findOne();
@@ -1098,8 +1168,7 @@ public interface Query<T> {
    * Add a single Expression to the where clause returning the query.
    * <pre>{@code
    *
-   * List<Order> newOrders =
-   *     ebeanServer.find(Order.class)
+   * List<Order> newOrders = DB.find(Order.class)
    * 		.where().eq("status", Order.NEW)
    * 		.findList();
    * ...
@@ -1114,8 +1183,7 @@ public interface Query<T> {
    * where clause.
    * <pre>{@code
    *
-   * List<Order> orders =
-   *     ebeanServer.find(Order.class)
+   * List<Order> orders = DB.find(Order.class)
    *     .where()
    *       .eq("status", Order.NEW)
    *       .ilike("customer.name","rob%")
@@ -1161,10 +1229,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   * List<Customer> list =
-   *     ebeanServer.find(Customer.class)
-   *     // .fetch("orders", new FetchConfig().lazy())
-   *     // .fetch("orders", new FetchConfig().query())
+   * List<Customer> list = DB.find(Customer.class)
    *     .fetch("orders")
    *     .where().ilike("name", "rob%")
    *     .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
@@ -1178,8 +1243,7 @@ public interface Query<T> {
    * </p>
    *
    * @param propertyName the name of the many property that you want to have a filter on.
-   * @return the expression list that you add filter expressions for the many
-   * to.
+   * @return the expression list that you add filter expressions for the many to.
    */
   ExpressionList<T> filterMany(String propertyName);
 
@@ -1293,7 +1357,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *   List<Customer> customers =
-   *       Ebean.find(Customer.class)
+   *       DB.find(Customer.class)
    *          .setDistinct(true)
    *          .select("name")
    *          .findList();
@@ -1309,7 +1373,7 @@ public interface Query<T> {
    *
    *  List<CountedValue<Order.Status>> orderStatusCount =
    *
-   *     Ebean.find(Order.class)
+   *     DB.find(Order.class)
    *      .select("status")
    *      .where()
    *      .gt("orderDate", LocalDate.now().minusMonths(3))
@@ -1329,7 +1393,6 @@ public interface Query<T> {
    *   count:1 orderStatus:COMPLETE
    *
    * }</pre>
-   *
    */
   Query<T> setCountDistinct(CountDistinctOrder orderBy);
 
@@ -1366,10 +1429,8 @@ public interface Query<T> {
    *
    * // Assuming sku is unique for products...
    *
-   * Map<String,Product> productMap =
-   *     ebeanServer.find(Product.class)
-   *     // use sku for keys...
-   *     .setMapKey("sku")
+   * Map<String,Product> productMap = DB.find(Product.class)
+   *     .setMapKey("sku")  // sku map keys...
    *     .findMap();
    *
    * }</pre>
@@ -1542,9 +1603,48 @@ public interface Query<T> {
   Query<T> alias(String alias);
 
   /**
+   * Set the base table to use for this query.
+   * <p>
+   * Typically this is used when a table has partitioning and we wish to specify a specific
+   * partition/table to query against.
+   * </p>
+   * <pre>{@code
+   *
+   *   QOrder()
+   *   .setBaseTable("order_2019_05")
+   *   .status.equalTo(Status.NEW)
+   *   .findList();
+   *
+   * }</pre>
+   */
+  Query<T> setBaseTable(String baseTable);
+
+  /**
    * Return the type of beans being queried.
    */
   Class<T> getBeanType();
+
+  /**
+   * Restrict the query to only return subtypes of the given inherit type.
+   *
+   * <pre>{@code
+   *
+   *   List<Animal> animals =
+   *     new QAnimal()
+   *       .name.startsWith("Fluffy")
+   *       .setInheritType(Cat.class)
+   *       .findList();
+   *
+   * }</pre>
+   *
+   * @param type An inheritance subtype of the
+   */
+  Query<T> setInheritType(Class<? extends T> type);
+
+  /**
+   * Returns the inherit type. This is normally the same as getBeanType() returns as long as no other type is set.
+   */
+  Class<? extends T> getInheritType();
 
   /**
    * Return the type of query being executed.

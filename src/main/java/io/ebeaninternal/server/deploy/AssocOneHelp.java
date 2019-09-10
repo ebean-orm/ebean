@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.type.DataReader;
 
 import java.sql.SQLException;
 
@@ -12,13 +13,20 @@ import java.sql.SQLException;
  */
 abstract class AssocOneHelp {
 
-  protected final BeanPropertyAssocOne<?> property;
+  final BeanPropertyAssocOne<?> property;
 
-  protected final BeanDescriptor<?> target;
+  private final BeanDescriptor<?> target;
+
+  private final String path;
 
   AssocOneHelp(BeanPropertyAssocOne<?> property) {
+    this(property, null);
+  }
+
+  AssocOneHelp(BeanPropertyAssocOne<?> property, String embeddedPrefix) {
     this.property = property;
     this.target = property.targetDescriptor;
+    this.path = (embeddedPrefix == null) ? property.name : embeddedPrefix + "." + property.name;
   }
 
   /**
@@ -26,6 +34,24 @@ abstract class AssocOneHelp {
    */
   void loadIgnore(DbReadContext ctx) {
     property.targetIdBinder.loadIgnore(ctx);
+  }
+
+  /**
+   * Read and return the property.
+   */
+  Object read(DataReader reader) throws SQLException {
+    return property.read(reader);
+  }
+
+  /**
+   * Read and return the property setting value into the bean.
+   */
+  Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    Object val = read(reader);
+    if (bean != null) {
+      property.setValue(bean, val);
+    }
+    return val;
   }
 
   /**
@@ -48,7 +74,7 @@ abstract class AssocOneHelp {
     boolean disableLazyLoading = ctx.isDisableLazyLoading();
     Object ref = target.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
     if (!disableLazyLoading) {
-      ctx.register(property.name, ((EntityBean) ref)._ebean_getIntercept());
+      ctx.register(path, ((EntityBean) ref)._ebean_getIntercept());
     }
     return ref;
   }

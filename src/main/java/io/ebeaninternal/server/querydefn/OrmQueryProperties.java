@@ -4,13 +4,13 @@ import io.ebean.ExpressionFactory;
 import io.ebean.FetchConfig;
 import io.ebean.OrderBy;
 import io.ebean.Query;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
-import io.ebean.util.SplitName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class OrmQueryProperties implements Serializable {
    * Construct for root so path (and parentPath) are null.
    */
   public OrmQueryProperties() {
-    this((String) null);
+    this(null);
   }
 
   /**
@@ -107,6 +107,9 @@ public class OrmQueryProperties implements Serializable {
     this.readOnly = response.readOnly;
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
+      if (fetchConfig.isCache()) {
+        this.cache = true;
+      }
     } else {
       this.fetchConfig = response.fetchConfig;
     }
@@ -157,6 +160,7 @@ public class OrmQueryProperties implements Serializable {
     this.cache = source.cache;
     this.readOnly = source.readOnly;
     this.filterMany = source.filterMany;
+    this.markForQueryJoin = source.markForQueryJoin;
     this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
   }
 
@@ -177,7 +181,6 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Move a OrderBy.Property from the main query to this query join.
    */
-  @SuppressWarnings("rawtypes")
   void addSecJoinOrderProperty(OrderBy.Property orderProp) {
     if (orderBy == null) {
       orderBy = new OrderBy();
@@ -193,7 +196,7 @@ public class OrmQueryProperties implements Serializable {
    * Return the expressions used to filter on this path. This should be a many path to use this
    * method.
    */
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public <T> SpiExpressionList<T> filterMany(Query<T> rootQuery) {
     if (filterMany == null) {
       FilterExprPath exprPath = new FilterExprPath(path);
@@ -293,7 +296,7 @@ public class OrmQueryProperties implements Serializable {
       sb.append(path).append(" ");
     }
     if (!isEmpty()) {
-      sb.append("(").append(rawProperties).append(") ");
+      sb.append("(").append(rawProperties).append(")");
     }
     return sb.toString();
   }
@@ -347,22 +350,12 @@ public class OrmQueryProperties implements Serializable {
     includedBeanJoin.add(propertyName);
   }
 
-  /**
-   * This excludes the bean joined properties.
-   * <p>
-   * This is because bean joins will have there own node in the SqlTree.
-   * </p>
-   */
-  public Set<String> getSelectProperties() {
+  public Set<String> getSelectInclude() {
+    return included;
+  }
 
-    if (secondaryQueryJoins == null) {
-      return included;
-    }
-
-    LinkedHashSet<String> temp = new LinkedHashSet<>(2 * (secondaryQueryJoins.size() + included.size()));
-    temp.addAll(included);
-    temp.addAll(secondaryQueryJoins);
-    return temp;
+  public Set<String> getSelectQueryJoin() {
+    return secondaryQueryJoins;
   }
 
   void addSecondaryQueryJoin(String property) {

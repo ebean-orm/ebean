@@ -19,6 +19,13 @@ alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic modify status drop default;
 alter table migtest_e_basic modify status null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
+
+update migtest_e_basic set status2 = 'N' where status2 is null;
+alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
+alter table migtest_e_basic modify status2 varchar2(1);
+alter table migtest_e_basic modify status2 default 'N';
+alter table migtest_e_basic modify status2 not null;
+alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_description;
 
 update migtest_e_basic set user_id = 23 where user_id is null;

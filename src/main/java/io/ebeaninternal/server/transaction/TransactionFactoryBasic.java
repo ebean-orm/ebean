@@ -52,7 +52,7 @@ class TransactionFactoryBasic extends TransactionFactory {
   }
 
   private SpiTransaction create(boolean explicit, Connection c) {
-    return manager.createTransaction(explicit, c, counter.incrementAndGet());
+    return manager.createTransaction(explicit, c);
   }
 
 }

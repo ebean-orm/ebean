@@ -54,7 +54,7 @@ public class DeployBeanTable {
     return idProperty == null ? null : createProperty(owner, idProperty);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private BeanProperty createProperty(BeanDescriptorMap owner, DeployBeanProperty prop) {
 
     if (prop instanceof DeployBeanPropertyAssocOne<?>) {

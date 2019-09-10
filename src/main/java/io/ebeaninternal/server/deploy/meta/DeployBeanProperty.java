@@ -188,7 +188,7 @@ public class DeployBeanProperty {
    */
   private int dbType;
 
-  private DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
+  private final DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
 
   /**
    * The method used to read the property.
@@ -206,7 +206,7 @@ public class DeployBeanProperty {
    */
   private GeneratedProperty generatedProperty;
 
-  protected final DeployBeanDescriptor<?> desc;
+  final DeployBeanDescriptor<?> desc;
 
   private boolean undirectionalShadow;
 
@@ -249,7 +249,7 @@ public class DeployBeanProperty {
   /**
    * Wrap the ScalarType using a ScalarTypeConverter.
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private ScalarType<?> wrapScalarType(Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     if (typeConverter == null) {
       return scalarType;
@@ -329,7 +329,7 @@ public class DeployBeanProperty {
   /**
    * Return the sortOrder for the properties.
    */
-  public int getSortOrder() {
+  int getSortOrder() {
     return sortOrder;
   }
 
@@ -357,7 +357,7 @@ public class DeployBeanProperty {
   /**
    * Mark this property as mapping to the discriminator column.
    */
-  public void setDiscriminator() {
+  void setDiscriminator() {
     this.discriminator = true;
   }
 
@@ -524,7 +524,7 @@ public class DeployBeanProperty {
     return naturalKey;
   }
 
-  public void setNaturalKey() {
+  void setNaturalKey() {
     this.naturalKey = true;
   }
 
@@ -763,29 +763,21 @@ public class DeployBeanProperty {
     return lob;
   }
 
-  public boolean isDbNumberType() {
+  boolean isDbNumberType() {
     return isNumericType(dbType);
   }
 
   private boolean isNumericType(int type) {
     switch (type) {
       case Types.BIGINT:
-        return true;
       case Types.DECIMAL:
-        return true;
-      case Types.DOUBLE:
-        return true;
-      case Types.FLOAT:
-        return true;
-      case Types.INTEGER:
-        return true;
-      case Types.NUMERIC:
-        return true;
-      case Types.REAL:
-        return true;
-      case Types.SMALLINT:
-        return true;
       case Types.TINYINT:
+      case Types.SMALLINT:
+      case Types.REAL:
+      case Types.NUMERIC:
+      case Types.INTEGER:
+      case Types.FLOAT:
+      case Types.DOUBLE:
         return true;
 
       default:

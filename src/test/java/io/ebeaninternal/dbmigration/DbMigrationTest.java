@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
 import io.ebean.BaseTestCase;
-import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -9,7 +8,6 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
-
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -52,7 +50,7 @@ public class DbMigrationTest extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform(Platform.ORACLE)
+  @IgnorePlatform({Platform.ORACLE, Platform.NUODB})
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
@@ -109,8 +107,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     // Run migration
     runScript(false, "1.1.sql");
-    SqlQuery select = server().createSqlQuery("select * from migtest_e_basic order by id");
-    List<SqlRow> result = select.findList();
+    List<SqlRow> result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
     assertThat(result).hasSize(2);
 
     SqlRow row = result.get(0);
@@ -138,11 +135,10 @@ public class DbMigrationTest extends BaseTestCase {
     // Oracle caches the statement and does not detect schema change. It fails with
     // an ORA-01007
     if (isOracle()) {
-      select = server().createSqlQuery("select * from migtest_e_basic order by id,id");
+      result = server().sqlQuery("select * from migtest_e_basic order by id,id").findList();
     } else {
-      select = server().createSqlQuery("select * from migtest_e_basic order by id");
+      result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
     }
-    result = select.findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).doesNotContain("old_boolean", "old_boolean2");
@@ -151,8 +147,7 @@ public class DbMigrationTest extends BaseTestCase {
     runScript(false, "1.4__dropsFor_1.3.sql");
 
     // now DB structure shoud be the same as v1_0
-    select = server().createSqlQuery("select * from migtest_e_basic order by id");
-    result = select.findList();
+    result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");

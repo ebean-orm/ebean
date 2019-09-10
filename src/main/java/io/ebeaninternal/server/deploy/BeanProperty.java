@@ -28,6 +28,7 @@ import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.LocalEncryptedType;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeBoolean;
@@ -42,6 +43,7 @@ import io.ebeanservice.docstore.api.support.DocStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -64,19 +66,19 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Flag to mark this is the id property.
    */
-  final boolean id;
+  private final boolean id;
 
-  final boolean importedPrimaryKey;
+  private final boolean importedPrimaryKey;
 
   /**
    * Flag to make this as a dummy property for unidirecitonal relationships.
    */
-  final boolean unidirectionalShadow;
+  private final boolean unidirectionalShadow;
 
   /**
    * Flag set if this maps to the inheritance discriminator column
    */
-  final boolean discriminator;
+  private final boolean discriminator;
 
   /**
    * Flag to mark the property as embedded. This could be on
@@ -88,55 +90,55 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Flag indicating if this the version property.
    */
-  final boolean version;
+  private final boolean version;
 
-  final boolean naturalKey;
+  private final boolean naturalKey;
 
   /**
    * Set if this property is nullable.
    */
-  final boolean nullable;
+  private final boolean nullable;
 
-  final boolean unique;
+  private final boolean unique;
 
   /**
    * Is this property include in database resultSet.
    */
-  final boolean dbRead;
+  private final boolean dbRead;
 
   /**
    * Include in DB insert.
    */
-  final boolean dbInsertable;
+  private final boolean dbInsertable;
 
   /**
    * Include in DB update.
    */
-  final boolean dbUpdatable;
+  private final boolean dbUpdatable;
 
   /**
    * True if the property is based on a SECONDARY table.
    */
-  final boolean secondaryTable;
+  private final boolean secondaryTable;
 
-  final TableJoin secondaryTableJoin;
-  final String secondaryTableJoinPrefix;
+  private final TableJoin secondaryTableJoin;
+  private final String secondaryTableJoinPrefix;
 
   /**
    * The property is inherited from a super class.
    */
-  final boolean inherited;
+  private final boolean inherited;
 
-  final Class<?> owningType;
+  private final Class<?> owningType;
 
-  final boolean local;
+  private final boolean local;
 
   /**
    * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
    */
-  final boolean lob;
+  private final boolean lob;
 
-  final boolean fetchEager;
+  private final boolean fetchEager;
 
   final boolean isTransient;
 
@@ -150,62 +152,62 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * The reflected field.
    */
-  final Field field;
+  private final Field field;
 
   /**
    * The bean type.
    */
-  final Class<?> propertyType;
+  private final Class<?> propertyType;
 
-  final String dbBind;
+  private final String dbBind;
 
   /**
    * The database column. This can include quoted identifiers.
    */
   final String dbColumn;
 
-  final String elPrefix;
+  private final String elPrefix;
   final String elPlaceHolder;
   final String elPlaceHolderEncrypted;
 
   /**
    * Select part of a SQL Formula used to populate this property.
    */
-  final String sqlFormulaSelect;
+  private final String sqlFormulaSelect;
 
   /**
    * Join part of a SQL Formula.
    */
   final String sqlFormulaJoin;
 
-  final String aggregation;
+  private final String aggregation;
 
-  final boolean formula;
+  private final boolean formula;
 
   /**
    * Set to true if stored encrypted.
    */
-  final boolean dbEncrypted;
+  private final boolean dbEncrypted;
 
-  final boolean localEncrypted;
+  private final boolean localEncrypted;
 
-  final int dbEncryptedType;
+  private final int dbEncryptedType;
 
   /**
    * The jdbc data type this maps to.
    */
-  final int dbType;
+  private final int dbType;
 
   final boolean excludedFromHistory;
 
   /**
    * Generator for insert or update timestamp etc.
    */
-  final GeneratedProperty generatedProperty;
+  private final GeneratedProperty generatedProperty;
 
-  final BeanPropertyGetter getter;
+  private final BeanPropertyGetter getter;
 
-  final BeanPropertySetter setter;
+  private final BeanPropertySetter setter;
 
   final BeanDescriptor<?> descriptor;
 
@@ -216,56 +218,56 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("rawtypes")
   final ScalarType scalarType;
 
-  final DocPropertyOptions docOptions;
+  private final DocPropertyOptions docOptions;
 
   /**
    * The length or precision for DB column.
    */
-  final int dbLength;
+  private final int dbLength;
 
   /**
    * The scale for DB column (decimal).
    */
-  final int dbScale;
+  private final int dbScale;
 
   /**
    * Deployment defined DB column definition.
    */
-  final String dbColumnDefn;
+  private final String dbColumnDefn;
 
   /**
    * DB Column default value for DDL definition (FALSE, NOW etc).
    */
-  final String dbColumnDefault;
-  final List<DbMigrationInfo> dbMigrationInfos;
+  private final String dbColumnDefault;
+  private final List<DbMigrationInfo> dbMigrationInfos;
 
   /**
    * Database DDL column comment.
    */
-  final String dbComment;
+  private final String dbComment;
 
-  final DbEncryptFunction dbEncryptFunction;
+  private final DbEncryptFunction dbEncryptFunction;
 
-  int deployOrder;
+  private int deployOrder;
 
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
-  final boolean unmappedJson;
-  final boolean tenantId;
+  private final boolean unmappedJson;
+  private final boolean tenantId;
 
-  final boolean draft;
+  private final boolean draft;
 
-  final boolean draftOnly;
+  private final boolean draftOnly;
 
-  final boolean draftDirty;
+  private final boolean draftDirty;
 
-  final boolean draftReset;
+  private final boolean draftReset;
 
-  final boolean softDelete;
+  private final boolean softDelete;
 
-  final String softDeleteDbSet;
+  private final String softDeleteDbSet;
 
-  final String softDeleteDbPredicate;
+  private final String softDeleteDbPredicate;
 
   public BeanProperty(DeployBeanProperty deploy) {
     this(null, deploy);
@@ -544,7 +546,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return dbEncryptFunction.getDecryptSql(this.getDbColumn());
   }
 
-  public String getDecryptSql(String tableAlias) {
+  private String getDecryptSql(String tableAlias) {
     return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn());
   }
 
@@ -640,6 +642,23 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
   }
 
+  @Override
+  public Object read(DataReader reader) throws SQLException {
+    return scalarType.read(reader);
+  }
+
+  public Object readSet(DataReader reader, EntityBean bean) throws SQLException {
+    try {
+      Object value = scalarType.read(reader);
+      if (bean != null) {
+        setValue(bean, value);
+      }
+      return value;
+    } catch (Exception e) {
+      throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
+    }
+  }
+
   public Object read(DbReadContext ctx) throws SQLException {
     return scalarType.read(ctx.getDataReader());
   }
@@ -684,7 +703,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return true if this object is part of an inheritance hierarchy.
    */
-  public boolean isInherited() {
+  private boolean isInherited() {
     return inherited;
   }
 
@@ -710,21 +729,21 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the DB literal expression to set the deleted state to true.
    */
-  public String getSoftDeleteDbSet() {
+  String getSoftDeleteDbSet() {
     return softDeleteDbSet;
   }
 
   /**
    * Return the DB literal predicate used to filter out soft deleted rows from a query.
    */
-  public String getSoftDeleteDbPredicate(String tableAlias) {
+  String getSoftDeleteDbPredicate(String tableAlias) {
     return tableAlias + softDeleteDbPredicate;
   }
 
   /**
    * Set the soft delete property value on the bean without invoking lazy loading.
    */
-  public void setSoftDeleteValue(EntityBean bean) {
+  void setSoftDeleteValue(EntityBean bean) {
     // assumes boolean deleted true being set which is ok limitation for now
     setValue(bean, true);
     bean._ebean_getIntercept().setChangedProperty(propertyIndex);
@@ -810,6 +829,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * Return the value in String format (for bean cache key).
+   */
+  public String format(Object value) {
+    return scalarType.format(value);
+  }
+
+  /**
    * Read the value for this property from L2 cache entry and set it to the bean.
    * <p>
    * This uses parse() as per the comment in getCacheDataValue().
@@ -884,7 +910,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the name of the property.
    */
-  @Override
+  @Override @Nonnull
   public String getName() {
     return name;
   }
@@ -993,7 +1019,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
-  public boolean isDirtyValue(Object value) {
+  boolean isDirtyValue(Object value) {
     return scalarType.isDirty(value);
   }
 
@@ -1036,14 +1062,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the DB scale for numeric columns.
    */
-  public int getDbScale() {
+  private int getDbScale() {
     return dbScale;
   }
 
   /**
    * Return a specific column DDL definition if specified (otherwise null).
    */
-  public String getDbColumnDefn() {
+  private String getDbColumnDefn() {
     return dbColumnDefn;
   }
 
@@ -1087,7 +1113,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the bean Field associated with this property.
    */
-  public Field getField() {
+  private Field getField() {
     return field;
   }
 
@@ -1123,14 +1149,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return true if this is a generated property mapping to @WhenCreated or @CreatedTimestamp.
    */
-  public boolean isGeneratedWhenCreated() {
+  boolean isGeneratedWhenCreated() {
     return generatedProperty instanceof GeneratedWhenCreated;
   }
 
   /**
    * Return true if this is a generated property mapping to @WhenModified or @UpdatedTimestamp.
    */
-  public boolean isGeneratedWhenModified() {
+  boolean isGeneratedWhenModified() {
     return generatedProperty instanceof GeneratedWhenModified;
   }
 
@@ -1166,7 +1192,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if this is a draftOnly property on a non-asDraft query and as such this
    * property should not be included in a sql query.
    */
-  protected boolean ignoreDraftOnlyProperty(boolean draftQuery) {
+  private boolean ignoreDraftOnlyProperty(boolean draftQuery) {
     return draftOnly && !draftQuery;
   }
 
@@ -1207,7 +1233,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Perform DB to Logical type conversion (if necessary).
    */
-  public Object convertToLogicalType(Object value) {
+  private Object convertToLogicalType(Object value) {
     if (scalarType != null) {
       return scalarType.toBeanType(value);
     }
@@ -1233,12 +1259,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public static boolean isLobType(int type) {
     switch (type) {
       case Types.CLOB:
-        return true;
       case Types.BLOB:
-        return true;
-      case Types.LONGVARBINARY:
-        return true;
       case Types.LONGVARCHAR:
+      case Types.LONGVARBINARY:
         return true;
 
       default:
@@ -1287,13 +1310,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
-   * Return true if this is a ManyToMany with history support (on the intersection table).
-   */
-  public boolean isManyToManyWithHistory() {
-    return false;
-  }
-
-  /**
    * Return true if this property hold unmapped JSON.
    */
   public boolean isUnmappedJson() {
@@ -1333,7 +1349,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return true if this property is reset/cleared on publish (on the draft bean).
    */
-  public boolean isDraftReset() {
+  boolean isDraftReset() {
     return draftReset;
   }
 
@@ -1361,7 +1377,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return true if this property is included in database queries.
    */
-  public boolean isDbRead() {
+  private boolean isDbRead() {
     return dbRead;
   }
 
@@ -1376,7 +1392,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
-  @Override
+  @Override @Nonnull
   public Class<?> getPropertyType() {
     return propertyType;
   }
@@ -1508,7 +1524,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Populate diff map comparing the property values.
    */
-  public void diffVal(String prefix, Map<String, ValuePair> map, Object newVal, Object oldVal) {
+  void diffVal(String prefix, Map<String, ValuePair> map, Object newVal, Object oldVal) {
     if (!ValueUtil.areEqual(newVal, oldVal)) {
       String propName = (prefix == null) ? name : prefix + "." + name;
       map.put(propName, new ValuePair(newVal, oldVal));

@@ -2,12 +2,16 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.meta.AbstractMetricVisitor;
 import io.ebean.meta.BasicMetricVisitor;
+import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaOrmQueryNode;
 import io.ebean.meta.MetaQueryMetric;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.ServerMetrics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +28,18 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
+  public List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request) {
+    return server.collectQueryPlans(request);
+  }
+
+  @Override
   public void visitMetrics(MetricVisitor visitor) {
     server.visitMetrics(visitor);
+  }
+
+  @Override
+  public ServerMetrics collectMetrics() {
+    return visitBasic();
   }
 
   @Override
@@ -58,7 +72,7 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
   private static class ResetVisitor extends AbstractMetricVisitor {
 
     ResetVisitor() {
-      super(true, true, true);
+      super(true, true, true, true);
     }
 
     @Override
@@ -73,6 +87,11 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
 
     @Override
     public void visitOrmQuery(MetaOrmQueryMetric metric) {
+      // ignore
+    }
+
+    @Override
+    public void visitCount(MetaCountMetric metric) {
       // ignore
     }
   }

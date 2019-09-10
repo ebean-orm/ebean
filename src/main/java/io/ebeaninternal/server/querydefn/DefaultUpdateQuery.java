@@ -49,7 +49,18 @@ public class DefaultUpdateQuery<T> implements UpdateQuery<T> {
   }
 
   @Override
+  public UpdateQuery<T> setLabel(String label) {
+    query.setLabel(label);
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> where() {
     return query.where();
+  }
+
+  @Override
+  public int update() {
+    return query.update();
   }
 }

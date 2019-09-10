@@ -9,11 +9,11 @@ import io.ebeaninternal.server.core.InternString;
  * Typically this is for Embedded Beans.
  * </p>
  */
-public class BeanPropertyOverride {
+class BeanPropertyOverride {
 
   private final String dbColumn;
 
-  public BeanPropertyOverride(String dbColumn) {
+  BeanPropertyOverride(String dbColumn) {
     this.dbColumn = InternString.intern(dbColumn);
   }
 

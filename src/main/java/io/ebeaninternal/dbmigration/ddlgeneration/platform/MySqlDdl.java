@@ -14,6 +14,10 @@ import java.util.Collection;
  */
 public class MySqlDdl extends PlatformDdl {
 
+  // check constraint support is disabled by default. See https://groups.google.com/forum/#!topic/ebean/luFN-2xBkUw
+  // this flag is for compatibility. Use it with care.
+  private static final boolean USE_CHECK_CONSTRAINT = Boolean.getBoolean("ebean.mysql.useCheckConstraint");
+
   public MySqlDdl(DatabasePlatform platform) {
     super(platform);
     this.alterColumn = "modify";
@@ -49,10 +53,39 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
+  public String createCheckConstraint(String ckName, String checkConstraint) {
+    if (USE_CHECK_CONSTRAINT) {
+      return super.createCheckConstraint(ckName, checkConstraint);
+    } else {
+      return null;
+    }
+  }
+  @Override
+  public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
+    if (USE_CHECK_CONSTRAINT) {
+      return super.alterTableAddCheckConstraint(tableName, checkConstraintName, checkConstraint);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    // drop constraint not supported in MySQL 5.7 and 8.0 but starting with MariaDB 10.2.1 CHECK is evaluated
-    // TODO: Implement for MariaDB >= 10.2.1
-    return null;
+    // drop constraint not supported in MySQL 5.7 and 8.0 but starting with MariaDB
+    // 10.2.1 CHECK is evaluated
+    if (USE_CHECK_CONSTRAINT) {
+      StringBuilder sb = new StringBuilder();
+      // statement for MySQL >= 8.0.16
+      sb.append("/*!80016 alter table ").append(tableName);
+      sb.append(" drop check ").append(constraintName).append(" */;\n");
+      // statement for MariaDB >= 10.2.1
+      sb.append("/*M!100201 ");
+      sb.append(super.alterTableDropConstraint(tableName, constraintName));
+      sb.append(" */");
+      return sb.toString();
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -79,7 +112,9 @@ public class MySqlDdl extends PlatformDdl {
 
   @Override
   public String alterColumnBaseAttributes(AlterColumn alter) {
-    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+    if (alter.getType() == null && alter.isNotnull() == null) {
+      // No type change or notNull change
+      // defaultValue change already handled in alterColumnDefaultValue
       return null;
     }
     String tableName = alter.getTableName();
@@ -104,7 +139,6 @@ public class MySqlDdl extends PlatformDdl {
       }
       buffer.append(String.format(" comment '%s'", comment));
     }
-
   }
 
   @Override

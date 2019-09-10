@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.dto;
 
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.QueryPlanMetric;
-import io.ebeaninternal.metric.TimedMetric;
+import io.ebean.metric.QueryPlanMetric;
+import io.ebean.metric.TimedMetric;
 
 abstract class DtoQueryPlanBase implements DtoQueryPlan {
 

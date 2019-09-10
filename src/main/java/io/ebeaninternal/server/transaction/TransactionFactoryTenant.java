@@ -43,7 +43,7 @@ class TransactionFactoryTenant extends TransactionFactory {
         tenantId = tenantProvider.currentId();
       }
       connection = dataSourceSupplier.getConnection(tenantId);
-      SpiTransaction transaction = manager.createTransaction(explicit, connection, counter.incrementAndGet());
+      SpiTransaction transaction = manager.createTransaction(explicit, connection);
       transaction.setTenantId(tenantId);
       return transaction;
 

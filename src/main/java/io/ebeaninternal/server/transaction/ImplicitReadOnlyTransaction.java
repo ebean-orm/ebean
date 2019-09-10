@@ -47,25 +47,24 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   /**
    * The status of the transaction.
    */
-  protected boolean active;
+  private boolean active;
 
   /**
    * The underlying Connection which is expected to use autoCommit such that we avoid the
    * explicit commit call at the end of the 'transaction' (for performance).
    */
-  protected Connection connection;
+  private Connection connection;
 
   /**
    * Holder of the objects fetched to ensure unique objects are used.
    */
-  protected PersistenceContext persistenceContext;
+  private PersistenceContext persistenceContext;
 
   private Object tenantId;
 
   private Map<String, Object> userObjects;
 
-  private long startNanos;
-  private long startMillis;
+  private final long startNanos;
 
   /**
    * Create without a tenantId.
@@ -78,7 +77,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
-    this.startMillis = manager.clockNowMillis();
   }
 
   /**
@@ -90,9 +88,9 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public long getStartMillis() {
+  public long getStartNanoTime() {
     // not used on read only transaction
-    return startMillis;
+    return startNanos;
   }
 
   @Override
@@ -191,11 +189,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   @Override
   public void registerDeleteBean(Integer persistingBean) {
-    throw new IllegalStateException(notExpectedMessage);
-  }
-
-  @Override
-  public void unregisterDeleteBean(Integer persistedBean) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -512,8 +505,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     }
     connection = null;
     active = false;
-    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
-    manager.collectMetricReadOnly(exeMicros);
+    manager.collectMetricReadOnly((System.nanoTime() - startNanos) / 1000L);
   }
 
   /**

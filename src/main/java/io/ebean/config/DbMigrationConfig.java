@@ -5,7 +5,6 @@ import io.ebean.annotation.Platform;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +31,8 @@ public class DbMigrationConfig {
    * Resource path for the migration xml and sql.
    */
   protected String migrationPath = "dbmigration";
+
+  protected String migrationInitPath = "dbinit";
 
   /**
    * Subdirectory the model xml files go into.
@@ -119,6 +120,15 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return the path for normal migrations or dbinit migrations.
+   *
+   * @param dbinitMigration When true return the path for dbinit migrations.
+   */
+  public String getMigrationPath(boolean dbinitMigration) {
+    return dbinitMigration ? migrationInitPath : migrationPath;
+  }
+
+  /**
    * Return the resource path for db migrations.
    */
   public String getMigrationPath() {
@@ -130,7 +140,7 @@ public class DbMigrationConfig {
    * <p>
    * The default of "dbmigration" is reasonable in most cases. You may look to set this
    * to be something like "dbmigration/myapp" where myapp gives it a unique resource path
-   * in the case there are multiple EbeanServer applications in the single classpath.
+   * in the case there are multiple Database applications in the single classpath.
    * </p>
    */
   public void setMigrationPath(String migrationPath) {
@@ -419,6 +429,7 @@ public class DbMigrationConfig {
   public void loadSettings(PropertiesWrapper properties, String serverName) {
 
     migrationPath = properties.get("migration.migrationPath", migrationPath);
+    migrationInitPath = properties.get("migration.migrationInitPath", migrationInitPath);
     modelPath = properties.get("migration.modelPath", modelPath);
     applyPrefix = properties.get("migration.applyPrefix", applyPrefix);
     applySuffix = properties.get("migration.applySuffix", applySuffix);
@@ -472,6 +483,7 @@ public class DbMigrationConfig {
     runnerConfig.setMetaTable(metaTable);
     runnerConfig.setApplySuffix(applySuffix);
     runnerConfig.setMigrationPath(migrationPath);
+    runnerConfig.setMigrationInitPath(migrationInitPath);
     runnerConfig.setRunPlaceholderMap(runPlaceholderMap);
     runnerConfig.setRunPlaceholders(runPlaceholders);
     runnerConfig.setDbUsername(getDbUsername());

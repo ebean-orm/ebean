@@ -18,9 +18,8 @@ public class ExplicitTransactionManager extends TransactionManager {
    * Create a ExplicitJdbcTransaction.
    */
   @Override
-  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
-
-    return new ExplicitJdbcTransaction(prefix + id, explicit, c, this);
+  protected SpiTransaction createTransaction(boolean explicit, Connection c) {
+    return new ExplicitJdbcTransaction(nextTxnId(), explicit, c, this);
   }
 
   /**

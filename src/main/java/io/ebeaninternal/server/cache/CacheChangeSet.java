@@ -28,13 +28,10 @@ public class CacheChangeSet {
 
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
 
-  private final long modificationTimestamp;
-
   /**
    * Construct specifying if we also need to process invalidation for entities based on views.
    */
-  public CacheChangeSet(long modificationTimestamp) {
-    this.modificationTimestamp = modificationTimestamp;
+  public CacheChangeSet() {
   }
 
   /**
@@ -86,6 +83,7 @@ public class CacheChangeSet {
    */
   public void addClearQuery(BeanDescriptor<?> descriptor) {
     queryCaches.add(descriptor);
+    touchedTables.add(descriptor.getBaseTable());
   }
 
   /**
@@ -152,16 +150,16 @@ public class CacheChangeSet {
   /**
    * Update a bean entry.
    */
-  public <T> void addBeanUpdate(BeanDescriptor<T> desc, Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+  public <T> void addBeanUpdate(BeanDescriptor<T> desc, String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
     touchedTables.add(desc.getBaseTable());
-    entries.add(new CacheChangeBeanUpdate(desc, id, changes, updateNaturalKey, version));
+    entries.add(new CacheChangeBeanUpdate(desc, key, changes, updateNaturalKey, version));
   }
 
   /**
    * Update a natural key.
    */
-  public <T> void addNaturalKeyPut(BeanDescriptor<T> desc, Object id, Object val) {
-    entries.add(new CacheChangeNaturalKeyPut(desc, id, val));
+  public <T> void addNaturalKeyPut(BeanDescriptor<T> desc, String key, String val) {
+    entries.add(new CacheChangeNaturalKeyPut(desc, key, val));
   }
 
   /**
@@ -170,13 +168,6 @@ public class CacheChangeSet {
   private ManyChange many(BeanDescriptor<?> desc, String manyProperty) {
     ManyKey key = new ManyKey(desc, manyProperty);
     return manyChangeMap.computeIfAbsent(key, ManyChange::new);
-  }
-
-  /**
-   * Return the modification timestamp for these changes.
-   */
-  public long modificationTimestamp() {
-    return modificationTimestamp;
   }
 
   /**

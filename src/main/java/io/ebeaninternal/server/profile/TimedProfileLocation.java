@@ -2,7 +2,7 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.TimedMetric;
+import io.ebean.metric.TimedMetric;
 
 /**
  * ProfileLocation that collects timing metrics.

@@ -9,13 +9,13 @@ import javax.persistence.OneToOne;
 @Entity
 public class ParcelLocation {
   @Id
-  @Column(name = "parcelLocId")
+  @Column(name = "parcellocid")
   private Long parcelLocId;
 
   private String location;
 
   @OneToOne
-  @JoinColumn(name = "parcelId", referencedColumnName = "parcelId")
+  @JoinColumn(name = "parcelid", referencedColumnName = "parcelid")
   private Parcel parcel;
 
   public Long getParcelLocId() {

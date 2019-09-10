@@ -10,17 +10,15 @@ import java.util.Set;
  */
 public class ServerCacheNotification {
 
-  private final long modifyTimestamp;
-
   private final Set<String> dependentTables;
 
-  public ServerCacheNotification(long modifyTimestamp, Set<String> dependentTables) {
-    this.modifyTimestamp = modifyTimestamp;
+  public ServerCacheNotification(Set<String> dependentTables) {
     this.dependentTables = dependentTables;
   }
 
-  public long getModifyTimestamp() {
-    return modifyTimestamp;
+  @Override
+  public String toString() {
+    return "tables:" + dependentTables;
   }
 
   public Set<String> getDependentTables() {

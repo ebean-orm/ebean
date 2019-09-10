@@ -34,7 +34,7 @@ public class DataBind {
 
   private List<InputStream> inputStreams;
 
-  private int pos;
+  protected int pos;
 
   public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;
@@ -141,7 +141,12 @@ public class DataBind {
   }
 
   public void setDate(java.sql.Date v) throws SQLException {
-    pstmt.setDate(++pos, v);
+    Calendar timeZone = dataTimeZone.getTimeZone();
+    if (timeZone != null) {
+      pstmt.setDate(++pos, v, timeZone);
+    } else {
+      pstmt.setDate(++pos, v);
+    }
   }
 
   public void setTimestamp(Timestamp v) throws SQLException {

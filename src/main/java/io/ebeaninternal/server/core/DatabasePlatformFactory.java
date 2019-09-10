@@ -2,12 +2,14 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.Postgres8Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
@@ -104,6 +106,12 @@ public class DatabasePlatformFactory {
     if (dbName.equals("db2")) {
       return new DB2Platform();
     }
+    if (dbName.equals("clickhouse")) {
+      return new ClickHousePlatform();
+    }
+    if (dbName.equals("nuodb")) {
+      return new NuoDbPlatform();
+    }
     if (dbName.equals("sqlite")) {
       return new SQLitePlatform();
     }
@@ -154,6 +162,8 @@ public class DatabasePlatformFactory {
       return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
       return readPostgres(connection);
+    } else if (dbProductName.contains("nuo")) {
+      return new NuoDbPlatform();
     } else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
     } else if (dbProductName.contains("db2")) {
@@ -162,6 +172,8 @@ public class DatabasePlatformFactory {
       return new SqlAnywherePlatform();
     } else if (dbProductName.contains("hdb")) {
       return new HanaPlatform();
+    } else if (dbProductName.contains("clickhouse")) {
+      return new ClickHousePlatform();
     }
 
     // use the standard one
@@ -171,7 +183,7 @@ public class DatabasePlatformFactory {
   /**
    * Use a select version() query as it could be Postgres or CockroachDB.
    */
-  private static PostgresPlatform readPostgres(Connection connection) {
+  private static DatabasePlatform readPostgres(Connection connection) {
     // Postgres driver uses a hardcoded product name so use version() query
     PreparedStatement statement = null;
     ResultSet resultSet = null;

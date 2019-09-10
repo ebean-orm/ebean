@@ -66,12 +66,10 @@ public class DeployBeanPropertyLists {
 
   private final List<BeanProperty> nonTransients = new ArrayList<>();
 
-  private final TableJoin[] tableJoins;
-
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
 
@@ -137,12 +135,6 @@ public class DeployBeanPropertyLists {
       // put the discriminator property into the property map only
       // (after the real properties have been organised into their lists)
       propertyMap.put(discProperty.getName(), discProperty);
-    }
-
-    List<DeployTableJoin> deployTableJoins = deploy.getTableJoins();
-    tableJoins = new TableJoin[deployTableJoins.size()];
-    for (int i = 0; i < deployTableJoins.size(); i++) {
-      tableJoins[i] = new TableJoin(deployTableJoins.get(i));
     }
   }
 
@@ -275,16 +267,12 @@ public class DeployBeanPropertyLists {
     return propertyMap;
   }
 
-  public TableJoin[] getTableJoin() {
-    return tableJoins;
-  }
-
   /**
    * Return the base scalar properties (excludes Id and secondary table
    * properties).
    */
   public BeanProperty[] getBaseScalar() {
-    return baseScalar.toArray(new BeanProperty[baseScalar.size()]);
+    return baseScalar.toArray(new BeanProperty[0]);
   }
 
   public BeanProperty getId() {
@@ -292,11 +280,11 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty[] getNonTransients() {
-    return nonTransients.toArray(new BeanProperty[nonTransients.size()]);
+    return nonTransients.toArray(new BeanProperty[0]);
   }
 
   public BeanProperty[] getTransients() {
-    return transients.toArray(new BeanProperty[transients.size()]);
+    return transients.toArray(new BeanProperty[0]);
   }
 
   public BeanProperty getVersionProperty() {
@@ -304,23 +292,23 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty[] getLocal() {
-    return local.toArray(new BeanProperty[local.size()]);
+    return local.toArray(new BeanProperty[0]);
   }
 
   public BeanProperty[] getMutable() {
-    return mutable.toArray(new BeanProperty[mutable.size()]);
+    return mutable.toArray(new BeanProperty[0]);
   }
 
   public BeanPropertyAssocOne<?>[] getEmbedded() {
-    return embedded.toArray(new BeanPropertyAssocOne[embedded.size()]);
+    return embedded.toArray(new BeanPropertyAssocOne[0]);
   }
 
   public BeanPropertyAssocOne<?>[] getOneImported() {
-    return onesImported.toArray(new BeanPropertyAssocOne[onesImported.size()]);
+    return onesImported.toArray(new BeanPropertyAssocOne[0]);
   }
 
   public BeanPropertyAssocOne<?>[] getOnes() {
-    return ones.toArray(new BeanPropertyAssocOne[ones.size()]);
+    return ones.toArray(new BeanPropertyAssocOne[0]);
   }
 
   public BeanPropertyAssocOne<?>[] getOneExportedSave() {
@@ -340,11 +328,11 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty[] getNonMany() {
-    return nonManys.toArray(new BeanProperty[nonManys.size()]);
+    return nonManys.toArray(new BeanProperty[0]);
   }
 
   public BeanPropertyAssocMany<?>[] getMany() {
-    return manys.toArray(new BeanPropertyAssocMany[manys.size()]);
+    return manys.toArray(new BeanPropertyAssocMany[0]);
   }
 
   public BeanPropertyAssocMany<?>[] getManySave() {
@@ -397,7 +385,7 @@ public class DeployBeanPropertyLists {
         list.add(prop);
       }
     }
-    return list.toArray(new BeanProperty[list.size()]);
+    return list.toArray(new BeanProperty[0]);
   }
 
   /**
@@ -412,7 +400,7 @@ public class DeployBeanPropertyLists {
         list.add(prop);
       }
     }
-    return list.toArray(new BeanProperty[list.size()]);
+    return list.toArray(new BeanProperty[0]);
   }
 
   /**
@@ -443,7 +431,7 @@ public class DeployBeanPropertyLists {
       }
     }
 
-    return (BeanPropertyAssocOne[]) list.toArray(new BeanPropertyAssocOne[list.size()]);
+    return (BeanPropertyAssocOne[]) list.toArray(new BeanPropertyAssocOne[0]);
   }
 
   private BeanPropertyAssocMany<?>[] getMany2Many() {
@@ -454,7 +442,7 @@ public class DeployBeanPropertyLists {
       }
     }
 
-    return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[list.size()]);
+    return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[0]);
   }
 
   private BeanPropertyAssocMany<?>[] getMany(Mode mode) {
@@ -476,7 +464,7 @@ public class DeployBeanPropertyLists {
       }
     }
 
-    return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[list.size()]);
+    return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[0]);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

@@ -19,13 +19,13 @@ public class Warehouse {
   private Integer id;
 
   @ManyToOne//(optional = false) //todo: should this be nullable with assertions made?
-  @JoinColumn(name = "officeZoneId")
+  @JoinColumn(name = "officezoneid")
   private ZoneInternal officeZone;
 
   @ManyToMany(cascade = CascadeType.PERSIST)
   @JoinTable(name = "warehousesshippingzones",
-    joinColumns = {@JoinColumn(name = "warehouseId", referencedColumnName = "ID")},
-    inverseJoinColumns = {@JoinColumn(name = "shippingZoneId", referencedColumnName = "ID")}
+    joinColumns = {@JoinColumn(name = "warehouseid", referencedColumnName = "id")},
+    inverseJoinColumns = {@JoinColumn(name = "shippingzoneid", referencedColumnName = "id")}
   )
   private Set<ZoneExternal> shippingZones;
 

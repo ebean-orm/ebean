@@ -2,7 +2,7 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.TimedMetric;
+import io.ebean.metric.TimedMetric;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
@@ -33,6 +33,16 @@ class DTimedMetric implements TimedMetric {
   DTimedMetric(MetricType metricType, String name) {
     this.metricType = metricType;
     this.name = name;
+  }
+
+  @Override
+  public void addSinceNanos(long startNanos) {
+    add((System.nanoTime() - startNanos) / 1000L);
+  }
+
+  @Override
+  public void addSinceNanos(long startNanos, long beans) {
+    add((System.nanoTime() - startNanos) / 1000L, beans);
   }
 
   /**

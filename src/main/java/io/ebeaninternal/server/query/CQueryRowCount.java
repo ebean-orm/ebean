@@ -125,8 +125,10 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       rowCount = rset.getInt(1);
 
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
-      queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode());
       request.slowQueryCheck(executionTimeMicros, rowCount);
+      if (queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode())) {
+        queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
+      }
       getTransaction().profileEvent(this);
       return rowCount;
 

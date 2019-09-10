@@ -29,7 +29,7 @@ public class ClusterManager implements ServerLookup {
 
   public ClusterManager(ContainerConfig config) {
     ClusterBroadcastFactory factory = createFactory();
-    if (factory != null) {
+    if (factory != null && config.isActive()) {
       broadcast = factory.create(this, config);
     } else {
       broadcast = null;

@@ -87,7 +87,7 @@ public class GeneratedPropertyFactory {
     }
   }
 
-  public void setCounter(DeployBeanProperty property) {
+  private void setCounter(DeployBeanProperty property) {
 
     counterFactory.setCounter(property);
   }

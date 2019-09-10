@@ -6,11 +6,11 @@ import io.ebean.Query;
 import io.ebean.SqlRow;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.datasource.DataSourceConfig;
+import org.junit.Assert;
 import org.tests.model.basic.TOne;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import io.ebean.datasource.DataSourceConfig;
-import org.junit.Assert;
 
 import java.util.List;
 
@@ -36,10 +36,9 @@ public class MainDbBoolean {
    */
   private EbeanServer createOracleEbeanServer() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig c = new ServerConfig();
     c.setName("ora");
+    c.setDdlExtra(false);
 
     // requires oracle driver in class path
     DataSourceConfig oraDb = new DataSourceConfig();
@@ -72,10 +71,9 @@ public class MainDbBoolean {
 
   private EbeanServer createEbeanServer() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig c = new ServerConfig();
     c.setName("pgtest");
+    c.setDdlExtra(false);
 
     // requires postgres driver in class path
     DataSourceConfig postgresDb = new DataSourceConfig();

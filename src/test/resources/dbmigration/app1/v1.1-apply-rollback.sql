@@ -1,2 +1,0 @@
--- CONTAINS --
--- drop statements for all the newly created objects in apply-create.sql

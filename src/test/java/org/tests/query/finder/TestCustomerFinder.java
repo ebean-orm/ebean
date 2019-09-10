@@ -3,9 +3,11 @@ package org.tests.query.finder;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.ServerMetrics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -151,18 +153,26 @@ public class TestCustomerFinder extends BaseTestCase {
     Customer.find.updateNames("Junk", 2000);
     Customer.find.byId(3);
 
-    BasicMetricVisitor basic = server().getMetaInfoManager().visitBasic();
+    ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
 
-    List<MetaOrmQueryMetric> planStats = basic.getOrmQueryMetrics();
+    List<MetaOrmQueryMetric> planStats = metrics.getOrmQueryMetrics();
     assertThat(planStats.size()).isGreaterThan(4);
 
     for (MetaOrmQueryMetric planStat : planStats) {
       System.out.println(planStat);
     }
 
-    for (MetaTimedMetric txnTimed : basic.getTimedMetrics()) {
+    for (MetaTimedMetric txnTimed : metrics.getTimedMetrics()) {
       System.out.println(txnTimed);
     }
+
+    QueryPlanRequest request = new QueryPlanRequest();
+
+    List<MetaQueryPlan> plans = server().getMetaInfoManager().collectQueryPlans(request);
+    for (MetaQueryPlan plan : plans) {
+      System.out.println(plan);
+    }
+
   }
 
 }

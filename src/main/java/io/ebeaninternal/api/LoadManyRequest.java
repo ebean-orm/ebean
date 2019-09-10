@@ -3,6 +3,7 @@ package io.ebeaninternal.api;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.util.StringHelper;
+import io.ebeaninternal.server.core.BindPadding;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -66,13 +67,6 @@ public class LoadManyRequest extends LoadRequest {
   }
 
   /**
-   * Return the load context.
-   */
-  public LoadManyBuffer getLoadContext() {
-    return loadContext;
-  }
-
-  /**
    * Return true if lazy loading should only load the id values.
    * <p>
    * This for use when lazy loading is invoked on methods such as clear() and removeAll() where it
@@ -80,14 +74,14 @@ public class LoadManyRequest extends LoadRequest {
    * used.
    * </p>
    */
-  public boolean isOnlyIds() {
+  private boolean isOnlyIds() {
     return onlyIds;
   }
 
   /**
    * Return true if we should load the Collection ids into the cache.
    */
-  public boolean isLoadCache() {
+  private boolean isLoadCache() {
     return loadCache;
   }
 
@@ -98,22 +92,16 @@ public class LoadManyRequest extends LoadRequest {
     return loadContext.getBatchSize();
   }
 
-  private List<Object> getParentIdList(int batchSize) {
+  private List<Object> getParentIdList() {
 
-    ArrayList<Object> idList = new ArrayList<>(batchSize);
+    List<Object> idList = new ArrayList<>();
 
     BeanPropertyAssocMany<?> many = getMany();
     for (BeanCollection<?> bc : batch) {
       idList.add(many.getParentId(bc.getOwnerBean()));
     }
-    if (!many.getTargetDescriptor().isMultiValueIdSupported()) {
-      int extraIds = batchSize - batch.size();
-      if (extraIds > 0) {
-        Object firstId = idList.get(0);
-        for (int i = 0; i < extraIds; i++) {
-          idList.add(firstId);
-        }
-      }
+    if (many.getTargetDescriptor().isPadInExpression()) {
+      BindPadding.padIds(idList);
     }
 
     return idList;
@@ -123,7 +111,7 @@ public class LoadManyRequest extends LoadRequest {
     return loadContext.getBeanProperty();
   }
 
-  public SpiQuery<?> createQuery(SpiEbeanServer server, int batchSize) {
+  public SpiQuery<?> createQuery(SpiEbeanServer server) {
 
     BeanPropertyAssocMany<?> many = getMany();
 
@@ -142,10 +130,7 @@ public class LoadManyRequest extends LoadRequest {
     }
 
     query.setLazyLoadForParents(many);
-
-    List<Object> idList = getParentIdList(batchSize);
-    many.addWhereParentIdIn(query, idList, loadContext.isUseDocStore());
-
+    many.addWhereParentIdIn(query, getParentIdList(), loadContext.isUseDocStore());
     query.setPersistenceContext(loadContext.getPersistenceContext());
 
     String mode = isLazy() ? "+lazy" : "+query";

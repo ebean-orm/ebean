@@ -14,7 +14,7 @@ import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.api.TxnProfileEventCodes;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * JDBC Connection based transaction.
  */
-public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
+class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private static final Logger logger = LoggerFactory.getLogger(JdbcTransaction.class);
 
@@ -46,12 +46,12 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * The associated TransactionManager.
    */
-  protected final TransactionManager manager;
+  final TransactionManager manager;
 
   /**
    * The transaction id.
    */
-  protected final String id;
+  private final String id;
 
   private final boolean logSql;
   private final boolean logSummary;
@@ -59,138 +59,137 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * The user defined label to group execution statistics.
    */
-  protected String label;
+  private String label;
 
   /**
    * Flag to indicate if this was an explicitly created Transaction.
    */
-  protected final boolean explicit;
+  private final boolean explicit;
 
   /**
    * Behaviour for ending query only transactions.
    */
-  protected final OnQueryOnly onQueryOnly;
+  private final OnQueryOnly onQueryOnly;
 
   /**
    * The status of the transaction.
    */
-  protected boolean active;
+  private boolean active;
 
-  protected boolean rollbackOnly;
+  private boolean rollbackOnly;
 
-  protected boolean nestedUseSavepoint;
+  private boolean nestedUseSavepoint;
 
   /**
    * The underlying Connection.
    */
-  protected Connection connection;
+  Connection connection;
 
   /**
    * Used to queue up persist requests for batch execution.
    */
-  protected BatchControl batchControl;
+  private BatchControl batchControl;
 
   /**
    * The event which holds persisted beans.
    */
-  protected TransactionEvent event;
+  private TransactionEvent event;
 
   /**
    * Holder of the objects fetched to ensure unique objects are used.
    */
-  protected PersistenceContext persistenceContext;
+  private PersistenceContext persistenceContext;
 
   /**
    * Used to give developers more control over the insert update and delete
    * functionality.
    */
-  protected boolean persistCascade = true;
+  private boolean persistCascade = true;
 
   /**
    * Flag used for performance to skip commit or rollback of query only
    * transactions in read committed transaction isolation.
    */
-  protected boolean queryOnly = true;
+  private boolean queryOnly = true;
 
-  protected boolean localReadOnly;
+  private boolean localReadOnly;
 
-  protected Boolean updateAllLoadedProperties;
+  private Boolean updateAllLoadedProperties;
 
-  protected boolean oldBatchMode;
+  private boolean oldBatchMode;
 
-  protected boolean batchMode;
+  private boolean batchMode;
 
-  protected boolean batchOnCascadeMode;
+  private boolean batchOnCascadeMode;
 
-  protected int batchSize = -1;
+  private int batchSize = -1;
 
-  protected boolean batchFlushOnQuery = true;
+  private boolean batchFlushOnQuery = true;
 
-  protected Boolean batchGetGeneratedKeys;
+  private Boolean batchGetGeneratedKeys;
 
-  protected Boolean batchFlushOnMixed;
+  private Boolean batchFlushOnMixed;
 
-  protected String logPrefix;
+  private String logPrefix;
 
   private Object tenantId;
 
   /**
    * The depth used by batch processing to help the ordering of statements.
    */
-  protected int depth;
+  private int depth;
 
   /**
    * Set to true if the connection has autoCommit=true initially.
    */
-  protected boolean autoCommit;
+  private boolean autoCommit;
 
-  protected IdentityHashMap<Object, Object> persistingBeans;
+  private IdentityHashMap<Object, Object> persistingBeans;
 
-  protected HashSet<Integer> deletingBeansHash;
+  private HashSet<Integer> deletingBeansHash;
 
-  protected HashMap<String, String> m2mIntersectionSave;
+  private HashMap<String, String> m2mIntersectionSave;
 
-  protected Map<String, Object> userObjects;
+  private Map<String, Object> userObjects;
 
-  protected List<TransactionCallback> callbackList;
+  private List<TransactionCallback> callbackList;
 
-  protected boolean batchOnCascadeSet;
+  private boolean batchOnCascadeSet;
 
-  protected TChangeLogHolder changeLogHolder;
+  private TChangeLogHolder changeLogHolder;
 
-  protected List<PersistDeferredRelationship> deferredList;
+  private List<PersistDeferredRelationship> deferredList;
 
   /**
    * The mode for updating doc store indexes for this transaction.
    * Only set when you want to override the default behavior.
    */
-  protected DocStoreMode docStoreMode;
+  private DocStoreMode docStoreMode;
 
-  protected int docStoreBatchSize;
+  private int docStoreBatchSize;
 
   /**
    * Explicit control over skipCache.
    */
-  protected Boolean skipCache;
+  private Boolean skipCache;
 
   /**
    * Default skip cache behavior from {@link ServerConfig#isSkipCacheAfterWrite()}.
    */
-  protected final boolean skipCacheAfterWrite;
+  private final boolean skipCacheAfterWrite;
 
-  protected DocStoreTransaction docStoreTxn;
+  DocStoreTransaction docStoreTxn;
 
   private ProfileStream profileStream;
 
-  protected ProfileLocation profileLocation;
+  private ProfileLocation profileLocation;
 
-  protected final long startNanos;
-  private final long startMillis;
+  private final long startNanos;
 
   /**
    * Create a new JdbcTransaction.
    */
-  public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
+  JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
       this.id = id;
@@ -202,7 +201,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.startNanos = System.nanoTime();
 
       if (manager == null) {
-        this.startMillis = System.currentTimeMillis();
         this.logSql = false;
         this.logSummary = false;
         this.skipCacheAfterWrite = true;
@@ -210,7 +208,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.batchOnCascadeMode = false;
         this.onQueryOnly = OnQueryOnly.ROLLBACK;
       } else {
-        this.startMillis = manager.clockNowMillis();
         this.logSql = manager.isLogSql();
         this.logSummary = manager.isLogSummary();
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
@@ -237,8 +234,8 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public long getStartMillis() {
-    return startMillis;
+  public long getStartNanoTime() {
+    return startNanos;
   }
 
   @Override
@@ -276,7 +273,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Overridden in AutoCommitJdbcTransaction as that expects to run/operate with autocommit true.
    */
-  protected void checkAutoCommit(Connection connection) throws SQLException {
+  void checkAutoCommit(Connection connection) throws SQLException {
     if (connection != null) {
       this.autoCommit = connection.getAutoCommit();
       if (this.autoCommit) {
@@ -314,7 +311,11 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public String toString() {
-    return logPrefix;
+    if (active) {
+      return logPrefix;
+    } else {
+      return logPrefix + "(inactive)";
+    }
   }
 
   @Override
@@ -340,7 +341,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     callbackList.add(callback);
   }
 
-  protected void firePreRollback() {
+  private void firePreRollback() {
     if (callbackList != null) {
       for (TransactionCallback callback : callbackList) {
         try {
@@ -352,7 +353,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
   }
 
-  protected void firePostRollback() {
+  private void firePostRollback() {
     if (callbackList != null) {
       for (TransactionCallback callback : callbackList) {
         try {
@@ -367,7 +368,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
   }
 
-  protected void firePreCommit() {
+  private void firePreCommit() {
     if (callbackList != null) {
       for (TransactionCallback callback : callbackList) {
         try {
@@ -379,7 +380,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
   }
 
-  protected void firePostCommit() {
+  private void firePostCommit() {
     if (callbackList != null) {
       for (TransactionCallback callback : callbackList) {
         try {
@@ -434,16 +435,6 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       deletingBeansHash = new HashSet<>();
     }
     deletingBeansHash.add(persistingBean);
-  }
-
-  /**
-   * Unregister the persisted bean.
-   */
-  @Override
-  public void unregisterDeleteBean(Integer persistedBean) {
-    if (deletingBeansHash != null) {
-      deletingBeansHash.remove(persistedBean);
-    }
   }
 
   /**
@@ -833,7 +824,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   public TransactionEvent getEvent() {
     queryOnly = false;
     if (event == null) {
-      event = new TransactionEvent(startMillis);
+      event = new TransactionEvent();
     }
     return event;
   }
@@ -904,7 +895,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     return getInternalConnection();
   }
 
-  protected void deactivate() {
+  void deactivate() {
     try {
       if (localReadOnly) {
         // reset readOnly status prior to returning to pool
@@ -936,7 +927,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Notify the transaction manager.
    */
-  protected void notifyCommit() {
+  void notifyCommit() {
     if (manager != null) {
       if (queryOnly) {
         manager.notifyOfQueryOnly(this);
@@ -949,7 +940,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Rollback or Commit for query only transaction.
    */
-  protected void connectionEndForQueryOnly() {
+  private void connectionEndForQueryOnly() {
     try {
       if (onQueryOnly == OnQueryOnly.COMMIT) {
         performCommit();
@@ -964,7 +955,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Perform the actual rollback on the connection.
    */
-  protected void performRollback() throws SQLException {
+  void performRollback() throws SQLException {
     long offset = profileOffset();
     connection.rollback();
     if (profileStream != null) {
@@ -975,7 +966,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Perform the actual commit on the connection.
    */
-  protected void performCommit() throws SQLException {
+  void performCommit() throws SQLException {
     long offset = profileOffset();
     connection.commit();
     if (profileStream != null) {
@@ -1030,7 +1021,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       // the event has been sent to the transaction manager
       // for postCommit processing (l2 cache updates etc)
       // start a new transaction event
-      event = new TransactionEvent(startMillis);
+      event = new TransactionEvent();
 
     } catch (Exception e) {
       doRollback(e);
@@ -1080,7 +1071,7 @@ public class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Notify the transaction manager.
    */
-  protected void notifyRollback(Throwable cause) {
+  void notifyRollback(Throwable cause) {
     if (manager != null) {
       if (queryOnly) {
         manager.notifyOfQueryOnly(this);

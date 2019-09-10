@@ -15,7 +15,7 @@ class ElementHelpSet implements ElementHelp {
 
   private static class Collector implements ElementCollector {
 
-    private Set<Object> set = new LinkedHashSet<>();
+    private final Set<Object> set = new LinkedHashSet<>();
 
     @Override
     public void addElement(Object element) {

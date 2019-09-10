@@ -2,12 +2,14 @@ package io.ebean;
 
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.ServerMetrics;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicWithUniqueCon;
+import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -34,13 +36,66 @@ public class UpdateQueryTest extends BaseTestCase {
 
     query.update();
 
-    assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ?  and id > ?");
+    assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ? and id > ?");
 
-    BasicMetricVisitor basic = visitMetricsBasic();
-    List<MetaOrmQueryMetric> ormQueryMetrics = basic.getOrmQueryMetrics();
+    ServerMetrics metrics = collectMetrics();
+    List<MetaOrmQueryMetric> ormQueryMetrics = metrics.getOrmQueryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
     assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
     assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateActive");
+  }
+
+  @Test
+  public void update() {
+
+    ResetBasicData.reset();
+
+    resetAllMetrics();
+
+    UpdateQuery<Customer> update = server().update(Customer.class);
+
+    LoggedSqlCollector.start();
+
+    int rows = update
+      .setRaw("status = status")
+      .setLabel("updateAll")
+      .update();
+
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(rows).isGreaterThan(0);
+
+    assertThat(sql.get(0)).contains("update o_customer set status = status");
+
+    ServerMetrics metrics = collectMetrics();
+    List<MetaOrmQueryMetric> ormQueryMetrics = metrics.getOrmQueryMetrics();
+    assertThat(ormQueryMetrics).hasSize(1);
+    assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
+    assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateAll");
+  }
+
+  @Test
+  public void query_asUpdate() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    int rows = server().find(Customer.class)
+      .where()
+      .gt("id", 1000)
+      .asUpdate()
+      .setRaw("status = status")
+      .setLabel("asUpdate")
+      .update();
+
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(rows).isEqualTo(0);
+
+    assertThat(sql.get(0)).contains("update o_customer set status = status where id > ?");
   }
 
   @Test
@@ -111,7 +166,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     query.update();
 
-    assertThat(sqlOf(query)).contains("update o_customer set status=?, updtime=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ?  and t1.country_code = ?  and t0.id > ? )");
+    assertThat(sqlOf(query)).contains("update o_customer set status=?, updtime=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ? and t1.country_code = ? and t0.id > ?)");
   }
 
   @Test

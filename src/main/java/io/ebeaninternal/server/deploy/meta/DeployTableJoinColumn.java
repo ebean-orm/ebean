@@ -13,27 +13,26 @@ public class DeployTableJoinColumn {
   /**
    * The local database column name.
    */
-  String localDbColumn;
+  private String localDbColumn;
 
   /**
    * SQL formula used for local column
    */
-  String localSqlFormula;
+  private String localSqlFormula;
 
   /**
    * The foreign database column name.
    */
-  String foreignDbColumn;
+  private String foreignDbColumn;
 
   /**
    * SQL formula used for foreign column
    */
-  String foreignSqlFormula;
+  private String foreignSqlFormula;
 
-  boolean insertable;
+  private boolean insertable;
 
-  boolean updateable;
-
+  private boolean updateable;
 
   /**
    * Construct when automatically determining the join.
@@ -55,7 +54,7 @@ public class DeployTableJoinColumn {
     this.updateable = updateable;
   }
 
-  public void setLocalSqlFormula(String localSqlFormula) {
+  void setLocalSqlFormula(String localSqlFormula) {
     if (localSqlFormula != null) {
       this.localSqlFormula = localSqlFormula;
       this.localDbColumn = null;
@@ -178,7 +177,7 @@ public class DeployTableJoinColumn {
   /**
    * Set the local database column name.
    */
-  public void setLocalDbColumn(String localDbColumn) {
+  void setLocalDbColumn(String localDbColumn) {
     this.localDbColumn = localDbColumn;
   }
 

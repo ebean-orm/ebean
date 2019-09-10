@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.CacheQueryTuning;
 import io.ebean.cache.QueryCacheEntryValidate;
@@ -9,6 +10,7 @@ import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.CurrentTenantProvider;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.util.AnnotationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,32 +47,51 @@ class DefaultCacheHolder {
     this.queryCacheEntryValidate = builder.getQueryCacheEntryValidate();
   }
 
-  ServerCache getCache(Class<?> beanType, String cacheKey, ServerCacheType type) {
-
-    return getCacheInternal(beanType, cacheKey, type);
+  void visitMetrics(MetricVisitor visitor) {
+    cacheFactory.visit(visitor);
+    for (ServerCache serverCache : allCaches.values()) {
+      serverCache.visit(visitor);
+    }
   }
 
-  private String key(String cacheKey, ServerCacheType type) {
-    return cacheKey + type.code();
+  ServerCache getCache(Class<?> beanType, ServerCacheType type) {
+    return getCacheInternal(beanType, type, null);
+  }
+
+  ServerCache getCache(Class<?> beanType, String collectionProperty) {
+    return getCacheInternal(beanType, ServerCacheType.COLLECTION_IDS, collectionProperty);
+  }
+
+  private String key(String beanName, ServerCacheType type) {
+    return beanName + type.code();
+  }
+
+  private String key(String beanName, String collectionProperty, ServerCacheType type) {
+    if (collectionProperty != null) {
+      return beanName + "." + collectionProperty + type.code();
+    } else {
+      return beanName + type.code();
+    }
   }
 
   /**
    * Return the cache for a given bean type.
    */
-  private ServerCache getCacheInternal(Class<?> beanType, String cacheKey, ServerCacheType type) {
+  private ServerCache getCacheInternal(Class<?> beanType, ServerCacheType type, String collectionProperty) {
 
-    String fullKey = key(cacheKey, type);
-    return allCaches.computeIfAbsent(fullKey, s -> createCache(beanType, type, fullKey));
+    String shortName = key(beanType.getSimpleName(), collectionProperty, type);
+    String fullKey = key(beanType.getName(), collectionProperty, type);
+    return allCaches.computeIfAbsent(fullKey, s -> createCache(beanType, type, fullKey, shortName));
   }
 
-  private ServerCache createCache(Class<?> beanType, ServerCacheType type, String key) {
+  private ServerCache createCache(Class<?> beanType, ServerCacheType type, String key, String shortName) {
     ServerCacheOptions options = getCacheOptions(beanType, type);
     if (type == ServerCacheType.COLLECTION_IDS) {
       synchronized (this) {
         collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
       }
     }
-    return cacheFactory.createCache(new ServerCacheConfig(type, key, options, tenantProvider, queryCacheEntryValidate));
+    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));
   }
 
   void clearAll() {
@@ -106,12 +127,10 @@ class DefaultCacheHolder {
    * Return the cache options for a given bean type.
    */
   ServerCacheOptions getCacheOptions(Class<?> beanType, ServerCacheType type) {
-    switch (type) {
-      case QUERY:
-        return getQueryOptions(beanType);
-      default:
-        return getBeanOptions(beanType);
+    if (type == ServerCacheType.QUERY) {
+      return getQueryOptions(beanType);
     }
+    return getBeanOptions(beanType);
   }
 
   private ServerCacheOptions getQueryOptions(Class<?> cls) {
@@ -123,11 +142,15 @@ class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
+
+    Cache cache = cls.getAnnotation(Cache.class);
+    boolean nearCache = (cache != null && cache.nearCache());
+
     CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
     if (tuning != null) {
-      return new ServerCacheOptions(tuning).applyDefaults(beanDefault);
+      return new ServerCacheOptions(nearCache, tuning).applyDefaults(beanDefault);
     }
-    return beanDefault.copy();
+    return beanDefault.copy(nearCache);
   }
 
 }

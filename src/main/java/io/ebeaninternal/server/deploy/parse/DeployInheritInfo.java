@@ -138,7 +138,7 @@ public class DeployInheritInfo {
   /**
    * Set the sql type of the discriminator.
    */
-  public void setColumnType(DiscriminatorType type) {
+  void setColumnType(DiscriminatorType type) {
     if (type == DiscriminatorType.INTEGER) {
       this.columnType = Types.INTEGER;
     } else {
@@ -199,9 +199,7 @@ public class DeployInheritInfo {
   public String getWhere() {
 
     List<Object> discList = new ArrayList<>();
-
     appendDiscriminator(discList);
-
     return buildWhereLiteral(discList);
   }
 

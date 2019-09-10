@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.profile;
 
+import io.ebean.ProfileLocation;
 import io.ebean.meta.MetricType;
-import io.ebeaninternal.metric.MetricFactory;
-import io.ebeaninternal.metric.QueryPlanMetric;
-import io.ebeaninternal.metric.TimedMetric;
-import io.ebeaninternal.metric.TimedMetricMap;
+import io.ebean.metric.CountMetric;
+import io.ebean.metric.MetricFactory;
+import io.ebean.metric.QueryPlanMetric;
+import io.ebean.metric.TimedMetric;
+import io.ebean.metric.TimedMetricMap;
 
 /**
  * Default metric factory implementation.
@@ -22,8 +24,13 @@ public class DMetricFactory implements MetricFactory {
   }
 
   @Override
-  public QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, String sql) {
-    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, sql), new DTimedMetric(metricType, label));
+  public CountMetric createCountMetric(MetricType metricType, String name) {
+    return new DCountMetric(metricType, name);
+  }
+
+  @Override
+  public QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, ProfileLocation profileLocation, String sql) {
+    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, profileLocation, sql), new DTimedMetric(metricType, label));
   }
 
 }

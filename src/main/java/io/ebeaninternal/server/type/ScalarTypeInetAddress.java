@@ -42,7 +42,7 @@ public class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
     try {
       return ConvertInetAddresses.forUriString(value);
     } catch (IllegalArgumentException e) {
-      throw new TextException("Error with InetAddresses [" + value + "] ", e);
+      throw new TextException("Error with InetAddresses [{}]", value, e);
     }
   }
 }

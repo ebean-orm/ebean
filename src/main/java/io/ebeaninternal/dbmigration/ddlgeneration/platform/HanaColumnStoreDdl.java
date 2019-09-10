@@ -1,9 +1,9 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import java.io.IOException;
-
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+
+import java.io.IOException;
 
 public class HanaColumnStoreDdl extends AbstractHanaDdl {
 

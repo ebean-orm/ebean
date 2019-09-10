@@ -8,12 +8,6 @@ import io.ebeaninternal.api.SpiTransactionScopeManager;
  */
 public abstract class TransactionScopeManager implements SpiTransactionScopeManager {
 
-  protected final String serverName;
-
-  public TransactionScopeManager(String serverName) {
-    this.serverName = serverName;
-  }
-
   /**
    * Register the transaction manager (for use by external transaction scopes).
    */
@@ -33,6 +27,17 @@ public abstract class TransactionScopeManager implements SpiTransactionScopeMana
    * Set a new Transaction for this serverName and Thread.
    */
   public abstract void set(SpiTransaction trans);
+
+  /**
+   * Clears the current Transaction from thread local scope (for implicit transactions).
+   */
+  public abstract void clear();
+
+  /**
+   * Clears the current Transaction from thread local scope without any check for active
+   * transactions. Intended for use with external transactions.
+   */
+  public abstract void clearExternal();
 
   /**
    * Replace the current transaction with this one.

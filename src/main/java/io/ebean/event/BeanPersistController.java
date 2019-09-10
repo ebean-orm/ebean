@@ -9,7 +9,7 @@ package io.ebean.event;
  * <p>
  * Note that getTransaction() on the PersistRequest returns the transaction used
  * for the insert, update, delete or fetch. To explicitly use this same
- * transaction you should use this transaction via methods on EbeanServer.
+ * transaction you should use this transaction via methods on Database.
  * </p>
  * <pre>{@code
  *

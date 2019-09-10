@@ -54,7 +54,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status, t0.kcustomer_id from o_order t0 order by t0.id");
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status, t0.kcustomer_id from o_order t0");
     } else {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
     }
@@ -91,7 +91,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0 order by t0.id");
+      assertThat(trimSql(sql.get(0), 2)).contains("select top 10 t0.id, t0.status from o_order t0");
     } else {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status from o_order t0");
     }
@@ -149,7 +149,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     String generatedSql = sqlOf(query, 2);
     //select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0 where t0.status = ? ; --bind(NEW)
-    assertEquals("select t0.id, t0.status, t0.kcustomer_id from o_order t0 where t0.status = ? ", generatedSql);
+    assertEquals("select t0.id, t0.status, t0.kcustomer_id from o_order t0 where t0.status = ?", generatedSql);
 
 
     //List<SpiQuery<?>> secondaryQueries = spiQuery.getLoggedSecondaryQueries();

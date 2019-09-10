@@ -1,13 +1,12 @@
 package org.tests.model.lazywithid;
 
-import static org.junit.Assert.assertEquals;
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.junit.Test;
-
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import static org.junit.Assert.assertEquals;
 
 public class TestColumnIdName extends BaseTestCase {
   @Test

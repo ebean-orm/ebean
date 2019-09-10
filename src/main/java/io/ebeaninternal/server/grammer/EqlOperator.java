@@ -10,6 +10,9 @@ enum EqlOperator {
   LTE,
   GT,
   GTE,
+  EQORNULL,
+  LTORNULL,
+  GTORNULL,
   CONTAINS,
   STARTS_WITH,
   ENDS_WITH,
@@ -18,6 +21,7 @@ enum EqlOperator {
   ISTARTS_WITH,
   IENDS_WITH,
   ILIKE,
+  INRANGE,
   BETWEEN
 
 }

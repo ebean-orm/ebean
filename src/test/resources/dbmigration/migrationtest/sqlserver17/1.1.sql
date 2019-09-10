@@ -36,6 +36,9 @@ IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest
 alter table migtest_e_basic add default 'A' for status;
 alter table migtest_e_basic alter column status nvarchar(1) not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
+IF (OBJECT_ID('ck_migtest_e_basic_status2', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
+EXEC usp_ebean_drop_default_constraint migtest_e_basic, status2;
+alter table migtest_e_basic alter column status2 nvarchar(127);
 
 -- rename all collisions;
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;

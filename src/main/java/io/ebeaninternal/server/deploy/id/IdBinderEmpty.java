@@ -10,8 +10,6 @@ import io.ebeaninternal.server.type.DataBind;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -127,7 +125,7 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public void bindId(DataBind dataBind, Object value) throws SQLException {
+  public void bindId(DataBind dataBind, Object value) {
 
   }
 
@@ -146,12 +144,12 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean) {
     return null;
   }
 
   @Override
-  public Object read(DbReadContext ctx) throws SQLException {
+  public Object read(DbReadContext ctx) {
     return null;
   }
 
@@ -170,12 +168,18 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public Object readData(DataInput dataOutput) throws IOException {
+  public Object readData(DataInput dataOutput) {
     return null;
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
+  public void writeData(DataOutput dataOutput, Object idValue) {
 
   }
+
+  @Override
+  public String cacheKey(Object bean) {
+    return null;
+  }
+
 }

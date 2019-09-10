@@ -5,6 +5,11 @@ import io.ebean.SqlUpdate;
 public interface SpiSqlUpdate extends SqlUpdate {
 
   /**
+   * Return the sql taking into account bind parameter expansion.
+   */
+  String getBaseSql();
+
+  /**
    * Return the Bind parameters.
    */
   BindParams getBindParams();

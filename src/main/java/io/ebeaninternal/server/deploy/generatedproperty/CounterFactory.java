@@ -13,11 +13,11 @@ import java.sql.Types;
  * Aka, Integer, Long, Short etc.
  * </p>
  */
-public class CounterFactory {
+class CounterFactory {
 
-  final GeneratedCounterInteger integerCounter = new GeneratedCounterInteger();
+  private final GeneratedCounterInteger integerCounter = new GeneratedCounterInteger();
 
-  final GeneratedCounterLong longCounter = new GeneratedCounterLong();
+  private final GeneratedCounterLong longCounter = new GeneratedCounterLong();
 
   public void setCounter(DeployBeanProperty property) {
 

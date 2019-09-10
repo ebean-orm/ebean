@@ -1,19 +1,17 @@
 package org.tests.query;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-
-import java.util.List;
-
+import io.ebean.BaseTestCase;
+import io.ebean.Ebean;
+import io.ebeantest.LoggedSql;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebeantest.LoggedSql;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests if outer joins are correctly used.
@@ -153,10 +151,11 @@ public class TestOuterJoin extends BaseTestCase {
   }
 
   @Test
-  public void testOuterOnFetch() throws Exception {
+  public void testOuterOnFetch() {
+
     LoggedSql.start();
 
-    List<Order> orders1 =  Ebean.find(Order.class).findList();
+    List<Order> orders1 =  Ebean.find(Order.class).orderBy("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" join o_customer") // ensure that we do not left join the customer
@@ -167,7 +166,7 @@ public class TestOuterJoin extends BaseTestCase {
     LoggedSql.start();
 
     List<Order> orders2 =  Ebean.find(Order.class)
-        .fetch("details", "id").findList();
+        .fetch("details", "id").orderBy("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" left join o_order_detail ");

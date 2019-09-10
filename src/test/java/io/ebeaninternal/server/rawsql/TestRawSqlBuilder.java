@@ -1,16 +1,26 @@
 package io.ebeaninternal.server.rawsql;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
+import io.ebean.SqlRow;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import org.assertj.core.api.StrictAssertions;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.rawsql.ERawSqlAggBean;
-import org.junit.Test;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -30,7 +40,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
   private Sql getSql(String sqlStatement) {
     RawSql r = RawSqlBuilder.parse(sqlStatement).create();
-    return ((SpiRawSql)r).getSql();
+    return ((SpiRawSql) r).getSql();
   }
 
   @Test
@@ -159,7 +169,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
       "order by o.id, d.id asc";
 
 
-    SpiRawSql rawSql = (SpiRawSql)RawSqlBuilder.parse(rs)
+    SpiRawSql rawSql = (SpiRawSql) RawSqlBuilder.parse(rs)
       .tableAliasMapping("c", "customer")
       .tableAliasMapping("d", "details")
       .tableAliasMapping("p", "details.product")
@@ -189,7 +199,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
     RawSqlBuilder builder = RawSqlBuilder.parse(rs);
 
-    SpiRawSql rawSql = (SpiRawSql)builder.create();
+    SpiRawSql rawSql = (SpiRawSql) builder.create();
     SpiRawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
 
     assertEquals(0, columnMapping.getIndexPosition("id"));
@@ -216,7 +226,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
       " from o_order d" +
       " group by DATE_TRUNC('DAY', d.order_date)";
 
-    SpiRawSql rawSql = (SpiRawSql)RawSqlBuilder.parse(sql).create();
+    SpiRawSql rawSql = (SpiRawSql) RawSqlBuilder.parse(sql).create();
 
     SpiRawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
 
@@ -236,6 +246,42 @@ public class TestRawSqlBuilder extends BaseTestCase {
     String fullSql = query.getGeneratedSql();
     assertThat(fullSql).contains(" having count(*) > ?");
 
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void findDuplicateColumnName() throws SQLException {
+
+    ResetBasicData.reset();
+
+    String sql = "select o.id, c.id, c.name " +
+      "from o_order o " +
+      "join o_customer c on o.kcustomer_id = c.id " +
+      "where c.id = ? and o.id > ?";
+
+    final DataSource dataSource = DB.getDefault().getPluginApi().getDataSource();
+
+    try (Connection connection = dataSource.getConnection()) {
+      try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setLong(1, 1L);
+        stmt.setLong(2, 1L);
+
+        try (ResultSet resultSet = stmt.executeQuery()) {
+          while (resultSet.next()) {
+
+            final SqlRow row = RawSqlBuilder.sqlRow(resultSet, "true", false);
+
+            final Integer orderId = row.getInteger("id");
+            final Integer custId = row.getInteger("public.o_customer.id");
+            final String name = row.getString("name");
+
+            assertThat(orderId).isNotEqualTo(1);
+            assertThat(custId).isEqualTo(1);
+            assertThat(name).isNotNull();
+          }
+        }
+      }
+    }
   }
 
 }

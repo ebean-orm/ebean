@@ -1,12 +1,14 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.ClickHouseDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.CockroachDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HanaColumnStoreDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.NuoDbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
@@ -32,6 +34,8 @@ public class PlatformDdlBuilder {
         return new MySqlDdl(platform);
       case HSQLDB:
         return new HsqldbDdl(platform);
+      case NUODB:
+        return new NuoDbDdl(platform);
       case ORACLE:
         return new Oracle10Ddl(platform);
       case SQLITE:
@@ -50,6 +54,8 @@ public class PlatformDdlBuilder {
         return new SqlServerDdl(platform);
       case HANA:
         return new HanaColumnStoreDdl(platform);
+      case CLICKHOUSE:
+        return new ClickHouseDdl(platform);
       default:
         return new PlatformDdl(platform);
     }

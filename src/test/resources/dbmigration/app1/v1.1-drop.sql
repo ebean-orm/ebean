@@ -1,3 +1,0 @@
--- CONTAINS --
--- drop column
--- drop table

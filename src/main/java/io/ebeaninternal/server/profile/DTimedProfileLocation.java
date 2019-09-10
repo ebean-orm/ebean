@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.metric.TimedMetric;
-import io.ebeaninternal.metric.TimedMetricStats;
+import io.ebean.metric.TimedMetric;
+import io.ebean.metric.TimedMetricStats;
 
 /**
  * Default profile location that uses stack trace.

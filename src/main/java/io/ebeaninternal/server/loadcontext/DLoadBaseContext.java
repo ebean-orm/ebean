@@ -3,13 +3,14 @@ package io.ebeaninternal.server.loadcontext;
 import io.ebean.FetchConfig;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 /**
  * Base class for Bean and BeanCollection loading (lazy loading and query join loading).
  */
-public abstract class DLoadBaseContext {
+abstract class DLoadBaseContext {
 
   protected final DLoadContext parent;
 
@@ -17,22 +18,21 @@ public abstract class DLoadBaseContext {
 
   protected final String fullPath;
 
-  protected final OrmQueryProperties queryProps;
-
-  protected final boolean hitCache;
-
   protected final String serverName;
 
-  protected final int firstBatchSize;
+  final OrmQueryProperties queryProps;
 
-  protected final int secondaryBatchSize;
+  final boolean hitCache;
 
-  protected final ObjectGraphNode objectGraphNode;
+  final int firstBatchSize;
 
-  protected final boolean queryFetch;
+  final int secondaryBatchSize;
 
+  final ObjectGraphNode objectGraphNode;
 
-  public DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
+  final boolean queryFetch;
+
+  DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
 
     this.parent = parent;
     this.serverName = parent.getEbeanServer().getName();
@@ -77,7 +77,19 @@ public abstract class DLoadBaseContext {
     return (lazyBatchSize > 1) ? lazyBatchSize : defaultBatchSize;
   }
 
-  protected PersistenceContext getPersistenceContext() {
+  /**
+   * If the parent has a query plan label then extend it with the path and
+   * set onto the secondary query.
+   */
+  void setLabel(SpiQuery<?> query) {
+
+    String label = parent.getPlanLabel();
+    if (label != null) {
+      query.setProfilePath(label, fullPath, parent.getProfileLocation());
+    }
+  }
+
+  PersistenceContext getPersistenceContext() {
     return parent.getPersistenceContext();
   }
 

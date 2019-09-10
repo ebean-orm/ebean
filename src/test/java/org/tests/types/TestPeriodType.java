@@ -2,8 +2,8 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.types.SomePeriodBean;
 import org.junit.Test;
+import org.tests.model.types.SomePeriodBean;
 
 import java.sql.Date;
 import java.time.LocalDate;

@@ -18,6 +18,7 @@ import io.ebean.Pairs;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.Match;
@@ -35,6 +36,7 @@ import io.ebeaninternal.api.SpiJunction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,7 +60,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private final ExpressionList<T> parentExprList;
 
-  protected ExpressionFactory expr;
+  protected final ExpressionFactory expr;
 
   String allDocNestedPath;
 
@@ -303,6 +305,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public UpdateQuery<T> asUpdate() {
+    return query.asUpdate();
+  }
+
+  @Override
   public Query<T> setIncludeSoftDeletes() {
     return query.setIncludeSoftDeletes();
   }
@@ -350,6 +357,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> apply(FetchPath fetchPath) {
     return query.apply(fetchPath);
+  }
+
+  @Override
+  public Query<T> usingTransaction(Transaction transaction) {
+    return query.usingTransaction(transaction);
+  }
+
+  @Override
+  public Query<T> usingConnection(Connection connection) {
+    return query.usingConnection(connection);
   }
 
   @Override
@@ -438,6 +455,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public boolean exists() {
+    return query.exists();
+  }
+
+  @Override
   public T findOne() {
     return query.findOne();
   }
@@ -448,8 +470,14 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> filterMany(String prop) {
-    return query.filterMany(prop);
+  public ExpressionList<T> filterMany(String manyProperty) {
+    return query.filterMany(manyProperty);
+  }
+
+  @Override
+  public Query<T> filterMany(String manyProperty, String expressions, Object... params) {
+    query.filterMany(manyProperty).where(expressions, params);
+    return query;
   }
 
   @Override
@@ -473,7 +501,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> select(FetchGroup fetchGroup) {
+  public Query<T> select(FetchGroup<T> fetchGroup) {
     return query.select(fetchGroup);
   }
 
@@ -724,6 +752,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> where(String expressions, Object... params) {
+    expr.where(this, expressions, params);
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
     add(expr.bitwiseAny(propertyName, flags));
     return this;
@@ -754,6 +788,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> eqOrNull(String propertyName, Object value) {
+    add(expr.eqOrNull(propertyName, value));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> ieq(String propertyName, String value) {
     add(expr.ieq(propertyName, value));
     return this;
@@ -780,6 +820,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> and(Expression expOne, Expression expTwo) {
     add(expr.and(expOne, expTwo));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value) {
+    add(expr.inRangeWith(lowProperty, highProperty, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
+    add(expr.inRange(propertyName, value1, value2));
     return this;
   }
 
@@ -816,6 +868,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> gt(String propertyName, Object value) {
     add(expr.gt(propertyName, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> gtOrNull(String propertyName, Object value) {
+    add(expr.gtOrNull(propertyName, value));
     return this;
   }
 
@@ -874,6 +932,14 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> in(String propertyName, Collection<?> values) {
     add(expr.in(propertyName, values));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> inOrEmpty(String propertyName, Collection<?> values) {
+    if (notEmpty(values)) {
+      add(expr.in(propertyName, values));
+    }
     return this;
   }
 
@@ -974,6 +1040,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> ltOrNull(String propertyName, Object value) {
+    add(expr.ltOrNull(propertyName, value));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> not(Expression exp) {
     add(expr.not(exp));
     return this;
@@ -1025,6 +1097,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   public ExpressionList<T> raw(String raw) {
     add(expr.raw(raw));
     return this;
+  }
+
+  @Override
+  public ExpressionList<T> rawOrEmpty(String raw, Collection<?> values) {
+    if (notEmpty(values)) {
+      add(expr.raw(raw, values));
+    }
+    return this;
+  }
+
+  private boolean notEmpty(Collection<?> values) {
+    return values != null && !values.isEmpty();
   }
 
   @Override

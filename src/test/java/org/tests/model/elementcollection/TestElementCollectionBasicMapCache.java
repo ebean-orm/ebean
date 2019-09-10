@@ -1,9 +1,9 @@
 package org.tests.model.elementcollection;
 
+import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiEbeanServer;
-
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestElementCollectionBasicMapCache {
+public class TestElementCollectionBasicMapCache extends BaseTestCase {
 
   @Test
   public void test() {
@@ -45,9 +45,9 @@ public class TestElementCollectionBasicMapCache {
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(3);
-    }
-    else {
+      assertThat(sql).hasSize(6);
+      assertSqlBind(sql, 3, 5);
+    } else {
       assertThat(sql).hasSize(5);
     }
 
@@ -73,9 +73,9 @@ public class TestElementCollectionBasicMapCache {
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(2); // cache hit
-    }
-    else {
+      assertThat(sql).hasSize(4); // cache hit
+      assertSqlBind(sql, 2, 3);
+    } else {
       assertThat(sql).hasSize(3); // cache hit
     }
 
@@ -95,7 +95,7 @@ public class TestElementCollectionBasicMapCache {
 
     LoggedSqlCollector.stop();
   }
-  
+
   public boolean isPersistBatchOnCascade() {
     return ((SpiEbeanServer) Ebean.getDefaultServer()).getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }
