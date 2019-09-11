@@ -141,7 +141,7 @@ class CQueryBuilder {
       if (dbPlatform.isSupportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSql("delete", request, predicates, sqlTree).getSql(), alias);
-      } else if (dbPlatform.getPlatform() == Platform.MYSQL) {
+      } else if (isMySql(dbPlatform.getPlatform())) {
         return aliasReplace(buildSql("delete " + alias, request, predicates, sqlTree).getSql(), alias);
       } else {
         // simple - delete from table ...
@@ -153,6 +153,10 @@ class CQueryBuilder {
     sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
     sql = aliasReplace(sql, alias);
     return sql;
+  }
+
+  private boolean isMySql(Platform platform) {
+    return platform == Platform.MYSQL || platform == Platform.MYSQL55;
   }
 
   private String alias(String rootTableAlias) {

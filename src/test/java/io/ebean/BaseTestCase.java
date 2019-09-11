@@ -183,7 +183,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isMySql() {
-    return Platform.MYSQL == platform();
+    return Platform.MYSQL == platform() || Platform.MYSQL55 == platform();
   }
 
   public boolean isHana() {
