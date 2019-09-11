@@ -18,15 +18,12 @@ public class MySqlDdl extends PlatformDdl {
   // this flag is for compatibility. Use it with care.
   private static final boolean USE_CHECK_CONSTRAINT = Boolean.getBoolean("ebean.mysql.useCheckConstraint");
 
-  private final boolean useMigrationStoredProcedures;
-
   public MySqlDdl(DatabasePlatform platform) {
     super(platform);
     this.alterColumn = "modify";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
     this.inlineComments = true;
-    this.useMigrationStoredProcedures = platform.isUseMigrationStoredProcedures();
   }
 
   /**
@@ -43,21 +40,6 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
     return "alter table " + tableName + " drop foreign key " + maxConstraintName(fkName);
-  }
-
-  /**
-   * It is rather complex to delete a column on MySql as there must not exist any foreign keys.
-   * That's why we call a user stored procedure here
-   */
-  @Override
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
-
-    if (useMigrationStoredProcedures) {
-      buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
-    } else {
-      buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
-        .append(dropColumnSuffix).endOfStatement();
-    }
   }
 
   @Override
