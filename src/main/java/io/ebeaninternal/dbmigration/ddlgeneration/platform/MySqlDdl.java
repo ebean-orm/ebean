@@ -18,12 +18,15 @@ public class MySqlDdl extends PlatformDdl {
   // this flag is for compatibility. Use it with care.
   private static final boolean USE_CHECK_CONSTRAINT = Boolean.getBoolean("ebean.mysql.useCheckConstraint");
 
+  private final boolean useMigrationStoredProcedures;
+
   public MySqlDdl(DatabasePlatform platform) {
     super(platform);
     this.alterColumn = "modify";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
     this.inlineComments = true;
+    this.useMigrationStoredProcedures = platform.isUseMigrationStoredProcedures();
   }
 
   /**
@@ -49,7 +52,12 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
 
-    buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+    if (useMigrationStoredProcedures) {
+      buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+    } else {
+      buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
+        .append(dropColumnSuffix).endOfStatement();
+    }
   }
 
   @Override
@@ -60,6 +68,7 @@ public class MySqlDdl extends PlatformDdl {
       return null;
     }
   }
+
   @Override
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
     if (USE_CHECK_CONSTRAINT) {
@@ -96,17 +105,13 @@ public class MySqlDdl extends PlatformDdl {
 
   @Override
   public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-
     // can't alter itself - done in alterColumnBaseAttributes()
     return null;
   }
 
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-
     String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
-
-    // use alter
     return "alter table " + tableName + " alter " + columnName + " " + suffix;
   }
 
@@ -124,7 +129,6 @@ public class MySqlDdl extends PlatformDdl {
     boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
     String notnullClause = notnull ? " not null" : "";
 
-    // use modify
     return "alter table " + tableName + " modify " + columnName + " " + type + notnullClause;
   }
 
@@ -161,7 +165,7 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) {
     // alter comment currently not supported as it requires to repeat whole column definition
   }
 
@@ -182,7 +186,6 @@ public class MySqlDdl extends PlatformDdl {
         i++;
       }
       buffer.endOfStatement();
-
     }
   }
 

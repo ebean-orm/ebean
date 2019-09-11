@@ -53,6 +53,8 @@ public class DatabasePlatform {
 
   protected boolean supportsSavepointId = true;
 
+  protected boolean useMigrationStoredProcedures = true;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
@@ -233,6 +235,9 @@ public class DatabasePlatform {
   public void configure(PlatformConfig config) {
     this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
     this.caseSensitiveCollation = config.isCaseSensitiveCollation();
+    if (config.isUseMigrationStoredProcedures()) {
+      useMigrationStoredProcedures = true;
+    }
     configureIdType(config.getIdType());
     configure(config, config.isAllQuotedIdentifiers());
   }
@@ -337,6 +342,13 @@ public class DatabasePlatform {
    */
   public boolean isSupportsSavepointId() {
     return supportsSavepointId;
+  }
+
+  /**
+   * Return true if migrations should use stored procedures.
+   */
+  public boolean isUseMigrationStoredProcedures() {
+    return useMigrationStoredProcedures;
   }
 
   /**
