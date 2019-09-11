@@ -14,7 +14,6 @@ import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
-import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -43,9 +42,6 @@ import java.util.List;
  * deployment properties.
  */
 class CQueryBuilder {
-
-  private static final String DELETE = "Delete";
-  private static final String UPDATE = "Update";
 
   final String tableAliasPlaceHolder;
   final String columnAliasPrefix;
@@ -104,7 +100,6 @@ class CQueryBuilder {
    */
   <T> CQueryUpdate buildUpdateQuery(boolean deleteRequest, OrmQueryRequest<T> request) {
 
-    String type = (deleteRequest) ? DELETE : UPDATE;
     SpiQuery<T> query = request.getQuery();
     String rootTableAlias = query.getAlias();
     query.setDelete();
@@ -263,12 +258,14 @@ class CQueryBuilder {
     query.setFirstRow(0);
     query.setMaxRows(0);
 
-    ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
-
     boolean countDistinct = query.isDistinct();
+    boolean withAgg = false;
     if (!countDistinct) {
-      // minimise select clause for standard count
-      query.setSelectId();
+      withAgg = includesAggregation(request, query);
+      if (!withAgg) {
+        // minimise select clause for standard count
+        query.setSelectId();
+      }
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -286,14 +283,14 @@ class CQueryBuilder {
       sqlTree.addSoftDeletePredicate(query);
     }
 
-    boolean hasMany = sqlTree.hasMany();
+    boolean wrap = sqlTree.hasMany() || withAgg;
 
     String sqlSelect = null;
     if (countDistinct) {
       if (sqlTree.isSingleProperty()) {
         request.setInlineCountDistinct();
       }
-    } else if (!hasMany) {
+    } else if (!wrap) {
       sqlSelect = "select count(*)";
     }
 
@@ -304,7 +301,7 @@ class CQueryBuilder {
       if (countDistinct) {
         sql = wrapSelectCount(sql);
 
-      } else if (hasMany || query.isRawSql()) {
+      } else if (wrap || query.isRawSql()) {
         // remove order by - mssql does not accept order by in subqueries
         int pos = sql.lastIndexOf(" order by ");
         if (pos != -1) {
@@ -319,6 +316,13 @@ class CQueryBuilder {
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(queryPlan, request, predicates);
+  }
+
+  /**
+   * Return true if the query includes an aggregation property.
+   */
+  private <T> boolean includesAggregation(OrmQueryRequest<T> request, SpiQuery<T> query) {
+    return request.getBeanDescriptor().includesAggregation(query.getDetail());
   }
 
   private String wrapSelectCount(String sql) {

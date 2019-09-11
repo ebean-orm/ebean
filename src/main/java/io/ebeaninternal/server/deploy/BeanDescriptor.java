@@ -66,7 +66,6 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.DeleteMode;
-import io.ebeaninternal.server.persist.DmlUtil;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.ExtraJoin;
 import io.ebeaninternal.server.query.STreeProperty;
@@ -77,6 +76,7 @@ import io.ebeaninternal.server.query.STreeType;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.ScalarType;
@@ -333,6 +333,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * list of properties that are Lists/Sets/Maps (Derived).
    */
   private final BeanProperty[] propertiesNonMany;
+  private final BeanProperty[] propertiesAggregate;
   private final BeanPropertyAssocMany<?>[] propertiesMany;
   private final BeanPropertyAssocMany<?>[] propertiesManySave;
   private final BeanPropertyAssocMany<?>[] propertiesManyDelete;
@@ -515,6 +516,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     this.propertiesMany = listHelper.getMany();
     this.propertiesNonMany = listHelper.getNonMany();
+    this.propertiesAggregate = listHelper.getAggregates();
     this.propertiesManySave = listHelper.getManySave();
     this.propertiesManyDelete = listHelper.getManyDelete();
     this.propertiesManyToMany = listHelper.getManyToMany();
@@ -3167,6 +3169,25 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public BeanPropertyAssocOne<?>[] propertiesEmbedded() {
     return propertiesEmbedded;
+  }
+
+  /**
+   * Return true if the query detail includes an aggregation property.
+   */
+  public boolean includesAggregation(OrmQueryDetail detail) {
+    return detail != null && propertiesAggregate.length > 0 && includesAggregation(detail.getChunk(null, false));
+  }
+
+  private boolean includesAggregation(OrmQueryProperties rootProps) {
+    if (rootProps != null) {
+      final Set<String> included = rootProps.getIncluded();
+      for (BeanProperty property : propertiesAggregate) {
+        if (included.contains(property.getName())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**

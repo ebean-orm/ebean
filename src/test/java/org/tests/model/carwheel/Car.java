@@ -1,5 +1,7 @@
 package org.tests.model.carwheel;
 
+import io.ebean.annotation.Aggregation;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +23,13 @@ public class Car {
   @Version
   private int version;
 
+  private String brand;
+
+  private int sold;
+
+  @Aggregation("sum(sold)")
+  private int totalSold;
+
   @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
   private List<Wheel> wheels;
 
@@ -38,6 +47,30 @@ public class Car {
 
   public void setVersion(int version) {
     this.version = version;
+  }
+
+  public String getBrand() {
+    return brand;
+  }
+
+  public void setBrand(String brand) {
+    this.brand = brand;
+  }
+
+  public int getSold() {
+    return sold;
+  }
+
+  public void setSold(int sold) {
+    this.sold = sold;
+  }
+
+  public int getTotalSold() {
+    return totalSold;
+  }
+
+  public void setTotalSold(int totalSold) {
+    this.totalSold = totalSold;
   }
 
   public List<Wheel> getWheels() {

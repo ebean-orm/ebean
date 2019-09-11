@@ -10,7 +10,6 @@ import io.ebeaninternal.server.deploy.BeanPropertyIdClass;
 import io.ebeaninternal.server.deploy.BeanPropertyOrderColumn;
 import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeString;
@@ -53,6 +52,8 @@ public class DeployBeanPropertyLists {
   private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<>();
 
   private final List<BeanProperty> nonManys = new ArrayList<>();
+
+  private final List<BeanProperty> aggs = new ArrayList<>();
 
   private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<>();
 
@@ -232,6 +233,9 @@ public class DeployBeanPropertyLists {
 
     } else {
       nonManys.add(prop);
+      if (prop.isAggregation()) {
+        aggs.add(prop);
+      }
       if (prop.isTenantId()) {
         tenant = prop;
       }
@@ -329,6 +333,10 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty[] getNonMany() {
     return nonManys.toArray(new BeanProperty[0]);
+  }
+
+  public BeanProperty[] getAggregates() {
+    return aggs.toArray(new BeanProperty[0]);
   }
 
   public BeanPropertyAssocMany<?>[] getMany() {

@@ -34,6 +34,28 @@ public class TestAggregationTopLevel extends BaseTestCase {
   }
 
   @Test
+  public void query_count() {
+
+    Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)
+      .select("date, totalKms")
+      .setMaxRows(10)
+      .having().gt("totalKms", 1)
+      .query();
+
+    LoggedSqlCollector.start();
+    query.findCount();
+    query.findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(2);
+
+    if (isH2() || isPostgres()) {
+      assertThat(sql.get(0)).contains("select count(*) from ( select t0.date, sum(t0.total_kms) from d_machine_stats t0 group by t0.date having sum(t0.total_kms) > ?)");
+      assertThat(sql.get(1)).contains("select t0.date, sum(t0.total_kms) from d_machine_stats t0 group by t0.date having sum(t0.total_kms) > ? limit 10");
+    }
+  }
+
+  @Test
   public void query_machineTotalKms_withHaving() {
 
     Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)
