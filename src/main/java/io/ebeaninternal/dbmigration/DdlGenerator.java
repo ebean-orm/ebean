@@ -47,6 +47,7 @@ public class DdlGenerator {
   private final boolean ddlAutoCommit;
   private final String dbSchema;
   private final ScriptTransform scriptTransform;
+  private final boolean useMigrationStoredProcedures;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -64,9 +65,11 @@ public class DdlGenerator {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
       this.ddlAutoCommit = false;
+      this.useMigrationStoredProcedures = false;
     } else {
       this.runDdl = serverConfig.isDdlRun();
       this.ddlAutoCommit = server.getDatabasePlatform().isDdlAutoCommit();
+      this.useMigrationStoredProcedures = server.getDatabasePlatform().isUseMigrationStoredProcedures();
     }
     this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
     this.baseDir = initBaseDir();
@@ -179,7 +182,7 @@ public class DdlGenerator {
 
   protected void runDropSql(Connection connection) throws IOException {
     if (!createOnly) {
-      if (extraDdl && jaxbPresent) {
+      if (extraDdl && jaxbPresent && useMigrationStoredProcedures) {
         String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
         if (extraApply != null) {
           runScript(connection, false, extraApply, "extra-ddl");
@@ -199,7 +202,7 @@ public class DdlGenerator {
     }
     runScript(connection, false, createAllContent, getCreateFileName());
 
-    if (extraDdl && jaxbPresent) {
+    if (extraDdl && jaxbPresent && useMigrationStoredProcedures) {
       if (currentModel().isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
         if (extraPartitioning != null && !extraPartitioning.isEmpty()) {

@@ -17,6 +17,7 @@ public class DbExpressionHandlerFactory {
         return new H2DbExpression();
       case POSTGRES:
         return new PostgresDbExpression();
+      case MYSQL55:
       case MYSQL:
         return new MySqlDbExpression();
       case ORACLE:

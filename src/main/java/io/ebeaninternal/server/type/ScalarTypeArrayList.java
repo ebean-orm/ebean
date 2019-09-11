@@ -104,8 +104,11 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
   protected List fromArray(Object[] array1) {
     List list = new ArrayList(array1.length);
     for (Object element : array1) {
-      if(element == null ) list.add(null);
-      else list.add(converter.toElement(element));
+      if (element == null) {
+        list.add(null);
+      } else {
+        list.add(converter.toElement(element));
+      }
     }
     return new ModifyAwareList(list);
   }

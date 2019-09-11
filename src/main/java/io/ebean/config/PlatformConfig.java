@@ -54,6 +54,8 @@ public class PlatformConfig {
 
   private boolean caseSensitiveCollation = true;
 
+  private boolean useMigrationStoredProcedures;
+
   /**
    * Modify the default mapping of standard types such as default precision for DECIMAL etc.
    */
@@ -76,6 +78,7 @@ public class PlatformConfig {
     this.idType = platformConfig.idType;
     this.geometrySRID = platformConfig.geometrySRID;
     this.dbUuid = platformConfig.dbUuid;
+    this.useMigrationStoredProcedures = platformConfig.useMigrationStoredProcedures;
     this.caseSensitiveCollation = platformConfig.caseSensitiveCollation;
     this.allQuotedIdentifiers = platformConfig.allQuotedIdentifiers;
     this.databaseInetAddressVarchar = platformConfig.databaseInetAddressVarchar;
@@ -108,6 +111,20 @@ public class PlatformConfig {
    */
   public void setCaseSensitiveCollation(boolean caseSensitiveCollation) {
     this.caseSensitiveCollation = caseSensitiveCollation;
+  }
+
+  /**
+   * Return true if force use of helper stored procedures for migrations.
+   */
+  public boolean isUseMigrationStoredProcedures() {
+    return useMigrationStoredProcedures;
+  }
+
+  /**
+   * Set true to force use of helper stored procedures for migrations.
+   */
+  public void setUseMigrationStoredProcedures(boolean useMigrationStoredProcedures) {
+    this.useMigrationStoredProcedures = useMigrationStoredProcedures;
   }
 
   /**
@@ -276,6 +293,7 @@ public class PlatformConfig {
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databaseInetAddressVarchar = p.getBoolean("databaseInetAddressVarchar", databaseInetAddressVarchar);
     caseSensitiveCollation = p.getBoolean("caseSensitiveCollation", caseSensitiveCollation);
+    useMigrationStoredProcedures = p.getBoolean("useMigrationStoredProcedures", useMigrationStoredProcedures);;
 
     DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
     if (dbUuid != null) {

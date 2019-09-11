@@ -30,6 +30,7 @@ public class PlatformDdlBuilder {
         return new H2Ddl(platform);
       case DB2:
         return new DB2Ddl(platform);
+      case MYSQL55:
       case MYSQL:
         return new MySqlDdl(platform);
       case HSQLDB:
