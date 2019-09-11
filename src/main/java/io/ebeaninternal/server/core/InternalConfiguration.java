@@ -514,7 +514,7 @@ public class InternalConfiguration {
 
     String tz = serverConfig.getDataTimeZone();
     if (tz == null) {
-      if (getPlatform() == Platform.MYSQL) {
+      if (isMySql(getPlatform())) {
         return new LocalDataTimeZone();
       }
       return new NoDataTimeZone();
@@ -524,6 +524,10 @@ public class InternalConfiguration {
     } else {
       return new SimpleDataTimeZone(tz);
     }
+  }
+
+  private boolean isMySql(Platform platform) {
+     return platform == Platform.MYSQL || platform == Platform.MYSQL55;
   }
 
   public DataTimeZone getDataTimeZone() {
