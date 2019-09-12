@@ -209,7 +209,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
     public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
       synchronized (this) {
-        boolean useCache = context.hitCache && !onlyIds;
+        boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
           EntityBean ownerBean = bc.getOwnerBean();
           BeanDescriptor<?> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());

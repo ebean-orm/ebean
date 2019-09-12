@@ -177,7 +177,7 @@ public class CacheChangeSet {
 
     final ManyKey key;
 
-    final List<Object> removes = new ArrayList<>();
+    final Set<Object> removes = new HashSet<>();
 
     final Map<Object, CachedManyIds> puts = new LinkedHashMap<>();
 
