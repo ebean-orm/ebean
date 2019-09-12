@@ -202,12 +202,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbColumn(dbColumn);
     }
 
+    Id id = get(prop, Id.class);
     GeneratedValue gen = get(prop, GeneratedValue.class);
     if (gen != null) {
-      readGenValue(gen, prop);
+      readGenValue(gen, id, prop);
     }
-
-    Id id = get(prop, Id.class);
     if (id != null) {
       readIdScalar(prop);
     }
@@ -519,8 +518,13 @@ public class AnnotationFields extends AnnotationParser {
     return util.createDataEncryptSupport(table, column);
   }
 
-  private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {
-
+  private void readGenValue(GeneratedValue gen, Id id, DeployBeanProperty prop) {
+    if (id == null) {
+      if (UUID.class.equals(prop.getPropertyType())) {
+        generatedPropFactory.setUuid(prop);
+        return;
+      }
+    }
     descriptor.setIdGeneratedValue();
     String genName = gen.generator();
 
