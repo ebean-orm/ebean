@@ -17,6 +17,7 @@ public class PostgresDdl extends PlatformDdl {
     this.columnSetType = "type ";
     this.alterTableIfExists = "if exists ";
     this.columnSetNull = "drop not null";
+    this.addForeignKeySkipCheck = " not valid";
   }
 
   @Override

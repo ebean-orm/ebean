@@ -11,6 +11,7 @@ import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.BaseDdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.VowelRemover;
@@ -105,6 +106,8 @@ public class PlatformDdl {
   protected String dropColumn = "drop column";
 
   protected String dropColumnSuffix = "";
+
+  protected String addForeignKeySkipCheck = "";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -405,7 +408,7 @@ public class PlatformDdl {
   /**
    * Add foreign key.
    */
-  public String alterTableAddForeignKey(WriteForeignKey request) {
+  public String alterTableAddForeignKey(DdlOptions options, WriteForeignKey request) {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer
@@ -418,6 +421,9 @@ public class PlatformDdl {
       .append(lowerTableName(request.refTable()));
     appendColumns(request.refCols(), buffer);
     appendForeignKeySuffix(request, buffer);
+    if (options.isForeignKeySkipCheck()) {
+      buffer.append(addForeignKeySkipCheck);
+    }
     return buffer.toString();
   }
 

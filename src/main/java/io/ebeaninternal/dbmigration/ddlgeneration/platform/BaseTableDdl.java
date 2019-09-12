@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.TableDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.IndexSet;
@@ -31,7 +32,6 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -462,7 +462,7 @@ public class BaseTableDdl implements TableDdl {
       fkeyBuffer.appendStatement(platformDdl.createIndex(request.indexName(), tableName, request.cols()));
     }
 
-    alterTableAddForeignKey(fkeyBuffer, request);
+    alterTableAddForeignKey(write.getOptions(), fkeyBuffer, request);
     fkeyBuffer.end();
 
     write.dropAllForeignKeys().appendStatement(platformDdl.alterTableDropForeignKey(tableName, request.fkName()));
@@ -473,9 +473,9 @@ public class BaseTableDdl implements TableDdl {
     write.dropAllForeignKeys().end();
   }
 
-  protected void alterTableAddForeignKey(DdlBuffer buffer, WriteForeignKey request) throws IOException {
+  protected void alterTableAddForeignKey(DdlOptions options, DdlBuffer buffer, WriteForeignKey request) throws IOException {
 
-    buffer.appendStatement(platformDdl.alterTableAddForeignKey(request));
+    buffer.appendStatement(platformDdl.alterTableAddForeignKey(options, request));
   }
 
   protected void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
@@ -635,7 +635,7 @@ public class BaseTableDdl implements TableDdl {
     if (DdlHelp.isDropForeignKey(alterForeignKey.getColumnNames())) {
       writer.apply().appendStatement(platformDdl.alterTableDropForeignKey(alterForeignKey.getTableName(), alterForeignKey.getName()));
     } else {
-      writer.apply().appendStatement(platformDdl.alterTableAddForeignKey(new WriteForeignKey(alterForeignKey)));
+      writer.apply().appendStatement(platformDdl.alterTableAddForeignKey(writer.getOptions(), new WriteForeignKey(alterForeignKey)));
     }
   }
 
@@ -899,7 +899,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterColumnAddForeignKey(DdlWrite writer, AlterColumn alterColumn) throws IOException {
 
-    alterTableAddForeignKey(writer.apply(), new WriteForeignKey(alterColumn));
+    alterTableAddForeignKey(writer.getOptions(), writer.apply(), new WriteForeignKey(alterColumn));
   }
 
   protected void alterColumnDropForeignKey(DdlWrite writer, AlterColumn alter) throws IOException {

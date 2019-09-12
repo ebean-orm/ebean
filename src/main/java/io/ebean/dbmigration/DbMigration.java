@@ -137,6 +137,14 @@ public interface DbMigration {
   void setGeneratePendingDrop(String generatePendingDrop);
 
   /**
+   * Set to true if ALTER TABLE ADD FOREIGN KEY should be generated with an option to skip validation.
+   * <p>
+   * Currently this is only useful for Postgres DDL adding the <code>NOT VALID</code> option.
+   * </p>
+   */
+  void setAddForeignKeySkipCheck(boolean addForeignKeySkipCheck);
+
+  /**
    * Add an additional platform to write the migration DDL.
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms
@@ -198,6 +206,7 @@ public interface DbMigration {
    * An "init" migration can only be executed and used on a database that has had no
    * prior migrations run on it.
    * </p>
+   *
    * @return the version of the generated migration
    */
   String generateInitMigration() throws IOException;

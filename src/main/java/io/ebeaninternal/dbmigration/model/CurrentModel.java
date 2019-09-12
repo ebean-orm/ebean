@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration.model;
 import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
@@ -37,6 +38,8 @@ public class CurrentModel {
 
   private DdlWrite write;
 
+  private DdlOptions ddlOptions = new DdlOptions();
+
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
    */
@@ -61,6 +64,10 @@ public class CurrentModel {
     this.maxLength = maxLength(server, constraintNaming);
     this.platformTypes = platformTypes;
     this.jaxbPresent = server.getServerConfig().getClassLoadConfig().isJavaxJAXBPresent();
+  }
+
+  public DdlOptions getDdlOptions() {
+    return ddlOptions;
   }
 
   /**
@@ -183,7 +190,7 @@ public class CurrentModel {
     if (write == null) {
       ChangeSet createChangeSet = getChangeSet();
 
-      write = new DdlWrite(new MConfiguration(), model);
+      write = new DdlWrite(new MConfiguration(), model, ddlOptions);
 
       DdlHandler handler = handler();
       handler.generateProlog(write);

@@ -26,6 +26,7 @@ import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
 import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlWriter;
@@ -106,6 +107,7 @@ public class DefaultDbMigration implements DbMigration {
   protected String version;
   protected String name;
   protected String generatePendingDrop;
+  private boolean addForeignKeySkipCheck;
 
   protected boolean includeBuiltInPartitioning = true;
 
@@ -178,6 +180,11 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public void setAddForeignKeySkipCheck(boolean addForeignKeySkipCheck) {
+    this.addForeignKeySkipCheck = addForeignKeySkipCheck;
   }
 
   @Override
@@ -565,7 +572,8 @@ public class DefaultDbMigration implements DbMigration {
       } else if (databasePlatform != null) {
         // writer needs the current model to provide table/column details for
         // history ddl generation (triggers, history tables etc)
-        DdlWrite write = new DdlWrite(new MConfiguration(), request.current);
+        DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
+        DdlWrite write = new DdlWrite(new MConfiguration(), request.current, options);
         PlatformDdlWriter writer = createDdlWriter(databasePlatform);
         writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
       }
@@ -623,8 +631,9 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
 
+    DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
-      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
+      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
