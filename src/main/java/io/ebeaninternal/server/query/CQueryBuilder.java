@@ -151,7 +151,7 @@ class CQueryBuilder {
   }
 
   private boolean isMySql(Platform platform) {
-    return platform == Platform.MYSQL || platform == Platform.MYSQL55;
+    return platform.base() == Platform.MYSQL;
   }
 
   private String alias(String rootTableAlias) {

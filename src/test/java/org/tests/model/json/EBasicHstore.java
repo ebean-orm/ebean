@@ -1,6 +1,6 @@
 package org.tests.model.json;
 
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,7 +17,7 @@ public class EBasicHstore {
   String name;
 
   // fallback to varchar(800) for non-Postgres
-  @DbHstore(length = 800)
+  @DbMap(length = 800)
   Map<String, String> map;
 
   @Version

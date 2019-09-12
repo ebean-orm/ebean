@@ -155,7 +155,7 @@ public abstract class BaseTestCase {
    * so tests that do this need to be skipped for SQL Server.
    */
   public boolean isSqlServer() {
-    return Platform.SQLSERVER17 == platform();
+    return Platform.SQLSERVER == platform().base();
   }
 
   public boolean isH2() {
@@ -183,7 +183,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isMySql() {
-    return Platform.MYSQL == platform() || Platform.MYSQL55 == platform();
+    return Platform.MYSQL == platform().base();
   }
 
   public boolean isHana() {
