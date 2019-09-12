@@ -5,7 +5,7 @@ import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbDefault;
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.DbMigration;
@@ -246,9 +246,9 @@ public class AnnotationFields extends AnnotationParser {
     if (comment != null) {
       prop.setDbComment(comment.value());
     }
-    DbHstore dbHstore = get(prop, DbHstore.class);
-    if (dbHstore != null) {
-      util.setDbHstore(prop, dbHstore);
+    DbMap dbMap = get(prop, DbMap.class);
+    if (dbMap != null) {
+      util.setDbMap(prop, dbMap);
     }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {

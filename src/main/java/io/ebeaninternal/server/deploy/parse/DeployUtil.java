@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.DbJsonType;
@@ -171,15 +171,15 @@ public class DeployUtil {
   /**
    * Map to Postgres HSTORE type (with fallback to JSON storage in VARCHAR).
    */
-  void setDbHstore(DeployBeanProperty prop, DbHstore dbHstore) {
+  void setDbMap(DeployBeanProperty prop, DbMap dbMap) {
 
-    ScalarType<?> scalarType = typeManager.getHstoreScalarType();
+    ScalarType<?> scalarType = typeManager.getDbMapScalarType();
     int dbType = scalarType.getJdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
     if (dbType == Types.VARCHAR) {
       // this is actually the fallback of JSON storage into VARCHAR
-      int dbLength = dbHstore.length();
+      int dbLength = dbMap.length();
       int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;
       prop.setDbLength(columnLength);
     }

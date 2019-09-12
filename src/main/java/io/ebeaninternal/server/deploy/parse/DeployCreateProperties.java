@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.Model;
 import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.UnmappedJson;
@@ -274,7 +274,7 @@ public class DeployCreateProperties {
     return (AnnotationUtil.findAnnotation(field, DbJson.class) != null)
       || (AnnotationUtil.findAnnotation(field, DbJsonB.class) != null)
       || (AnnotationUtil.findAnnotation(field, DbArray.class) != null)
-      || (AnnotationUtil.findAnnotation(field, DbHstore.class) != null)
+      || (AnnotationUtil.findAnnotation(field, DbMap.class) != null)
       || (AnnotationUtil.findAnnotation(field, UnmappedJson.class) != null);
   }
 
