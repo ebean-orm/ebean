@@ -82,7 +82,7 @@ class DefaultBeanLoader {
       parentDesc.contextPut(pc, parentId, parentBean);
     }
 
-    boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching();
+    boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
       Boolean readOnly = null;
       if (ebi.isReadOnly()) {
