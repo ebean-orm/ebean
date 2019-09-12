@@ -108,6 +108,7 @@ public class DefaultDbMigration implements DbMigration {
   protected String name;
   protected String generatePendingDrop;
   private boolean addForeignKeySkipCheck;
+  private int lockTimeoutSeconds;
 
   protected boolean includeBuiltInPartitioning = true;
 
@@ -185,6 +186,11 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setAddForeignKeySkipCheck(boolean addForeignKeySkipCheck) {
     this.addForeignKeySkipCheck = addForeignKeySkipCheck;
+  }
+
+  @Override
+  public void setLockTimeout(int seconds) {
+    this.lockTimeoutSeconds = seconds;
   }
 
   @Override
@@ -641,7 +647,7 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, serverConfig, migrationConfig);
+    return new PlatformDdlWriter(platform, serverConfig, migrationConfig, lockTimeoutSeconds);
   }
 
   /**

@@ -145,6 +145,15 @@ public interface DbMigration {
   void setAddForeignKeySkipCheck(boolean addForeignKeySkipCheck);
 
   /**
+   * Set the lock timeout to be included with the DDL generation.
+   * <p>
+   * Currently this is only useful for Postgres migrations adding a <code>set lock_timeout</code>
+   * statement to the generated database migration.
+   * </p>
+   */
+  void setLockTimeout(int seconds);
+
+  /**
    * Add an additional platform to write the migration DDL.
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms

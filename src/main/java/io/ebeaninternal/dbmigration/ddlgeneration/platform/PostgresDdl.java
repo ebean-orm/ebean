@@ -20,6 +20,10 @@ public class PostgresDdl extends PlatformDdl {
     this.addForeignKeySkipCheck = " not valid";
   }
 
+  public String setLockTimeout(int lockTimeoutSeconds) {
+    return "set lock_timeout = " + (lockTimeoutSeconds * 1000);
+  }
+
   @Override
   public boolean suppressPrimaryKeyOnPartition() {
     return true;

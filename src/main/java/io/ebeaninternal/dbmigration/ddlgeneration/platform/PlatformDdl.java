@@ -212,6 +212,13 @@ public class PlatformDdl {
   }
 
   /**
+   * By default this does nothing returning null / no lock timeout.
+   */
+  public String setLockTimeout(int lockTimeoutSeconds) {
+    return null;
+  }
+
+  /**
    * Write all the table columns converting to platform types as necessary.
    */
   public void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
