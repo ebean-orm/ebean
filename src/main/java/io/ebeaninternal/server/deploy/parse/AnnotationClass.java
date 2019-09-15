@@ -11,7 +11,6 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.StorageEngine;
-import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -188,11 +187,6 @@ public class AnnotationClass extends AnnotationParser {
     DbComment comment = findAnnotationRecursive(cls, DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
-    }
-
-    UpdateMode updateMode = findAnnotationRecursive(cls, UpdateMode.class);
-    if (updateMode != null) {
-      descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
     if (!disableL2Cache) {

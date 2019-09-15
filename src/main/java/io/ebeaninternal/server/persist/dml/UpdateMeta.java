@@ -20,17 +20,10 @@ import java.util.List;
 final class UpdateMeta extends BaseMeta {
 
   private final BindableList set;
-  private final UpdatePlan modeNoneUpdatePlan;
-  private final UpdatePlan modeVersionUpdatePlan;
 
-  UpdateMeta(BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable tenantId) {
+  UpdateMeta(BindableList set, BindableId id, Bindable version, Bindable tenantId) {
     super(id, version, tenantId);
     this.set = set;
-
-    String sqlNone = genSql(ConcurrencyMode.NONE, set, desc.getBaseTable());
-    String sqlVersion = genSql(ConcurrencyMode.VERSION, set, desc.getBaseTable());
-    this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
-    this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);
   }
 
   /**
@@ -56,21 +49,7 @@ final class UpdateMeta extends BaseMeta {
    * get or generate the sql based on the concurrency mode.
    */
   SpiUpdatePlan getUpdatePlan(PersistRequestBean<?> request) {
-
-    if (request.isDynamicUpdateSql()) {
-      return getDynamicUpdatePlan(request);
-    }
-
-    switch (request.getConcurrencyMode()) {
-      case NONE:
-        return modeNoneUpdatePlan;
-
-      case VERSION:
-        return modeVersionUpdatePlan;
-
-      default:
-        throw new RuntimeException("Invalid mode " + request.getConcurrencyMode());
-    }
+    return getDynamicUpdatePlan(request);
   }
 
   private SpiUpdatePlan getDynamicUpdatePlan(PersistRequestBean<?> persistRequest) {

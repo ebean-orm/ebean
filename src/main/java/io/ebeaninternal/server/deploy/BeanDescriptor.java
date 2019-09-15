@@ -406,11 +406,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final String baseTableAlias;
 
-  /**
-   * If true then only changed properties get updated.
-   */
-  private final boolean updateChangesOnly;
-
   private final boolean cacheSharableBeans;
 
   private final String docStoreQueueId;
@@ -466,7 +461,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
     this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
-    this.updateChangesOnly = deploy.isUpdateChangesOnly();
     this.indexDefinitions = deploy.getIndexDefinitions();
 
     this.readAuditing = deploy.isReadAuditing();
@@ -1701,14 +1695,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public String getUpdateImportedIdSql(ImportedId prop) {
     return "update " + baseTable + " set " + prop.importedIdClause() + " where " + idBinder.getBindIdSql(null);
-  }
-
-  /**
-   * Return true if updates should only include changed properties. Otherwise
-   * all loaded properties are included in the update.
-   */
-  public boolean isUpdateChangesOnly() {
-    return updateChangesOnly;
   }
 
   /**

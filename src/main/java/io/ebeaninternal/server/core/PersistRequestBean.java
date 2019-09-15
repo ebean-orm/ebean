@@ -1052,16 +1052,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Return true if the update DML/SQL must be dynamically generated.
-   * <p>
-   * This is the case for updates/deletes of partially populated beans.
-   * </p>
-   */
-  public boolean isDynamicUpdateSql() {
-    return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();
-  }
-
-  /**
    * Return true if the property should be included in the update.
    */
   public boolean isAddToUpdate(BeanProperty prop) {

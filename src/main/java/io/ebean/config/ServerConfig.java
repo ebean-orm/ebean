@@ -351,11 +351,6 @@ public class ServerConfig {
   private DbConstraintNaming constraintNaming = new DbConstraintNaming();
 
   /**
-   * Behaviour of update to include on the change properties.
-   */
-  private boolean updateChangesOnly = true;
-
-  /**
    * Behaviour of updates in JDBC batch to by default include all properties.
    */
   private boolean updateAllPropertiesInBatch;
@@ -2410,20 +2405,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return true to only update changed properties.
-   */
-  public boolean isUpdateChangesOnly() {
-    return updateChangesOnly;
-  }
-
-  /**
-   * Set to true to only update changed properties.
-   */
-  public void setUpdateChangesOnly(boolean updateChangesOnly) {
-    this.updateChangesOnly = updateChangesOnly;
-  }
-
-  /**
    * Returns true if updates in JDBC batch default to include all properties by default.
    */
   public boolean isUpdateAllPropertiesInBatch() {
@@ -2966,7 +2947,6 @@ public class ServerConfig {
 
     skipCacheAfterWrite = p.getBoolean("skipCacheAfterWrite", skipCacheAfterWrite);
     updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);
-    updateChangesOnly = p.getBoolean("updateChangesOnly", updateChangesOnly);
 
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);

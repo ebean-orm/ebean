@@ -67,10 +67,8 @@ class MetaFactory {
     BindableId id = idFact.createId(desc);
     Bindable version = versionFact.create(desc);
     Bindable tenantId = versionFact.createTenantId(desc);
-
     BindableList setBindable = new BindableList(setList);
-
-    return new UpdateMeta(desc, setBindable, id, version, tenantId);
+    return new UpdateMeta(setBindable, id, version, tenantId);
   }
 
   /**

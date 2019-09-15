@@ -131,8 +131,6 @@ public class DeployBeanDescriptor<T> {
    */
   private ConcurrencyMode concurrencyMode;
 
-  private boolean updateChangesOnly;
-
   private List<IndexDefinition> indexDefinitions;
 
   private String storageEngine;
@@ -521,14 +519,6 @@ public class DeployBeanDescriptor<T> {
    */
   public void setConcurrencyMode(ConcurrencyMode concurrencyMode) {
     this.concurrencyMode = concurrencyMode;
-  }
-
-  public boolean isUpdateChangesOnly() {
-    return updateChangesOnly;
-  }
-
-  public void setUpdateChangesOnly(boolean updateChangesOnly) {
-    this.updateChangesOnly = updateChangesOnly;
   }
 
   /**
