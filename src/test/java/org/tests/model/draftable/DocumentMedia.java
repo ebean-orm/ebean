@@ -1,14 +1,11 @@
 package org.tests.model.draftable;
 
-import io.ebean.annotation.DraftableElement;
-
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 /**
  * 'Owned' by @Draftable root.
  */
-@DraftableElement
 @Entity
 public class DocumentMedia extends BaseDomain {
 

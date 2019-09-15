@@ -4,7 +4,6 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
-import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.config.EncryptKey;
@@ -185,11 +184,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private final Map<String, String> asOfTableMap = new HashMap<>();
 
-  /**
-   * Map of base tables to 'draft' tables.
-   */
-  private final Map<String, String> draftTableMap = new HashMap<>();
-
   private final int queryPlanTTLSeconds;
 
   // temporary collections used during startup and then cleared
@@ -346,13 +340,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   @Override
   public IdBinder createIdBinder(BeanProperty idProperty) {
     return idBinderFactory.createIdBinder(idProperty);
-  }
-
-  /**
-   * Return the map of base tables to draft tables.
-   */
-  public Map<String, String> getDraftTableMap() {
-    return draftTableMap;
   }
 
   /**
@@ -562,7 +549,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // we can initialise them which sorts out circular
     // dependencies for OneToMany and ManyToOne etc
 
-    BeanDescriptorInitContext initContext = new BeanDescriptorInitContext(asOfTableMap, draftTableMap, asOfViewSuffix);
+    BeanDescriptorInitContext initContext = new BeanDescriptorInitContext(asOfTableMap, asOfViewSuffix);
 
     // PASS 1:
     // initialise the ID properties of all the beans
@@ -1146,12 +1133,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(prop);
 
-    if (targetDesc.isDraftableElement()) {
-      // automatically turning on orphan removal and CascadeType.ALL
-      prop.setModifyListenMode(BeanCollection.ModifyListenMode.REMOVALS);
-      prop.getCascadeInfo().setSaveDelete(true, true);
-    }
-
     if (prop.hasOrderColumn()) {
       makeOrderColumn(prop);
     }
@@ -1224,9 +1205,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // get the bean descriptor that holds the mappedBy property
     String mappedBy = prop.getMappedBy();
     if (mappedBy == null) {
-      if (getTargetDescriptor(prop).isDraftable()) {
-        prop.setIntersectionDraftTable();
-      }
       return;
     }
 
@@ -1274,10 +1252,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     DeployTableJoin inverseJoin = new DeployTableJoin();
     mappedIntJoin.copyTo(inverseJoin, false, intTableName);
     prop.setInverseJoin(inverseJoin);
-
-    if (targetDesc.isDraftable()) {
-      prop.setIntersectionDraftTable();
-    }
   }
 
   private <T> void setBeanControllerFinderListener(DeployBeanDescriptor<T> descriptor) {
@@ -1401,8 +1375,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     if (IdType.IDENTITY == desc.getIdType()) {
       // used when getGeneratedKeys is not supported (SQL Server 2000, SAP Hana)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
-      String selectLastInsertedIdDraft = (!desc.isDraftable()) ? selectLastInsertedId : dbIdentity.getSelectLastInsertedId(desc.getDraftTable());
-      desc.setSelectLastInsertedId(selectLastInsertedId, selectLastInsertedIdDraft);
+      desc.setSelectLastInsertedId(selectLastInsertedId);
       return;
     }
 

@@ -29,11 +29,6 @@ final class BindableIdEmbedded implements BindableId {
   }
 
   @Override
-  public boolean isDraftOnly() {
-    return false;
-  }
-
-  @Override
   public boolean isEmpty() {
     return false;
   }

@@ -18,11 +18,6 @@ public final class Flags {
   public static final int RECURSE = 0x00000002;
 
   /**
-   * Indicates Publish mode.
-   */
-  public static final int PUBLISH = 0x00000004;
-
-  /**
    * Indicates Merge mode.
    */
   public static final int MERGE = 0x00000008;
@@ -37,9 +32,7 @@ public final class Flags {
    */
   public static final int ZERO = 0;
 
-  public static final int PUBLISH_RECURSE = PUBLISH + RECURSE;
-
-  private static final int PUBLISH_MERGE_NORMAL = PUBLISH + MERGE + NORMAL;
+  private static final int MERGE_NORMAL = MERGE + NORMAL;
 
   private static final int INSERT_NORMAL = INSERT + NORMAL;
 
@@ -58,24 +51,17 @@ public final class Flags {
   }
 
   /**
-   * Return true if part of a Publish.
-   */
-  public static boolean isPublish(int state) {
-    return isSet(state, PUBLISH);
-  }
-
-  /**
    * Return true if part of a Merge.
    */
   public static boolean isMerge(int state) {
-    return isSet(state, PUBLISH);
+    return isSet(state, MERGE);
   }
 
   /**
    * Return true if part of a Merge or Publish or Normal (bean state matches persist).
    */
-  public static boolean isPublishMergeOrNormal(int state) {
-    return (state & PUBLISH_MERGE_NORMAL) != 0;
+  public static boolean isMergeOrNormal(int state) {
+    return (state & MERGE_NORMAL) != 0;
   }
 
   /**
@@ -124,17 +110,6 @@ public final class Flags {
 
   public static int unsetRecurse(int state) {
     return unset(state, RECURSE);
-  }
-
-  /**
-   * Set Publish flag.
-   */
-  public static int setPublish(int state) {
-    return set(state, PUBLISH);
-  }
-
-  public static int unsetPublish(int state) {
-    return unset(state, PUBLISH);
   }
 
   /**

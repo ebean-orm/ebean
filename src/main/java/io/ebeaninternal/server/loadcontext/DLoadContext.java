@@ -41,7 +41,6 @@ public class DLoadContext implements LoadContext {
 
   private final DLoadBeanContext rootBeanContext;
 
-  private final boolean asDraft;
   private final Timestamp asOf;
   private final Boolean readOnly;
   private final CacheMode useBeanCache;
@@ -80,7 +79,6 @@ public class DLoadContext implements LoadContext {
     this.origin = initOrigin();
     this.defaultBatchSize = 100;
     this.useBeanCache = CacheMode.OFF;
-    this.asDraft = false;
     this.asOf = null;
     this.readOnly = false;
     this.disableLazyLoading = false;
@@ -109,7 +107,6 @@ public class DLoadContext implements LoadContext {
     SpiQuery<?> query = request.getQuery();
     this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
-    this.asDraft = query.isAsDraft();
     this.includeSoftDeletes = query.isIncludeSoftDeletes();
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
@@ -352,9 +349,6 @@ public class DLoadContext implements LoadContext {
     }
     query.setDisableLazyLoading(disableLazyLoading);
     query.asOf(asOf);
-    if (asDraft) {
-      query.asDraft();
-    }
     if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
     }

@@ -45,8 +45,6 @@ public class MColumn {
    */
   private AlterColumn alterColumn;
 
-  private boolean draftOnly;
-
   private List<DbMigrationInfo> dbMigrationInfos;
 
   public MColumn(Column column) {
@@ -90,7 +88,6 @@ public class MColumn {
   public MColumn copyForDraft() {
 
     MColumn copy = new MColumn(name, type);
-    copy.draftOnly = draftOnly;
     copy.checkConstraint = checkConstraint;
     copy.checkConstraintName = checkConstraintName;
     copy.defaultValue = defaultValue;
@@ -241,24 +238,10 @@ public class MColumn {
   }
 
   /**
-   * Set the draftOnly status for this column.
-   */
-  public void setDraftOnly(boolean draftOnly) {
-    this.draftOnly = draftOnly;
-  }
-
-  /**
-   * Return the draftOnly status for this column.
-   */
-  public boolean isDraftOnly() {
-    return draftOnly;
-  }
-
-  /**
    * Return true if this column should be included in History DB triggers etc.
    */
   public boolean isIncludeInHistory() {
-    return !draftOnly && !historyExclude;
+    return !historyExclude;
   }
 
   public Column createColumn() {

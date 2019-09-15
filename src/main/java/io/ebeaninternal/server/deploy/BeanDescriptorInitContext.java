@@ -5,19 +5,13 @@ import java.util.Map;
 class BeanDescriptorInitContext {
 
   private final Map<String, String> withHistoryTables;
-  private final Map<String, String> draftTables;
   private final String asOfViewSuffix;
 
   private String embeddedPrefix;
 
-  BeanDescriptorInitContext(Map<String, String> withHistoryTables, Map<String, String> draftTables, String asOfViewSuffix) {
+  BeanDescriptorInitContext(Map<String, String> withHistoryTables, String asOfViewSuffix) {
     this.withHistoryTables = withHistoryTables;
-    this.draftTables = draftTables;
     this.asOfViewSuffix = asOfViewSuffix;
-  }
-
-  void addDraft(String baseTable, String draftTable) {
-    draftTables.put(baseTable, draftTable);
   }
 
   void addHistory(String baseTable, String baseTableAsOf) {
@@ -26,10 +20,6 @@ class BeanDescriptorInitContext {
 
   void addHistoryIntersection(String intersectionTableName) {
     withHistoryTables.put(intersectionTableName, intersectionTableName + asOfViewSuffix);
-  }
-
-  void addDraftIntersection(String intersectionPublishTable, String intersectionDraftTable) {
-    draftTables.put(intersectionPublishTable, intersectionDraftTable);
   }
 
   public void setEmbeddedPrefix(String embeddedPrefix) {

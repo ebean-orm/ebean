@@ -47,8 +47,6 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   private ArrayList<BeanProperty> encryptedProps;
 
-  private final CQueryDraftSupport draftSupport;
-
   private final CQueryHistorySupport historySupport;
 
   private final boolean historyQuery;
@@ -58,13 +56,12 @@ class DefaultDbSqlContext implements DbSqlContext {
    */
   DefaultDbSqlContext(SqlTreeAlias alias, CQueryBuilder builder,
                       boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport,
-                      CQueryDraftSupport draftSupport, String fromForUpdate) {
+                      String fromForUpdate) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = builder.tableAliasPlaceHolder;
     this.columnAliasPrefix = builder.columnAliasPrefix;
     this.useColumnAlias = columnAliasPrefix != null && alwaysUseColumnAlias;
-    this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
     this.fromForUpdate = fromForUpdate;
@@ -130,12 +127,8 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     sb.append(" ").append(type);
     boolean addAsOfOnClause = false;
-    if (draftSupport != null) {
-      appendTable(table, draftSupport.getDraftTable(table));
-
-    } else if (!historyQuery) {
+    if (!historyQuery) {
       sb.append(" ").append(table).append(" ");
-
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
@@ -189,11 +182,6 @@ class DefaultDbSqlContext implements DbSqlContext {
     } else {
       sb.append(" ").append(table).append(" ");
     }
-  }
-
-  @Override
-  public boolean isDraftQuery() {
-    return draftSupport != null;
   }
 
   @Override

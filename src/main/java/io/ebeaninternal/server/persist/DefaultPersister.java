@@ -38,9 +38,7 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
@@ -60,8 +58,6 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
  * </p>
  */
 public final class DefaultPersister implements Persister {
-
-  private static final Logger PUB = LoggerFactory.getLogger("io.ebean.PUB");
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultPersister.class);
 
@@ -172,208 +168,6 @@ public final class DefaultPersister implements Persister {
   }
 
   /**
-   * Restore draft beans to match live beans given the query.
-   */
-  @Override
-  public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
-
-    Class<T> beanType = query.getBeanType();
-    BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
-
-    DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
-
-    List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
-    PUB.debug("draftRestore [{}] count[{}]", desc.getName(), liveBeans.size());
-    if (liveBeans.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    draftHandler.fetchDestinationBeans(liveBeans, true);
-
-    BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
-
-    for (T liveBean : liveBeans) {
-      T draftBean = draftHandler.publishToDestinationBean(liveBean);
-      // reset @DraftDirty and @DraftReset properties
-      draftHandler.resetDraft(draftBean);
-
-      PUB.trace("draftRestore bean [{}] id[{}]", desc.getName(), draftHandler.getId());
-      update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, Flags.RECURSE));
-    }
-
-    PUB.debug("draftRestore - complete for [{}]", desc.getName());
-    return draftHandler.getDrafts();
-  }
-
-  /**
-   * Helper method to return the list of Id values for the list of beans.
-   */
-  private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
-    List<Object> idList = new ArrayList<>(beans.size());
-    for (T liveBean : beans) {
-      idList.add(desc.getBeanId(liveBean));
-    }
-    return idList;
-  }
-
-  /**
-   * Publish from draft to live given the query.
-   */
-  @Override
-  public <T> List<T> publish(Query<T> query, Transaction transaction) {
-
-    Class<T> beanType = query.getBeanType();
-    BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
-
-    DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
-
-    List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
-    PUB.debug("publish [{}] count[{}]", desc.getName(), draftBeans.size());
-    if (draftBeans.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    draftHandler.fetchDestinationBeans(draftBeans, false);
-
-    BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
-
-    List<T> livePublish = new ArrayList<>(draftBeans.size());
-    for (T draftBean : draftBeans) {
-      T liveBean = draftHandler.publishToDestinationBean(draftBean);
-      livePublish.add(liveBean);
-
-      // reset @DraftDirty and @DraftReset properties
-      draftHandler.resetDraft(draftBean);
-
-      Type persistType = draftHandler.isInsert() ? Type.INSERT : Type.UPDATE;
-      PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftHandler.getId(), persistType);
-
-      PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, Flags.PUBLISH_RECURSE);
-      if (persistType == Type.INSERT) {
-        insert(request);
-      } else {
-        update(request);
-      }
-    }
-
-    draftHandler.updateDrafts(transaction, mgr);
-
-    PUB.debug("publish - complete for [{}]", desc.getName());
-    return livePublish;
-  }
-
-  /**
-   * Helper to handle draft beans (properties reset etc).
-   */
-  class DraftHandler<T> {
-
-    final BeanDescriptor<T> desc;
-    final Transaction transaction;
-    final List<T> draftUpdates = new ArrayList<>();
-
-    /**
-     * Id value of the last published bean.
-     */
-    Object id;
-
-    /**
-     * True if the last published bean is new/insert.
-     */
-    boolean insert;
-
-    /**
-     * The destination beans to publish/restore to mapped by id.
-     */
-    Map<?, T> destBeans;
-
-    DraftHandler(BeanDescriptor<T> desc, Transaction transaction) {
-      this.desc = desc;
-      this.transaction = transaction;
-    }
-
-    /**
-     * Return the list of draft beans with changes (to be persisted).
-     */
-    List<T> getDrafts() {
-      return draftUpdates;
-    }
-
-    /**
-     * Set the draft dirty state to false and reset any dirtyReset properties.
-     */
-    void resetDraft(T draftBean) {
-      if (desc.draftReset(draftBean)) {
-        // draft bean is dirty so collect it for persisting later
-        draftUpdates.add(draftBean);
-      }
-    }
-
-    /**
-     * Save all the draft beans (with various properties reset etc).
-     */
-    void updateDrafts(Transaction transaction, BeanManager<T> mgr) {
-      if (!draftUpdates.isEmpty()) {
-        // update the dirty status on the drafts that have been published
-        PUB.debug("publish - update dirty status on [{}] drafts", draftUpdates.size());
-        for (T draftUpdate : draftUpdates) {
-          update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, Flags.ZERO));
-        }
-      }
-    }
-
-    /**
-     * Fetch the source beans based on the query.
-     */
-    List<T> fetchSourceBeans(Query<T> query, boolean asDraft) {
-      desc.draftQueryOptimise(query);
-      if (asDraft) {
-        query.asDraft();
-      }
-      return server.findList(query, transaction);
-    }
-
-    /**
-     * Fetch the destination beans that will be published to.
-     */
-    void fetchDestinationBeans(List<T> sourceBeans, boolean asDraft) {
-
-      List<Object> ids = getBeanIds(desc, sourceBeans);
-
-      Query<T> destQuery = server.find(desc.getBeanType()).where().idIn(ids).query();
-      if (asDraft) {
-        destQuery.asDraft();
-      }
-      desc.draftQueryOptimise(destQuery);
-      this.destBeans = server.findMap(destQuery, transaction);
-    }
-
-    /**
-     * Publish/restore the values from the sourceBean to the matching destination bean.
-     */
-    T publishToDestinationBean(T sourceBean) {
-      id = desc.getBeanId(sourceBean);
-      T destBean = destBeans.get(id);
-      insert = (destBean == null);
-      // apply changes from liveBean to draftBean
-      return desc.publish(sourceBean, destBean);
-    }
-
-    /**
-     * Return true if the last publish resulted in an new bean to insert.
-     */
-    boolean isInsert() {
-      return insert;
-    }
-
-    /**
-     * Return the Id value of the last published/restored bean.
-     */
-    Object getId() {
-      return id;
-    }
-  }
-
-  /**
    * Recursively delete the bean. This calls back to the EbeanServer.
    */
   private int deleteRecurse(EntityBean detailBean, Transaction t, DeleteMode deleteMode) {
@@ -418,7 +212,6 @@ public final class DefaultPersister implements Persister {
 
     PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequest.Type.UPDATE);
     req.setDeleteMissingChildren(deleteMissingChildren);
-    req.checkDraft();
     try {
       req.initTransIfRequiredWithBatchCascade();
       if (req.isReference()) {
@@ -579,15 +372,7 @@ public final class DefaultPersister implements Persister {
 
     Type deleteType = permanent ? Type.DELETE_PERMANENT : Type.DELETE;
     PersistRequestBean<EntityBean> originalRequest = createDeleteRequest(bean, t, deleteType);
-    if (originalRequest.isHardDeleteDraft()) {
-      // a hard delete of a draftable bean so first we need to  delete the associated 'live' bean
-      // due to FK constraint and then after that execute the original delete of the draft bean
-      return deleteRequest(createDeleteRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, Flags.PUBLISH), originalRequest);
-
-    } else {
-      // normal delete or soft delete
-      return deleteRequest(originalRequest);
-    }
+    return deleteRequest(originalRequest);
   }
 
   /**
@@ -976,9 +761,9 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
+  void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean queue) {
 
-    SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
+    SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many);
     if (queue) {
       addToFlushQueue(sqlDelete, t, true);
     } else {
@@ -986,8 +771,8 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  private SpiSqlUpdate deleteAllIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, boolean publish) {
-    IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean, publish);
+  private SpiSqlUpdate deleteAllIntersection(EntityBean bean, BeanPropertyAssocMany<?> many) {
+    IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean);
     return intRow.createDeleteChildren(server);
   }
 
@@ -1037,7 +822,7 @@ public final class DefaultPersister implements Persister {
       if (many.hasJoinTable()) {
         if (deleteMode.isHard()) {
           // delete associated rows from intersection table (but not during soft delete)
-          deleteManyIntersection(parentBean, many, t, request.isPublish(), false);
+          deleteManyIntersection(parentBean, many, t, false);
         }
       } else {
 
@@ -1263,7 +1048,7 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = mgr.getBeanDescriptor();
     EntityBean entityBean = (EntityBean) bean;
     PersistRequest.Type type;
-    if (Flags.isPublishMergeOrNormal(flags)) {
+    if (Flags.isMergeOrNormal(flags)) {
       // just use bean state to determine insert or update
       type = entityBean._ebean_getIntercept().isUpdate() ? Type.UPDATE : Type.INSERT;
     } else {

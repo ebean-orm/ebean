@@ -51,18 +51,7 @@ public class MTable {
    */
   private final String name;
 
-  /**
-   * The associated draft table.
-   */
-  private MTable draftTable;
-
-  /**
-   * Marked true for draft tables. These need to have their FK references adjusted
-   * after all the draft tables have been identified.
-   */
-  private boolean draft;
-
-  private PartitionMeta partitionMeta;
+   private PartitionMeta partitionMeta;
 
   /**
    * Primary key name.
@@ -133,28 +122,6 @@ public class MTable {
   private List<String> droppedColumns = new ArrayList<>();
 
   /**
-   * Create a copy of this table structure as a 'draft' table.
-   * <p>
-   * Note that both tables contain @DraftOnly MColumns and these are filtered out
-   * later when creating the CreateTable object.
-   */
-  public MTable createDraftTable() {
-
-    draftTable = new MTable(name + "_draft");
-    draftTable.draft = true;
-    draftTable.whenCreatedColumn = whenCreatedColumn;
-    // compoundKeys
-    // compoundUniqueConstraints
-    draftTable.identityType = identityType;
-
-    for (MColumn col : allColumns()) {
-      draftTable.addColumn(col.copyForDraft());
-    }
-
-    return draftTable;
-  }
-
-  /**
    * Construct for migration.
    */
   public MTable(CreateTable createTable) {
@@ -165,7 +132,6 @@ public class MTable {
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
     this.withHistory = Boolean.TRUE.equals(createTable.isWithHistory());
-    this.draft = Boolean.TRUE.equals(createTable.isDraft());
     this.sequenceName = createTable.getSequenceName();
     this.sequenceInitial = toInt(createTable.getSequenceInitial());
     this.sequenceAllocate = toInt(createTable.getSequenceAllocate());
@@ -257,15 +223,9 @@ public class MTable {
     if (withHistory) {
       createTable.setWithHistory(Boolean.TRUE);
     }
-    if (draft) {
-      createTable.setDraft(Boolean.TRUE);
-    }
 
     for (MColumn column : allColumns()) {
-      // filter out draftOnly columns from the base table
-      if (draft || !column.isDraftOnly()) {
-        createTable.getColumn().add(column.createColumn());
-      }
+      createTable.getColumn().add(column.createColumn());
     }
 
     for (MCompoundForeignKey compoundKey : compoundKeys) {
@@ -325,10 +285,7 @@ public class MTable {
     for (MColumn newColumn : newColumnMap.values()) {
       MColumn localColumn = getColumn(newColumn.getName());
       if (localColumn == null) {
-        // can ignore if draftOnly column and non-draft table
-        if (!newColumn.isDraftOnly() || draft) {
-          diffNewColumn(newColumn);
-        }
+        diffNewColumn(newColumn);
       } else {
         localColumn.compare(modelDiff, this, newColumn);
       }
@@ -338,10 +295,6 @@ public class MTable {
     for (MColumn existingColumn : allColumns()) {
       MColumn newColumn = newColumnMap.get(existingColumn.getName());
       if (newColumn == null) {
-        diffDropColumn(modelDiff, existingColumn);
-      } else if (newColumn.isDraftOnly() && !draft) {
-        // effectively a drop column (draft only column on a non-draft table)
-        logger.trace("... drop column {} from table {} as now draftOnly", newColumn.getName(), name);
         diffDropColumn(modelDiff, existingColumn);
       }
     }
@@ -421,13 +374,6 @@ public class MTable {
 
   public String getName() {
     return name;
-  }
-
-  /**
-   * Return true if this table is a 'Draft' table.
-   */
-  public boolean isDraft() {
-    return draft;
   }
 
   /**
@@ -715,43 +661,6 @@ public class MTable {
       }
     }
     return false;
-  }
-
-  /**
-   * Adjust the references (FK) if it should relate to a draft table.
-   */
-  public void adjustReferences(ModelContainer modelContainer) {
-
-    Collection<MColumn> cols = allColumns();
-    for (MColumn col : cols) {
-      String references = col.getReferences();
-      if (references != null) {
-        String baseTable = extractBaseTable(references);
-        MTable refBaseTable = modelContainer.getTable(baseTable);
-        if (refBaseTable.draftTable != null) {
-          // change references to another associated 'draft' table
-          String newReferences = deriveReferences(references, refBaseTable.draftTable.getName());
-          col.setReferences(newReferences);
-        }
-      }
-    }
-  }
-
-  /**
-   * Return the base table name from references (table.column).
-   */
-  private String extractBaseTable(String references) {
-    int lastDot = references.lastIndexOf('.');
-    return references.substring(0, lastDot);
-  }
-
-  /**
-   * Return the new references using the given draftTableName.
-   * (The referenced column is the same as before).
-   */
-  private String deriveReferences(String references, String draftTableName) {
-    int lastDot = references.lastIndexOf('.');
-    return draftTableName + "." + references.substring(lastDot + 1);
   }
 
   /**

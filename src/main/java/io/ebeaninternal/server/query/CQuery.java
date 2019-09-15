@@ -250,11 +250,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   @Override
-  public boolean isDraftQuery() {
-    return query.isAsDraft();
-  }
-
-  @Override
   public boolean isDisableLazyLoading() {
     return disableLazyLoading;
   }

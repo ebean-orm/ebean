@@ -218,11 +218,6 @@ public class DeployBeanProperty {
 
   private boolean tenantId;
 
-  private boolean draft;
-  private boolean draftOnly;
-  private boolean draftDirty;
-  private boolean draftReset;
-
   private boolean softDelete;
   private boolean unmappedJson;
 
@@ -978,41 +973,6 @@ public class DeployBeanProperty {
 
   public void setExcludedFromHistory() {
     this.excludedFromHistory = true;
-  }
-
-  public void setDraft() {
-    this.draft = true;
-    this.isTransient = true;
-  }
-
-  public boolean isDraft() {
-    return draft;
-  }
-
-  public void setDraftOnly() {
-    this.draftOnly = true;
-  }
-
-  public boolean isDraftOnly() {
-    return draftOnly;
-  }
-
-  public void setDraftDirty() {
-    this.draftOnly = true;
-    this.draftDirty = true;
-    this.nullable = false;
-  }
-
-  public boolean isDraftDirty() {
-    return draftDirty;
-  }
-
-  public void setDraftReset() {
-    this.draftReset = true;
-  }
-
-  public boolean isDraftReset() {
-    return draftReset;
   }
 
   /**

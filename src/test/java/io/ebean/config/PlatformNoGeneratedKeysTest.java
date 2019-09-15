@@ -9,7 +9,6 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import org.junit.Test;
 import org.tests.model.basic.EBasicVer;
-import org.tests.model.draftable.BasicDraftableBean;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
@@ -57,28 +56,6 @@ public class PlatformNoGeneratedKeysTest {
 
   }
 
-  @Test
-  public void insertNoBatch_expect_selectIdentity() {
-
-    EBasicVer b0 = new EBasicVer("one");
-    server.save(b0);
-
-    assertThat(b0.getId()).isNotNull();
-
-
-    BasicDraftableBean d0 = new BasicDraftableBean("done");
-    server.save(d0);
-
-    assertThat(d0.getId()).isNotNull();
-
-    server.publish(BasicDraftableBean.class, d0.getId());
-
-    BasicDraftableBean one = server.find(BasicDraftableBean.class, d0.getId());
-
-    assertThat(one.getName()).isEqualTo("done");
-    assertThat(one.isDraft()).isFalse();
-  }
-
   private static EbeanServer testH2Server() {
 
     ServerConfig config = new ServerConfig();
@@ -105,8 +82,6 @@ public class PlatformNoGeneratedKeysTest {
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.getClasses().add(EBasicVer.class);
-    config.getClasses().add(BasicDraftableBean.class);
-
 
     return EbeanServerFactory.create(config);
   }

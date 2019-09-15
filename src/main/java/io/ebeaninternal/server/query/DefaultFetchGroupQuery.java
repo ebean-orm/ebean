@@ -152,11 +152,6 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   }
 
   @Override
-  public Query<T> asDraft() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }

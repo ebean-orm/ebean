@@ -115,8 +115,7 @@ public final class SqlTreeBuilder {
 
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.getHistorySupport(query);
-    CQueryDraftSupport draftSupport = builder.getDraftSupport(query);
-    this.ctx = new DefaultDbSqlContext(alias, builder, !subQuery, historySupport, draftSupport, fromForUpdate);
+    this.ctx = new DefaultDbSqlContext(alias, builder, !subQuery, historySupport, fromForUpdate);
   }
 
   /**

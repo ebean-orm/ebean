@@ -3,7 +3,6 @@ package io.ebeaninternal.dbmigration.model.build;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
-import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
@@ -13,8 +12,6 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 import io.ebeaninternal.server.type.ScalarType;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,14 +38,6 @@ public class ModelBuildContext {
     this.constraintNaming = naming;
     this.maxLength = maxLength;
     this.platformTypes = platformTypes;
-  }
-
-  /**
-   * Adjust the foreign key references on any draft tables (that reference other draft tables).
-   * This is called as a 'second pass' after all the draft tables have been identified.
-   */
-  public void adjustDraftReferences() {
-    model.adjustDraftReferences();
   }
 
   public String normaliseTable(String baseTable) {
@@ -148,51 +137,6 @@ public class ModelBuildContext {
   }
 
   /**
-   * Create the draft table for a given table.
-   */
-  public void createDraft(MTable table, boolean draftable) {
-
-    MTable draftTable = table.createDraftTable();
-    draftTable.setPkName(primaryKeyName(draftTable.getName()));
-
-    if (draftable) {
-      // Add a FK from @Draftable live table back to it's draft table)
-      List<MColumn> pkCols = table.primaryKeyColumns();
-      if (pkCols.size() == 1) {
-        // only doing this for single column PK at this stage
-        MColumn pk = pkCols.get(0);
-        pk.setReferences(draftTable.getName() + "." + pk.getName());
-        pk.setForeignKeyName(foreignKeyConstraintName(table.getName(), pk.getName(), 0));
-      }
-    }
-
-    int fkCount = 0;
-    int ixCount = 0;
-    int uqCount = 0;
-    Collection<MColumn> cols = draftTable.allColumns();
-    for (MColumn col : cols) {
-      if (col.getForeignKeyName() != null) {
-        // Note that we adjust the 'references' table later in a second pass
-        // after we know all the tables that are 'draftable'
-        //col.setReferences(refTable + "." + refColumn);
-        col.setForeignKeyName(foreignKeyConstraintName(draftTable.getName(), col.getName(), ++fkCount));
-
-        String[] indexCols = {col.getName()};
-        col.setForeignKeyIndex(foreignKeyIndexName(draftTable.getName(), indexCols, ++ixCount));
-      }
-      // adjust the unique constraint names
-      if (col.getUnique() != null) {
-        col.setUnique(uniqueConstraintName(draftTable.getName(), col.getName(), ++uqCount));
-      }
-      if (col.getUniqueOneToOne() != null) {
-        col.setUniqueOneToOne(uniqueConstraintName(draftTable.getName(), col.getName(), ++uqCount));
-      }
-    }
-
-    addTable(draftTable);
-  }
-
-  /**
    * Return a builder to add foreign keys.
    */
   public FkeyBuilder fkeyBuilder(MTable destTable) {
@@ -218,7 +162,7 @@ public class ModelBuildContext {
     /**
      * Add a foreign key based on the table join.
      */
-    public FkeyBuilder addForeignKey(BeanDescriptor<?> desc, TableJoin tableJoin, boolean direction) {
+    FkeyBuilder addForeignKey(BeanDescriptor<?> desc, TableJoin tableJoin, boolean direction) {
 
       String baseTable = ctx.normaliseTable(desc.getBaseTable());
       String fkName = ctx.foreignKeyConstraintName(tableName, baseTable, count.incrementAndGet());

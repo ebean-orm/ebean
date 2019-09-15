@@ -54,13 +54,13 @@ public class CQueryEngine {
 
   private final DatabasePlatform dbPlatform;
 
-  public CQueryEngine(ServerConfig serverConfig, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+  public CQueryEngine(ServerConfig serverConfig, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = serverConfig.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = serverConfig.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, serverConfig.getAsOfSysPeriod());
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
+    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport);
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
@@ -500,9 +500,6 @@ public class CQueryEngine {
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
-    if (query.isAsDraft()) {
-      msg.append(" draft[true] ");
-    }
     if (originKey != null) {
       msg.append("origin[").append(originKey).append("] ");
     }
@@ -545,9 +542,6 @@ public class CQueryEngine {
     msg.append("type[").append(q.getBeanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
-    }
-    if (query.isAsDraft()) {
-      msg.append(" draft[true] ");
     }
     if (originKey != null) {
       msg.append("origin[").append(originKey).append("] ");

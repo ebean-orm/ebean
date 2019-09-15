@@ -295,11 +295,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> asDraft() {
-    return query.asDraft();
-  }
-
-  @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return query.asDto(dtoClass);
   }

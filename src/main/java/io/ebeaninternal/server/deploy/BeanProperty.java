@@ -255,14 +255,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   private final boolean unmappedJson;
   private final boolean tenantId;
 
-  private final boolean draft;
-
-  private final boolean draftOnly;
-
-  private final boolean draftDirty;
-
-  private final boolean draftReset;
-
   private final boolean softDelete;
 
   private final String softDeleteDbSet;
@@ -292,10 +284,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.excludedFromHistory = deploy.isExcludedFromHistory();
     this.unmappedJson = deploy.isUnmappedJson();
     this.tenantId = deploy.isTenantId();
-    this.draft = deploy.isDraft();
-    this.draftDirty = deploy.isDraftDirty();
-    this.draftOnly = deploy.isDraftOnly();
-    this.draftReset = deploy.isDraftReset();
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
       this.secondaryTableJoin = new TableJoin(deploy.getSecondaryTableJoin());
@@ -393,10 +381,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
     this.excludedFromHistory = source.excludedFromHistory;
     this.tenantId = source.tenantId;
-    this.draft = source.draft;
-    this.draftDirty = source.draftDirty;
-    this.draftOnly = source.draftOnly;
-    this.draftReset = source.draftReset;
     this.softDelete = source.softDelete;
     this.softDeleteDbSet = source.softDeleteDbSet;
     this.softDeleteDbPredicate = source.softDeleteDbPredicate;
@@ -593,7 +577,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
-    } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
+    } else if (!isTransient) {
 
       if (secondaryTableJoin != null) {
         ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
@@ -712,18 +696,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public boolean isLocal() {
     return local;
-  }
-
-  /**
-   * Copy/set the property value from the draft bean to the live bean.
-   */
-  public void publish(EntityBean draftBean, EntityBean liveBean) {
-
-    if (!version && !draftOnly) {
-      // set property value from draft to live
-      Object value = getValueIntercept(draftBean);
-      setValueIntercept(liveBean, value);
-    }
   }
 
   /**
@@ -1191,16 +1163,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return true if this property is loadable from a resultSet.
    */
-  public boolean isLoadProperty(boolean draftQuery) {
-    return !ignoreDraftOnlyProperty(draftQuery) && (!isTransient || formula);
-  }
-
-  /**
-   * Return true if this is a draftOnly property on a non-asDraft query and as such this
-   * property should not be included in a sql query.
-   */
-  private boolean ignoreDraftOnlyProperty(boolean draftQuery) {
-    return draftOnly && !draftQuery;
+  public boolean isLoadProperty() {
+    return (!isTransient || formula);
   }
 
   /**
@@ -1328,36 +1292,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public boolean isTenantId() {
     return tenantId;
-  }
-
-  /**
-   * Return true if this property only exists on the draft table.
-   */
-  public boolean isDraftOnly() {
-    return draftOnly;
-  }
-
-  /**
-   * Return true if this property is a boolean flag on a draftable bean
-   * indicating if the instance is a draft or live bean.
-   */
-  public boolean isDraft() {
-    return draft;
-  }
-
-  /**
-   * Return true if this property is a boolean flag only on the draft table
-   * indicating that when the draft is different from the published row.
-   */
-  public boolean isDraftDirty() {
-    return draftDirty;
-  }
-
-  /**
-   * Return true if this property is reset/cleared on publish (on the draft bean).
-   */
-  boolean isDraftReset() {
-    return draftReset;
   }
 
   /**

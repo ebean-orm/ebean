@@ -216,13 +216,11 @@ class DefaultBeanLoader {
       ebi.setPersistenceContext(pc);
     }
 
-    boolean draft = desc.isDraftInstance(bean);
-
     if (embeddedOwnerIndex == -1) {
       if (desc.lazyLoadMany(ebi)) {
         return;
       }
-      if (!draft && Mode.LAZYLOAD_BEAN == mode && desc.isBeanCaching()) {
+      if (Mode.LAZYLOAD_BEAN == mode && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active
         if (desc.cacheBeanLoad(bean, ebi, id, pc)) {
           return;
@@ -232,10 +230,6 @@ class DefaultBeanLoader {
 
     SpiQuery<?> query = server.createQuery(desc.getBeanType());
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
-    if (draft) {
-      query.asDraft();
-    }
-
     if (embeddedOwnerIndex > -1) {
       query.select(ebi.getProperty(embeddedOwnerIndex));
     }

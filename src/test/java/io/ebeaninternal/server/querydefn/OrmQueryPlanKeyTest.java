@@ -207,9 +207,6 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   public void equals_when_diffTemporalMode() {
 
     CQueryPlanKey key1 = query().createQueryPlanKey();
-    CQueryPlanKey key2 = query().asDraft().createQueryPlanKey();
-    assertDifferent(key1, key2);
-
     CQueryPlanKey key3 = query().asOf(new Timestamp(System.currentTimeMillis())).createQueryPlanKey();
     assertDifferent(key1, key3);
 

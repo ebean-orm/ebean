@@ -104,22 +104,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
     }
 
-    addDraftTable();
-
     table.updateCompoundIndices();
   }
-
-  /**
-   * Create a 'draft' table that is mostly the same as the base table.
-   * It has @DraftOnly columns and adjusted primary and foreign keys.
-   */
-  private void addDraftTable() {
-    if (beanDescriptor.isDraftable() || beanDescriptor.isDraftableElement()) {
-      // create a 'Draft' table which looks very similar (change PK, FK etc)
-      ctx.createDraft(table, !beanDescriptor.isDraftableElement());
-    }
-  }
-
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
@@ -245,7 +231,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     // "logical" type like jsonb(200) that can map to JSONB or VARCHAR(200)
     MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p, false));
     col.setComment(p.getDbComment());
-    col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
 
     if (p.isId()) {

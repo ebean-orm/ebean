@@ -14,11 +14,6 @@ public class BindableIdEmpty implements BindableId {
   }
 
   @Override
-  public boolean isDraftOnly() {
-    return false;
-  }
-
-  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     // nothing
   }

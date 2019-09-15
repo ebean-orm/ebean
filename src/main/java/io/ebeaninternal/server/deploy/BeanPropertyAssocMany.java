@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +47,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   private final TableJoin intersectionJoin;
   private final String intersectionPublishTable;
-  private final String intersectionDraftTable;
 
   private IntersectionTable intersectionTable;
 
@@ -134,10 +132,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     this.intersectionJoin = deploy.createIntersectionTableJoin();
     if (intersectionJoin != null) {
       this.intersectionPublishTable = intersectionJoin.getTable();
-      this.intersectionDraftTable = deploy.getIntersectionDraftTable();
     } else {
       this.intersectionPublishTable = null;
-      this.intersectionDraftTable = null;
     }
     this.inverseJoin = deploy.createInverseTableJoin();
     this.modifyListenMode = deploy.getModifyListenMode();
@@ -381,7 +377,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   private IntersectionTable initIntersectionTable() {
 
-    IntersectionBuilder row = new IntersectionBuilder(intersectionPublishTable, intersectionDraftTable);
+    IntersectionBuilder row = new IntersectionBuilder(intersectionPublishTable);
     for (ExportedProperty exportedProperty : exportedProperties) {
       row.addColumn(exportedProperty.getForeignDbColumn());
     }
@@ -442,7 +438,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     StringBuilder sb = new StringBuilder(50);
     SpiQuery<?> query = request.getQueryRequest().getQuery();
     if (hasJoinTable()) {
-      sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
+      sb.append(intersectionPublishTable);
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
@@ -767,37 +763,19 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return row;
   }
 
-  public IntersectionRow buildManyToManyDeleteChildren(EntityBean parentBean, boolean publish) {
+  public IntersectionRow buildManyToManyDeleteChildren(EntityBean parentBean) {
 
-    String tableName = publish ? intersectionPublishTable : intersectionDraftTable;
-    IntersectionRow row = new IntersectionRow(tableName);
+    IntersectionRow row = new IntersectionRow(intersectionPublishTable);
     buildExport(row, parentBean);
     return row;
   }
 
-  public IntersectionRow buildManyToManyMapBean(EntityBean parent, EntityBean other, boolean publish) {
+  public IntersectionRow buildManyToManyMapBean(EntityBean parent, EntityBean other) {
 
-    String tableName = publish ? intersectionPublishTable : intersectionDraftTable;
-    IntersectionRow row = new IntersectionRow(tableName);
+    IntersectionRow row = new IntersectionRow(intersectionPublishTable);
     buildExport(row, parent);
     buildImport(row, other);
     return row;
-  }
-
-  /**
-   * Register the mapping of intersection table to associated draft table.
-   */
-  void registerDraftIntersectionTable(BeanDescriptorInitContext initContext) {
-    if (hasDraftIntersection()) {
-      initContext.addDraftIntersection(intersectionPublishTable, intersectionDraftTable);
-    }
-  }
-
-  /**
-   * Return true if the relationship is a ManyToMany with the intersection having an associated draft table.
-   */
-  private boolean hasDraftIntersection() {
-    return intersectionDraftTable != null && !intersectionDraftTable.equals(intersectionPublishTable);
   }
 
   /**
@@ -885,60 +863,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     jsonHelp.jsonRead(readJson, parentBean);
-  }
-
-  @SuppressWarnings("unchecked")
-  void publishMany(EntityBean draft, EntityBean live) {
-
-    // collections will not be null due to enhancement
-    BeanCollection<T> draftVal = (BeanCollection<T>) getValueIntercept(draft);
-    BeanCollection<T> liveVal = (BeanCollection<T>) getValueIntercept(live);
-
-    // Organise the existing live beans into map keyed by id
-    Map<Object, T> liveBeansAsMap = liveBeansAsMap(liveVal);
-
-    // publish from each draft to live bean creating new live beans as required
-    draftVal.size();
-    Collection<T> actualDetails = draftVal.getActualDetails();
-    for (T bean : actualDetails) {
-      Object id = targetDescriptor.getId((EntityBean) bean);
-      T liveBean = liveBeansAsMap.remove(id);
-
-      if (isManyToMany()) {
-        if (liveBean == null) {
-          // add new relationship (Map not allowed here)
-          liveVal.addBean(targetDescriptor.createReference(id, null));
-        }
-
-      } else {
-        // recursively publish the OneToMany child bean
-        T newLive = targetDescriptor.publish(bean, liveBean);
-        if (liveBean == null) {
-          // Map not allowed here
-          liveVal.addBean(newLive);
-        }
-      }
-    }
-
-    // anything remaining should be deleted (so remove from modify aware collection)
-    Collection<T> values = liveBeansAsMap.values();
-    for (T value : values) {
-      liveVal.removeBean(value);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private Map<Object, T> liveBeansAsMap(BeanCollection<?> liveVal) {
-
-    liveVal.size();
-    Collection<?> liveBeans = liveVal.getActualDetails();
-    Map<Object, T> liveMap = new LinkedHashMap<>();
-
-    for (Object liveBean : liveBeans) {
-      Object id = targetDescriptor.getId((EntityBean) liveBean);
-      liveMap.put(id, (T) liveBean);
-    }
-    return liveMap;
   }
 
   public boolean isIncludeCascadeSave() {

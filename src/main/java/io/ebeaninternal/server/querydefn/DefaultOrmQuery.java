@@ -466,13 +466,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> asDraft() {
-    this.temporalMode = TemporalMode.DRAFT;
-    this.useBeanCache = CacheMode.OFF;
-    return this;
-  }
-
-  @Override
   public DefaultOrmQuery<T> setIncludeSoftDeletes() {
     this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
@@ -1043,11 +1036,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isAsOfQuery() {
     return asOf != null;
-  }
-
-  @Override
-  public boolean isAsDraft() {
-    return TemporalMode.DRAFT == temporalMode;
   }
 
   @Override

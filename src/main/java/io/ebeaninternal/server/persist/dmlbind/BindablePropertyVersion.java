@@ -25,11 +25,6 @@ public class BindablePropertyVersion implements Bindable {
   }
 
   @Override
-  public boolean isDraftOnly() {
-    return prop.isDraftOnly();
-  }
-
-  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(prop)) {
       list.add(this);

@@ -20,26 +20,8 @@ public class BindableList implements Bindable {
     items = list.toArray(new Bindable[0]);
   }
 
-  /**
-   * Return a bindable list that excludes @DraftOnly properties.
-   */
-  public BindableList excludeDraftOnly() {
-    List<Bindable> copy = new ArrayList<>(items.length);
-    for (Bindable b : items) {
-      if (!b.isDraftOnly()) {
-        copy.add(b);
-      }
-    }
-    return new BindableList(copy);
-  }
-
   public boolean isEmpty() {
     return items.length == 0;
-  }
-
-  @Override
-  public boolean isDraftOnly() {
-    return false;
   }
 
   public void addAll(List<Bindable> list) {

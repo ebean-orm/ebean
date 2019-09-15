@@ -196,12 +196,11 @@ public class InternalConfiguration {
     this.dtoBeanManager = new DtoBeanManager(typeManager, xmlRead.readDtoMapping());
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlRead.xmlDeployment());
-    Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
 
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
-    this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
+    this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping);
   }
 
   private SpiLogManager initLogManager() {

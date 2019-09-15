@@ -87,7 +87,7 @@ public class InsertHandler extends DmlHandler {
     SpiTransaction t = persistRequest.getTransaction();
 
     // get the appropriate sql
-    sql = meta.getSql(withId, persistRequest.isPublish());
+    sql = meta.getSql(withId);
 
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
@@ -96,7 +96,7 @@ public class InsertHandler extends DmlHandler {
       pstmt = getPstmt(t, sql, useGeneratedKeys);
     }
     dataBind = bind(pstmt);
-    meta.bind(this, bean, withId, persistRequest.isPublish());
+    meta.bind(this, bean, withId);
     if (persistRequest.isBatched()) {
       batchedPstmt.registerInputStreams(dataBind.getInputStreams());
     }

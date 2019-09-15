@@ -9,13 +9,11 @@ import java.util.List;
 public class IntersectionBuilder {
 
   private final String publishTable;
-  private final String draftTable;
 
   private final List<String> columns = new ArrayList<>();
 
-  IntersectionBuilder(String publishTable, String draftTable) {
+  IntersectionBuilder(String publishTable) {
     this.publishTable = publishTable;
-    this.draftTable = draftTable;
   }
 
   public void addColumn(String column) {
@@ -26,18 +24,7 @@ public class IntersectionBuilder {
 
     String insertSql = insertSql(publishTable);
     String deleteSql = deleteSql(publishTable);
-
-    String draftInsertSql;
-    String draftDeleteSql;
-    if (publishTable.equals(draftTable)) {
-      draftInsertSql = insertSql;
-      draftDeleteSql = deleteSql;
-    } else {
-      draftInsertSql = insertSql(draftTable);
-      draftDeleteSql = deleteSql(draftTable);
-    }
-
-    return new IntersectionTable(insertSql, deleteSql, draftInsertSql, draftDeleteSql);
+    return new IntersectionTable(insertSql, deleteSql);
   }
 
   private String insertSql(String tableName) {

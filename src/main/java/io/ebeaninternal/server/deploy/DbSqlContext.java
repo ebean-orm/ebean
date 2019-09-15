@@ -119,11 +119,6 @@ public interface DbSqlContext {
   boolean isIncludeSoftDelete();
 
   /**
-   * Return true if the query is a 'asDraft' query.
-   */
-  boolean isDraftQuery();
-
-  /**
    * Start group by clause.
    */
   void startGroupBy();

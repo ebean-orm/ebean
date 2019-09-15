@@ -4,8 +4,6 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbPartition;
 import io.ebean.annotation.DocStore;
-import io.ebean.annotation.Draftable;
-import io.ebean.annotation.DraftableElement;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
@@ -162,16 +160,6 @@ public class AnnotationClass extends AnnotationParser {
     DbPartition partition = findAnnotationRecursive(cls, DbPartition.class);
     if (partition != null) {
       descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
-    }
-
-    Draftable draftable = findAnnotationRecursive(cls, Draftable.class);
-    if (draftable != null) {
-      descriptor.setDraftable();
-    }
-
-    DraftableElement draftableElement = findAnnotationRecursive(cls, DraftableElement.class);
-    if (draftableElement != null) {
-      descriptor.setDraftableElement();
     }
 
     ReadAudit readAudit = findAnnotationRecursive(cls, ReadAudit.class);

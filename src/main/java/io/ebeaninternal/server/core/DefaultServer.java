@@ -98,11 +98,11 @@ import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.CallableQueryCount;
 import io.ebeaninternal.server.query.CallableQueryIds;
 import io.ebeaninternal.server.query.CallableQueryList;
+import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.query.LimitOffsetPagedList;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
 import io.ebeaninternal.server.query.QueryFutureRowCount;
-import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.querydefn.DefaultDtoQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmUpdate;
@@ -1821,54 +1821,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
       return 0;
     }, transaction);
-  }
-
-  @Override
-  public <T> List<T> publish(Query<T> query, Transaction transaction) {
-
-    return executeInTrans((txn) -> persister.publish(query, txn), transaction);
-  }
-
-  @Override
-  public <T> T publish(Class<T> beanType, Object id) {
-    return publish(beanType, id, null);
-  }
-
-  @Override
-  public <T> List<T> publish(Query<T> query) {
-    return publish(query, null);
-  }
-
-  @Override
-  public <T> T publish(Class<T> beanType, Object id, Transaction transaction) {
-
-    Query<T> query = find(beanType).setId(id);
-    List<T> liveBeans = publish(query, transaction);
-    return (liveBeans.size() == 1) ? liveBeans.get(0) : null;
-  }
-
-  @Override
-  public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
-
-    return executeInTrans((txn) -> persister.draftRestore(query, txn), transaction);
-  }
-
-  @Override
-  public <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction) {
-
-    Query<T> query = find(beanType).setId(id);
-    List<T> beans = draftRestore(query, transaction);
-    return (beans.size() == 1) ? beans.get(0) : null;
-  }
-
-  @Override
-  public <T> T draftRestore(Class<T> beanType, Object id) {
-    return draftRestore(beanType, id, null);
-  }
-
-  @Override
-  public <T> List<T> draftRestore(Query<T> query) {
-    return draftRestore(query, null);
   }
 
   private EntityBean checkEntityBean(Object bean) {

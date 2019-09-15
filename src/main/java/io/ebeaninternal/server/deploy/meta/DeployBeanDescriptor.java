@@ -124,7 +124,6 @@ public class DeployBeanDescriptor<T> {
    * Used with Identity columns but no getGeneratedKeys support.
    */
   private String selectLastInsertedId;
-  private String selectLastInsertedIdDraft;
 
   /**
    * The concurrency mode for beans of this type.
@@ -144,17 +143,11 @@ public class DeployBeanDescriptor<T> {
 
   private String baseTableVersionsBetween;
 
-  private String draftTable;
-
   private String[] dependentTables;
 
   private boolean historySupport;
 
   private boolean readAuditing;
-
-  private boolean draftable;
-
-  private boolean draftableElement;
 
   private TableName baseTableFull;
 
@@ -318,23 +311,6 @@ public class DeployBeanDescriptor<T> {
       }
     }
     return partitionMeta;
-  }
-
-  public void setDraftable() {
-    draftable = true;
-  }
-
-  public boolean isDraftable() {
-    return draftable;
-  }
-
-  public void setDraftableElement() {
-    draftable = true;
-    draftableElement = true;
-  }
-
-  public boolean isDraftableElement() {
-    return draftableElement;
   }
 
   /**
@@ -639,10 +615,6 @@ public class DeployBeanDescriptor<T> {
     postConstructListeners.add(postConstructListener);
   }
 
-  public String getDraftTable() {
-    return draftTable;
-  }
-
   /**
    * For view based entity return the dependant tables.
    */
@@ -710,7 +682,6 @@ public class DeployBeanDescriptor<T> {
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
     this.baseTableAsOf = baseTable + asOfSuffix;
     this.baseTableVersionsBetween = baseTable + versionsBetweenSuffix;
-    this.draftTable = (draftable) ? baseTable + "_draft" : baseTable;
   }
 
   public void sortProperties() {
@@ -828,16 +799,11 @@ public class DeployBeanDescriptor<T> {
     return selectLastInsertedId;
   }
 
-  public String getSelectLastInsertedIdDraft() {
-    return selectLastInsertedIdDraft;
-  }
-
   /**
    * Set the SQL used to return the last inserted Id.
    */
-  public void setSelectLastInsertedId(String selectLastInsertedId, String selectLastInsertedIdDraft) {
+  public void setSelectLastInsertedId(String selectLastInsertedId) {
     this.selectLastInsertedId = selectLastInsertedId;
-    this.selectLastInsertedIdDraft = selectLastInsertedIdDraft;
   }
 
   /**

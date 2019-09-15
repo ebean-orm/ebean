@@ -32,9 +32,8 @@ public class TestTransactionTryResources extends BaseTestCase {
       transaction.commit();
     }
 
-    Document document = Document.find.asDraft(doc.getId());
+    Document document = Document.find.byId(doc.getId());
     assertThat(document).isNotNull();
-    assertThat(document.isDraft()).isTrue();
 
     // cleanup
     Ebean.delete(document);
@@ -69,7 +68,6 @@ public class TestTransactionTryResources extends BaseTestCase {
 
       List<Document> docs = Document.find.query()
         .where().startsWith("body", "tryWithResources_catch")
-        .asDraft()
         .findList();
 
       assertThat(docs).hasSize(1);

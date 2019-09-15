@@ -13,10 +13,6 @@ import io.ebean.annotation.DocCode;
 import io.ebean.annotation.DocEmbedded;
 import io.ebean.annotation.DocProperty;
 import io.ebean.annotation.DocSortable;
-import io.ebean.annotation.Draft;
-import io.ebean.annotation.DraftDirty;
-import io.ebean.annotation.DraftOnly;
-import io.ebean.annotation.DraftReset;
 import io.ebean.annotation.Encrypted;
 import io.ebean.annotation.Expose;
 import io.ebean.annotation.Formula;
@@ -224,18 +220,7 @@ public class AnnotationFields extends AnnotationParser {
     if (get(prop, TenantId.class) != null) {
       prop.setTenantId();
     }
-    if (get(prop, Draft.class) != null) {
-      prop.setDraft();
-    }
-    if (get(prop, DraftOnly.class) != null) {
-      prop.setDraftOnly();
-    }
-    if (get(prop, DraftDirty.class) != null) {
-      prop.setDraftDirty();
-    }
-    if (get(prop, DraftReset.class) != null) {
-      prop.setDraftReset();
-    }
+
     SoftDelete softDelete = get(prop, SoftDelete.class);
     if (softDelete != null) {
       prop.setSoftDelete();

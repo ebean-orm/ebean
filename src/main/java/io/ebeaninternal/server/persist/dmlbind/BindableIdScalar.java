@@ -40,11 +40,6 @@ public final class BindableIdScalar implements BindableId {
     return uidProp.toString();
   }
 
-  @Override
-  public boolean isDraftOnly() {
-    return false;
-  }
-
   /**
    * Does nothing for BindableId.
    */

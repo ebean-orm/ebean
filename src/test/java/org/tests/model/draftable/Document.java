@@ -1,9 +1,6 @@
 package org.tests.model.draftable;
 
 import io.ebean.Finder;
-import io.ebean.annotation.Draft;
-import io.ebean.annotation.DraftOnly;
-import io.ebean.annotation.Draftable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +11,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 
-@Draftable
 @Entity
 public class Document extends BaseDomain {
 
@@ -26,10 +22,8 @@ public class Document extends BaseDomain {
 
   String body;
 
-  @Draft
   boolean draft;
 
-  @DraftOnly
   Timestamp whenPublish;
 
   @ManyToOne
@@ -95,8 +89,5 @@ public class Document extends BaseDomain {
       super(Document.class);
     }
 
-    public Document asDraft(Long id) {
-      return query().asDraft().setId(id).findOne();
-    }
   }
 }

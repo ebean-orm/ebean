@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
@@ -178,7 +177,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * getGeneratedKeys is not supported.
    */
   private final String selectLastInsertedId;
-  private final String selectLastInsertedIdDraft;
 
   private final boolean autoTunable;
 
@@ -203,8 +201,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final BeanProperty softDeleteProperty;
   private final boolean softDelete;
 
-  private final String draftTable;
-
   private final PartitionMeta partitionMeta;
   private final String storageEngine;
 
@@ -218,17 +214,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   private final boolean readAuditing;
 
-  private final boolean draftable;
-
-  private final boolean draftableElement;
-
   private final BeanProperty unmappedJson;
 
   private final BeanProperty tenant;
-
-  private final BeanProperty draft;
-
-  private final BeanProperty draftDirty;
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -410,7 +398,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final String docStoreQueueId;
 
-  private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
   private final BeanDescriptorJsonHelp<T> jsonHelp;
   private DocStoreBeanAdapter<T> docStoreAdapter;
@@ -459,15 +446,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.sequenceInitialValue = deploy.getSequenceInitialValue();
     this.sequenceAllocationSize = deploy.getSequenceAllocationSize();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
-    this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.indexDefinitions = deploy.getIndexDefinitions();
 
     this.readAuditing = deploy.isReadAuditing();
-    this.draftable = deploy.isDraftable();
-    this.draftableElement = deploy.isDraftableElement();
     this.historySupport = deploy.isHistorySupport();
-    this.draftTable = deploy.getDraftTable();
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
     this.primaryKeyJoin = deploy.getPrimaryKeyJoin();
@@ -490,8 +473,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.versionProperty = listHelper.getVersionProperty();
     this.unmappedJson = listHelper.getUnmappedJson();
     this.tenant = listHelper.getTenant();
-    this.draft = listHelper.getDraft();
-    this.draftDirty = listHelper.getDraftDirty();
     this.propMap = listHelper.getPropertyMap();
     this.propertiesTransient = listHelper.getTransients();
     this.propertiesNonTransient = listHelper.getNonTransients();
@@ -522,8 +503,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = new BeanDescriptorJsonHelp<>(this);
-    this.draftHelp = new BeanDescriptorDraftHelp<>(this);
-
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
     this.docStoreQueueId = docStoreAdapter.getQueueId();
 
@@ -676,13 +655,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * </p>
    */
   void initialiseId(BeanDescriptorInitContext initContext) {
-
     if (logger.isTraceEnabled()) {
       logger.trace("BeanDescriptor initialise " + fullName);
-    }
-
-    if (draftable) {
-      initContext.addDraft(baseTable, draftTable);
     }
     if (historySupport) {
       // add mapping (used to swap out baseTable for asOf queries)
@@ -703,11 +677,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Initialise the exported and imported parts for associated properties.
    */
   public void initialiseOther(BeanDescriptorInitContext initContext) {
-
-    for (BeanPropertyAssocMany<?> many : propertiesManyToMany) {
-      // register associated draft table for M2M intersection
-      many.registerDraftIntersectionTable(initContext);
-    }
 
     if (historySupport) {
       // history support on this bean so check all associated intersection tables
@@ -1242,24 +1211,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     docStoreAdapter.deleteById(idValue, txn);
   }
 
-  public T publish(T draftBean, T liveBean) {
-    return draftHelp.publish(draftBean, liveBean);
-  }
-
-  /**
-   * Reset properties on the draft bean based on @DraftDirty and @DraftReset.
-   */
-  public boolean draftReset(T draftBean) {
-    return draftHelp.draftReset(draftBean);
-  }
-
-  /**
-   * Return the draft dirty boolean property or null if there is not one assigned to this bean type.
-   */
-  public BeanProperty getDraftDirty() {
-    return draftDirty;
-  }
-
   /**
    * Prepare the query for multi-tenancy check for document store only use.
    */
@@ -1312,11 +1263,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return true if the persist request needs to notify the cache.
    */
-  public boolean isCacheNotify(PersistRequest.Type type, boolean publish) {
-    if (draftable && !publish) {
-      // no caching when editing draft beans
-      return false;
-    }
+  public boolean isCacheNotify(PersistRequest.Type type) {
     return cacheHelp.isCacheNotify(type);
   }
 
@@ -2870,8 +2817,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   @Override
   public String getBaseTable(SpiQuery.TemporalMode mode) {
     switch (mode) {
-      case DRAFT:
-        return draftTable;
       case VERSIONS:
         return baseTableVersionsBetween;
       case AS_OF:
@@ -2879,13 +2824,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       default:
         return baseTable;
     }
-  }
-
-  /**
-   * Return the associated draft table.
-   */
-  public String getDraftTable() {
-    return draftTable;
   }
 
   /**
@@ -2924,20 +2862,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       bean._ebean_getIntercept().setLoaded();
       setAllLoaded(bean);
     }
-  }
-
-  /**
-   * Return true if this entity type is draftable.
-   */
-  public boolean isDraftable() {
-    return draftable;
-  }
-
-  /**
-   * Return true if this entity type is a draftable element (child).
-   */
-  public boolean isDraftableElement() {
-    return draftableElement;
   }
 
   @Override
@@ -2988,61 +2912,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     if (tenant != null) {
       tenant.setTenantValue(entityBean, tenantId);
     }
-  }
-
-  /**
-   * Set the draft to true for this entity bean instance.
-   * This bean is being loaded via asDraft() query.
-   */
-  @Override
-  public void setDraft(EntityBean entityBean) {
-    if (draft != null) {
-      draft.setValue(entityBean, true);
-    }
-  }
-
-  /**
-   * Return true if the bean is considered a 'draft' instance (not 'live').
-   */
-  public boolean isDraftInstance(EntityBean entityBean) {
-    if (draft != null) {
-      return Boolean.TRUE == draft.getValue(entityBean);
-    }
-    // no draft property - so return false
-    return false;
-  }
-
-  /**
-   * Return true if the bean is draftable and considered a 'live' instance.
-   */
-  public boolean isLiveInstance(EntityBean entityBean) {
-    if (draft != null) {
-      return Boolean.FALSE == draft.getValue(entityBean);
-    }
-    // no draft property - so return false
-    return false;
-  }
-
-  /**
-   * If there is a @DraftDirty property set it's value on the bean.
-   */
-  public void setDraftDirty(EntityBean entityBean, boolean value) {
-    if (draftDirty != null) {
-      // check to see if the dirty property has already
-      // been set and if so do not set the value
-      if (!entityBean._ebean_getIntercept().isChangedProperty(draftDirty.getPropertyIndex())) {
-        draftDirty.setValueIntercept(entityBean, value);
-      }
-    }
-  }
-
-  /**
-   * Optimise the draft query fetching any draftable element relationships.
-   */
-  public void draftQueryOptimise(Query<T> query) {
-    // use per query PersistenceContext to ensure fresh beans loaded
-    query.setPersistenceContextScope(PersistenceContextScope.QUERY);
-    draftHelp.draftQueryOptimise(query);
   }
 
   /**
@@ -3104,8 +2973,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * supported.
    * </p>
    */
-  public String getSelectLastInsertedId(boolean publish) {
-    return publish ? selectLastInsertedId : selectLastInsertedIdDraft;
+  public String getSelectLastInsertedId() {
+    return selectLastInsertedId;
   }
 
   /**
