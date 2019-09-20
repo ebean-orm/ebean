@@ -3,13 +3,12 @@ package org.tests.update;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.TransactionalTestCase;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -20,7 +19,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestStatelessUpdate extends TransactionalTestCase {
 
@@ -170,14 +171,14 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customerWithChange.setName("new name");
 
     // contacts is not loaded
-    Assert.assertFalse(containsContacts(customerWithChange));
+    assertFalse(containsContacts(customerWithChange));
     server.update(customerWithChange);
 
     Customer result = Ebean.find(Customer.class, customer.getId());
 
     // assert null list was ignored (missing children not deleted)
     Assert.assertNotNull(result.getContacts());
-    Assert.assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+    assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
   }
 
   /**
@@ -208,14 +209,14 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customerWithChange.getContacts();
 
     // contacts has been initialised to empty BeanList
-    Assert.assertTrue(containsContacts(customerWithChange));
+    assertTrue(containsContacts(customerWithChange));
     server.update(customerWithChange);
 
     Customer result = Ebean.find(Customer.class, customer.getId());
 
     // assert empty bean list was ignore (missing children not deleted)
     Assert.assertNotNull(result.getContacts());
-    Assert.assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+    assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
   }
 
   @Test
@@ -240,14 +241,13 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     // with Ebean enhancement this loads the an empty contacts BeanList
     customerWithChange.setContacts(Collections.<Contact>emptyList());
 
-    Assert.assertTrue(containsContacts(customerWithChange));
+    assertTrue(containsContacts(customerWithChange));
     server.update(customerWithChange);
 
     Customer result = Ebean.find(Customer.class, customer.getId());
 
     // assert empty bean list was ignore (missing children not deleted)
-    Assert.assertNotNull(result.getContacts());
-    Assert.assertTrue("the contacts were deleted", result.getContacts().isEmpty());
+    assertThat(result.getContacts()).hasSize(1);
   }
 
   private boolean containsContacts(Customer cust) {
@@ -316,9 +316,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateContact1.setId(contact1.getId());
     updateContact1.setLastName("contact1-changed");
 
-
     Contact updateContact3 = new Contact();
-    //updateContact3.setId(contact3.getId());
     updateContact3.setLastName("contact3-added");
 
     Customer updateCustomer = new Customer();
@@ -326,30 +324,24 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateCustomer.getContacts().add(updateContact1);
     updateCustomer.getContacts().add(updateContact3);
 
-    // not adding contact2 so it will get deleted
-    //updateCustomer.getContacts().add(updateContact2);
-
     server.update(updateCustomer);
-
 
     // assert
     Customer assCustomer = server.find(Customer.class, customer.getId());
     List<Contact> assContacts = assCustomer.getContacts();
-    assertEquals(2, assContacts.size());
+    assertThat(assContacts).hasSize(3);
     Set<Integer> ids = new LinkedHashSet<>();
     Set<String> names = new LinkedHashSet<>();
     for (Contact contact : assContacts) {
       ids.add(contact.getId());
       names.add(contact.getLastName());
     }
-    Assert.assertTrue(ids.contains(contact1.getId()));
-    Assert.assertTrue(ids.contains(updateContact3.getId()));
-    Assert.assertFalse(ids.contains(contact2.getId()));
-
-    Assert.assertTrue(names.contains(updateContact1.getLastName()));
-    Assert.assertTrue(names.contains(updateContact3.getLastName()));
+    assertTrue(ids.contains(contact1.getId()));
+    assertTrue(ids.contains(updateContact3.getId()));
+    assertTrue(ids.contains(contact2.getId()));
+    assertTrue(names.contains(updateContact1.getLastName()));
+    assertTrue(names.contains(updateContact3.getLastName()));
   }
-
 
   @Test
   public void testStatelessRecursiveUpdateWithChangesInDetailOnlyAnd() {
@@ -398,12 +390,12 @@ public class TestStatelessUpdate extends TransactionalTestCase {
       ids.add(contact.getId());
       names.add(contact.getLastName());
     }
-    Assert.assertTrue(ids.contains(contact1.getId()));
-    Assert.assertTrue(ids.contains(updateContact3.getId()));
-    Assert.assertTrue(ids.contains(contact2.getId()));
+    assertTrue(ids.contains(contact1.getId()));
+    assertTrue(ids.contains(updateContact3.getId()));
+    assertTrue(ids.contains(contact2.getId()));
 
-    Assert.assertTrue(names.contains(updateContact1.getLastName()));
-    Assert.assertTrue(names.contains(contact2.getLastName()));
-    Assert.assertTrue(names.contains(updateContact3.getLastName()));
+    assertTrue(names.contains(updateContact1.getLastName()));
+    assertTrue(names.contains(contact2.getLastName()));
+    assertTrue(names.contains(updateContact3.getLastName()));
   }
 }
