@@ -48,7 +48,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateAll.setId(e.getId());
     updateAll.setName("updAllProps");
 
-    server.update(updateAll, null, false);
+    server.update(updateAll);
 
     eBasic = server.find(EBasic.class, e.getId());
     assertEquals(e.getStatus(), eBasic.getStatus());
@@ -383,9 +383,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateCustomer.getContacts().add(updateContact3);
 
     // not adding contact2 but it won't be deleted in this case
-    boolean deleteMissingChildren = false;
-    server.update(updateCustomer, null, deleteMissingChildren);
-
+    server.update(updateCustomer);
 
     // assert
     Customer assCustomer = server.find(Customer.class, customer.getId());

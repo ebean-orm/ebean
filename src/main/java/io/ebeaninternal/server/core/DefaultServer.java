@@ -1736,28 +1736,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     ((EntityBean) bean)._ebean_getIntercept().setDirty(true);
   }
 
-  /**
-   * Update the bean using the default 'updatesDeleteMissingChildren' setting.
-   */
   @Override
   public void update(Object bean) {
     update(bean, null);
   }
 
-  /**
-   * Update the bean using the default 'updatesDeleteMissingChildren' setting.
-   */
   @Override
   public void update(Object bean, Transaction t) {
     persister.update(checkEntityBean(bean), t);
-  }
-
-  /**
-   * Update the bean specifying the deleteMissingChildren option.
-   */
-  @Override
-  public void update(Object bean, Transaction t, boolean deleteMissingChildren) {
-    persister.update(checkEntityBean(bean), t, deleteMissingChildren);
   }
 
   @Override

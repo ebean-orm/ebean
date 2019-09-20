@@ -84,11 +84,13 @@ class AnnotationAssocManys extends AnnotationParser {
     if (oneToMany != null) {
       readToOne(oneToMany, prop);
       if (readOrphanRemoval(oneToMany)) {
+        prop.setOrphanRemoval();
         prop.setModifyListenMode(ModifyListenMode.REMOVALS);
         prop.getCascadeInfo().setDelete(true);
       }
       PrivateOwned privateOwned = get(prop, PrivateOwned.class);
       if (privateOwned != null) {
+        prop.setOrphanRemoval();
         prop.setModifyListenMode(ModifyListenMode.REMOVALS);
         prop.getCascadeInfo().setDelete(privateOwned.cascadeRemove());
       }

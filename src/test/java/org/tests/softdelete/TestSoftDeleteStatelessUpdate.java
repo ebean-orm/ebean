@@ -1,7 +1,7 @@
 package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeantest.LoggedSql;
 import org.junit.Test;
 import org.tests.model.softdelete.EsdDetail;
@@ -21,8 +21,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
     master.getDetails().add(new EsdDetail("d2"));
     master.getDetails().add(new EsdDetail("d3"));
 
-
-    Ebean.save(master);
+    DB.save(master);
 
     EsdMaster upd = new EsdMaster("m1-modified");
     upd.setId(master.getId());
@@ -38,7 +37,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
 
     LoggedSql.start();
 
-    Ebean.getDefaultServer().update(upd, null, true);
+    DB.update(upd);
 
     List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(5);
@@ -47,7 +46,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
       assertThat(sql.get(1)).contains("update esd_detail set deleted=true where master_id = ? and not");
     }
 
-    EsdMaster fetchedWithSoftDeletes = Ebean.find(EsdMaster.class)
+    EsdMaster fetchedWithSoftDeletes = DB.find(EsdMaster.class)
       .setId(master.getId())
       .setIncludeSoftDeletes()
       .fetch("details")
@@ -59,7 +58,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id  where t0.id = ?");
 
-    EsdMaster fetchedWithOutSoftDeletes = Ebean.find(EsdMaster.class)
+    EsdMaster fetchedWithOutSoftDeletes = DB.find(EsdMaster.class)
       .setId(master.getId())
       .fetch("details")
       .findOne();

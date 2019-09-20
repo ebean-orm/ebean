@@ -396,15 +396,6 @@ public class DB {
    * called then no optimistic locking is performed (internally ConcurrencyMode.NONE is used).
    * </p>
    * <p>
-   * <b>{@link DatabaseConfig#setUpdatesDeleteMissingChildren(boolean)}: </b> When cascade saving to a
-   * OneToMany or ManyToMany the updatesDeleteMissingChildren setting controls if any other children
-   * that are in the database but are not in the collection are deleted.
-   * </p>
-   * <p>
-   * <b>{@link DatabaseConfig#setUpdateChangesOnly(boolean)}: </b> The updateChangesOnly setting
-   * controls if only the changed properties are included in the update or if all the loaded
-   * properties are included instead.
-   * </p>
    * <pre>{@code
    *
    *   // A 'stateless update' example
@@ -414,9 +405,6 @@ public class DB {
    *   database.update(customer);
    *
    * }</pre>
-   *
-   * @see DatabaseConfig#setUpdatesDeleteMissingChildren(boolean)
-   * @see DatabaseConfig#setUpdateChangesOnly(boolean)
    */
   public static void update(Object bean) throws OptimisticLockException {
     getDefault().update(bean);

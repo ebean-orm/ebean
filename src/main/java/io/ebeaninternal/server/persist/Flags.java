@@ -78,6 +78,10 @@ public final class Flags {
     return (state & PUBLISH_MERGE_NORMAL) != 0;
   }
 
+  public static boolean isUpdateForce(int state) {
+    return !isSet(state, INSERT) && !isSet(state, NORMAL);
+  }
+
   /**
    * Return true if the given flag is set.
    */
@@ -149,10 +153,10 @@ public final class Flags {
   }
 
   private static int set(int state, int flag) {
-    return (state |= flag);
+    return state | flag;
   }
 
   private static int unset(int state, int flag) {
-    return state &= ~flag;
+    return state & ~flag;
   }
 }

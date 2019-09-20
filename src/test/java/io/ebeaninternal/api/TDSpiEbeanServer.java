@@ -810,10 +810,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException {
-  }
-
-  @Override
   public void insert(Object bean) {
   }
 

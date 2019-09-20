@@ -74,11 +74,8 @@ public final class DefaultPersister implements Persister {
 
   private final BeanDescriptorManager beanDescriptorManager;
 
-  private final boolean updatesDeleteMissingChildren;
-
   public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr) {
     this.server = server;
-    this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
     this.beanDescriptorManager = descMgr;
     this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize());
   }
@@ -407,17 +404,7 @@ public final class DefaultPersister implements Persister {
    */
   @Override
   public void update(EntityBean entityBean, Transaction t) {
-    update(entityBean, t, updatesDeleteMissingChildren);
-  }
-
-  /**
-   * Update the bean specifying deleteMissingChildren.
-   */
-  @Override
-  public void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
-
     PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequest.Type.UPDATE);
-    req.setDeleteMissingChildren(deleteMissingChildren);
     req.checkDraft();
     try {
       req.initTransIfRequiredWithBatchCascade();
@@ -448,8 +435,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public void save(EntityBean bean, Transaction t) {
     if (bean._ebean_getIntercept().isUpdate()) {
-      // deleteMissingChildren is false when using 'save' on 'loaded' beans
-      update(bean, t, false);
+      update(bean, t);
     } else {
       insert(bean, t);
     }

@@ -356,11 +356,6 @@ public class ServerConfig {
   private boolean updateAllPropertiesInBatch;
 
   /**
-   * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
-   */
-  private boolean updatesDeleteMissingChildren = true;
-
-  /**
    * Database platform configuration.
    */
   private PlatformConfig platformConfig = new PlatformConfig();
@@ -2424,22 +2419,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if updates by default delete missing children when cascading save to a OneToMany or
-   * ManyToMany. When not set this defaults to true.
-   */
-  public boolean isUpdatesDeleteMissingChildren() {
-    return updatesDeleteMissingChildren;
-  }
-
-  /**
-   * Set if updates by default delete missing children when cascading save to a OneToMany or
-   * ManyToMany. When not set this defaults to true.
-   */
-  public void setUpdatesDeleteMissingChildren(boolean updatesDeleteMissingChildren) {
-    this.updatesDeleteMissingChildren = updatesDeleteMissingChildren;
-  }
-
-  /**
    * Return true if query statistics should be collected by ObjectGraphNode.
    */
   public boolean isCollectQueryStatsByNode() {
@@ -2947,9 +2926,6 @@ public class ServerConfig {
 
     skipCacheAfterWrite = p.getBoolean("skipCacheAfterWrite", skipCacheAfterWrite);
     updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);
-
-    boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
-    updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
 
     if (p.get("batch.mode") != null || p.get("persistBatching") != null) {
       throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");

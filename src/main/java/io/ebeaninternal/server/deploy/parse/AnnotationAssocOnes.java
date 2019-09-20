@@ -225,7 +225,9 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setNullable(propAnn.optional());
     prop.setFetchType(propAnn.fetch());
     prop.setMappedBy(propAnn.mappedBy());
-    prop.setOrphanRemoval(readOrphanRemoval(propAnn));
+    if (readOrphanRemoval(propAnn)) {
+      prop.setOrphanRemoval();
+    }
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
     }
