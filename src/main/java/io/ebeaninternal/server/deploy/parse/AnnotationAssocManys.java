@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.HistoryExclude;
-import io.ebean.annotation.PrivateOwned;
 import io.ebean.annotation.Where;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.config.BeanNotRegisteredException;
@@ -87,12 +86,6 @@ class AnnotationAssocManys extends AnnotationParser {
         prop.setOrphanRemoval();
         prop.setModifyListenMode(ModifyListenMode.REMOVALS);
         prop.getCascadeInfo().setDelete(true);
-      }
-      PrivateOwned privateOwned = get(prop, PrivateOwned.class);
-      if (privateOwned != null) {
-        prop.setOrphanRemoval();
-        prop.setModifyListenMode(ModifyListenMode.REMOVALS);
-        prop.getCascadeInfo().setDelete(privateOwned.cascadeRemove());
       }
       OrderColumn orderColumn = get(prop, OrderColumn.class);
       if (orderColumn != null) {

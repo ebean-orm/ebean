@@ -1,13 +1,12 @@
 package org.tests.inheritance;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
-import io.ebean.annotation.PrivateOwned;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.LAZY;
 
 /**
  * Model class to reference an organization tree node.
@@ -22,9 +21,8 @@ public class OrganizationTreeNode {
 
 	private String name;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parentTreeNode")
+	@OneToOne(cascade = ALL, fetch = LAZY, mappedBy = "parentTreeNode", orphanRemoval = true)
 	@NotNull
-	@PrivateOwned
 	private OrganizationNode organizationNode;
 
 	public Long getId() {

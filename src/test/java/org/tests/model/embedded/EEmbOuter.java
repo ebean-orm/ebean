@@ -1,7 +1,5 @@
 package org.tests.model.embedded;
 
-import io.ebean.annotation.PrivateOwned;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -20,8 +18,7 @@ public class EEmbOuter {
   @Version
   private int updateCount;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @PrivateOwned
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   List<EEmbInner> inners;
 
   @Embedded

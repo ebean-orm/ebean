@@ -1,14 +1,11 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.UpdateMode;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "t_mapsuper1")
-@UpdateMode(updateChangesOnly = true)
 public class TMapSuperEntity extends TMappedSuper2 {
 
   private static final long serialVersionUID = 1L;

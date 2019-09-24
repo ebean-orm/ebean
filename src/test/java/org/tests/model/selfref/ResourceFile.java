@@ -1,7 +1,5 @@
 package org.tests.model.selfref;
 
-import io.ebean.annotation.PrivateOwned;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,8 +21,7 @@ public class ResourceFile extends BaseResourceFile {
   @JoinColumn(name = "parentresourcefileid", nullable = true)
   private ResourceFile parent;
 
-  @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "parent")
-  @PrivateOwned
+  @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "parent", orphanRemoval = true)
   private Set<ResourceFile> alternatives = new HashSet<>();
 
   @Column(name = "name", length = 128, nullable = false)
