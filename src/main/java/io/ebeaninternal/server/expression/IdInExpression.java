@@ -121,7 +121,7 @@ public class IdInExpression extends NonPrepareExpression {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("IdIn[?");
-    if (!multiValueIdSupported) {
+    if (!multiValueIdSupported || idCollection.isEmpty()) {
       // query plan specific to the number of parameters in the IN clause
       builder.append(idCollection.size());
     }

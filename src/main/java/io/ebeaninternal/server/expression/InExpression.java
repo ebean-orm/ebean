@@ -170,7 +170,7 @@ class InExpression extends AbstractExpression {
       builder.append("empty");
     } else {
       builder.append(" ?");
-      if (!multiValueSupported) {
+      if (!multiValueSupported || bindValues.isEmpty()) {
         // query plan specific to the number of parameters in the IN clause
         builder.append(bindValues.size());
       }
