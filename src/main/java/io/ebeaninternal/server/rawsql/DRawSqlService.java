@@ -9,6 +9,7 @@ import io.ebeaninternal.server.query.DefaultSqlRow;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class DRawSqlService implements SpiRawSqlService {
 
@@ -45,10 +46,30 @@ public class DRawSqlService implements SpiRawSqlService {
       if (name == null) {
         name = meta.getColumnName(i);
       }
+
       if (ret.containsKey(name)) {
         name = combine(meta.getSchemaName(i), meta.getTableName(i), name);
       }
       ret.put(name, resultSet.getObject(i));
+
+      // convert (C/B)LOBs to java objects.
+      // A java.sql.Clob depends on an open connection, so storing this object in a map
+      // that is accessed later, when the connection is closed, will result in a "connection is closed" exception.
+      switch (meta.getColumnType(i)) {
+      case Types.CLOB:
+      case Types.NCLOB:
+      ret.put(name, resultSet.getString(i));
+      break;
+
+      case Types.BLOB:
+        ret.put(name, resultSet.getBytes(i));
+        break;
+
+      default:
+        ret.put(name, resultSet.getObject(i));
+        break;
+      }
+
     }
     return ret;
   }
