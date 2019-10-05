@@ -134,12 +134,12 @@ public class AnnotationClass extends AnnotationParser {
     }
 
     for (Index index : findAnnotationsRecursive(cls, Index.class)) {
-      descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
+      descriptor.addIndex(new IndexDefinition(convertColumnNames(index.columnNames()), index.name(), index.unique()));
     }
 
     UniqueConstraint uc = findAnnotationRecursive(cls, UniqueConstraint.class);
     if (uc != null) {
-      descriptor.addIndex(new IndexDefinition(uc.columnNames()));
+      descriptor.addIndex(new IndexDefinition(convertColumnNames(uc.columnNames())));
     }
 
     View view = findAnnotationRecursive(cls, View.class);
@@ -150,7 +150,7 @@ public class AnnotationClass extends AnnotationParser {
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
-        descriptor.addIndex(new IndexDefinition(c.columnNames()));
+        descriptor.addIndex(new IndexDefinition(convertColumnNames(c.columnNames())));
       }
     }
 

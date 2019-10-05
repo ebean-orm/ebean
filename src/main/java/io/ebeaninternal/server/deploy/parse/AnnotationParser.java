@@ -103,8 +103,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   void readColumn(Column columnAnn, DeployBeanProperty prop) {
 
     if (!isEmpty(columnAnn.name())) {
-      String dbColumn = databasePlatform.convertQuotedIdentifiers(columnAnn.name());
-      prop.setDbColumn(dbColumn);
+      prop.setDbColumn(databasePlatform.convertQuotedIdentifiers(columnAnn.name()));
     }
 
     prop.setDbInsertable(columnAnn.insertable());
@@ -137,5 +136,12 @@ public abstract class AnnotationParser extends AnnotationBase {
       return false;
     }
     return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
+  }
+
+  String[] convertColumnNames(String[] columnNames) {
+    for (int i = 0; i < columnNames.length; i++) {
+      columnNames[i] = databasePlatform.convertQuotedIdentifiers(columnNames[i]);
+    }
+    return columnNames;
   }
 }
