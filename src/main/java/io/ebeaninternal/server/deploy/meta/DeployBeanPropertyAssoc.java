@@ -45,6 +45,8 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 
   private PropertyForeignKey foreignKey;
 
+  boolean orphanRemoval;
+
   /**
    * Construct the property.
    */
@@ -146,6 +148,14 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
     if (!"".equals(mappedBy)) {
       this.mappedBy = mappedBy;
     }
+  }
+
+  public void setOrphanRemoval() {
+    orphanRemoval = true;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
   }
 
   /**

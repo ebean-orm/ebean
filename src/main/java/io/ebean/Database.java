@@ -1216,9 +1216,6 @@ public interface Database {
    * database.update(customer);
    *
    * }</pre>
-   *
-   * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
-   * @see ServerConfig#setUpdateChangesOnly(boolean)
    */
   void update(Object bean) throws OptimisticLockException;
 
@@ -1226,16 +1223,6 @@ public interface Database {
    * Update a bean additionally specifying a transaction.
    */
   void update(Object bean, Transaction transaction) throws OptimisticLockException;
-
-  /**
-   * Update a bean additionally specifying a transaction and the deleteMissingChildren setting.
-   *
-   * @param bean                  the bean to update
-   * @param transaction           the transaction to use (can be null).
-   * @param deleteMissingChildren specify false if you do not want 'missing children' of a OneToMany
-   *                              or ManyToMany to be automatically deleted.
-   */
-  void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
 
   /**
    * Update a collection of beans. If there is no current transaction one is created and used to

@@ -1,13 +1,12 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.PrivateOwned;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
 import java.util.List;
+
+import static javax.persistence.CascadeType.PERSIST;
 
 @Entity
 public class AnimalShelter {
@@ -20,8 +19,7 @@ public class AnimalShelter {
 
   String name;
 
-  @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "shelter")
-  @PrivateOwned
+  @OneToMany(cascade = PERSIST, mappedBy = "shelter", orphanRemoval = true)
   List<Animal> animals;
 
   public Long getId() {

@@ -31,11 +31,6 @@ public interface Persister {
   void update(EntityBean entityBean, Transaction t);
 
   /**
-   * Update the bean specifying deleteMissingChildren.
-   */
-  void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren);
-
-  /**
    * Force an Insert using the given bean.
    */
   void insert(EntityBean entityBean, Transaction t);

@@ -38,7 +38,6 @@ public class SaveManyBeans extends SaveManyBase {
 
   private Collection<?> collection;
   private final DefaultPersister persister;
-  private boolean deleteMissing;
   private int sortOrder;
 
   SaveManyBeans(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request, DefaultPersister persister) {
@@ -56,18 +55,17 @@ public class SaveManyBeans extends SaveManyBase {
   void save() {
 
     if (many.hasJoinTable()) {
-
       // check if we can save the m2m intersection in this direction
       // we only allow one direction based on first traversed basis
       boolean saveIntersectionFromThisDirection = isSaveIntersection();
       if (cascade) {
-        saveAssocManyDetails(false);
+        saveAssocManyDetails();
       }
       // for ManyToMany save the 'relationship' via inserts/deletes
       // into/from the intersection table
       if (saveIntersectionFromThisDirection) {
         // only allowed on one direction of a m2m based on beanName
-        saveAssocManyIntersection(request.isDeleteMissingChildren());
+        saveAssocManyIntersection();
       } else {
         resetModifyState();
       }
@@ -79,7 +77,7 @@ public class SaveManyBeans extends SaveManyBase {
       }
       if (cascade) {
         // potentially deletes 'missing children' for 'stateless update'
-        saveAssocManyDetails(request.isDeleteMissingChildren());
+        saveAssocManyDetails();
       }
     }
   }
@@ -98,13 +96,9 @@ public class SaveManyBeans extends SaveManyBase {
   /**
    * Save the details from a OneToMany collection.
    */
-  private void saveAssocManyDetails(boolean deleteMissingChildren) {
-
-    this.deleteMissing = deleteMissingChildren;
-
+  private void saveAssocManyDetails() {
     // check that the list is not null and if it is a BeanCollection
     // check that is has been populated (don't trigger lazy loading)
-
     collection = BeanCollectionUtil.getActualEntries(value);
     if (collection != null) {
       processDetails();
@@ -127,7 +121,7 @@ public class SaveManyBeans extends SaveManyBase {
       targetDescriptor.preAllocateIds(collection.size());
     }
 
-    if (deleteMissing) {
+    if (!insertedParent && many.isOrphanRemoval() && request.isForcedUpdate()) {
       // collect the Id's (to exclude from deleteManyDetails)
       List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
       // deleting missing children - children not in our collected detailIds
@@ -141,7 +135,6 @@ public class SaveManyBeans extends SaveManyBase {
     }
     transaction.depth(-1);
   }
-
 
   private void saveAllBeans(BeanProperty orderColumn) {
 
@@ -240,17 +233,16 @@ public class SaveManyBeans extends SaveManyBase {
    * This is done via MapBeans.
    * </p>
    */
-  private void saveAssocManyIntersection(boolean deleteMissingChildren) {
+  private void saveAssocManyIntersection() {
 
     if (value == null) {
       return;
     }
     if (request.isQueueManyIntersection()) {
       // queue/delay until bean persist request is flushed
-      this.deleteMissing = deleteMissingChildren;
       request.addManyIntersection(this);
     } else {
-      saveAssocManyIntersection(deleteMissingChildren, false);
+      saveAssocManyIntersection(false);
     }
   }
 
@@ -258,13 +250,14 @@ public class SaveManyBeans extends SaveManyBase {
    * Push intersection table changes onto batch flush queue.
    */
   public void saveIntersectionBatch() {
-    saveAssocManyIntersection(deleteMissing, true);
+    saveAssocManyIntersection(true);
   }
 
-  private void saveAssocManyIntersection(boolean deleteMissingChildren, boolean queue) {
+  private void saveAssocManyIntersection(boolean queue) {
 
+    boolean forcedUpdate = request.isForcedUpdate();
     boolean vanillaCollection = !(value instanceof BeanCollection<?>);
-    if (vanillaCollection || deleteMissingChildren) {
+    if (vanillaCollection || forcedUpdate) {
       // delete all intersection rows and then treat all
       // beans in the collection as additions
       persister.deleteManyIntersection(parentBean, many, transaction, publish, queue);
@@ -273,7 +266,7 @@ public class SaveManyBeans extends SaveManyBase {
     Collection<?> deletions = null;
     Collection<?> additions;
 
-    if (insertedParent || vanillaCollection || deleteMissingChildren) {
+    if (insertedParent || vanillaCollection || forcedUpdate) {
       // treat everything in the list/set/map as an intersection addition
       if (value instanceof Map<?, ?>) {
         additions = ((Map<?, ?>) value).values();

@@ -49,6 +49,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private final TableJoin intersectionJoin;
   private final String intersectionPublishTable;
   private final String intersectionDraftTable;
+  private final boolean orphanRemoval;
 
   private IntersectionTable intersectionTable;
 
@@ -123,6 +124,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public BeanPropertyAssocMany(BeanDescriptor<?> descriptor, DeployBeanPropertyAssocMany<T> deploy) {
     super(descriptor, deploy);
     this.unidirectional = deploy.isUnidirectional();
+    this.orphanRemoval = deploy.isOrphanRemoval();
     this.o2mJoinTable = deploy.isO2mJoinTable();
     this.hasOrderColumn = deploy.hasOrderColumn();
     this.manyToMany = deploy.isManyToMany();
@@ -508,6 +510,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   public boolean hasOrderColumn() {
     return hasOrderColumn;
+  }
+
+  public boolean isOrphanRemoval() {
+    return orphanRemoval;
   }
 
   @Override

@@ -1,16 +1,17 @@
 package org.tests.model.softdelete;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
 
 @Entity
 public class EsdMaster extends BaseSoftDelete {
 
   String name;
 
-  @OneToMany(mappedBy = "master", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "master", cascade = ALL, orphanRemoval = true)
   List<EsdDetail> details;
 
   public EsdMaster(String name) {

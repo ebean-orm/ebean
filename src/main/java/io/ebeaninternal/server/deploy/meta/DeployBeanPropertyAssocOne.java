@@ -21,8 +21,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private String columnPrefix;
 
-  private boolean orphanRemoval;
-
   /**
    * Create the property.
    */
@@ -143,14 +141,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
       // we pretty much need to cascade save so turning that on automatically ...
       cascadeInfo.setType(CascadeType.ALL);
     }
-  }
-
-  public void setOrphanRemoval(boolean orphanRemoval) {
-    this.orphanRemoval = orphanRemoval;
-  }
-
-  public boolean isOrphanRemoval() {
-    return orphanRemoval;
   }
 
   public void setJoinType(boolean outerJoin) {

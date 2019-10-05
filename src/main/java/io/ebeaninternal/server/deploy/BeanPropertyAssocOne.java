@@ -39,11 +39,8 @@ import java.util.Map;
 public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocOne {
 
   private final boolean oneToOne;
-
   private final boolean oneToOneExported;
-
   private final boolean orphanRemoval;
-
   private final boolean primaryKeyExport;
   private final boolean primaryKeyJoin;
 
@@ -89,7 +86,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       for (BeanProperty embeddedProp : embeddedProps) {
         embeddedPropsMap.put(embeddedProp.getName(), embeddedProp);
       }
-
     } else {
       embeddedProps = null;
       embeddedPropsMap = null;

@@ -104,8 +104,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private boolean notifyCache;
 
-  private boolean deleteMissingChildren;
-
   /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
    * appropriate caches are updated in that case.
@@ -627,20 +625,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public BeanDescriptor<T> getBeanDescriptor() {
     return beanDescriptor;
-  }
-
-  /**
-   * Return true if a stateless update should also delete any missing details beans.
-   */
-  public boolean isDeleteMissingChildren() {
-    return deleteMissingChildren;
-  }
-
-  /**
-   * Set if deleteMissingChildren occurs on cascade save to OneToMany or ManyToMany.
-   */
-  public void setDeleteMissingChildren(boolean deleteMissingChildren) {
-    this.deleteMissingChildren = deleteMissingChildren;
   }
 
   /**
@@ -1475,5 +1459,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       this.saveManyIntersections = new ArrayList<>();
     }
     this.saveManyIntersections.add(saveManyIntersection);
+  }
+
+  public boolean isForcedUpdate() {
+    return Flags.isUpdateForce(flags);
   }
 }
