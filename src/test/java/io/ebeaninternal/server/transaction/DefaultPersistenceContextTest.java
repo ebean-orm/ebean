@@ -7,7 +7,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Vehicle;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultPersistenceContextTest {
 

@@ -6,7 +6,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */

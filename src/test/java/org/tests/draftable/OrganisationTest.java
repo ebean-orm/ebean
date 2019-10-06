@@ -2,11 +2,10 @@ package org.tests.draftable;
 
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import org.junit.Test;
 import org.tests.model.draftable.Document;
 import org.tests.model.draftable.DocumentMedia;
 import org.tests.model.draftable.Organisation;
-import org.assertj.core.api.StrictAssertions;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -99,8 +98,8 @@ public class OrganisationTest {
     // publish will perform an insert, update and delete on child DocumentMedia
     // during the publish below with media1 being deleted
     Document liveBean = server.publish(Document.class, doc.getId(), null);
-    StrictAssertions.assertThat(liveBean.getBody()).isEqualTo("Body2");
-    StrictAssertions.assertThat(liveBean.getMedia().size()).isEqualTo(2);
+    assertThat(liveBean.getBody()).isEqualTo("Body2");
+    assertThat(liveBean.getMedia().size()).isEqualTo(2);
     assertThat(liveBean.getMedia()).extracting("name").contains("media2", "media3");
 
   }

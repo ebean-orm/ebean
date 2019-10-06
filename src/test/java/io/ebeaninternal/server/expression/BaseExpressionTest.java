@@ -10,7 +10,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class BaseExpressionTest extends BaseTestCase {
 

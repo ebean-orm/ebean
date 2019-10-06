@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 public class ScalarTypeZonedDateTimeTest {

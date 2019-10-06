@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import org.tests.model.EGenProps;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 public class TestGeneratedProperties extends BaseTestCase {

@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import org.tests.model.softdelete.ESoftDelMid;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSoftDeleteOptionalRelationship extends BaseTestCase {
 

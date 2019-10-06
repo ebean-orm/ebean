@@ -7,7 +7,7 @@ import org.tests.model.basic.cache.CInhOne;
 import org.tests.model.basic.cache.CInhRoot;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestInheritanceCache extends BaseTestCase {
 

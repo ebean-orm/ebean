@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.time.Instant;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IsoJsonDateTimeParserTest {
 

@@ -5,7 +5,7 @@ import io.ebean.Expression;
 import org.junit.Test;
 
 import static io.ebean.Expr.eq;
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NotExpressionTest extends BaseExpressionTest {
 

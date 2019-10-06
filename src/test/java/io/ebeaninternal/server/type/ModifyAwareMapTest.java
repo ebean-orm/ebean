@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class ModifyAwareMapTest {
 

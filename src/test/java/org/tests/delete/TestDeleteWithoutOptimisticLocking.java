@@ -9,7 +9,7 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.converstation.Group;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
 

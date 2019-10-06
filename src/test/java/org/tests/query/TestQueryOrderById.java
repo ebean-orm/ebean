@@ -6,7 +6,7 @@ import io.ebean.Query;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryOrderById extends BaseTestCase {
 

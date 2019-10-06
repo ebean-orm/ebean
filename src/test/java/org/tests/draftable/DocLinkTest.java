@@ -4,11 +4,10 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
-import org.tests.model.draftable.Doc;
-import org.tests.model.draftable.Link;
-import org.assertj.core.api.StrictAssertions;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.draftable.Doc;
+import org.tests.model.draftable.Link;
 
 import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
@@ -48,10 +47,10 @@ public class DocLinkTest extends BaseTestCase {
   public void testUpdate_whenNotPublished() {
 
     Link link1 = new Link("update");
-    StrictAssertions.assertThat(link1.isDraft()).isFalse();
+    assertThat(link1.isDraft()).isFalse();
 
     link1.save();
-    StrictAssertions.assertThat(link1.isDraft()).isTrue();
+    assertThat(link1.isDraft()).isTrue();
 
     // perform stateless update
     Link linkUpdate = new Link();
@@ -71,10 +70,10 @@ public class DocLinkTest extends BaseTestCase {
   public void testDelete_whenNotPublished() {
 
     Link link1 = new Link("Ld1");
-    StrictAssertions.assertThat(link1.isDraft()).isFalse();
+    assertThat(link1.isDraft()).isFalse();
 
     link1.save();
-    StrictAssertions.assertThat(link1.isDraft()).isTrue();
+    assertThat(link1.isDraft()).isTrue();
 
     link1.setComment("some change");
     link1.save();
@@ -120,15 +119,15 @@ public class DocLinkTest extends BaseTestCase {
     server.publish(Link.class, link1.getId());
 
     link1 = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    StrictAssertions.assertThat(link1.isDraft()).isTrue();
+    assertThat(link1.isDraft()).isTrue();
 
     // this is a soft delete (no automatic publish here, only updates draft)
     link1.delete();
 
     Link live = Ebean.find(Link.class).setId(link1.getId()).findOne();
     assertThat(live).isNotNull();
-    StrictAssertions.assertThat(live.isDraft()).isFalse();
-    StrictAssertions.assertThat(live.isDeleted()).isFalse(); // soft delete state not published yet
+    assertThat(live.isDraft()).isFalse();
+    assertThat(live.isDeleted()).isFalse(); // soft delete state not published yet
 
     // this is a permanent delete (effectively has automatic publish)
     server.deletePermanent(link1);
@@ -169,19 +168,18 @@ public class DocLinkTest extends BaseTestCase {
     link1.save();
 
     Link draft1 = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    StrictAssertions.assertThat(draft1.isDirty()).isTrue();
+    assertThat(draft1.isDirty()).isTrue();
 
     EbeanServer server = Ebean.getDefaultServer();
 
     Link linkLive = server.publish(Link.class, link1.getId(), null);
-    StrictAssertions.assertThat(linkLive.getComment()).isEqualTo(comment);
-    StrictAssertions.assertThat(linkLive.getWhenPublish()).isEqualToIgnoringMillis(when);
+    assertThat(linkLive.getComment()).isEqualTo(comment);
+    assertThat(linkLive.getWhenPublish()).isEqualToIgnoringMillis(when);
 
     Link draft1b = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    StrictAssertions.assertThat(draft1b.isDirty()).isFalse();
-    StrictAssertions.assertThat(draft1b.getComment()).isNull();
-    StrictAssertions.assertThat(draft1b.getWhenPublish()).isNull();
-
+    assertThat(draft1b.isDirty()).isFalse();
+    assertThat(draft1b.getComment()).isNull();
+    assertThat(draft1b.getWhenPublish()).isNull();
   }
 
   @Test
@@ -245,7 +243,7 @@ public class DocLinkTest extends BaseTestCase {
     EbeanServer server = Ebean.getDefaultServer();
 
     Link live = server.publish(Link.class, link1.getId(), null);
-    StrictAssertions.assertThat(live.isDraft()).isFalse();
+    assertThat(live.isDraft()).isFalse();
 
     Link draftLink = Ebean.find(Link.class)
       .setId(link1.getId())
@@ -262,8 +260,7 @@ public class DocLinkTest extends BaseTestCase {
       .asDraft()
       .findOne();
 
-    StrictAssertions.assertThat(draftLink.getLocation()).isEqualTo("firstLocation");
-
+    assertThat(draftLink.getLocation()).isEqualTo("firstLocation");
   }
 
   @Test
@@ -291,9 +288,8 @@ public class DocLinkTest extends BaseTestCase {
     List<Link> links = server.draftRestore(query);
 
     assertThat(links).hasSize(1);
-    StrictAssertions.assertThat(links.get(0).getLocation()).isEqualTo("firstLocation");
-    StrictAssertions.assertThat(links.get(0).isDirty()).isEqualTo(false);
-    StrictAssertions.assertThat(links.get(0).getComment()).isNull();
-
+    assertThat(links.get(0).getLocation()).isEqualTo("firstLocation");
+    assertThat(links.get(0).isDirty()).isEqualTo(false);
+    assertThat(links.get(0).getComment()).isNull();
   }
 }

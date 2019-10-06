@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.sql.Date;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class ScalarTypeDateTest {

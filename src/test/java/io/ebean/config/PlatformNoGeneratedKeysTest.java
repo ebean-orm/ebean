@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.draftable.BasicDraftableBean;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PlatformNoGeneratedKeysTest {
 

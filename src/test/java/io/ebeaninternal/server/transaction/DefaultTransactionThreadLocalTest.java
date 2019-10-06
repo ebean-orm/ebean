@@ -15,7 +15,7 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;

@@ -11,7 +11,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class H2HistoryDdlTest {

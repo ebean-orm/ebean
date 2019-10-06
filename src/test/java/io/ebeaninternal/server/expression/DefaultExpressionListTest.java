@@ -3,7 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.ExpressionList;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultExpressionListTest extends BaseExpressionTest {
 

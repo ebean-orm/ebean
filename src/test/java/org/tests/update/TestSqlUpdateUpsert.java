@@ -47,7 +47,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     assertThat(found2.getId()).isEqualTo(key);
     assertThat(found2.getEmail()).isEqualTo(email);
     assertThat(found2.isOnlineStatus()).isFalse();
-    assertThat(found2.getWhenUpdated()).isGreaterThan(found.getWhenUpdated()); // otherwise this test fails on my machine
+    assertThat(found2.getWhenUpdated()).isAfter(found.getWhenUpdated()); // otherwise this test fails on my machine
   }
 
   @ForPlatform(Platform.POSTGRES)
@@ -84,7 +84,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     assertThat(found2.getId()).isEqualTo(key);
     assertThat(found2.getEmail()).isEqualTo("foo@one.com");
     assertThat(found2.isOnlineStatus()).isFalse();
-    assertThat(found2.getWhenUpdated()).isGreaterThan(found.getWhenUpdated());
+    assertThat(found2.getWhenUpdated()).isAfter(found.getWhenUpdated());
 
   }
 

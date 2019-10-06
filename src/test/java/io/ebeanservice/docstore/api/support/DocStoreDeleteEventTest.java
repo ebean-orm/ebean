@@ -6,15 +6,16 @@ import io.ebean.EbeanServer;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
-import org.tests.model.basic.Order;
-import org.assertj.core.api.StrictAssertions;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.tests.model.basic.Order;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DocStoreDeleteEventTest {
 
@@ -44,7 +45,7 @@ public class DocStoreDeleteEventTest {
   }
 
   @Test
-  public void addToQueue() throws Exception {
+  public void addToQueue() {
 
     DocStoreDeleteEvent event = new DocStoreDeleteEvent(orderType(), 42);
 
@@ -55,9 +56,9 @@ public class DocStoreDeleteEventTest {
     assertThat(queueEntries).hasSize(1);
 
     DocStoreQueueEntry entry = queueEntries.get(0);
-    StrictAssertions.assertThat(entry.getBeanId()).isEqualTo(42);
-    StrictAssertions.assertThat(entry.getQueueId()).isEqualTo("order");
-    StrictAssertions.assertThat(entry.getPath()).isNull();
+    assertThat(entry.getBeanId()).isEqualTo(42);
+    assertThat(entry.getQueueId()).isEqualTo("order");
+    assertThat(entry.getPath()).isNull();
     assertThat(entry.getType()).isEqualTo(DocStoreQueueEntry.Action.DELETE);
   }
 }

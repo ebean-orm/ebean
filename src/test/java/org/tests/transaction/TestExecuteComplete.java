@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 public class TestExecuteComplete extends BaseTestCase {

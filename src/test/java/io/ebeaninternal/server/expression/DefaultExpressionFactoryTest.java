@@ -4,7 +4,7 @@ import io.ebean.Expression;
 import io.ebeaninternal.api.SpiExpression;
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class DefaultExpressionFactoryTest {

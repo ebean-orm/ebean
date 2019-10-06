@@ -2,7 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import org.junit.Test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class BetweenPropertyExpressionTest extends BaseExpressionTest {
 

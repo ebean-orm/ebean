@@ -10,7 +10,6 @@ import io.ebean.SqlRow;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
-import org.assertj.core.api.StrictAssertions;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -30,7 +29,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
   @Test
   public void testDeriveProperty() {
-    StrictAssertions.assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName("item_total", "some_other")).isEqualTo("itemTotal");
+    assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName("item_total", "some_other")).isEqualTo("itemTotal");
     assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "some_other")).isEqualTo("someOther");
     assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "alias.some_other")).isEqualTo("someOther");
     assertThat(SpiRawSql.ColumnMapping.Column.derivePropertyName(null, "alias.someOther")).isEqualTo("someOther");

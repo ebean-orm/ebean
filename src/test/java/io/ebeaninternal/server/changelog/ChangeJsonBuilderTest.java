@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.io.StringWriter;
 import java.util.List;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ChangeJsonBuilderTest extends BaseTestCase {
