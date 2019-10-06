@@ -36,8 +36,7 @@ public class MatchingNamingConvention extends AbstractNamingConvention {
 
   @Override
   public TableName getTableNameByConvention(Class<?> beanClass) {
-
-    return new TableName(getCatalog(), getSchema(), beanClass.getSimpleName());
+    return new TableName(quoteIdentifiers(getCatalog()), quoteIdentifiers(getSchema()), quoteIdentifiers(beanClass.getSimpleName()));
   }
 
   @Override

@@ -3,8 +3,11 @@ package io.ebean.config;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class MatchingNamingConventionTest {
 
@@ -15,20 +18,45 @@ public class MatchingNamingConventionTest {
     this.namingConvention.setDatabasePlatform(new H2Platform());
   }
 
-  @Test
-  public void getColumnFromProperty_when_allQuoted() {
-
+  private MatchingNamingConvention createMatchingNamingConventionAllQuoted() {
     SqlServer17Platform platform = new SqlServer17Platform();
 
     PlatformConfig config = new PlatformConfig();
     config.setAllQuotedIdentifiers(true);
     platform.configure(config);
 
-    NamingConvention nc = new MatchingNamingConvention();
+    MatchingNamingConvention nc = new MatchingNamingConvention();
     nc.setDatabasePlatform(platform);
+    return nc;
+  }
+
+  @Test
+  public void getColumnFromProperty_when_allQuoted() {
+
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
 
     assertThat(nc.getColumnFromProperty(null, "bridgetabUserId")).isEqualTo("[bridgetabUserId]");
     assertThat(nc.getColumnFromProperty(null, "order")).isEqualTo("[order]");
+  }
+
+  @Test
+  public void getTableNameByConvention_when_allQuoted() {
+
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
+
+    final TableName tableName = nc.getTableNameByConvention(Customer.class);
+    assertEquals("[Customer]", tableName.getName());
+    assertNull(tableName.getCatalog());
+    assertNull(tableName.getSchema());
+  }
+
+
+  @Test
+  public void getSequenceName() {
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
+
+    final String sequenceName = nc.getSequenceName("[Customer]", null);
+    assertEquals("Customer_seq", sequenceName);
   }
 
   @Test

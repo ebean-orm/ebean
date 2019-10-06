@@ -83,10 +83,13 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   }
 
   @Override
-  public String getSequenceName(String tableName, String pkColumn) {
-    String s = TABLE_REPLACE.matcher(sequenceFormat).replaceAll(Matcher.quoteReplacement(tableName));
+  public String getSequenceName(String rawTableName, String pkColumn) {
+    final String tableNameUnquoted = databasePlatform.unQuote(rawTableName);
+    String s = TABLE_REPLACE.matcher(sequenceFormat).replaceAll(Matcher.quoteReplacement(tableNameUnquoted));
     if (pkColumn == null) {
       pkColumn = "";
+    } else {
+      pkColumn = databasePlatform.unQuote(pkColumn);
     }
     return COLUMN_REPLACE.matcher(s).replaceAll(Matcher.quoteReplacement(pkColumn));
   }
