@@ -257,7 +257,9 @@ public class DdlGenerator {
   protected void runResourceScript(Connection connection, String sqlScript) throws IOException {
     if (sqlScript != null) {
       try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
-        if (is != null) {
+        if (is == null) {
+          log.warn("sql script {} was not found as a resource", sqlScript);
+        } else {
           String content = readContent(new InputStreamReader(is));
           runScript(connection, false, content, sqlScript);
         }
