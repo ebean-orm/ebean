@@ -23,24 +23,22 @@ class SaveManyElementCollectionMap extends SaveManyBase {
   void save() {
 
     Set<Map.Entry<?, ?>> entries = (Set<Map.Entry<?, ?>>) BeanCollectionUtil.getActualEntries(value);
-    if (entries == null || !BeanCollectionUtil.isModified(value)) {
-      return;
+    if (entries != null && (insertedParent || BeanCollectionUtil.isModified(value))) {
+      Object parentId = request.getBeanId();
+      preElementCollectionUpdate(parentId);
+
+      transaction.depth(+1);
+      SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
+      for (Map.Entry<?, ?> entry : entries) {
+        sqlInsert.setNextParameter(parentId);
+        sqlInsert.setNextParameter(entry.getKey());
+        many.bindElementValue(sqlInsert, entry.getValue());
+        server.execute(sqlInsert, transaction);
+      }
+
+      transaction.depth(-1);
+      resetModifyState();
+      postElementCollectionUpdate();
     }
-
-    Object parentId = request.getBeanId();
-    preElementCollectionUpdate(parentId);
-
-    transaction.depth(+1);
-    SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
-    for (Map.Entry<?, ?> entry : entries) {
-      sqlInsert.setNextParameter(parentId);
-      sqlInsert.setNextParameter(entry.getKey());
-      many.bindElementValue(sqlInsert, entry.getValue());
-      server.execute(sqlInsert, transaction);
-    }
-
-    transaction.depth(-1);
-    resetModifyState();
-    postElementCollectionUpdate();
   }
 }

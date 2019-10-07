@@ -21,22 +21,20 @@ class SaveManyElementCollection extends SaveManyBase {
   void save() {
 
     Collection<?> collection = BeanCollectionUtil.getActualEntries(value);
-    if (collection == null || !BeanCollectionUtil.isModified(value)) {
-      return;
-    }
+    if (collection != null && (insertedParent || BeanCollectionUtil.isModified(value))) {
+      Object parentId = request.getBeanId();
+      preElementCollectionUpdate(parentId);
 
-    Object parentId = request.getBeanId();
-    preElementCollectionUpdate(parentId);
-
-    transaction.depth(+1);
-    SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
-    for (Object value : collection) {
-      sqlInsert.setNextParameter(parentId);
-      many.bindElementValue(sqlInsert, value);
-      server.execute(sqlInsert, transaction);
+      transaction.depth(+1);
+      SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
+      for (Object value : collection) {
+        sqlInsert.setNextParameter(parentId);
+        many.bindElementValue(sqlInsert, value);
+        server.execute(sqlInsert, transaction);
+      }
+      transaction.depth(-1);
+      resetModifyState();
+      postElementCollectionUpdate();
     }
-    transaction.depth(-1);
-    resetModifyState();
-    postElementCollectionUpdate();
   }
 }
