@@ -129,8 +129,7 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void unregisterBean(Object bean) {
-
+  public void unregisterBeans() {
   }
 
   @Override
@@ -160,7 +159,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void register(TransactionCallback callback) {
-
   }
 
   @Override
@@ -170,12 +168,10 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setReadOnly(boolean readOnly) {
-
   }
 
   @Override
   public void setRollbackOnly() {
-
   }
 
   @Override
@@ -186,27 +182,22 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setDocStoreMode(DocStoreMode mode) {
-
   }
 
   @Override
   public void setDocStoreBatchSize(int batchSize) {
-
   }
 
   @Override
   public void setPersistCascade(boolean persistCascade) {
-
   }
 
   @Override
   public void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
-
   }
 
   @Override
   public void setSkipCache(boolean skipCache) {
-
   }
 
   @Override
@@ -216,7 +207,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setBatchMode(boolean useBatch) {
-
   }
 
   @Override
@@ -235,7 +225,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setBatchSize(int batchSize) {
-
   }
 
   @Override
@@ -245,17 +234,14 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
-
   }
 
   @Override
   public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
-
   }
 
   @Override
   public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
-
   }
 
   @Override
@@ -265,12 +251,10 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void flush() throws PersistenceException {
-
   }
 
   @Override
   public void flushBatch() throws PersistenceException {
-
   }
 
   @Override
@@ -280,12 +264,10 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-
   }
 
   @Override
   public void putUserObject(String name, Object value) {
-
   }
 
   @Override
@@ -300,7 +282,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void depth(int diff) {
-
   }
 
   @Override
@@ -335,7 +316,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setBatchControl(BatchControl control) {
-
   }
 
   @Override
@@ -345,7 +325,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setPersistenceContext(PersistenceContext context) {
-
   }
 
   @Override
@@ -365,12 +344,10 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void flushBatchOnCascade() {
-
   }
 
   @Override
   public void flushBatchOnRollback() {
-
   }
 
   @Override
@@ -380,27 +357,22 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void markNotQueryOnly() {
-
   }
 
   @Override
   public void checkBatchEscalationOnCollection() {
-
   }
 
   @Override
   public void flushBatchOnCollection() {
-
   }
 
   @Override
   public void addBeanChange(BeanChange beanChange) {
-
   }
 
   @Override
   public void sendChangeLog(ChangeSet changeSet) {
-
   }
 
   @Override
@@ -410,7 +382,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setTenantId(Object tenantId) {
-
   }
 
   @Override
@@ -425,12 +396,10 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void profileEvent(SpiProfileTransactionEvent event) {
-
   }
 
   @Override
   public void setProfileStream(ProfileStream profileStream) {
-
   }
 
   @Override
@@ -440,7 +409,6 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void setProfileLocation(ProfileLocation profileLocation) {
-
   }
 
   @Override

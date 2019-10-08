@@ -189,8 +189,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void unregisterBean(Object bean) {
-    transaction.unregisterBean(bean);
+  public void unregisterBeans() {
+    transaction.unregisterBeans();
   }
 
   @Override

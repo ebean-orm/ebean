@@ -473,6 +473,7 @@ public final class DefaultPersister implements Persister {
   }
 
   private void saveRecurse(PersistRequestBean<?> request) {
+    request.setSaveRecurse();
     if (request.isReference()) {
       // its a reference...
       if (request.isPersistCascade()) {

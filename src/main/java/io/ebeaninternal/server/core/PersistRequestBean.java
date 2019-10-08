@@ -83,6 +83,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private int flags;
 
+  private boolean saveRecurse;
+
   private DocStoreMode docStoreMode;
 
   private final ConcurrencyMode concurrencyMode;
@@ -529,8 +531,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void addToQueue(DocStoreUpdates docStoreUpdates) {
     switch (type) {
       case INSERT:
-        docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
-        break;
       case UPDATE:
       case DELETE_SOFT:
         docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
@@ -585,7 +585,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public void unRegisterBean() {
-    transaction.unregisterBean(bean);
+    if (!saveRecurse) {
+      // only clear all persisted beans when persisting at the top level
+      transaction.unregisterBeans();
+    }
   }
 
   /**
@@ -1463,5 +1466,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   public boolean isForcedUpdate() {
     return Flags.isUpdateForce(flags);
+  }
+
+  /**
+   * Set when this request is from cascading persist.
+   */
+  public void setSaveRecurse() {
+    saveRecurse = true;
   }
 }

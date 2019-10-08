@@ -75,9 +75,10 @@ public interface SpiTransaction extends Transaction {
   boolean isRegisteredDeleteBean(Integer hash);
 
   /**
-   * Unregister the persisted bean.
+   * Unregister the persisted beans. Expected after persisting top level beans
+   * and hence including all beans that were cascade persisted.
    */
-  void unregisterBean(Object bean);
+  void unregisterBeans();
 
   /**
    * Return true if this is a bean that has already been persisted in the

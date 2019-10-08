@@ -201,7 +201,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void unregisterBean(Object bean) {
+  public void unregisterBeans() {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -280,7 +280,6 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   @Override
   public void setBatchMode(boolean batchMode) {
-
   }
 
   @Override

@@ -446,11 +446,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   /**
-   * Unregister the persisted bean.
+   * Unregister the persisted beans (when persisting at the top level).
    */
   @Override
-  public void unregisterBean(Object bean) {
-    persistingBeans.remove(bean);
+  public void unregisterBeans() {
+    persistingBeans.clear();
   }
 
   /**
