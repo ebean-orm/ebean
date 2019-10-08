@@ -283,10 +283,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Check for batch escalation on cascade.
    */
   public void checkBatchEscalationOnCascade() {
-    if (transaction.checkBatchEscalationOnCascade(this)) {
-      // we escalated to use batch mode so flush when done
-      // but if createdTransaction then commit will flush it
-      batchOnCascadeSet = !createdTransaction;
+    if (type != Type.INSERT || beanDescriptor.isCascadeBatchEscalateSupported()) {
+      if (transaction.checkBatchEscalationOnCascade(this)) {
+        // we escalated to use batch mode so flush when done
+        // but if createdTransaction then commit will flush it
+        batchOnCascadeSet = !createdTransaction;
+      }
     }
     persistCascade = transaction.isPersistCascade();
   }

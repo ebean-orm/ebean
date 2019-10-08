@@ -140,6 +140,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final short profileBeanId;
 
   private final boolean multiValueSupported;
+  private boolean cascadeBatchEscalateSupported;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -752,6 +753,24 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     }
   }
 
+  private boolean hasCircularImportedId() {
+    for (BeanPropertyAssocOne<?> assocOne : propertiesOneImportedSave) {
+      if (assocOne.hasCircularImportedId(this)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  boolean hasCircularImportedIdTo(BeanDescriptor sourceDesc) {
+    for (BeanPropertyAssocOne<?> assocOne : propertiesOneImportedSave) {
+      if (assocOne.getTargetDescriptor() == sourceDesc) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void registerColumn(String dbColumn, String path) {
     String key = dbColumn.toLowerCase();
     // check for clash with imported OneToOne PK
@@ -812,6 +831,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   @SuppressWarnings("unchecked")
   void initialiseDocMapping() {
+    cascadeBatchEscalateSupported = supportCascadeBatch();
     for (BeanPropertyAssocMany<?> many : propertiesMany) {
       many.initialisePostTarget();
     }
@@ -824,6 +844,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     docMapping = docStoreAdapter.createDocMapping();
     docStoreAdapter.registerPaths();
     cacheHelp.deriveNotifyFlags();
+  }
+
+  private boolean supportCascadeBatch() {
+    return idType == IdType.IDENTITY || !hasCircularImportedId();
+  }
+
+  /**
+   * Return false if JDBC batch can't be implicitly escalated to.
+   * This happens when we have circular import id situation (need to defer setting identity value).
+   */
+  public boolean isCascadeBatchEscalateSupported() {
+    return cascadeBatchEscalateSupported;
   }
 
   void initInheritInfo() {

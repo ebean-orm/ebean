@@ -643,6 +643,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       // implicit transaction, no gain by batching where depth <= 0
       return false;
     }
+    //
     return batchMode;
   }
 
