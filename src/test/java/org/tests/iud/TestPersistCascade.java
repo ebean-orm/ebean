@@ -2,12 +2,17 @@ package org.tests.iud;
 
 import io.ebean.BaseTestCase;
 import org.avaje.moduuid.ModUUID;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestPersistCascade extends BaseTestCase {
 
   @Test
-  public void insert() throws InterruptedException {
+  public void insert() {
 
     PcfCountry country = new PcfCountry();
     for (int a = 0; a < 3; a++) {
@@ -15,16 +20,27 @@ public class TestPersistCascade extends BaseTestCase {
       PcfPerson viceMayor = createPerson();
       country.addCity(new PcfCity("city_" + ModUUID.newShortId(), mayor, viceMayor));
     }
-//    try (Transaction txn = DB.beginTransaction()) {
-//      txn.setBatchSize(20);
-//      country.save();
-//      txn.commit();
-//    }
 
+    LoggedSqlCollector.start();
     country.save();
 
+    final List<String> sql = LoggedSqlCollector.stop();
 
-    Thread.sleep(2000);
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql.get(0)).contains("insert into pcf_country");
+      assertThat(sql.get(1)).contains("insert into pcf_person");
+      assertSqlBind(sql, 2, 7);
+      assertThat(sql.get(8)).contains("insert into pcf_calendar");
+      assertSqlBind(sql, 9, 20);
+      assertThat(sql.get(21)).contains("insert into pcf_city");
+      assertSqlBind(sql, 22, 24);
+      assertThat(sql.get(25)).contains("insert into pcf_event");
+      assertSqlBind(sql, 26, 45);
+      assertThat(sql.get(46)).contains("insert into pcf_event");
+      assertSqlBind(sql, 47, 66);
+      assertThat(sql.get(67)).contains("insert into pcf_event");
+      assertSqlBind(sql, 68, 87);
+    }
 
     country.deletePermanent();
   }
