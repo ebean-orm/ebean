@@ -95,6 +95,10 @@ public class ModelBuildContext {
     return model.addTable(table);
   }
 
+  public void addTableElementCollection(MTable table) {
+    model.addTableElementCollection(table);
+  }
+
   public void addIndex(String indexName, String tableName, String columnName) {
     model.addIndex(indexName, tableName, columnName);
   }

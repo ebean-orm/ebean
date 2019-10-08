@@ -261,6 +261,13 @@ public class MColumn {
     return !draftOnly && !historyExclude;
   }
 
+  public void clearForeignKey() {
+    this.references = null;
+    this.foreignKeyName = null;
+    this.fkeyOnDelete = null;
+    this.fkeyOnUpdate = null;
+  }
+
   public Column createColumn() {
 
     Column c = new Column();

@@ -16,6 +16,51 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelContainerTest {
 
   @Test
+  public void elementCollectionTable_single_expect_foreignKeys() {
+
+    ModelContainer container = new ModelContainer();
+
+    container.addTableElementCollection(createElementCollectionTable("ec_bean.id", "fk_ec_bean_ec_table"));
+
+    final MTable ecTable = container.getTable("ec_table");
+    final MColumn fkCol = ecTable.getColumn("fk_col");
+    assertThat(fkCol.getReferences()).isEqualTo("ec_bean.id");
+  }
+
+  @Test
+  public void elementCollectionTable_reused_expect_noForeignKeys() {
+
+    ModelContainer container = new ModelContainer();
+
+    container.addTableElementCollection(createElementCollectionTable("ec_bean.id", "fk_ec_bean_ec_table"));
+    container.addTableElementCollection(createElementCollectionTable("ec_otherBean.id", "fk_ec_otherBean_ec_table"));
+
+    final MTable ecTable = container.getTable("ec_table");
+    final MColumn fkCol = ecTable.getColumn("fk_col");
+    assertThat(fkCol.getReferences()).isNull();
+    assertThat(fkCol.getForeignKeyName()).isNull();
+
+    final MIndex index = container.getIndex("ix_ec_table");
+    assertThat(index.getTableName()).isEqualTo("ec_table");
+    assertThat(index.getColumns()).containsOnly("fk_col");
+  }
+
+  private MTable createElementCollectionTable(String references, String fkName) {
+
+    MTable ecTable = new MTable("ec_table");
+    final MColumn colFk = new MColumn("fk_col", "varchar", true);
+    colFk.setReferences(references);
+    colFk.setForeignKeyName(fkName);
+    colFk.setForeignKeyIndex("ix_ec_table");
+
+    ecTable.addColumn(colFk);
+    ecTable.addColumn(new MColumn("key", "varchar", true));
+    ecTable.addColumn(new MColumn("val", "varchar", true));
+
+    return ecTable;
+  }
+
+  @Test
   public void apply_when_noPendingDrops_then_emptyPending() {
 
     ModelContainer container = new ModelContainer();

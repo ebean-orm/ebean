@@ -17,15 +17,11 @@ public class ModelBuildElementTable {
   public static void build(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
 
     BeanTable beanTable = manyProp.getBeanTable();
-
     BeanDescriptor<?> targetDescriptor = manyProp.getTargetDescriptor();
-
     MTable table = new MTable(beanTable.getBaseTable());
 
     VisitAllUsing.visitOne(targetDescriptor, new ModelBuildPropertyVisitor(ctx, table, targetDescriptor));
-
-    ctx.addTable(table);
+    ctx.addTableElementCollection(table);
   }
-
 
 }

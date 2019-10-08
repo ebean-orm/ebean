@@ -313,10 +313,28 @@ public class ModelContainer {
   }
 
   /**
+   * Add an element table taking into account if it is reused/references back
+   * to multiple bean types (and so can't have foreign key).
+   */
+  public void addTableElementCollection(MTable table) {
+    final MTable reusedElementCollection = tables.get(table.getName());
+    if (reusedElementCollection != null) {
+      final MIndex index = reusedElementCollection.setReusedElementCollection();
+      if (index != null) {
+        indexes.put(index.getIndexName(), index);
+      }
+    } else {
+      if (table.isPartitioned()) {
+        partitionedTables.add(table);
+      }
+      tables.put(table.getName(), table);
+    }
+  }
+
+  /**
    * Add a single column index.
    */
   public void addIndex(String indexName, String tableName, String columnName) {
-
     indexes.put(indexName, new MIndex(indexName, tableName, columnName));
   }
 
@@ -324,7 +342,6 @@ public class ModelContainer {
    * Add a multi column index.
    */
   public void addIndex(String indexName, String tableName, String[] columnNames) {
-
     indexes.put(indexName, new MIndex(indexName, tableName, columnNames));
   }
 

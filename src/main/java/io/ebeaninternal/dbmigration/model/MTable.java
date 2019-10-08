@@ -273,8 +273,7 @@ public class MTable {
     }
 
     for (MCompoundUniqueConstraint constraint : uniqueConstraints) {
-      UniqueConstraint uq = constraint.getUniqueConstraint();
-      createTable.getUniqueConstraint().add(uq);
+      createTable.getUniqueConstraint().add(constraint.getUniqueConstraint());
     }
 
     return createTable;
@@ -788,5 +787,21 @@ public class MTable {
 
   public void setPartitionMeta(PartitionMeta partitionMeta) {
     this.partitionMeta = partitionMeta;
+  }
+
+  /**
+   * Clear foreign key as this element collection table logically references
+   * back to multiple tables.
+   */
+  public MIndex setReusedElementCollection() {
+    MIndex index = null;
+    for (MColumn column : columns.values()) {
+      final String references = column.getReferences();
+      if (references != null) {
+        index = new MIndex(column.getForeignKeyIndex(), name, column.getName());
+        column.clearForeignKey();
+      }
+    }
+    return index;
   }
 }
