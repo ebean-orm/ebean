@@ -1,8 +1,6 @@
 package org.tests.iud;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Transaction;
 import org.avaje.moduuid.ModUUID;
 import org.junit.Test;
 
@@ -15,7 +13,7 @@ public class TestPersistCascade extends BaseTestCase {
     for (int a = 0; a < 3; a++) {
       PcfPerson mayor = createPerson();
       PcfPerson viceMayor = createPerson();
-      country.addCity(new PcfCity("c_" + ModUUID.newShortId(), mayor, viceMayor));
+      country.addCity(new PcfCity("city_" + ModUUID.newShortId(), mayor, viceMayor));
     }
 //    try (Transaction txn = DB.beginTransaction()) {
 //      txn.setBatchSize(20);
@@ -32,7 +30,7 @@ public class TestPersistCascade extends BaseTestCase {
   }
 
   private static PcfPerson createPerson() {
-    PcfPerson person = new PcfPerson("per_" + ModUUID.newShortId());
+    PcfPerson person = new PcfPerson("person_" + ModUUID.newShortId());
     for (int a = 0; a < 2; a++) {
       PcfCalendar calendar = new PcfCalendar();
       for (int b = 0; b < 10; b++) {

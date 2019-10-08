@@ -49,15 +49,17 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(5); // update of collection only
+      assertThat(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
+      assertSqlBind(sql.get(1));
+      assertThat(sql.get(2)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
+      assertSqlBind(sql, 3, 4);
+    } else {
       assertThat(sql).hasSize(4); // update of collection only
       assertThat(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
-      assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
-      assertSqlBind(sql, 2, 3);
-    } else {
-      assertThat(sql).hasSize(3); // update of collection only
-      assertThat(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
-      assertThat(sql.get(1)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
+      assertSqlBind(sql.get(1));
       assertThat(sql.get(2)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,number) values (?,?,?,?,?)");
     }
 
     EcbmPerson three = Ebean.find(EcbmPerson.class)
@@ -77,7 +79,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     Ebean.save(three);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(4);
+    assertThat(sql).hasSize(5);
 
     EcbmPerson four = Ebean.find(EcbmPerson.class)
       .setId(person.getId())

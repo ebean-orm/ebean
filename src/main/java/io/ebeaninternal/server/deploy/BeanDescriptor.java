@@ -140,7 +140,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final short profileBeanId;
 
   private final boolean multiValueSupported;
-  private boolean cascadeBatchEscalateSupported;
+  private boolean batchEscalateOnCascadeInsert;
+  private boolean batchEscalateOnCascadeDelete;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -831,7 +832,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   @SuppressWarnings("unchecked")
   void initialiseDocMapping() {
-    cascadeBatchEscalateSupported = supportCascadeBatch();
+    batchEscalateOnCascadeInsert = supportBatchEscalateOnInsert();
+    batchEscalateOnCascadeDelete = supportBatchEscalateOnDelete();
     for (BeanPropertyAssocMany<?> many : propertiesMany) {
       many.initialisePostTarget();
     }
@@ -846,7 +848,19 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     cacheHelp.deriveNotifyFlags();
   }
 
-  private boolean supportCascadeBatch() {
+  private boolean supportBatchEscalateOnDelete() {
+    if (softDelete) {
+      return false;
+    }
+    for (BeanPropertyAssocMany<?> assocMany : propertiesManyDelete) {
+      if (assocMany.isCascadeDeleteEscalate()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean supportBatchEscalateOnInsert() {
     return idType == IdType.IDENTITY || !hasCircularImportedId();
   }
 
@@ -854,8 +868,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return false if JDBC batch can't be implicitly escalated to.
    * This happens when we have circular import id situation (need to defer setting identity value).
    */
-  public boolean isCascadeBatchEscalateSupported() {
-    return cascadeBatchEscalateSupported;
+  public boolean isBatchEscalateOnCascade(PersistRequest.Type type) {
+    return type == PersistRequest.Type.INSERT ? batchEscalateOnCascadeInsert : batchEscalateOnCascadeDelete;
   }
 
   void initInheritInfo() {

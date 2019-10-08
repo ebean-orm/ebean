@@ -40,7 +40,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
     DB.update(upd);
 
     List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(6);
     assertThat(sql.get(0)).contains("update esd_master set name=? where id=?");
     if (isPlatformBooleanNative()) {
       assertThat(sql.get(1)).contains("update esd_detail set deleted=true where master_id = ? and not");

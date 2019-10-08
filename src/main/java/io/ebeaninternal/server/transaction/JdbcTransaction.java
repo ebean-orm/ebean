@@ -639,11 +639,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public boolean isBatchThisRequest() {
-    if (!batchOnCascadeSet && !explicit && depth <= 0) {
-      // implicit transaction, no gain by batching where depth <= 0
-      return false;
-    }
-    //
     return batchMode;
   }
 

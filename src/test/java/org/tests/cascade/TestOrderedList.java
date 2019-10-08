@@ -48,9 +48,7 @@ public class TestOrderedList extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
 
-
     fetchAndReorder(master.getId());
-
   }
 
   private void fetchAndReorder(Long id) {
@@ -96,8 +94,9 @@ public class TestOrderedList extends BaseTestCase {
     Ebean.delete(fresh);
 
     sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
-    assertThat(sql.get(1)).contains("delete from om_ordered_master where id=? and version=?");
+    assertSqlBind(sql.get(1));
+    assertThat(sql.get(2)).contains("delete from om_ordered_master where id=? and version=?");
   }
 }

@@ -114,6 +114,10 @@ public abstract class BaseTestCase {
     return trimSql(query.getGeneratedSql(), columns);
   }
 
+  protected void assertSqlBind(String sql) {
+    assertThat(sql).contains("-- bind");
+  }
+
   protected void assertSqlBind(List<String> sql, int i) {
     assertThat(sql.get(i)).contains("-- bind");
   }
