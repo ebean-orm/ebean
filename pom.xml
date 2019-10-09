@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-parent</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -386,7 +386,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>3.1.1</version>
         <configuration>
           <doctitle>Ebean 11</doctitle>
           <overview>src/main/java/io/ebean/overview.html</overview>
@@ -398,6 +398,8 @@
             <artifactId>pygments-doclet</artifactId>
             <version>1.0.0</version>
           </docletArtifact>
+          <!-- for people using JDK11, our javadoc doclet isn't 11 compatible yet -->
+          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>
           <additionalparam>
             -Xdoclint:none
             -include-basedir ${project.basedir}
