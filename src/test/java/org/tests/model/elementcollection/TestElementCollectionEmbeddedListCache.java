@@ -48,10 +48,11 @@ public class TestElementCollectionEmbeddedListCache extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(4); // update of collection only
+      assertThat(sql).hasSize(5); // update of collection only
       assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
-      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
-      assertSqlBind(sql, 2, 3);
+      assertSqlBind(sql.get(1));
+      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertSqlBind(sql, 3, 4);
     } else {
       assertThat(sql).hasSize(3); // update of collection only
       assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
@@ -76,7 +77,7 @@ public class TestElementCollectionEmbeddedListCache extends BaseTestCase {
     Ebean.save(three);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(4);
+    assertThat(sql).hasSize(5);
 
     EcblPerson four = Ebean.find(EcblPerson.class)
       .setId(person.getId())

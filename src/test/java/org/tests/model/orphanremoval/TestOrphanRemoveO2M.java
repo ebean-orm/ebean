@@ -30,8 +30,9 @@ public class TestOrphanRemoveO2M extends BaseTestCase {
     assertThat(Ebean.find(OrpDetail.class, "d1")).isNull();
     assertThat(Ebean.find(OrpDetail.class, "d2")).isNull();
 
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("delete from orp_detail where id=?");
+    assertSqlBind(sql, 1, 2);
   }
 
   @Test

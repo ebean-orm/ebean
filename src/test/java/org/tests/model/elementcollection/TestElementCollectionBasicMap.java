@@ -105,11 +105,12 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(6);
+      assertThat(sql).hasSize(7);
       assertThat(sql.get(0)).contains("update ecm_person set name=?, version=? where id=? and version=?");
       assertThat(sql.get(1)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
-      assertThat(sql.get(2)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
-      assertSqlBind(sql, 3, 5);
+      assertSqlBind(sql.get(2));
+      assertThat(sql.get(3)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertSqlBind(sql, 4, 6);
     } else {
       assertThat(sql).hasSize(5);
       assertThat(sql.get(0)).contains("update ecm_person set name=?, version=? where id=? and version=?");
@@ -139,10 +140,11 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(6);
+      assertThat(sql).hasSize(7);
       assertThat(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
-      assertThat(sql.get(1)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
-      assertSqlBind(sql, 2, 5);
+      assertSqlBind(sql.get(1));
+      assertThat(sql.get(2)).contains("insert into ecm_person_phone_numbers (ecm_person_id,type,number) values (?,?,?)");
+      assertSqlBind(sql, 3, 6);
     } else {
       assertThat(sql).hasSize(5);
       assertThat(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");

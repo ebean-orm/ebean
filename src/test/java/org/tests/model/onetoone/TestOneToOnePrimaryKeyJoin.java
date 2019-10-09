@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
 
-
   private OtoPrime insert(String desc) {
     OtoPrime prime = new OtoPrime("p" + desc);
     OtoPrimeExtra extra = new OtoPrimeExtra("e" + desc);
@@ -50,7 +49,6 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
     assertThat(sqlOf(queryWithFetch, 10)).contains("select t0.pid, t0.name, t0.version, t1.eid, t1.extra, t1.version from oto_prime t0 join oto_prime_extra t1 on t1.eid = t0.pid  where t0.pid = ?")
       .as("we join to oto_prime_extra");
 
-
     assertThat(oneWith.getExtra().getExtra()).isEqualTo("e" + desc);
 
     thenUpdate(oneWith);
@@ -72,7 +70,6 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
 
   private void thenDelete(OtoPrime found) {
 
-
     OtoPrime bean = Ebean.find(OtoPrime.class, found.getPid());
 
     LoggedSqlCollector.start();
@@ -82,6 +79,5 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("delete from oto_prime_extra where");
     assertThat(sql.get(1)).contains("delete from oto_prime where");
-
   }
 }

@@ -140,6 +140,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final short profileBeanId;
 
   private final boolean multiValueSupported;
+  private boolean batchEscalateOnCascadeInsert;
+  private boolean batchEscalateOnCascadeDelete;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -752,6 +754,24 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     }
   }
 
+  private boolean hasCircularImportedId() {
+    for (BeanPropertyAssocOne<?> assocOne : propertiesOneImportedSave) {
+      if (assocOne.hasCircularImportedId(this)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  boolean hasCircularImportedIdTo(BeanDescriptor sourceDesc) {
+    for (BeanPropertyAssocOne<?> assocOne : propertiesOneImportedSave) {
+      if (assocOne.getTargetDescriptor() == sourceDesc) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void registerColumn(String dbColumn, String path) {
     String key = dbColumn.toLowerCase();
     // check for clash with imported OneToOne PK
@@ -812,6 +832,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   @SuppressWarnings("unchecked")
   void initialiseDocMapping() {
+    batchEscalateOnCascadeInsert = supportBatchEscalateOnInsert();
+    batchEscalateOnCascadeDelete = supportBatchEscalateOnDelete();
     for (BeanPropertyAssocMany<?> many : propertiesMany) {
       many.initialisePostTarget();
     }
@@ -824,6 +846,30 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     docMapping = docStoreAdapter.createDocMapping();
     docStoreAdapter.registerPaths();
     cacheHelp.deriveNotifyFlags();
+  }
+
+  private boolean supportBatchEscalateOnDelete() {
+    if (softDelete) {
+      return false;
+    }
+    for (BeanPropertyAssocMany<?> assocMany : propertiesManyDelete) {
+      if (assocMany.isCascadeDeleteEscalate()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean supportBatchEscalateOnInsert() {
+    return idType == IdType.IDENTITY || !hasCircularImportedId();
+  }
+
+  /**
+   * Return false if JDBC batch can't be implicitly escalated to.
+   * This happens when we have circular import id situation (need to defer setting identity value).
+   */
+  public boolean isBatchEscalateOnCascade(PersistRequest.Type type) {
+    return type == PersistRequest.Type.INSERT ? batchEscalateOnCascadeInsert : batchEscalateOnCascadeDelete;
   }
 
   void initInheritInfo() {

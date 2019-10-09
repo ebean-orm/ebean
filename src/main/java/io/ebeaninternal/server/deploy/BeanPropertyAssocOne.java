@@ -807,4 +807,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       }
     }
   }
+
+  public boolean hasCircularImportedId(BeanDescriptor<?> sourceDesc) {
+    return targetDescriptor.hasCircularImportedIdTo(sourceDesc);
+  }
 }

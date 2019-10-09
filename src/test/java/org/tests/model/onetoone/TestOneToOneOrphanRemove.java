@@ -34,19 +34,21 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     Ebean.save(jack);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(4);
+    assertThat(sql).hasSize(5);
     assertThat(sql.get(0)).contains("delete from oto_cust_address where aid=? and version=?");
-    assertThat(sql.get(1)).contains("update oto_cust set version=? where cid=? and version=?");
-    assertThat(sql.get(2)).contains("insert into oto_cust_address ");
-    assertThat(sql.get(3)).contains("-- bind(other1");
+    assertSqlBind(sql.get(1));
+    assertThat(sql.get(2)).contains("update oto_cust set version=? where cid=? and version=?");
+    assertThat(sql.get(3)).contains("insert into oto_cust_address ");
+    assertThat(sql.get(4)).contains("-- bind(other1");
 
     jack.setAddress(null);
     Ebean.save(jack);
 
     sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("delete from oto_cust_address where aid=? and version=?");
-    assertThat(sql.get(1)).contains("update oto_cust set version=? where cid=? and version=?");
+    assertSqlBind(sql.get(1));
+    assertThat(sql.get(2)).contains("update oto_cust set version=? where cid=? and version=?");
 
     OtoCustAddress foundAddress = Ebean.find(OtoCustAddress.class, address2.getAid());
     assertThat(foundAddress).isNull();

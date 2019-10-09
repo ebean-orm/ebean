@@ -25,9 +25,10 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
     Ebean.save(b);
 
     List<String> update = LoggedSqlCollector.current();
-    assertThat(update).hasSize(2);
+    assertThat(update).hasSize(3);
     assertThat(update.get(0)).contains("insert into oto_aone");
-    assertThat(update.get(1)).contains("update oto_atwo set aone_id=? where id=?");
+    assertSqlBind(update.get(1));
+    assertThat(update.get(2)).contains("update oto_atwo set aone_id=? where id=?");
 
     Ebean.delete(b);
 
@@ -50,9 +51,10 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
     Ebean.save(b);
 
     List<String> inserts = LoggedSqlCollector.current();
-    assertThat(inserts).hasSize(2);
+    assertThat(inserts).hasSize(3);
     assertThat(inserts.get(0)).contains("insert into oto_aone");
-    assertThat(inserts.get(1)).contains("insert into oto_atwo");
+    assertSqlBind(inserts.get(1));
+    assertThat(inserts.get(2)).contains("insert into oto_atwo");
 
     Ebean.delete(b);
 
@@ -80,10 +82,12 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
     Ebean.save(b);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(5);
     assertThat(sql.get(0)).contains("insert into oto_aone");
-    assertThat(sql.get(1)).contains("update oto_atwo set aone_id=? where id=?");
-    assertThat(sql.get(2)).contains("delete from oto_aone where id=?");
+    assertSqlBind(sql.get(1));
+    assertThat(sql.get(2)).contains("update oto_atwo set aone_id=? where id=?");
+    assertThat(sql.get(3)).contains("delete from oto_aone where id=?");
+    assertSqlBind(sql.get(4));
 
     Ebean.delete(b);
 
@@ -91,7 +95,6 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
     assertThat(deletes).hasSize(2);
     assertThat(deletes.get(0)).contains("delete from oto_atwo");
     assertThat(deletes.get(1)).contains("delete from oto_aone");
-
   }
 }
 

@@ -958,6 +958,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return cascadeInfo.isDelete() || o2mJoinTable || ModifyListenMode.REMOVALS == modifyListenMode;
   }
 
+  public boolean isCascadeDeleteEscalate() {
+    return !elementCollection && cascadeInfo.isDelete();
+  }
+
   public String insertElementCollection() {
     return sqlHelp.insertElementCollection();
   }
