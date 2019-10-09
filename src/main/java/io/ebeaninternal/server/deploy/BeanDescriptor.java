@@ -3213,9 +3213,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private boolean includesAggregation(OrmQueryProperties rootProps) {
     if (rootProps != null) {
       final Set<String> included = rootProps.getIncluded();
-      for (BeanProperty property : propertiesAggregate) {
-        if (included.contains(property.getName())) {
-          return true;
+      if (included != null) {
+        for (BeanProperty property : propertiesAggregate) {
+          if (included.contains(property.getName())) {
+            return true;
+          }
         }
       }
     }

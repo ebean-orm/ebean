@@ -59,6 +59,24 @@ public class TestAggregationCount extends BaseTestCase {
   }
 
   @Test
+  public void example_count() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    int count =
+      Ebean.find(TEventOne.class)
+        .where().isNotNull("name")
+        .findCount();
+
+    assertThat(count).isGreaterThan(1);
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(trimSql(sql.get(0))).contains("select count(*) from tevent_one t0 where t0.name is not null");
+  }
+
+  @Test
   public void testNonAggregationLazyLoading() {
 
     Query<TEventOne> query = Ebean.find(TEventOne.class).select("id");
