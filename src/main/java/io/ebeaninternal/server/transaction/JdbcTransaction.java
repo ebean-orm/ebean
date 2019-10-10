@@ -785,6 +785,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       for (PersistDeferredRelationship deferred : deferredList) {
         deferred.execute(this);
       }
+      batchFlush();
       deferredList.clear();
     }
   }

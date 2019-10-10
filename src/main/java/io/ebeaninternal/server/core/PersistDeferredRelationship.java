@@ -20,7 +20,6 @@ public class PersistDeferredRelationship {
   private final EntityBean bean;
 
   public PersistDeferredRelationship(SpiEbeanServer ebeanServer, BeanDescriptor<?> beanDescriptor, EntityBean assocBean, ImportedId importedId, EntityBean bean) {
-
     this.ebeanServer = ebeanServer;
     this.beanDescriptor = beanDescriptor;
     this.assocBean = assocBean;
@@ -41,13 +40,11 @@ public class PersistDeferredRelationship {
 
     // bind the set clause for the importedId
     int pos = importedId.bind(1, sqlUpdate, assocBean);
-
     // bind the where clause for the bean
     Object[] idValues = beanDescriptor.getIdBinder().getIdValues(bean);
     for (int j = 0; j < idValues.length; j++) {
       sqlUpdate.setParameter(pos + j, idValues[j]);
     }
-
     ebeanServer.execute(sqlUpdate, transaction);
   }
 }
