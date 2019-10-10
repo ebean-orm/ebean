@@ -42,6 +42,11 @@ public interface BeanPersistRequest<T> {
   Set<String> getUpdatedProperties();
 
   /**
+   * Flags set for dirty properties (used by ElasticSearch integration).
+   */
+  boolean[] getDirtyProperties();
+
+  /**
    * Return true for an update request if at least one of dirty properties is contained
    * in the given set of property names.
    * <p>

@@ -427,6 +427,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the dirty properties on this request.
    */
+  @Override
   public boolean[] getDirtyProperties() {
     return dirtyProperties;
   }
@@ -485,7 +486,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Collect L2 cache changes to be applied after the transaction has successfully committed.
    */
-  public void notifyCache(CacheChangeSet changeSet) {
+  private void notifyCache(CacheChangeSet changeSet) {
     if (notifyCache) {
       switch (type) {
         case INSERT:
@@ -738,14 +739,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public Object getParentBean() {
     return parentBean;
-  }
-
-  /**
-   * Return the controller if there is one associated with this type of bean. This returns null if
-   * there is no controller associated.
-   */
-  public BeanPersistController getBeanController() {
-    return controller;
   }
 
   /**
