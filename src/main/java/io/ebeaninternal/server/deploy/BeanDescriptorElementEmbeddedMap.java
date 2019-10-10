@@ -29,9 +29,13 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
   }
 
   @Override
+  public boolean isJsonReadCollection() {
+    return true;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
-    ctx.writeStartObject();
     if (stringKey) {
       Object key = entry.getKey();
       String keyName = (key == null) ? "null" : key.toString();
@@ -43,7 +47,6 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
       ctx.writeFieldName("value");
       writeJsonElement(ctx, entry.getValue());
     }
-    ctx.writeEndObject();
   }
 
   @Override
@@ -52,30 +55,21 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
     JsonParser parser = readJson.getParser();
     ElementCollector add = elementHelp.createCollector();
     do {
-      JsonToken token = parser.nextToken();
-      if (token != JsonToken.START_OBJECT) {
+      String fieldName = parser.nextFieldName();
+      if (fieldName == null) {
         break;
       }
       if (stringKey) {
-        String key = parser.nextFieldName();
         parser.nextToken();
         Object val = readJsonElement(readJson, null);
-        add.addKeyValue(key, val);
-
+        add.addKeyValue(fieldName, val);
       } else {
         parser.nextFieldName();
         Object key = scalarTypeKey.jsonRead(parser);
-
         parser.nextFieldName();
         Object val = readJsonElement(readJson, null);
         add.addKeyValue(key, val);
       }
-
-      token = parser.nextToken();
-      if (token != JsonToken.END_OBJECT) {
-        break;
-      }
-
     } while (true);
 
     return add.collection();

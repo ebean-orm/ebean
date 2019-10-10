@@ -21,6 +21,11 @@ abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     this.elementHelp = elementHelp;
   }
 
+  @Override
+  public boolean isJsonReadCollection() {
+    return true;
+  }
+
   /**
    * Find and return the first base scalar type (and we expect only 1).
    */

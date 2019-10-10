@@ -399,6 +399,37 @@ public class WriteJson implements SpiJsonWriter {
   }
 
   @Override
+  public void beginAssocManyMap(String key, boolean elementCollection) {
+    try {
+      pathStack.pushPathKey(key);
+      if (key != null) {
+        generator.writeFieldName(key);
+      }
+      if (elementCollection) {
+        generator.writeStartObject();
+      } else {
+        generator.writeStartArray();
+      }
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
+  }
+
+  @Override
+  public void endAssocManyMap(boolean elementCollection) {
+    try {
+      pathStack.pop();
+      if (elementCollection) {
+        generator.writeEndObject();
+      } else {
+        generator.writeEndArray();
+      }
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
+  }
+
+  @Override
   public <T> void writeBean(BeanDescriptor<T> desc, EntityBean bean) {
     createWriteBean(desc, bean).write(this);
   }

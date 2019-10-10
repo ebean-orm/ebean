@@ -40,22 +40,18 @@ class BeanPropertyAssocManyJsonHelp {
     if (!this.many.jsonDeserialize) {
       return;
     }
-
     JsonParser parser = readJson.getParser();
     JsonToken event = parser.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       return;
     }
-
     if (many.isTransient()) {
       jsonReadTransientUsingObjectMapper(readJson, parentBean);
       return;
     }
-
-    if (JsonToken.START_ARRAY != event) {
-      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start_array");
+    if (JsonToken.START_ARRAY != event && JsonToken.START_OBJECT != event) {
+      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start array or object");
     }
-
     many.setValue(parentBean, many.jsonReadCollection(readJson, parentBean));
   }
 

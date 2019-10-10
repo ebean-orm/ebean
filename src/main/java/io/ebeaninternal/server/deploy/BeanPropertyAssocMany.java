@@ -971,7 +971,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
-    elementDescriptor.jsonWriteMapEntry(ctx, entry);
+    if (elementDescriptor != null) {
+      elementDescriptor.jsonWriteMapEntry(ctx, entry);
+    } else {
+      targetDescriptor.jsonWrite(ctx, (EntityBean)entry.getValue());
+    }
   }
 
   void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
@@ -1051,10 +1055,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
 
-    if (elementDescriptor != null && manyType.isMap()) {
+    if (elementDescriptor != null && elementDescriptor.isJsonReadCollection()) {
       return elementDescriptor.jsonReadCollection(readJson, parentBean);
     }
-
     BeanCollection<?> collection = createEmpty(parentBean);
     BeanCollectionAdd add = getBeanCollectionAdd(collection);
     do {

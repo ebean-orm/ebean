@@ -1,6 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -169,5 +170,22 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
     String asJson = Ebean.json().toJson(foundFirst);
     EcsPerson fromJson = Ebean.json().toBean(EcsPerson.class, asJson);
     assertThat(fromJson.getPhoneNumbers()).containsAll(foundFirst.getPhoneNumbers());
+  }
+
+  @Test
+  public void json() {
+
+    EcsPerson person = new EcsPerson("Fiona021");
+    person.getPhoneNumbers().add("021 1234");
+    person.getPhoneNumbers().add("021 4321");
+
+    final String asJson = DB.json().toJson(person);
+
+    assertThat(asJson).isEqualTo("{\"name\":\"Fiona021\",\"phoneNumbers\":[\"021 1234\",\"021 4321\"]}");
+
+    final EcsPerson fromJson = DB.json().toBean(EcsPerson.class, asJson);
+    assertThat(fromJson.getName()).isEqualTo("Fiona021");
+    assertThat(fromJson.getPhoneNumbers()).hasSize(2);
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanSet size[2] set[021 1234, 021 4321]");
   }
 }

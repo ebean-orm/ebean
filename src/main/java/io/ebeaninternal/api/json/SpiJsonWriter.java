@@ -63,6 +63,16 @@ public interface SpiJsonWriter extends JsonWriter {
   void endAssocMany();
 
   /**
+   * Start a Many.
+   */
+  void beginAssocManyMap(String name, boolean elementCollection);
+
+  /**
+   * End a Many.
+   */
+  void endAssocManyMap(boolean elementCollection);
+
+  /**
    * Write value using underlying Jaskson object mapper if available.
    */
   void writeValueUsingObjectMapper(String name, Object value);

@@ -1,6 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -167,4 +168,20 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     assertThat(phoneString).contains("64-021-4321");
   }
 
+  @Test
+  public void json() {
+
+    EcbmPerson person = new EcbmPerson("Fiona64021");
+    person.getPhoneNumbers().put("home", new EcPhone("64", "021","1234"));
+    person.getPhoneNumbers().put("work", new EcPhone("64","021","4321"));
+
+    final String asJson = DB.json().toJson(person);
+
+    assertThat(asJson).isEqualTo("{\"name\":\"Fiona64021\",\"phoneNumbers\":{\"home\":{\"countryCode\":\"64\",\"area\":\"021\",\"number\":\"1234\"},\"work\":{\"countryCode\":\"64\",\"area\":\"021\",\"number\":\"4321\"}}}");
+
+    final EcbmPerson fromJson = DB.json().toBean(EcbmPerson.class, asJson);
+    assertThat(fromJson.getName()).isEqualTo("Fiona64021");
+    assertThat(fromJson.getPhoneNumbers()).hasSize(2);
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanMap size[2] map{home=64-021-1234, work=64-021-4321}");
+  }
 }

@@ -1,6 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -17,8 +18,8 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     LoggedSqlCollector.start();
 
     EcblPerson person = new EcblPerson("Fiona64021");
-    person.getPhoneNumbers().add(new EcPhone("64", "021","1234"));
-    person.getPhoneNumbers().add(new EcPhone("64","021","4321"));
+    person.getPhoneNumbers().add(new EcPhone("64", "021", "1234"));
+    person.getPhoneNumbers().add(new EcPhone("64", "021", "4321"));
     Ebean.save(person);
 
     List<String> sql = LoggedSqlCollector.current();
@@ -35,8 +36,8 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     }
 
     EcblPerson person1 = new EcblPerson("Fiona6409");
-    person1.getPhoneNumbers().add(new EcPhone("61","09","1234"));
-    person1.getPhoneNumbers().add(new EcPhone("64","09","4321"));
+    person1.getPhoneNumbers().add(new EcPhone("61", "09", "1234"));
+    person1.getPhoneNumbers().add(new EcPhone("64", "09", "4321"));
     Ebean.save(person1);
 
     LoggedSqlCollector.current();
@@ -174,5 +175,22 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     String phoneString = fromJson.getPhoneNumbers().toString();
     assertThat(phoneString).contains("64-021-1234");
     assertThat(phoneString).contains("64-021-4321");
+  }
+
+  @Test
+  public void json() {
+
+    EcblPerson person = new EcblPerson("Fiona64021");
+    person.getPhoneNumbers().add(new EcPhone("64", "021", "1234"));
+    person.getPhoneNumbers().add(new EcPhone("64", "021", "4321"));
+
+    final String asJson = DB.json().toJson(person);
+
+    assertThat(asJson).isEqualTo("{\"name\":\"Fiona64021\",\"phoneNumbers\":[{\"countryCode\":\"64\",\"area\":\"021\",\"number\":\"1234\"},{\"countryCode\":\"64\",\"area\":\"021\",\"number\":\"4321\"}]}");
+
+    final EcblPerson fromJson = DB.json().toBean(EcblPerson.class, asJson);
+    assertThat(fromJson.getName()).isEqualTo("Fiona64021");
+    assertThat(fromJson.getPhoneNumbers()).hasSize(2);
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanList size[2] list[64-021-1234, 64-021-4321]");
   }
 }

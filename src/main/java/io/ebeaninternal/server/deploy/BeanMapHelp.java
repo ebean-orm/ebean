@@ -163,11 +163,12 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     }
 
     if (!map.isEmpty() || ctx.isIncludeEmpty()) {
-      ctx.beginAssocMany(name);
+      final boolean elementCollection = many.isElementCollection();
+      ctx.beginAssocManyMap(name, elementCollection);
       for (Entry<?, ?> entry : map.entrySet()) {
         many.jsonWriteMapEntry(ctx, entry);
       }
-      ctx.endAssocMany();
+      ctx.endAssocManyMap(elementCollection);
     }
   }
 

@@ -1,6 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -174,5 +175,22 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     assertThat(fromJson.getPhoneNumbers()).containsValues("021 1234", "021 4321");
     assertThat(fromJson.getPhoneNumbers().get("home")).isEqualTo("021 1234");
+  }
+
+  @Test
+  public void json() {
+
+    EcmPerson person = new EcmPerson("Fiona021");
+    person.getPhoneNumbers().put("home", "021 1234");
+    person.getPhoneNumbers().put("work", "021 4321");
+
+    final String asJson = DB.json().toJson(person);
+
+    assertThat(asJson).isEqualTo("{\"name\":\"Fiona021\",\"phoneNumbers\":{\"home\":\"021 1234\",\"work\":\"021 4321\"}}");
+
+    final EcmPerson fromJson = DB.json().toBean(EcmPerson.class, asJson);
+    assertThat(fromJson.getName()).isEqualTo("Fiona021");
+    assertThat(fromJson.getPhoneNumbers()).hasSize(2);
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanMap size[2] map{home=021 1234, work=021 4321}");
   }
 }

@@ -36,6 +36,11 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
   }
 
   @Override
+  public boolean isJsonReadCollection() {
+    return false;
+  }
+
+  @Override
   public void initialiseOther(BeanDescriptorInitContext initContext) {
     super.initialiseOther(initContext);
     this.targetDescriptor = embeddedProperty.getTargetDescriptor();

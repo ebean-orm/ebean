@@ -3549,6 +3549,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     throw new IllegalStateException("Unexpected - expect Element override");
   }
 
+  public boolean isJsonReadCollection() {
+    return false;
+  }
+
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
   }
