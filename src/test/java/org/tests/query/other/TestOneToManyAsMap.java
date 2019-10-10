@@ -2,8 +2,6 @@ package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
-import org.junit.Assert;
 import org.junit.Test;
 import org.tests.model.map.MpRole;
 import org.tests.model.map.MpUser;
@@ -12,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestOneToManyAsMap extends BaseTestCase {
 
@@ -19,27 +19,27 @@ public class TestOneToManyAsMap extends BaseTestCase {
   public void test() {
 
     MpUser u = new MpUser();
-    Ebean.save(u);
+    DB.save(u);
 
-    MpUser u2 = Ebean.find(MpUser.class, u.getId());
-    Assert.assertNotNull(u2);
+    MpUser u2 = DB.find(MpUser.class, u.getId());
+    assertNotNull(u2);
 
     u2.setName("Charlie Brown");
     MpRole ourl = new MpRole();
     ourl.setOrganizationId(47L);
     u2.getRoles().put("one", ourl);
-    Ebean.save(u2);
+    DB.save(u2);
 
-    MpUser u3 = Ebean.find(MpUser.class, u.getId());
-    Assert.assertEquals("Charlie Brown", u3.getName());
+    MpUser u3 = DB.find(MpUser.class, u.getId());
+    assertEquals("Charlie Brown", u3.getName());
 
     Map<String, MpRole> listMap = u3.getRoles();
-    Assert.assertEquals(1, listMap.size());
+    assertEquals(1, listMap.size());
 
     MpRole mpRole = listMap.get("one");
-    Assert.assertNotNull(mpRole);
-    Assert.assertEquals(Long.valueOf(47L), mpRole.getOrganizationId());
-    Assert.assertEquals("one", mpRole.getCode());
+    assertNotNull(mpRole);
+    assertEquals(Long.valueOf(47L), mpRole.getOrganizationId());
+    assertEquals("one", mpRole.getCode());
 
   }
 

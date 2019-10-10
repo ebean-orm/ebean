@@ -2,7 +2,6 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -21,7 +20,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
     EcsPerson person = new EcsPerson("Fiona021");
     person.getPhoneNumbers().add("021 1234");
     person.getPhoneNumbers().add("021 4321");
-    Ebean.save(person);
+    DB.save(person);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -40,12 +39,12 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
     person1.getPhoneNumbers().add("09 1234");
     person1.getPhoneNumbers().add("09 4321");
     person1.getPhoneNumbers().add("09 9876");
-    Ebean.save(person1);
+    DB.save(person1);
 
     LoggedSqlCollector.current();
 
     List<EcsPerson> found =
-      Ebean.find(EcsPerson.class).where()
+      DB.find(EcsPerson.class).where()
         .startsWith("name", "Fiona0")
         .order().asc("id")
         .findList();
@@ -63,7 +62,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
     assertThat(trimSql(sql.get(1))).contains("select t0.ecs_person_id, t0.phone from ecs_person_phone t0 where");
 
     List<EcsPerson> found2 =
-      Ebean.find(EcsPerson.class)
+      DB.find(EcsPerson.class)
         .fetch("phoneNumbers")
         .where()
         .startsWith("name", "Fiona0")
@@ -87,7 +86,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
   private void updateBasic(EcsPerson bean) {
 
     bean.setName("Fiona021-mod-0");
-    Ebean.save(bean);
+    DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
@@ -100,7 +99,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
     bean.setName("Fiona021-mod-both");
     bean.getPhoneNumbers().add("01-22123");
-    Ebean.save(bean);
+    DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -124,7 +123,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
   private void updateNothing(EcsPerson bean) {
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(0);
@@ -135,7 +134,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
   private void updateOnlyCollection(EcsPerson bean) {
 
     bean.getPhoneNumbers().add("01-4321");
-    Ebean.save(bean);
+    DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -158,7 +157,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
 
   private void delete(EcsPerson bean) {
 
-    Ebean.delete(bean);
+    DB.delete(bean);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(2);
@@ -167,8 +166,8 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
   }
 
   private void jsonToFrom(EcsPerson foundFirst) {
-    String asJson = Ebean.json().toJson(foundFirst);
-    EcsPerson fromJson = Ebean.json().toBean(EcsPerson.class, asJson);
+    String asJson = DB.json().toJson(foundFirst);
+    EcsPerson fromJson = DB.json().toBean(EcsPerson.class, asJson);
     assertThat(fromJson.getPhoneNumbers()).containsAll(foundFirst.getPhoneNumbers());
   }
 

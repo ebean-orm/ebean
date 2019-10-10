@@ -2,7 +2,6 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,10 +15,10 @@ public class TestElementCollectionEnumSet extends BaseTestCase {
     person.getTags().add(EcEnumPerson.Tags.BLUE);
     person.getTags().add(EcEnumPerson.Tags.RED);
 
-    Ebean.save(person);
+    DB.save(person);
 
 
-    EcEnumPerson one = Ebean.find(EcEnumPerson.class)
+    EcEnumPerson one = DB.find(EcEnumPerson.class)
       .setId(person.getId())
       .fetch("tags")
       .findOne();
@@ -29,7 +28,7 @@ public class TestElementCollectionEnumSet extends BaseTestCase {
     one.getTags().add(EcEnumPerson.Tags.GREEN);
     one.getTags().remove(EcEnumPerson.Tags.BLUE);
 
-    Ebean.save(one);
+    DB.save(one);
   }
 
   @Test
