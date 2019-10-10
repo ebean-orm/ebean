@@ -3,6 +3,8 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebeantest.LoggedSql;
+
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -23,10 +25,11 @@ public class TestQueryExists extends BaseTestCase {
       .where().gt("id", 1)
       .query();
 
+    LoggedSql.start();
     boolean check = query.exists();
+    String sql = LoggedSql.stop().get(0);
     assertThat(check).isTrue();
 
-    String sql = sqlOf(query);
     if (isH2() || isPostgres()) {
       assertThat(sql).contains("select t0.id from o_order t0 where t0.id > ? limit 1");
     }
