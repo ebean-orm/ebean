@@ -7,7 +7,6 @@ alter table migtest_e_basic drop column old_boolean;
 
 alter table migtest_e_basic drop column old_boolean2;
 
-alter table migtest_e_basic drop foreign key fk_migtest_e_basic_eref_id;
 alter table migtest_e_basic drop column eref_id;
 
 alter table migtest_e_history2 drop column obsolete_string1;
