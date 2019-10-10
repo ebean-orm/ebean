@@ -1196,17 +1196,6 @@ public interface Database {
    * <b>Optimistic Locking: </b> Note that if the version property is not set when update() is
    * called then no optimistic locking is performed (internally ConcurrencyMode.NONE is used).
    * </p>
-   * <p>
-   * <b>{@link ServerConfig#setUpdatesDeleteMissingChildren(boolean)}: </b> When cascade saving to a
-   * OneToMany or ManyToMany the updatesDeleteMissingChildren setting controls if any other children
-   * that are in the database but are not in the collection are deleted.
-   * </p>
-   * <p>
-   * <b>{@link ServerConfig#setUpdateChangesOnly(boolean)}: </b> The updateChangesOnly setting
-   * controls if only the changed properties are included in the update or if all the loaded
-   * properties are included instead.
-   * </p>
-   * <p>
    * <pre>{@code
    *
    * // A 'stateless update' example

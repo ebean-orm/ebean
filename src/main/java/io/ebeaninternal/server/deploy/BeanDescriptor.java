@@ -1302,7 +1302,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the draft dirty boolean property or null if there is not one assigned to this bean type.
    */
-  public BeanProperty getDraftDirty() {
+  BeanProperty getDraftDirty() {
     return draftDirty;
   }
 

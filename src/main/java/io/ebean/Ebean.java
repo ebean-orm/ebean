@@ -548,9 +548,6 @@ public final class Ebean {
    *   DB.update(customer);
    *
    * }</pre>
-   *
-   * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
-   * @see ServerConfig#setUpdateChangesOnly(boolean)
    */
   public static void update(Object bean) throws OptimisticLockException {
     serverMgr.getDefaultServer().update(bean);

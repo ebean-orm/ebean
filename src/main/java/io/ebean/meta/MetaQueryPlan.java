@@ -2,6 +2,9 @@ package io.ebean.meta;
 
 import io.ebean.ProfileLocation;
 
+/**
+ * Meta data for captured query plan.
+ */
 public interface MetaQueryPlan {
 
   /**
