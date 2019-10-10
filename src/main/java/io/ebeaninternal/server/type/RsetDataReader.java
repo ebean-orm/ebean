@@ -175,7 +175,12 @@ public class RsetDataReader implements DataReader {
 
   @Override
   public Time getTime() throws SQLException {
-    return rset.getTime(pos());
+    Calendar cal = dataTimeZone.getTimeZone();
+    if (cal != null) {
+      return rset.getTime(pos(), cal);
+    } else {
+      return rset.getTime(pos());
+    }
   }
 
   @Override

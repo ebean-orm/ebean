@@ -159,7 +159,12 @@ public class DataBind {
   }
 
   public void setTime(Time v) throws SQLException {
-    pstmt.setTime(++pos, v);
+    Calendar timeZone = dataTimeZone.getTimeZone();
+    if (timeZone != null) {
+      pstmt.setTime(++pos, v, timeZone);
+    } else {
+      pstmt.setTime(++pos, v);
+    }
   }
 
   public void setBoolean(boolean v) throws SQLException {
