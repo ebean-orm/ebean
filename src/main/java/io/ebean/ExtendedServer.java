@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * The extended API for Database.
@@ -106,6 +107,24 @@ public interface ExtendedServer {
    */
   @Nonnull
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
+
+  /**
+   * Return the query result as a Stream using a single persistence context.
+   * <p>
+   * Note that the stream needs to be closed so use with try with resources.
+   * </p>
+   */
+  @Nonnull
+  <T> Stream<T> findStream(Query<T> query, Transaction transaction);
+
+  /**
+   * Return the query result as a Stream (with multiple persistence contexts).
+   * <p>
+   * Note that the stream needs to be closed so use with try with resources.
+   * </p>
+   */
+  @Nonnull
+  <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query visiting the each bean one at a time.

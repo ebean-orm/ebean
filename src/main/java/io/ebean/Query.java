@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Object relational query for finding a List, Set, Map or single entity bean.
@@ -701,6 +702,49 @@ public interface Query<T> {
    */
   @Nonnull
   QueryIterator<T> findIterate();
+
+  /**
+   * Execute the query returning the result as a Stream.
+   * <p>
+   * Note that this will hold all resulting beans in memory using a single
+   * persistence context. Use findLargeStream() for queries that expect to
+   * return a large number of results.
+   * </p>
+   * <pre>{@code
+   *
+   *  // use try with resources to ensure Stream is closed
+   *
+   *  try (Stream<Customer> stream = query.findStream()) {
+   *    stream
+   *    .map(...)
+   *    .collect(...);
+   *  }
+   *
+   * }</pre>
+   */
+  @Nonnull
+  Stream<T> findStream();
+
+  /**
+   * Execute the query returning the result as a Stream.
+   * <p>
+   * Note that this uses multiple persistence contexts such that we can use
+   * it with a large number of results.
+   * </p>
+   * <pre>{@code
+   *
+   *  // use try with resources to ensure Stream is closed
+   *
+   *  try (Stream<Customer> stream = query.findLargeStream()) {
+   *    stream
+   *    .map(...)
+   *    .collect(...);
+   *  }
+   *
+   * }</pre>
+   */
+  @Nonnull
+  Stream<T> findLargeStream();
 
   /**
    * Execute the query processing the beans one at a time.

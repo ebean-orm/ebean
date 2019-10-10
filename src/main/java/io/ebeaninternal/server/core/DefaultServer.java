@@ -98,11 +98,11 @@ import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.CallableQueryCount;
 import io.ebeaninternal.server.query.CallableQueryIds;
 import io.ebeaninternal.server.query.CallableQueryList;
+import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.query.LimitOffsetPagedList;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
 import io.ebeaninternal.server.query.QueryFutureRowCount;
-import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.querydefn.DefaultDtoQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.DefaultOrmUpdate;
@@ -136,11 +136,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * The default server side implementation of EbeanServer.
@@ -651,7 +656,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         executeSql(connection, databasePlatform.truncateStatement(table));
       }
       connection.commit();
-    } catch(SQLException e) {
+    } catch (SQLException e) {
       throw new PersistenceException("Error executing truncate", e);
     }
   }
@@ -1504,6 +1509,48 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } catch (RuntimeException ex) {
       request.endTransIfRequired();
       throw ex;
+    }
+  }
+
+  @Override
+  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
+    return findStreamWithSingleContext(false, query, transaction);
+  }
+
+  @Override
+  public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
+    return findStreamWithSingleContext(true, query, transaction);
+  }
+
+  private <T> Stream<T> findStreamWithSingleContext(boolean singleContext, Query<T> query, Transaction transaction) {
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
+    if (singleContext) {
+      request.setIterateSingleContext();
+    }
+    try {
+      request.initTransIfRequired();
+      return toStream(request.findIterate());
+    } catch (RuntimeException ex) {
+      request.endTransIfRequired();
+      throw ex;
+    }
+  }
+
+  private <T> Stream<T> toStream(QueryIterator<T> queryIterator) {
+    return stream(spliteratorUnknownSize(queryIterator, Spliterator.ORDERED), false)
+      .onClose(new QueryIteratorClose(queryIterator));
+  }
+
+  private static class QueryIteratorClose implements Runnable {
+    private final QueryIterator<?> iterator;
+
+    private QueryIteratorClose(QueryIterator<?> iterator) {
+      this.iterator = iterator;
+    }
+
+    @Override
+    public void run() {
+      iterator.close();
     }
   }
 

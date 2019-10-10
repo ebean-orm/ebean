@@ -204,12 +204,14 @@ public class CQueryEngine {
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);
-
     try {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
+      if (request.isIterateSingleContext()) {
+        // expected relatively small number of results, single persistence context
+        cquery.prepareBindExecuteQuery();
+      } else if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;

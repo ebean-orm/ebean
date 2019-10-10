@@ -104,9 +104,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
   @Override
   public <T> QueryIterator<T> findIterate(OrmQueryRequest<T> request) {
-
     // LIMITATION: You can not use QueryIterator to load bean cache
-
     flushJdbcBatchOnQuery(request);
     return queryEngine.findIterate(request);
   }

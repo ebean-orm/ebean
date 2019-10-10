@@ -71,6 +71,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Default implementation of an Object Relational query.
@@ -756,7 +757,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (underlyingList.size() == 1) {
       SpiExpression singleExpression = underlyingList.get(0);
       if (singleExpression instanceof IdInExpression) {
-        return new CacheIdLookup<>((IdInExpression)singleExpression);
+        return new CacheIdLookup<>((IdInExpression) singleExpression);
       }
     }
     return null;
@@ -1455,7 +1456,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public Query<T> usingTransaction(Transaction transaction) {
-    this.transaction = (SpiTransaction)transaction;
+    this.transaction = (SpiTransaction) transaction;
     return this;
   }
 
@@ -1519,6 +1520,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public QueryIterator<T> findIterate() {
     return server.findIterate(this, transaction);
+  }
+
+  @Override
+  public Stream<T> findStream() {
+    return server.findStream(this, transaction);
+  }
+
+  @Override
+  public Stream<T> findLargeStream() {
+    return server.findLargeStream(this, transaction);
   }
 
   @Override

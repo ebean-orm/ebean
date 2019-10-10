@@ -66,6 +66,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 
 /**
@@ -656,6 +657,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
+  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
     return null;
   }
 

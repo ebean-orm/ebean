@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
@@ -240,6 +241,18 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   @Nonnull
   @Override
   public QueryIterator<T> findIterate() {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Nonnull
+  @Override
+  public Stream<T> findStream() {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Nonnull
+  @Override
+  public Stream<T> findLargeStream() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
