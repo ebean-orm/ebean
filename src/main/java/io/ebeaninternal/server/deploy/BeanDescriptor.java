@@ -3108,6 +3108,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Set the generated Id value if appropriate.
+   */
+  public void setGeneratedId(EntityBean entityBean, Transaction transaction) {
+    if (idGenerator == null || idProperty == null || idProperty.isEmbedded()) {
+      return;
+    }
+    if (isNullOrZero(idProperty.getValue(entityBean))) {
+      convertSetId(nextId(transaction), entityBean);
+    }
+  }
+
+  /**
    * Return true if the Id value is marked as a <code>@GeneratedValue</code>.
    */
   public boolean isIdGeneratedValue() {

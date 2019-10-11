@@ -506,11 +506,7 @@ public final class DefaultPersister implements Persister {
         // save associated One beans recursively first
         saveAssocOne(request);
       }
-
-      // set the IDGenerated value if required
-      setIdGenValue(request);
       request.executeOrQueue();
-
       if (request.isPersistCascade()) {
         // save any associated List held beans
         saveAssocMany(request);
@@ -1194,33 +1190,6 @@ public final class DefaultPersister implements Persister {
           }
         }
       }
-    }
-  }
-
-  /**
-   * Set Id Generated value for insert.
-   */
-  private void setIdGenValue(PersistRequestBean<?> request) {
-
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
-    if (!desc.isUseIdGenerator()) {
-      return;
-    }
-
-    BeanProperty idProp = desc.getIdProperty();
-    if (idProp == null || idProp.isEmbedded()) {
-      // not supporting IdGeneration for concatenated or Embedded
-      return;
-    }
-
-    EntityBean bean = request.getEntityBean();
-    Object uid = idProp.getValue(bean);
-
-    if (isNullOrZero(uid)) {
-      // generate the nextId and set it to the property
-      Object nextId = desc.nextId(request.getTransaction());
-      // cast the data type if required and set it
-      desc.convertSetId(nextId, bean);
     }
   }
 

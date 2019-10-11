@@ -1262,6 +1262,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void executeInsert() {
+    setGeneratedId();
     setTenantId();
     if (controller == null || controller.preInsert(this)) {
       beanManager.getBeanPersister().insert(this);
@@ -1468,5 +1469,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void setSaveRecurse() {
     saveRecurse = true;
+  }
+
+  public void setGeneratedId() {
+    beanDescriptor.setGeneratedId(entityBean, transaction);
   }
 }
