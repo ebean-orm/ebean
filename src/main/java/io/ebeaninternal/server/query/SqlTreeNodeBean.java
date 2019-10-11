@@ -595,7 +595,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
           ctx.append(" and");
         }
         ctx.append(" ").append(ctx.getTableAlias(prefix)).append(".");
-        ctx.append(inheritInfo.getWhere()).append(" ");
+        ctx.append(inheritInfo.getWhere());
       }
     }
 

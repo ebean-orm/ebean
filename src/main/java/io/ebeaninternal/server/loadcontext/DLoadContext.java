@@ -19,6 +19,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
@@ -288,6 +289,11 @@ public class DLoadContext implements LoadContext {
   }
 
   @Override
+  public void register(String path, EntityBeanIntercept ebi, BeanPropertyAssocOne<?> property) {
+    getBeanContextWithInherit(path, property).register(ebi);
+  }
+
+  @Override
   public void register(String path, BeanCollection<?> bc) {
     getManyContext(path).register(bc);
   }
@@ -297,6 +303,11 @@ public class DLoadContext implements LoadContext {
       return rootBeanContext;
     }
     return beanMap.computeIfAbsent(path, p -> createBeanContext(p, defaultBatchSize, null));
+  }
+
+  DLoadBeanContext getBeanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
+    String key = path + ":" + property.getTargetDescriptor().getName();
+    return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path, defaultBatchSize, null));
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
@@ -331,9 +342,12 @@ public class DLoadContext implements LoadContext {
   }
 
   private DLoadBeanContext createBeanContext(String path, int batchSize, OrmQueryProperties queryProps) {
-
     BeanPropertyAssoc<?> p = (BeanPropertyAssoc<?>) getBeanProperty(rootDescriptor, path);
     return new DLoadBeanContext(this, p.getTargetDescriptor(), path, batchSize, queryProps);
+  }
+
+  private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path, int batchSize, OrmQueryProperties queryProps) {
+    return new DLoadBeanContext(this, property.getTargetDescriptor(), path, batchSize, queryProps);
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {

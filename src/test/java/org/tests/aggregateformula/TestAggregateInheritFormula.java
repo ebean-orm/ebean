@@ -34,6 +34,6 @@ public class TestAggregateInheritFormula {
     final List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(segments).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.segment_id_zat, min(t0.status_id) from iaf_segment t0 where t0.ptype = 'target'  and t0.segment_id_zat = ? group by t0.segment_id_zat");
+    assertThat(sql.get(0)).contains("select t0.segment_id_zat, min(t0.status_id) from iaf_segment t0 where t0.ptype = 'target' and t0.segment_id_zat = ? group by t0.segment_id_zat");
   }
 }

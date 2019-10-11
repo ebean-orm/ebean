@@ -21,6 +21,7 @@ import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
@@ -635,8 +636,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   @Override
-  public void register(String path, EntityBeanIntercept ebi) {
+  public void registerBeanInherit(BeanPropertyAssocOne<?> property, EntityBeanIntercept ebi) {
+    String path = getPath(property.getName());
+    request.getGraphContext().register(path, ebi, property);
+  }
 
+  @Override
+  public void register(String path, EntityBeanIntercept ebi) {
     path = getPath(path);
     request.getGraphContext().register(path, ebi);
   }
