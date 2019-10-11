@@ -57,14 +57,13 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
     boolean disableLazyLoading = ctx.isDisableLazyLoading();
     Object ref = desc.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
     if (!disableLazyLoading) {
-      ctx.register(property.name, ((EntityBean) ref)._ebean_getIntercept());
+      ctx.registerBeanInherit(property, ((EntityBean) ref)._ebean_getIntercept());
     }
     return ref;
   }
 
   @Override
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
     // add join to support the discriminator column
     String relativePrefix = ctx.getRelativePrefix(property.name);
     property.tableJoin.addJoin(joinType, relativePrefix, ctx);

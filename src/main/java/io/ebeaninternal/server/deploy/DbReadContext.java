@@ -61,6 +61,11 @@ public interface DbReadContext {
   void register(String path, EntityBeanIntercept ebi);
 
   /**
+   * Register a reference with inheritance for lazy loading.
+   */
+  void registerBeanInherit(BeanPropertyAssocOne<?> property, EntityBeanIntercept ebi);
+
+  /**
    * Register a collection for lazy loading.
    */
   void register(String path, BeanCollection<?> bc);

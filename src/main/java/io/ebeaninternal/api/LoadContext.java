@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 /**
  * Controls the loading of reference objects for a query instance.
@@ -46,6 +47,11 @@ public interface LoadContext {
    * Register a Bean for lazy loading.
    */
   void register(String path, EntityBeanIntercept ebi);
+
+  /**
+   * Register a Bean with inheritance.
+   */
+  void register(String path, EntityBeanIntercept ebi, BeanPropertyAssocOne<?> property);
 
   /**
    * Register a collection for lazy loading.
