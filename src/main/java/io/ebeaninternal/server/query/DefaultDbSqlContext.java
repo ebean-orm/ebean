@@ -16,7 +16,7 @@ class DefaultDbSqlContext implements DbSqlContext {
   private static final String PERIOD = ".";
   private static final int STRING_BUILDER_INITIAL_CAPACITY = 140;
 
-  private final String tableAliasPlaceHolder;
+  private static final String tableAliasPlaceHolder = "${ta}";
 
   private final String columnAliasPrefix;
 
@@ -56,14 +56,11 @@ class DefaultDbSqlContext implements DbSqlContext {
   /**
    * Construct for SELECT clause (with column alias settings).
    */
-  DefaultDbSqlContext(SqlTreeAlias alias, CQueryBuilder builder,
-                      boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport,
+  DefaultDbSqlContext(SqlTreeAlias alias, String columnAliasPrefix, CQueryHistorySupport historySupport,
                       CQueryDraftSupport draftSupport, String fromForUpdate) {
-
     this.alias = alias;
-    this.tableAliasPlaceHolder = builder.tableAliasPlaceHolder;
-    this.columnAliasPrefix = builder.columnAliasPrefix;
-    this.useColumnAlias = columnAliasPrefix != null && alwaysUseColumnAlias;
+    this.columnAliasPrefix = columnAliasPrefix;
+    this.useColumnAlias = columnAliasPrefix != null;
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);

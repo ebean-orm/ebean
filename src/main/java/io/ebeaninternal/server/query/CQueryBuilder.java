@@ -43,9 +43,7 @@ import java.util.List;
  */
 class CQueryBuilder {
 
-  final String tableAliasPlaceHolder;
-  final String columnAliasPrefix;
-
+  private final String columnAliasPrefix;
   private final SqlLimiter sqlLimiter;
   private final CQueryBuilderRawSql rawSqlHandler;
   private final Binder binder;
@@ -55,6 +53,7 @@ class CQueryBuilder {
   private final CQueryHistorySupport historySupport;
   private final CQueryDraftSupport draftSupport;
   private final DatabasePlatform dbPlatform;
+  private final boolean selectCountWithColumnAlias;
 
   /**
    * Create the SqlGenSelect.
@@ -64,11 +63,11 @@ class CQueryBuilder {
     this.binder = binder;
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
-    this.tableAliasPlaceHolder = dbPlatform.getTableAliasPlaceHolder();
     this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
     this.sqlLimiter = dbPlatform.getSqlLimiter();
     this.rawSqlHandler = new CQueryBuilderRawSql(sqlLimiter, dbPlatform);
     this.selectCountWithAlias = dbPlatform.isSelectCountWithAlias();
+    this.selectCountWithColumnAlias = dbPlatform.isSelectCountWithColumnAlias();
   }
 
   /**
@@ -86,7 +85,6 @@ class CQueryBuilder {
       sb.append(".");
       sb.append(token.trim());
     }
-
     return sb.toString();
   }
 
@@ -273,7 +271,7 @@ class CQueryBuilder {
 
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates);
+    SqlTree sqlTree = createSqlTree(request, predicates, selectCountWithColumnAlias && withAgg);
     if (SpiQuery.TemporalMode.CURRENT == query.getTemporalMode()) {
       sqlTree.addSoftDeletePredicate(query);
     }
@@ -399,6 +397,10 @@ class CQueryBuilder {
    * </p>
    */
   private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
+    return createSqlTree(request, predicates, false);
+  }
+
+  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, boolean forceColumnAlias) {
 
     if (request.isNativeSql()) {
       return createNativeSqlTree(request, predicates);
@@ -406,7 +408,8 @@ class CQueryBuilder {
     if (request.isRawSql()) {
       return createRawSqlSqlTree(request, predicates);
     }
-    return new SqlTreeBuilder(this, request, predicates).build();
+    String colAliasPrefix = forceColumnAlias ? "c" : columnAliasPrefix;
+    return new SqlTreeBuilder(colAliasPrefix, this, request, predicates).build();
   }
 
   private String nativeQueryPaging(SpiQuery<?> query, String sql) {

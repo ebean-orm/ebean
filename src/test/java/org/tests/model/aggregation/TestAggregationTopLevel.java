@@ -52,6 +52,8 @@ public class TestAggregationTopLevel extends BaseTestCase {
     if (isH2() || isPostgres()) {
       assertThat(sql.get(0)).contains("select count(*) from ( select t0.date, sum(t0.total_kms) from d_machine_stats t0 group by t0.date having sum(t0.total_kms) > ?)");
       assertThat(sql.get(1)).contains("select t0.date, sum(t0.total_kms) from d_machine_stats t0 group by t0.date having sum(t0.total_kms) > ? limit 10");
+    } else if (isSqlServer()) {
+      assertThat(sql.get(0)).contains("select count(*) from ( select t0.date c1, sum(t0.total_kms) c2 from d_machine_stats t0 group by t0.date having sum(t0.total_kms) > ?)");
     }
   }
 

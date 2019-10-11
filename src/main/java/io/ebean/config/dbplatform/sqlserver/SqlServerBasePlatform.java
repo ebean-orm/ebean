@@ -28,6 +28,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
+    this.selectCountWithColumnAlias = true;
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.historySupport = new SqlServerHistorySupport();

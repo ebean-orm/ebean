@@ -96,7 +96,7 @@ public final class SqlTreeBuilder {
    * support the where and/or order by clause. If so these extra joins are added
    * to the root node.
    */
-  SqlTreeBuilder(CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
+  SqlTreeBuilder(String columnAliasPrefix, CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -116,7 +116,8 @@ public final class SqlTreeBuilder {
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.getHistorySupport(query);
     CQueryDraftSupport draftSupport = builder.getDraftSupport(query);
-    this.ctx = new DefaultDbSqlContext(alias, builder, !subQuery, historySupport, draftSupport, fromForUpdate);
+    String colAlias = subQuery ? null : columnAliasPrefix;
+    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
   }
 
   /**

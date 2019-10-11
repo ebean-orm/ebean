@@ -148,8 +148,6 @@ public class DatabasePlatform {
 
   protected String columnAliasPrefix = "c";
 
-  protected String tableAliasPlaceHolder = "${ta}";
-
   /**
    * Use a BackTick ` at the beginning and end of table or column names that you
    * want to use quoted identifiers for. The backticks get converted to the
@@ -183,6 +181,7 @@ public class DatabasePlatform {
   protected boolean idInExpandedForm;
 
   protected boolean selectCountWithAlias;
+  protected boolean selectCountWithColumnAlias;
 
   /**
    * If set then use the FORWARD ONLY hint when creating ResultSets for
@@ -479,20 +478,6 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return the table alias placeholder.
-   */
-  public String getTableAliasPlaceHolder() {
-    return tableAliasPlaceHolder;
-  }
-
-  /**
-   * Set the table alias placeholder.
-   */
-  public void setTableAliasPlaceHolder(String tableAliasPlaceHolder) {
-    this.tableAliasPlaceHolder = tableAliasPlaceHolder;
-  }
-
-  /**
    * Return the close quote for quoted identifiers.
    */
   public String getCloseQuote() {
@@ -683,6 +668,14 @@ public class DatabasePlatform {
   public boolean isSelectCountWithAlias() {
     return selectCountWithAlias;
   }
+
+  /**
+   * Return true if select count with subquery needs column alias (SQL Server).
+   */
+  public boolean isSelectCountWithColumnAlias() {
+    return selectCountWithColumnAlias;
+  }
+
 
   public String completeSql(String sql, Query<?> query) {
     if (query.isForUpdate()) {
