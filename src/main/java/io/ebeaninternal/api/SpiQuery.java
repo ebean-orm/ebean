@@ -458,7 +458,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Set the query to be a delete query.
    */
-  void setDelete();
+  void setupForDeleteOrUpdate(boolean deleteRequest);
 
   /**
    * Set the query to be delete by ids due to cascading delete.

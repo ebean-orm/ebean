@@ -3,6 +3,8 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.Test;
 import org.tests.model.basic.EDefaultProp;
 
@@ -11,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class TestCreateEntityBean extends BaseTestCase {
 
+  @IgnorePlatform(Platform.SQLSERVER)
   @Test
   public void testDefaultRelation() {
 

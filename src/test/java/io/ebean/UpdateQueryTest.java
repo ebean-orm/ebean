@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaOrmQueryMetric;
@@ -15,7 +16,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class UpdateQueryTest extends BaseTestCase {
 
@@ -143,12 +143,10 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("update o_customer cust set status=?, updtime=? where id > ?");
   }
 
+  @IgnorePlatform(Platform.MYSQL)
   @Test
   public void withJoin() {
 
-    if (isMySql()) {
-      return;
-    }
     EbeanServer server = server();
 
     Country nz = server.getReference(Country.class, "NZ");
@@ -167,6 +165,51 @@ public class UpdateQueryTest extends BaseTestCase {
     query.update();
 
     assertThat(sqlOf(query)).contains("update o_customer set status=?, updtime=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ? and t1.country_code = ? and t0.id > ?)");
+  }
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void withJoinAndLimit() {
+
+    EbeanServer server = server();
+
+    Country nz = server.getReference(Country.class, "NZ");
+
+    LoggedSqlCollector.start();
+
+    server.update(Customer.class)
+      .set("status", Customer.Status.ACTIVE)
+      .where()
+      .eq("billingAddress.country", nz)
+      .gt("id", 1000)
+      .setMaxRows(100)
+      .update();
+
+    final List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t1.country_code = ? and t0.id > ? limit 100)");
+  }
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.MYSQL})
+  @Test
+  public void simpleWithLimit() {
+
+    EbeanServer server = server();
+
+    LoggedSqlCollector.start();
+
+    server.update(Customer.class)
+      .set("status", Customer.Status.ACTIVE)
+      .where()
+      .gt("id", 1000)
+      .setMaxRows(100)
+      .update();
+
+    final List<String> sql = LoggedSqlCollector.stop();
+    if (isMySql() || isH2()) {
+      assertThat(sql.get(0)).contains("update o_customer set status=? where id > ? limit 100");
+    } else {
+      assertThat(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 where t0.id > ? limit 100)");
+    }
   }
 
   @Test

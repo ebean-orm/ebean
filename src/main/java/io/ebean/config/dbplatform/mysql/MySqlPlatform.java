@@ -28,6 +28,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.useExtraTransactionOnIterateSecondaryQueries = true;
     this.selectCountWithAlias = true;
     this.supportsSavepointId = false;
+    this.inlineSqlUpdateLimit = true;
     this.dbEncrypt = new MySqlDbEncrypt();
     this.historySupport = new MySqlHistorySupport();
     this.columnAliasPrefix = null;

@@ -795,4 +795,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       dependentTables.addAll(tables);
     }
   }
+
+  /**
+   * Return true if no MaxRows or use LIMIT in SQL update.
+   */
+  public boolean isInlineSqlUpdateLimit() {
+    return query.getMaxRows() < 1 || ebeanServer.getDatabasePlatform().isInlineSqlUpdateLimit();
+  }
 }

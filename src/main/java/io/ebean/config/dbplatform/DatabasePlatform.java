@@ -76,6 +76,11 @@ public class DatabasePlatform {
   protected boolean caseSensitiveCollation = true;
 
   /**
+   * Set true if the Database support LIMIT clause on sql update.
+   */
+  protected boolean inlineSqlUpdateLimit;
+
+  /**
    * For limit/offset, row_number etc limiting of SQL queries.
    */
   protected SqlLimiter sqlLimiter = new LimitOffsetSqlLimiter();
@@ -171,7 +176,7 @@ public class DatabasePlatform {
   /**
    * Characters escaped for startsWith, endsWith and contains.
    */
-  protected char[] likeSpecialCharacters = { '%', '_', '|' };
+  protected char[] likeSpecialCharacters = {'%', '_', '|'};
 
   protected DbEncrypt dbEncrypt;
 
@@ -187,7 +192,7 @@ public class DatabasePlatform {
 
   /**
    * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
-   *
+   * <p>
    * This is {@code false} for HANA
    */
   protected boolean supportsResultSetConcurrencyModeUpdatable = true;
@@ -340,6 +345,13 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return true if the platform supports LIMIT with sql update.
+   */
+  public boolean isInlineSqlUpdateLimit() {
+    return inlineSqlUpdateLimit;
+  }
+
+  /**
    * Return the maximum table name length.
    * <p>
    * This is used when deriving names of intersection tables.
@@ -370,11 +382,11 @@ public class DatabasePlatform {
   /**
    * Return a DB Sequence based IdGenerator.
    *
-   * @param be        the BackgroundExecutor that can be used to load the sequence if
-   *                  desired
-   * @param ds        the DataSource
-   * @param stepSize  the sequence allocation size as defined by mapping (defaults to 50)
-   * @param seqName   the name of the sequence
+   * @param be       the BackgroundExecutor that can be used to load the sequence if
+   *                 desired
+   * @param ds       the DataSource
+   * @param stepSize the sequence allocation size as defined by mapping (defaults to 50)
+   * @param seqName  the name of the sequence
    */
   public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
     return null;
@@ -659,7 +671,7 @@ public class DatabasePlatform {
     if (dbName != null && !dbName.isEmpty()) {
       if (dbName.startsWith(openQuote)) {
         // trim off the open and close quotes
-        return dbName.substring(1, dbName.length()-1);
+        return dbName.substring(1, dbName.length() - 1);
       }
     }
     return dbName;
@@ -786,7 +798,7 @@ public class DatabasePlatform {
     for (int i = 0; i < value.length(); i++) {
       char ch = value.charAt(i);
       boolean escaped = false;
-      for (char escapeChar: likeSpecialCharacters) {
+      for (char escapeChar : likeSpecialCharacters) {
         if (ch == escapeChar) {
           if (sb == null) {
             sb = new StringBuilder(value.substring(0, i));

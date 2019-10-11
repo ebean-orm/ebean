@@ -692,13 +692,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   /**
-   * Setup to be a delete query.
+   * Setup to be a delete or update query.
    */
   @Override
-  public void setDelete() {
+  public void setupForDeleteOrUpdate(boolean deleteRequest) {
     // unset any paging and select on the id in the case where the query
     // includes joins and we use - delete ... where id in (...)
-    maxRows = 0;
+    if (deleteRequest) {
+      maxRows = 0;
+    }
     firstRow = 0;
     forUpdate = null;
     rootTableAlias = "${RTA}"; // alias we remove later
