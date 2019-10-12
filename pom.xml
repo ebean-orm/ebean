@@ -142,7 +142,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.22.1</version>
+      <version>12.1.1</version>
     </dependency>
 
     <dependency>
@@ -329,7 +329,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.45.1</version>
+        <version>12.1.1</version>
         <executions>
           <execution>
             <id>test</id>
@@ -388,7 +388,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.1.1</version>
         <configuration>
-          <doctitle>Ebean 11</doctitle>
+          <doctitle>Ebean 12</doctitle>
           <overview>src/main/java/io/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
@@ -399,7 +399,7 @@
             <version>1.0.0</version>
           </docletArtifact>
           <!-- for people using JDK11, our javadoc doclet isn't 11 compatible yet -->
-          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>
+<!--          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>-->
           <additionalparam>
             -Xdoclint:none
             -include-basedir ${project.basedir}
