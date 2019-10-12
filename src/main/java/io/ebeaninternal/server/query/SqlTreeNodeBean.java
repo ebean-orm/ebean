@@ -227,7 +227,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     @Override
     void initBeanType() throws SQLException {
-      InheritInfo localInfo = inheritInfo.readType(ctx);
+      InheritInfo localInfo = readId ? inheritInfo.readType(ctx) : desc.getInheritInfo();
       if (localInfo == null) {
         // the bean must be null
         localIdBinder = idBinder;
@@ -539,7 +539,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     if (readId) {
-      if (!subQuery && inheritInfo != null && inheritInfo.hasChildren()) {
+      if (!subQuery && inheritInfo != null) {
         ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
       }
       appendSelectId(ctx, idBinder.getBeanProperty());

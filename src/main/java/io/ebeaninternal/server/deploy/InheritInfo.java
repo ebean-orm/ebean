@@ -219,9 +219,6 @@ public class InheritInfo {
    * Return the associated InheritInfo for this DB row read.
    */
   public InheritInfo readType(DbReadContext ctx) throws SQLException {
-    if (!hasChildren()) {
-      return this;
-    }
     return readType(ctx.getDataReader().getString());
   }
 

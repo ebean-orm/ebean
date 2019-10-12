@@ -154,11 +154,8 @@ public final class TableJoin {
 
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
 
-    String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
-
     String joinLiteral = joinType.getLiteral(type);
-    ctx.addJoin(joinLiteral, table, columns(), a1, a2, inheritance);
-
+    ctx.addJoin(joinLiteral, table, columns(), a1, a2);
     return joinType.autoToOuter(type);
   }
 

@@ -112,7 +112,7 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance) {
+  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2) {
 
     if (tableJoins == null) {
       tableJoins = new HashSet<>();
@@ -164,11 +164,6 @@ class DefaultDbSqlContext implements DbSqlContext {
       } else {
         sb.append(a1).append(".").append(pair.getLocalDbColumn());
       }
-    }
-
-    // add on any inheritance where clause
-    if (inheritance != null && !inheritance.isEmpty()) {
-      sb.append(" and ").append(a2).append(".").append(inheritance);
     }
 
     if (addAsOfOnClause) {
