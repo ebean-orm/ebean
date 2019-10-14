@@ -53,5 +53,12 @@ public class TestInsertQuery {
     p.setMpoly(mpoly);
 
     Ebean.save(p);
+
+    List<String> content =
+      Ebean.find(MyBean.class)
+      .select("ST_AsText(lineString)::String")
+      .findSingleAttributeList();
+
+    System.out.println(content);
   }
 }
