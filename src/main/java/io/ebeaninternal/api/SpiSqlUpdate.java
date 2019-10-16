@@ -33,4 +33,9 @@ public interface SpiSqlUpdate extends SqlUpdate {
    * Reset bind position to be ready for another bind execute.
    */
   void reset();
+
+  /**
+   * Return a copy of the SqlUpdate with empty bind parameters.
+   */
+  SpiSqlUpdate copy();
 }

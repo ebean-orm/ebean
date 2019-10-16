@@ -118,6 +118,11 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public SpiSqlUpdate copy() {
+    return new DefaultSqlUpdate(server, origSql, new BindParams());
+  }
+
+  @Override
   public void reset() {
     addPos = 0;
   }
