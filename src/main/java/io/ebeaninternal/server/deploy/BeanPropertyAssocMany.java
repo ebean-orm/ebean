@@ -963,7 +963,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return !elementCollection && cascadeInfo.isDelete();
   }
 
-  public String insertElementCollection() {
+  public SpiSqlUpdate insertElementCollection() {
     return sqlHelp.insertElementCollection();
   }
 

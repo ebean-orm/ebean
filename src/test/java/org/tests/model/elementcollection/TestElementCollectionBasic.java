@@ -17,6 +17,36 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   @Test
+  public void insertThen_UpdateWhenNotChanged_expect_noChanges() {
+
+    EcPerson person = new EcPerson("Nothing021");
+    person.getPhoneNumbers().add("021 1234");
+    person.getPhoneNumbers().add("021 4321");
+
+    LoggedSqlCollector.start();
+    Ebean.save(person);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(eventLog()).containsOnly("preInsert", "postInsert");
+    assertThat(sql).hasSize(4);
+
+    final EcPerson found = Ebean.find(EcPerson.class, person.getId());
+    found.getPhoneNumbers().size();
+
+    sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("from ec_person t0 where t0.id = ?");
+    assertThat(sql.get(1)).contains("from ec_person_phone t0 where");
+
+    // save when not actually changed
+    Ebean.save(found);
+
+    sql = LoggedSqlCollector.stop();
+    assertThat(sql).isEmpty();
+    assertThat(eventLog()).isEmpty();
+  }
+
+  @Test
   public void test() {
 
     eventLog();

@@ -29,18 +29,17 @@ public class TestElementCollectionCascadeMultiple extends BaseTestCase {
     save(top);
 
     final List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(9);
 
     assertThat(sql.get(0)).contains("insert into ecs_person");
     assertThat(sql.get(1)).contains("-- bind");
-    assertThat(sql.get(2)).contains("insert into ecs_person_phone");
+    assertThat(sql.get(2)).contains("insert into ec_top");
     assertThat(sql.get(3)).contains("-- bind");
-    assertThat(sql.get(4)).contains("-- bind");
-    assertThat(sql.get(5)).contains("insert into ec_top");
+    assertThat(sql.get(4)).contains("insert into ecs_person_phone");
+    assertThat(sql.get(5)).contains("-- bind");
     assertThat(sql.get(6)).contains("-- bind");
     assertThat(sql.get(7)).contains("insert into ec_top_ecs_person");
     assertThat(sql.get(8)).contains("-- bind");
-
-    assertThat(sql).hasSize(9);
   }
 
   @Transactional(batchSize = 20)

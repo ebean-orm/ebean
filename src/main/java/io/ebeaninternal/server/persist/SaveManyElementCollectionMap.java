@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -14,31 +14,46 @@ import java.util.Set;
  */
 class SaveManyElementCollectionMap extends SaveManyBase {
 
-  SaveManyElementCollectionMap(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
-    super(insertedParent, many, parentBean, request);
+  private Set<Map.Entry<?, ?>> entries;
+
+  SaveManyElementCollectionMap(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    super(persister, insertedParent, many, parentBean, request);
+  }
+
+  private boolean modifiedCollection() {
+    return entries != null && (insertedParent || BeanCollectionUtil.isModified(value));
   }
 
   @SuppressWarnings("unchecked")
   @Override
   void save() {
-
-    Set<Map.Entry<?, ?>> entries = (Set<Map.Entry<?, ?>>) BeanCollectionUtil.getActualEntries(value);
-    if (entries != null && (insertedParent || BeanCollectionUtil.isModified(value))) {
-      Object parentId = request.getBeanId();
-      preElementCollectionUpdate(parentId);
-
-      transaction.depth(+1);
-      SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
-      for (Map.Entry<?, ?> entry : entries) {
-        sqlInsert.setNextParameter(parentId);
-        sqlInsert.setNextParameter(entry.getKey());
-        many.bindElementValue(sqlInsert, entry.getValue());
-        server.execute(sqlInsert, transaction);
+    entries = (Set<Map.Entry<?, ?>>) BeanCollectionUtil.getActualEntries(value);
+    if (modifiedCollection()) {
+      preElementCollectionUpdate();
+      if (insertedParent && request.isQueueSaveMany()) {
+        request.addSaveMany(this);
+      } else {
+        saveCollection();
       }
-
-      transaction.depth(-1);
-      resetModifyState();
-      postElementCollectionUpdate();
     }
+  }
+
+  @Override
+  public void saveBatch() {
+    saveCollection();
+  }
+
+  private void saveCollection() {
+    SpiSqlUpdate proto = many.insertElementCollection();
+    Object parentId = request.getBeanId();
+    for (Map.Entry<?, ?> entry : entries) {
+      final SpiSqlUpdate sqlInsert = proto.copy();
+      sqlInsert.setNextParameter(parentId);
+      sqlInsert.setNextParameter(entry.getKey());
+      many.bindElementValue(sqlInsert, entry.getValue());
+      persister.addToFlushQueueLast(sqlInsert, transaction);
+    }
+    resetModifyState();
+    postElementCollectionUpdate();
   }
 }

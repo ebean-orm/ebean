@@ -37,12 +37,10 @@ public class SaveManyBeans extends SaveManyBase {
   private final DeleteMode deleteMode;
 
   private Collection<?> collection;
-  private final DefaultPersister persister;
   private int sortOrder;
 
-  SaveManyBeans(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request, DefaultPersister persister) {
-    super(insertedParent, many, parentBean, request);
-    this.persister = persister;
+  SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    super(persister, insertedParent, many, parentBean, request);
     this.cascade = many.getCascadeInfo().isSave();
     this.publish = request.isPublish();
     this.targetDescriptor = many.getTargetDescriptor();
@@ -238,9 +236,9 @@ public class SaveManyBeans extends SaveManyBase {
     if (value == null) {
       return;
     }
-    if (request.isQueueManyIntersection()) {
+    if (request.isQueueSaveMany()) {
       // queue/delay until bean persist request is flushed
-      request.addManyIntersection(this);
+      request.addSaveMany(this);
     } else {
       saveAssocManyIntersection(false);
     }
@@ -249,7 +247,8 @@ public class SaveManyBeans extends SaveManyBase {
   /**
    * Push intersection table changes onto batch flush queue.
    */
-  public void saveIntersectionBatch() {
+  @Override
+  public void saveBatch() {
     saveAssocManyIntersection(true);
   }
 

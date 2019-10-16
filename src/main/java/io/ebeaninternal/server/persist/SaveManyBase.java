@@ -14,10 +14,11 @@ import java.io.IOException;
 /**
  * Base for saving entity bean collections and element collections.
  */
-abstract class SaveManyBase {
+abstract class SaveManyBase implements SaveMany {
 
   private static final Logger log = LoggerFactory.getLogger(SaveManyBase.class);
 
+  final DefaultPersister persister;
   final PersistRequestBean<?> request;
   final SpiEbeanServer server;
   final boolean insertedParent;
@@ -26,7 +27,8 @@ abstract class SaveManyBase {
   final EntityBean parentBean;
   final Object value;
 
-  SaveManyBase(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+  SaveManyBase(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    this.persister = persister;
     this.request = request;
     this.server = request.getServer();
     this.insertedParent = insertedParent;
@@ -41,10 +43,10 @@ abstract class SaveManyBase {
    */
   abstract void save();
 
-  void preElementCollectionUpdate(Object parentId) {
+  void preElementCollectionUpdate() {
     if (!insertedParent) {
       request.preElementCollectionUpdate();
-      server.execute(many.deleteByParentId(parentId, null), transaction);
+      persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction);
     }
   }
 
@@ -64,7 +66,7 @@ abstract class SaveManyBase {
 
   void postElementCollectionUpdate() {
     if (!insertedParent) {
-      if (request.postElementCollectionUpdate()) {
+      if (request.isNotifyCache()) {
         try {
           String asJson = many.jsonWriteCollection(value);
           request.addCollectionChange(many.getName(), asJson);

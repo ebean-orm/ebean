@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -13,28 +13,44 @@ import java.util.Collection;
  */
 class SaveManyElementCollection extends SaveManyBase {
 
-  SaveManyElementCollection(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
-    super(insertedParent, many, parentBean, request);
+  private Collection<?> collection;
+
+  SaveManyElementCollection(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
+    super(persister, insertedParent, many, parentBean, request);
+  }
+
+  private boolean modifiedCollection() {
+    return collection != null && (insertedParent || BeanCollectionUtil.isModified(value));
   }
 
   @Override
   void save() {
-
-    Collection<?> collection = BeanCollectionUtil.getActualEntries(value);
-    if (collection != null && (insertedParent || BeanCollectionUtil.isModified(value))) {
-      Object parentId = request.getBeanId();
-      preElementCollectionUpdate(parentId);
-
-      transaction.depth(+1);
-      SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
-      for (Object value : collection) {
-        sqlInsert.setNextParameter(parentId);
-        many.bindElementValue(sqlInsert, value);
-        server.execute(sqlInsert, transaction);
+    collection = BeanCollectionUtil.getActualEntries(value);
+    if (modifiedCollection()) {
+      preElementCollectionUpdate();
+      if (insertedParent && request.isQueueSaveMany()) {
+        request.addSaveMany(this);
+      } else {
+        saveCollection();
       }
-      transaction.depth(-1);
-      resetModifyState();
-      postElementCollectionUpdate();
     }
+  }
+
+  @Override
+  public void saveBatch() {
+    saveCollection();
+  }
+
+  private void saveCollection() {
+    SpiSqlUpdate proto = many.insertElementCollection();
+    Object parentId = request.getBeanId();
+    for (Object value : collection) {
+      final SpiSqlUpdate sqlInsert = proto.copy();
+      sqlInsert.setNextParameter(parentId);
+      many.bindElementValue(sqlInsert, value);
+      persister.addToFlushQueueLast(sqlInsert, transaction);
+    }
+    resetModifyState();
+    postElementCollectionUpdate();
   }
 }

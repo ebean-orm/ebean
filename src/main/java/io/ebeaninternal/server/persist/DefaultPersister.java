@@ -151,6 +151,16 @@ public final class DefaultPersister implements Persister {
     }
   }
 
+  @Override
+  public void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t) {
+    addToFlushQueue(update, t, true);
+  }
+
+  @Override
+  public void addToFlushQueueLast(SpiSqlUpdate update, SpiTransaction t) {
+    addToFlushQueue(update, t, false);
+  }
+
   private void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, boolean early) {
     new PersistRequestUpdateSql(server, update, t, persistExecute).addToFlushQueue(early);
   }
@@ -949,18 +959,15 @@ public final class DefaultPersister implements Persister {
 
   private SaveManyBase saveManyRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     if (!many.isElementCollection()) {
-      return new SaveManyBeans(insertedParent, many, parentBean, request, this);
-
+      return new SaveManyBeans(this, insertedParent, many, parentBean, request);
     } else if (many.getManyType().isMap()) {
-      return new SaveManyElementCollectionMap(insertedParent, many, parentBean, request);
-
+      return new SaveManyElementCollectionMap(this, insertedParent, many, parentBean, request);
     } else {
-      return new SaveManyElementCollection(insertedParent, many, parentBean, request);
+      return new SaveManyElementCollection(this, insertedParent, many, parentBean, request);
     }
   }
 
   void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
-
     SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
     if (queue) {
       addToFlushQueue(sqlDelete, t, true);

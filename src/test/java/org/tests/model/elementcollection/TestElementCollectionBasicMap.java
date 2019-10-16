@@ -18,7 +18,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    EcmPerson person = new EcmPerson("Fiona021");
+    EcmPerson person = new EcmPerson("MFiona021");
     person.getPhoneNumbers().put("home", "021 1234");
     person.getPhoneNumbers().put("work", "021 4321");
     DB.save(person);
@@ -36,7 +36,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
       assertThat(sql.get(2)).contains("insert into ecm_person_phone");
     }
 
-    EcmPerson person1 = new EcmPerson("Fiona09");
+    EcmPerson person1 = new EcmPerson("MFiona09");
     person1.getPhoneNumbers().put("home", "09 1234");
     person1.getPhoneNumbers().put("work", "09 4321");
     person1.getPhoneNumbers().put("mob", "09 9876");
@@ -46,9 +46,11 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     List<EcmPerson> found =
       DB.find(EcmPerson.class).where()
-        .startsWith("name", "Fiona0")
+        .startsWith("name", "MFiona0")
         .order().asc("id")
         .findList();
+
+    assertThat(found).hasSize(2);
 
     Map<String, String> phoneNumbers0 = found.get(0).getPhoneNumbers();
     Map<String, String> phoneNumbers1 = found.get(1).getPhoneNumbers();
@@ -68,7 +70,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
       DB.find(EcmPerson.class)
         .fetch("phoneNumbers")
         .where()
-        .startsWith("name", "Fiona0")
+        .startsWith("name", "MFiona0")
         .order().asc("id")
         .findList();
 

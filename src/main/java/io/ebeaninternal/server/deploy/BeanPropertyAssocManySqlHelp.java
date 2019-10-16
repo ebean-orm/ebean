@@ -59,8 +59,8 @@ class BeanPropertyAssocManySqlHelp<T> {
     return sb.toString();
   }
 
-  String insertElementCollection() {
-    return elementCollectionInsertSql;
+  SpiSqlUpdate insertElementCollection() {
+    return new DefaultSqlUpdate(elementCollectionInsertSql);
   }
 
   private static class Cols extends BaseTablePropertyVisitor {
