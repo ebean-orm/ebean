@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.dbmigration.model.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -165,13 +165,13 @@ class BeanPropertyAssocManySqlHelp<T> {
     return server.findIds(q, t);
   }
 
-  SqlUpdate deleteByParentId(Object parentId) {
+  SpiSqlUpdate deleteByParentId(Object parentId) {
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(deleteByParentIdSql);
     many.bindParentId(sqlDelete, parentId);
     return sqlDelete;
   }
 
-  SqlUpdate deleteByParentIdList(List<Object> parentIds) {
+  SpiSqlUpdate deleteByParentIdList(List<Object> parentIds) {
 
     StringBuilder sb = new StringBuilder(100);
     sb.append(deleteByParentIdInSql);

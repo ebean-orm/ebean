@@ -14,6 +14,7 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -318,7 +319,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     // do not add to the selectChain at the top level of the Many bean
   }
 
-  public SqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
+  public SpiSqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
     if (parentId != null) {
       return sqlHelp.deleteByParentId(parentId);
     } else {
