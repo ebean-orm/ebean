@@ -3,8 +3,8 @@
 
   <parent>
     <groupId>org.avaje</groupId>
-    <artifactId>java8-parent</artifactId>
-    <version>1.4</version>
+    <artifactId>java8-oss</artifactId>
+    <version>2.1</version>
   </parent>
 
   <groupId>io.ebean</groupId>
