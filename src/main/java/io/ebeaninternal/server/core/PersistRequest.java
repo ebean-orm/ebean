@@ -66,6 +66,11 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     }
   }
 
+  @Override
+  public boolean isFlushQueue() {
+    return false;
+  }
+
   /**
    * Execute a the request or queue/batch it for later execution.
    */

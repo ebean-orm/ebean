@@ -31,30 +31,28 @@ public class BatchedPstmtHolder {
    */
   private int maxSize;
 
-  public BatchedPstmtHolder() {
+  BatchedPstmtHolder() {
   }
 
   /**
    * Return the PreparedStatement if it has already been used in this Batch.
    * This will return null if no matching PreparedStatement is found.
    */
-  public PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) {
-    BatchedPstmt batchedPstmt = getBatchedPstmt(stmtKey, postExecute);
-    return (batchedPstmt == null) ? null : batchedPstmt.getStatement();
+  PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) throws SQLException {
+    BatchedPstmt batchedPstmt = getBatchedPstmt(stmtKey);
+    return (batchedPstmt == null) ? null : batchedPstmt.getStatement(postExecute);
   }
 
   /**
    * Return the BatchedPstmt that holds the batched statement.
    */
-  public BatchedPstmt getBatchedPstmt(String stmtKey, BatchPostExecute postExecute) {
+  public BatchedPstmt getBatchedPstmt(String stmtKey) {
 
     BatchedPstmt bs = stmtMap.get(stmtKey);
     if (bs == null) {
       // the PreparedStatement has need been created
       return null;
     }
-    // add the post execute processing for this bean/row
-    bs.add(postExecute);
 
     // maintain a max batch size for any given batched stmt.
     // Used to determine when to flush.

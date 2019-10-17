@@ -91,7 +91,7 @@ public class InsertHandler extends DmlHandler {
 
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
-      pstmt = getPstmt(t, sql, persistRequest, useGeneratedKeys);
+      pstmt = getPstmtBatch(t, sql, persistRequest, useGeneratedKeys);
     } else {
       pstmt = getPstmt(t, sql, useGeneratedKeys);
     }

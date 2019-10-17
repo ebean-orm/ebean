@@ -32,6 +32,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   private final boolean forceNoBatch;
 
   private boolean batchThisRequest;
+  private boolean flushQueue;
 
   public PersistRequestUpdateSql(SpiEbeanServer server, SpiSqlUpdate sqlUpdate,
                                  SpiTransaction t, PersistExecute persistExecute, boolean forceNoBatch) {
@@ -50,7 +51,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
   @Override
   public void profile(long offset, int flushCount) {
-    profileBase(EVT_UPDATESQL, offset, (short)0, flushCount);
+    profileBase(EVT_UPDATESQL, offset, (short) 0, flushCount);
   }
 
   /**
@@ -77,7 +78,13 @@ public final class PersistRequestUpdateSql extends PersistRequest {
     if (control == null) {
       control = persistExecute.createBatchControl(transaction);
     }
+    flushQueue = true;
     control.addToFlushQueue(this, early);
+  }
+
+  @Override
+  public boolean isFlushQueue() {
+    return flushQueue;
   }
 
   @Override

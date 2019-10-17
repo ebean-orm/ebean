@@ -92,10 +92,11 @@ class ExeUpdateSql {
     // process named parameters if required
     String sql = updateSql.getBaseSql();
     sql = BindParamsParser.parse(bindParams, sql);
+    parseUpdate(sql, request);
 
     PreparedStatement pstmt;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmt(t, request.isLogSql(), sql, request);
+      pstmt = pstmtFactory.getPstmtBatch(t, sql, request);
     } else {
       pstmt = pstmtFactory.getPstmt(t, sql, request.isGetGeneratedKeys());
     }
@@ -112,8 +113,6 @@ class ExeUpdateSql {
     request.setBindLog(bindLog);
     updateSql.setGeneratedSql(sql);
 
-    // derive the statement type (for TransactionEvent)
-    parseUpdate(sql, request);
     if (batchThisRequest) {
       request.logSqlBatchBind();
     }

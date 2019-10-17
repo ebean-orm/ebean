@@ -74,7 +74,7 @@ class ExeCallableSql {
 
     CallableStatement cstmt;
     if (batchThisRequest) {
-      cstmt = pstmtFactory.getCstmt(t, logSql, sql, request);
+      cstmt = pstmtFactory.getCstmtBatch(t, logSql, sql, request);
     } else {
       if (logSql) {
         t.logSql(TrimLogSql.trim(sql));

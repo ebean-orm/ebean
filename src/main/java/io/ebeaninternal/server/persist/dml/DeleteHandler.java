@@ -35,7 +35,7 @@ public class DeleteHandler extends DmlHandler {
 
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
-      pstmt = getPstmt(t, sql, persistRequest, false);
+      pstmt = getPstmtBatch(t, sql, persistRequest, false);
     } else {
       pstmt = getPstmt(t, sql, false);
     }

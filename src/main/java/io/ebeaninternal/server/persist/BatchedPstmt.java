@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
+import io.ebeaninternal.api.SpiTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,10 +74,29 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   }
 
   /**
-   * Return the statement.
+   * Return the statement adding the postExecute task.
    */
-  public PreparedStatement getStatement() {
+  public PreparedStatement getStatement(BatchPostExecute postExecute) throws SQLException {
+    if (postExecute.isFlushQueue() && list.size() >= 20) {
+      flushStatementBatch();
+    }
+    list.add(postExecute);
     return pstmt;
+  }
+
+  /**
+   * Flush this PreparedStatement using executeBatch() as this was queued element collection
+   * or intersection table sql (and otherwise it can be unlimited size).
+   */
+  private void flushStatementBatch() throws SQLException {
+    final int[] rows = pstmt.executeBatch();
+    if (rows.length != list.size()) {
+      throw new IllegalStateException("Invalid state? rows:" + rows.length + " != " + list.size());
+    }
+    for (BatchPostExecute item : list) {
+      item.postExecute();
+    }
+    list.clear();
   }
 
   /**

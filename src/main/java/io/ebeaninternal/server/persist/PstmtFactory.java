@@ -23,7 +23,7 @@ class PstmtFactory {
   /**
    * Get a callable statement without any batching.
    */
-  public CallableStatement getCstmt(SpiTransaction t, String sql) throws SQLException {
+  CallableStatement getCstmt(SpiTransaction t, String sql) throws SQLException {
     Connection conn = t.getInternalConnection();
     return conn.prepareCall(sql);
   }
@@ -31,7 +31,7 @@ class PstmtFactory {
   /**
    * Get a prepared statement without any batching.
    */
-  public PreparedStatement getPstmt(SpiTransaction t, String sql, boolean getGeneratedKeys) throws SQLException {
+  PreparedStatement getPstmt(SpiTransaction t, String sql, boolean getGeneratedKeys) throws SQLException {
     Connection conn = t.getInternalConnection();
     if (getGeneratedKeys) {
       return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -43,21 +43,20 @@ class PstmtFactory {
   /**
    * Return a prepared statement taking into account batch requirements.
    */
-  public PreparedStatement getPstmt(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe) throws SQLException {
+  PreparedStatement getPstmtBatch(SpiTransaction t, String sql, BatchPostExecute batchExe) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-    PreparedStatement stmt = batch.getStmt(sql, batchExe);
-
-    if (stmt != null) {
-      return stmt;
+    BatchedPstmt existingStmt = batch.getBatchedPstmt(sql);
+    if (existingStmt != null) {
+      return existingStmt.getStatement(batchExe);
     }
 
-    if (logSql) {
+    if (t.isLogSql()) {
       t.logSql(TrimLogSql.trim(sql));
     }
 
     Connection conn = t.getInternalConnection();
-    stmt = conn.prepareStatement(sql);
+    PreparedStatement stmt = conn.prepareStatement(sql);
 
     BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
     batch.addStmt(bs, batchExe);
@@ -67,7 +66,7 @@ class PstmtFactory {
   /**
    * Return a callable statement taking into account batch requirements.
    */
-  public CallableStatement getCstmt(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe) throws SQLException {
+  CallableStatement getCstmtBatch(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe) throws SQLException {
 
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
     CallableStatement stmt = (CallableStatement) batch.getStmt(sql, batchExe);
