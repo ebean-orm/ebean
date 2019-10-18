@@ -15,8 +15,13 @@ public class MnocRole {
   @Version
   Integer version;
 
-  public MnocRole() {
-
+  /**
+   * Only for testing.
+   */
+  public MnocRole(MnocRole other) {
+    this.roleId = other.getRoleId();
+    this.roleName = other.getRoleName();
+    this.version = other.getVersion();
   }
 
   public MnocRole(String roleName) {

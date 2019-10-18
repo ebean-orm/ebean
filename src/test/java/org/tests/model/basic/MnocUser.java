@@ -21,13 +21,9 @@ public class MnocUser {
   Integer version;
 
   // No cascade REMOVE
-  @ManyToMany(cascade = CascadeType.PERSIST)
+  @ManyToMany
   @OrderBy("roleName")
   List<MnocRole> validRoles;
-
-  public MnocUser() {
-
-  }
 
   public MnocUser(String userName) {
     this.userName = userName;

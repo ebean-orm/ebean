@@ -956,7 +956,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   public boolean isIncludeCascadeDelete() {
-    return cascadeInfo.isDelete() || o2mJoinTable || ModifyListenMode.REMOVALS == modifyListenMode;
+    return cascadeInfo.isDelete() || hasJoinTable() || ModifyListenMode.REMOVALS == modifyListenMode;
   }
 
   boolean isCascadeDeleteEscalate() {
