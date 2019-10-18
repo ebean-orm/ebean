@@ -2,7 +2,6 @@ package io.ebean;
 
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
@@ -1201,6 +1200,13 @@ public class DB {
    */
   public static BeanState getBeanState(Object bean) {
     return getDefault().getBeanState(bean);
+  }
+
+  /**
+   * Return the value of the Id property for a given bean.
+   */
+  public static Object getBeanId(Object bean) {
+    return getDefault().getBeanId(bean);
   }
 
   /**
