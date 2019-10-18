@@ -2,6 +2,7 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
@@ -80,5 +81,36 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     assertSqlBind(sql.get(2));
     assertThat(sql.get(3)).contains("insert into mnoc_user_mnoc_role (mnoc_user_user_id, mnoc_role_role_id) values (?, ?)");
     assertSqlBind(sql.get(4));
+  }
+
+  @Test
+  public void deleteBatch() {
+
+    MnocUser u0 = new MnocUser("usr2a");
+    u0.addValidRole(r0);
+    u0.addValidRole(r1);
+
+    MnocUser u1 = new MnocUser("usr2b");
+    u1.addValidRole(r0);
+    u1.addValidRole(r1);
+
+    DB.save(u0);
+    DB.save(u1);
+
+    LoggedSqlCollector.start();
+
+    try (Transaction txn = DB.beginTransaction()) {
+      txn.setBatchMode(true);
+      DB.delete(u0);
+      DB.delete(u1);
+      txn.commit();
+    }
+
+    final List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(8);
+    assertThat(sql.get(0)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
+    assertThat(sql.get(4)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
+    assertThat(sql.get(2)).contains("delete from mnoc_user where user_id=? and version=?");
+    assertThat(sql.get(6)).contains("delete from mnoc_user where user_id=? and version=?");
   }
 }
