@@ -1,7 +1,7 @@
 package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.tests.model.basic.MnocRole;
 import org.tests.model.basic.MnocUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,9 +23,9 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
 
   @BeforeClass
   public static void setup() {
-    Ebean.save(r0);
-    Ebean.save(r1);
-    Ebean.save(r2);
+    DB.save(r0);
+    DB.save(r1);
+    DB.save(r2);
   }
 
   @IgnorePlatform(Platform.NUODB)
@@ -35,21 +36,49 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     u0.addValidRole(r0);
     u0.addValidRole(r1);
 
-    Ebean.save(u0);
+    DB.save(u0);
 
-    MnocUser loadedUser = Ebean.find(MnocUser.class, u0.getUserId());
+    MnocUser loadedUser = DB.find(MnocUser.class, u0.getUserId());
     List<MnocRole> validRoles = loadedUser.getValidRoles();
     assertThat(validRoles).hasSize(2);
 
     LoggedSqlCollector.start();
-    Ebean.delete(u0);
+    DB.delete(u0);
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
     assertThat(sql.get(1)).contains("delete from mnoc_user where user_id=? and version=?");
 
-    final MnocUser found = Ebean.find(MnocUser.class, u0.getUserId());
+    final MnocUser found = DB.find(MnocUser.class, u0.getUserId());
     assertThat(found).isNull();
+  }
+
+  @Test
+  public void update() {
+
+    MnocUser u0 = new MnocUser("usr1");
+    u0.addValidRole(r0);
+    u0.addValidRole(r1);
+
+    DB.save(u0);
+
+    List<MnocRole> roles = new ArrayList<>();
+    roles.add(new MnocRole(r2));
+
+    final MnocUser user = DB.find(MnocUser.class, u0.getUserId());
+    user.setUserName("usr1-mod");
+    user.setValidRoles(roles);
+
+    LoggedSqlCollector.start();
+    DB.update(user);
+
+    final List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(5);
+    assertThat(sql.get(0)).contains("update mnoc_user set user_name=?, version=? where user_id=? and version=?");
+    assertThat(sql.get(1)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
+    assertSqlBind(sql.get(2));
+    assertThat(sql.get(3)).contains("insert into mnoc_user_mnoc_role (mnoc_user_user_id, mnoc_role_role_id) values (?, ?)");
+    assertSqlBind(sql.get(4));
   }
 }
