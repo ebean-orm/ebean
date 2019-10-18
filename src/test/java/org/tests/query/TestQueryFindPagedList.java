@@ -38,13 +38,13 @@ public class TestQueryFindPagedList extends BaseTestCase {
   }
 
   @Test(expected = PersistenceException.class)
-  public void test_noMaxRows() throws ExecutionException, InterruptedException {
+  public void test_noMaxRows() {
 
     Ebean.find(Order.class).findPagedList();
   }
 
   @Test
-  public void test_maxRows_NoCount() throws ExecutionException, InterruptedException {
+  public void test_maxRows_NoCount() {
 
     ResetBasicData.reset();
 
@@ -86,7 +86,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
   }
 
   @Test
-  public void test_maxRows_countInBackground_withLoadRowCount() throws InterruptedException {
+  public void test_maxRows_countInBackground_withLoadRowCount() {
 
     ResetBasicData.reset();
 
@@ -154,7 +154,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
   }
 
   @Test
-  public void test_noCount() throws ExecutionException, InterruptedException {
+  public void test_noCount() {
 
     ResetBasicData.reset();
 
@@ -192,7 +192,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
 
   @Test
-  public void test_countInBackground_withLoadRowCount() throws InterruptedException {
+  public void test_countInBackground_withLoadRowCount() {
 
     ResetBasicData.reset();
 
@@ -208,7 +208,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
 
   @Test
-  public void test_countUsingForegound() throws ExecutionException, InterruptedException {
+  public void test_countUsingForegound() {
 
     ResetBasicData.reset();
 
@@ -246,7 +246,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
 
   @Test
-  public void test_usingAlias() throws ExecutionException, InterruptedException {
+  public void test_usingAlias() {
 
     ResetBasicData.reset();
 
