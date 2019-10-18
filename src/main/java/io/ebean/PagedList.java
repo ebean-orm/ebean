@@ -61,6 +61,13 @@ import java.util.concurrent.Future;
 public interface PagedList<T> {
 
   /**
+   * Return an empty PagedList.
+   */
+  static <B> PagedList<B> emptyList() {
+    return new EmptyPagedList<>();
+  }
+
+  /**
    * Initiate the loading of the total row count in the background.
    * <pre>{@code
    *

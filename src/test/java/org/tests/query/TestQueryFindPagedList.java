@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.PagedList;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
@@ -22,6 +23,19 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQueryFindPagedList extends BaseTestCase {
 
+  @Test
+  public void empty() {
+    PagedList<Customer> empty = PagedList.emptyList();
+
+    assertThat(empty.getList()).isEmpty();
+    assertThat(empty.getTotalPageCount()).isEqualTo(0);
+    assertThat(empty.getTotalCount()).isEqualTo(0);
+    assertThat(empty.getPageIndex()).isEqualTo(0);
+    assertThat(empty.getPageSize()).isEqualTo(0);
+    assertThat(empty.hasNext()).isFalse();
+    assertThat(empty.hasPrev()).isFalse();
+    assertThat(empty.getDisplayXtoYofZ("a", "b")).isEqualTo("");
+  }
 
   @Test(expected = PersistenceException.class)
   public void test_noMaxRows() throws ExecutionException, InterruptedException {
