@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.EBasicEncrypt;
+import org.tests.model.basic.EBasicEncryptRelate;
 
 import java.sql.Date;
 import java.util.List;
@@ -32,6 +33,26 @@ public class TestEncrypt extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("; --bind(****,Rob%)");
+  }
+
+  @Test
+  @ForPlatform(Platform.H2) // only run this on H2 - PGCrypto not happy on CI server
+  public void testQueryJoin() {
+
+    LoggedSqlCollector.start();
+
+    DB.find(EBasicEncryptRelate.class)
+      .where().eq("other.description", "foo")
+      .findList();
+
+    DB.find(EBasicEncryptRelate.class)
+      .where().eq("other.description", "foo")
+      .findCount();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(2);
+    assertThat(loggedSql.get(0)).contains("left join e_basicenc t1 on t1.id = t0.other_id");
+    assertThat(loggedSql.get(1)).contains("left join e_basicenc t1 on t1.id = t0.other_id");
   }
 
   @Test
