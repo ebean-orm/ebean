@@ -488,30 +488,8 @@ class CQueryBuilder {
         }
         if (el == null) {
           throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
-        } else {
-          BeanProperty beanProperty = el.getBeanProperty();
-          if (beanProperty.isId()) {
-            if (propertyName.contains(".")) {
-              // For @Id properties we chop off the last part of the path
-              propertyName = SplitName.parent(propertyName);
-            }
-          } else if (beanProperty.isDiscriminator()) {
-            propertyName = SplitName.parent(propertyName);
-          } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
-            String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
-            msg += ". It should be mapped to a simple property (probably the Id property). ";
-            throw new PersistenceException(msg);
-          }
-          if (propertyName != null) {
-            boolean assocProperty = el.isAssocProperty();
-            if (!assocProperty) {
-              pathProps.addToPath(null, propertyName);
-            } else {
-              String[] pathProp = SplitName.split(propertyName);
-              pathProps.addToPath(pathProp[0], pathProp[1]);
-            }
-          }
         }
+        addRawColumnMapping(pathProps, column, propertyName, el);
       }
     }
 
@@ -532,6 +510,31 @@ class CQueryBuilder {
 
     // build SqlTree based on OrmQueryDetail of the RawSql
     return new SqlTreeBuilder(request, predicates, detail, rawNoId).build();
+  }
+
+  private void addRawColumnMapping(PathProperties pathProps, Column column, String propertyName, ElPropertyValue el) {
+    BeanProperty beanProperty = el.getBeanProperty();
+    if (beanProperty.isId()) {
+      if (propertyName.contains(".")) {
+        // For @Id properties we chop off the last part of the path
+        propertyName = SplitName.parent(propertyName);
+      }
+    } else if (beanProperty.isDiscriminator()) {
+      propertyName = SplitName.parent(propertyName);
+    } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
+      String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
+      msg += ". It should be mapped to a simple property (probably the Id property). ";
+      throw new PersistenceException(msg);
+    }
+    if (propertyName != null) {
+      boolean assocProperty = el.isAssocProperty();
+      if (!assocProperty) {
+        pathProps.addToPath(null, propertyName);
+      } else {
+        String[] pathProp = SplitName.split(propertyName);
+        pathProps.addToPath(pathProp[0], pathProp[1]);
+      }
+    }
   }
 
   /**
