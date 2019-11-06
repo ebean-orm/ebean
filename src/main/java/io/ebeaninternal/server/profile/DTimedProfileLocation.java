@@ -13,10 +13,22 @@ class DTimedProfileLocation extends DProfileLocation implements TimedProfileLoca
 
   private final TimedMetric timedMetric;
 
+  private final boolean overrideMetricName;
+
+  private String fullName;
+
   DTimedProfileLocation(int lineNumber, String label, TimedMetric timedMetric) {
     super(lineNumber);
     this.label = label;
     this.timedMetric = timedMetric;
+    this.overrideMetricName = "".equals(label);
+  }
+
+  @Override
+  protected void initWith(String locationLabel) {
+    if (overrideMetricName) {
+      fullName = "txn.named." + locationLabel;
+    }
   }
 
   @Override
@@ -38,7 +50,10 @@ class DTimedProfileLocation extends DProfileLocation implements TimedProfileLoca
   public void visit(MetricVisitor visitor) {
     TimedMetricStats collect = timedMetric.collect(visitor.isReset());
     if (collect != null) {
-      collect.setLocation(obtain());
+      if (overrideMetricName) {
+        collect.setName(fullName);
+      }
+      collect.setLocation(shortDescription());
       visitor.visitTimed(collect);
     }
   }

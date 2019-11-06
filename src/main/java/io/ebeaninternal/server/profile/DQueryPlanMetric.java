@@ -78,7 +78,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
     @Override
     public String getLocation() {
-      return stats.getLocation();
+      return meta.getLocation();
     }
 
     @Override

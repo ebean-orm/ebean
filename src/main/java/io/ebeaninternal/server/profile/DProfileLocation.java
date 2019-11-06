@@ -49,8 +49,13 @@ class DProfileLocation implements ProfileLocation {
       label = UtilLocation.label(shortDesc);
       shortDescription = shortDesc;
       location = loc;
+      initWith(label);
     }
     return location;
+  }
+
+  protected void initWith(String label) {
+    // nothing by default
   }
 
   @Override

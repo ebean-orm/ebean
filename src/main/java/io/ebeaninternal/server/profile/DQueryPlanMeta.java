@@ -38,6 +38,10 @@ class DQueryPlanMeta {
     return profileLocation;
   }
 
+  public String getLocation() {
+    return (profileLocation == null) ? null : profileLocation.shortDescription();
+  }
+
   public String getSql() {
     return sql;
   }

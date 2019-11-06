@@ -10,7 +10,7 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private final MetricType metricType;
 
-  private final String name;
+  private String name;
 
   private String location;
 
@@ -39,9 +39,6 @@ class DTimeMetricStats implements TimedMetricStats {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (location != null) {
-      sb.append("loc:").append(location).append(" ");
-    }
     if (name != null) {
       sb.append("name:").append(name).append(" ");
     }
@@ -49,12 +46,20 @@ class DTimeMetricStats implements TimedMetricStats {
       .append(" total:").append(total)
       .append(" max:").append(max)
       .append(" beanCount:").append(beanCount);
+    if (location != null) {
+      sb.append(" loc:").append(location);
+    }
     return sb.toString();
   }
 
   @Override
   public void setLocation(String location) {
     this.location = location;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
