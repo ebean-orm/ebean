@@ -11,6 +11,8 @@ import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.rawsql.A2Customer;
+import org.tests.rawsql.ACustomer;
 
 import java.util.List;
 
@@ -100,4 +102,72 @@ public class TestRawSqlParsing extends BaseTestCase {
     assertThat(sqlOf(query)).contains(") all_split limit 5 offset 1");
   }
 
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void testColumnName2() {
+
+    ResetBasicData.reset();
+
+    String sql = "select 42 custId, 'bar' customerName from o_customer";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+
+    Query<A2Customer> query = Ebean.createQuery(A2Customer.class)
+      .setRawSql(rawSql);
+
+    final List<A2Customer> list = query.findList();
+
+    assertThat(list).isNotEmpty();
+    for (A2Customer customer : list) {
+      assertThat(customer.getCustId()).isEqualTo(42L);
+      assertThat(customer.getCustomerName()).isEqualTo("bar");
+    }
+  }
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void testColumnAlias() {
+
+    ResetBasicData.reset();
+
+    String sql = "select 43 custId, name as custName from o_customer";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+
+    Query<ACustomer> query = Ebean.createQuery(ACustomer.class)
+      .setRawSql(rawSql);
+
+    final List<ACustomer> list = query.findList();
+
+    assertThat(list).isNotEmpty();
+    for (ACustomer customer : list) {
+      assertThat(customer.getCustId()).isEqualTo(43L);
+      assertThat(customer.getCustName()).isNotNull();
+    }
+  }
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void testColumnNameMapping() {
+
+    ResetBasicData.reset();
+
+    String sql = "select v.custId, v.customerName from (select id custId, name customerName from o_customer) v";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql)
+      .columnMapping("v.customerName", "custName")
+      .create();
+
+    Query<ACustomer> query = Ebean.createQuery(ACustomer.class)
+      .setRawSql(rawSql);
+
+    final List<ACustomer> list = query.findList();
+
+    assertThat(list).isNotEmpty();
+    for (ACustomer customer : list) {
+      assertThat(customer.getCustId()).isGreaterThan(0L);
+      assertThat(customer.getCustName()).isNotNull();
+    }
+  }
 }
