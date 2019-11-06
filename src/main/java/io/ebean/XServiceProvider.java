@@ -20,29 +20,23 @@ class XServiceProvider {
   private static SpiFetchGroupService fetchGroupService = initSpiFetchGroupService();
 
   private static SpiFetchGroupService initSpiFetchGroupService() {
-    Iterator<SpiFetchGroupService> loader = ServiceLoader.load(SpiFetchGroupService.class).iterator();
-    if (loader.hasNext()) {
-      return loader.next();
-    }
-    throw new IllegalStateException("No service implementation found for SpiFetchGroupService?");
+    return loadFirstService(SpiFetchGroupService.class);
   }
 
   private static SpiRawSqlService initRawSql() {
-
-    Iterator<SpiRawSqlService> loader = ServiceLoader.load(SpiRawSqlService.class).iterator();
-    if (loader.hasNext()) {
-      return loader.next();
-    }
-    throw new IllegalStateException("No service implementation found for SpiRawSqlService?");
+    return loadFirstService(SpiRawSqlService.class);
   }
 
   private static SpiProfileLocationFactory initProfileLocation() {
+    return loadFirstService(SpiProfileLocationFactory.class);
+  }
 
-    Iterator<SpiProfileLocationFactory> loader = ServiceLoader.load(SpiProfileLocationFactory.class).iterator();
+  private static <T> T loadFirstService(Class<T> cls) {
+    Iterator<T> loader = ServiceLoader.load(cls).iterator();
     if (loader.hasNext()) {
       return loader.next();
     }
-    throw new IllegalStateException("No service implementation found for SpiProfileLocationFactory?");
+    throw new IllegalStateException("No service implementation found for " + cls);
   }
 
   /**
