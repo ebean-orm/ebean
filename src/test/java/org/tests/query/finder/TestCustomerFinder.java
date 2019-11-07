@@ -8,6 +8,7 @@ import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.meta.ServerMetrics;
+import io.ebean.meta.SortMetric;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -138,20 +139,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    resetAllMetrics();
-
-    List<Customer> customers = Customer.find.all();
-    assertThat(customers).isNotEmpty();
-
-    Customer customer = Customer.find.byId(1);
-    assertThat(customer).isNotNull();
-    Customer.find.byId(2);
-
-    Customer.find.namesStartingWith("F");
-    Customer.find.byNameStatus("Rob", Customer.Status.ACTIVE);
-    Customer.find.totalCount();
-    Customer.find.updateNames("Junk", 2000);
-    Customer.find.byId(3);
+    runQueries();
 
     ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
 
@@ -172,7 +160,71 @@ public class TestCustomerFinder extends BaseTestCase {
     for (MetaQueryPlan plan : plans) {
       System.out.println(plan);
     }
+  }
 
+  @Test
+  public void test_metricsAsJson_withAll() {
+
+    ResetBasicData.reset();
+
+    runQueries();
+
+    String metricsJson = server().getMetaInfoManager()
+      .collectMetricsAsJson()
+      .withHash(true)
+      .withLocation(true)
+      .withNewLine(true)
+      .withSql(true)
+      .withSort(SortMetric.TOTAL)
+      .json();
+
+    System.out.println(metricsJson);
+    assertThat(metricsJson).contains("\"name\":\"txn.main\"");
+    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+    assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
+    assertThat(metricsJson).contains("\"hash\":\"4d648ce0542aedfb042ad68746342730\"");
+    assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
+  }
+
+  @Test
+  public void test_metricsAsJson_minimal() {
+
+    ResetBasicData.reset();
+
+    runQueries();
+
+    String metricsJson = server().getMetaInfoManager()
+      .collectMetricsAsJson()
+      .withHash(false)
+      .withLocation(false)
+      .withNewLine(false)
+      .withSql(false)
+      .withSort(null)
+      .json();
+
+    System.out.println(metricsJson);
+    assertThat(metricsJson).contains("\"name\":\"txn.main\"");
+    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+    assertThat(metricsJson).doesNotContain("\"loc\":");
+    assertThat(metricsJson).doesNotContain("\"hash\":");
+    assertThat(metricsJson).doesNotContain("\"sql\":");
+  }
+
+  private void runQueries() {
+    resetAllMetrics();
+
+    List<Customer> customers = Customer.find.all();
+    assertThat(customers).isNotEmpty();
+
+    Customer customer = Customer.find.byId(1);
+    assertThat(customer).isNotNull();
+    Customer.find.byId(2);
+
+    Customer.find.namesStartingWith("F");
+    Customer.find.byNameStatus("Rob", Customer.Status.ACTIVE);
+    Customer.find.totalCount();
+    Customer.find.updateNames("Junk", 2000);
+    Customer.find.byId(3);
   }
 
 }
