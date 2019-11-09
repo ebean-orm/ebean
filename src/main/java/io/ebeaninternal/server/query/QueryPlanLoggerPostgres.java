@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * A QueryPlanlogger for Postgres that prefixes "EXPLAIN ANALYZE" to the query.
+ * A QueryPlanLogger for Postgres that prefixes "EXPLAIN ANALYZE" to the query.
  */
 public class QueryPlanLoggerPostgres extends QueryPlanLogger {
 

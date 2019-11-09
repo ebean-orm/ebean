@@ -129,7 +129,7 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       if (queryPlan.executionTime(rowCount, executionTimeMicros, query.getParentNode())) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
-      getTransaction().profileEvent(this);
+      t.profileEvent(this);
       return rowCount;
 
     } finally {

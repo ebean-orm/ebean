@@ -31,5 +31,4 @@ public class QueryFutureRowCount<T> extends BaseFuture<Integer> implements Futur
     return super.cancel(mayInterruptIfRunning);
   }
 
-
 }

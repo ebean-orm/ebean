@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * A QueryPlanlogger for oracle.
+ * A QueryPlanLogger for oracle.
  *
  * @author Roland Praml, FOCONIS AG
  */

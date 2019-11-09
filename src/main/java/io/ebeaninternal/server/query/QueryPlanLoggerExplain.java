@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 /**
- * A QueryPlanlogger that prefixes "EXPLAIN " to the query. This works for Postgres, H2 and MySql.
+ * A QueryPlanLogger that prefixes "EXPLAIN " to the query. This works for Postgres, H2 and MySql.
  */
 public class QueryPlanLoggerExplain extends QueryPlanLogger {
 

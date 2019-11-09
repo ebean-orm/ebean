@@ -96,7 +96,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
       if (queryPlan.executionTime(rowCount, executionTimeMicros, null)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
-      getTransaction().profileEvent(this);
+      t.profileEvent(this);
       return rowCount;
 
     } finally {

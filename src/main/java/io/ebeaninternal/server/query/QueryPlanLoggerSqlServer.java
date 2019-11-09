@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * A QueryPlanlogger for sqlserver. It will return the plan as XML, which can be opened in
+ * A QueryPlanLogger for SqlServer. It will return the plan as XML, which can be opened in
  * Microsoft SQL Server Management Studio.
  *
  * @author Roland Praml, FOCONIS AG
