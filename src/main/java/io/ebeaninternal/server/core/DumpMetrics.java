@@ -153,18 +153,16 @@ class DumpMetrics {
   }
 
   private void appendProfileAndSql(MetaQueryMetric metric, StringBuilder sb) {
-    ProfileLocation profileLocation = metric.getProfileLocation();
-    if (dumpLoc && profileLocation != null) {
-      sb.append("\n  loc:").append(profileLocation.shortDescription());
+    String location = metric.getLocation();
+    if (dumpLoc && location != null) {
+      sb.append("\n  loc:").append(location);
     }
-
     if (dumpSql) {
       sb.append(" \n\n  sql:").append(metric.getSql()).append("\n\n");
     }
   }
 
   private void log(MetaTimedMetric metric) {
-
     StringBuilder sb = new StringBuilder();
     sb.append(padNameTimed(metric.getName())).append(" ");
     appendCounters(metric, sb);

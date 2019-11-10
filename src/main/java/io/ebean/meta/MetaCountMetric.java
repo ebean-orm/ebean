@@ -1,19 +1,9 @@
 package io.ebean.meta;
 
 /**
- * Count metrics.
+ * Count metrics. For example L2 cache hits.
  */
-public interface MetaCountMetric {
-
-  /**
-   * Return the metric type.
-   */
-  MetricType getMetricType();
-
-  /**
-   * Return the metric name.
-   */
-  String getName();
+public interface MetaCountMetric extends MetaMetric {
 
   /**
    * Return the total count.

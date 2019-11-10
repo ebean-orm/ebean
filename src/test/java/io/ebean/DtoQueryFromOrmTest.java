@@ -63,7 +63,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     for (MetaQueryMetric stat : stats) {
       long meanMicros = stat.getMean();
       assertThat(meanMicros).isLessThan(900_000);
-      assertThat(stat.getProfileLocation()).isSameAs(loc0);
+      assertThat(stat.getLocation()).isSameAs(loc0.shortDescription());
     }
 
     assertThat(stats).hasSize(1);

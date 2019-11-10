@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.Database;
-import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaCountMetric;
+import io.ebean.meta.MetaMetric;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
@@ -20,16 +20,15 @@ class DumpMetricsJson implements ServerMetricsAsJson {
 
   private final StringWriter writer = new StringWriter();
 
-  private boolean dumpHash = true;
-  private boolean dumpSql = true;
-  private boolean dumpLoc = true;
+  private boolean withHash = true;
+  private boolean withSql = true;
+  private boolean withLocation = true;
+  private String newLine = "\n";
 
   private Comparator<MetaTimedMetric> sortBy = SortMetric.NAME;
 
   private int listCounter;
   private int objKeyCounter;
-
-  private String newLine = "\n";
 
   DumpMetricsJson(Database database) {
     this.database = database;
@@ -37,19 +36,19 @@ class DumpMetricsJson implements ServerMetricsAsJson {
 
   @Override
   public ServerMetricsAsJson withLocation(boolean withLocation) {
-    this.dumpLoc = withLocation;
+    this.withLocation = withLocation;
     return this;
   }
 
   @Override
   public ServerMetricsAsJson withSql(boolean withSql) {
-    this.dumpSql = withSql;
+    this.withSql = withSql;
     return this;
   }
 
   @Override
   public ServerMetricsAsJson withHash(boolean withHash) {
-    this.dumpHash = withHash;
+    this.withHash = withHash;
     return this;
   }
 
@@ -70,7 +69,6 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     collect(database.getMetaInfoManager().collectMetrics());
     return writer.toString();
   }
-
 
   private void collect(ServerMetrics serverMetrics) {
 
@@ -158,64 +156,69 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     writer.append("\"").append(val).append("\"");
   }
 
-  private void log(MetaTimedMetric metric) {
-
-    metricStart();
-    key("name");
-    val(metric.getName());
-    appendCounters(metric);
-    objEnd();
-  }
-
-  private void metricStart() {
+  private void metricStart(MetaMetric metric) {
     if (listCounter++ > 0) {
       writer.append(",").append(newLine);
     }
     objStart();
+    key("name");
+    val(metric.getName());
+    key("type");
+    val(metric.getMetricType().name());
+  }
+
+  private void metricEnd() {
+    objEnd();
+  }
+
+  private void log(MetaTimedMetric metric) {
+    metricStart(metric);
+    appendCounters(metric);
+    if (withLocation) {
+      appendLocation(metric.getLocation());
+    }
+    metricEnd();
   }
 
   private void logCount(MetaCountMetric metric) {
-    metricStart();
-    key("name");
-    val(metric.getName());
+    metricStart(metric);
     key("count");
     val(metric.getCount());
-    objEnd();
+    metricEnd();
   }
 
   private void logQuery(MetaOrmQueryMetric metric) {
-
-    metricStart();
-    key("name");
-    val(metric.getName());
+    metricStart(metric);
     appendCounters(metric);
-    if (dumpHash) {
+    if (withHash) {
       key("hash");
       val(metric.getSqlHash());
     }
-    appendProfileAndSql(metric);
-    objEnd();
+    appendLocationAndSql(metric);
+    metricEnd();
   }
 
   private void logDtoQuery(MetaQueryMetric metric) {
-
-    metricStart();
-    key("name");
-    val(metric.getName());
+    metricStart(metric);
     appendCounters(metric);
-    appendProfileAndSql(metric);
-    objEnd();
+    appendLocationAndSql(metric);
+    metricEnd();
   }
 
-  private void appendProfileAndSql(MetaQueryMetric metric) {
-    ProfileLocation profileLocation = metric.getProfileLocation();
-    if (dumpLoc && profileLocation != null) {
-      key("loc");
-      val(profileLocation.shortDescription());
+  private void appendLocationAndSql(MetaQueryMetric metric) {
+    if (withLocation) {
+      appendLocation(metric.getLocation());
     }
-    if (dumpSql) {
+    if (withSql) {
       key("sql");
       val(metric.getSql());
+    }
+  }
+
+  private void appendLocation(String location) {
+    if (location != null) {
+      key("loc");
+      val(location);
     }
   }
 

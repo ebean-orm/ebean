@@ -4,17 +4,7 @@ package io.ebean.meta;
 /**
  * Timed execution statistics.
  */
-public interface MetaTimedMetric {
-
-  /**
-   * Return the metric type.
-   */
-  MetricType getMetricType();
-
-  /**
-   * Return the metric name.
-   */
-  String getName();
+public interface MetaTimedMetric extends MetaMetric {
 
   /**
    * Return the metric location if defined.
