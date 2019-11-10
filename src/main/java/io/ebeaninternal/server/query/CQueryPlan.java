@@ -176,7 +176,7 @@ public class CQueryPlan {
   }
 
   private String location() {
-    return (profileLocation == null) ? null : profileLocation.shortDescription();
+    return (profileLocation == null) ? null : profileLocation.location();
   }
 
   private CQueryPlanKey buildPlanKey(String sql, boolean rowNumberIncluded, String logWhereSql) {

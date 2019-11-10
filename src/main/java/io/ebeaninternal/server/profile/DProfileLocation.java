@@ -11,9 +11,9 @@ class DProfileLocation implements ProfileLocation {
 
   private static final String UNKNOWN = "unknown";
 
-  private String location;
+  private String fullLocation;
 
-  private String shortDescription;
+  private String location;
 
   private String label;
 
@@ -43,15 +43,15 @@ class DProfileLocation implements ProfileLocation {
   @Override
   public String obtain() {
     // atomic assignments so happy enough with this (racing but atomic)
-    if (location == null) {
+    if (fullLocation == null) {
       final String loc = create();
       final String shortDesc = shortDesc(loc);
       label = UtilLocation.label(shortDesc);
-      shortDescription = shortDesc;
-      location = loc;
+      location = shortDesc;
+      fullLocation = loc;
       initWith(label);
     }
-    return location;
+    return fullLocation;
   }
 
   protected void initWith(String label) {
@@ -64,8 +64,8 @@ class DProfileLocation implements ProfileLocation {
   }
 
   @Override
-  public String shortDescription() {
-    return shortDescription;
+  public String location() {
+    return location;
   }
 
   private String create() {

@@ -38,7 +38,7 @@ public interface ProfileLocation {
   /**
    * Return a short version of the location description.
    */
-  String shortDescription();
+  String location();
 
   /**
    * Return the short label.
