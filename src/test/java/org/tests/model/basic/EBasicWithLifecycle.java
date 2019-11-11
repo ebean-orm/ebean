@@ -1,5 +1,6 @@
 package org.tests.model.basic;
 
+import io.ebean.Model;
 import io.ebean.annotation.PostSoftDelete;
 import io.ebean.annotation.PreSoftDelete;
 import io.ebean.annotation.SoftDelete;
@@ -19,7 +20,7 @@ import javax.persistence.Version;
 
 @Entity
 @Table(name = "e_basic_withlife")
-public class EBasicWithLifecycle {
+public class EBasicWithLifecycle extends Model {
 
   @Id
   Long id;
