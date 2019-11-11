@@ -33,6 +33,8 @@ public class EBasicWithLifecycle extends Model {
   @Version
   Long version;
 
+  String other;
+
   transient StringBuilder buffer = new StringBuilder();
 
   @PrePersist
@@ -58,6 +60,7 @@ public class EBasicWithLifecycle extends Model {
   @PreUpdate
   public void preUpdate1() {
     buffer.append("preUpdate1");
+    other += "preUpdate1";
   }
 
   @PreUpdate
@@ -139,6 +142,14 @@ public class EBasicWithLifecycle extends Model {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getOther() {
+    return other;
+  }
+
+  public void setOther(String other) {
+    this.other = other;
   }
 
   public boolean isDeleted() {

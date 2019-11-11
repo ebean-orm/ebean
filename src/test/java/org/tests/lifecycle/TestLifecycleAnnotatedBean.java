@@ -76,6 +76,9 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     found.setName("after");
     found.update();
     assertThat(found.getBuffer()).contains("preUpdate1", "preUpdate2", "postUpdate1", "postUpdate2");
+
+    final EBasicWithLifecycle check = DB.find(EBasicWithLifecycle.class, bean.getId());
+    assertThat(check.getOther()).isEqualTo("nullpreUpdate1");
   }
 
   @Test
