@@ -218,6 +218,11 @@ public class DeployCreateProperties {
 
     Class<?> propertyType = field.getType();
 
+    if (isTransientField(field)) {
+      // return with no ScalarType (still support JSON features)
+      return new DeployBeanProperty(desc, propertyType, null, null);
+    }
+
     ManyToOne manyToOne = AnnotationUtil.findAnnotation(field, ManyToOne.class);
     if (manyToOne != null) {
       Class<?> tt = manyToOne.targetEntity();
@@ -254,10 +259,6 @@ public class DeployCreateProperties {
       return new DeployBeanProperty(desc, propertyType, scalarType, null);
     }
 
-    if (isTransientField(field)) {
-      // return with no ScalarType (still support JSON features)
-      return new DeployBeanProperty(desc, propertyType, null, null);
-    }
     try {
       return new DeployBeanPropertyAssocOne(desc, propertyType);
 

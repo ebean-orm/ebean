@@ -2574,25 +2574,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return null;
   }
 
+  @Override
+  public boolean isDynamicPropertyName(String propName) {
+    return propName.indexOf('(') > -1;
+  }
   /**
    * Return a 'dynamic property' used to read a formula.
    */
-  private STreeProperty findSqlTreeFormula(String formula, String path) {
+  @Override
+  public STreeProperty createDynamicProperty(String formula, String path) {
     String key = formula + "-" + path;
     return dynamicProperty.computeIfAbsent(key, (fullKey) -> FormulaPropertyPath.create(this, formula, path));
-  }
-
-  /**
-   * Return a property that is part of the SQL tree.
-   * <p>
-   * The property can be a dynamic formula or a well known bean property.
-   */
-  @Override
-  public STreeProperty findPropertyWithDynamic(String propName, String path) {
-    if (propName.indexOf('(') > -1) {
-      return findSqlTreeFormula(propName, path);
-    }
-    return _findBeanProperty(propName);
   }
 
   /**
@@ -2994,7 +2986,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     if (p != null) {
       p.load(sqlBeanLoad);
     } else {
-      property.loadIgnore(ctx);
+      property.loadOptional(sqlBeanLoad);
     }
   }
 

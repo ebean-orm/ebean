@@ -145,7 +145,11 @@ final class FormulaPropertyPath {
   }
 
   private BeanProperty target(String logicalName) {
-    return descriptor._findBeanProperty(logicalName);
+    int pos = logicalName.indexOf('@');
+    if (pos != -1) {
+      logicalName = logicalName.substring(pos + 1);
+    }
+    return descriptor.findProperty(logicalName);
   }
 
   private String logicalName() {

@@ -23,7 +23,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -106,6 +108,9 @@ public class Customer extends BasicDomain {
 
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
   List<Contact> contacts;
+
+  @Transient
+  private Map<String, Object> otherProps = new HashMap<>();
 
   @Override
   public String toString() {
@@ -223,5 +228,13 @@ public class Customer extends BasicDomain {
       contacts = new ArrayList<>();
     }
     contacts.add(contact);
+  }
+
+  public Map<String, Object> getOtherProps() {
+    return otherProps;
+  }
+
+  public void setOtherProps(Map<String, Object> otherProps) {
+    this.otherProps = otherProps;
   }
 }

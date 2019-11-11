@@ -70,7 +70,7 @@ public class BootupClasses implements ClassFilter {
   private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates = new ArrayList<>();
 
   private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates = new ArrayList<>();
-  
+
   private final List<Class<? extends CustomDeployParser>> customDeployParserCandidates = new ArrayList<>();
 
   private final List<IdGenerator> idGeneratorInstances = new ArrayList<>();
@@ -195,7 +195,7 @@ public class BootupClasses implements ClassFilter {
   public void addCustomDeployParser(List<CustomDeployParser> customDeployParser) {
     add(customDeployParser, customDeployParserInstances, customDeployParserCandidates);
   }
-  
+
   public void addChangeLogInstances(ServerConfig serverConfig) {
 
     readAuditPrepare = serverConfig.getReadAuditPrepare();
@@ -358,8 +358,9 @@ public class BootupClasses implements ClassFilter {
 
   @Override
   public boolean isMatch(Class<?> cls) {
-
-    if (isEmbeddable(cls)) {
+    if (cls.isInterface()) {
+      return false; // we are only interested in classes
+    } else if (isEmbeddable(cls)) {
       embeddableList.add(cls);
 
     } else if (isEntity(cls)) {
@@ -449,7 +450,7 @@ public class BootupClasses implements ClassFilter {
       customDeployParserCandidates.add((Class<? extends CustomDeployParser>) cls);
       interesting = true;
     }
-    
+
     // single instances
     // TODO: What should happen, if there is already an other
     // changeLogListener assigned? (Last wins? / Exception?)

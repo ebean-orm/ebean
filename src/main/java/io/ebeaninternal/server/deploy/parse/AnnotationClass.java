@@ -216,7 +216,12 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
 
-    Set<EntityImplements> entityImplements = AnnotationUtil.findAnnotationsRecursive(cls, EntityImplements.class);
+    Set<EntityImplements> entityImplements;
+    if (descriptor.getInheritInfo() == null || descriptor.getInheritInfo().isRoot()) {
+      entityImplements = AnnotationUtil.findAnnotationsRecursive(cls, EntityImplements.class);
+    } else {
+      entityImplements = AnnotationUtil.findAnnotations(cls, EntityImplements.class);
+    }
     for (EntityImplements ann : entityImplements) {
       for (Class<?> iface : ann.value()) {
         descriptor.addInterface(iface);

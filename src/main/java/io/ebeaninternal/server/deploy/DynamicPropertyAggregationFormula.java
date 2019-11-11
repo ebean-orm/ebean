@@ -4,6 +4,8 @@ import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 
+import java.util.Map;
+
 import javax.persistence.PersistenceException;
 
 /**
@@ -19,12 +21,30 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   private final String alias;
 
+  private final String mapKey;
+
   DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {
     super(name, name, null, scalarType);
     this.parsedFormula = parsedFormula;
     this.aggregate = aggregate;
     this.asTarget = asTarget;
-    this.alias = alias;
+    if (alias == null) {
+      this.alias = null;
+      this.mapKey = null;
+    } else {
+      int pos = alias.indexOf('@');
+      if (pos == -1) {
+        this.alias = alias;
+        this.mapKey = null;
+      } else {
+        this.alias = alias.substring(0, pos);
+        if (asTarget != null && Map.class.isAssignableFrom(asTarget.getPropertyType())) {
+          this.mapKey = name.substring(pos + asTarget.getName().length() + 2);
+        } else {
+          this.mapKey = null;
+        }
+      }
+    }
   }
 
   @Override
@@ -56,8 +76,17 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
       return;
     }
     if (asTarget != null) {
-      sqlBeanLoad.load(asTarget, value);
+      if (mapKey != null) {
+        sqlBeanLoad.loadInMap(asTarget, mapKey, value);
+      } else {
+        sqlBeanLoad.load(asTarget, value);
+      }
     }
+  }
+
+  @Override
+  public void loadOptional(SqlBeanLoad sqlBeanLoad) {
+    load(sqlBeanLoad);
   }
 
   @Override

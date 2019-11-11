@@ -82,6 +82,11 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   void loadIgnore(DbReadContext ctx);
 
   /**
+   * Loads the property optional. This is especially used for dynamic properties.
+   */
+  void loadOptional(SqlBeanLoad sqlBeanLoad);
+
+  /**
    * Append to the select clause.
    */
   void appendSelect(DbSqlContext ctx, boolean subQuery);
