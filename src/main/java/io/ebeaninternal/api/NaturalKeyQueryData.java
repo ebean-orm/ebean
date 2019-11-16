@@ -103,24 +103,44 @@ public class NaturalKeyQueryData<T> {
 
     this.set = new NaturalKeySet();
     if (inValues != null) {
-      // a findList() with an IN clause so we project
-      // for every IN value a natural key combination
-      for (Object inValue : inValues) {
-        set.add(new NaturalKeyEntry(naturalKey, eqList, inProperty, inValue));
-      }
+      addInValues();
     } else if (inPairs != null) {
-      // a findList() with an IN Map clause so we project
-      // for every IN value a natural key combination
-      for (Pairs.Entry entry : inPairs) {
-        set.add(new NaturalKeyEntry(naturalKey, eqList, inProperty0, inProperty1, entry));
-      }
-
+      addInPairs();
     } else {
-      // only one - a findOne()
-      set.add(new NaturalKeyEntry(naturalKey, eqList));
+      addEqualsKey();
     }
-
     return set;
+  }
+
+  private void addInPairs() {
+    // a findList() with an IN Map clause so we project
+    // for every IN value a natural key combination
+    for (Pairs.Entry entry : inPairs) {
+      set.add(new NaturalKeyEntryBasic(naturalKey, eqList, inProperty0, inProperty1, entry));
+    }
+  }
+
+  private void addInValues() {
+    if (eqList == null) {
+      // a single property IN expression
+      for (Object inValue : inValues) {
+        set.add(new NaturalKeyEntrySimple(inValue));
+      }
+    } else {
+      // IN expression + EQ expression(s)
+      for (Object inValue : inValues) {
+        set.add(new NaturalKeyEntryBasic(naturalKey, eqList, inProperty, inValue));
+      }
+    }
+  }
+
+  private void addEqualsKey() {
+    if (eqList.size() == 1) {
+      // a single property EQ expression
+      set.add(new NaturalKeyEntrySimple(eqList.get(0).value));
+    } else {
+      set.add(new NaturalKeyEntryBasic(naturalKey, eqList));
+    }
   }
 
   /**

@@ -21,6 +21,10 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
     return getBeanCacheStats(OCachedAppDetail.class, true);
   }
 
+  private ServerCacheStatistics appStats() {
+    return getBeanCacheStats(OCachedApp.class, true);
+  }
+
   @Test
   public void test_findOne() {
 
@@ -111,6 +115,52 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
       .findList();
   }
 
+  @Test
+  public void findSimple() {
+
+    setupData();
+    clearAllL2Cache();
+
+    OCachedApp app0 = findAppByName("app0");
+    assertThat(app0).isNotNull();
+    assertThat(appStats().getHitCount()).isEqualTo(0);
+
+    app0 = findAppByName("app0");
+    assertThat(app0).isNotNull();
+    assertThat(appStats().getHitCount()).isEqualTo(1);
+  }
+
+  private OCachedApp findAppByName(String appName) {
+
+    return DB.find(OCachedApp.class)
+      .where()
+      .eq("appName", appName)
+      .findOne();
+  }
+
+  @Test
+  public void findApp_many() {
+
+    setupData();
+    clearAllL2Cache();
+
+    List<OCachedApp> result = findAppByNames("app0", "app1");
+    assertThat(result).hasSize(2);
+    assertThat(appStats().getHitCount()).isEqualTo(0);
+
+    result = findAppByNames("app0", "app1");
+    assertThat(result).hasSize(2);
+    assertThat(appStats().getHitCount()).isEqualTo(2);
+  }
+
+  private List<OCachedApp> findAppByNames(String... appNames) {
+
+    return DB.find(OCachedApp.class)
+      .setUseCache(true)
+      .where()
+      .in("appName", appNames)
+      .findList();
+  }
   private static void setupData() {
 
     if (!seededData) {

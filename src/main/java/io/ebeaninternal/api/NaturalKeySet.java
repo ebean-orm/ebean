@@ -9,7 +9,7 @@ public class NaturalKeySet {
 
   private final Map<Object, NaturalKeyEntry> map = new LinkedHashMap<>();
 
-  public NaturalKeySet() {
+  NaturalKeySet() {
   }
 
   public int size() {
@@ -24,8 +24,7 @@ public class NaturalKeySet {
     return map.keySet();
   }
 
-  public Object getInValue(Object naturalKey) {
-    NaturalKeyEntry entry = map.get(naturalKey);
-    return entry.getInValue();
+  Object getInValue(Object naturalKey) {
+    return map.get(naturalKey).getInValue();
   }
 }
