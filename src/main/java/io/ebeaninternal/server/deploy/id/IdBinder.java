@@ -213,4 +213,8 @@ public interface IdBinder {
    */
   String cacheKey(Object idValue);
 
+  /**
+   * Return a key to use for bean caches given the bean.
+   */
+  String cacheKeyFromBean(EntityBean bean);
 }

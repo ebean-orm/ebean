@@ -501,4 +501,8 @@ public final class IdBinderEmbedded implements IdBinder {
     return sb.toString();
   }
 
+  @Override
+  public String cacheKeyFromBean(EntityBean bean) {
+    return cacheKey(embIdProperty.getValue(bean));
+  }
 }

@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
+import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricType;
@@ -74,6 +75,10 @@ public abstract class BaseTestCase {
       logger.error("Fatal error while getting ebean-server. Exiting...", e);
       System.exit(1);
     }
+  }
+
+  protected void clearAllL2Cache() {
+    server().getServerCacheManager().clearAll();
   }
 
   protected void resetAllMetrics() {
@@ -219,6 +224,10 @@ public abstract class BaseTestCase {
 
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
     return spiEbeanServer().getBeanDescriptor(cls);
+  }
+
+  protected <T> ServerCacheStatistics getBeanCacheStats(Class<T> cls, boolean reset) {
+    return server().getServerCacheManager().getBeanCache(cls).getStatistics(reset);
   }
 
   protected Platform platform() {

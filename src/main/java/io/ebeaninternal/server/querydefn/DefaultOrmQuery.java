@@ -48,6 +48,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanNaturalKey;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -771,8 +772,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (whereExpressions == null) {
       return null;
     }
-    String[] naturalKey = beanDescriptor.getNaturalKey();
-    if (naturalKey == null || naturalKey.length == 0) {
+    BeanNaturalKey naturalKey = beanDescriptor.getNaturalKey();
+    if (naturalKey == null) {
       return null;
     }
 

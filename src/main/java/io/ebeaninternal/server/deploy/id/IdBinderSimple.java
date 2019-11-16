@@ -268,4 +268,9 @@ public final class IdBinderSimple implements IdBinder {
     return scalarType.format(value);
   }
 
+  @Override
+  public String cacheKeyFromBean(EntityBean bean) {
+    final Object value = idProperty.getValue(bean);
+    return scalarType.format(value);
+  }
 }

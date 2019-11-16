@@ -210,6 +210,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  Object naturalKeyVal(Map<String, Object> values) {
+    EntityBean bean = (EntityBean) values.get(name);
+    if (bean == null) {
+      return null;
+    }
+    return targetIdBinder.cacheKeyFromBean(bean);
+  }
+
   @Override
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 

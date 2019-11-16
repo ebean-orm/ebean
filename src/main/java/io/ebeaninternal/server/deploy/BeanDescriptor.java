@@ -375,6 +375,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final BeanProperty[] propertiesGenUpdate;
   private final List<BeanProperty[]> propertiesUnique = new ArrayList<>();
 
+  private BeanNaturalKey beanNaturalKey;
+
   /**
    * The bean class name or the table name for MapBeans.
    */
@@ -751,6 +753,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     } else {
       softDeleteByIdSql = null;
       softDeleteByIdInSql = null;
+    }
+    initNaturalKey();
+  }
+
+  private void initNaturalKey() {
+    final String[] naturalKey = cacheHelp.getNaturalKey();
+    if (naturalKey != null && naturalKey.length != 0) {
+      BeanProperty[] props = new BeanProperty[naturalKey.length];
+      for (int i = 0; i < naturalKey.length; i++) {
+        props[i] = getBeanProperty(naturalKey[i]);
+      }
+      this.beanNaturalKey = new BeanNaturalKey(naturalKey, props);
     }
   }
 
@@ -1322,10 +1336,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Return the natural key properties.
+   * Return the natural key.
    */
-  public String[] getNaturalKey() {
-    return cacheHelp.getNaturalKey();
+  public BeanNaturalKey getNaturalKey() {
+    return beanNaturalKey;
   }
 
   /**

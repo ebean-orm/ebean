@@ -856,6 +856,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     setValue(bean, cacheData);
   }
 
+  /**
+   * Return the cache key value for this property.
+   */
+  Object naturalKeyVal(Map<String, Object> values) {
+    return values.get(name);
+  }
+
   @Override
   public Object getVal(Object bean) {
     return getValue((EntityBean) bean);

@@ -2,6 +2,7 @@ package io.ebeaninternal.api;
 
 
 import io.ebean.Pairs;
+import io.ebeaninternal.server.deploy.BeanNaturalKey;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ public class NaturalKeyEntry {
   /**
    * Used when query query just has a series of EQ expressions (no IN clause).
    */
-  public NaturalKeyEntry(String[] naturalKey, List<NaturalKeyEq> eqList) {
+  NaturalKeyEntry(BeanNaturalKey naturalKey, List<NaturalKeyEq> eqList) {
     load(eqList);
     this.key = calculateKey(naturalKey);
   }
@@ -27,7 +28,7 @@ public class NaturalKeyEntry {
   /**
    * Create when query uses an IN clause.
    */
-  public NaturalKeyEntry(String[] naturalKey, List<NaturalKeyEq> eqList, String inProperty, Object inValue) {
+  NaturalKeyEntry(BeanNaturalKey naturalKey, List<NaturalKeyEq> eqList, String inProperty, Object inValue) {
     load(eqList);
     if (inProperty != null) {
       map.put(inProperty, inValue);
@@ -39,7 +40,7 @@ public class NaturalKeyEntry {
   /**
    * Create when query uses an IN PAIRS clause.
    */
-  public NaturalKeyEntry(String[] naturalKey, List<NaturalKeyEq> eqList,
+  NaturalKeyEntry(BeanNaturalKey naturalKey, List<NaturalKeyEq> eqList,
                          String inMapProperty0, String inMapProperty1, Pairs.Entry pair) {
     load(eqList);
     map.put(inMapProperty0, pair.getA());
@@ -56,18 +57,8 @@ public class NaturalKeyEntry {
     }
   }
 
-  private Object calculateKey(String[] naturalKey) {
-
-    if (naturalKey.length == 1) {
-      return map.get(naturalKey[0]);
-    }
-
-    StringBuilder sb = new StringBuilder();
-    for (String key : naturalKey) {
-      sb.append(map.get(key)).append(";");
-    }
-
-    return sb.toString();
+  private Object calculateKey(BeanNaturalKey naturalKey) {
+    return naturalKey.calculateKey(map);
   }
 
   /**
@@ -80,7 +71,7 @@ public class NaturalKeyEntry {
   /**
    * Return the inValue (used to remove from IN clause of original query).
    */
-  public Object getInValue() {
+  Object getInValue() {
     return inValue;
   }
 }

@@ -182,4 +182,8 @@ public final class IdBinderEmpty implements IdBinder {
     return null;
   }
 
+  @Override
+  public String cacheKeyFromBean(EntityBean bean) {
+    return null;
+  }
 }
