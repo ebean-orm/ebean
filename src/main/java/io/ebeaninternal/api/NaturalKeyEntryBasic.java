@@ -14,7 +14,7 @@ import java.util.Map;
 class NaturalKeyEntryBasic implements NaturalKeyEntry {
 
   private final Map<String,Object> map = new HashMap<>();
-  private final Object key;
+  private final String key;
   private Object inValue;
 
   /**
@@ -57,12 +57,12 @@ class NaturalKeyEntryBasic implements NaturalKeyEntry {
     }
   }
 
-  private Object calculateKey(BeanNaturalKey naturalKey) {
+  private String calculateKey(BeanNaturalKey naturalKey) {
     return naturalKey.calculateKey(map);
   }
 
   @Override
-  public Object key() {
+  public String key() {
     return key;
   }
 

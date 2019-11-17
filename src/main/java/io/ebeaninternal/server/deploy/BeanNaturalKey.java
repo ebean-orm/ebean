@@ -66,11 +66,7 @@ public class BeanNaturalKey {
    *
    * @param map The bind values for the properties.
    */
-  public Object calculateKey(Map<String, Object> map) {
-    if (naturalKey.length == 1) {
-      return map.get(naturalKey[0]);
-    }
-
+  public String calculateKey(Map<String, Object> map) {
     StringBuilder sb = new StringBuilder();
     for (BeanProperty prop : props) {
       sb.append(prop.naturalKeyVal(map)).append(";");

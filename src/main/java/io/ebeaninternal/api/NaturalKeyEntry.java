@@ -8,7 +8,7 @@ public interface NaturalKeyEntry {
   /**
    * Return the natural cache key (String concatenation of values).
    */
-  Object key();
+  String key();
 
   /**
    * Return the inValue (used to remove from IN clause of original query).

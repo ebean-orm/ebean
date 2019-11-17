@@ -2,19 +2,21 @@ package io.ebeaninternal.api;
 
 class NaturalKeyEntrySimple implements NaturalKeyEntry {
 
-  private final Object key;
+  private final String key;
+  private final Object val;
 
-  NaturalKeyEntrySimple(Object key) {
-    this.key = key;
+  NaturalKeyEntrySimple(Object val) {
+    this.key = val.toString();
+    this.val = val;
   }
 
   @Override
-  public Object key() {
+  public String key() {
     return key;
   }
 
   @Override
   public Object getInValue() {
-    return key;
+    return val;
   }
 }
