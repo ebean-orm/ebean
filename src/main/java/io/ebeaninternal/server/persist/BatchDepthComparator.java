@@ -12,7 +12,7 @@ import java.util.Comparator;
  * keys from inserts. These values are required to persist the 'detail' beans.
  * </p>
  */
-public class BatchDepthComparator implements Comparator<BatchedBeanHolder>, Serializable {
+class BatchDepthComparator implements Comparator<BatchedBeanHolder>, Serializable {
 
   private static final long serialVersionUID = 264611821665757991L;
 

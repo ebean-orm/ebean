@@ -157,7 +157,7 @@ public class BatchedPstmtHolder {
    * Used to determine when to flush the batch.
    * </p>
    */
-  public int getMaxSize() {
+  int getMaxSize() {
     return maxSize;
   }
 

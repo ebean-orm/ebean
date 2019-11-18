@@ -50,7 +50,7 @@ class BatchedBeanHolder {
   /**
    * Create a new entry with a given type and depth.
    */
-  public BatchedBeanHolder(BatchControl control, BeanDescriptor<?> beanDescriptor, int order) {
+  BatchedBeanHolder(BatchControl control, BeanDescriptor<?> beanDescriptor, int order) {
     this.control = control;
     this.shortDesc = beanDescriptor.getName() + ":" + order;
     this.order = order;
