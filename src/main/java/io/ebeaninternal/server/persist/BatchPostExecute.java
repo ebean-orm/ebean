@@ -40,4 +40,9 @@ public interface BatchPostExecute {
    * Add as event to the profiling.
    */
   void profile(long offset, int batchSize);
+
+  /**
+   * Add timing metrics for batch persist.
+   */
+  void addTimingBatch(long startNanos, int batch);
 }

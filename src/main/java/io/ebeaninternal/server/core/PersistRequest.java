@@ -57,6 +57,15 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     this.label = label;
   }
 
+  @Override
+  public void addTimingBatch(long startNanos, int size) {
+    // nothing by default
+  }
+
+  public void addTimingNoBatch(long startNanos) {
+    // nothing by default
+  }
+
   /**
    * Effectively set start nanos if we are collecting metrics on a label.
    */

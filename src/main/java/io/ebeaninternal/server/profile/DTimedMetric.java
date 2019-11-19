@@ -36,6 +36,17 @@ class DTimedMetric implements TimedMetric {
   }
 
   @Override
+  public void addBatchSince(long startNanos, int batch) {
+    if (batch > 0) {
+      final long totalMicros = (System.nanoTime() - startNanos) / 1000L;
+      final long mean = totalMicros / batch;
+      count.add(batch);
+      total.add(totalMicros);
+      max.accumulate(mean);
+    }
+  }
+
+  @Override
   public void addSinceNanos(long startNanos) {
     add((System.nanoTime() - startNanos) / 1000L);
   }

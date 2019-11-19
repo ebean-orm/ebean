@@ -44,6 +44,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   private final SpiTransaction transaction;
 
   private long profileStart;
+  private long timedStart;
 
   private int[] results;
 
@@ -112,14 +113,21 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
    */
   public void executeBatch(boolean getGeneratedKeys) throws SQLException {
 
-    this.profileStart = transaction.profileOffset();
+    timedStart = System.nanoTime();
+    profileStart = transaction.profileOffset();
     executeAndCheckRowCounts();
     if (isGenKeys && getGeneratedKeys) {
       getGeneratedKeys();
     }
     postExecute();
     close();
+    addTimingMetrics();
     transaction.profileEvent(this);
+  }
+
+  private void addTimingMetrics() {
+    // just use the first persist request to add batch metrics
+    list.get(0).addTimingBatch(timedStart, list.size());
   }
 
   @Override
@@ -151,7 +159,6 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
         String s = "results array error " + results.length + " " + list.size();
         throw new SQLException(s);
       }
-
       // check for concurrency exceptions...
       for (int i = 0; i < results.length; i++) {
         list.get(i).checkRowCount(results[i]);

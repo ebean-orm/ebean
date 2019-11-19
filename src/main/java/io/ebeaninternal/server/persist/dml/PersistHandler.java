@@ -23,6 +23,11 @@ interface PersistHandler {
   int execute() throws SQLException;
 
   /**
+   * Execute now for non-batch with timing.
+   */
+  int executeNoBatch() throws SQLException;
+
+  /**
    * Close resources including underlying preparedStatement.
    */
   void close();

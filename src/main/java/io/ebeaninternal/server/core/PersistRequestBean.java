@@ -229,6 +229,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     initGeneratedProperties();
   }
 
+  @Override
+  public void addTimingBatch(long startNanos, int batch) {
+    beanDescriptor.metricPersistBatch(type, startNanos, batch);
+  }
+
+  @Override
+  public void addTimingNoBatch(long startNanos) {
+    beanDescriptor.metricPersistNoBatch(type, startNanos);
+  }
+
   /**
    * Add to profile as batched bean insert, update or delete.
    */

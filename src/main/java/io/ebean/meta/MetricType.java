@@ -11,6 +11,11 @@ public enum MetricType {
   TXN,
 
   /**
+   * ORM Insert Update or Delete.
+   */
+  IUD,
+
+  /**
    * ORM queries.
    */
   ORM,

@@ -143,6 +143,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private boolean batchEscalateOnCascadeInsert;
   private boolean batchEscalateOnCascadeDelete;
 
+  private final BeanIudMetrics iudMetrics;
+
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
@@ -441,7 +443,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
-
+    this.iudMetrics = new BeanIudMetrics(name);
     this.namedQuery = deploy.getNamedQuery();
     this.namedRawSql = deploy.getNamedRawSql();
     this.inheritInfo = deploy.getInheritInfo();
@@ -896,6 +898,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         deleteRecurseSkippable = inheritInfo.isDeleteRecurseSkippable();
       }
     }
+  }
+
+  public void metricPersistBatch(PersistRequest.Type type, long startNanos, int size) {
+    iudMetrics.addBatch(type, startNanos, size);
+  }
+
+  public void metricPersistNoBatch(PersistRequest.Type type, long startNanos) {
+    iudMetrics.addNoBatch(type, startNanos);
   }
 
   public void merge(EntityBean bean, EntityBean existing) {
@@ -1684,6 +1694,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Visit all the ORM query plan metrics (includes UpdateQuery with updates and deletes).
    */
   public void visitMetrics(MetricVisitor visitor) {
+    iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
         visitor.visitOrmQuery(queryPlan.getSnapshot(visitor.isReset()));

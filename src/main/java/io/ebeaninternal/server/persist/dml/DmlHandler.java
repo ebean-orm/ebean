@@ -92,6 +92,16 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   @Override
   public abstract int execute() throws SQLException;
 
+  @Override
+  public final int executeNoBatch() throws SQLException {
+    final long startNanos = System.nanoTime();
+    try {
+      return execute();
+    } finally {
+      persistRequest.addTimingNoBatch(startNanos);
+    }
+  }
+
   /**
    * Check the rowCount.
    */

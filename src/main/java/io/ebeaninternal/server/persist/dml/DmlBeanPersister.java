@@ -70,7 +70,7 @@ public final class DmlBeanPersister implements BeanPersister {
         return -1;
 
       } else {
-        return handler.execute();
+        return handler.executeNoBatch();
       }
 
     } catch (SQLException e) {
