@@ -323,13 +323,13 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>12.1.1</version>
+        <version>12.1.4</version>
         <executions>
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
             <configuration>
-              <transformArgs>debug=1</transformArgs>
+              <transformArgs>debug=0</transformArgs>
             </configuration>
             <goals>
               <goal>testEnhance</goal>
@@ -393,7 +393,7 @@
             <version>1.0.0</version>
           </docletArtifact>
           <!-- for people using JDK11, our javadoc doclet isn't 11 compatible yet -->
-<!--          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>-->
+          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>
           <additionalparam>
             -Xdoclint:none
             -include-basedir ${project.basedir}
