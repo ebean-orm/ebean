@@ -386,7 +386,7 @@ final class BeanDescriptorCacheHelp<T> {
 
     Map<Object, Object> beanDataMap = beanCache.getAll(keys);
     if (beanLog.isTraceEnabled()) {
-      beanLog.trace("   GET MANY {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
+      beanLog.trace("   MGET {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
     }
 
     BeanCacheResult<T> result = new BeanCacheResult<>();
@@ -412,7 +412,7 @@ final class BeanDescriptorCacheHelp<T> {
     Map<Object, Object> naturalKeyMap = naturalKeyCache.getAll(keys);
 
     if (natLog.isTraceEnabled()) {
-      natLog.trace(" LOOKUP Many {}({}) - hits:{}", cacheName, keys, naturalKeyMap);
+      natLog.trace(" MLOOKUP {}({}) - hits:{}", cacheName, keys, naturalKeyMap);
     }
 
     BeanCacheResult<T> result = new BeanCacheResult<>();
@@ -429,7 +429,7 @@ final class BeanDescriptorCacheHelp<T> {
     Set<Object> ids = new HashSet<>(naturalKeyMap.values());
     Map<Object, Object> beanDataMap = beanCache.getAll(ids);
     if (beanLog.isTraceEnabled()) {
-      beanLog.trace("   GET MANY {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
+      beanLog.trace("   MGET {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
     }
     // process the hits into beans etc
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
@@ -550,13 +550,13 @@ final class BeanDescriptorCacheHelp<T> {
       }
     }
     if (beanLog.isDebugEnabled()) {
-      beanLog.debug("   PUT ALL {}({})", cacheName, map.keySet());
+      beanLog.debug("   MPUT {}({})", cacheName, map.keySet());
     }
     getBeanCache().putAll(map);
 
     if (natKeys != null && !natKeys.isEmpty()) {
       if (natLog.isDebugEnabled()) {
-        natLog.debug(" PUT ALL {}({}, {})", cacheName, naturalKey, natKeys.keySet());
+        natLog.debug(" MPUT {}({}, {})", cacheName, naturalKey, natKeys.keySet());
       }
       naturalKeyCache.putAll(natKeys);
     }
@@ -733,7 +733,7 @@ final class BeanDescriptorCacheHelp<T> {
   void beanCacheApplyInvalidate(Collection<String> keys) {
     if (beanCache != null) {
       if (beanLog.isDebugEnabled()) {
-        beanLog.debug("   REMOVE {}({})", cacheName, keys);
+        beanLog.debug("   MREMOVE {}({})", cacheName, keys);
       }
       beanCache.removeAll(new HashSet<>(keys));
     }
@@ -756,7 +756,7 @@ final class BeanDescriptorCacheHelp<T> {
     Map<Object, Object> hits = getBeanCache().getAll(ebis.keySet());
 
     if (beanLog.isTraceEnabled()) {
-      beanLog.trace("   LOAD ALL {}({}) - got hits ({})", cacheName, ebis.keySet(), hits.size());
+      beanLog.trace("   MLOAD {}({}) - got hits ({})", cacheName, ebis.keySet(), hits.size());
     }
 
     Set<EntityBeanIntercept> loaded = new HashSet<>();
@@ -771,7 +771,7 @@ final class BeanDescriptorCacheHelp<T> {
 
       if (lazyLoadProperty > -1 && !cacheData.isLoaded(propertyName)) {
         if (beanLog.isTraceEnabled()) {
-          beanLog.trace("   LOAD {}({}) - cache miss on property({})", cacheName, key, propertyName);
+          beanLog.trace("   load {}({}) - cache miss on property({})", cacheName, key, propertyName);
         }
         iterator.remove();
 
@@ -779,13 +779,13 @@ final class BeanDescriptorCacheHelp<T> {
         CachedBeanDataToBean.load(desc, ebi.getOwner(), cacheData, context);
         loaded.add(ebi);
         if (beanLog.isDebugEnabled()) {
-          beanLog.debug("   LOAD {}({}) - hit", cacheName, key);
+          beanLog.debug("   load {}({}) - hit", cacheName, key);
         }
       }
     }
 
     if (!ebis.isEmpty() && beanLog.isTraceEnabled()) {
-      beanLog.trace("   LOAD {}({}) - cache miss", cacheName, ebis.keySet());
+      beanLog.trace("   load {}({}) - cache miss", cacheName, ebis.keySet());
     }
 
     return loaded;
