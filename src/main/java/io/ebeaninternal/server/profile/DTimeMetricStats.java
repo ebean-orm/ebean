@@ -44,8 +44,7 @@ class DTimeMetricStats implements TimedMetricStats {
     }
     sb.append("count:").append(count)
       .append(" total:").append(total)
-      .append(" max:").append(max)
-      .append(" beanCount:").append(beanCount);
+      .append(" max:").append(max);
     if (location != null) {
       sb.append(" loc:").append(location);
     }
