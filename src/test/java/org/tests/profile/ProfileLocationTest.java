@@ -19,7 +19,7 @@ public class ProfileLocationTest {
   public void test_obtain() {
 
     assertThat(doIt()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
-    assertThat(loc.shortDescription()).isEqualTo("ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
+    assertThat(loc.location()).isEqualTo("ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
     assertThat(loc.label()).isEqualTo("ProfileLocationTest.doIt");
   }
 
@@ -35,7 +35,7 @@ public class ProfileLocationTest {
     other.hashCode();
 
     assertThat(loc2.label()).isEqualTo("ProfileLocationTest$Other.init");
-    assertThat(loc2.shortDescription()).isEqualTo("ProfileLocationTest$Other.<init>(ProfileLocationTest.java:44)");
+    assertThat(loc2.location()).isEqualTo("ProfileLocationTest$Other.<init>(ProfileLocationTest.java:44)");
   }
 
   static class Other {

@@ -53,7 +53,7 @@ class DTimedProfileLocation extends DProfileLocation implements TimedProfileLoca
       if (overrideMetricName) {
         collect.setName(fullName);
       }
-      collect.setLocation(shortDescription());
+      collect.setLocation(location());
       visitor.visitTimed(collect);
     }
   }

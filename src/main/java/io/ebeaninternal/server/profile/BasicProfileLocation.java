@@ -7,19 +7,19 @@ import io.ebean.ProfileLocation;
  */
 final class BasicProfileLocation implements ProfileLocation {
 
+  private final String fullLocation;
   private final String location;
-  private final String shortDescription;
   private final String label;
 
-  BasicProfileLocation(String location) {
-    this.location = location;
-    this.shortDescription = shortDesc(location);
-    this.label = UtilLocation.label(shortDescription);
+  BasicProfileLocation(String fullLocation) {
+    this.fullLocation = fullLocation;
+    this.location = shortDesc(fullLocation);
+    this.label = UtilLocation.label(location);
   }
 
   @Override
   public String toString() {
-    return shortDescription;
+    return location;
   }
 
   @Override
@@ -29,7 +29,7 @@ final class BasicProfileLocation implements ProfileLocation {
 
   @Override
   public String obtain() {
-    return location;
+    return fullLocation;
   }
 
   @Override
@@ -38,8 +38,8 @@ final class BasicProfileLocation implements ProfileLocation {
   }
 
   @Override
-  public String shortDescription() {
-    return shortDescription;
+  public String location() {
+    return location;
   }
 
   private String shortDesc(String location) {

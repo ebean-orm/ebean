@@ -14,7 +14,7 @@ public class BasicProfileLocationTest {
     DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric(MetricType.TXN, "junk"));
 
     assertThat(loc.obtain()).endsWith(":12)");
-    assertThat(loc.shortDescription()).isEqualTo("NativeMethodAccessorImpl.invoke0(Native Method:12)");
+    assertThat(loc.location()).isEqualTo("NativeMethodAccessorImpl.invoke0(Native Method:12)");
     assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
 
   }
@@ -24,7 +24,7 @@ public class BasicProfileLocationTest {
 
     BasicProfileLocation loc = new BasicProfileLocation("com.foo.Bar.all");
     assertThat(loc.obtain()).isEqualTo("com.foo.Bar.all");
-    assertThat(loc.shortDescription()).isEqualTo("Bar.all");
+    assertThat(loc.location()).isEqualTo("Bar.all");
     assertThat(loc.label()).isEqualTo("Bar.all");
   }
 
@@ -33,7 +33,7 @@ public class BasicProfileLocationTest {
 
     BasicProfileLocation loc = new BasicProfileLocation("foo.Bar.all");
     assertThat(loc.obtain()).isEqualTo("foo.Bar.all");
-    assertThat(loc.shortDescription()).isEqualTo("Bar.all");
+    assertThat(loc.location()).isEqualTo("Bar.all");
     assertThat(loc.label()).isEqualTo("Bar.all");
   }
 }
