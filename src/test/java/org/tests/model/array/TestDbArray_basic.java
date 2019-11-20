@@ -32,6 +32,7 @@ public class TestDbArray_basic extends BaseTestCase {
   public void insert() throws SQLException {
 
     bean.setName("some stuff");
+    assertThat(bean.getStatuses()).isNotNull();
 
     List<String> phNumbers = bean.getPhoneNumbers();
     phNumbers.add("4321");
