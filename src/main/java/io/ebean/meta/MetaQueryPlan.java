@@ -28,9 +28,9 @@ public interface MetaQueryPlan {
   String getSql();
 
   /**
-   * Return the hash of the sql.
+   * Return the hash of the plan.
    */
-  String getSqlHash();
+  String getHash();
 
   /**
    * Return a description of the bind values.

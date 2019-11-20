@@ -182,7 +182,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"txn.main\", \"type\":\"TXN\"");
     assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
-    assertThat(metricsJson).contains("\"hash\":\"4d648ce0542aedfb042ad68746342730\"");
+    assertThat(metricsJson).contains("\"hash\":\"f089744556e1677b57c7c6ef73f65da8\"");
     assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
   }
 

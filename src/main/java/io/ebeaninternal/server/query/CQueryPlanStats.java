@@ -233,8 +233,8 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public String getSqlHash() {
-      return queryPlan.getSqlHash();
+    public String getHash() {
+      return queryPlan.getHash();
     }
 
     @Override

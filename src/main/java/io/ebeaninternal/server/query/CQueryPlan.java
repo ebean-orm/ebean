@@ -73,7 +73,7 @@ public class CQueryPlan {
   private final boolean rowNumberIncluded;
 
   private final String sql;
-  private final String sqlHash;
+  private final String hash;
 
   private final String logWhereSql;
 
@@ -118,7 +118,6 @@ public class CQueryPlan {
     this.autoTuned = query.isAutoTuned();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
-    this.sqlHash = md5Hash(sql);
     this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
@@ -127,6 +126,7 @@ public class CQueryPlan {
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
+    this.hash = md5Hash();
   }
 
   /**
@@ -146,7 +146,6 @@ public class CQueryPlan {
     this.autoTuned = false;
     this.asOfTableCount = 0;
     this.sql = sql;
-    this.sqlHash = md5Hash(sql);
     this.sqlTree = sqlTree;
     this.rawSql = false;
     this.rowNumberIncluded = rowNumberIncluded;
@@ -155,6 +154,7 @@ public class CQueryPlan {
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
+    this.hash = md5Hash();
   }
 
   private String deriveName(String label, SpiQuery.Type type) {
@@ -260,23 +260,26 @@ public class CQueryPlan {
 
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
-    return rawSql ? planKey.getPartialKey() + "_" + sqlHash : planKey.getPartialKey();
+    return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
   }
 
   /**
    * Return the MD5 hash of the sql.
    */
-  private String md5Hash(String sql) {
+  private String md5Hash() {
+    StringBuilder sb = new StringBuilder(sql)
+      .append("|").append(name)
+      .append("|").append(location);
     try {
-      return Md5.hash(sql);
+      return Md5.hash(sb.toString());
     } catch (Exception e) {
       logger.error("Failed to MD5 hash the query", e);
       return "error";
     }
   }
 
-  String getSqlHash() {
-    return sqlHash;
+  String getHash() {
+    return hash;
   }
 
   public String getSql() {

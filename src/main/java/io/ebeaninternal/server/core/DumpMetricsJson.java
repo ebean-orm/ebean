@@ -192,7 +192,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     appendCounters(metric);
     if (withHash) {
       key("hash");
-      val(metric.getSqlHash());
+      val(metric.getHash());
     }
     appendLocationAndSql(metric);
     metricEnd();

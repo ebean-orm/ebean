@@ -38,7 +38,7 @@ public interface MetaTimedMetric extends MetaMetric {
 
   /**
    * Return the total beans or rows processed or loaded.
-   *
+   * <p>
    * This will be 0 if the metric isn't a query plan (like transaction execution statistics).
    */
   long getBeanCount();

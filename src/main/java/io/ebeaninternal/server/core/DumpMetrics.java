@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaQueryMetric;
@@ -131,7 +130,7 @@ class DumpMetrics {
     appendQueryName(metric, sb);
     appendCounters(metric, sb);
     if (dumpHash) {
-      sb.append("\n hash:").append(metric.getSqlHash());
+      sb.append("\n hash:").append(metric.getHash());
     }
     appendProfileAndSql(metric, sb);
     out(sb.toString());

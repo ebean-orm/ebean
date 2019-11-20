@@ -16,7 +16,7 @@ class DQueryPlanOutput implements MetaQueryPlan {
   private final String bind;
   private final String plan;
 
-  private String sqlHash;
+  private String hash;
   private long queryTimeMicros;
   private long captureCount;
 
@@ -30,8 +30,8 @@ class DQueryPlanOutput implements MetaQueryPlan {
   }
 
   @Override
-  public String getSqlHash() {
-    return sqlHash;
+  public String getHash() {
+    return hash;
   }
 
   /**
@@ -98,15 +98,15 @@ class DQueryPlanOutput implements MetaQueryPlan {
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + sqlHash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + hash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
   }
 
   /**
    * Additionally set the query execution time and the number of bind captures.
    */
-  void with(long queryTimeMicros, long captureCount, String sqlHash) {
+  void with(long queryTimeMicros, long captureCount, String hash) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
-    this.sqlHash = sqlHash;
+    this.hash = hash;
   }
 }

@@ -9,7 +9,6 @@ public final class Md5 {
    * Return the MD5 hash of the underlying sql.
    */
   public static String hash(String content) {
-
     try {
       MessageDigest md = MessageDigest.getInstance("MD5");
       return digestToHex(md.digest(content.getBytes(StandardCharsets.UTF_8)));
