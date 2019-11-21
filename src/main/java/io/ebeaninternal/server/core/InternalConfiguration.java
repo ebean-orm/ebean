@@ -45,6 +45,7 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.core.timezone.CloneDataTimeZone;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.core.timezone.LocalDataTimeZone;
 import io.ebeaninternal.server.core.timezone.NoDataTimeZone;
 import io.ebeaninternal.server.core.timezone.SimpleDataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -65,7 +66,7 @@ import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
-import io.ebeaninternal.server.query.dto.DtoQueryEngine;
+import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
@@ -163,13 +164,13 @@ public class InternalConfiguration {
 
   private final SpiLogManager logManager;
 
-  public InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
+  InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
                                ServerConfig serverConfig, BootupClasses bootupClasses) {
 
     this.online = online;
     this.serverConfig = serverConfig;
     this.clockService = new ClockService(serverConfig.getClock());
-    this.tableModState = new TableModState(clockService);
+    this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();
@@ -237,7 +238,7 @@ public class InternalConfiguration {
     return docStoreFactory;
   }
 
-  public ClockService getClockService() {
+  ClockService getClockService() {
     return clockService;
   }
 
@@ -292,7 +293,7 @@ public class InternalConfiguration {
   /**
    * Return the ReadAuditLogger implementation to use.
    */
-  public ReadAuditLogger getReadAuditLogger() {
+  ReadAuditLogger getReadAuditLogger() {
     ReadAuditLogger found = bootupClasses.getReadAuditLogger();
     return plugin(found != null ? found : new DefaultReadAuditLogger());
   }
@@ -300,7 +301,7 @@ public class InternalConfiguration {
   /**
    * Return the ReadAuditPrepare implementation to use.
    */
-  public ReadAuditPrepare getReadAuditPrepare() {
+  ReadAuditPrepare getReadAuditPrepare() {
     ReadAuditPrepare found = bootupClasses.getReadAuditPrepare();
     return plugin(found != null ? found : new DefaultReadAuditPrepare());
   }
@@ -328,35 +329,33 @@ public class InternalConfiguration {
 
   private MultiValueBind createMultiValueBind(Platform platform) {
     // only Postgres at this stage
-    switch (platform) {
-      case POSTGRES:
-        return new PostgresMultiValueBind();
-      default:
-        return new MultiValueBind();
+    if (platform == Platform.POSTGRES) {
+      return new PostgresMultiValueBind();
     }
+    return new MultiValueBind();
   }
 
-  public SpiJsonContext createJsonContext(SpiEbeanServer server) {
+  SpiJsonContext createJsonContext(SpiEbeanServer server) {
     return new DJsonContext(server, jsonFactory, typeManager);
   }
 
-  public AutoTuneService createAutoTuneService(SpiEbeanServer server) {
+  AutoTuneService createAutoTuneService(SpiEbeanServer server) {
     return AutoTuneServiceFactory.create(server, serverConfig);
   }
 
-  public DtoQueryEngine createDtoQueryEngine() {
+  DtoQueryEngine createDtoQueryEngine() {
     return new DtoQueryEngine(binder);
   }
 
-  public RelationalQueryEngine createRelationalQueryEngine() {
+  RelationalQueryEngine createRelationalQueryEngine() {
     return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue(), serverConfig.getPlatformConfig().getDbUuid().useBinaryOptimized());
   }
 
-  public OrmQueryEngine createOrmQueryEngine() {
+  OrmQueryEngine createOrmQueryEngine() {
     return new DefaultOrmQueryEngine(cQueryEngine, binder);
   }
 
-  public Persister createPersister(SpiEbeanServer server) {
+  Persister createPersister(SpiEbeanServer server) {
     return new DefaultPersister(server, binder, beanDescriptorManager);
   }
 
@@ -366,6 +365,10 @@ public class InternalConfiguration {
 
   public BootupClasses getBootupClasses() {
     return bootupClasses;
+  }
+
+  private Platform getPlatform() {
+    return getDatabasePlatform().getPlatform();
   }
 
   public DatabasePlatform getDatabasePlatform() {
@@ -384,7 +387,7 @@ public class InternalConfiguration {
     return binder;
   }
 
-  public BeanDescriptorManager getBeanDescriptorManager() {
+  BeanDescriptorManager getBeanDescriptorManager() {
     return beanDescriptorManager;
   }
 
@@ -400,7 +403,7 @@ public class InternalConfiguration {
     return deployUtil;
   }
 
-  public CQueryEngine getCQueryEngine() {
+  CQueryEngine getCQueryEngine() {
     return cQueryEngine;
   }
 
@@ -416,14 +419,14 @@ public class InternalConfiguration {
   /**
    * Create the DocStoreIntegration components for the given server.
    */
-  public DocStoreIntegration createDocStoreIntegration(SpiServer server) {
+  DocStoreIntegration createDocStoreIntegration(SpiServer server) {
     return plugin(docStoreFactory.create(server));
   }
 
   /**
    * Create the TransactionManager taking into account autoCommit mode.
    */
-  public TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
+  TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
 
     TransactionScopeManager scopeManager = createTransactionScopeManager();
     boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || serverConfig.isNotifyL2CacheInForeground();
@@ -498,9 +501,9 @@ public class InternalConfiguration {
     }
     if (externalTransactionManager != null) {
       logger.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
-      return new ExternalTransactionScopeManager(serverConfig.getName(), externalTransactionManager);
+      return new ExternalTransactionScopeManager(externalTransactionManager);
     } else {
-      return new DefaultTransactionScopeManager(serverConfig.getName());
+      return new DefaultTransactionScopeManager();
     }
   }
 
@@ -511,13 +514,20 @@ public class InternalConfiguration {
 
     String tz = serverConfig.getDataTimeZone();
     if (tz == null) {
+      if (isMySql(getPlatform())) {
+        return new LocalDataTimeZone();
+      }
       return new NoDataTimeZone();
     }
-    if (getDatabasePlatform().getPlatform() == Platform.ORACLE) {
+    if (getPlatform() == Platform.ORACLE) {
       return new CloneDataTimeZone(tz);
     } else {
       return new SimpleDataTimeZone(tz);
     }
+  }
+
+  private boolean isMySql(Platform platform) {
+     return platform.base() == Platform.MYSQL;
   }
 
   public DataTimeZone getDataTimeZone() {
@@ -561,11 +571,11 @@ public class InternalConfiguration {
     return multiValueBind;
   }
 
-  public DtoBeanManager getDtoBeanManager() {
+  DtoBeanManager getDtoBeanManager() {
     return dtoBeanManager;
   }
 
-  public SpiLogManager getLogManager() {
+  SpiLogManager getLogManager() {
     return logManager;
   }
 

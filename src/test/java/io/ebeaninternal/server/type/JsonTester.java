@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.config.JsonConfig;
-import io.ebeaninternal.server.text.json.WriteJson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.config.JsonConfig;
+import io.ebeaninternal.server.text.json.WriteJson;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -25,8 +25,7 @@ public class JsonTester<T> {
     this.type = type;
   }
 
-  public void test(T value) throws IOException {
-
+  public String test(T value) throws IOException {
     StringWriter writer = new StringWriter();
 
     JsonGenerator generator = factory.createGenerator(writer);
@@ -48,5 +47,6 @@ public class JsonTester<T> {
     T val1 = type.jsonRead(parser);
     assertEquals(value, val1);
 
+    return writer.toString();
   }
 }

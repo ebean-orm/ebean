@@ -20,7 +20,7 @@ public class PalletLocation {
   private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "ZONE_SID")
+  @JoinColumn(name = "zone_sid")
   private Zone zone;
 
   public Integer getId() {

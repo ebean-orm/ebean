@@ -19,7 +19,7 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
    */
   public ChainedBeanPostConstructListener(List<BeanPostConstructListener> list) {
     this.list = list;
-    this.chain = list.toArray(new BeanPostConstructListener[list.size()]);
+    this.chain = list.toArray(new BeanPostConstructListener[0]);
   }
 
   /**

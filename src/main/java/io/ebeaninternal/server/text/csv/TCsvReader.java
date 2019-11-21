@@ -351,7 +351,7 @@ public class TCsvReader<T> implements CsvReader<T> {
         return path.parseDateTime(dt.getTime());
 
       } catch (ParseException e) {
-        throw new TextException("Error parsing [" + value + "] using format[" + format + "]", e);
+        throw new TextException("Error parsing [{}] using format[" + format + "]", value, e);
       }
     }
 

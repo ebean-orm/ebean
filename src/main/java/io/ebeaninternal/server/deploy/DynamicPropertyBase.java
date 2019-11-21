@@ -11,9 +11,9 @@ import java.util.List;
  */
 abstract class DynamicPropertyBase implements STreeProperty {
 
-  final String name;
+  private final String name;
   final String fullName;
-  final String elPrefix;
+  private final String elPrefix;
   final ScalarType<?> scalarType;
 
   DynamicPropertyBase(String name, String fullName, String elPrefix, ScalarType<?> scalarType) {

@@ -16,12 +16,16 @@ public interface EntityBean extends Serializable {
   /**
    * Return all the property names in defined order.
    */
-  String[] _ebean_getPropertyNames();
+  default String[] _ebean_getPropertyNames() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Return the property name at the given position.
    */
-  String _ebean_getPropertyName(int pos);
+  default String _ebean_getPropertyName(int pos) {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Return the enhancement marker value.
@@ -30,28 +34,38 @@ public interface EntityBean extends Serializable {
    * entity classes are enhanced (specifically not just a super class).
    * </p>
    */
-  String _ebean_getMarker();
+  default String _ebean_getMarker() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Create and return a new entity bean instance.
    */
-  Object _ebean_newInstance();
+  default Object _ebean_newInstance() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Generated method that sets the loaded state on all the embedded beans on
    * this entity bean by using EntityBeanIntercept.setEmbeddedLoaded(Object o);
    */
-  void _ebean_setEmbeddedLoaded();
+  default void _ebean_setEmbeddedLoaded() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Return true if any embedded beans are new or dirty.
    */
-  boolean _ebean_isEmbeddedNewOrDirty();
+  default boolean _ebean_isEmbeddedNewOrDirty() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Return the intercept for this object.
    */
-  EntityBeanIntercept _ebean_getIntercept();
+  default EntityBeanIntercept _ebean_getIntercept() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Similar to _ebean_getIntercept() except it checks to see if the intercept
@@ -66,7 +80,9 @@ public interface EntityBean extends Serializable {
    * frameworks that can't take into account our ebean fields.
    * </p>
    */
-  EntityBeanIntercept _ebean_intercept();
+  default EntityBeanIntercept _ebean_intercept() {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Set the value of a field of an entity bean of this type.
@@ -75,12 +91,16 @@ public interface EntityBean extends Serializable {
    * on entity beans. That means lazy loading and oldValues creation.
    * </p>
    */
-  void _ebean_setField(int fieldIndex, Object value);
+  default void _ebean_setField(int fieldIndex, Object value) {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Set the field value with interception.
    */
-  void _ebean_setFieldIntercept(int fieldIndex, Object value);
+  default void _ebean_setFieldIntercept(int fieldIndex, Object value) {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Return the value of a field from an entity bean of this type.
@@ -89,11 +109,15 @@ public interface EntityBean extends Serializable {
    * on entity beans. That means lazy loading.
    * </p>
    */
-  Object _ebean_getField(int fieldIndex);
+  default Object _ebean_getField(int fieldIndex) {
+    throw new NotEnhancedException();
+  }
 
   /**
    * Return the field value with interception.
    */
-  Object _ebean_getFieldIntercept(int fieldIndex);
+  default Object _ebean_getFieldIntercept(int fieldIndex) {
+    throw new NotEnhancedException();
+  }
 
 }

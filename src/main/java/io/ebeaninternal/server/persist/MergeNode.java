@@ -16,9 +16,9 @@ import java.util.Map;
  */
 abstract class MergeNode {
 
-  protected final String fullPath;
-  protected final BeanDescriptor<?> targetDescriptor;
-  protected Map<String,MergeNode> children;
+  private final String fullPath;
+  final BeanDescriptor<?> targetDescriptor;
+  private Map<String,MergeNode> children;
 
   MergeNode(String fullPath, BeanPropertyAssoc<?> property) {
     this.fullPath = fullPath;
@@ -80,7 +80,7 @@ abstract class MergeNode {
   /**
    * Cascade the merge processing if this has child nodes.
    */
-  protected void cascade(EntityBean entityBean, EntityBean outlineBean, MergeRequest request) {
+  void cascade(EntityBean entityBean, EntityBean outlineBean, MergeRequest request) {
 
     if (children != null && !children.isEmpty()) {
       MergeRequest sub = request.sub(entityBean, outlineBean);

@@ -95,7 +95,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql).contains("select t0.id, t0.name, count(u1.id), sum(u1.units), sum(u1.units * u1.amount) from tevent_one t0");
     assertThat(sql).contains("from tevent_one t0 join tevent_many u1 on u1.event_id = t0.id ");
     assertThat(sql).contains("where u1.description like ");
-    assertThat(sql).contains(" group by t0.id, t0.name having count(u1.id) >= ?  order by t0.name");
+    assertThat(sql).contains(" group by t0.id, t0.name having count(u1.id) >= ? order by t0.name");
 
     // invoke lazy loading
     Long version = list.get(0).getVersion();
@@ -169,7 +169,7 @@ public class TestAggregationCount extends BaseTestCase {
       .orderBy().asc("name");
 
     query1.findList();
-    assertThat(query1.getGeneratedSql()).contains("having count(u1.id) >= ?  order by t0.name");
+    assertThat(query1.getGeneratedSql()).contains("having count(u1.id) >= ? order by t0.name");
   }
 
   @Test
@@ -391,7 +391,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(names).isNotEmpty();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select " + concat("t0.last_name",", ","t0.first_name") + " from contact t0 where t0.phone is null  order by t0.last_name");
+    assertThat(trimSql(sql.get(0))).contains("select " + concat("t0.last_name",", ","t0.first_name") + " from contact t0 where t0.phone is null order by t0.last_name");
   }
 
   @Test
@@ -459,7 +459,7 @@ public class TestAggregationCount extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.email, " + concat("t0.last_name",", ","t0.first_name") + " lastName from contact t0 where t0.phone is null  order by t0.last_name; --bind()");
+    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.email, " + concat("t0.last_name",", ","t0.first_name") + " lastName from contact t0 where t0.phone is null order by t0.last_name; --bind()");
   }
 
 }

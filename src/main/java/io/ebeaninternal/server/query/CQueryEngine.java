@@ -17,7 +17,7 @@ import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.Binder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +68,12 @@ public class CQueryEngine {
   }
 
   public <T> int delete(OrmQueryRequest<T> request) {
-    CQueryUpdate query = queryBuilder.buildUpdateQuery("Delete", request);
+    CQueryUpdate query = queryBuilder.buildUpdateQuery(true, request);
     return executeUpdate(request, query);
   }
 
   public <T> int update(OrmQueryRequest<T> request) {
-    CQueryUpdate query = queryBuilder.buildUpdateQuery("Update", request);
+    CQueryUpdate query = queryBuilder.buildUpdateQuery(false, request);
     return executeUpdate(request, query);
   }
 

@@ -13,7 +13,7 @@ import java.sql.SQLException;
  *
  *  String sql = "select id, name, status from o_customer order by name desc";
  *
- *  Ebean.createSqlQuery(sql)
+ *  DB.sqlQuery(sql)
  *    .findEachRow((resultSet, rowNum) -> {
  *
  *      // read directly from ResultSet

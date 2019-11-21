@@ -141,7 +141,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     write = new DdlWrite();
     hanaHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_integer integer array(90));\n\n");
-    
+
     write = new DdlWrite();
     hanaHandler().generate(write, Helper.getAlterTableAddDbArrayColumnInteger());
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_integer integer array);\n\n");

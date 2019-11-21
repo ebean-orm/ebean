@@ -5,7 +5,7 @@ import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbDefault;
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.DbMigration;
@@ -25,6 +25,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.JsonIgnore;
 import io.ebean.annotation.Length;
 import io.ebean.annotation.SoftDelete;
+import io.ebean.annotation.Sum;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.UnmappedJson;
 import io.ebean.annotation.UpdatedTimestamp;
@@ -132,6 +133,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
+      info.setEmbeddedId(prop);
     }
 
     DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
@@ -200,12 +202,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbColumn(dbColumn);
     }
 
+    Id id = get(prop, Id.class);
     GeneratedValue gen = get(prop, GeneratedValue.class);
     if (gen != null) {
-      readGenValue(gen, prop);
+      readGenValue(gen, id, prop);
     }
-
-    Id id = get(prop, Id.class);
     if (id != null) {
       readIdScalar(prop);
     }
@@ -244,9 +245,9 @@ public class AnnotationFields extends AnnotationParser {
     if (comment != null) {
       prop.setDbComment(comment.value());
     }
-    DbHstore dbHstore = get(prop, DbHstore.class);
-    if (dbHstore != null) {
-      util.setDbHstore(prop, dbHstore);
+    DbMap dbMap = get(prop, DbMap.class);
+    if (dbMap != null) {
+      util.setDbMap(prop, dbMap);
     }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
@@ -283,6 +284,10 @@ public class AnnotationFields extends AnnotationParser {
     Aggregation aggregation = get(prop, Aggregation.class);
     if (aggregation != null) {
       prop.setAggregation(aggregation.value());
+    }
+    Sum sum = get(prop, Sum.class);
+    if (sum != null) {
+      prop.setAggregation("sum(" + prop.getName() + ")");
     }
 
     Version version = get(prop, Version.class);
@@ -490,7 +495,7 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private ScalarTypeEncryptedWrapper<?> createScalarType(DeployBeanProperty prop, ScalarType<?> st) {
 
     // Use Java Encryptor wrapping the logical scalar type
@@ -513,8 +518,13 @@ public class AnnotationFields extends AnnotationParser {
     return util.createDataEncryptSupport(table, column);
   }
 
-  private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {
-
+  private void readGenValue(GeneratedValue gen, Id id, DeployBeanProperty prop) {
+    if (id == null) {
+      if (UUID.class.equals(prop.getPropertyType())) {
+        generatedPropFactory.setUuid(prop);
+        return;
+      }
+    }
     descriptor.setIdGeneratedValue();
     String genName = gen.generator();
 

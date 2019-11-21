@@ -1,0 +1,14 @@
+package io.ebeaninternal.server.core;
+
+import io.ebean.bean.CallOrigin;
+
+/**
+ * Creates CallOrigin based on the stack trace.
+ */
+public interface CallOriginFactory {
+
+  /**
+   * Create and return the CallStack given the stack trace elements.
+   */
+  CallOrigin createCallOrigin();
+}

@@ -23,13 +23,14 @@ public class OraclePlatform extends DatabasePlatform {
   public OraclePlatform() {
     super();
     this.platform = Platform.ORACLE;
+    this.supportsDeleteTableAlias = true;
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
     this.historySupport = new OracleDbHistorySupport();
-
+    this.truncateTable = "truncate table %s cascade";
     dbIdentity.setIdType(IdType.SEQUENCE);
     dbIdentity.setSupportsSequence(true);
     dbIdentity.setSupportsIdentity(true);
@@ -47,6 +48,7 @@ public class OraclePlatform extends DatabasePlatform {
         //.addAcquireLock("")
         .addDuplicateKey("1")
         .addDataIntegrity("2291")
+        .addSerializableConflict("72000")
         .build();
 
     this.openQuote = "\"";

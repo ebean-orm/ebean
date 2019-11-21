@@ -3,11 +3,13 @@ package org.tests.model.orphanremoval;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import javax.validation.constraints.Size;
 
 @Entity
 public class OrpDetail2 {
 
   @Id
+  @Size(max=100)
   String id;
 
   String detail;

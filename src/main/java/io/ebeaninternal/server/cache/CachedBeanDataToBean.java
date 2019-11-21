@@ -13,6 +13,8 @@ public class CachedBeanDataToBean {
   public static void load(BeanDescriptor<?> desc, EntityBean bean, CachedBeanData cacheBeanData, PersistenceContext context) {
 
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    // any future lazy loading skips L2 bean cache
+    ebi.setLoadedFromCache(true);
 
     BeanProperty idProperty = desc.getIdProperty();
     if (desc.getInheritInfo() != null) {

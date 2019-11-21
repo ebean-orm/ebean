@@ -2,8 +2,8 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
-import org.tests.model.basic.Order;
 import org.junit.Test;
+import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +22,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("id", true).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("id is not null ");
+    assertThat(expReq.getSql()).isEqualTo("id is not null");
   }
 
   @Test
@@ -32,7 +32,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("id", false).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("id is null ");
+    assertThat(expReq.getSql()).isEqualTo("id is null");
   }
 
   @Test
@@ -42,7 +42,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("customer", true).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("customer.id is not null ");
+    assertThat(expReq.getSql()).isEqualTo("customer.id is not null");
   }
 
   @Test
@@ -52,7 +52,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("customer", false).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("customer.id is null ");
+    assertThat(expReq.getSql()).isEqualTo("customer.id is null");
   }
 
   @Test

@@ -17,7 +17,15 @@ import java.util.List;
 
 class InExpression extends AbstractExpression {
 
+  private static final String SQL_TRUE = "1=1";
+  private static final String SQL_FALSE = "1=0";
+
   private final boolean not;
+
+  /**
+   * Set to true when adding "1=1" predicate (due to null or empty sourceValues).
+   */
+  private final boolean empty;
 
   private final Collection<?> sourceValues;
 
@@ -26,18 +34,27 @@ class InExpression extends AbstractExpression {
   private boolean multiValueSupported;
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
+    this(propertyName, sourceValues, not, false);
+  }
+
+  InExpression(String propertyName, Collection<?> sourceValues, boolean not, boolean orEmpty) {
     super(propertyName);
     this.sourceValues = sourceValues;
     this.not = not;
+    this.empty = orEmpty && (sourceValues == null || sourceValues.isEmpty());
   }
 
   InExpression(String propertyName, Object[] array, boolean not) {
     super(propertyName);
     this.sourceValues = Arrays.asList(array);
     this.not = not;
+    this.empty = false;
   }
 
   private List<Object> values() {
+    if (empty || sourceValues == null) {
+      return Collections.emptyList();
+    }
     List<Object> vals = new ArrayList<>(sourceValues.size());
     for (Object sourceValue : sourceValues) {
       assert sourceValue != null : "null is not allowed in in-queries";
@@ -46,23 +63,25 @@ class InExpression extends AbstractExpression {
     return vals;
   }
 
+  private List<Object> initBindValues() {
+    if (bindValues == null) {
+      bindValues = values();
+    }
+    return bindValues;
+  }
+
   @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
-    // can't use naturalKey cache for NOT IN
-    if (not) {
+    // can't use naturalKey cache for NOT IN or when "empty"
+    if (not || empty) {
       return false;
     }
-    List<Object> copy = data.matchIn(propName, bindValues);
-    if (copy == null) {
-      return false;
-    }
-    bindValues = copy;
-    return true;
+    return data.matchIn(propName, initBindValues());
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    bindValues = values();
+    initBindValues();
     if (bindValues.size() > 0) {
       multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
     }
@@ -70,11 +89,16 @@ class InExpression extends AbstractExpression {
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIn(propName, values().toArray(), not);
+    if (!empty) {
+      context.writeIn(propName, values().toArray(), not);
+    }
   }
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
+    if (empty) {
+      return;
+    }
     for (Object value : bindValues) {
       if (value == null) {
         throw new NullPointerException("null values in 'in(...)' queries must be handled separately!");
@@ -108,10 +132,12 @@ class InExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
+    if (empty) {
+      request.append(SQL_TRUE);
+      return;
+    }
     if (bindValues.isEmpty()) {
-      String expr = not ? "1=1" : "1=0";
-      request.append(expr);
+      request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
 
@@ -122,9 +148,7 @@ class InExpression extends AbstractExpression {
 
     if (prop != null) {
       request.append(prop.getAssocIdInExpr(propName));
-      String inClause = prop.getAssocIdInValueExpr(not, bindValues.size());
-      request.append(inClause);
-
+      request.append(prop.getAssocIdInValueExpr(not, bindValues.size()));
     } else {
       request.append(propName);
       request.appendInExpression(not, bindValues);
@@ -142,10 +166,14 @@ class InExpression extends AbstractExpression {
       builder.append("In[");
     }
     builder.append(propName);
-    builder.append(" ?");
-    if (!multiValueSupported) {
-      // query plan specific to the number of parameters in the IN clause
-      builder.append(bindValues.size());
+    if (empty) {
+      builder.append("empty");
+    } else {
+      builder.append(" ?");
+      if (!multiValueSupported) {
+        // query plan specific to the number of parameters in the IN clause
+        builder.append(bindValues.size());
+      }
     }
     builder.append("]");
   }

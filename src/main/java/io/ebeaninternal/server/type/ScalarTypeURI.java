@@ -38,7 +38,7 @@ public class ScalarTypeURI extends ScalarTypeBaseVarchar<URI> {
     try {
       return new URI(value);
     } catch (URISyntaxException e) {
-      throw new TextException("Error with URI [" + value + "] ", e);
+      throw new TextException("Error with URI [{}]", value, e);
     }
   }
 }

@@ -38,10 +38,8 @@ public class SqlServerSqlLimiter implements SqlLimiter {
     }
 
     sb.append(dbSql);
-    if (firstRow > 0) {
-      sb.append(" ").append("offset");
-      sb.append(" ").append(firstRow).append(" rows");
-    }
+    sb.append(" ").append("offset");
+    sb.append(" ").append(firstRow).append(" rows");
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }

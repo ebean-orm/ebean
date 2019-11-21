@@ -27,6 +27,7 @@ import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.persist.DeleteMode;
 import io.ebeaninternal.server.persist.Flags;
 import io.ebeaninternal.server.persist.PersistExecute;
+import io.ebeaninternal.server.persist.SaveManyBeans;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -84,7 +85,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private DocStoreMode docStoreMode;
 
-  private ConcurrencyMode concurrencyMode;
+  private final ConcurrencyMode concurrencyMode;
 
   /**
    * The unique id used for logging summary.
@@ -174,7 +175,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private int pendingPostUpdateNotify;
 
   /**
-   * Set to true when post execute has occured (so includes batch flush).
+   * Set to true when post execute has occurred (so includes batch flush).
    */
   private boolean postExecute;
 
@@ -182,6 +183,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set to true after many properties have been persisted (so includes element collections).
    */
   private boolean complete;
+
+  /**
+   * Many to many intersection table changes that are held for later batch processing.
+   */
+  private List<SaveManyBeans> saveManyIntersections;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -217,6 +223,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.setDraftDirty(entityBean, true);
     }
     this.dirty = intercept.isDirty();
+  }
+
+  /**
+   * Init generated properties for soft delete (as it's an update).
+   */
+  public void initForSoftDelete() {
     initGeneratedProperties();
   }
 
@@ -601,11 +613,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     transaction.registerDeleteBean(hash);
   }
 
-  public void unregisterDeleteBean() {
-    Integer hash = getBeanHash();
-    transaction.unregisterDeleteBean(hash);
-  }
-
   public boolean isRegisteredForDeleteBean() {
     if (transaction == null) {
       return false;
@@ -958,6 +965,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (isLogSummary()) {
       logSummary();
     }
+    saveQueuedManyIntersection();
+  }
+
+  private void saveQueuedManyIntersection() {
+    if (saveManyIntersections != null) {
+      saveManyIntersections.forEach(SaveManyBeans::saveIntersectionBatch);
+    }
   }
 
   /**
@@ -1122,6 +1136,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       updatedManysOnly = true;
       setNotifyCache();
       addPostCommitListeners();
+      saveQueuedManyIntersection();
     }
     notifyCacheOnComplete();
     postUpdateNotify();
@@ -1314,10 +1329,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void docStorePersist() {
     idValue = beanDescriptor.getId(entityBean);
-    switch (type) {
-      case UPDATE:
-        dirtyProperties = intercept.getDirtyProperties();
-        break;
+    if (type == Type.UPDATE) {
+      dirtyProperties = intercept.getDirtyProperties();
     }
     // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
     docStoreMode = DocStoreMode.IGNORE;
@@ -1364,6 +1377,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the request flags indicating this is an insert.
    */
   public void flagInsert() {
+    initGeneratedProperties();
     if (intercept.isNew()) {
       flags = Flags.setInsertNormal(flags);
     } else {
@@ -1375,6 +1389,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Unset the request insert flag indicating this is an update.
    */
   public void flagUpdate() {
+    initGeneratedProperties();
     if (intercept.isLoaded()) {
       flags = Flags.setUpdateNormal(flags);
     } else {
@@ -1456,5 +1471,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public String getSelectLastInsertedId() {
     return beanDescriptor.getSelectLastInsertedId(publish);
+  }
+
+  /**
+   * Return true if the intersection table updates should be queued and batched.
+   */
+  public boolean isQueueManyIntersection() {
+    return !postExecute;
+  }
+
+  /**
+   * The intersection table updates to the batch executed later on postExecute.
+   */
+  public void addManyIntersection(SaveManyBeans saveManyIntersection) {
+    if (this.saveManyIntersections == null) {
+      this.saveManyIntersections = new ArrayList<>();
+    }
+    this.saveManyIntersections.add(saveManyIntersection);
   }
 }

@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.service.SpiFetchGroupQuery;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Address;
@@ -112,4 +113,26 @@ public class FetchGroupTest extends BaseTestCase {
     assertThat(sql.get(0)).contains("select t0.id, t0.name, t0.version, t1.id, t1.line_1, t1.line_2, t1.city, t2.code, t2.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_country t2 on t2.code = t1.country_code ");
   }
 
+  @Test
+  public void fetchGroupQuery() {
+
+    // in practice this query is used by query beans for type safe FetchGroup construction
+    final SpiFetchGroupQuery<Customer> query = FetchGroup.queryFor(Customer.class);
+    query.select("name");
+
+    final FetchGroup<Customer> fetchGroup = query.buildFetchGroup();
+
+    LoggedSqlCollector.start();
+
+    Customer.find
+      .query()
+      .where()
+      .ilike("name", "rob")
+      .select(fetchGroup)
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.name from o_customer t0 where");
+  }
 }

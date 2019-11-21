@@ -52,7 +52,7 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
     }
   }
 
-  protected String getArrayType(int dbType) {
+  String getArrayType(int dbType) {
     switch(dbType) {
       case TINYINT:
       case SMALLINT:
@@ -82,8 +82,8 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
         //case NCLOB:
       case NCHAR:
       case NVARCHAR:
-        return "varchar";
-      case ExtraDbTypes.UUID: // Db Native UUID
+      case ExtraDbTypes.UUID: // Postgres cast to uuid[]
+      case ExtraDbTypes.INET: // Postgres cast to inet[]
         return "varchar";
 
       default:

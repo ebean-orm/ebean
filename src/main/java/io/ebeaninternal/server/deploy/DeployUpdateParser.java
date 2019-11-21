@@ -27,17 +27,19 @@ public final class DeployUpdateParser extends DeployParser {
   public String convertWord() {
 
     String dbWord = getDeployWord(word);
-
     if (dbWord != null) {
       return dbWord;
     }
     // maybe tableAlias.propertyName
-    return convertSubword(0, word, null);
+    return convertSubword(word);
   }
 
-  private String convertSubword(int start, String currentWord, StringBuilder localBuffer) {
-    while (true) {
+  private String convertSubword(String currentWord) {
 
+    int start = 0;
+    StringBuilder localBuffer = null;
+
+    while (true) {
       int dotPos = currentWord.indexOf('.', start);
       if (start == 0 && dotPos == -1) {
         return currentWord;
@@ -52,7 +54,7 @@ public final class DeployUpdateParser extends DeployParser {
       }
 
       // append up to the dot
-      localBuffer.append(currentWord.substring(start, dotPos + 1));
+      localBuffer.append(currentWord, start, dotPos + 1);
 
       if (dotPos == currentWord.length() - 1) {
         // ends with a "." ???
@@ -61,17 +63,13 @@ public final class DeployUpdateParser extends DeployParser {
 
       // get the remainder after the dot
       start = dotPos + 1;
-      String remainder = currentWord.substring(start, currentWord.length());
+      String remainder = currentWord.substring(start);
 
-      //String dbWord = deployMap.get(remainder.toLowerCase());
       String dbWord = getDeployWord(remainder);
       if (dbWord != null) {
         // we have found a match for the remainder
         localBuffer.append(dbWord);
         return localBuffer.toString();
-      } else {
-        //
-
       }
     }
   }
@@ -84,11 +82,7 @@ public final class DeployUpdateParser extends DeployParser {
     }
 
     ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
-    if (elProp != null) {
-      return elProp.getDbColumn();
-    } else {
-      return null;
-    }
+    return elProp != null ? elProp.getDbColumn() : null;
   }
 
 }

@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.JsonConfig;
 import io.ebeaninternal.server.core.BasicTypeConverter;
+import org.joda.time.DateMidnight;
 
 import java.sql.Date;
 import java.sql.Types;
@@ -14,8 +16,13 @@ public class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<org.joda.time
   /**
    * Instantiates a new scalar type joda date midnight.
    */
-  public ScalarTypeJodaDateMidnight() {
-    super(org.joda.time.DateMidnight.class, false, Types.DATE);
+  public ScalarTypeJodaDateMidnight(JsonConfig.Date mode) {
+    super(mode, org.joda.time.DateMidnight.class, false, Types.DATE);
+  }
+
+  @Override
+  protected String toIsoFormat(DateMidnight value) {
+    return value.toString();
   }
 
   @Override

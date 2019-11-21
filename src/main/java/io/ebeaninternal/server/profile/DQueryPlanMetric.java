@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.profile;
 
+import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
@@ -61,13 +62,18 @@ class DQueryPlanMetric implements QueryPlanMetric {
     }
 
     @Override
+    public ProfileLocation getProfileLocation() {
+      return meta.getProfileLocation();
+    }
+
+    @Override
     public String getSql() {
       return meta.getSql();
     }
 
     @Override
     public String getName() {
-      return stats.getName();
+      return meta.getName();
     }
 
     @Override

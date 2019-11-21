@@ -41,7 +41,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
     Ebean.getDefaultServer().update(upd, null, true);
 
     List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(4);
+    assertThat(sql).hasSize(5);
     assertThat(sql.get(0)).contains("update esd_master set name=? where id=?");
     if (isPlatformBooleanNative()) {
       assertThat(sql.get(1)).contains("update esd_detail set deleted=true where master_id = ? and not");

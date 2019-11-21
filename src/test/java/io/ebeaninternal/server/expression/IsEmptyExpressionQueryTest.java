@@ -3,10 +3,14 @@ package io.ebeaninternal.server.expression;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.tests.model.nofk.EUserNoFk;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,6 +28,29 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     query.findList();
     assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 where not exists (select 1 from contact x where x.customer_id = t0.id");
+  }
+
+  @Test
+  public void deleteQuery_isEmpty() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(EUserNoFk.class)
+      .where().isEmpty("files")
+      .delete();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(sql.get(0)).contains("delete from euser_no_fk t0 where not exists (select 1 from efile_no_fk x where x.owner_user_id = t0.user_id)");
+    } else if (isMySql()) {
+      assertThat(sql.get(0)).contains("delete t0 from euser_no_fk t0 where not exists (select 1 from efile_no_fk x where x.owner_user_id = t0.user_id)");
+    } else {
+      assertThat(sql.get(0)).contains("delete from euser_no_fk where not exists (select 1 from efile_no_fk x where x.owner_user_id = user_id)");
+    }
   }
 
   @Test

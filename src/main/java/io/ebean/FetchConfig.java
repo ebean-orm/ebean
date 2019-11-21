@@ -24,7 +24,7 @@ import java.io.Serializable;
  * <p>
  * <pre>{@code
  * // Normal fetch join results in a single SQL query
- * List<Order> list = Ebean.find(Order.class).fetch("details").findList();
+ * List<Order> list = DB.find(Order.class).fetch("details").findList();
  *
  * // Find Orders join details using a single SQL query
  * }</pre>
@@ -36,7 +36,7 @@ import java.io.Serializable;
  *
  * // This will use 2 SQL queries to build this object graph
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .fetch("details", new FetchConfig().query())
  *         .findList();
  *
@@ -52,7 +52,7 @@ import java.io.Serializable;
  *
  * // This will use 3 SQL queries to build this object graph
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .fetch("details", new FetchConfig().query())
  *         .fetch("customer", new FetchConfig().queryFirst(5))
  *         .findList();
@@ -70,7 +70,7 @@ import java.io.Serializable;
  * <pre>{@code
  * // This will use 3 SQL queries to build this object graph
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .select("status, shipDate")
  *         .fetch("details", "quantity, price", new FetchConfig().query())
  *         .fetch("details.product", "sku, name")
@@ -100,7 +100,7 @@ import java.io.Serializable;
  * <pre>{@code
  *
  * List<Order> list =
- *     Ebean.find(Order.class)
+ *     DB.find(Order.class)
  *         .fetch("customer", new FetchConfig().query(10).lazy(5))
  *         .findList();
  *
@@ -121,7 +121,7 @@ import java.io.Serializable;
  * <p>
  * <pre>{@code
  *
- * List<Order> list = Ebean.find(Order.class)
+ * List<Order> list = DB.find(Order.class)
  *   .fetch("customer","name", new FetchConfig().lazy(5))
  *   .fetch("customer.contacts","contactName, phone, email")
  *   .fetch("customer.shippingAddress")
@@ -147,6 +147,8 @@ public class FetchConfig implements Serializable {
   private int queryBatchSize = -1;
 
   private boolean queryAll;
+
+  private boolean cache;
 
   /**
    * Construct the fetch configuration object.
@@ -183,6 +185,17 @@ public class FetchConfig implements Serializable {
    * </p>
    */
   public FetchConfig query() {
+    this.queryBatchSize = 0;
+    this.queryAll = true;
+    return this;
+  }
+
+  /**
+   * Eagerly fetch the beans fetching the beans from the L2 bean cache
+   * and using the DB for beans not in the cache.
+   */
+  public FetchConfig cache() {
+    this.cache = true;
     this.queryBatchSize = 0;
     this.queryAll = true;
     return this;
@@ -247,6 +260,13 @@ public class FetchConfig implements Serializable {
     return queryAll;
   }
 
+  /**
+   * Return true if this uses L2 bean cache.
+   */
+  public boolean isCache() {
+    return cache;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -255,6 +275,7 @@ public class FetchConfig implements Serializable {
     FetchConfig that = (FetchConfig) o;
     if (lazyBatchSize != that.lazyBatchSize) return false;
     if (queryBatchSize != that.queryBatchSize) return false;
+    if (cache != that.cache) return false;
     return queryAll == that.queryAll;
   }
 
@@ -263,6 +284,7 @@ public class FetchConfig implements Serializable {
     int result = lazyBatchSize;
     result = 92821 * result + queryBatchSize;
     result = 92821 * result + (queryAll ? 1 : 0);
+    result = 92821 * result + (cache ? 1 : 0);
     return result;
   }
 }

@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public class NaturalKeyEntry {
 
-  private Map<String,Object> map = new HashMap<>();
-  private Object key;
+  private final Map<String,Object> map = new HashMap<>();
+  private final Object key;
   private Object inValue;
 
   /**
