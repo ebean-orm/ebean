@@ -88,6 +88,40 @@
             <column name="test_number1" type="integer"/>
             <column name="test_number2" type="integer" notnull="true"/>
         </createTable>
+        <createTable name="migtest_e_index1" pkName="pk_migtest_e_index1">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="string1" type="varchar(10)"/>
+            <column name="string2" type="varchar(10)"/>
+        </createTable>
+        <createTable name="migtest_e_index2" pkName="pk_migtest_e_index2">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="string1" type="varchar(10)"/>
+            <column name="string2" type="varchar(10)"/>
+            <uniqueConstraint name="uq_migtest_e_index2" columnNames="string1,string2" oneToOne="false" nullableColumns="string1,string2"/>
+        </createTable>
+        <createTable name="migtest_e_index3" pkName="pk_migtest_e_index3">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="string1" type="varchar(10)"/>
+            <column name="string2" type="varchar(10)"/>
+            <uniqueConstraint name="uq_migtest_e_index3" columnNames="string1" oneToOne="false" nullableColumns="string1"/>
+        </createTable>
+        <createTable name="migtest_e_index4" pkName="pk_migtest_e_index4">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="string1" type="varchar(10)"/>
+            <column name="string2" type="varchar(10)"/>
+            <uniqueConstraint name="uq_migtest_e_index4_string1" columnNames="string1" oneToOne="false" nullableColumns="string1"/>
+        </createTable>
+        <createTable name="migtest_e_index5" pkName="pk_migtest_e_index5">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="string1" type="varchar(10)"/>
+            <column name="string2" type="varchar(10)"/>
+        </createTable>
+        <createTable name="migtest_e_index6" pkName="pk_migtest_e_index6">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="string1" type="varchar(10)"/>
+            <column name="string2" type="varchar(10)"/>
+            <uniqueConstraint name="uq_migtest_e_index6_string1" columnNames="string1" oneToOne="false" nullableColumns="string1"/>
+        </createTable>
         <createTable name="migtest_e_ref" pkName="pk_migtest_e_ref">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="name" type="varchar(127)" notnull="true"/>
@@ -115,5 +149,10 @@
         </createTable>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
+        <createIndex indexName="ix_migtest_e_index1" tableName="migtest_e_index1" columns="string1,string2"/>
+        <createIndex indexName="ix_migtest_e_index3" tableName="migtest_e_index3" columns="string2"/>
+        <createIndex indexName="ix_migtest_e_index4_string2" tableName="migtest_e_index4" columns="string2"/>
+        <createIndex indexName="ix_migtest_e_index5" tableName="migtest_e_index5" columns="string1,string2"/>
+        <createIndex indexName="ix_migtest_e_index6_string2" tableName="migtest_e_index6" columns="string2"/>
     </changeSet>
 </migration>

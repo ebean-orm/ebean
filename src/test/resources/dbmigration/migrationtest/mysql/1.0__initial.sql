@@ -121,6 +121,52 @@ create table migtest_e_history6 (
   constraint pk_migtest_e_history6 primary key (id)
 );
 
+create table migtest_e_index1 (
+  id                            integer auto_increment not null,
+  string1                       varchar(10),
+  string2                       varchar(10),
+  constraint pk_migtest_e_index1 primary key (id)
+);
+
+create table migtest_e_index2 (
+  id                            integer auto_increment not null,
+  string1                       varchar(10),
+  string2                       varchar(10),
+  constraint uq_migtest_e_index2 unique (string1,string2),
+  constraint pk_migtest_e_index2 primary key (id)
+);
+
+create table migtest_e_index3 (
+  id                            integer auto_increment not null,
+  string1                       varchar(10),
+  string2                       varchar(10),
+  constraint uq_migtest_e_index3 unique (string1),
+  constraint pk_migtest_e_index3 primary key (id)
+);
+
+create table migtest_e_index4 (
+  id                            integer auto_increment not null,
+  string1                       varchar(10),
+  string2                       varchar(10),
+  constraint uq_migtest_e_index4_string1 unique (string1),
+  constraint pk_migtest_e_index4 primary key (id)
+);
+
+create table migtest_e_index5 (
+  id                            integer auto_increment not null,
+  string1                       varchar(10),
+  string2                       varchar(10),
+  constraint pk_migtest_e_index5 primary key (id)
+);
+
+create table migtest_e_index6 (
+  id                            integer auto_increment not null,
+  string1                       varchar(10),
+  string2                       varchar(10),
+  constraint uq_migtest_e_index6_string1 unique (string1),
+  constraint pk_migtest_e_index6 primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer auto_increment not null,
   name                          varchar(127) not null,
@@ -160,6 +206,11 @@ create table migtest_oto_master (
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_e_index1 on migtest_e_index1 (string1,string2);
+create index ix_migtest_e_index3 on migtest_e_index3 (string2);
+create index ix_migtest_e_index4_string2 on migtest_e_index4 (string2);
+create index ix_migtest_e_index5 on migtest_e_index5 (string1,string2);
+create index ix_migtest_e_index6_string2 on migtest_e_index6 (string2);
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
 

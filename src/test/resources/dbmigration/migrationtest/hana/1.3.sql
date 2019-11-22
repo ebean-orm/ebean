@@ -18,6 +18,34 @@ delimiter $$
 do
 begin
 declare exit handler for sql_error_code 397 begin end;
+exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_status_indextest1';
+end;
+$$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 397 begin end;
+exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_name';
+end;
+$$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 397 begin end;
+exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4';
+end;
+$$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 397 begin end;
+exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5';
+end;
+$$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 397 begin end;
 exec 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status';
 end;
 $$;
@@ -50,34 +78,6 @@ alter table migtest_e_basic add ( old_boolean boolean default false not null);
 alter table migtest_e_basic add ( old_boolean2 boolean);
 alter table migtest_e_basic add ( eref_id integer);
 
-delimiter $$
-do
-begin
-declare exit handler for sql_error_code 397 begin end;
-exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_status_indextest1';
-end;
-$$;
-delimiter $$
-do
-begin
-declare exit handler for sql_error_code 397 begin end;
-exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_name';
-end;
-$$;
-delimiter $$
-do
-begin
-declare exit handler for sql_error_code 397 begin end;
-exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4';
-end;
-$$;
-delimiter $$
-do
-begin
-declare exit handler for sql_error_code 397 begin end;
-exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5';
-end;
-$$;
 -- cannot create unique index "uq_migtest_e_basic_indextest2" on table "migtest_e_basic" with nullable columns;
 -- cannot create unique index "uq_migtest_e_basic_indextest6" on table "migtest_e_basic" with nullable columns;
 delimiter $$
@@ -120,8 +120,35 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_history6 alter ( test_number2 integer default 7 not null);
 alter table migtest_e_history6_history alter ( test_number2 integer default 7 not null);
 alter table migtest_e_history6 add system versioning history table migtest_e_history6_history not validated /* 11 */;
+alter table migtest_e_index1 alter ( string1 nclob );
+alter table migtest_e_index1 alter ( string1 nvarchar(10));
+alter table migtest_e_index1 alter ( string2 nclob );
+alter table migtest_e_index1 alter ( string2 nvarchar(10));
+alter table migtest_e_index2 alter ( string1 nclob );
+alter table migtest_e_index2 alter ( string1 nvarchar(10));
+alter table migtest_e_index2 alter ( string2 nclob );
+alter table migtest_e_index2 alter ( string2 nvarchar(10));
+alter table migtest_e_index3 alter ( string1 nclob );
+alter table migtest_e_index3 alter ( string1 nvarchar(10));
+alter table migtest_e_index3 alter ( string2 nclob );
+alter table migtest_e_index3 alter ( string2 nvarchar(10));
+alter table migtest_e_index4 alter ( string1 nclob );
+alter table migtest_e_index4 alter ( string1 nvarchar(10));
+alter table migtest_e_index4 alter ( string2 nclob );
+alter table migtest_e_index4 alter ( string2 nvarchar(10));
+alter table migtest_e_index5 alter ( string1 nclob );
+alter table migtest_e_index5 alter ( string1 nvarchar(10));
+alter table migtest_e_index5 alter ( string2 nclob );
+alter table migtest_e_index5 alter ( string2 nvarchar(10));
+alter table migtest_e_index6 alter ( string1 nclob );
+alter table migtest_e_index6 alter ( string1 nvarchar(10));
+alter table migtest_e_index6 alter ( string2 nclob );
+alter table migtest_e_index6 alter ( string2 nvarchar(10));
+-- cannot create unique index "uq_migtest_e_index6_string1" on table "migtest_e_index6" with nullable columns;
 -- explicit index "ix_migtest_e_basic_indextest1" for single column "indextest1" of table "migtest_e_basic" is not necessary;
 -- explicit index "ix_migtest_e_basic_indextest5" for single column "indextest5" of table "migtest_e_basic" is not necessary;
+create inverted hash index ix_migtest_e_index5 on migtest_e_index5 (string1,string2);
+-- explicit index "ix_migtest_e_index6_string2" for single column "string2" of table "migtest_e_index6" is not necessary;
 delimiter $$
 do
 begin

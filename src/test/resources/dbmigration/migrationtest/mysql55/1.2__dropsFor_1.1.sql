@@ -3,17 +3,17 @@
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
-alter table migtest_e_basic drop column old_boolean;
+CALL usp_ebean_drop_column('migtest_e_basic', 'old_boolean');
 
-alter table migtest_e_basic drop column old_boolean2;
+CALL usp_ebean_drop_column('migtest_e_basic', 'old_boolean2');
 
-alter table migtest_e_basic drop column eref_id;
+CALL usp_ebean_drop_column('migtest_e_basic', 'eref_id');
 
-alter table migtest_e_history2 drop column obsolete_string1;
-alter table migtest_e_history2_history drop column obsolete_string1;
+CALL usp_ebean_drop_column('migtest_e_history2', 'obsolete_string1');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'obsolete_string1');
 
-alter table migtest_e_history2 drop column obsolete_string2;
-alter table migtest_e_history2_history drop column obsolete_string2;
+CALL usp_ebean_drop_column('migtest_e_history2', 'obsolete_string2');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'obsolete_string2');
 
 drop table if exists migtest_e_ref;
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
