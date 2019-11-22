@@ -25,6 +25,8 @@ public class JsonReadOptions {
 
   protected Object loadContext;
 
+  private JsonVersionMigrationHandler versionMigrationHandler;
+
   /**
    * Default constructor.
    */
@@ -116,4 +118,17 @@ public class JsonReadOptions {
     this.loadContext = loadContext;
   }
 
+  /**
+   * Set the version migration handler.
+   */
+  public void setVersionMigrationHandler(JsonVersionMigrationHandler versionMigrationHandler) {
+    this.versionMigrationHandler = versionMigrationHandler;
+  }
+
+  /**
+   * returns the version migration handler.
+   */
+  public JsonVersionMigrationHandler getVersionMigrationHandler() {
+    return versionMigrationHandler;
+  }
 }
