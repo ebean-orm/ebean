@@ -681,6 +681,36 @@ class ElMatchBuilder {
   }
 
   /**
+   * In Range (half open).
+   */
+  static class InRange<T,V> extends Base<T,V> {
+
+    final Comparable<V> min;
+    final Comparable<V> max;
+
+    InRange(ElPropertyValue elGetValue, Comparable<V> min, Comparable<V> max) {
+      super(elGetValue);
+      this.min = min;
+      this.max = max;
+    }
+
+    @Override
+    public boolean match(V value) {
+      return min.compareTo(value) <= 0
+          && max.compareTo(value) > 0;
+    }
+
+    @Override
+    public void toString(StringBuilder sb) {
+      sb.append(elGetValue).append(" inrange '").append(min).append("' and '").append(max).append('\'');
+    }
+
+    @Override
+    public <F extends QueryDsl<T, F>> void visitDsl(QueryDsl<T, F> target) {
+      target.inRange(elGetValue.getElName(), min, max);
+    }
+  }
+  /**
    * Greater Than.
    */
   static class Gt<T,V extends Comparable<V>> extends BaseValue<T,V> {
