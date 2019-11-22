@@ -26,12 +26,15 @@ import io.ebean.Transaction;
 import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.bean.CallOrigin;
+import io.ebean.bean.CallStack;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.LoadErrorHandler;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.CacheIdLookup;
@@ -49,6 +52,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -1414,6 +1418,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return fetch(property, null, FETCH_QUERY);
   }
 
+  @Override
   public Query<T> fetchCache(String property) {
     return fetch(property, null, FETCH_CACHE);
   }
@@ -2055,9 +2060,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void handleLoadError(String fullName, Exception e) {
+  public void handleLoadError(EntityBean bean, BeanProperty prop, String fullName, Exception e) {
     if (!allowLoadErrors) {
-      throw new PersistenceException("Error loading on " + fullName, e);
+      LoadErrorHandler handler = server.getServerConfig().getLoadErrorHandler();
+      if (handler == null) {
+        throw new PersistenceException("Error loading on " + fullName, e);
+      }
+      handler.handleLoadError(bean, prop, fullName, e);
     }
   }
 

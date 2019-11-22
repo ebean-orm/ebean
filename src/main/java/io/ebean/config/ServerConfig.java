@@ -31,6 +31,7 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.plugin.CustomDeployParser;
+import io.ebean.plugin.LoadErrorHandler;
 import io.ebean.util.StringHelper;
 
 import javax.persistence.EnumType;
@@ -540,6 +541,12 @@ public class ServerConfig {
 
   /**
    * Construct a Database Configuration for programmatically creating an Database.
+   * The global load error handler.
+   */
+  private LoadErrorHandler loadErrorHandler;
+
+  /**
+   * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
 
@@ -3340,6 +3347,20 @@ public class ServerConfig {
    */
   public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
     this.idGeneratorAutomatic = idGeneratorAutomatic;
+  }
+
+  /**
+   * Returns the load error handler.
+   */
+  public LoadErrorHandler getLoadErrorHandler() {
+    return loadErrorHandler;
+  }
+
+  /**
+   * Sets the loadErrorHandler.
+   */
+  public void setLoadErrorHandler(LoadErrorHandler loadErrorHandler) {
+    this.loadErrorHandler = loadErrorHandler;
   }
 
   /**
