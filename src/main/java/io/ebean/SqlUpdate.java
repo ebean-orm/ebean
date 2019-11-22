@@ -266,9 +266,21 @@ public interface SqlUpdate {
   SqlUpdate setNextParameter(Object value);
 
   /**
+   * Set the next positioned parameter. JdbcType is used if value is null.
+   *
+   * @param value The value to bind
+   */
+  SqlUpdate setNextParameter(Object value, int jdbcType);
+
+  /**
    * Set a parameter via its index position.
    */
   SqlUpdate setParameter(int position, Object value);
+
+  /**
+   * Set a parameter via its index position. JdbcType is used if value is null.
+   */
+  SqlUpdate setParameter(int position, Object value, int jdbcType);
 
   /**
    * Set a null parameter via its index position.
@@ -284,6 +296,11 @@ public interface SqlUpdate {
    * Set a named parameter value.
    */
   SqlUpdate setParameter(String name, Object param);
+
+  /**
+   * Set a named parameter value. JdbcType is used if value is null.
+   */
+  SqlUpdate setParameter(String name, Object param, int jdbcType);
 
   /**
    * Set a named parameter that has a null value. Exactly the same as
