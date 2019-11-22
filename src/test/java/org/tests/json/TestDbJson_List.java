@@ -1,6 +1,7 @@
 package org.tests.json;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -18,10 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestDbJson_List extends BaseTestCase {
 
@@ -219,5 +217,19 @@ public class TestDbJson_List extends BaseTestCase {
       .hasMessageContaining("blabla");
 
     Ebean.delete(bean);
+  }
+
+  @Test
+  public void testNullToEmpty() throws Exception {
+    EBasicJsonList bean = new EBasicJsonList();
+    bean.setFlags(null);
+    bean.setTags(null);
+    bean.setBeanMap(null);
+    DB.save(bean);
+
+    bean = DB.find(EBasicJsonList.class)
+        .setId(bean.getId()).findOne();
+
+    assertThat(bean.getFlags()).isEmpty();
   }
 }

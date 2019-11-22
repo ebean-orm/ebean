@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.query;
 
+import java.util.Collection;
+import java.util.Map;
+
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiQuery.Mode;
@@ -70,12 +73,7 @@ public class SqlBeanLoad {
 
     try {
       Object dbVal = prop.read(ctx);
-      if (!refreshLoading) {
-        prop.setValue(bean, dbVal);
-      } else {
-        prop.setValueIntercept(bean, dbVal);
-      }
-
+      load(prop, dbVal);
       return dbVal;
 
     } catch (Exception e) {
@@ -89,6 +87,14 @@ public class SqlBeanLoad {
    * Load the given value into the property.
    */
   public void load(BeanProperty target, Object dbVal) {
+    if (dbVal == null) {
+      Object current = target.getValue(bean);
+      if ((current instanceof Collection) && ((Collection<?>) current).isEmpty()) {
+        dbVal = current; // do not modify
+      } else if ((current instanceof Map) && ((Map<?, ?>) current).isEmpty()) {
+        dbVal = current; // do not modify
+      }
+    }
     if (!refreshLoading) {
       target.setValue(bean, dbVal);
     } else {
