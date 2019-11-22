@@ -29,6 +29,8 @@ alter table migtest_fk_none add constraint fk_mgtst_fk_nn_n_d foreign key (one_i
 alter table migtest_fk_none_via_join add constraint fk_mgtst_fk_9tknzj foreign key (one_id) references migtest_fk_one (id) on delete restrict;
 alter table migtest_fk_set_null drop constraint fk_mgtst_fk_wicx8x;
 alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy;
+alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
 
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
@@ -55,8 +57,6 @@ alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add constraint ck_mgtst__b_l39g41 check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer default 42 not null;
 
-alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy;
-alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_ucfcne unique  (status,indextest1);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__bsc_nm unique  (name);
 -- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc00 unique  (indextest4);
@@ -83,6 +83,19 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
+alter table migtest_e_index1 alter column string1 varchar(20);
+alter table migtest_e_index1 alter column string2 varchar(20);
+alter table migtest_e_index2 alter column string1 varchar(20);
+alter table migtest_e_index2 alter column string2 varchar(20);
+alter table migtest_e_index3 alter column string1 varchar(20);
+alter table migtest_e_index3 alter column string2 varchar(20);
+alter table migtest_e_index4 alter column string1 varchar(20);
+alter table migtest_e_index4 alter column string2 varchar(20);
+alter table migtest_e_index5 alter column string1 varchar(20);
+alter table migtest_e_index5 alter column string2 varchar(20);
+alter table migtest_e_index6 drop constraint uq_mgtst__n_1aoskk;
+alter table migtest_e_index6 alter column string1 varchar(20);
+alter table migtest_e_index6 alter column string2 varchar(20);
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -91,6 +104,8 @@ create index ix_mgtst__b_eu8css on migtest_e_basic (indextest3);
 create index ix_mgtst__b_eu8csv on migtest_e_basic (indextest6);
 drop index ix_mgtst__b_eu8csq;
 drop index ix_mgtst__b_eu8csu;
+drop index ix_mgtst__ndx5;
+drop index ix_mgtst__n_r52a9e;
 create index ix_mgtst_mt_3ug4ok on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 

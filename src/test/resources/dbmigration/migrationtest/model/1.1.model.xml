@@ -13,6 +13,8 @@
         <alterColumn columnName="one_id" tableName="migtest_fk_none" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_one_id" foreignKeyIndex="ix_migtest_fk_none_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT"/>
         <alterColumn columnName="one_id" tableName="migtest_fk_none_via_join" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_none_via_join_one_id" foreignKeyIndex="ix_migtest_fk_none_via_join_one_id"/>
         <alterColumn columnName="one_id" tableName="migtest_fk_set_null" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="RESTRICT" foreignKeyOnUpdate="RESTRICT" dropForeignKey="fk_migtest_fk_set_null_one_id" dropForeignKeyIndex="ix_migtest_fk_set_null_one_id"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="status2" tableName="migtest_e_basic" type="varchar(127)" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" dropCheckConstraint="ck_migtest_e_basic_status2"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
@@ -36,8 +38,6 @@
             <column name="progress" type="integer" defaultValue="0" notnull="true" checkConstraint="check ( progress in (0,1,2))" checkConstraintName="ck_migtest_e_basic_progress"/>
             <column name="new_integer" type="integer" defaultValue="42" notnull="true"/>
         </addColumn>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
-        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_status_indextest1" tableName="migtest_e_basic" columnNames="status,indextest1" oneToOne="false" nullableColumns="indextest1"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" oneToOne="false" nullableColumns="name"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" oneToOne="false" nullableColumns="indextest4"/>
@@ -63,6 +63,19 @@
         </addColumn>
         <alterColumn columnName="test_number1" tableName="migtest_e_history6" withHistory="true" currentType="integer" defaultValue="42" notnull="true" currentNotnull="false"/>
         <alterColumn columnName="test_number2" tableName="migtest_e_history6" withHistory="true" currentType="integer" notnull="false" currentNotnull="true"/>
+        <alterColumn columnName="string1" tableName="migtest_e_index1" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string2" tableName="migtest_e_index1" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string1" tableName="migtest_e_index2" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string2" tableName="migtest_e_index2" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string1" tableName="migtest_e_index3" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string2" tableName="migtest_e_index3" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string1" tableName="migtest_e_index4" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string2" tableName="migtest_e_index4" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string1" tableName="migtest_e_index5" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string2" tableName="migtest_e_index5" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_index6_string1" tableName="migtest_e_index6" columnNames="DROP CONSTRAINT" nullableColumns="string1"/>
+        <alterColumn columnName="string1" tableName="migtest_e_index6" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
+        <alterColumn columnName="string2" tableName="migtest_e_index6" type="varchar(20)" currentType="varchar(10)" currentNotnull="false"/>
         <addColumn tableName="migtest_e_softdelete">
             <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>
         </addColumn>
@@ -88,6 +101,8 @@
         <createIndex indexName="ix_migtest_e_basic_indextest6" tableName="migtest_e_basic" columns="indextest6"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic"/>
+        <dropIndex indexName="ix_migtest_e_index5" tableName="migtest_e_index5"/>
+        <dropIndex indexName="ix_migtest_e_index6_string2" tableName="migtest_e_index6"/>
     </changeSet>
     <changeSet type="pendingDrops">
         <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>

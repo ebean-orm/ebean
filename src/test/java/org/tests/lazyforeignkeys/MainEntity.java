@@ -8,11 +8,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import javax.validation.constraints.Size;
+
 @Entity
 @Table(name = "main_entity")
 public class MainEntity {
 
   @Id
+  @Size(max = 16)
   private String id;
 
   private String attr1;

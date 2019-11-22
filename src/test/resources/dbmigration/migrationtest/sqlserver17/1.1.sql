@@ -30,6 +30,10 @@ alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key
 alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id);
 IF OBJECT_ID('fk_migtest_fk_set_null_one_id', 'F') IS NOT NULL alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
+IF (OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest2') drop index uq_migtest_e_basic_indextest2 ON migtest_e_basic;
+IF (OBJECT_ID('uq_migtest_e_basic_indextest6', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest6') drop index uq_migtest_e_basic_indextest6 ON migtest_e_basic;
 
 update migtest_e_basic set status = 'A' where status is null;
 IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
@@ -55,10 +59,6 @@ alter table migtest_e_basic add progress integer default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add new_integer integer default 42 not null;
 
-IF (OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
-IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest2') drop index uq_migtest_e_basic_indextest2 ON migtest_e_basic;
-IF (OBJECT_ID('uq_migtest_e_basic_indextest6', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
-IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest6') drop index uq_migtest_e_basic_indextest6 ON migtest_e_basic;
 create unique nonclustered index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(status,indextest1) where indextest1 is not null;
 create unique nonclustered index uq_migtest_e_basic_name on migtest_e_basic(name) where name is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) where indextest4 is not null;
@@ -83,6 +83,29 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 add default 42 for test_number1;
 alter table migtest_e_history6 alter column test_number1 integer not null;
 alter table migtest_e_history6 alter column test_number2 integer;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index1','U') AND name = 'ix_migtest_e_index1') drop index ix_migtest_e_index1 ON migtest_e_index1;
+alter table migtest_e_index1 alter column string1 nvarchar(20);
+alter table migtest_e_index1 alter column string2 nvarchar(20);
+IF (OBJECT_ID('uq_migtest_e_index2', 'UQ') IS NOT NULL) alter table migtest_e_index2 drop constraint uq_migtest_e_index2;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index2','U') AND name = 'uq_migtest_e_index2') drop index uq_migtest_e_index2 ON migtest_e_index2;
+alter table migtest_e_index2 alter column string1 nvarchar(20);
+alter table migtest_e_index2 alter column string2 nvarchar(20);
+IF (OBJECT_ID('uq_migtest_e_index3', 'UQ') IS NOT NULL) alter table migtest_e_index3 drop constraint uq_migtest_e_index3;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index3','U') AND name = 'uq_migtest_e_index3') drop index uq_migtest_e_index3 ON migtest_e_index3;
+alter table migtest_e_index3 alter column string1 nvarchar(20);
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index3','U') AND name = 'ix_migtest_e_index3') drop index ix_migtest_e_index3 ON migtest_e_index3;
+alter table migtest_e_index3 alter column string2 nvarchar(20);
+IF (OBJECT_ID('uq_migtest_e_index4_string1', 'UQ') IS NOT NULL) alter table migtest_e_index4 drop constraint uq_migtest_e_index4_string1;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index4','U') AND name = 'uq_migtest_e_index4_string1') drop index uq_migtest_e_index4_string1 ON migtest_e_index4;
+alter table migtest_e_index4 alter column string1 nvarchar(20);
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index4','U') AND name = 'ix_migtest_e_index4_string2') drop index ix_migtest_e_index4_string2 ON migtest_e_index4;
+alter table migtest_e_index4 alter column string2 nvarchar(20);
+alter table migtest_e_index5 alter column string1 nvarchar(20);
+alter table migtest_e_index5 alter column string2 nvarchar(20);
+IF (OBJECT_ID('uq_migtest_e_index6_string1', 'UQ') IS NOT NULL) alter table migtest_e_index6 drop constraint uq_migtest_e_index6_string1;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index6','U') AND name = 'uq_migtest_e_index6_string1') drop index uq_migtest_e_index6_string1 ON migtest_e_index6;
+alter table migtest_e_index6 alter column string1 nvarchar(20);
+alter table migtest_e_index6 alter column string2 nvarchar(20);
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 
 alter table migtest_oto_child add master_id numeric(19);
@@ -91,6 +114,8 @@ create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest1') drop index ix_migtest_e_basic_indextest1 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest5') drop index ix_migtest_e_basic_indextest5 ON migtest_e_basic;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index5','U') AND name = 'ix_migtest_e_index5') drop index ix_migtest_e_index5 ON migtest_e_index5;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_index6','U') AND name = 'ix_migtest_e_index6_string2') drop index ix_migtest_e_index6_string2 ON migtest_e_index6;
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
 
@@ -106,6 +131,12 @@ alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_
 create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
 alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id);
 
+create index ix_migtest_e_index1 on migtest_e_index1 (string1,string2);
+create unique nonclustered index uq_migtest_e_index2 on migtest_e_index2(string1,string2) where string1 is not null and string2 is not null;
+create unique nonclustered index uq_migtest_e_index3 on migtest_e_index3(string1) where string1 is not null;
+create index ix_migtest_e_index3 on migtest_e_index3 (string2);
+create unique nonclustered index uq_migtest_e_index4_string1 on migtest_e_index4(string1) where string1 is not null;
+create index ix_migtest_e_index4_string2 on migtest_e_index4 (string2);
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id);
 
 alter table migtest_e_history
