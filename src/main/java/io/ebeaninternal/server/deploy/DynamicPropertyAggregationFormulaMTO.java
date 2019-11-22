@@ -22,7 +22,7 @@ public class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyAggrega
     try {
       value = prop.read(sqlBeanLoad.ctx());
     } catch (Exception e) {
-      sqlBeanLoad.ctx().handleLoadError(fullName, e);
+      sqlBeanLoad.ctx().handleLoadError(null, prop, fullName, e);
       return;
     }
     if (asTarget != null) {
