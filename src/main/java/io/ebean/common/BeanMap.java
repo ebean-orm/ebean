@@ -36,6 +36,15 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     this(new LinkedHashMap<>());
   }
 
+  /**
+   * Used by foconis enhancer to create a beanmap which knows it's parent.
+   */
+  public BeanMap(EntityBean ownerBean, String propertyName) {
+    this();
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+  }
+
   public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
   }
@@ -276,6 +285,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public E put(K key, E value) {
     checkReadOnly();
     init();
+    owningBean(value, key);
     if (modifyListening) {
       E oldBean = map.put(key, value);
       if (value != oldBean) {
@@ -297,11 +307,15 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
       for (Entry<? extends K, ? extends E> entry : puts.entrySet()) {
         Object oldBean = map.put(entry.getKey(), entry.getValue());
         if (entry.getValue() != oldBean) {
+          owningBean(entry.getValue(), entry.getKey());
           modifyAddition(entry.getValue());
           modifyRemoval(oldBean);
         }
       }
     } else {
+      for (Entry<? extends K, ? extends E> entry : puts.entrySet()) {
+        owningBean(entry.getValue(), entry.getKey());
+      }
       map.putAll(puts);
     }
   }

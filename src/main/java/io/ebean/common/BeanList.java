@@ -41,6 +41,15 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   /**
+   * Used by foconis enhancer to create a beanlist which knows it's parent.
+   */
+  public BeanList(EntityBean ownerBean, String propertyName) {
+    this();
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+  }
+
+  /**
    * Used to create deferred fetch proxy.
    */
   public BeanList(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
@@ -232,6 +241,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public void add(int index, E element) {
     checkReadOnly();
     init();
+    owningBean(element, index);
     if (modifyListening) {
       modifyAddition(element);
     }
@@ -247,6 +257,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public boolean add(E o) {
     checkReadOnly();
     init();
+    owningBean(o, list.size());
     if (modifyListening) {
       if (list.add(o)) {
         modifyAddition(o);
@@ -266,6 +277,10 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
       // all elements in c are added (no contains checking)
       getModifyHolder().modifyAdditionAll(c);
     }
+    int i = list.size();
+    for (E bean : c) {
+      owningBean(bean, i++);
+    }
     return list.addAll(c);
   }
 
@@ -276,6 +291,10 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     if (modifyListening) {
       // all elements in c are added (no contains checking)
       getModifyHolder().modifyAdditionAll(c);
+    }
+    int i = index;
+    for (E bean : c) {
+      owningBean(bean, i++);
     }
     return list.addAll(index, c);
   }
