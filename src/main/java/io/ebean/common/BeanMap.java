@@ -57,6 +57,11 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
+  public void reset() {
+    this.map = null;
+  }
+
+  @Override
   public boolean isSkipSave() {
     return map == null || (map.isEmpty() && !holdsModifications());
   }
