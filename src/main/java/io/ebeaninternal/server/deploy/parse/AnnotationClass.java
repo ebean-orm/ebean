@@ -14,7 +14,6 @@ import io.ebean.annotation.StorageEngine;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
-import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
@@ -31,7 +30,9 @@ import javax.persistence.IdClass;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import java.util.Set;
+
+import static io.ebean.util.AnnotationUtil.findAnnotationRecursive;
+import static io.ebean.util.AnnotationUtil.findAnnotationsRecursive;
 
 /**
  * Read the class level deployment annotations.
@@ -50,7 +51,7 @@ public class AnnotationClass extends AnnotationParser {
    * Create to parse AttributeOverride annotations which is run last
    * after all the properties/fields have been parsed fully.
    */
-  public AnnotationClass(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
+  AnnotationClass(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info, readConfig);
     this.asOfViewSuffix = readConfig.getAsOfViewSuffix();
     this.versionsBetweenSuffix = readConfig.getVersionsBetweenSuffix();
@@ -60,10 +61,10 @@ public class AnnotationClass extends AnnotationParser {
   /**
    * Parse any AttributeOverride set on the class.
    */
-  public void parseAttributeOverride() {
+  void parseAttributeOverride() {
 
     Class<?> cls = descriptor.getBeanType();
-    AttributeOverride override = AnnotationUtil.findAnnotationRecursive(cls, AttributeOverride.class);
+    AttributeOverride override = findAnnotationRecursive(cls, AttributeOverride.class);
     if (override != null) {
       String propertyName = override.name();
       Column column = override.column();
@@ -105,14 +106,14 @@ public class AnnotationClass extends AnnotationParser {
   private void read(Class<?> cls) {
 
     // maybe doc store only so check for this before @Entity
-    DocStore docStore = AnnotationUtil.findAnnotationRecursive(cls, DocStore.class);
+    DocStore docStore = findAnnotationRecursive(cls, DocStore.class);
     if (docStore != null) {
       descriptor.readDocStore(docStore);
       descriptor.setEntityType(EntityType.DOC);
       descriptor.setName(cls.getSimpleName());
     }
 
-    Entity entity = AnnotationUtil.findAnnotationRecursive(cls, Entity.class);
+    Entity entity = findAnnotationRecursive(cls, Entity.class);
     if (entity != null) {
       descriptor.setEntityType(EntityType.ORM);
       if (entity.name().isEmpty()) {
@@ -122,32 +123,31 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    IdClass idClass = AnnotationUtil.findAnnotationRecursive(cls, IdClass.class);
+    IdClass idClass = findAnnotationRecursive(cls, IdClass.class);
     if (idClass != null) {
       descriptor.setIdClass(idClass.value());
     }
 
-    Embeddable embeddable = AnnotationUtil.findAnnotationRecursive(cls, Embeddable.class);
+    Embeddable embeddable = findAnnotationRecursive(cls, Embeddable.class);
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
-    Set<Index> indices = AnnotationUtil.findAnnotationsRecursive(cls, Index.class);
-    for (Index index : indices) {
+    for (Index index : findAnnotationsRecursive(cls, Index.class)) {
       descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
 
-    UniqueConstraint uc = AnnotationUtil.findAnnotationRecursive(cls, UniqueConstraint.class);
+    UniqueConstraint uc = findAnnotationRecursive(cls, UniqueConstraint.class);
     if (uc != null) {
       descriptor.addIndex(new IndexDefinition(uc.columnNames()));
     }
 
-    View view = AnnotationUtil.findAnnotationRecursive(cls, View.class);
+    View view = findAnnotationRecursive(cls, View.class);
     if (view != null) {
       descriptor.setView(view.name(), view.dependentTables());
     }
-    Table table = AnnotationUtil.findAnnotationRecursive(cls, Table.class);
+    Table table = findAnnotationRecursive(cls, Table.class);
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
@@ -155,59 +155,59 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    StorageEngine storage = AnnotationUtil.findAnnotationRecursive(cls, StorageEngine.class);
+    StorageEngine storage = findAnnotationRecursive(cls, StorageEngine.class);
     if (storage != null) {
       descriptor.setStorageEngine(storage.value());
     }
 
-    DbPartition partition = AnnotationUtil.findAnnotationRecursive(cls, DbPartition.class);
+    DbPartition partition = findAnnotationRecursive(cls, DbPartition.class);
     if (partition != null) {
       descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
     }
 
-    Draftable draftable = AnnotationUtil.findAnnotationRecursive(cls, Draftable.class);
+    Draftable draftable = findAnnotationRecursive(cls, Draftable.class);
     if (draftable != null) {
       descriptor.setDraftable();
     }
 
-    DraftableElement draftableElement = AnnotationUtil.findAnnotationRecursive(cls, DraftableElement.class);
+    DraftableElement draftableElement = findAnnotationRecursive(cls, DraftableElement.class);
     if (draftableElement != null) {
       descriptor.setDraftableElement();
     }
 
-    ReadAudit readAudit = AnnotationUtil.findAnnotationRecursive(cls, ReadAudit.class);
+    ReadAudit readAudit = findAnnotationRecursive(cls, ReadAudit.class);
     if (readAudit != null) {
       descriptor.setReadAuditing();
     }
 
-    History history = AnnotationUtil.findAnnotationRecursive(cls, History.class);
+    History history = findAnnotationRecursive(cls, History.class);
     if (history != null) {
       descriptor.setHistorySupport();
     }
 
-    DbComment comment = AnnotationUtil.findAnnotationRecursive(cls, DbComment.class);
+    DbComment comment = findAnnotationRecursive(cls, DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
     }
 
-    UpdateMode updateMode = AnnotationUtil.findAnnotationRecursive(cls, UpdateMode.class);
+    UpdateMode updateMode = findAnnotationRecursive(cls, UpdateMode.class);
     if (updateMode != null) {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
     if (!disableL2Cache) {
-      Cache cache = AnnotationUtil.findAnnotationRecursive(cls, Cache.class);
+      Cache cache = findAnnotationRecursive(cls, Cache.class);
       if (cache != null) {
         descriptor.setCache(cache);
       } else {
-        InvalidateQueryCache invalidateQueryCache = AnnotationUtil.findAnnotationRecursive(cls, InvalidateQueryCache.class);
+        InvalidateQueryCache invalidateQueryCache = findAnnotationRecursive(cls, InvalidateQueryCache.class);
         if (invalidateQueryCache != null) {
           descriptor.setInvalidateQueryCache(invalidateQueryCache.region());
         }
       }
     }
 
-    for (NamedQuery namedQuery : AnnotationUtil.findAnnotationsRecursive(cls, NamedQuery.class)) {
+    for (NamedQuery namedQuery : findAnnotationsRecursive(cls, NamedQuery.class)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
   }

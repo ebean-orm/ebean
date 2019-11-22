@@ -2,9 +2,12 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.onetoone.album.Cover;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +35,12 @@ public class NoopExpressionTest extends BaseExpressionTest {
       .where().add(NoopExpression.INSTANCE)
       .query();
 
+    LoggedSqlCollector.start();
+
     query.findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql.get(0)).contains("select count(*) from cover t0 where 1=1 and");
   }
 
   @Test

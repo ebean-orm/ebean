@@ -60,7 +60,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private final ExpressionList<T> parentExprList;
 
-  protected ExpressionFactory expr;
+  protected final ExpressionFactory expr;
 
   String allDocNestedPath;
 
@@ -470,8 +470,14 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> filterMany(String prop) {
-    return query.filterMany(prop);
+  public ExpressionList<T> filterMany(String manyProperty) {
+    return query.filterMany(manyProperty);
+  }
+
+  @Override
+  public Query<T> filterMany(String manyProperty, String expressions, Object... params) {
+    query.filterMany(manyProperty).where(expressions, params);
+    return query;
   }
 
   @Override
@@ -495,7 +501,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> select(FetchGroup fetchGroup) {
+  public Query<T> select(FetchGroup<T> fetchGroup) {
     return query.select(fetchGroup);
   }
 
@@ -742,6 +748,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> where(String expressions, Object... params) {
+    expr.where(this, expressions, params);
     return this;
   }
 

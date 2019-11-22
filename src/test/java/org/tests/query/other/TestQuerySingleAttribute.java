@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQuerySingleAttribute extends BaseTestCase {
 
-
   @Test
   public void exampleUsage() {
 
@@ -236,8 +235,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .select("more");
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A' ");
-
+    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A'");
   }
 
   @Test

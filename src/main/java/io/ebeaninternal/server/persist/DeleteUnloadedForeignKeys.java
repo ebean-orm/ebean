@@ -39,10 +39,6 @@ class DeleteUnloadedForeignKeys {
     this.deletePermanent = request.isHardDeleteCascade();
   }
 
-  public boolean isEmpty() {
-    return propList.isEmpty();
-  }
-
   public void add(BeanPropertyAssocOne<?> prop) {
     propList.add(prop);
   }

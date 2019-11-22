@@ -76,8 +76,6 @@ public class FormulaPropertyPathTest extends BaseTestCase {
       assertThat(propertyPath.alias()).isNull();
     }
 
-    STreeProperty treeProperty = propertyPath.build();
-
-    assertThat(treeProperty).isNotNull();
+    assertThat(propertyPath.build()).isNotNull();
   }
 }

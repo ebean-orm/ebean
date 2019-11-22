@@ -4,7 +4,7 @@ import io.ebeaninternal.api.SpiCacheRegion;
 
 class DCacheRegionNone implements SpiCacheRegion {
 
-  static SpiCacheRegion INSTANCE = new DCacheRegionNone();
+  static final SpiCacheRegion INSTANCE = new DCacheRegionNone();
 
   @Override
   public String getName() {

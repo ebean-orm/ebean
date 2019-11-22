@@ -77,6 +77,9 @@ public class PlatformConfig {
     this.geometrySRID = platformConfig.geometrySRID;
     this.dbUuid = platformConfig.dbUuid;
     this.caseSensitiveCollation = platformConfig.caseSensitiveCollation;
+    this.allQuotedIdentifiers = platformConfig.allQuotedIdentifiers;
+    this.databaseInetAddressVarchar = platformConfig.databaseInetAddressVarchar;
+    this.customDbTypeMappings = platformConfig.customDbTypeMappings;
   }
 
   /**

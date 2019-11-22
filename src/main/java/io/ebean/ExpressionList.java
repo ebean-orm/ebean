@@ -489,7 +489,26 @@ public interface ExpressionList<T> {
    * Add some filter predicate expressions to the many property.
    */
   @Nonnull
-  ExpressionList<T> filterMany(String prop);
+  ExpressionList<T> filterMany(String manyProperty);
+
+  /**
+   * Add filter expressions to the many property.
+   *
+   * <pre>{@code
+   *
+   *   DB.find(Customer.class)
+   *   .where()
+   *   .eq("name", "Rob")
+   *   .filterMany("orders", "status = ?", Status.NEW)
+   *   .findList();
+   *
+   * }</pre>
+   *
+   * @param manyProperty The many property
+   * @param expressions  Filter expressions with and, or and ? or ?1 type bind parameters
+   * @param params       Bind parameters used in the expressions
+   */
+  Query<T> filterMany(String manyProperty, String expressions, Object... params);
 
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial
@@ -664,6 +683,14 @@ public interface ExpressionList<T> {
   ExpressionList<T> where();
 
   /**
+   * Add the expressions to this expression list.
+   *
+   * @param expressions The expressions that are parsed and added to this expression list
+   * @param params      Bind parameters to match ? or ?1 bind positions.
+   */
+  ExpressionList<T> where(String expressions, Object... params);
+
+  /**
    * Path exists - for the given path in a JSON document.
    * <pre>{@code
    *
@@ -831,9 +858,9 @@ public interface ExpressionList<T> {
    */
   ExpressionList<T> inRange(String propertyName, Object value1, Object value2);
 
-    /**
-     * Between - property between the two given values.
-     */
+  /**
+   * Between - property between the two given values.
+   */
   ExpressionList<T> between(String propertyName, Object value1, Object value2);
 
   /**
@@ -1327,7 +1354,7 @@ public interface ExpressionList<T> {
    *
    * }</pre>
    * <p>
-   *   Note that we need to cast the Postgres array for UUID types like:
+   * Note that we need to cast the Postgres array for UUID types like:
    * </p>
    * <pre>{@code
    *
@@ -1335,7 +1362,7 @@ public interface ExpressionList<T> {
    *
    * }</pre>
    *
-   * @param raw The raw expression that is typically a subquery
+   * @param raw    The raw expression that is typically a subquery
    * @param values The values which is typically a list or set of id values.
    */
   ExpressionList<T> rawOrEmpty(String raw, Collection<?> values);

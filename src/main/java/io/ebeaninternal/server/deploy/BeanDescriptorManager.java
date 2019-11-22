@@ -669,7 +669,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return (BeanManager<T>) getBeanManager(entityType.getName());
   }
 
-  public BeanManager<?> getBeanManager(String beanClassName) {
+  private BeanManager<?> getBeanManager(String beanClassName) {
     return beanManagerMap.get(beanClassName);
   }
 
@@ -821,7 +821,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return new BeanTable(beanTable, this);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   private void readEntityRelationships() {
 
     // We only perform 'circular' checks etc after we have
@@ -1656,13 +1655,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return changeLogListener;
   }
 
-  public void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
+  private void addPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
 
     String baseTable = prop.getDesc().getBaseTable();
     DeployTableJoin inverse = prop.getTableJoin().createInverse(baseTable);
 
-    TableJoin inverseJoin = new TableJoin(inverse);
-
+    TableJoin inverseJoin = new TableJoin(inverse, prop.getForeignKey());
     DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
     target.setPrimaryKeyJoin(inverseJoin);
   }

@@ -148,6 +148,8 @@ public class FetchConfig implements Serializable {
 
   private boolean queryAll;
 
+  private boolean cache;
+
   /**
    * Construct the fetch configuration object.
    */
@@ -183,6 +185,17 @@ public class FetchConfig implements Serializable {
    * </p>
    */
   public FetchConfig query() {
+    this.queryBatchSize = 0;
+    this.queryAll = true;
+    return this;
+  }
+
+  /**
+   * Eagerly fetch the beans fetching the beans from the L2 bean cache
+   * and using the DB for beans not in the cache.
+   */
+  public FetchConfig cache() {
+    this.cache = true;
     this.queryBatchSize = 0;
     this.queryAll = true;
     return this;
@@ -247,6 +260,13 @@ public class FetchConfig implements Serializable {
     return queryAll;
   }
 
+  /**
+   * Return true if this uses L2 bean cache.
+   */
+  public boolean isCache() {
+    return cache;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -255,6 +275,7 @@ public class FetchConfig implements Serializable {
     FetchConfig that = (FetchConfig) o;
     if (lazyBatchSize != that.lazyBatchSize) return false;
     if (queryBatchSize != that.queryBatchSize) return false;
+    if (cache != that.cache) return false;
     return queryAll == that.queryAll;
   }
 
@@ -263,6 +284,7 @@ public class FetchConfig implements Serializable {
     int result = lazyBatchSize;
     result = 92821 * result + queryBatchSize;
     result = 92821 * result + (queryAll ? 1 : 0);
+    result = 92821 * result + (cache ? 1 : 0);
     return result;
   }
 }

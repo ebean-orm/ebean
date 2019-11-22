@@ -4,7 +4,6 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiSqlUpdate;
-import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
@@ -36,7 +37,7 @@ public class SaveManyBeans extends SaveManyBase {
   private final DeleteMode deleteMode;
 
   private Collection<?> collection;
-  private DefaultPersister persister;
+  private final DefaultPersister persister;
   private boolean deleteMissing;
   private int sortOrder;
 
@@ -223,7 +224,7 @@ public class SaveManyBeans extends SaveManyBase {
       }
       if (detailBean instanceof EntityBean) {
         Object id = targetDescriptor.getId((EntityBean) detailBean);
-        if (!DmlUtil.isNullOrZero(id)) {
+        if (!isNullOrZero(id)) {
           // remember the Id (other details not in the collection) will be removed
           detailIds.add(id);
         }
@@ -356,7 +357,7 @@ public class SaveManyBeans extends SaveManyBase {
             EntityBean eb = (EntityBean) removedBean;
             if (!eb._ebean_getIntercept().isNew()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
-              persister.deleteRequest(persister.createPublishRequest(removedBean, transaction, PersistRequest.Type.DELETE, request.getFlags()));
+              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.getFlags()));
             }
           }
         }

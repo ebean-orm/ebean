@@ -288,6 +288,16 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitAny_expression(EQLParser.Any_expressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#inOrEmpty_expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterInOrEmpty_expression(EQLParser.InOrEmpty_expressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#inOrEmpty_expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitInOrEmpty_expression(EQLParser.InOrEmpty_expressionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#in_expression}.
 	 * @param ctx the parse tree
 	 */
@@ -327,6 +337,16 @@ public interface EQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitInrange_expression(EQLParser.Inrange_expressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#inrange_op}.
+	 * @param ctx the parse tree
+	 */
+	void enterInrange_op(EQLParser.Inrange_opContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#inrange_op}.
+	 * @param ctx the parse tree
+	 */
+	void exitInrange_op(EQLParser.Inrange_opContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link EQLParser#propertyBetween_expression}.
 	 * @param ctx the parse tree

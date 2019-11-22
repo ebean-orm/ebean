@@ -14,7 +14,9 @@ import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
+import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
@@ -22,14 +24,15 @@ import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
+import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlWriter;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MConfiguration;
 import io.ebeaninternal.dbmigration.model.MigrationModel;
-import io.ebeaninternal.dbmigration.model.MigrationVersion;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.dbmigration.model.ModelDiff;
 import io.ebeaninternal.dbmigration.model.PlatformDdlWriter;
@@ -104,6 +107,8 @@ public class DefaultDbMigration implements DbMigration {
   protected String version;
   protected String name;
   protected String generatePendingDrop;
+  private boolean addForeignKeySkipCheck;
+  private int lockTimeoutSeconds;
 
   protected boolean includeBuiltInPartitioning = true;
 
@@ -176,6 +181,16 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public void setAddForeignKeySkipCheck(boolean addForeignKeySkipCheck) {
+    this.addForeignKeySkipCheck = addForeignKeySkipCheck;
+  }
+
+  @Override
+  public void setLockTimeout(int seconds) {
+    this.lockTimeoutSeconds = seconds;
   }
 
   @Override
@@ -563,7 +578,8 @@ public class DefaultDbMigration implements DbMigration {
       } else if (databasePlatform != null) {
         // writer needs the current model to provide table/column details for
         // history ddl generation (triggers, history tables etc)
-        DdlWrite write = new DdlWrite(new MConfiguration(), request.current);
+        DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
+        DdlWrite write = new DdlWrite(new MConfiguration(), request.current, options);
         PlatformDdlWriter writer = createDdlWriter(databasePlatform);
         writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
       }
@@ -621,8 +637,9 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
 
+    DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
-      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
+      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
@@ -630,7 +647,7 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, serverConfig, migrationConfig);
+    return new PlatformDdlWriter(platform, serverConfig, migrationConfig, lockTimeoutSeconds);
   }
 
   /**
@@ -786,6 +803,8 @@ public class DefaultDbMigration implements DbMigration {
         return new HsqldbPlatform();
       case POSTGRES:
         return new PostgresPlatform();
+      case MYSQL55:
+        return new MySql55Platform();
       case MYSQL:
         return new MySqlPlatform();
       case ORACLE:
@@ -804,6 +823,8 @@ public class DefaultDbMigration implements DbMigration {
         return new SQLitePlatform();
       case HANA:
         return new HanaPlatform();
+      case NUODB:
+        return new NuoDbPlatform();
       case COCKROACH:
         return new CockroachPlatform();
       case CLICKHOUSE:

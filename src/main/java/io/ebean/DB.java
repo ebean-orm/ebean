@@ -1237,4 +1237,18 @@ public class DB {
     return getDefault().json();
   }
 
+  /**
+   * Truncate the base tables for the given bean types.
+   */
+  public static void truncate(Class<?>... types) {
+    getDefault().truncate(types);
+  }
+
+  /**
+   * Truncate the given tables.
+   */
+  public static void truncate(String... tables) {
+    getDefault().truncate(tables);
+  }
+
 }

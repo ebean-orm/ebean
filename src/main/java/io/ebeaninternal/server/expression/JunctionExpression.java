@@ -327,7 +327,17 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> where(String expressions, Object... params) {
+    throw new IllegalStateException("where not allowed on Junction expression list");
+  }
+
+  @Override
   public ExpressionList<T> filterMany(String prop) {
+    throw new IllegalStateException("filterMany not allowed on Junction expression list");
+  }
+
+  @Override
+  public Query<T> filterMany(String manyProperty, String expressions, Object... params) {
     throw new IllegalStateException("filterMany not allowed on Junction expression list");
   }
 

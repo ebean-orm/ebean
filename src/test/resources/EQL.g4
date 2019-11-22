@@ -123,12 +123,17 @@ any_expression
    | inrange_expression
    | between_expression
    | propertyBetween_expression
+   | inOrEmpty_expression
    | in_expression
    | isNull_expression
    | isNotNull_expression
    | isEmpty_expression
    | isNotEmpty_expression
    | '(' any_expression ')'
+   ;
+
+inOrEmpty_expression
+   : PATH_VARIABLE 'inOrEmpty' in_value
    ;
 
 in_expression
@@ -145,7 +150,11 @@ between_expression
    ;
 
 inrange_expression
-   : PATH_VARIABLE 'inrange' value_expression 'to' value_expression
+   : PATH_VARIABLE inrange_op value_expression 'to' value_expression
+   ;
+
+inrange_op
+   : 'inrange' | 'inRange'
    ;
 
 propertyBetween_expression
@@ -199,6 +208,7 @@ comparison_operator
    | '<>' | '!=' | 'ne'
    | 'ieq'
    | 'ine'
+   | 'eqOrNull' | 'gtOrNull' | 'ltOrNull'
    ;
 
 value_expression
@@ -215,6 +225,7 @@ literal
 
 INPUT_VARIABLE
    : ':' ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
+   | '?' ('0' .. '9')*
    ;
 
 PATH_VARIABLE

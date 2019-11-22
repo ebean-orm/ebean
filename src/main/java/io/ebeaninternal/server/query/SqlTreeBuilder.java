@@ -35,8 +35,6 @@ public final class SqlTreeBuilder {
 
   private final OrmQueryDetail queryDetail;
 
-  private final StringBuilder summary = new StringBuilder();
-
   private final CQueryPredicates predicates;
 
   private final boolean subQuery;
@@ -75,7 +73,7 @@ public final class SqlTreeBuilder {
   /**
    * Construct for RawSql query.
    */
-  public SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
+  SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
 
     this.rawSql = true;
     this.desc = request.getBeanDescriptor();
@@ -98,7 +96,7 @@ public final class SqlTreeBuilder {
    * support the where and/or order by clause. If so these extra joins are added
    * to the root node.
    */
-  public SqlTreeBuilder(CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
+  SqlTreeBuilder(CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -126,8 +124,6 @@ public final class SqlTreeBuilder {
    */
   public SqlTree build() {
 
-    summary.append(desc.getName());
-
     // build the appropriate chain of SelectAdapter's
     buildRoot(desc);
 
@@ -148,9 +144,7 @@ public final class SqlTreeBuilder {
     }
 
     boolean includeJoins = alias != null && alias.isIncludeJoins();
-
-    return new SqlTree(summary.toString(), rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps,
-      manyProperty, queryDetail.getFetchPaths(), includeJoins);
+    return new SqlTree(rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps, manyProperty, includeJoins);
   }
 
   private String buildSelectClause() {
@@ -254,10 +248,14 @@ public final class SqlTreeBuilder {
 
     List<SqlTreeNode> myJoinList = new ArrayList<>();
 
+    List<STreePropertyAssocOne> extraProps = new ArrayList<>();
     for (STreePropertyAssocOne one : desc.propsOne()) {
       String propPrefix = SplitName.add(prefix, one.getName());
       if (isIncludeBean(propPrefix)) {
         selectIncludes.add(propPrefix);
+        if (!one.hasForeignKey()) {
+          extraProps.add(one);
+        }
         buildSelectChain(propPrefix, one, one.target(), myJoinList);
       }
     }
@@ -273,15 +271,13 @@ public final class SqlTreeBuilder {
     OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
     SqlTreeProperties props = getBaseSelect(desc, queryProps);
 
-    if (prefix != null) {
-      // check for aggregation on a fetch
-      props.checkAggregation();
-    } else if (!rawSql) {
+    if (prefix == null && !rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
         sqlDistinct = true;
       }
       addManyWhereJoins(myJoinList);
     }
+    extraProps.forEach(props::add);
 
     SqlTreeNode selectNode = buildNode(prefix, prop, desc, myJoinList, props);
     if (joinList != null) {
@@ -304,6 +300,12 @@ public final class SqlTreeBuilder {
       STreePropertyAssoc beanProperty = (STreePropertyAssoc) desc.findPropertyFromPath(joinProp.getProperty());
       SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp.getProperty(), beanProperty, joinProp.getSqlJoinType());
       myJoinList.add(nodeJoin);
+    }
+    if (manyWhereJoins.isFormulaWithJoin()) {
+      for (String property : manyWhereJoins.getFormulaJoinProperties()) {
+        STreeProperty beanProperty = desc.findPropertyFromPath(property);
+        myJoinList.add(new SqlTreeNodeFormulaWhereJoin(beanProperty, SqlJoinType.OUTER));
+      }
     }
   }
 
@@ -470,8 +472,6 @@ public final class SqlTreeBuilder {
   private SqlTreeProperties getBaseSelectPartial(STreeType desc, OrmQueryProperties queryProps) {
 
     SqlTreeProperties selectProps = new SqlTreeProperties();
-    selectProps.setReadOnly(queryProps.isReadOnly());
-
     // add properties in the order in which they appear
     // in the query. Gives predictable sql/properties for
     // use with SqlSelect type queries.
@@ -479,9 +479,21 @@ public final class SqlTreeBuilder {
     // Also note that this can include transient properties.
     // This makes sense for transient properties used to
     // hold sum() count() type values (with SqlSelect)
-    for (String propName : queryProps.getSelectProperties()) {
+    final Set<String> selectInclude = queryProps.getSelectInclude();
+    for (String propName : selectInclude) {
       if (!propName.isEmpty()) {
         addProperty(selectProps, desc, queryProps, propName);
+      }
+    }
+
+    if (!selectProps.isAggregationManyToOne()) {
+      final Set<String> selectQueryJoin = queryProps.getSelectQueryJoin();
+      if (selectQueryJoin != null) {
+        for (String joinProperty : selectQueryJoin) {
+          if (!selectInclude.contains(joinProperty)) {
+            addProperty(selectProps, desc, queryProps, joinProperty);
+          }
+        }
       }
     }
 
@@ -544,7 +556,6 @@ public final class SqlTreeBuilder {
       }
 
       manyProperty = manyProp;
-      summary.append(" +many:").append(propName);
       return true;
     }
     return false;
@@ -562,7 +573,6 @@ public final class SqlTreeBuilder {
 
     if (queryDetail.includesPath(prefix)) {
       // explicitly included
-      summary.append(", ").append(prefix);
       String[] splitNames = SplitName.split(prefix);
       queryDetail.includeBeanJoin(splitNames[0], splitNames[1]);
       return true;
@@ -710,7 +720,7 @@ public final class SqlTreeBuilder {
           extras.add(predProp);
         }
       }
-      return extras.toArray(new String[extras.size()]);
+      return extras.toArray(new String[0]);
     }
 
   }

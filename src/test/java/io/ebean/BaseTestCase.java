@@ -2,18 +2,23 @@ package io.ebean;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
+import io.ebean.config.dbplatform.IdType;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.HelpCreateQueryRequest;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
-import org.avaje.agentloader.AgentLoader;
+import io.ebeaninternal.server.transaction.TransactionScopeManager;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +29,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 @RunWith(ConditionalTestRunner.class)
 public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
+
+  @Rule public TestName name = new TestName();
+
+  @After
+  public void checkForLeak() {
+    TransactionScopeManager scope = spiEbeanServer().getTransactionManager().scope();
+    SpiTransaction trans = scope.getInScope();
+    if (trans != null) {
+      String msg = getClass().getSimpleName() + "." + name.getMethodName() + " did not clear threadScope:" + trans;
+      scope.clearExternal(); // clear for next test
+      fail(msg);
+    }
+  }
+
 
   /**
    * this is the clock delta that may occur between testing machine and db server.
@@ -46,10 +66,6 @@ public abstract class BaseTestCase {
       DB_CLOCK_DELTA = Integer.parseInt(s);
     } else {
       DB_CLOCK_DELTA = 100;
-    }
-    logger.debug("... preStart");
-    if (!AgentLoader.loadAgentByMainClass("io.ebean.enhance.Transformer", "debug=1")) {
-      logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }
     try {
       // First try, if we get the default server. If this fails, all tests will fail.
@@ -78,6 +94,10 @@ public abstract class BaseTestCase {
     return timedMetrics.stream()
       .filter((it) -> it.getMetricType() == MetricType.SQL)
       .collect(Collectors.toList());
+  }
+
+  protected SpiTransaction getInScopeTransaction() {
+    return spiEbeanServer().getTransactionManager().scope().getInScope();
   }
 
   /**
@@ -135,7 +155,7 @@ public abstract class BaseTestCase {
    * so tests that do this need to be skipped for SQL Server.
    */
   public boolean isSqlServer() {
-    return Platform.SQLSERVER17 == platform();
+    return Platform.SQLSERVER == platform().base();
   }
 
   public boolean isH2() {
@@ -150,6 +170,10 @@ public abstract class BaseTestCase {
     return Platform.ORACLE == platform();
   }
 
+  public boolean isNuoDb() {
+    return Platform.NUODB == platform();
+  }
+
   public boolean isDb2() {
     return Platform.DB2 == platform();
   }
@@ -159,7 +183,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isMySql() {
-    return Platform.MYSQL == platform();
+    return Platform.MYSQL == platform().base();
   }
 
   public boolean isHana() {
@@ -195,6 +219,10 @@ public abstract class BaseTestCase {
 
   protected Platform platform() {
     return spiEbeanServer().getDatabasePlatform().getPlatform();
+  }
+
+  protected IdType idType() {
+    return spiEbeanServer().getDatabasePlatform().getDbIdentity().getIdType();
   }
 
   protected SpiEbeanServer spiEbeanServer() {

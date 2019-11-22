@@ -10,13 +10,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
@@ -34,10 +29,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
    */
   private TransactionManager transactionManager;
 
-  /**
-   * The EbeanServer name.
-   */
-  private String serverName;
+  private TransactionScopeManager scope;
 
   /**
    * Instantiates a new spring aware transaction scope manager.
@@ -55,7 +47,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     // the public API and hence the Object type and casting here
 
     this.transactionManager = (TransactionManager) txnMgr;
-    this.serverName = transactionManager.getServerName();
+    this.scope = transactionManager.scope();
   }
 
   /**
@@ -102,7 +94,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     }
 
     // check current Ebean transaction
-    SpiTransaction currentEbeanTransaction = DefaultTransactionThreadLocal.get(serverName);
+    SpiTransaction currentEbeanTransaction = scope.getInScope();
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
       String msg = "JTA Transaction - no current txn BUT using current Ebean one " + currentEbeanTransaction.getId();
@@ -132,7 +124,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     syncRegistry.registerInterposedSynchronization(txnListener);
 
     // also put in Ebean ThreadLocal
-    DefaultTransactionThreadLocal.set(serverName, newTrans);
+    scope.set(newTrans);
     return newTrans;
   }
 
@@ -152,29 +144,28 @@ public class JtaTransactionManager implements ExternalTransactionManager {
   private static class DummyUserTransaction implements UserTransaction {
 
     @Override
-    public void begin() throws NotSupportedException, SystemException {
+    public void begin() {
     }
 
     @Override
-    public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
-      SecurityException, IllegalStateException, SystemException {
+    public void commit() throws SecurityException, IllegalStateException {
     }
 
     @Override
-    public int getStatus() throws SystemException {
+    public int getStatus() {
       return 0;
     }
 
     @Override
-    public void rollback() throws IllegalStateException, SecurityException, SystemException {
+    public void rollback() throws IllegalStateException, SecurityException {
     }
 
     @Override
-    public void setRollbackOnly() throws IllegalStateException, SystemException {
+    public void setRollbackOnly() throws IllegalStateException {
     }
 
     @Override
-    public void setTransactionTimeout(int seconds) throws SystemException {
+    public void setTransactionTimeout(int seconds) {
     }
   }
 
@@ -192,12 +183,9 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
     private final SpiTransaction transaction;
 
-    private final String serverName;
-
     private JtaTxnListener(TransactionManager transactionManager, SpiTransaction t) {
       this.transactionManager = transactionManager;
       this.transaction = t;
-      this.serverName = transactionManager.getServerName();
     }
 
     @Override
@@ -216,7 +204,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
           }
           transactionManager.notifyOfCommit(transaction);
           // Remove this transaction object as it is completed
-          DefaultTransactionThreadLocal.replace(serverName, null);
+          transactionManager.scope().clearExternal();
           break;
 
         case Status.STATUS_ROLLEDBACK:
@@ -225,7 +213,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
           }
           transactionManager.notifyOfRollback(transaction, null);
           // Remove this transaction object as it is completed
-          DefaultTransactionThreadLocal.replace(serverName, null);
+          transactionManager.scope().clearExternal();
           break;
 
         default:

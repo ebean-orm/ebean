@@ -349,7 +349,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getHstoreScalarType() {
+  public ScalarType<?> getDbMapScalarType() {
     return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR);
   }
 

@@ -17,7 +17,7 @@ public class MultiValueBind {
     void bind(Object value) throws SQLException;
   }
 
-  protected Object[] toArray(Collection<?> values, ScalarType<?> type) {
+  Object[] toArray(Collection<?> values, ScalarType<?> type) {
     Object[] array = new Object[values.size()];
     int i = 0;
     for (Object value : values) {

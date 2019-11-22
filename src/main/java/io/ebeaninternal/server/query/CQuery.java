@@ -183,7 +183,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Flag set when read auditing.
    */
-  private boolean audit;
+  private final boolean audit;
 
   /**
    * Flag set when findIterate is being read audited meaning we log in batches.
@@ -198,6 +198,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Create the Sql select based on the request.
    */
+  @SuppressWarnings("unchecked")
   public CQuery(OrmQueryRequest<T> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
     this.audit = request.isAuditReads();
@@ -520,7 +521,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return result;
   }
 
-  protected EntityBean next() {
+  EntityBean next() {
     if (audit) {
       auditNextBean();
     }
@@ -531,7 +532,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return nextBean;
   }
 
-  protected boolean hasNext() throws SQLException {
+  boolean hasNext() throws SQLException {
 
     synchronized (this) {
       if (noMoreRows || cancelled) {
@@ -569,13 +570,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   BeanCollection<T> readCollection() throws SQLException {
-
     while (hasNext()) {
-      EntityBean bean = next();
-      help.add(collection, bean, false);
+      help.add(collection, next(), false);
     }
-
     updateExecutionStatistics();
     return collection;
   }
@@ -583,7 +582,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Update execution stats and check for slow query.
    */
-  void updateExecutionStatistics() {
+  private void updateExecutionStatistics() {
     updateStatistics();
     request.slowQueryCheck(executionTimeMicros, rowCount);
   }

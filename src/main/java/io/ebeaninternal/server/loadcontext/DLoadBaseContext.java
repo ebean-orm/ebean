@@ -10,7 +10,7 @@ import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 /**
  * Base class for Bean and BeanCollection loading (lazy loading and query join loading).
  */
-public abstract class DLoadBaseContext {
+abstract class DLoadBaseContext {
 
   protected final DLoadContext parent;
 
@@ -18,22 +18,21 @@ public abstract class DLoadBaseContext {
 
   protected final String fullPath;
 
-  protected final OrmQueryProperties queryProps;
-
-  protected final boolean hitCache;
-
   protected final String serverName;
 
-  protected final int firstBatchSize;
+  final OrmQueryProperties queryProps;
 
-  protected final int secondaryBatchSize;
+  final boolean hitCache;
 
-  protected final ObjectGraphNode objectGraphNode;
+  final int firstBatchSize;
 
-  protected final boolean queryFetch;
+  final int secondaryBatchSize;
 
+  final ObjectGraphNode objectGraphNode;
 
-  public DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
+  final boolean queryFetch;
+
+  DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
 
     this.parent = parent;
     this.serverName = parent.getEbeanServer().getName();
@@ -86,13 +85,11 @@ public abstract class DLoadBaseContext {
 
     String label = parent.getPlanLabel();
     if (label != null) {
-      label += "_" + fullPath;
-      query.setLabel(label);
-      query.setProfileLocation(parent.getProfileLocation());
+      query.setProfilePath(label, fullPath, parent.getProfileLocation());
     }
   }
 
-  protected PersistenceContext getPersistenceContext() {
+  PersistenceContext getPersistenceContext() {
     return parent.getPersistenceContext();
   }
 

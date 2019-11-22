@@ -52,7 +52,7 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
     }
   }
 
-  protected String getArrayType(int dbType) {
+  String getArrayType(int dbType) {
     switch(dbType) {
       case TINYINT:
       case SMALLINT:

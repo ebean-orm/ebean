@@ -27,7 +27,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -53,7 +52,7 @@ public class CQueryPlan {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
 
-  public static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
+  static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
 
@@ -89,7 +88,7 @@ public class CQueryPlan {
 
   private final Class<?> beanType;
 
-  protected final DataTimeZone dataTimeZone;
+  final DataTimeZone dataTimeZone;
 
   private final int asOfTableCount;
 
@@ -133,7 +132,7 @@ public class CQueryPlan {
   /**
    * Create a query plan for a raw sql query.
    */
-  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rowNumberIncluded, String logWhereSql) {
 
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
@@ -143,18 +142,18 @@ public class CQueryPlan {
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType());
     this.location = location();
-    this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
+    this.planKey = buildPlanKey(sql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.asOfTableCount = 0;
     this.sql = sql;
     this.sqlHash = md5Hash(sql);
     this.sqlTree = sqlTree;
-    this.rawSql = rawSql;
+    this.rawSql = false;
     this.rowNumberIncluded = rowNumberIncluded;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
-    this.dependentTables = (rawSql) ? Collections.emptySet() : sqlTree.dependentTables();
+    this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
   }
 
@@ -180,9 +179,8 @@ public class CQueryPlan {
     return (profileLocation == null) ? "" : profileLocation.shortDescription();
   }
 
-  private CQueryPlanKey buildPlanKey(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
-
-    return new RawSqlQueryPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
+  private CQueryPlanKey buildPlanKey(String sql, boolean rowNumberIncluded, String logWhereSql) {
+    return new RawSqlQueryPlanKey(sql, false, rowNumberIncluded, logWhereSql);
   }
 
   @Override
@@ -249,10 +247,6 @@ public class CQueryPlan {
     return autoTuned;
   }
 
-  CQueryPlanKey getPlanKey() {
-    return planKey;
-  }
-
   /**
    * Return a key used in audit logging to identify the query.
    */
@@ -281,7 +275,7 @@ public class CQueryPlan {
     }
   }
 
-  public String getSqlHash() {
+  String getSqlHash() {
     return sqlHash;
   }
 
@@ -351,7 +345,7 @@ public class CQueryPlan {
     return stats.isEmpty();
   }
 
-  public TimedMetric createTimedMetric() {
+  TimedMetric createTimedMetric() {
     return MetricFactory.get().createTimedMetric(MetricType.ORM, label);
   }
 

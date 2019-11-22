@@ -9,14 +9,15 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.38.2-SNAPSHOT</version>
+  <version>11.45.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
   <url>http://ebean-orm.github.io/</url>
 
   <properties>
-    <jackson-core.version>2.9.8</jackson-core.version>
+    <jackson-core.version>2.9.9</jackson-core.version>
+    <jackson-databind.version>2.9.9.2</jackson-databind.version>
     <snakeyaml.version>1.21</snakeyaml.version>
   </properties>
 
@@ -117,7 +118,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>4.10</version>
+      <version>5.1</version>
     </dependency>
 
     <dependency>
@@ -129,7 +130,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
-      <version>4.5.2</version>
+      <version>4.6.1</version>
     </dependency>
 
     <dependency>
@@ -141,7 +142,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>11.15.1</version>
+      <version>11.20.1</version>
     </dependency>
 
     <dependency>
@@ -161,7 +162,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson-core.version}</version>
+      <version>${jackson-databind.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -219,6 +220,13 @@
 
     <!-- Test scope -->
 
+    <dependency>
+      <groupId>com.nuodb.jdbc</groupId>
+      <artifactId>nuodb-jdbc</artifactId>
+      <version>20.2.0</version>
+      <scope>test</scope>
+    </dependency>
+
     <!--<dependency>-->
     <!--<groupId>oracle</groupId>-->
     <!--<artifactId>oracle-jdbc</artifactId>-->
@@ -229,7 +237,7 @@
     <dependency>
       <groupId>io.ebean.test</groupId>
       <artifactId>ebean-test-docker</artifactId>
-      <version>2.5.1</version>
+      <version>2.10.3</version>
       <scope>test</scope>
     </dependency>
 
@@ -237,20 +245,6 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-agentloader</artifactId>
-      <version>3.0.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-agent</artifactId>
-      <version>11.38.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -287,8 +281,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <!-- Do not upgrade to 6.0.6: https://bugs.mysql.com/bug.php?id=82896 -->
-      <version>5.1.43</version>
+      <version>8.0.17</version>
       <scope>test</scope>
     </dependency>
 
@@ -296,6 +289,13 @@
       <groupId>com.sap.cloud.db.jdbc</groupId>
       <artifactId>ngdbc</artifactId>
       <version>2.3.48</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -330,7 +330,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.38.1</version>
+        <version>11.45.1</version>
         <executions>
           <execution>
             <id>test</id>
@@ -393,7 +393,7 @@
           <overview>src/main/java/io/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
-          <excludePackageNames>io.ebeaninternal.*:io.ebeanservice:io.ebean.common:io.ebean.bean:io.ebean.service:io.ebean.metric:io.ebean.util:io.ebean.config.properties:io.ebean.config.dbplatform*</excludePackageNames>
+          <excludePackageNames>io.ebeaninternal.*:io.ebeanservice:io.ebean.common:io.ebean.bean:io.ebean.service:io.ebean.metric:io.ebean.util:io.ebean.config.properties:io.ebean.config.dbplatform</excludePackageNames>
           <docletArtifact>
             <groupId>org.avaje</groupId>
             <artifactId>pygments-doclet</artifactId>

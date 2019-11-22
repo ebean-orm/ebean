@@ -16,6 +16,7 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.grammer.EqlParser;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -149,6 +150,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression bitwiseAnd(String propertyName, long flags, long match) {
     return new BitwiseExpression(propertyName, BitwiseOp.AND, flags, "=", match);
+  }
+
+  @Override
+  public <T> void where(ExpressionList<T> list, String expressions, Object[] params) {
+    EqlParser.parseWhere(expressions, list, this, params);
   }
 
   /**

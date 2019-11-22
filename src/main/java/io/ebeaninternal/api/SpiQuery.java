@@ -7,7 +7,7 @@ import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.readaudit.ReadEvent;
@@ -106,9 +106,9 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
      */
     UPDATE(FIND_UPDATE, "update", true);
 
-    private boolean update;
-    private String profileEventId;
-    private String label;
+    private final boolean update;
+    private final String profileEventId;
+    private final String label;
 
     Type(String profileEventId, String label) {
       this(profileEventId, label, false);
@@ -288,6 +288,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * invoking a lazy load was included in the query.
    */
   boolean selectAllForLazyLoadProperty();
+
+  /**
+   * Set the on a secondary query given the label, relativePath and profile location of the parent query.
+   */
+  void setProfilePath(String label, String relativePath, ProfileLocation profileLocation);
 
   /**
    * Set the query mode.
@@ -558,7 +563,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * because the queryPlanHash is used to identify the query point.
    * </p>
    */
-  ObjectGraphNode setOrigin(CallStack callStack);
+  ObjectGraphNode setOrigin(CallOrigin callOrigin);
 
   /**
    * Set the profile point of the bean or collection that is lazy loading.

@@ -85,7 +85,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private DocStoreMode docStoreMode;
 
-  private ConcurrencyMode concurrencyMode;
+  private final ConcurrencyMode concurrencyMode;
 
   /**
    * The unique id used for logging summary.
@@ -223,6 +223,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.setDraftDirty(entityBean, true);
     }
     this.dirty = intercept.isDirty();
+  }
+
+  /**
+   * Init generated properties for soft delete (as it's an update).
+   */
+  public void initForSoftDelete() {
     initGeneratedProperties();
   }
 
@@ -1320,10 +1326,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public void docStorePersist() {
     idValue = beanDescriptor.getId(entityBean);
-    switch (type) {
-      case UPDATE:
-        dirtyProperties = intercept.getDirtyProperties();
-        break;
+    if (type == Type.UPDATE) {
+      dirtyProperties = intercept.getDirtyProperties();
     }
     // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
     docStoreMode = DocStoreMode.IGNORE;
@@ -1370,6 +1374,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the request flags indicating this is an insert.
    */
   public void flagInsert() {
+    initGeneratedProperties();
     if (intercept.isNew()) {
       flags = Flags.setInsertNormal(flags);
     } else {
@@ -1381,6 +1386,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Unset the request insert flag indicating this is an update.
    */
   public void flagUpdate() {
+    initGeneratedProperties();
     if (intercept.isLoaded()) {
       flags = Flags.setUpdateNormal(flags);
     } else {

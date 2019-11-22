@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.grammer;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
@@ -13,7 +14,10 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +37,63 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+  }
+
+  @Test
+  public void where_eqOrNull_bindVal() {
+    Query<Customer> query = parse("where name eqOrNull 'Rob'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+  }
+
+  @Test
+  public void where_eqOrNull_bindNamed() {
+    Query<Customer> query = parse("where name eqOrNull :name");
+    query.setParameter("name", "Rob");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+  }
+
+  @Test
+  public void where_eqOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name eqOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_eqOrNull_bindPositioned_asNull() {
+
+    final Query<Customer> query = where("name eqOrNull ?", (String)null);
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("(t0.name is null or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_gtOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name gtOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.name > ? or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_ltOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name ltOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.name < ? or t0.name is null)");
+    }
   }
 
   @Test
@@ -273,6 +334,62 @@ public class EqlParserTest extends BaseTestCase {
     query.findList();
 
     platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  @Test
+  public void where_inOrEmpty_withVals() {
+
+    final Query<Customer> query = where("name inOrEmpty ?", Arrays.asList("Baz", "Maz", "Jim"));
+    query.findList();
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  @Test
+  public void where_inOrEmpty_withValsAsSet() {
+
+    final Query<Customer> query = where("name inOrEmpty ?", new HashSet<>(Arrays.asList("Baz", "Maz", "Jim")));
+    query.findList();
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  @Test
+  public void where_inOrEmpty_withEmpty() {
+
+    final Query<Customer> query = where("name inOrEmpty ?", new ArrayList());
+    query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain("where");
+  }
+
+  @Test
+  public void where_inOrEmpty_withNull() {
+
+    List<String> names = null;
+    final Query<Customer> query = where("name inOrEmpty ?", names);
+    query.findList();
+    assertThat(query.getGeneratedSql()).doesNotContain("where");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void query_inOrEmpty_withVals() {
+
+    Query<Customer> query = parse("where name inOrEmpty (:names)");
+    query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
+    query.findList();
+
+    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+  }
+
+  /**
+   * This test fails in that we can't use inOrEmpty with named parameters.
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void query_inOrEmpty_withNamedParams_expect_IllegalArgument() {
+
+    Query<Customer> query = parse("where name inOrEmpty (:names)");
+    query.setParameter("names", new ArrayList<>());
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain("where");
   }
 
   @Test
@@ -675,9 +792,86 @@ public class EqlParserTest extends BaseTestCase {
 
   private Query<Customer> parse(String raw) {
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     EqlParser.parse(raw, (SpiQuery<?>) query);
     return query;
   }
 
+  @Test
+  public void where_simple() {
+
+    final Query<Customer> query = where("name isNotNull");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 where t0.name is not null");
+    }
+  }
+
+  @Test
+  public void where_withParams() {
+
+    final Query<Customer> query = where("id isNotNull and name = ? and smallnote istartsWith ?", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.id is not null and t0.name = ? and lower(t0.smallnote) like ? escape'|' )");
+    }
+  }
+
+  @Test
+  public void where_withParamsQuPos() {
+
+    final Query<Customer> query = where("name = ?1 and smallnote istartsWith ?2 and name like ?1", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" where (t0.name = ? and lower(t0.smallnote) like ? escape'|'  and t0.name like ? escape'' )");
+    }
+  }
+
+  @Test
+  public void where_orSimple() {
+
+    final Query<Customer> query = where("id isNotNull or name = ?", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.id is not null or t0.name = ?)");
+    }
+  }
+
+  @Test
+  public void where_orWithParams() {
+
+    final Query<Customer> query = where("(id isNotNull or name = ?) and smallnote istartsWith ?", "Rob", "Foo");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|' )");
+    }
+  }
+
+  @Test
+  public void where_dateInRange() {
+
+    final Query<Customer> query = where("anniversary inrange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
+    }
+  }
+
+  @Test
+  public void where_dateInRange_camelCase() {
+
+    final Query<Customer> query = where("anniversary inRange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
+    }
+  }
+
+  private Query<Customer> where(String where, Object... params) {
+
+    Query<Customer> query = DB.find(Customer.class);
+    EqlParser.parseWhere(where, query.where(), query.getExpressionFactory(), params);
+
+    return query;
+  }
 }

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.Model;
 import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.UnmappedJson;
@@ -199,7 +199,7 @@ public class DeployCreateProperties {
     return null;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
 
     try {
@@ -213,7 +213,7 @@ public class DeployCreateProperties {
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();
@@ -274,7 +274,7 @@ public class DeployCreateProperties {
     return (AnnotationUtil.findAnnotation(field, DbJson.class) != null)
       || (AnnotationUtil.findAnnotation(field, DbJsonB.class) != null)
       || (AnnotationUtil.findAnnotation(field, DbArray.class) != null)
-      || (AnnotationUtil.findAnnotation(field, DbHstore.class) != null)
+      || (AnnotationUtil.findAnnotation(field, DbMap.class) != null)
       || (AnnotationUtil.findAnnotation(field, UnmappedJson.class) != null);
   }
 
@@ -313,9 +313,16 @@ public class DeployCreateProperties {
 
       Type[] typeArgs = ptype.getActualTypeArguments();
       if (typeArgs.length == 1) {
-        // probably a Set or List
+        // expecting set or list
         if (typeArgs[0] instanceof Class<?>) {
           return (Class<?>) typeArgs[0];
+        }
+        if (typeArgs[0] instanceof WildcardType) {
+          final Type[] upperBounds = ((WildcardType) typeArgs[0]).getUpperBounds();
+          if (upperBounds.length == 1 && upperBounds[0] instanceof Class<?>) {
+            // kotlin generated wildcard type
+            return (Class<?>) upperBounds[0];
+          }
         }
         // throw new RuntimeException("Unexpected Parameterised Type? "+typeArgs[0]);
         return null;

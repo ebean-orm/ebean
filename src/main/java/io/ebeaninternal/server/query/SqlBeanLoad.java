@@ -49,13 +49,6 @@ public class SqlBeanLoad {
     return ctx;
   }
 
-  /**
-   * Increment the resultSet index 1.
-   */
-  public void loadIgnore(int increment) {
-    ctx.getDataReader().incrementPos(increment);
-  }
-
   public Object load(BeanProperty prop) {
 
     if (!rawSql && !prop.isLoadProperty(ctx.isDraftQuery())) {

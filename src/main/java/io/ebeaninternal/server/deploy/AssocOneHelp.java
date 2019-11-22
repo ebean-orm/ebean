@@ -13,9 +13,9 @@ import java.sql.SQLException;
  */
 abstract class AssocOneHelp {
 
-  protected final BeanPropertyAssocOne<?> property;
+  final BeanPropertyAssocOne<?> property;
 
-  protected final BeanDescriptor<?> target;
+  private final BeanDescriptor<?> target;
 
   private final String path;
 

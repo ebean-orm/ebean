@@ -33,11 +33,17 @@ public final class TableJoin {
    */
   private final int queryHash;
 
+  private final PropertyForeignKey foreignKey;
+
+  public TableJoin(DeployTableJoin deploy) {
+    this(deploy, null);
+  }
+
   /**
    * Create a TableJoin.
    */
-  public TableJoin(DeployTableJoin deploy) {
-
+  public TableJoin(DeployTableJoin deploy, PropertyForeignKey foreignKey) {
+    this.foreignKey = foreignKey;
     this.table = InternString.intern(deploy.getTable());
     this.type = deploy.getType();
     this.inheritInfo = deploy.getInheritInfo();
@@ -52,6 +58,7 @@ public final class TableJoin {
   }
 
   private TableJoin(TableJoin source, String overrideColumn) {
+    this.foreignKey = null;
     this.table = source.table;
     this.type = source.type;
     this.inheritInfo = source.inheritInfo;
@@ -96,14 +103,6 @@ public final class TableJoin {
     return true;
   }
 
-
-  /**
-   * Return a hash value for adding to a query plan.
-   */
-  public int queryHash() {
-    return queryHash;
-  }
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(30);
@@ -112,6 +111,13 @@ public final class TableJoin {
       sb.append(column).append(" ");
     }
     return sb.toString();
+  }
+
+  /**
+   * Return the foreign key options.
+   */
+  public PropertyForeignKey getForeignKey() {
+    return foreignKey;
   }
 
   /**
@@ -128,21 +134,13 @@ public final class TableJoin {
     return table;
   }
 
-  /**
-   * Return the type of join. LEFT JOIN etc.
-   */
-  public SqlJoinType getType() {
-    return type;
-  }
-
-  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, String predicate) {
+  public void addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, String predicate) {
     String[] names = SplitName.split(prefix);
     String a1 = ctx.getTableAlias(names[0]);
     String a2 = ctx.getTableAlias(prefix);
 
-    SqlJoinType returnJoinType = addJoin(joinType, a1, a2, ctx);
+    addJoin(joinType, a1, a2, ctx);
     ctx.append("and ").append(a2).append(predicate);
-    return returnJoinType;
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {

@@ -24,7 +24,7 @@ import io.ebean.RawSql;
 import io.ebean.Transaction;
 import io.ebean.UpdateQuery;
 import io.ebean.Version;
-import io.ebean.bean.CallStack;
+import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.bean.PersistenceContext;
@@ -78,6 +78,8 @@ import java.util.function.Predicate;
 public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
+
+  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
 
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
@@ -376,6 +378,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       return profileLocation.label();
     }
     return null;
+  }
+
+  @Override
+  public void setProfilePath(String label, String relativePath, ProfileLocation profileLocation) {
+    this.profileLocation = profileLocation;
+    this.label = ((profileLocation == null) ? label : profileLocation.label()) + "_" + relativePath;
   }
 
   @Override
@@ -1073,10 +1081,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public ObjectGraphNode setOrigin(CallStack callStack) {
+  public ObjectGraphNode setOrigin(CallOrigin callOrigin) {
 
     // create a 'origin' which links this query to the profiling information
-    ObjectGraphOrigin o = new ObjectGraphOrigin(calculateOriginQueryHash(), callStack, beanType.getName());
+    ObjectGraphOrigin o = new ObjectGraphOrigin(calculateOriginQueryHash(), callOrigin, beanType.getName());
     parentNode = new ObjectGraphNode(o, null);
     return parentNode;
   }
@@ -1405,6 +1413,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return fetch(property, null, FETCH_QUERY);
   }
 
+  public Query<T> fetchCache(String property) {
+    return fetch(property, null, FETCH_CACHE);
+  }
+
   @Override
   public Query<T> fetchLazy(String property) {
     return fetch(property, null, FETCH_LAZY);
@@ -1423,6 +1435,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> fetchQuery(String property, String columns) {
     return fetch(property, columns, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchCache(String property, String columns) {
+    return fetch(property, columns, FETCH_CACHE);
   }
 
   @Override
@@ -1718,6 +1735,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return beanDescriptor.getBeanType();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Query<T> setInheritType(Class<? extends T> type) {
     if (type == beanType) {
@@ -1894,8 +1912,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       namedParams = new HashMap<>();
     }
 
-    ONamedParam param = namedParams.computeIfAbsent(name, ONamedParam::new);
-    return param;
+    return namedParams.computeIfAbsent(name, ONamedParam::new);
   }
 
   @Override

@@ -97,6 +97,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
+    this.persistenceContext = query.getPersistenceContext();
   }
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {
@@ -113,6 +114,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       queryPlanKey = query.setDeleteByIdsPlan();
       return false;
     }
+  }
+
+  @Override
+  public boolean isPadInExpression() {
+    return beanDescriptor.isPadInExpression();
   }
 
   @Override
@@ -350,6 +356,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public void endTransIfRequired() {
     if (createdTransaction && transaction.isActive()) {
       transaction.commit();
+      if (query.getType().isUpdate()) {
+        // for implicit update/delete queries clear the thread local
+        ebeanServer.clearServerTransaction();
+      }
     }
   }
 
@@ -692,9 +702,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   public void putToQueryCache(Object result) {
-    // use transaction start where as query statement start would be better at READ_COMMITTED
-    long asOfTimestamp = transaction.getStartMillis();
-    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, asOfTimestamp));
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.getStartNanoTime()));
   }
 
   /**

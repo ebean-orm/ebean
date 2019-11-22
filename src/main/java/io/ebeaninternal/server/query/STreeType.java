@@ -23,11 +23,6 @@ public interface STreeType {
   boolean hasId();
 
   /**
-   * Return true if the type is for ElementCollection (not mapped to an entity type/class).
-   */
-  boolean isElementType();
-
-  /**
    * Return true if the type uses soft delete.
    */
   boolean isSoftDelete();

@@ -36,7 +36,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.clobDbType = Types.VARCHAR;
     this.nativeUuidType = true;
     this.columnAliasPrefix = null;
-
+    this.truncateTable = "truncate table %s cascade";
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
 
@@ -52,6 +52,7 @@ public class PostgresPlatform extends DatabasePlatform {
         .addAcquireLock("55P03")
         .addDuplicateKey("23505")
         .addDataIntegrity("23000","23502","23503","23514")
+        .addSerializableConflict("40001")
         .build();
 
     this.openQuote = "\"";

@@ -5,7 +5,7 @@ import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbDefault;
-import io.ebean.annotation.DbHstore;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.DbMigration;
@@ -202,12 +202,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbColumn(dbColumn);
     }
 
+    Id id = get(prop, Id.class);
     GeneratedValue gen = get(prop, GeneratedValue.class);
     if (gen != null) {
-      readGenValue(gen, prop);
+      readGenValue(gen, id, prop);
     }
-
-    Id id = get(prop, Id.class);
     if (id != null) {
       readIdScalar(prop);
     }
@@ -246,9 +245,9 @@ public class AnnotationFields extends AnnotationParser {
     if (comment != null) {
       prop.setDbComment(comment.value());
     }
-    DbHstore dbHstore = get(prop, DbHstore.class);
-    if (dbHstore != null) {
-      util.setDbHstore(prop, dbHstore);
+    DbMap dbMap = get(prop, DbMap.class);
+    if (dbMap != null) {
+      util.setDbMap(prop, dbMap);
     }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
@@ -496,7 +495,7 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private ScalarTypeEncryptedWrapper<?> createScalarType(DeployBeanProperty prop, ScalarType<?> st) {
 
     // Use Java Encryptor wrapping the logical scalar type
@@ -519,8 +518,13 @@ public class AnnotationFields extends AnnotationParser {
     return util.createDataEncryptSupport(table, column);
   }
 
-  private void readGenValue(GeneratedValue gen, DeployBeanProperty prop) {
-
+  private void readGenValue(GeneratedValue gen, Id id, DeployBeanProperty prop) {
+    if (id == null) {
+      if (UUID.class.equals(prop.getPropertyType())) {
+        generatedPropFactory.setUuid(prop);
+        return;
+      }
+    }
     descriptor.setIdGeneratedValue();
     String genName = gen.generator();
 

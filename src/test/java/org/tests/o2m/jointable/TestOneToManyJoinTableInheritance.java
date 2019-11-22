@@ -2,6 +2,8 @@ package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.config.dbplatform.IdType;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.o2m.jointable.inheritance.ClassA;
@@ -34,15 +36,14 @@ public class TestOneToManyJoinTableInheritance extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
 
-    boolean hasSequence = isSqlServer(); // uses sequence
     assertThat(sql).hasSize(11);
     assertThat(sql.get(0)).contains("insert into class_super ");
-    if (!hasSequence) {
+    if (idType() == IdType.IDENTITY) {
       assertThat(sql.get(1)).contains("-- bind(ClassA)");
       assertThat(sql.get(2)).contains("-- bind(ClassB)");
     }
     assertThat(sql.get(3)).contains("insert into monkey ");
-    if (!hasSequence) {
+    if (idType() == IdType.IDENTITY) {
       assertThat(sql.get(4)).contains("-- bind(Sim");
       assertThat(sql.get(5)).contains("-- bind(Tim");
       assertThat(sql.get(6)).contains("-- bind(Uim");

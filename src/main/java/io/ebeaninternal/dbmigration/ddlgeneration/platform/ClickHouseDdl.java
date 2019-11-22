@@ -4,6 +4,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 
 import java.io.IOException;
 
@@ -40,7 +41,7 @@ public class ClickHouseDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterTableAddForeignKey(WriteForeignKey request) {
+  public String alterTableAddForeignKey(DdlOptions options, WriteForeignKey request) {
     return null;
   }
 

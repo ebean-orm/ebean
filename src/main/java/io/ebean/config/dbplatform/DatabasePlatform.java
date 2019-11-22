@@ -51,6 +51,8 @@ public class DatabasePlatform {
 
   protected boolean supportsDeleteTableAlias;
 
+  protected boolean supportsSavepointId = true;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
@@ -136,6 +138,8 @@ public class DatabasePlatform {
    * The database platform name.
    */
   protected Platform platform = Platform.GENERIC;
+
+  protected String truncateTable = "truncate table %s";
 
   protected String columnAliasPrefix = "c";
 
@@ -326,6 +330,13 @@ public class DatabasePlatform {
    */
   public boolean isCaseSensitiveCollation() {
     return caseSensitiveCollation;
+  }
+
+  /**
+   * Return true if the platform supports SavepointId values.
+   */
+  public boolean isSupportsSavepointId() {
+    return supportsSavepointId;
   }
 
   /**
@@ -568,7 +579,7 @@ public class DatabasePlatform {
   /**
    * Normally not needed - overridden in CockroachPlatform.
    */
-  public boolean isDdlCommitOnCreateIndex() {
+  public boolean isDdlAutoCommit() {
     return false;
   }
 
@@ -697,6 +708,13 @@ public class DatabasePlatform {
    */
   public PersistBatch getPersistBatchOnCascade() {
     return persistBatchOnCascade;
+  }
+
+  /**
+   * Return a statement to truncate a table.
+   */
+  public String truncateStatement(String table) {
+    return String.format(truncateTable, table);
   }
 
   /**

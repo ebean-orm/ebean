@@ -38,7 +38,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       Ebean.save(parent);
 
       // nothing flushed yet
-      assertEquals(0, LoggedSqlCollector.start().size());
+      assertThat(LoggedSqlCollector.start()).isEmpty();
 
       txn.flushBatch();
 
@@ -49,14 +49,14 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       Ebean.save(parent);
 
       // nothing flushed yet
-      assertEquals(0, LoggedSqlCollector.start().size());
+      assertThat(LoggedSqlCollector.start()).isEmpty();
 
       Ebean.commitTransaction();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSqlCollector.start();
-      assertEquals(2, loggedSql2.size());
-      assertTrue(loggedSql2.get(0).contains(" update td_parent "));
+      assertThat(loggedSql2).hasSize(2);
+      assertThat(loggedSql2.get(0)).contains(" update td_parent ");
     }
   }
 

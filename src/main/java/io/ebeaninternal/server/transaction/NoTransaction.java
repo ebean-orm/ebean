@@ -46,9 +46,9 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public long getStartMillis() {
+  public long getStartNanoTime() {
     // not used
-    return System.currentTimeMillis();
+    return System.nanoTime();
   }
 
   @Override

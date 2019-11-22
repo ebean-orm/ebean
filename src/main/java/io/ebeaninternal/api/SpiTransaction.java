@@ -98,7 +98,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the start timestamp for the transaction (JVM side).
    */
-  long getStartMillis();
+  long getStartNanoTime();
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.

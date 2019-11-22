@@ -101,7 +101,7 @@ class DefaultDbSqlContext implements DbSqlContext {
       return null;
     }
 
-    return encryptedProps.toArray(new BeanProperty[encryptedProps.size()]);
+    return encryptedProps.toArray(new BeanProperty[0]);
   }
 
   @Override
@@ -227,12 +227,6 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public DefaultDbSqlContext append(String s) {
-    sb.append(s);
-    return this;
-  }
-
-  @Override
-  public DefaultDbSqlContext append(char s) {
     sb.append(s);
     return this;
   }

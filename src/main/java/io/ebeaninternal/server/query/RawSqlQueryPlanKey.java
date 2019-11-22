@@ -2,6 +2,8 @@ package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.CQueryPlanKey;
 
+import java.util.Objects;
+
 /**
  * QueryPlanKey for RawSql queries.
  */
@@ -49,7 +51,7 @@ class RawSqlQueryPlanKey implements CQueryPlanKey {
     if (rawSql != that.rawSql) return false;
     if (rowNumberIncluded != that.rowNumberIncluded) return false;
     if (!sql.equals(that.sql)) return false;
-    return logWhereSql != null ? logWhereSql.equals(that.logWhereSql) : that.logWhereSql == null;
+    return Objects.equals(logWhereSql, that.logWhereSql);
   }
 
   @Override

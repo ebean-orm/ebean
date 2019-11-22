@@ -25,7 +25,7 @@ public abstract class QueryPlanLogger {
     return createPlan(plan, bind.toString(), sb.toString());
   }
 
-  protected DQueryPlanOutput createPlan(CQueryPlan plan, String bind, String planString) {
+  DQueryPlanOutput createPlan(CQueryPlan plan, String bind, String planString) {
     return new DQueryPlanOutput(plan.getBeanType(), plan.getName(), plan.getSql(), bind, planString, plan.getProfileLocation());
   }
 

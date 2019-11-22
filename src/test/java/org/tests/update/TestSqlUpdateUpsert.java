@@ -121,7 +121,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
 
     EPersonOnline found2 = Ebean.find(EPersonOnline.class, key2);
     assertThat(found2).isNotNull();
-    assertThat(found2.getId()).isEqualTo(key);
+    assertThat(found2.getId().toString()).isEqualTo(key.toString());
     assertThat(found2.getEmail()).isEqualTo("bar@one.com");
     assertThat(found2.isOnlineStatus()).isFalse();
 

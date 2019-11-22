@@ -502,6 +502,14 @@ public interface Query<T> {
   Query<T> fetchQuery(String path, String fetchProperties);
 
   /**
+   * Fetch the path and properties using L2 bean cache.
+   *
+   * @param path            The path of the beans we are fetching from L2 cache.
+   * @param fetchProperties The properties that should be loaded.
+   */
+  Query<T> fetchCache(String path, String fetchProperties);
+
+  /**
    * Fetch the path and properties lazily (via batch lazy loading).
    * <p>
    * This is the same as:
@@ -586,6 +594,11 @@ public interface Query<T> {
    * @param path the property path we wish to fetch eagerly
    */
   Query<T> fetchQuery(String path);
+
+  /**
+   * Fetch the path eagerly using L2 cache.
+   */
+  Query<T> fetchCache(String path);
 
   /**
    * Fetch the path lazily (via batch lazy loading).

@@ -13,11 +13,6 @@ import java.util.List;
 public class SqlTreeProperties {
 
   /**
-   * True if this node of the tree should have read only entity beans.
-   */
-  private boolean readOnly;
-
-  /**
    * The bean properties in order.
    */
   private final List<STreeProperty> propsList = new ArrayList<>();
@@ -28,6 +23,8 @@ public class SqlTreeProperties {
   private final LinkedHashSet<String> propNames = new LinkedHashSet<>();
 
   private boolean allProperties;
+
+  private boolean aggregationManyToOne;
 
   private boolean aggregation;
 
@@ -47,22 +44,23 @@ public class SqlTreeProperties {
   public void add(STreeProperty prop) {
     propsList.add(prop);
     propNames.add(prop.getName());
+    if (prop.isAggregation()) {
+      if (!aggregation) {
+        aggregation = true;
+        aggregationPath = prop.getElPrefix();
+      }
+      if (prop.isAggregationManyToOne()) {
+        aggregationManyToOne = true;
+      }
+    }
   }
 
   public STreeProperty[] getProps() {
-    return propsList.toArray(new STreeProperty[propsList.size()]);
+    return propsList.toArray(new STreeProperty[0]);
   }
 
   boolean isPartialObject() {
     return !allProperties;
-  }
-
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
   }
 
   void setAllProperties() {
@@ -86,6 +84,13 @@ public class SqlTreeProperties {
   }
 
   /**
+   * Return true if this is an aggregation formula on a ManyToOne.
+   */
+  boolean isAggregationManyToOne() {
+    return aggregationManyToOne;
+  }
+
+  /**
    * Return true if this contains an aggregation property.
    */
   public boolean isAggregation() {
@@ -93,32 +98,16 @@ public class SqlTreeProperties {
   }
 
   /**
-   * Check for aggregation (need for groug by clause).
-   */
-  public void checkAggregation() {
-    aggregationJoin();
-  }
-
-  /**
    * Return the property to join for aggregation.
    */
   private String aggregationJoin() {
-    if (!allProperties) {
-      for (STreeProperty beanProperty : propsList) {
-        if (beanProperty.isAggregation()) {
-          aggregation = true;
-          aggregationPath = beanProperty.getElPrefix();
-          return aggregationPath;
-        }
-      }
-    }
-    return null;
+    return aggregationPath;
   }
 
   /**
    * Return true if a top level aggregation which means the Id property must be excluded.
    */
-  public boolean isAggregationRoot() {
+  boolean isAggregationRoot() {
     return aggregation && (aggregationPath == null);
   }
 }

@@ -49,13 +49,12 @@ class PathPropertiesParser {
   private String getPath() {
     do {
       char c1 = chars[pos++];
-      switch (c1) {
-        case '(':
-          return currentWord();
-        default:
-          if (pos == 1) {
-            return "";
-          }
+      if (c1 == '(') {
+        return currentWord();
+      } else {
+        if (pos == 1) {
+          return "";
+        }
       }
     } while (pos < eof);
     throw new RuntimeException("Hit EOF while reading sectionTitle from " + startPos);

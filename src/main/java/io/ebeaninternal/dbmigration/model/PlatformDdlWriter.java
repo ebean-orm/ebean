@@ -33,10 +33,13 @@ public class PlatformDdlWriter {
 
   private final PlatformDdl platformDdl;
 
-  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, DbMigrationConfig config) {
+  private final int lockTimeoutSeconds;
+
+  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, DbMigrationConfig config, int lockTimeoutSeconds) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
     this.serverConfig = serverConfig;
     this.config = config;
+    this.lockTimeoutSeconds = lockTimeoutSeconds;
   }
 
   /**
@@ -46,6 +49,13 @@ public class PlatformDdlWriter {
 
     DdlHandler handler = handler();
     handler.generateProlog(write);
+    if (lockTimeoutSeconds > 0) {
+      String lockSql = platformDdl.setLockTimeout(lockTimeoutSeconds);
+      if (lockSql != null) {
+        write.apply().append(lockSql).endOfStatement().newLine();
+      }
+    }
+
     List<ChangeSet> changeSets = dbMigration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
       if (isApply(changeSet)) {

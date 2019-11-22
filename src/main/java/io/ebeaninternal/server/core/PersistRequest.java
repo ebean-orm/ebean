@@ -24,7 +24,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     DELETE_PERMANENT(EVT_DELETE_PERMANENT),
     UPDATESQL(EVT_UPDATESQL),
     CALLABLESQL(EVT_CALLABLESQL);
-    String profileEventId;
+    final String profileEventId;
 
     Type(String profileEventId) {
       this.profileEventId = profileEventId;

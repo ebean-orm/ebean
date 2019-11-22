@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.CountDistinctOrder;
+import io.ebean.OrderBy;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -13,7 +14,6 @@ import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebean.util.StringHelper;
-import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -42,9 +42,6 @@ import java.util.List;
  * deployment properties.
  */
 class CQueryBuilder {
-
-  private static final String DELETE = "Delete";
-  private static final String UPDATE = "Update";
 
   final String tableAliasPlaceHolder;
   final String columnAliasPrefix;
@@ -103,7 +100,6 @@ class CQueryBuilder {
    */
   <T> CQueryUpdate buildUpdateQuery(boolean deleteRequest, OrmQueryRequest<T> request) {
 
-    String type = (deleteRequest) ? DELETE : UPDATE;
     SpiQuery<T> query = request.getQuery();
     String rootTableAlias = query.getAlias();
     query.setDelete();
@@ -113,7 +109,7 @@ class CQueryBuilder {
     if (queryPlan != null) {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
-      return new CQueryUpdate(type, request, predicates, queryPlan);
+      return new CQueryUpdate(request, predicates, queryPlan);
     }
 
     predicates.prepare(true);
@@ -128,19 +124,19 @@ class CQueryBuilder {
     }
 
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, false, false, predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree, false, predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
-    return new CQueryUpdate(type, request, predicates, queryPlan);
+    return new CQueryUpdate(request, predicates, queryPlan);
   }
 
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
 
     String alias = alias(rootTableAlias);
-    if (!sqlTree.isIncludeJoins()) {
+    if (sqlTree.noJoins()) {
       if (dbPlatform.isSupportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSql("delete", request, predicates, sqlTree).getSql(), alias);
-      } else if (dbPlatform.getPlatform() == Platform.MYSQL) {
+      } else if (isMySql(dbPlatform.getPlatform())) {
         return aliasReplace(buildSql("delete " + alias, request, predicates, sqlTree).getSql(), alias);
       } else {
         // simple - delete from table ...
@@ -152,6 +148,10 @@ class CQueryBuilder {
     sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
     sql = aliasReplace(sql, alias);
     return sql;
+  }
+
+  private boolean isMySql(Platform platform) {
+    return platform.base() == Platform.MYSQL;
   }
 
   private String alias(String rootTableAlias) {
@@ -168,7 +168,7 @@ class CQueryBuilder {
     sb.append(" set ").append(predicates.getDbUpdateClause());
     String updateClause = sb.toString();
 
-    if (!sqlTree.isIncludeJoins()) {
+    if (sqlTree.noJoins()) {
       // simple - update table set ... where ...
       return aliasStrip(buildSqlUpdate(updateClause, request, predicates, sqlTree).getSql());
     }
@@ -213,7 +213,7 @@ class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates);
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
 
-    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
@@ -258,14 +258,12 @@ class CQueryBuilder {
     query.setFirstRow(0);
     query.setMaxRows(0);
 
-    ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
-
     boolean countDistinct = query.isDistinct();
+    boolean withAgg = false;
     if (!countDistinct) {
-      // minimise select clause for standard count
-      if (manyWhereJoins.isFormulaWithJoin()) {
-        query.select(manyWhereJoins.getFormulaProperties());
-      } else {
+      withAgg = includesAggregation(request, query);
+      if (!withAgg) {
+        // minimise select clause for standard count
         query.setSelectId();
       }
     }
@@ -285,14 +283,14 @@ class CQueryBuilder {
       sqlTree.addSoftDeletePredicate(query);
     }
 
-    boolean hasMany = sqlTree.hasMany();
+    boolean wrap = sqlTree.hasMany() || withAgg;
 
     String sqlSelect = null;
     if (countDistinct) {
       if (sqlTree.isSingleProperty()) {
         request.setInlineCountDistinct();
       }
-    } else if (!hasMany) {
+    } else if (!wrap) {
       sqlSelect = "select count(*)";
     }
 
@@ -303,7 +301,7 @@ class CQueryBuilder {
       if (countDistinct) {
         sql = wrapSelectCount(sql);
 
-      } else if (hasMany || query.isRawSql()) {
+      } else if (wrap || query.isRawSql()) {
         // remove order by - mssql does not accept order by in subqueries
         int pos = sql.lastIndexOf(" order by ");
         if (pos != -1) {
@@ -314,10 +312,17 @@ class CQueryBuilder {
     }
 
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(queryPlan, request, predicates);
+  }
+
+  /**
+   * Return true if the query includes an aggregation property.
+   */
+  private <T> boolean includesAggregation(OrmQueryRequest<T> request, SpiQuery<T> query) {
+    return request.getBeanDescriptor().includesAggregation(query.getDetail());
   }
 
   private String wrapSelectCount(String sql) {
@@ -452,7 +457,7 @@ class CQueryBuilder {
         }
       }
 
-      RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[propertyNames.size()]));
+      RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[0]));
       query.setRawSql(rawSql);
       return createRawSqlSqlTree(request, predicates);
 
@@ -600,7 +605,10 @@ class CQueryBuilder {
       }
       if (distinct && dbOrderBy != null && !query.isSingleAttribute()) {
         // add the orderBy columns to the select clause (due to distinct)
-        sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
+        final OrderBy<?> orderBy = query.getOrderBy();
+        if (orderBy != null && orderBy.supportsSelect()) {
+          sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
+        }
       }
     }
 
@@ -641,7 +649,7 @@ class CQueryBuilder {
     }
 
     String dbWhere = predicates.getDbWhere();
-    if (!isEmpty(dbWhere)) {
+    if (hasValue(dbWhere)) {
       if (!hasWhere) {
         hasWhere = true;
         sb.append(" where ");
@@ -652,7 +660,7 @@ class CQueryBuilder {
     }
 
     String dbFilterMany = predicates.getDbFilterMany();
-    if (!isEmpty(dbFilterMany)) {
+    if (hasValue(dbFilterMany)) {
       if (!hasWhere) {
         hasWhere = true;
         sb.append(" where ");
@@ -685,7 +693,7 @@ class CQueryBuilder {
     }
 
     String dbHaving = predicates.getDbHaving();
-    if (!isEmpty(dbHaving)) {
+    if (hasValue(dbHaving)) {
       sb.append(" having ").append(dbHaving);
     }
 
@@ -740,8 +748,8 @@ class CQueryBuilder {
     return true;
   }
 
-  private boolean isEmpty(String s) {
-    return s == null || s.isEmpty();
+  private boolean hasValue(String s) {
+    return s != null && !s.isEmpty();
   }
 
   boolean isPlatformDistinctOn() {
