@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.DbSqlContextColumn;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -39,10 +40,12 @@ class SqlTree {
 
   private final boolean noJoins;
 
+  private final DbSqlContextColumn[] columns;
+
   /**
    * Create the SqlSelectClause.
    */
-  SqlTree(SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
+  SqlTree(SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, DbSqlContextColumn[] columns, String groupBy, String inheritanceWhereSql,
           STreeProperty[] encryptedProps, STreePropertyAssocMany manyProperty, boolean includeJoins) {
 
     this.rootNode = rootNode;
@@ -54,6 +57,7 @@ class SqlTree {
     this.encryptedProps = encryptedProps;
     this.manyProperty = manyProperty;
     this.noJoins = !includeJoins;
+    this.columns = columns;
   }
 
   /**
@@ -156,5 +160,12 @@ class SqlTree {
     Set<String> tables = new LinkedHashSet<>();
     rootNode.dependentTables(tables);
     return tables;
+  }
+
+  /**
+   * Return the columns of the select clause.
+   */
+  public DbSqlContextColumn[] getColumns() {
+    return columns;
   }
 }

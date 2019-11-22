@@ -73,6 +73,11 @@ public interface DbSqlContext {
    * table alias.
    */
   void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType);
+  
+  /**
+   * Returns a list of current columns.
+   */
+  DbSqlContextColumn[] getColumns();
 
   /**
    * Return the current content length.

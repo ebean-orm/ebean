@@ -886,6 +886,16 @@ public interface Query<T> {
   boolean isCountDistinct();
 
   /**
+   * Sets the class to use for counting distinct values.
+   */
+  Query<T> setCountDistinctDto(Class<?> dtoClass);
+  
+  /**
+   * Returns the class to use for counting distinct values.
+   */
+  Class<?> getCountDistinctDto();
+
+  /**
    * Execute the query returning true if a row is found.
    * <p>
    * The query is executed using max rows of 1 and will only select the id property.

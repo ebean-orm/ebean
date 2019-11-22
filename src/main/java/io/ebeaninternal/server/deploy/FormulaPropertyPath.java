@@ -57,6 +57,7 @@ final class FormulaPropertyPath {
       parsed = parsed.replace("${}", "${" + path + "}");
     }
     this.parsedAggregation = buildFormula(parsed);
+    // FIXME: We should parse all props in a complex formula
     this.firstProp = parser.getFirstProp();
   }
 
@@ -105,37 +106,37 @@ final class FormulaPropertyPath {
   }
 
   STreeProperty build() {
-
+    // FIXME: we must parse all properties
+    final BeanProperty property = firstProp == null ? null : firstProp.getBeanProperty();
     if (cast != null) {
       ScalarType<?> scalarType = descriptor.getScalarType(cast);
       if (scalarType == null) {
         throw new IllegalStateException("Unable to find scalarType for cast of [" + cast + "] on formula [" + formula + "] for type " + descriptor);
       }
-      return create(scalarType);
+      return create(scalarType, property);
     }
     if (isCount()) {
-      return create(descriptor.getScalarType(Types.BIGINT));
+      return create(descriptor.getScalarType(Types.BIGINT), property);
     }
     if (isConcat()) {
-      return create(descriptor.getScalarType(Types.VARCHAR));
+      return create(descriptor.getScalarType(Types.VARCHAR), property);
     }
-    if (firstProp == null) {
+    if (property == null) {
       throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor + " - maybe use a cast like ::String ?");
     }
 
-    // determine scalarType based on first property found by parser
-    final BeanProperty property = firstProp.getBeanProperty();
     if (!property.isAssocId()) {
-      return create(property.getScalarType());
+      // determine scalarType based on first property found by parser
+      return create(property.getScalarType(), property);
     } else {
       return createManyToOne(property);
     }
   }
 
-  private DynamicPropertyAggregationFormula create(ScalarType<?> scalarType) {
+  private DynamicPropertyAggregationFormula create(ScalarType<?> scalarType, BeanProperty baseProp) {
 
     String logicalName = logicalName();
-    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), target(logicalName), alias);
+    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), baseProp, target(logicalName), alias);
   }
 
   private DynamicPropertyAggregationFormula createManyToOne(BeanProperty property) {

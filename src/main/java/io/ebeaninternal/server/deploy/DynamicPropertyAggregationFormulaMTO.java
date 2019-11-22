@@ -7,7 +7,7 @@ public class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyAggrega
   private final BeanPropertyAssocOne prop;
 
   DynamicPropertyAggregationFormulaMTO(BeanPropertyAssocOne prop, String name, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {
-    super(name, prop.getIdScalarType(), parsedFormula, aggregate, asTarget, alias);
+    super(name, prop.getIdScalarType(), parsedFormula, aggregate, null, asTarget, alias);
     this.prop = prop;
   }
 

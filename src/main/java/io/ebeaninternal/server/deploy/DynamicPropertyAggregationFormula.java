@@ -21,8 +21,8 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   private final String mapKey;
 
-  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {
-    super(name, name, null, scalarType);
+  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty baseProp, BeanProperty asTarget, String alias) {
+    super(name, name, null, scalarType, baseProp);
     this.parsedFormula = parsedFormula;
     this.aggregate = aggregate;
     this.asTarget = asTarget;

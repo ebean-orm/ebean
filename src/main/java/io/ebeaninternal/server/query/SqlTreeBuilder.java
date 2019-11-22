@@ -6,6 +6,7 @@ import io.ebeaninternal.api.PropertyJoin;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.deploy.DbSqlContextColumn;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
@@ -134,6 +135,7 @@ public final class SqlTreeBuilder {
     String inheritanceWhereSql = null;
     String groupBy = null;
     STreeProperty[] encryptedProps = null;
+    DbSqlContextColumn[] columns = null;
     if (!rawSql) {
       selectSql = buildSelectClause();
       fromSql = buildFromClause();
@@ -141,10 +143,11 @@ public final class SqlTreeBuilder {
       groupBy = buildGroupByClause();
       distinctOn = buildDistinctOn();
       encryptedProps = ctx.getEncryptedProps();
+      columns = ctx.getColumns();
     }
 
     boolean includeJoins = alias != null && alias.isIncludeJoins();
-    return new SqlTree(rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps, manyProperty, includeJoins);
+    return new SqlTree(rootNode, distinctOn, selectSql, fromSql, columns, groupBy, inheritanceWhereSql, encryptedProps, manyProperty, includeJoins);
   }
 
   private String buildSelectClause() {
@@ -387,11 +390,16 @@ public final class SqlTreeBuilder {
    * This means it can included individual properties of an embedded bean.
    * </p>
    */
-  private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName) {
+  private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName, String path) {
 
-    STreeProperty p = desc.findProperty(propName);
+    STreeProperty p;
+    if (desc.isDynamicPropertyName(propName)) {
+      p = desc.createDynamicProperty(propName, path);
+    } else {
+      p = desc.findProperty(propName);
+    }
     if (p == null) {
-      logger.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
+      logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
 
     } else if (p instanceof STreePropertyAssoc && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
@@ -409,7 +417,7 @@ public final class SqlTreeBuilder {
                            OrmQueryProperties queryProps, String propName) {
 
     if (subQuery) {
-      addPropertyToSubQuery(selectProps, desc, propName);
+      addPropertyToSubQuery(selectProps, desc, propName, queryProps.getPath());
       return;
     }
 
