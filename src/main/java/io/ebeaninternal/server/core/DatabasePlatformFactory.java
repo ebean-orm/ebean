@@ -63,6 +63,11 @@ public class DatabasePlatformFactory {
       if (serverConfig.getDataSourceConfig().isOffline()) {
         throw new PersistenceException("You must specify a DatabasePlatformName when you are offline");
       }
+
+      if (serverConfig.getTenantMode().isDynamicDataSource()) {
+        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "
+          + serverConfig.getTenantMode());
+      }
       // guess using meta data from driver
       return byDataSource(serverConfig.getDataSource());
 
@@ -152,6 +157,7 @@ public class DatabasePlatformFactory {
   private DatabasePlatform byDatabaseMeta(DatabaseMetaData metaData, Connection connection) throws SQLException {
 
     String dbProductName = metaData.getDatabaseProductName().toLowerCase();
+    logger.info("Detected database {} {}", dbProductName, metaData.getDatabaseProductVersion());
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
 
