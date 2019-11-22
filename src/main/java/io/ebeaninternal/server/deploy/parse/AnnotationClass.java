@@ -6,6 +6,8 @@ import io.ebean.annotation.DbPartition;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.Draftable;
 import io.ebean.annotation.DraftableElement;
+import io.ebean.annotation.EntityImplements;
+import io.ebean.annotation.EntityOverride;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
@@ -92,7 +94,7 @@ public class AnnotationClass extends AnnotationParser {
   private void setTableName() {
 
     if (descriptor.isBaseTableType()) {
-      Class<?> beanType = descriptor.getBeanType();
+      Class<?> beanType = descriptor.getBaseBeanType();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null) {
         beanType = inheritInfo.getRoot().getType();
@@ -210,6 +212,19 @@ public class AnnotationClass extends AnnotationParser {
     for (NamedQuery namedQuery : findAnnotationsRecursive(cls, NamedQuery.class)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
+
+    Set<EntityImplements> entityImplements = AnnotationUtil.findAnnotationsRecursive(cls, EntityImplements.class);
+    for (EntityImplements ann : entityImplements) {
+      for (Class<?> iface : ann.value()) {
+        descriptor.addInterface(iface);
+      }
+    }
+
+    EntityOverride entityOverride = AnnotationUtil.findAnnotation(cls, EntityOverride.class);
+    if (entityOverride != null) {
+      descriptor.setOverridePriority(entityOverride.priority());
+    }
+
   }
 
 }

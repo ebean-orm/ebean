@@ -4,7 +4,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
+import io.ebean.annotation.EntityImplements;
+
 @Entity
+@EntityImplements(IAddress.class)
 public class Address implements IAddress {
 
   @Id
