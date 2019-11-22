@@ -1,5 +1,6 @@
 package io.ebean;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -77,7 +78,18 @@ import java.util.Set;
  *
  * @param <T> the entity bean type
  */
-public interface Filter<T> {
+public interface Filter<T> extends QueryDsl<T,Filter<T>> {
+
+  /**
+   * Matcher to test if a bean will match. This holds a context internally, so that matching will happen efficient.
+   *
+   * @author Roland Praml, FOCONIS AG
+   *
+   * @param <T> the entity bean type.
+   */
+  interface Matcher<T> {
+    boolean match(T bean);
+  }
 
   /**
    * Specify a sortByClause.
@@ -92,95 +104,69 @@ public interface Filter<T> {
   Filter<T> sort(String sortByClause);
 
   /**
+   * Specify the first row to return.
+   */
+  Filter<T> firstRow(int firstRow);
+
+  /**
    * Specify the maximum number of rows/elements to return.
    */
   Filter<T> maxRows(int maxRows);
 
-  /**
-   * Equal To - property equal to the given value.
-   */
+  @Override
   Filter<T> eq(String prop, Object value);
 
-  /**
-   * Not Equal To - property not equal to the given value.
-   */
+  @Override
   Filter<T> ne(String propertyName, Object value);
 
-  /**
-   * Case Insensitive Equal To.
-   */
+  @Override
   Filter<T> ieq(String propertyName, String value);
 
-  /**
-   * Between - property between the two given values.
-   */
+  @Override
   Filter<T> between(String propertyName, Object value1, Object value2);
 
-  /**
-   * Greater Than - property greater than the given value.
-   */
+  @Override
   Filter<T> gt(String propertyName, Object value);
 
-  /**
-   * Greater Than or Equal to - property greater than or equal to the given
-   * value.
-   */
+  @Override
   Filter<T> ge(String propertyName, Object value);
 
-  /**
-   * Less Than - property less than the given value.
-   */
+  @Override
   Filter<T> lt(String propertyName, Object value);
 
-  /**
-   * Less Than or Equal to - property less than or equal to the given value.
-   */
+  @Override
   Filter<T> le(String propertyName, Object value);
 
-  /**
-   * Is Null - property is null.
-   */
+  @Override
   Filter<T> isNull(String propertyName);
 
-  /**
-   * Is Not Null - property is not null.
-   */
+  @Override
   Filter<T> isNotNull(String propertyName);
 
-  /**
-   * Starts With.
-   */
+  @Override
   Filter<T> startsWith(String propertyName, String value);
 
-  /**
-   * Case insensitive Starts With.
-   */
+  @Override
   Filter<T> istartsWith(String propertyName, String value);
 
-  /**
-   * Ends With.
-   */
+  @Override
   Filter<T> endsWith(String propertyName, String value);
 
-  /**
-   * Case insensitive Ends With.
-   */
+  @Override
   Filter<T> iendsWith(String propertyName, String value);
 
-  /**
-   * Contains - property contains the string "value".
-   */
+  @Override
   Filter<T> contains(String propertyName, String value);
 
-  /**
-   * Case insensitive Contains.
-   */
+  @Override
   Filter<T> icontains(String propertyName, String value);
 
   /**
    * In - property has a value contained in the set of values.
    */
-  Filter<T> in(String propertyName, Set<?> values);
+  default Filter<T> in(String propertyName, Set<?> values) {
+    return in(propertyName, (Collection<?>)values);
+  }
 
   /**
    * Apply the filter to the list returning a new list of the matching elements
@@ -193,4 +179,25 @@ public interface Filter<T> {
    */
   List<T> filter(List<T> sourceList);
 
+  /**
+   * returns the firstRow setting.
+   */
+  int getFirstRow();
+
+  /**
+   * retrns the maxRow setting.
+   * @return
+   */
+  int getMaxRows();
+
+  /**
+   * returns the sortByClause.
+   * @return
+   */
+  String getSort();
+
+  /**
+   * Returns a matcher.
+   */
+  Matcher<T> matcher();
 }

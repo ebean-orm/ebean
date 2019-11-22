@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebean.QueryDsl;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -80,5 +81,10 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
   public boolean isSameByBind(SpiExpression other) {
     IdExpression that = (IdExpression) other;
     return value.equals(that.value);
+  }
+
+  @Override
+  public <F extends QueryDsl<?,F>> void visitDsl(BeanDescriptor<?> desc, QueryDsl<?, F> target) {
+    target.eq(desc.getIdProperty().getName(), value);
   }
 }

@@ -409,6 +409,20 @@ public final class OrderBy<T> implements Serializable {
     }
 
     /**
+     * Returns true, if we have a "nulls first" or "nulls last" value.
+     */
+    public boolean hasNulls() {
+      return nulls != null;
+    }
+
+    /**
+     * Returns true, if we have a "nulls first" value.
+     */
+    public boolean nullsFirst() {
+      return "first".equalsIgnoreCase(highLow) || "low".equalsIgnoreCase(highLow);
+    }
+
+    /**
      * Support use in select clause if no collation or nulls ordering.
      */
     boolean supportsSelect() {
