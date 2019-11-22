@@ -22,8 +22,12 @@ public class TestWhereLikeWithSlash extends BaseTestCase {
     List<EBasic> list = query.findList();
 
     assertEquals(1, list.size());
-
-    Query<EBasic> query1 = Ebean.find(EBasic.class).where().like("name", "slash\\mon%").query();
+    Query<EBasic> query1;
+    if (isMySql()) {
+      query1 = Ebean.find(EBasic.class).where().like("name", "slash\\\\mon%").query();
+    } else {
+      query1 = Ebean.find(EBasic.class).where().like("name", "slash\\mon%").query();
+    }
     List<EBasic> list1 = query1.findList();
 
     if (!isMySql() && !isNuoDb()) {

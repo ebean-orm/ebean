@@ -193,6 +193,6 @@ public class TestQueryFilterMany extends BaseTestCase {
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains(" from o_customer t0");
     assertThat(sql.get(1)).contains("from contact t0 where ");
-    assertThat(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ? escape'|' )");
+    assertThat(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ?");
   }
 }
