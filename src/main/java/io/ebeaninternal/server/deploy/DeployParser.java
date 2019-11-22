@@ -10,45 +10,45 @@ public abstract class DeployParser {
   /**
    * used to identify sql literal.
    */
-  protected static final char SINGLE_QUOTE = '\'';
+  private static final char SINGLE_QUOTE = '\'';
 
   /**
    * used to identify query named parameters.
    */
-  protected static final char COLON = ':';
+  private static final char COLON = ':';
 
   /**
    * Used to determine when a column name terminates.
    */
-  protected static final char UNDERSCORE = '_';
+  private static final char UNDERSCORE = '_';
 
-  protected static final char OPEN_SQUARE_BRACKET = '[';
-  protected static final char CLOSE_SQUARE_BRACKET = ']';
-  protected static final char DOUBLE_QUOTE = '\"';
-  protected static final char BACK_QUOTE = '`';
+  private static final char OPEN_SQUARE_BRACKET = '[';
+  private static final char CLOSE_SQUARE_BRACKET = ']';
+  private static final char DOUBLE_QUOTE = '\"';
+  private static final char BACK_QUOTE = '`';
 
   /**
    * Used to determine when a column name terminates.
    */
-  protected static final char PERIOD = '.';
+  private static final char PERIOD = '.';
 
-  protected static final char OPEN_BRACKET = '(';
+  private static final char OPEN_BRACKET = '(';
 
-  protected boolean encrypted;
+  boolean encrypted;
 
-  protected String source;
+  private String source;
 
-  protected StringBuilder sb;
+  private StringBuilder sb;
 
-  protected int sourceLength;
+  private int sourceLength;
 
-  protected int pos;
+  private int pos;
 
-  protected String priorWord;
+  String priorWord;
 
-  protected String word;
+  String word;
 
-  protected char wordTerminator;
+  private char wordTerminator;
 
   private StringBuilder wordBuffer;
 
@@ -98,7 +98,7 @@ public abstract class DeployParser {
     return sb.toString();
   }
 
-  protected boolean skipWordConvert() {
+  boolean skipWordConvert() {
     return false;
   }
 

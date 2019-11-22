@@ -23,14 +23,14 @@ public class BeanFindControllerTest extends BaseTestCase {
   @Test
   public void test() {
 
-    System.setProperty("ebean.ignoreExtraDdl", "true");
-
     ServerConfig config = new ServerConfig();
 
     config.setName("h2otherfind");
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
+    config.setDdlExtra(false);
+
     config.setRegister(false);
     config.setDefaultServer(false);
     config.add(new ModUuidGenerator());
@@ -41,8 +41,6 @@ public class BeanFindControllerTest extends BaseTestCase {
     config.getFindControllers().add(findController);
 
     EbeanServer ebeanServer = EbeanServerFactory.create(config);
-
-    System.clearProperty("ebean.ignoreExtraDdl");
 
     assertFalse(findController.calledInterceptFind);
     ebeanServer.find(EBasic.class, 42);

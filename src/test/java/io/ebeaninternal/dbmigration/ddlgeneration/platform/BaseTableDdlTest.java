@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 
 import io.ebean.config.ServerConfig;
+import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
@@ -60,6 +61,23 @@ public class BaseTableDdlTest {
 
     String ddl = write.apply().getBuffer();
     assertThat(ddl).contains("alter table mytable add column col_name varchar2(20)");
+  }
+
+  @Test
+  public void testAddColumn_withTypeConversion_clickHouseVarchar() throws IOException {
+
+    ClickHouseTableDdl ddlGen = new ClickHouseTableDdl(serverConfig, PlatformDdlBuilder.create(new ClickHousePlatform()));
+
+    DdlWrite write = new DdlWrite();
+
+    Column column = new Column();
+    column.setName("col_name");
+    column.setType("varchar(20)");
+
+    ddlGen.alterTableAddColumn(write.apply(), "mytable", column, false, false);
+
+    String ddl = write.apply().getBuffer();
+    assertThat(ddl).contains("alter table mytable add column col_name String");
   }
 
   @Test

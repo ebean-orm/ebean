@@ -4,11 +4,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
+import javax.validation.constraints.Size;
 
 @Entity
 public class OrpDetail {
 
   @Id
+  @Size(max=100)
   String id;
 
   String detail;

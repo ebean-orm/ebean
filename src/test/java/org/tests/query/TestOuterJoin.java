@@ -151,10 +151,11 @@ public class TestOuterJoin extends BaseTestCase {
   }
 
   @Test
-  public void testOuterOnFetch() throws Exception {
+  public void testOuterOnFetch() {
+
     LoggedSql.start();
 
-    List<Order> orders1 =  Ebean.find(Order.class).findList();
+    List<Order> orders1 =  Ebean.find(Order.class).orderBy("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" join o_customer") // ensure that we do not left join the customer
@@ -165,7 +166,7 @@ public class TestOuterJoin extends BaseTestCase {
     LoggedSql.start();
 
     List<Order> orders2 =  Ebean.find(Order.class)
-        .fetch("details", "id").findList();
+        .fetch("details", "id").orderBy("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" left join o_order_detail ");

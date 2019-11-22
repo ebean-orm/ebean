@@ -50,7 +50,9 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("order by t0.id");
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id  limit 10");
+    }
   }
 
 
@@ -109,7 +111,9 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("order by t0.id");
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("join o_customer t1 on t1.id = t0.kcustomer_id  limit 10");
+    }
   }
 
   @Test
@@ -122,13 +126,16 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     Ebean.find(Order.class)
       .setFirstRow(10)
       .setMaxRows(10)
+      .orderBy("id")
       .findPagedList()
       .getList();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("order by t0.id");
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains(" limit 10 offset 10");
+    }
   }
 
 

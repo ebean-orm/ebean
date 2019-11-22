@@ -41,6 +41,13 @@ abstract class SaveManyBase {
    */
   abstract void save();
 
+  void preElementCollectionUpdate(Object parentId) {
+    if (!insertedParent) {
+      request.preElementCollectionUpdate();
+      server.execute(many.deleteByParentId(parentId, null), transaction);
+    }
+  }
+
   void resetModifyState() {
     if (value instanceof BeanCollection<?>) {
       modifyListenReset((BeanCollection<?>) value);

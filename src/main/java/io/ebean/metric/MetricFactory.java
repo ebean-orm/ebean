@@ -1,5 +1,6 @@
 package io.ebean.metric;
 
+import io.ebean.ProfileLocation;
 import io.ebean.meta.MetricType;
 
 /**
@@ -25,8 +26,13 @@ public interface MetricFactory {
   TimedMetric createTimedMetric(MetricType metricType, String name);
 
   /**
+   * Create a counter metric.
+   */
+  CountMetric createCountMetric(MetricType metricType, String name);
+
+  /**
    * Create a Timed metric.
    */
-  QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, String sql);
+  QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, ProfileLocation profileLocation, String sql);
 
 }

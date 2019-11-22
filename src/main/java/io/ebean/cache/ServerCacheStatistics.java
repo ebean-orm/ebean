@@ -21,23 +21,13 @@ public class ServerCacheStatistics {
 
   protected long missCount;
 
-  protected long insertCount;
-
-  protected long updateCount;
+  protected long putCount;
 
   protected long removeCount;
 
   protected long clearCount;
 
-  protected long evictionRunCount;
-
-  protected long evictionRunMicros;
-
-  protected long evictByIdle;
-
-  protected long evictByTTL;
-
-  protected long evictByLRU;
+  protected long evictCount;
 
   @Override
   public String toString() {
@@ -49,15 +39,10 @@ public class ServerCacheStatistics {
     sb.append(" hitRatio:").append(getHitRatio());
     sb.append(" hit:").append(hitCount);
     sb.append(" miss:").append(missCount);
-    sb.append(" insert:").append(insertCount);
-    sb.append(" update:").append(updateCount);
+    sb.append(" put:").append(putCount);
     sb.append(" remove:").append(removeCount);
     sb.append(" clear:").append(clearCount);
-    sb.append(" evictByIdle:").append(evictByIdle);
-    sb.append(" evictByTTL:").append(evictByTTL);
-    sb.append(" evictByLRU:").append(evictByLRU);
-    sb.append(" evictionRunCount:").append(evictionRunCount);
-    sb.append(" evictionRunMicros:").append(evictionRunMicros);
+    sb.append(" evict:").append(evictCount);
     return sb.toString();
   }
 
@@ -153,29 +138,15 @@ public class ServerCacheStatistics {
   /**
    * Set the put insert count.
    */
-  public void setInsertCount(long insertCount) {
-    this.insertCount = insertCount;
+  public void setPutCount(long putCount) {
+    this.putCount = putCount;
   }
 
   /**
    * Return the put insert count.
    */
-  public long getInsertCount() {
-    return insertCount;
-  }
-
-  /**
-   * Set the put update count.
-   */
-  public void setUpdateCount(long updateCount) {
-    this.updateCount = updateCount;
-  }
-
-  /**
-   * Return the put update count.
-   */
-  public long getUpdateCount() {
-    return updateCount;
+  public long getPutCount() {
+    return putCount;
   }
 
   /**
@@ -207,72 +178,17 @@ public class ServerCacheStatistics {
   }
 
   /**
-   * Set the eviction run count.
-   */
-  public void setEvictionRunCount(long evictCount) {
-    this.evictionRunCount = evictCount;
-  }
-
-  /**
-   * Return the eviction run count.
-   */
-  public long getEvictionRunCount() {
-    return evictionRunCount;
-  }
-
-  /**
-   * Set the eviction run time in micros.
-   */
-  public void setEvictionRunMicros(long evictionRunMicros) {
-    this.evictionRunMicros = evictionRunMicros;
-  }
-
-  /**
-   * Return the eviction run time in micros.
-   */
-  public long getEvictionRunMicros() {
-    return evictionRunMicros;
-  }
-
-  /**
    * Set the count of entries evicted due to idle time.
    */
-  public void setEvictByIdle(long evictByIdle) {
-    this.evictByIdle = evictByIdle;
+  public void setEvictCount(long evictCount) {
+    this.evictCount = evictCount;
   }
 
   /**
    * Return the count of entries evicted due to idle time.
    */
-  public long getEvictByIdle() {
-    return evictByIdle;
+  public long getEvictCount() {
+    return evictCount;
   }
 
-  /**
-   * Set the count of entries evicted due to time to live.
-   */
-  public void setEvictByTTL(long evictByTTL) {
-    this.evictByTTL = evictByTTL;
-  }
-
-  /**
-   * Return the count of entries evicted due to time to live.
-   */
-  public long getEvictByTTL() {
-    return evictByTTL;
-  }
-
-  /**
-   * Set the count of entries evicted due to time least recently used.
-   */
-  public void setEvictByLRU(long evictByLRU) {
-    this.evictByLRU = evictByLRU;
-  }
-
-  /**
-   * Return the count of entries evicted due to time least recently used.
-   */
-  public long getEvictByLRU() {
-    return evictByLRU;
-  }
 }

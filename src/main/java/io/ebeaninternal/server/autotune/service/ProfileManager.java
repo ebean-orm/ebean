@@ -103,8 +103,7 @@ public class ProfileManager implements ProfilingListener {
 
   private ProfileOrigin getProfileOrigin(ObjectGraphOrigin originQueryPoint) {
     synchronized (monitor) {
-      ProfileOrigin stats = profileMap.computeIfAbsent(originQueryPoint.getKey(), k -> new ProfileOrigin(originQueryPoint, queryTuningAddVersion, profilingBase, profilingRate));
-      return stats;
+      return profileMap.computeIfAbsent(originQueryPoint.getKey(), k -> new ProfileOrigin(originQueryPoint, queryTuningAddVersion, profilingBase, profilingRate));
     }
   }
 

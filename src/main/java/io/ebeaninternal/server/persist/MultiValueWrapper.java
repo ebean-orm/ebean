@@ -8,7 +8,7 @@ import java.util.Collection;
  */
 public class MultiValueWrapper {
   private final Collection<?> values;
-  private Class<?> type;
+  private final Class<?> type;
 
   public MultiValueWrapper(Collection<?> values, Class<?> type) {
     this.values = values;

@@ -23,5 +23,5 @@ public interface STreePropertyAssocOne extends STreePropertyAssoc {
   /**
    * Return the property value as an entity bean from the parent.
    */
-  public EntityBean getValueAsEntityBean(EntityBean parentBean);
+  EntityBean getValueAsEntityBean(EntityBean parentBean);
 }

@@ -18,6 +18,13 @@ alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status set null;
 alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I'));
+
+update migtest_e_basic set status2 = 'N' where status2 is null;
+alter table migtest_e_basic drop constraint ck_mgtst__b_z543fg;
+alter table migtest_e_basic alter column status2 varchar(1);
+alter table migtest_e_basic alter column status2 set default 'N';
+alter table migtest_e_basic alter column status2 set not null;
+alter table migtest_e_basic add constraint ck_mgtst__b_z543fg check ( status2 in ('N','A','I'));
 alter table migtest_e_basic drop constraint uq_mgtst__b_vs45xo;
 
 update migtest_e_basic set user_id = 23 where user_id is null;

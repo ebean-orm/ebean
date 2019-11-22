@@ -6,7 +6,10 @@ import org.junit.Test;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ScalarTypeLocalDateTimeTest {
 
@@ -28,7 +31,7 @@ public class ScalarTypeLocalDateTimeTest {
   @Test
   public void testConvertToMillis() throws Exception {
 
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().withNano(123_000_000); // jdk11 workaround
     long asMillis = type.convertToMillis(now);
     LocalDateTime fromMillis = type.convertFromMillis(asMillis);
 
@@ -74,7 +77,7 @@ public class ScalarTypeLocalDateTimeTest {
   @Test
   public void testJson() throws Exception {
 
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().withNano(123_000_000); // jdk11 workaround
 
     JsonTester<LocalDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
@@ -86,5 +89,17 @@ public class ScalarTypeLocalDateTimeTest {
     ScalarTypeLocalDateTime typeIso = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
     jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
+  }
+
+  @Test
+  public void isoJsonFormatParse() {
+
+    ScalarTypeLocalDateTime typeIso = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
+
+    LocalDateTime localDateTime = LocalDateTime.now();
+    String asJson = typeIso.toJsonISO8601(localDateTime);
+
+    LocalDateTime value = typeIso.fromJsonISO8601(asJson);
+    assertThat(localDateTime).isEqualToIgnoringNanos(value);
   }
 }

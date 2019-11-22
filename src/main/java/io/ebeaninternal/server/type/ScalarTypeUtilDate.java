@@ -6,7 +6,10 @@ import io.ebeaninternal.server.core.BasicTypeConverter;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.util.Date;
+
+import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 
 /**
  * ScalarType for java.util.Date.
@@ -26,7 +29,7 @@ public class ScalarTypeUtilDate {
 
     @Override
     protected String toJsonISO8601(Date value) {
-      return dateTimeParser.format(value);
+      return formatIso(value.toInstant());
     }
 
     @Override
@@ -70,6 +73,11 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
+    public Date convertFromInstant(Instant ts) {
+      return new java.util.Date(ts.toEpochMilli());
+    }
+
+    @Override
     public Timestamp convertToTimestamp(Date date) {
       return new Timestamp(date.getTime());
     }
@@ -82,10 +90,13 @@ public class ScalarTypeUtilDate {
 
   public static class DateType extends ScalarTypeBaseDate<java.util.Date> {
 
-    public DateType() {
-      super(Date.class, false, Types.DATE);
+    public DateType(JsonConfig.Date mode) {
+      super(mode, Date.class, false, Types.DATE);
     }
 
+    protected String toIsoFormat(java.util.Date value) {
+      return UtilDateParser.format(value);
+    }
 
     @Override
     public long convertToMillis(java.util.Date value) {

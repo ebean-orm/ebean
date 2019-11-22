@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.CacheMode;
 import io.ebean.ExpressionList;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * Helper to handle lazy loading and refreshing of beans.
  */
-public class DefaultBeanLoader {
+class DefaultBeanLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultBeanLoader.class);
 
@@ -33,63 +34,19 @@ public class DefaultBeanLoader {
 
   private final boolean onIterateUseExtraTxn;
 
-  protected DefaultBeanLoader(DefaultServer server) {
+  DefaultBeanLoader(DefaultServer server) {
     this.server = server;
     this.onIterateUseExtraTxn = server.getDatabasePlatform().useExtraTransactionOnIterateSecondaryQueries();
   }
 
-  /**
-   * Return a batch size that might be less than the requestedBatchSize.
-   * <p>
-   * This means we can have large and variable requestedBatchSizes.
-   * </p>
-   * <p>
-   * We want to restrict the number of different batch sizes as we want to
-   * re-use the query plan cache and get DB statement re-use.
-   * </p>
-   */
-  private int getBatchSize(int batchSize) {
+  void loadMany(LoadManyRequest loadRequest) {
 
-    if (batchSize == 1) {
-      // there is only one bean/collection to load
-      return 1;
-    }
-    if (batchSize <= 5) {
-      // anything less than 5 becomes 5
-      return 5;
-    }
-    if (batchSize <= 10) {
-      return 10;
-    }
-    if (batchSize <= 20) {
-      return 20;
-    }
-    if (batchSize <= 50) {
-      return 50;
-    }
-    if (batchSize <= 100) {
-      return 100;
-    }
-    return batchSize;
-  }
-
-  public void refreshMany(EntityBean parentBean, String propertyName) {
-    refreshMany(parentBean, propertyName, null);
-  }
-
-  public void loadMany(LoadManyRequest loadRequest) {
-
-    List<BeanCollection<?>> batch = loadRequest.getBatch();
-
-    int batchSize = getBatchSize(batch.size());
-
-    SpiQuery<?> query = loadRequest.createQuery(server, batchSize);
+    SpiQuery<?> query = loadRequest.createQuery(server);
     executeQuery(loadRequest, query);
-
     loadRequest.postLoad();
   }
 
-  public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
+  void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
     EntityBean parentBean = bc.getOwnerBean();
     String propertyName = bc.getPropertyName();
@@ -97,8 +54,8 @@ public class DefaultBeanLoader {
     loadManyInternal(parentBean, propertyName, null, false, onlyIds);
   }
 
-  public void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
-    loadManyInternal(parentBean, propertyName, t, true, false);
+  void refreshMany(EntityBean parentBean, String propertyName) {
+    loadManyInternal(parentBean, propertyName, null, true, false);
   }
 
   private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, boolean onlyIds) {
@@ -125,7 +82,7 @@ public class DefaultBeanLoader {
       parentDesc.contextPut(pc, parentId, parentBean);
     }
 
-    boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching();
+    boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
       Boolean readOnly = null;
       if (ebi.isReadOnly()) {
@@ -147,8 +104,7 @@ public class DefaultBeanLoader {
       query.setLoadDescription("+lazy", null);
     }
 
-    String idProperty = parentDesc.getIdBinder().getIdProperty();
-    query.select(idProperty);
+    query.select(parentDesc.getIdBinder().getIdProperty());
 
     if (onlyIds) {
       query.fetch(many.getName(), many.getTargetIdProperty());
@@ -185,16 +141,14 @@ public class DefaultBeanLoader {
   /**
    * Load a batch of beans for +query or +lazy loading.
    */
-  public void loadBean(LoadBeanRequest loadRequest) {
+  void loadBean(LoadBeanRequest loadRequest) {
 
     List<EntityBeanIntercept> batch = loadRequest.getBatch();
     if (batch.isEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
 
-    int batchSize = getBatchSize(batch.size());
-
-    List<Object> idList = loadRequest.getIdList(batchSize);
+    List<Object> idList = loadRequest.getIdList();
     if (idList.isEmpty()) {
       // everything was loaded from cache
       return;
@@ -202,6 +156,9 @@ public class DefaultBeanLoader {
 
     SpiQuery<?> query = server.createQuery(loadRequest.getBeanType());
     loadRequest.configureQuery(query, idList);
+    if (loadRequest.isLoadedFromCache()) {
+      query.setBeanCacheMode(CacheMode.PUT);
+    }
 
     List<?> list = executeQuery(loadRequest, query);
     loadRequest.postLoad(list);
@@ -228,7 +185,7 @@ public class DefaultBeanLoader {
     refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN, -1);
   }
 
-  public void loadBean(EntityBeanIntercept ebi) {
+  void loadBean(EntityBeanIntercept ebi) {
     refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
   }
 
@@ -315,6 +272,5 @@ public class DefaultBeanLoader {
     }
 
     desc.resetManyProperties(dbBean);
-
   }
 }

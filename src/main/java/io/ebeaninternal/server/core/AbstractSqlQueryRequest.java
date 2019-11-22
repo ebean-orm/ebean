@@ -8,7 +8,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiSqlBinding;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.lib.util.Str;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.util.BindParamsParser;
@@ -144,15 +144,13 @@ public abstract class AbstractSqlQueryRequest {
    * Prepare and execute the SQL using the Binder.
    */
   public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+    startNano = System.nanoTime();
     executeAsSql(binder);
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
 
-    startNano = System.nanoTime();
-
     prepareSql();
-
     Connection conn = trans.getInternalConnection();
 
     pstmt = conn.prepareStatement(sql);

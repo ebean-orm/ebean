@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
 
+import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;

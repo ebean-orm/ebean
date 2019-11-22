@@ -18,5 +18,10 @@ public enum DataErrorType {
   /**
    * Data integrity error like an invalid foreign key.
    */
-  DataIntegrity
+  DataIntegrity,
+
+  /**
+   * Non recoverable concurrency conflict.
+   */
+  SerializableConflict
 }

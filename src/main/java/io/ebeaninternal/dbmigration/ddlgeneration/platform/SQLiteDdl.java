@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 
 /**
  * DB2 platform specific DDL.
@@ -25,7 +26,7 @@ public class SQLiteDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterTableAddForeignKey(WriteForeignKey request) {
+  public String alterTableAddForeignKey(DdlOptions options, WriteForeignKey request) {
     // not supported
     return null;
   }
