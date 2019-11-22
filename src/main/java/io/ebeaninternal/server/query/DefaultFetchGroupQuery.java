@@ -9,6 +9,7 @@ import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.FetchPath;
+import io.ebean.Filter;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
