@@ -1,7 +1,14 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.BaseDdlBuffer;
+import io.ebeaninternal.dbmigration.model.MCompoundUniqueConstraint;
 import io.ebeaninternal.dbmigration.model.MConfiguration;
+import io.ebeaninternal.dbmigration.model.MIndex;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 
@@ -25,6 +32,8 @@ public class DdlWrite {
   private final DdlBuffer dropAllForeignKeys;
 
   private final DdlBuffer dropAll;
+
+  private final Set<Object> stashedIndices = new LinkedHashSet<>();
 
   private final DdlOptions options;
 
@@ -66,6 +75,35 @@ public class DdlWrite {
    */
   public MTable getTable(String tableName) {
     return currentModel.getTable(tableName);
+  }
+
+  /**
+   * Returns all indices on the given table and column.
+   * Index is only returned once!
+   */
+  public List<MIndex> findIndices(String tableName, String columnName) {
+    List<MIndex> ret = new ArrayList<>();
+    for (MIndex index : currentModel.getIndexes().values()) {
+      if (index.getTableName().equals(tableName) && index.getColumns().contains(columnName)) {
+        if (stashedIndices.add(index)) {
+          ret.add(index);
+        }
+      }
+    }
+    return ret;
+  }
+
+  public List<MCompoundUniqueConstraint> findUniqueConstraints(String tableName, String columnName) {
+    List<MCompoundUniqueConstraint> ret = new ArrayList<>();
+    for (MCompoundUniqueConstraint constraint : currentModel.getTable(tableName).getUniqueConstraints()) {
+      for (String column : constraint.getColumns()) {
+        if (column.equals(columnName) && stashedIndices.add(constraint)) {
+          ret.add(constraint);
+          break;
+        }
+      }
+    }
+    return ret;
   }
 
   /**
