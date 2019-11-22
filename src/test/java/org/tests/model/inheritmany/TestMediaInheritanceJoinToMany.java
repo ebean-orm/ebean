@@ -41,7 +41,7 @@ public class TestMediaInheritanceJoinToMany extends BaseTestCase {
     assertThat(generatedSql).contains("from mprofile t0 left join mmedia t1 on t1.id = t0.picture_id ");
     assertThat(generatedSql).doesNotContain("t1.type = 'Picture'");
 
-    assertThat(generatedSql).contains("where t0.name = ? ");
+    assertThat(generatedSql).contains("where t0.name = ?");
 
   }
 

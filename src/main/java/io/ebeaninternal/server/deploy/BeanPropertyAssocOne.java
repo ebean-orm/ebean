@@ -159,7 +159,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
-    return tableJoin.addJoin(joinType, prefix, ctx, this.formula);
+    return tableJoin.addJoin(joinType, prefix, ctx, isFormula());
   }
 
   /**
@@ -167,7 +167,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
-    return tableJoin.addJoin(joinType, a1, a2, ctx, this.formula);
+    return tableJoin.addJoin(joinType, a1, a2, ctx, isFormula());
   }
 
   /**
@@ -180,6 +180,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   /**
    * Return the property value as an entity bean.
    */
+  @Override
   public EntityBean getValueAsEntityBean(EntityBean owner) {
     return (EntityBean) getValue(owner);
   }
@@ -375,6 +376,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  @Override
   public boolean hasForeignKey() {
     return foreignKey == null || primaryKeyJoin || !foreignKey.isNoConstraint();
   }
@@ -716,10 +718,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       return new AssocOneHelpRefExported(this);
     } else {
       if (targetInheritInfo != null) {
-        if (targetInheritInfo.isConcrete() && !isFormula()) {
-          return new AssocOneHelpRefSimple(this);
-        } else {
+        if (targetInheritInfo.hasChildren() || isFormula()) {
+          // we have to add disc also, if a formula is specified, because
+          // the formula might refer the wrong entity.
           return new AssocOneHelpRefInherit(this);
+        } else {
+          return new AssocOneHelpRefSimple(this);
         }
       } else {
         return new AssocOneHelpRefSimple(this, embeddedPrefix);
