@@ -122,7 +122,7 @@ public final class Flags {
     return set(state, RECURSE);
   }
 
-  public static int unsetRecuse(int state) {
+  public static int unsetRecurse(int state) {
     return unset(state, RECURSE);
   }
 

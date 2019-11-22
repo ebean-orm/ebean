@@ -11,10 +11,10 @@ import io.ebean.Query;
 import io.ebeaninternal.api.SpiExpressionList;
 
 import javax.persistence.PersistenceException;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class FilterExpressionList<T> extends DefaultExpressionList<T> {
@@ -87,6 +87,21 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   @Override
   public Set<T> findSet() {
     return rootQuery.findSet();
+  }
+
+  @Override
+  public T findOne() {
+    return rootQuery.findOne();
+  }
+
+  @Override
+  public Optional<T> findOneOrEmpty() {
+    return rootQuery.findOneOrEmpty();
+  }
+
+  @Override
+  public boolean exists() {
+    return rootQuery.exists();
   }
 
   @Override

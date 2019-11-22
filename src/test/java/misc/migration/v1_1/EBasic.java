@@ -52,6 +52,9 @@ public class EBasic {
   @DbDefault("A")
   Status status;
 
+  @Size(max=127)
+  String status2;
+
   @Index(unique = true)
   @Size(max=127)
   String name;

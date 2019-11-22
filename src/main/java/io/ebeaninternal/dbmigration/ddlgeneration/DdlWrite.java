@@ -26,17 +26,19 @@ public class DdlWrite {
 
   private final DdlBuffer dropAll;
 
+  private final DdlOptions options;
+
   /**
    * Create without any configuration or current model (no history support).
    */
   public DdlWrite() {
-    this(new MConfiguration(), new ModelContainer());
+    this(new MConfiguration(), new ModelContainer(), new DdlOptions());
   }
 
   /**
    * Create with a configuration.
    */
-  public DdlWrite(MConfiguration configuration, ModelContainer currentModel) {
+  public DdlWrite(MConfiguration configuration, ModelContainer currentModel, DdlOptions options) {
     this.currentModel = currentModel;
     this.applyDropDependencies = new BaseDdlBuffer(configuration);
     this.apply = new BaseDdlBuffer(configuration);
@@ -45,6 +47,14 @@ public class DdlWrite {
     this.applyHistoryTrigger = new BaseDdlBuffer(configuration);
     this.dropAllForeignKeys = new BaseDdlBuffer(configuration);
     this.dropAll = new BaseDdlBuffer(configuration);
+    this.options = options;
+  }
+
+  /**
+   * Return the DDL options.
+   */
+  public DdlOptions getOptions() {
+    return options;
   }
 
   /**

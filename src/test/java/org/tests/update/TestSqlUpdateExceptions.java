@@ -9,9 +9,27 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestSqlUpdateExceptions extends BaseTestCase {
 
   private String sql = "insert into uuone (id, name, version) values (?,?,?)";
+
+  @Test
+  public void simpleInsert() {
+
+    UUID id = UUID.randomUUID();
+
+    Ebean.createSqlUpdate(sql)
+      .setParams(id, "hi", 1)
+      .executeNow();
+
+    UUID foundId = Ebean.createSqlQuery("select id from uuone where id = ?")
+      .setParams(id)
+      .findSingleAttribute(UUID.class);
+
+    assertThat(foundId).isEqualTo(id);
+  }
 
   @Test(expected = DuplicateKeyException.class)
   public void duplicateKey() {

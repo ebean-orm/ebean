@@ -52,7 +52,6 @@ public class AnnotationAssocOnes extends AnnotationParser {
    */
   @Override
   public void parse() {
-
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssocOne<?>) {
         readAssocOne((DeployBeanPropertyAssocOne<?>) prop);
@@ -133,16 +132,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
     for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
-      if (beanTable == null) {
-        throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
-      }
-      prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
-      if (!joinColumn.updatable()) {
-        prop.setDbUpdateable(false);
-      }
-      if (!joinColumn.nullable()) {
-        prop.setNullable(false);
-      }
+      setFromJoinColumn(prop, beanTable, joinColumn);
       checkForNoConstraint(prop, joinColumn);
     }
 
@@ -150,16 +140,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       for (JoinColumn joinColumn : joinTable.joinColumns()) {
-        if (beanTable == null) {
-          throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName()+" - no related 'BeanTable'");
-        }
-        prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
-        if (!joinColumn.updatable()) {
-          prop.setDbUpdateable(false);
-        }
-        if (!joinColumn.nullable()) {
-          prop.setNullable(false);
-        }
+        setFromJoinColumn(prop, beanTable, joinColumn);
       }
     }
 
@@ -187,10 +168,27 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
   }
 
+  private void setFromJoinColumn(DeployBeanPropertyAssocOne<?> prop, BeanTable beanTable, JoinColumn joinColumn) {
+    if (beanTable == null) {
+      throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName() + " - no related 'BeanTable'");
+    }
+    prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
+    if (!joinColumn.updatable()) {
+      prop.setDbUpdateable(false);
+    }
+    if (!joinColumn.nullable()) {
+      prop.setNullable(false);
+    }
+  }
+
   private void checkForNoConstraint(DeployBeanPropertyAssocOne<?> prop, JoinColumn joinColumn) {
-    ForeignKey foreignKey = joinColumn.foreignKey();
-    if (foreignKey != null && foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
-      prop.setForeignKey(new PropertyForeignKey());
+    try {
+      ForeignKey foreignKey = joinColumn.foreignKey();
+      if (foreignKey.value() == ConstraintMode.NO_CONSTRAINT) {
+        prop.setForeignKey(new PropertyForeignKey());
+      }
+    } catch (NoSuchMethodError e) {
+      // support old JPA API
     }
   }
 
@@ -227,15 +225,22 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setNullable(propAnn.optional());
     prop.setFetchType(propAnn.fetch());
     prop.setMappedBy(propAnn.mappedBy());
+    prop.setOrphanRemoval(readOrphanRemoval(propAnn));
     if (!"".equals(propAnn.mappedBy())) {
       prop.setOneToOneExported();
-      prop.setOrphanRemoval(propAnn.orphanRemoval());
-    } else if (propAnn.orphanRemoval()) {
-      prop.setOrphanRemoval(true);
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());
     prop.setBeanTable(beanTable(prop));
+  }
+
+  private boolean readOrphanRemoval(OneToOne property) {
+    try {
+      return property.orphanRemoval();
+    } catch (NoSuchMethodError e) {
+      // Support old JPA API
+      return false;
+    }
   }
 
   private void readPrimaryKeyJoin(PrimaryKeyJoinColumn primaryKeyJoin, DeployBeanPropertyAssocOne<?> prop) {

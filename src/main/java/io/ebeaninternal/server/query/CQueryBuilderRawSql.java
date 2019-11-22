@@ -90,7 +90,7 @@ class CQueryBuilderRawSql {
     }
 
     String dbWhere = predicates.getDbWhere();
-    if (!isEmpty(dbWhere)) {
+    if (hasValue(dbWhere)) {
       if (dynamicWhere == null) {
         dynamicWhere = dbWhere;
       } else {
@@ -98,7 +98,7 @@ class CQueryBuilderRawSql {
       }
     }
 
-    if (!isEmpty(dynamicWhere)) {
+    if (hasValue(dynamicWhere)) {
       if (sql.isAndWhereExpr()) {
         sb.append(" and ");
       } else {
@@ -109,13 +109,13 @@ class CQueryBuilderRawSql {
     }
 
     String preHaving = sql.getPreHaving();
-    if (!isEmpty(preHaving)) {
+    if (hasValue(preHaving)) {
       sb.append(preHaving);
       sb.append(" ");
     }
 
     String dbHaving = predicates.getDbHaving();
-    if (!isEmpty(dbHaving)) {
+    if (hasValue(dbHaving)) {
       sb.append(" ");
       if (sql.isAndHavingExpr()) {
         sb.append("and ");
@@ -126,15 +126,15 @@ class CQueryBuilderRawSql {
       sb.append(" ");
     }
 
-    if (!isEmpty(orderBy)) {
+    if (hasValue(orderBy)) {
       sb.append(" ").append(sql.getOrderByPrefix()).append(" ").append(orderBy);
     }
 
     return sb.toString().trim();
   }
 
-  private boolean isEmpty(String s) {
-    return s == null || s.isEmpty();
+  private boolean hasValue(String s) {
+    return s != null && !s.isEmpty();
   }
 
   private String getOrderBy(CQueryPredicates predicates, SpiRawSql.Sql sql) {

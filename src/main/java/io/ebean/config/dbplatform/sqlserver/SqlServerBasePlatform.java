@@ -47,8 +47,8 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.openQuote = "[";
     this.closeQuote = "]";
     this.likeSpecialCharacters = new char[]{'%', '_', '['};
-    this.likeClauseRaw = "like ? collate Latin1_General_BIN";
-    this.likeClauseEscaped = "like ? collate Latin1_General_BIN";
+    this.likeClauseRaw = "like ?";
+    this.likeClauseEscaped = "like ?";
 
     booleanDbType = Types.INTEGER;
     this.dbDefaultValue.setFalse("0");

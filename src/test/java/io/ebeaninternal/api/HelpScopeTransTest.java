@@ -2,6 +2,7 @@ package io.ebeaninternal.api;
 
 import io.ebean.Ebean;
 import io.ebean.TxScope;
+import org.junit.Assert;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -31,6 +32,19 @@ public class HelpScopeTransTest {
 
     HelpScopeTrans.exit(null, 1);
     HelpScopeTrans.exit(null, 1);
+  }
+
+  @Test
+  public void disableTransaction() {
+    HelpScopeTrans.setEnabled(false);
+
+    try {
+      HelpScopeTrans.enter(TxScope.required());
+      Assert.assertNull(Ebean.getDefaultServer().currentTransaction());
+      HelpScopeTrans.exit(null, 1);
+    } finally {
+      HelpScopeTrans.setEnabled(true);
+    }
   }
 
 }

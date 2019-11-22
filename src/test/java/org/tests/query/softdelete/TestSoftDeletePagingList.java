@@ -50,9 +50,9 @@ public class TestSoftDeletePagingList extends TransactionalTestCase {
 
     assertThat(sql.get(1)).contains("where t0.s3_url like ");
     if (isPlatformBooleanNative()) {
-      assertThat(sql.get(1)).contains("and t0.deleted = false order by t0.id");
+      assertThat(sql.get(1)).contains("and t0.deleted = false");
     } else {
-      assertThat(sql.get(1)).contains("and t0.deleted = 0 order by t0.id");
+      assertThat(sql.get(1)).contains("and t0.deleted = 0");
     }
   }
 }

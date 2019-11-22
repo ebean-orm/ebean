@@ -36,6 +36,10 @@ alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
 alter table migtest_e_basic modify status default 'A';
 alter table migtest_e_basic modify status not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
+alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
+alter table migtest_e_basic modify status2 varchar2(127);
+alter table migtest_e_basic modify status2 drop default;
+alter table migtest_e_basic modify status2 null;
 
 -- rename all collisions;
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);

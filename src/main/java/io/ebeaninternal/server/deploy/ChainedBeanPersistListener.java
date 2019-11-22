@@ -50,7 +50,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
    */
   public ChainedBeanPersistListener(List<BeanPersistListener> list) {
     this.list = list;
-    this.chain = list.toArray(new BeanPersistListener[list.size()]);
+    this.chain = list.toArray(new BeanPersistListener[0]);
   }
 
   /**

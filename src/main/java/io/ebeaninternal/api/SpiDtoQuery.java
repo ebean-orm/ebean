@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.DtoQuery;
+import io.ebean.ProfileLocation;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 
@@ -37,8 +38,22 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Return the label for the query.
    */
-  @Override
   String getLabel();
+
+  /**
+   * Return the label with fallback to profile location label.
+   */
+  String getPlanLabel();
+
+  /**
+   * Obtain the location if necessary.
+   */
+  void obtainLocation();
+
+  /**
+   * Return the profile location.
+   */
+  ProfileLocation getProfileLocation();
 
   /**
    * Return the associated DTO bean type.

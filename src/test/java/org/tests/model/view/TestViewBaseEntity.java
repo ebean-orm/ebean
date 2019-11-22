@@ -25,7 +25,7 @@ public class TestViewBaseEntity extends BaseTestCase {
 
     List<EOrderAgg> list = query.findList();
 
-    assertThat(sqlOf(query, 3)).contains("select t0.order_id, t0.order_total, t0.ship_total, t0.order_id from order_agg_vw t0 where t0.order_total > ? ");
+    assertThat(sqlOf(query, 3)).contains("select t0.order_id, t0.order_total, t0.ship_total, t0.order_id from order_agg_vw t0 where t0.order_total > ?");
     assertThat(list).isNotEmpty();
   }
 

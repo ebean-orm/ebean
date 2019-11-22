@@ -17,7 +17,7 @@ public class Question {
   }
 
   @ManyToOne
-  @JoinColumn(name = "groupObjectId")
+  @JoinColumn(name = "groupobjectid")
   private Group group;
 
   private int sequenceNumber;

@@ -4,7 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class BindableIdEmpty implements BindableId {
@@ -30,7 +29,7 @@ public class BindableIdEmpty implements BindableId {
   }
 
   @Override
-  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
+  public void dmlBind(BindableRequest request, EntityBean bean) {
     // nothing
   }
 

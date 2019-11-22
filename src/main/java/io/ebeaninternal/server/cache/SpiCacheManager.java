@@ -1,11 +1,21 @@
 package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheRegion;
+import io.ebean.meta.MetricVisitor;
+import io.ebeaninternal.api.SpiCacheRegion;
+
+import java.util.List;
 
 /**
  * The cache service for server side caching of beans and query results.
  */
 public interface SpiCacheManager {
+
+  /**
+   * Visit and collect the metrics.
+   */
+  void visitMetrics(MetricVisitor visitor);
 
   /**
    * Return true if the L2 caching is local.
@@ -15,6 +25,28 @@ public interface SpiCacheManager {
    * </p>
    */
   boolean isLocalL2Caching();
+
+  /**
+   * Return all the regions.
+   */
+  List<ServerCacheRegion> allRegions();
+
+  /**
+   * Set the regions that are enabled.
+   *
+   * @param regions A single region name or a comma delimited list of region names.
+   */
+  void setEnabledRegions(String regions);
+
+  /**
+   * Enable or disable all cache regions.
+   */
+  void setAllRegionsEnabled(boolean enabled);
+
+  /**
+   * Return the cache region. We can enable L2 caching by region.
+   */
+  SpiCacheRegion getRegion(String region);
 
   /**
    * Return the cache for mapping natural keys to id values.

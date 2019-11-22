@@ -2,6 +2,7 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ForPlatform;
@@ -29,7 +30,6 @@ public class TestRawSqlParsing extends BaseTestCase {
     RawSql rawSql = RawSqlBuilder
       .parse(sql)
       .columnMapping("order_id", "order.id")
-      //.columnMapping("sum(order_qty*unit_price)","totalAmount")
       .create();
 
     Sql rs = ((SpiRawSql)rawSql).getSql();
@@ -72,4 +72,32 @@ public class TestRawSqlParsing extends BaseTestCase {
 
     assertThat(customers).isNotEmpty();
   }
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void testUnion() {
+
+    ResetBasicData.reset();
+
+    String sql =
+      "select id, name from (" +
+      "  select id, name from o_customer where name <= 'f' " +
+      "  union all " +
+      "  select id, name from o_customer where name > 'f' " +
+      ") all_split";
+
+
+    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+
+    Query<Customer> query = Ebean.createQuery(Customer.class)
+      .setRawSql(rawSql)
+      .setFirstRow(1)
+      .setMaxRows(5);
+      //.orderById(false);
+
+    query.findList();
+
+    assertThat(sqlOf(query)).contains(") all_split limit 5 offset 1");
+  }
+
 }

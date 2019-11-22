@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.Ebean;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MConfiguration;
@@ -27,7 +28,7 @@ public class H2HistoryDdlTest {
 
     CurrentModel currentModel = new CurrentModel(ebeanServer);
     ModelContainer modelContainer = currentModel.read();
-    DdlWrite write = new DdlWrite(new MConfiguration(), modelContainer);
+    DdlWrite write = new DdlWrite(new MConfiguration(), modelContainer, new DdlOptions());
 
     H2Platform h2Platform = new H2Platform();
     PlatformDdl h2Ddl = PlatformDdlBuilder.create(h2Platform);

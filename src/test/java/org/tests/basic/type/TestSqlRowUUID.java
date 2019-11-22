@@ -57,5 +57,11 @@ public class TestSqlRowUUID extends BaseTestCase {
       .findList();
 
     assertThat(result).hasSize(1);
+
+    List<TUuidEntity> list = Ebean.find(TUuidEntity.class)
+      .where().rawOrEmpty("id = any(?::uuid[])", ids)
+      .findList();
+
+    assertThat(list).hasSize(1);
   }
 }

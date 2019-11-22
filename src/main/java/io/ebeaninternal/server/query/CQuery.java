@@ -18,7 +18,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanCollectionHelp;
 import io.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -184,7 +183,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Flag set when read auditing.
    */
-  private boolean audit;
+  private final boolean audit;
 
   /**
    * Flag set when findIterate is being read audited meaning we log in batches.
@@ -199,6 +198,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Create the Sql select based on the request.
    */
+  @SuppressWarnings("unchecked")
   public CQuery(OrmQueryRequest<T> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
     this.audit = request.isAuditReads();
@@ -236,7 +236,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
-  private BeanCollectionHelp<T> createHelp(OrmQueryRequest<T> request) {
+  private CQueryCollectionAdd<T> createHelp(OrmQueryRequest<T> request) {
     if (request.isFindById()) {
       return null;
     } else {
@@ -521,7 +521,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return result;
   }
 
-  protected EntityBean next() {
+  EntityBean next() {
     if (audit) {
       auditNextBean();
     }
@@ -532,7 +532,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return nextBean;
   }
 
-  protected boolean hasNext() throws SQLException {
+  boolean hasNext() throws SQLException {
 
     synchronized (this) {
       if (noMoreRows || cancelled) {
@@ -570,13 +570,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   BeanCollection<T> readCollection() throws SQLException {
-
     while (hasNext()) {
-      EntityBean bean = next();
-      help.add(collection, bean, false);
+      help.add(collection, next(), false);
     }
-
     updateExecutionStatistics();
     return collection;
   }
@@ -584,7 +582,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   /**
    * Update execution stats and check for slow query.
    */
-  void updateExecutionStatistics() {
+  private void updateExecutionStatistics() {
     updateStatistics();
     request.slowQueryCheck(executionTimeMicros, rowCount);
   }
@@ -813,6 +811,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   PreparedStatement getPstmt() {
     return pstmt;
+  }
+
+  @Override
+  public void handleLoadError(String fullName, Exception e) {
+    query.handleLoadError(fullName, e);
   }
 
   public Set<String> getDependentTables() {

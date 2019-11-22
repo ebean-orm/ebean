@@ -24,8 +24,8 @@ public class TestGeneratedKeys extends BaseTestCase {
   @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
   public void testSequence() throws SQLException {
     SpiEbeanServer server = spiEbeanServer();
-    IdType idType = server.getDatabasePlatform().getDbIdentity().getIdType();
-    if (!IdType.SEQUENCE.equals(idType)) {
+
+    if (idType() != IdType.SEQUENCE) {
       // only run this test when SEQUENCE is being used
       return;
     }
@@ -69,19 +69,16 @@ public class TestGeneratedKeys extends BaseTestCase {
   @Test
   public void testIdentity() throws SQLException {
 
-    SpiEbeanServer server = spiEbeanServer();
-    IdType idType = server.getDatabasePlatform().getDbIdentity().getIdType();
-
-    if (!IdType.IDENTITY.equals(idType)) {
+    if (idType() != IdType.IDENTITY) {
       // only run this test when SEQUENCE is being used
       return;
     }
 
-    try (Transaction tx = server.beginTransaction()) {
+    try (Transaction tx = server().beginTransaction()) {
 
       GenKeyIdentity al = new GenKeyIdentity();
       al.setDescription("my description");
-      server.save(al);
+      server().save(al);
 
       // For JDBC batching we won't get the id until after
       // the batch has been flushed explicitly or via commit

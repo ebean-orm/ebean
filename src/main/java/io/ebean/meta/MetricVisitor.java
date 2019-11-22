@@ -21,6 +21,11 @@ public interface MetricVisitor {
   boolean isCollectQueryMetrics();
 
   /**
+   * Return true if we should visit the L2 cache metrics.
+   */
+  boolean isCollectL2Metrics();
+
+  /**
    * Visit has started.
    */
   void visitStart();
@@ -39,6 +44,11 @@ public interface MetricVisitor {
    * Visit ORM query metrics.
    */
   void visitOrmQuery(MetaOrmQueryMetric metric);
+
+  /**
+   * Visit a Counter metric.
+   */
+  void visitCount(MetaCountMetric metric);
 
   /**
    * Visit has completed.
