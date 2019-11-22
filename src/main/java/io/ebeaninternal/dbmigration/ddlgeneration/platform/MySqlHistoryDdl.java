@@ -11,13 +11,11 @@ import java.io.IOException;
  */
 public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
 
-
-  public MySqlHistoryDdl() {
+  MySqlHistoryDdl() {
   }
 
   @Override
   protected void dropTriggers(DdlBuffer buffer, String baseTable) throws IOException {
-
     buffer.append("drop trigger ").append(updateTriggerName(baseTable)).endOfStatement();
     buffer.append("drop trigger ").append(deleteTriggerName(baseTable)).endOfStatement();
   }

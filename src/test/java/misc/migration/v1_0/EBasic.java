@@ -1,5 +1,6 @@
 package misc.migration.v1_0;
 
+import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -32,6 +33,10 @@ public class EBasic {
 
   Status status;
 
+  @DbDefault("N")
+  @NotNull
+  Status status2;
+
   @Size(max=127)
   String name;
 
@@ -39,11 +44,11 @@ public class EBasic {
   String description;
 
   Timestamp someDate;
-  
+
   boolean old_boolean;
 
   Boolean old_boolean2;
-  
+
   @ManyToOne
   ERef eref;
 

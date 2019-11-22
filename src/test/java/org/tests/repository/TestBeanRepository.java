@@ -1,6 +1,7 @@
 package org.tests.repository;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -15,6 +16,7 @@ public class TestBeanRepository extends BaseTestCase {
 
   @Test
   public void test() {
+    DB.find(Customer.class).where().in("name", "c0", "c1").delete();
 
     ResetBasicData.reset();
 

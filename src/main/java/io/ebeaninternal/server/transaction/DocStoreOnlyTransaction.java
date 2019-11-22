@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Document store only transaction.
@@ -41,12 +40,12 @@ public class DocStoreOnlyTransaction extends JdbcTransaction {
   }
 
   @Override
-  protected void performRollback() throws SQLException {
+  protected void performRollback() {
     // do nothing (could perhaps throw not supported exception)
   }
 
   @Override
-  protected void performCommit() throws SQLException {
+  protected void performCommit() {
     if (docStoreTxn != null) {
       manager.docStoreUpdateProcessor.commit(docStoreTxn);
     }

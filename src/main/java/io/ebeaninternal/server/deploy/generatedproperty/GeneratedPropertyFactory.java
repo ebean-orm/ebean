@@ -27,6 +27,8 @@ public class GeneratedPropertyFactory {
 
   private final HashSet<String> numberTypes = new HashSet<>();
 
+  private final UuidGeneratedProperty generatedUuid = new UuidGeneratedProperty();
+
   private final GeneratedWhoModified generatedWhoModified;
 
   private final GeneratedWhoCreated generatedWhoCreated;
@@ -87,7 +89,7 @@ public class GeneratedPropertyFactory {
     }
   }
 
-  public void setCounter(DeployBeanProperty property) {
+  private void setCounter(DeployBeanProperty property) {
 
     counterFactory.setCounter(property);
   }
@@ -121,6 +123,10 @@ public class GeneratedPropertyFactory {
    */
   public PlatformIdGenerator getIdGenerator(String generatorName) {
     return idGeneratorMap.get(generatorName);
+  }
+
+  public void setUuid(DeployBeanProperty prop) {
+    prop.setGeneratedProperty(generatedUuid);
   }
 
   /**

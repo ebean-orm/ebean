@@ -5,5 +5,4 @@
            sum(d.ship_qty * d.unit_price) as ship_total
     from o_order_detail d
     group by d.order_id;
-
   

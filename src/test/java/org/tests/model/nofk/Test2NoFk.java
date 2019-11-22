@@ -1,6 +1,7 @@
 package org.tests.model.nofk;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -21,9 +22,8 @@ public class Test2NoFk extends BaseTestCase {
   @Before
   public void setup() {
     // Reset t
-    Ebean.find(EFile2NoFk.class).delete();
-    Ebean.find(EUserNoFk.class).delete();
-    Ebean.find(EUserNoFkSoftDel.class).delete();
+    DB.truncate(EFile2NoFk.class, EUserNoFk.class, EUserNoFkSoftDel.class);
+    assertThat(DB.find(EFile2NoFk.class).findCount()).isEqualTo(0);
 
     // There are two user accounts persisted in our database
     EUserNoFk root = new EUserNoFk();

@@ -68,5 +68,5 @@ public interface TypeManager {
   /**
    * Return the ScalarType used to handle HSTORE (Map<String,String>).
    */
-  ScalarType<?> getHstoreScalarType();
+  ScalarType<?> getDbMapScalarType();
 }

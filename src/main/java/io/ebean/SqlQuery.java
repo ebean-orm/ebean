@@ -10,34 +10,30 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * Query object for performing native SQL queries that return SqlRow's.
- * <p>
- * Firstly note that you can use your own sql queries with <em>entity beans</em>
- * by using the SqlSelect annotation. This should be your first approach when
- * wanting to use your own SQL queries.
- * </p>
- * <p>
- * If ORM Mapping is too tight and constraining for your problem then SqlQuery
- * could be a good approach.
- * </p>
+ * Query object for performing native SQL queries that return SqlRow or directly read
+ * ResultSet using a RowMapper.
  * <p>
  * The returned SqlRow objects are similar to a LinkedHashMap with some type
  * conversion support added.
  * </p>
  * <p>
+ * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
+ * </p>
+ * <p>
+ * Refer to {@link Database#findNative(Class, String)} for native sql queries returning entity beans.
+ * </p>
+ *
  * <pre>{@code
  *
- *   // its typically a good idea to use a named query
- *   // and put the sql in the orm.xml instead of in your code
+ *   // example using named parameters
  *
  *   String sql = "select id, name from customer where name like :name and status_code = :status";
  *
- *   SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
- *   sqlQuery.setParameter("name", "Acme%");
- *   sqlQuery.setParameter("status", "ACTIVE");
- *
- *   // execute the query returning a List of MapBean objects
- *   List<SqlRow> list = sqlQuery.findList();
+ *   List<SqlRow> list =
+ *     DB.sqlQuery(sql)
+ *       .setParameter("name", "Acme%")
+ *       .setParameter("status", "ACTIVE")
+ *       .findList();
  *
  * }</pre>
  */
@@ -104,7 +100,7 @@ public interface SqlQuery extends Serializable {
    *
    *  String sql = "select id, name, status from customer order by name desc";
    *
-   *  Ebean.createSqlQuery(sql)
+   *  DB.sqlQuery(sql)
    *    .findEachRow((resultSet, rowNum) -> {
    *
    *      // read directly from ResultSet
@@ -134,7 +130,7 @@ public interface SqlQuery extends Serializable {
    *
    *   String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
    *
-   *   BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+   *   BigDecimal maxPrice = DB.sqlQuery(sql)
    *     .setParameter(1, 2)
    *     .findSingleAttribute(BigDecimal.class);
    *
@@ -176,9 +172,10 @@ public interface SqlQuery extends Serializable {
    *   " order by (unit_price * order_qty) desc";
    *
    *   //
-   *   List<BigDecimal> lineAmounts = Ebean.createSqlQuery(sql)
-   *     .setParameter(1, 3)
-   *     .findSingleAttributeList(BigDecimal.class);
+   *   List<BigDecimal> lineAmounts =
+   *     DB.sqlQuery(sql)
+   *       .setParameter(1, 3)
+   *       .findSingleAttributeList(BigDecimal.class);
    *
    * }</pre>
    *
@@ -194,6 +191,33 @@ public interface SqlQuery extends Serializable {
    * The same as bind for named parameters.
    */
   SqlQuery setParameter(String name, Object value);
+
+  /**
+   * Set one of more positioned parameters.
+   * <p>
+   * This is a convenient alternative to multiple calls setParameter().
+   *
+   * <pre>{@code
+   *
+   *   String sql = "select id, name from customer where name like ? and status = ?";
+   *
+   *   List<SqlRow> list =
+   *     DB.sqlQuery(sql)
+   *       .setParams("Rob", Status.NEW)
+   *       .findList();
+   *
+   *
+   *   // is the same as ...
+   *
+   *   List<SqlRow> list =
+   *     DB.sqlQuery(sql)
+   *       .setParameter(1, "Rob")
+   *       .setParameter(2, "Status.NEW)
+   *       .findList();
+   *
+   * }</pre>
+   */
+  SqlQuery setParams(Object... values);
 
   /**
    * The same as bind for positioned parameters.

@@ -68,10 +68,24 @@ public interface FetchGroupBuilder<T> {
   FetchGroupBuilder<T> fetchQuery(String path);
 
   /**
+   * Fetch the path including all its properties using L2 cache.
+   * Cache misses fallback to fetchQuery().
+   */
+  @Nonnull
+  FetchGroupBuilder<T> fetchCache(String path);
+
+  /**
    * Fetch the path including specified properties using a query join.
    */
   @Nonnull
   FetchGroupBuilder<T> fetchQuery(String path, String properties);
+
+  /**
+   * Fetch the path including specified properties using L2 cache.
+   * Cache misses fallback to fetchQuery().
+   */
+  @Nonnull
+  FetchGroupBuilder<T> fetchCache(String path, String properties);
 
   /**
    * Fetch the path including all its properties lazily.

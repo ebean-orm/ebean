@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class UTMaster extends Model {
   String name;
 
   String description;
+
+  LocalDate date;
 
   @Version
   Integer version;
@@ -50,6 +53,14 @@ public class UTMaster extends Model {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public LocalDate getDate() {
+    return date;
+  }
+
+  public void setDate(LocalDate date) {
+    this.date = date;
   }
 
   public String getDescription() {

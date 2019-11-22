@@ -7,7 +7,9 @@ import io.ebean.util.SplitName;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -21,9 +23,7 @@ public class ManyWhereJoins implements Serializable {
 
   private final TreeMap<String, PropertyJoin> joins = new TreeMap<>();
 
-  private StringBuilder formulaProperties = new StringBuilder();
-
-  private boolean formulaWithJoin;
+  private List<String> formulaJoinProperties;
 
   private boolean aggregation;
 
@@ -125,27 +125,24 @@ public class ManyWhereJoins implements Serializable {
    * specifically for the findCount query.
    */
   public void addFormulaWithJoin(String propertyName) {
-    if (formulaWithJoin) {
-      formulaProperties.append(",");
-    } else {
-      formulaProperties = new StringBuilder();
-      formulaWithJoin = true;
+    if (formulaJoinProperties == null) {
+      formulaJoinProperties = new ArrayList<>();
     }
-    formulaProperties.append(propertyName);
+    formulaJoinProperties.add(propertyName);
   }
 
   /**
    * Return true if the query select includes a formula with join.
    */
   public boolean isFormulaWithJoin() {
-    return formulaWithJoin;
+    return formulaJoinProperties != null;
   }
 
   /**
    * Return the formula properties to build the select clause for a findCount query.
    */
-  public String getFormulaProperties() {
-    return formulaProperties.toString();
+  public List<String> getFormulaJoinProperties() {
+    return formulaJoinProperties;
   }
 
   /**

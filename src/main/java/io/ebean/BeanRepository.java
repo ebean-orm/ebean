@@ -13,7 +13,7 @@ import java.util.Collection;
  * public class CustomerRepository extends BeanRepository<Long,Customer> {
  *
  *   @Inject
- *   public CustomerRepository(EbeanServer server) {
+ *   public CustomerRepository(Database server) {
  *     super(Customer.class, server);
  *   }
  *
@@ -34,23 +34,23 @@ import java.util.Collection;
 public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
 
   /**
-   * Create with the given bean type and EbeanServer instance.
+   * Create with the given bean type and Database instance.
    * <p>
    * Typically users would extend BeanRepository rather than BeanFinder.
    * </p>
    * <pre>{@code
    *
    *   @Inject
-   *   public CustomerRepository(EbeanServer server) {
+   *   public CustomerRepository(Database server) {
    *     super(Customer.class, server);
    *   }
    *
    * }</pre>
    *
    * @param type   The bean type
-   * @param server The EbeanServer instance typically created via Spring factory or equivalent
+   * @param server The Database instance typically created via Spring factory or equivalent
    */
-  protected BeanRepository(Class<T> type, EbeanServer server) {
+  protected BeanRepository(Class<T> type, Database server) {
     super(type, server);
   }
 
@@ -75,7 +75,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    *
    * }</pre>
    *
-   * @see EbeanServer#markAsDirty(Object)
+   * @see Database#markAsDirty(Object)
    */
   public void markAsDirty(T bean) {
     db().markAsDirty(bean);
@@ -111,7 +111,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
    * insert or an update based on that.
    *
-   * @see EbeanServer#save(Object)
+   * @see Database#save(Object)
    */
   public void save(T bean) {
     db().save(bean);
@@ -127,7 +127,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   /**
    * Update this entity.
    *
-   * @see EbeanServer#update(Object)
+   * @see Database#update(Object)
    */
   public void update(T bean) {
     db().update(bean);
@@ -136,7 +136,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   /**
    * Insert this entity.
    *
-   * @see EbeanServer#insert(Object)
+   * @see Database#insert(Object)
    */
   public void insert(T bean) {
     db().insert(bean);
@@ -157,7 +157,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    * deleted. Note that, if JDBC batch mode is used then this always returns true.
    * </p>
    *
-   * @see EbeanServer#delete(Object)
+   * @see Database#delete(Object)
    */
   public boolean delete(T bean) {
     return db().delete(bean);
@@ -177,7 +177,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    * want to perform a hard/permanent delete.
    * </p>
    *
-   * @see EbeanServer#deletePermanent(Object)
+   * @see Database#deletePermanent(Object)
    */
   public boolean deletePermanent(T bean) {
     return db().deletePermanent(bean);
@@ -189,7 +189,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
    * insert or an update based on that.
    *
-   * @see EbeanServer#merge(Object)
+   * @see Database#merge(Object)
    */
   public void merge(T bean) {
     db().merge(bean);
@@ -201,7 +201,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
    * insert or an update based on that.
    *
-   * @see EbeanServer#merge(Object, MergeOptions)
+   * @see Database#merge(Object, MergeOptions)
    */
   public void merge(T bean, MergeOptions options) {
     db().merge(bean, options);
@@ -210,7 +210,7 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   /**
    * Refreshes this entity from the database.
    *
-   * @see EbeanServer#refresh(Object)
+   * @see Database#refresh(Object)
    */
   public void refresh(T bean) {
     db().refresh(bean);

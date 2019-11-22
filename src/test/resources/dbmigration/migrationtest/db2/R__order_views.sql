@@ -1,5 +1,4 @@
 
-
     create or replace view order_agg_vw as
     select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
            sum(d.ship_qty * d.unit_price) as ship_total

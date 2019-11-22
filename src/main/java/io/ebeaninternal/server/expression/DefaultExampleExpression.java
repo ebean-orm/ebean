@@ -212,7 +212,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
         }
         item.addSql(request);
       }
-      request.append(") ");
+      request.append(")");
     }
   }
 
@@ -303,9 +303,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    */
   private boolean isZero(Object value) {
     if (value instanceof Number) {
-      Number num = (Number) value;
-      double doubleValue = num.doubleValue();
-      if (doubleValue == 0) {
+      if (((Number) value).doubleValue() == 0) {
         return true;
       }
     }

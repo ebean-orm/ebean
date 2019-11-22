@@ -11,4 +11,8 @@ public interface CQueryPlanKey {
    */
   String getPartialKey();
 
+  /**
+   * Return a query plan key taking into account persist cascading.
+   */
+  CQueryPlanKey withDeleteByIds();
 }

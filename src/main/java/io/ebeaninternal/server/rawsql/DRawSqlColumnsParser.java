@@ -49,7 +49,7 @@ final class DRawSqlColumnsParser {
           tmp.add(aSplit.trim());
         }
       }
-      split = tmp.toArray(new String[tmp.size()]);
+      split = tmp.toArray(new String[0]);
     }
 
     if (split.length == 0) {

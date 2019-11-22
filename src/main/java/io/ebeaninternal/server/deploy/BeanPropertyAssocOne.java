@@ -23,6 +23,7 @@ import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarDataReader;
+import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -44,14 +45,15 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private final boolean orphanRemoval;
 
   private final boolean primaryKeyExport;
+  private final boolean primaryKeyJoin;
 
   private AssocOneHelp localHelp;
 
-  protected final BeanProperty[] embeddedProps;
+  final BeanProperty[] embeddedProps;
 
   private final HashMap<String, BeanProperty> embeddedPropsMap;
 
-  protected ImportedId importedId;
+  ImportedId importedId;
 
   private String deleteByParentIdSql;
   private String deleteByParentIdInSql;
@@ -74,6 +76,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
     super(descriptor, deploy);
     primaryKeyExport = deploy.isPrimaryKeyExport();
+    primaryKeyJoin = deploy.isPrimaryKeyJoin();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
@@ -93,14 +96,36 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  /**
+   * Copy constructor for ManyToOne inside Embeddable.
+   */
+  public BeanPropertyAssocOne(BeanPropertyAssocOne source, BeanPropertyOverride override) {
+    super(source, override);
+    primaryKeyExport = source.primaryKeyExport;
+    primaryKeyJoin = source.primaryKeyJoin;
+    oneToOne = source.oneToOne;
+    oneToOneExported = source.oneToOneExported;
+    orphanRemoval = source.orphanRemoval;
+    embeddedProps = null;
+    embeddedPropsMap = null;
+  }
+
   @Override
   public void initialise(BeanDescriptorInitContext initContext) {
     super.initialise(initContext);
-    initialiseAssocOne();
+    initialiseAssocOne(initContext.getEmbeddedPrefix());
+    if (embedded) {
+      // initialise ManyToOne importedId
+      initContext.setEmbeddedPrefix(name);
+      for (BeanProperty embeddedProp : embeddedProps) {
+        embeddedProp.initialise(initContext);
+      }
+      initContext.setEmbeddedPrefix(null);
+    }
   }
 
-  private void initialiseAssocOne() {
-    localHelp = createHelp(embedded, oneToOneExported);
+  private void initialiseAssocOne(String embeddedPrefix) {
+    localHelp = createHelp(embedded, oneToOneExported, embeddedPrefix);
 
     if (!isTransient) {
       //noinspection StatementWithEmptyBody
@@ -132,7 +157,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   /**
    * Derive late in lifecycle cache notification on this relationship.
    */
-  public void initialisePostTarget() {
+  void initialisePostTarget() {
     this.cacheNotifyRelationship = isCacheNotifyRelationship();
   }
 
@@ -335,11 +360,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   public boolean hasForeignKey() {
-    return foreignKey == null || !foreignKey.isNoConstraint();
-  }
-
-  public boolean hasForeignKeyIndex() {
-    return foreignKey == null || !foreignKey.isNoIndex();
+    return foreignKey == null || primaryKeyJoin || !foreignKey.isNoConstraint();
   }
 
   /**
@@ -369,10 +390,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       return;
     }
 
+    String nextPrefix = (prefix == null) ? name : prefix + "." + name;
+
     if (embedded) {
-      prefix = (prefix == null) ? name : prefix + "." + name;
       BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
-      targetDescriptor.diff(prefix, map, (EntityBean) newEmb, (EntityBean) oldEmb);
+      targetDescriptor.diff(nextPrefix, map, (EntityBean) newEmb, (EntityBean) oldEmb);
 
     } else {
       // we are only interested in the Id value
@@ -385,8 +407,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       Object newId = (newBean == null) ? null : idProperty.getValue(newBean);
       Object oldId = (oldBean == null) ? null : idProperty.getValue(oldBean);
       if (newId != null || oldId != null) {
-        prefix = (prefix == null) ? name : prefix + "." + name;
-        idProperty.diffVal(prefix, map, newId, oldId);
+        idProperty.diffVal(nextPrefix, map, newId, oldId);
       }
     }
   }
@@ -442,6 +463,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public ScalarDataReader<?> getIdReader() {
     return targetDescriptor.getIdProperty();
+  }
+
+  ScalarType getIdScalarType() {
+    return targetDescriptor.getIdProperty().scalarType;
   }
 
   /**
@@ -556,7 +581,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       }
     }
 
-    return list.toArray(new ExportedProperty[list.size()]);
+    return list.toArray(new ExportedProperty[0]);
   }
 
   /**
@@ -649,7 +674,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
-  void setEmbeddedOwner(EntityBean bean, Object value) {
+  private void setEmbeddedOwner(EntityBean bean, Object value) {
     ((EntityBean) value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
   }
 
@@ -668,7 +693,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
-  private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported) {
+  private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported, String embeddedPrefix) {
     if (embedded) {
       return new AssocOneHelpEmbedded(this);
     } else if (oneToOneExported) {
@@ -677,7 +702,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (targetInheritInfo != null) {
         return new AssocOneHelpRefInherit(this);
       } else {
-        return new AssocOneHelpRefSimple(this);
+        return new AssocOneHelpRefSimple(this, embeddedPrefix);
       }
     }
   }
@@ -743,10 +768,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       writeJson.writeNullField(name);
 
     } else {
-      if (writeJson.isParentBean(value)) {
-        // bi-directional and already rendered parent
-
-      } else {
+      if (!writeJson.isParentBean(value)) {
         // Hmmm, not writing complex non-entity bean
         if (value instanceof EntityBean) {
           writeJson.beginAssocOne(name, bean);

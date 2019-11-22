@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Persister implementation using DML.
  * <p>
@@ -123,6 +125,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException e) {
       request.rollbackTransIfRequired();
       throw e;
+    } finally {
+      request.clearTransIfRequired();
     }
   }
 
@@ -141,12 +145,24 @@ public final class DefaultPersister implements Persister {
     }
   }
 
+  @Override
+  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue) {
+    if (queue) {
+      addToFlushQueue(update, t, false);
+    } else {
+      executeSqlUpdate(update, t);
+    }
+  }
+
+  private void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, boolean early) {
+    new PersistRequestUpdateSql(server, update, t, persistExecute).addToFlushQueue(early);
+  }
+
   /**
    * Execute the updateSql.
    */
   @Override
   public int executeSqlUpdate(SqlUpdate updSql, Transaction t) {
-
     return executeOrQueue(new PersistRequestUpdateSql(server, (SpiSqlUpdate) updSql, (SpiTransaction) t, persistExecute));
   }
 
@@ -253,7 +269,6 @@ public final class DefaultPersister implements Persister {
 
     final BeanDescriptor<T> desc;
     final Transaction transaction;
-    final BeanProperty draftDirty;
     final List<T> draftUpdates = new ArrayList<>();
 
     /**
@@ -274,7 +289,6 @@ public final class DefaultPersister implements Persister {
     DraftHandler(BeanDescriptor<T> desc, Transaction transaction) {
       this.desc = desc;
       this.transaction = transaction;
-      this.draftDirty = desc.getDraftDirty();
     }
 
     /**
@@ -363,7 +377,7 @@ public final class DefaultPersister implements Persister {
    * Recursively delete the bean. This calls back to the EbeanServer.
    */
   private int deleteRecurse(EntityBean detailBean, Transaction t, DeleteMode deleteMode) {
-    return deleteRequest(createRequest(detailBean, t, deleteMode.persistType()));
+    return deleteRequest(createDeleteRequest(detailBean, t, deleteMode.persistType()));
   }
 
   @Override
@@ -423,6 +437,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
       throw ex;
+    } finally {
+      req.clearTransIfRequired();
     }
   }
 
@@ -446,6 +462,10 @@ public final class DefaultPersister implements Persister {
   public void insert(EntityBean bean, Transaction t) {
 
     PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.INSERT);
+    if (req.isReference()) {
+      // skip insert on reference bean
+      return;
+    }
     try {
       req.initTransIfRequiredWithBatchCascade();
       insert(req);
@@ -455,6 +475,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
       throw ex;
+    } finally {
+      req.clearTransIfRequired();
     }
   }
 
@@ -556,12 +578,11 @@ public final class DefaultPersister implements Persister {
   public int delete(EntityBean bean, Transaction t, boolean permanent) {
 
     Type deleteType = permanent ? Type.DELETE_PERMANENT : Type.DELETE;
-    PersistRequestBean<EntityBean> originalRequest = createRequest(bean, t, deleteType);
-
+    PersistRequestBean<EntityBean> originalRequest = createDeleteRequest(bean, t, deleteType);
     if (originalRequest.isHardDeleteDraft()) {
       // a hard delete of a draftable bean so first we need to  delete the associated 'live' bean
       // due to FK constraint and then after that execute the original delete of the draft bean
-      return deleteRequest(createPublishRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, Flags.PUBLISH), originalRequest);
+      return deleteRequest(createDeleteRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, Flags.PUBLISH), originalRequest);
 
     } else {
       // normal delete or soft delete
@@ -607,6 +628,8 @@ public final class DefaultPersister implements Persister {
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
       throw ex;
+    } finally {
+      req.clearTransIfRequired();
     }
   }
 
@@ -615,8 +638,8 @@ public final class DefaultPersister implements Persister {
       t.depth(-1);
       t.checkBatchEscalationOnCollection();
     }
-    for (Object aBeanList : beanList) {
-      deleteRecurse((EntityBean) aBeanList, t, deleteMode);
+    for (Object bean : beanList) {
+      deleteRecurse((EntityBean) bean, t, deleteMode);
     }
     if (children) {
       t.flushBatchOnCollection();
@@ -866,7 +889,6 @@ public final class DefaultPersister implements Persister {
       // bean to handle bi-directional cascading
       request.registerDeleteBean();
       deleteAssocMany(request);
-      request.unregisterDeleteBean();
 
       unloadedForeignKeys = getDeleteUnloadedForeignKeys(request);
       if (unloadedForeignKeys != null) {
@@ -954,12 +976,19 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  void deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t, boolean publish) {
+  void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
 
-    // delete all intersection rows for this bean
+    SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
+    if (queue) {
+      addToFlushQueue(sqlDelete, t, true);
+    } else {
+      executeSqlUpdate(sqlDelete, t);
+    }
+  }
+
+  private SpiSqlUpdate deleteAllIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, boolean publish) {
     IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean, publish);
-    SqlUpdate sqlDelete = intRow.createDeleteChildren(server);
-    executeSqlUpdate(sqlDelete, t);
+    return intRow.createDeleteChildren(server);
   }
 
   /**
@@ -1008,7 +1037,7 @@ public final class DefaultPersister implements Persister {
       if (many.hasJoinTable()) {
         if (deleteMode.isHard()) {
           // delete associated rows from intersection table (but not during soft delete)
-          deleteAssocManyIntersection(parentBean, many, t, request.isPublish());
+          deleteManyIntersection(parentBean, many, t, request.isPublish(), false);
         }
       } else {
 
@@ -1200,11 +1229,9 @@ public final class DefaultPersister implements Persister {
     EntityBean bean = request.getEntityBean();
     Object uid = idProp.getValue(bean);
 
-    if (DmlUtil.isNullOrZero(uid)) {
-
+    if (isNullOrZero(uid)) {
       // generate the nextId and set it to the property
       Object nextId = desc.nextId(request.getTransaction());
-
       // cast the data type if required and set it
       desc.convertSetId(nextId, bean);
     }
@@ -1215,25 +1242,15 @@ public final class DefaultPersister implements Persister {
    * perform an insert, update or delete.
    */
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type) {
-    return createRequestInternal(bean, t, type, Flags.ZERO);
+    return createRequestInternal(bean, t, type);
   }
 
   /**
    * Create the Persist Request Object additionally specifying the publish status.
    */
-  <T> PersistRequestBean<T> createPublishRequest(T bean, Transaction t, PersistRequest.Type type, int flags) {
-    return createRequestInternal(bean, t, type, Flags.unsetRecuse(flags));
-  }
-
-  /**
-   * Create the Persist Request Object additionally specifying the publish status.
-   */
-  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type, int flags) {
+  private <T> PersistRequestBean<T> createRequestInternal(T bean, Transaction t, PersistRequest.Type type) {
     BeanManager<T> mgr = getBeanManager(bean);
-    if (mgr == null) {
-      throw new PersistenceException(errNotRegistered(bean.getClass()));
-    }
-    return createRequest(bean, t, null, mgr, type, flags);
+    return createRequest(bean, t, null, mgr, type, Flags.ZERO);
   }
 
   /**
@@ -1243,9 +1260,6 @@ public final class DefaultPersister implements Persister {
    */
   private <T> PersistRequestBean<T> createRequestRecurse(T bean, Transaction t, Object parentBean, int flags) {
     BeanManager<T> mgr = getBeanManager(bean);
-    if (mgr == null) {
-      throw new PersistenceException(errNotRegistered(bean.getClass()));
-    }
     BeanDescriptor<T> desc = mgr.getBeanDescriptor();
     EntityBean entityBean = (EntityBean) bean;
     PersistRequest.Type type;
@@ -1264,10 +1278,26 @@ public final class DefaultPersister implements Persister {
    * Create the Persist Request Object that wraps all the objects used to
    * perform an insert, update or delete.
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
                                                   PersistRequest.Type type, int flags) {
 
+    // no delete requests come here
+    return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, flags);
+  }
+
+  <T> PersistRequestBean<T> createDeleteRemoved(T bean, Transaction t, int flags) {
+    return createDeleteRequest(bean, t, PersistRequest.Type.DELETE, Flags.unsetRecurse(flags));
+  }
+
+  private <T> PersistRequestBean<T> createDeleteRequest(EntityBean bean, Transaction t, Type type) {
+    return createDeleteRequest(bean, t, type, Flags.ZERO);
+  }
+
+  @SuppressWarnings({"unchecked"})
+  private <T> PersistRequestBean<T> createDeleteRequest(Object bean, Transaction t, PersistRequest.Type type, int flags) {
+
+    BeanManager<T> mgr = getBeanManager(bean);
     if (type == Type.DELETE_PERMANENT) {
       type = Type.DELETE;
     } else if (type == Type.DELETE && mgr.getBeanDescriptor().isSoftDelete()) {
@@ -1275,7 +1305,9 @@ public final class DefaultPersister implements Persister {
       type = Type.DELETE_SOFT;
     }
 
-    return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, flags);
+    PersistRequestBean<T> request =  new PersistRequestBean<>(server, (T)bean, null, mgr, (SpiTransaction) t, persistExecute, type, flags);
+    request.initForSoftDelete();
+    return request;
   }
 
   private String errNotRegistered(Class<?> beanClass) {
@@ -1293,8 +1325,12 @@ public final class DefaultPersister implements Persister {
    * </p>
    */
   @SuppressWarnings("unchecked")
-  private <T> BeanManager<T> getBeanManager(T bean) {
+  private <T> BeanManager<T> getBeanManager(Object bean) {
 
-    return (BeanManager<T>) beanDescriptorManager.getBeanManager(bean.getClass());
+    BeanManager<T> mgr = (BeanManager<T>) beanDescriptorManager.getBeanManager(bean.getClass());
+    if (mgr == null) {
+      throw new PersistenceException(errNotRegistered(bean.getClass()));
+    }
+    return mgr;
   }
 }

@@ -140,7 +140,7 @@ public class DbMigrationConfig {
    * <p>
    * The default of "dbmigration" is reasonable in most cases. You may look to set this
    * to be something like "dbmigration/myapp" where myapp gives it a unique resource path
-   * in the case there are multiple EbeanServer applications in the single classpath.
+   * in the case there are multiple Database applications in the single classpath.
    * </p>
    */
   public void setMigrationPath(String migrationPath) {

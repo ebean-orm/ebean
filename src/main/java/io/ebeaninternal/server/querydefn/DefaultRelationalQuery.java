@@ -35,6 +35,11 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   private int bufferFetchSizeHint;
 
   /**
+   * Helper to add positioned parameters in order.
+   */
+  private int addPos;
+
+  /**
    * Bind parameters when using the query language.
    */
   private final BindParams bindParams = new BindParams();
@@ -105,6 +110,14 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   @Override
   public Optional<SqlRow> findOneOrEmpty() {
     return Optional.ofNullable(findOne());
+  }
+
+  @Override
+  public DefaultRelationalQuery setParams(Object... values) {
+    for (Object value : values) {
+      setParameter(++addPos, value);
+    }
+    return this;
   }
 
   @Override

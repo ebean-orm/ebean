@@ -41,7 +41,7 @@ package io.ebean;
  * <p>
  * <pre>{@code
  *
- * Update<Topic> update = Ebean.createUpdate(Topic.class, "incrementPostCount");
+ * Update<Topic> update = DB.createUpdate(Topic.class, "incrementPostCount");
  * update.setParameter("id", 1);
  * int rows = update.execute();
  *

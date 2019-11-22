@@ -49,8 +49,7 @@ class ModelBuildIntersectionTable {
 
   private void buildFkConstraints() {
 
-    PropertyForeignKey foreignKey = manyProp.getForeignKey();
-    if (foreignKey == null || !foreignKey.isNoConstraint()) {
+    if (manyProp.hasForeignKeyConstraint()) {
       ctx.fkeyBuilder(intersectionTable)
         .addForeignKey(manyProp.getBeanDescriptor(), intersectionTableJoin, true)
         .addForeignKey(manyProp.getTargetDescriptor(), tableJoin, false);

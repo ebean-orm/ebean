@@ -30,6 +30,9 @@ public class OCachedBean {
   @OneToMany(mappedBy = "cachedBean", cascade = CascadeType.ALL)
   List<OCachedBeanChild> children = new ArrayList<>();
 
+  @OneToMany(mappedBy = "cachedBean", cascade = CascadeType.ALL)
+  List<OBeanChild> notCachedChildren = new ArrayList<>();
+
   public Long getId() {
     return id;
   }
@@ -60,5 +63,13 @@ public class OCachedBean {
 
   public void setChildren(List<OCachedBeanChild> children) {
     this.children = children;
+  }
+
+  public List<OBeanChild> getNotCachedChildren() {
+    return notCachedChildren;
+  }
+
+  public void setNotCachedChildren(List<OBeanChild> notCachedChildren) {
+    this.notCachedChildren = notCachedChildren;
   }
 }

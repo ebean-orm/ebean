@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Internal service API for Raw Sql.
@@ -432,8 +433,8 @@ public interface SpiRawSql extends RawSql {
         Column that = (Column) o;
         if (indexPos != that.indexPos) return false;
         if (!dbColumn.equals(that.dbColumn)) return false;
-        if (dbAlias != null ? !dbAlias.equals(that.dbAlias) : that.dbAlias != null) return false;
-        return propertyName != null ? propertyName.equals(that.propertyName) : that.propertyName == null;
+        if (!Objects.equals(dbAlias, that.dbAlias)) return false;
+        return Objects.equals(propertyName, that.propertyName);
       }
 
       @Override

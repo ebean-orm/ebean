@@ -18,7 +18,6 @@ public class HanaPlatform extends DatabasePlatform {
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.supportsResultSetConcurrencyModeUpdatable = false;
     this.columnAliasPrefix = null;
-
     this.historySupport = new HanaHistorySupport();
     this.basicSqlLimiter = new HanaBasicSqlLimiter();
 

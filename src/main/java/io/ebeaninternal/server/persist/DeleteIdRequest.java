@@ -14,6 +14,7 @@ class DeleteIdRequest implements BeanDeleteIdRequest {
   DeleteIdRequest(SpiEbeanServer server, Transaction transaction, Object id) {
     this.server = server;
     this.transaction = transaction;
+    this.id = id;
   }
 
   void setId(Object id) {
