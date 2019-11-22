@@ -16,6 +16,7 @@ import io.ebean.annotation.StorageEngine;
 import io.ebean.annotation.UpdateMode;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
@@ -35,6 +36,8 @@ import javax.persistence.UniqueConstraint;
 
 import static io.ebean.util.AnnotationUtil.findAnnotationRecursive;
 import static io.ebean.util.AnnotationUtil.findAnnotationsRecursive;
+
+import java.util.Set;
 
 /**
  * Read the class level deployment annotations.
