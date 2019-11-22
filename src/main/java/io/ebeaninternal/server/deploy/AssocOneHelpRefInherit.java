@@ -33,7 +33,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   Object read(DbReadContext ctx) throws SQLException {
 
     // read discriminator to determine the type
-    InheritInfo rowInheritInfo = inherit.readType(ctx);
+    InheritInfo rowInheritInfo = !inherit.hasChildren() ? inherit : inherit.readType(ctx);
     if (rowInheritInfo == null) {
       // ignore the id property
       property.targetIdBinder.loadIgnore(ctx);

@@ -20,19 +20,22 @@ public class TestMTOInheritNoDiscriminator extends BaseTestCase {
 
     final TTruckHolder found = DB.find(TTruckHolder.class)
       .fetch("items")
+      .fetch("truck","*")
       .where().idEq(holder.getId())
       .findOne();
 
     assertThat(found).isNotNull();
     assertThat(found.getItems()).hasSize(2);
     assertThat(found.getItems()).extracting(TTruckHolderItem::getFoo).contains("a","b");
+    assertThat(found.getTruck()).isInstanceOf(TTruck.class);
 
 
     final List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
     if (isH2() || isPostgres()) {
-      assertThat(sql.get(0)).contains(" and t2.type = 'truck' ");
+      assertThat(sql.get(0)).contains("t2.truckload");
+      assertThat(sql.get(0)).doesNotContain("t2.type"); // not required here
     }
   }
 

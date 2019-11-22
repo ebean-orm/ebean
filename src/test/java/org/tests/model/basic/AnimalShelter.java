@@ -23,6 +23,9 @@ public class AnimalShelter {
   @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "shelter")
   @PrivateOwned
   List<Animal> animals;
+  
+  @OneToMany(mappedBy = "shelter")
+  List<Dog> dogs;
 
   public Long getId() {
     return id;
@@ -54,6 +57,14 @@ public class AnimalShelter {
 
   public void setAnimals(List<Animal> animals) {
     this.animals = animals;
+  }
+  
+  public List<Dog> getDogs() {
+    return dogs;
+  }
+  
+  public void setDogs(List<Dog> dogs) {
+    this.dogs = dogs;
   }
 
 }

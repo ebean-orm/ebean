@@ -183,7 +183,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
-      if (inheritInfo != null) {
+      if (inheritInfo != null && inheritInfo.hasChildren()) {
         // discriminator column always proceeds id column
         selectChain.add(getPath(prefix, inheritInfo.getDiscriminatorColumn()));
       }
@@ -227,7 +227,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     @Override
     void initBeanType() throws SQLException {
-      InheritInfo localInfo = inheritInfo.readType(ctx);
+      InheritInfo localInfo = !inheritInfo.hasChildren() ? inheritInfo : inheritInfo.readType(ctx);
       if (localInfo == null) {
         // the bean must be null
         localIdBinder = idBinder;
