@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebeaninternal.server.query.STreeProperty;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 
