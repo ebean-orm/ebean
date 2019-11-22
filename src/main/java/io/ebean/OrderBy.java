@@ -4,7 +4,6 @@ import io.ebean.util.StringHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,7 +80,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with ascending order to this OrderBy.
    */
   public Query<T> asc(String propertyName, String collation) {
-
     list.add(new Property(propertyName, true, collation));
     return query;
   }
@@ -90,7 +88,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with descending order to this OrderBy.
    */
   public Query<T> desc(String propertyName) {
-
     list.add(new Property(propertyName, false));
     return query;
   }
@@ -99,7 +96,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with descending order to this OrderBy.
    */
   public Query<T> desc(String propertyName, String collation) {
-
     list.add(new Property(propertyName, false, collation));
     return query;
   }
@@ -109,7 +105,6 @@ public final class OrderBy<T> implements Serializable {
    * Return true if the property is known to be contained in the order by clause.
    */
   public boolean containsProperty(String propertyName) {
-
     for (Property aList : list) {
       if (propertyName.equals(aList.getProperty())) {
         return true;
@@ -162,10 +157,9 @@ public final class OrderBy<T> implements Serializable {
    * Return a copy of the OrderBy.
    */
   public OrderBy<T> copy() {
-
     OrderBy<T> copy = new OrderBy<>();
-    for (Property aList : list) {
-      copy.add(aList.copy());
+    for (Property property : list) {
+      copy.add(property.copy());
     }
     return copy;
   }
@@ -240,6 +234,18 @@ public final class OrderBy<T> implements Serializable {
   public OrderBy<T> clear() {
     list.clear();
     return this;
+  }
+
+  /**
+   * Return true if this order by can be used in select clause.
+   */
+  public boolean supportsSelect() {
+    for (Property property : list) {
+      if (!property.supportsSelect()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -416,6 +422,12 @@ public final class OrderBy<T> implements Serializable {
       return "first".equalsIgnoreCase(highLow) || "low".equalsIgnoreCase(highLow);
     }
 
+    /**
+     * Support use in select clause if no collation or nulls ordering.
+     */
+    boolean supportsSelect() {
+      return nulls == null;
+    }
   }
 
   private void parse(String orderByClause) {
@@ -426,15 +438,15 @@ public final class OrderBy<T> implements Serializable {
 
     String[] chunks = orderByClause.split(",");
     for (String chunk : chunks) {
-      String[] pairs = chunk.split(" ");
-      Property p = parseProperty(pairs);
+      Property p = parseProperty(chunk);
       if (p != null) {
         list.add(p);
       }
     }
   }
 
-  private Property parseProperty(String[] pairs) {
+  private Property parseProperty(String chunk) {
+    String[] pairs = chunk.split(" ");
     if (pairs.length == 0) {
       return null;
     }
@@ -460,8 +472,7 @@ public final class OrderBy<T> implements Serializable {
       boolean asc = isAscending(wordList.get(1));
       return new Property(wordList.get(0), asc, wordList.get(2), wordList.get(3));
     }
-    String m = "Expecting a 1, 2 or 4 words in [" + Arrays.toString(pairs) + "] but got " + wordList;
-    throw new RuntimeException(m);
+    return new Property(chunk.trim(), true);
   }
 
   private boolean isAscending(String s) {

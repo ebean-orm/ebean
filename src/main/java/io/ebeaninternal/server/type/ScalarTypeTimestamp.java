@@ -6,6 +6,9 @@ import io.ebeaninternal.server.core.BasicTypeConverter;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
+
+import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 
 /**
  * ScalarType for java.sql.Timestamp.
@@ -23,7 +26,7 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
   @Override
   protected String toJsonISO8601(Timestamp value) {
-    return dateTimeParser.format(value);
+    return formatIso(value.toInstant());
   }
 
   @Override
@@ -39,6 +42,11 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
   @Override
   public Timestamp convertFromTimestamp(Timestamp ts) {
     return ts;
+  }
+
+  @Override
+  public Timestamp convertFromInstant(Instant ts) {
+    return Timestamp.from(ts);
   }
 
   @Override

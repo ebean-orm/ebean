@@ -10,7 +10,7 @@ import java.io.IOException;
 
 class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
-  private boolean not;
+  private final boolean not;
 
   CaseInsensitiveEqualExpression(String propertyName, Object value, boolean not) {
     super(propertyName, value);
@@ -55,9 +55,9 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
       pname = prop.getBeanProperty().getDecryptProperty(propName);
     }
     if (not) {
-      request.append("lower(").append(pname).append(") !=? ");
+      request.append("lower(").append(pname).append(") != ?");
     } else {
-      request.append("lower(").append(pname).append(") =? ");
+      request.append("lower(").append(pname).append(") = ?");
     }
   }
 

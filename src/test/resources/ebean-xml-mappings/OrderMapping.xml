@@ -14,6 +14,17 @@
         order by c.name, c.id
       </query>
     </raw-sql>
+
+    <raw-sql name="myRawTest3">
+      <column-mapping column="o.id" property="id"/>
+      <column-mapping column="o.status" property="status"/>
+      <query>
+        -- must be unparsed raw sql
+        select o.id, o.status
+        from o_order o
+      </query>
+    </raw-sql>
+
   </entity>
 
 </ebean>

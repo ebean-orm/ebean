@@ -335,6 +335,24 @@ public final class ConvertInetAddresses {
   }
 
   /**
+   * Return the host address without the square brackets around IPv6 addresses.
+   */
+  public static String toHostAddress(InetAddress ip) {
+    return ip.getHostAddress();
+  }
+
+  /**
+   * Parse the IPv4 or IPv6 address without quare brackets around IPv6 addresses.
+   */
+  public static InetAddress fromHost(String hostAddr) {
+    if (hostAddr.startsWith("[")) {
+      // IPv6 address
+      hostAddr = hostAddr.substring(1, hostAddr.length() - 1);
+    }
+    return forString(hostAddr);
+  }
+
+  /**
    * Returns an InetAddress representing the literal IPv4 or IPv6 host
    * portion of a URL, encoded in the format specified by RFC 3986 section 3.2.2.
    * <p/>

@@ -40,6 +40,13 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   boolean isAggregation();
 
   /**
+   * Return true if the property is an aggregation on a ManyToOne.
+   */
+  default boolean isAggregationManyToOne() {
+    return false;
+  }
+
+  /**
    * Return true if the property is a formula.
    */
   boolean isFormula();

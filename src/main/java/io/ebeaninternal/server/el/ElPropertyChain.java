@@ -142,8 +142,7 @@ public class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public boolean containsFormulaWithJoin() {
-    // Not cascading the check at this stage
-    return false;
+    return lastBeanProperty.containsFormulaWithJoin();
   }
 
   @Override

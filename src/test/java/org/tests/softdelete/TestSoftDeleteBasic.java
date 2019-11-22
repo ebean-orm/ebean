@@ -79,8 +79,8 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("from ebasic_sdchild t0 where t0.owner_id = ?  and t0.deleted = ");
-    assertThat(sql.get(1)).contains("from ebasic_sdchild t0 where t0.owner_id = ?  and t0.deleted = ");
+    assertThat(sql.get(0)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
+    assertThat(sql.get(1)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
   }
 
   @Test

@@ -1,5 +1,7 @@
 package io.ebean;
 
+import io.ebean.service.SpiFetchGroupQuery;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -109,6 +111,13 @@ public interface FetchGroup<T> {
   @Nonnull
   static <T> FetchGroupBuilder<T> of(Class<T> cls) {
     return XServiceProvider.fetchGroupOf(cls);
+  }
+
+  /**
+   * Return a query to be used by query beans for constructing FetchGroup.
+   */
+  static <T> SpiFetchGroupQuery<T> queryFor(Class<T> beanType) {
+    return XServiceProvider.fetchGroupQueryFor(beanType);
   }
 
 }

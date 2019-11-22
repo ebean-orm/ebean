@@ -11,7 +11,7 @@ package io.ebean;
  * </p>
  * <pre>{@code
  * Query q =
- *     Ebean.find(Person.class)
+ *     DB.find(Person.class)
  *       .where()
  *         .or()
  *           .like("name", "Rob%")
@@ -30,7 +30,7 @@ package io.ebean;
  * <pre>{@code
  *
  * Query q =
- *     Ebean.find(Person.class)
+ *     DB.find(Person.class)
  *       .where()
  *         .or()
  *           .like("name", "Rob%")
@@ -50,7 +50,7 @@ package io.ebean;
  * </p>
  * <pre>{@code
  * Query<Customer> q =
- *  Ebean.find(Customer.class)
+ *  DB.find(Customer.class)
  *      .where()
  *        .or()
  *          .and()

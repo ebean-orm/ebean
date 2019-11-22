@@ -6,29 +6,52 @@ import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.server.core.BindPadding;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * In a collection of Id values.
  */
 public class IdInExpression extends NonPrepareExpression {
 
-  private final Collection<?> idCollection;
+  private final List<Object> idCollection;
 
   private boolean multiValueIdSupported;
 
   public IdInExpression(Collection<?> idCollection) {
-    this.idCollection = idCollection;
+    this.idCollection = new ArrayList<>(idCollection);
+  }
+
+  /**
+   * Return the ids this expression is looking to fetch.
+   */
+  public Collection<Object> idValues() {
+    return idCollection;
+  }
+
+  /**
+   * Remove Ids that where obtained from l2 cache. Don't fetch these from DB.
+   */
+  public int removeIds(Set<Object> hitIds) {
+    idCollection.removeAll(hitIds);
+    return idCollection.size();
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     multiValueIdSupported = request.isMultiValueIdSupported();
+    if (!multiValueIdSupported && !idCollection.isEmpty() && request.isPadInExpression()) {
+      // pad out the ids for better hit ratio on DB query plans
+      BindPadding.padIds(idCollection);
+    }
   }
 
   @Override

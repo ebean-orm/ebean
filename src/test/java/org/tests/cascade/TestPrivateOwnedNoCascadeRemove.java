@@ -2,6 +2,8 @@ package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.TSDetailTwo;
 import org.tests.model.basic.TSMasterTwo;
@@ -13,6 +15,7 @@ import java.util.Set;
 
 public class TestPrivateOwnedNoCascadeRemove extends BaseTestCase {
 
+  @IgnorePlatform(Platform.NUODB)
   @Test
   public void test() {
 

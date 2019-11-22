@@ -1,6 +1,8 @@
 package io.ebean;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,4 +39,21 @@ public interface BackgroundExecutor {
    * </p>
    */
   void executePeriodically(Runnable r, long delay, TimeUnit unit);
+
+  /**
+   * Schedules a Runnable for one-shot action that becomes enabled after the given delay.
+   *
+   * @return a ScheduledFuture representing pending completion of the task and
+   *         whose get() method will return null upon completion
+   */
+  ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit);
+
+  /**
+   * Schedules a Callable for one-shot action that becomes enabled after the given delay.
+   *
+   * @return a ScheduledFuture that can be used to extract result or cancel
+   */
+  <V> ScheduledFuture<V> schedule(Callable<V> c, long delay, TimeUnit unit);
+
+
 }

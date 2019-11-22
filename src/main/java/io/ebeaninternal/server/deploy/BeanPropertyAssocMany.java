@@ -9,6 +9,7 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * Property mapped to a List Set or Map.
  */
-public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocMany {
+public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocMany, PropertyAssocMany {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssocMany.class);
 
@@ -82,7 +82,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Descriptor for the 'target' when the property maps to an element collection.
    */
-  BeanDescriptor<T> elementDescriptor;
+  final BeanDescriptor<T> elementDescriptor;
 
   /**
    * Order by used when fetch joining the associated many.
@@ -108,7 +108,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Property on the 'child' bean that links back to the 'master'.
    */
-  protected BeanPropertyAssocOne<?> childMasterProperty;
+  private BeanPropertyAssocOne<?> childMasterProperty;
 
   private String childMasterIdProperty;
 
@@ -204,10 +204,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Initialise after the target bean descriptors have been all set.
    */
-  public void initialisePostTarget() {
+  void initialisePostTarget() {
     if (childMasterProperty != null) {
       BeanProperty masterId = childMasterProperty.getTargetDescriptor().getIdProperty();
-      childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      if (masterId != null) { // in docstore only, the master-id may be not available
+        childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+      }
     }
   }
 
@@ -227,6 +229,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       desc.registerTable(targetDescriptor.getBaseTable(), this);
     }
   }
+
   /**
    * Return the underlying collection of beans.
    */
@@ -346,9 +349,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   /**
    * Add the loaded current bean to its associated parent.
-   *
+   * <p>
    * Helper method used by Elastic integration when loading with a persistence context.
    */
+  @Override
   public void lazyLoadMany(EntityBean current) {
     EntityBean parentBean = childMasterProperty.getValueAsEntityBean(current);
     if (parentBean != null) {
@@ -425,7 +429,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
-  public Object read(DbReadContext ctx) throws SQLException {
+  public Object read(DbReadContext ctx) {
     return null;
   }
 
@@ -613,8 +617,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
-  public BeanCollection<?> createReferenceIfNull(EntityBean parentBean) {
+  public BeanCollection<?> createReference(EntityBean localBean, boolean forceNewReference) {
+    return forceNewReference ? createReference(localBean) : createReferenceIfNull(localBean);
+  }
 
+  @Override
+  public BeanCollection<?> createReferenceIfNull(EntityBean parentBean) {
     Object v = getValue(parentBean);
     if (v instanceof BeanCollection<?>) {
       BeanCollection<?> bc = (BeanCollection<?>) v;
@@ -627,7 +635,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   public BeanCollection<?> createReference(EntityBean parentBean) {
-
     BeanCollection<?> ref = help.createReference(parentBean);
     setValue(parentBean, ref);
     return ref;
@@ -637,8 +644,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return help.createEmpty(parentBean);
   }
 
-  public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
-    return help.getBeanCollectionAdd(bc, mapKey);
+  private BeanCollectionAdd getBeanCollectionAdd(Object bc) {
+    return help.getBeanCollectionAdd(bc, null);
   }
 
   public Object getParentId(EntityBean parentBean) {
@@ -684,7 +691,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
     }
 
-    return list.toArray(new ExportedProperty[list.size()]);
+    return list.toArray(new ExportedProperty[0]);
   }
 
   /**
@@ -783,7 +790,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Register the mapping of intersection table to associated draft table.
    */
-  public void registerDraftIntersectionTable(BeanDescriptorInitContext initContext) {
+  void registerDraftIntersectionTable(BeanDescriptorInitContext initContext) {
     if (hasDraftIntersection()) {
       initContext.addDraftIntersection(intersectionPublishTable, intersectionDraftTable);
     }
@@ -884,7 +891,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @SuppressWarnings("unchecked")
-  public void publishMany(EntityBean draft, EntityBean live) {
+  void publishMany(EntityBean draft, EntityBean live) {
 
     // collections will not be null due to enhancement
     BeanCollection<T> draftVal = (BeanCollection<T>) getValueIntercept(draft);
@@ -956,16 +963,19 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return targetDescriptor.isDocStoreMapped();
   }
 
-  public BeanCollectionHelp<T> getHelp() {
-    return help;
-  }
-
-  public void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
+  void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {
     elementDescriptor.jsonWriteMapEntry(ctx, entry);
   }
 
-  public void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
+  void jsonWriteElementValue(SpiJsonWriter ctx, Object element) {
     elementDescriptor.jsonWriteElement(ctx, element);
+  }
+
+  /**
+   * Only cache Many Ids if the target bean is also cached.
+   */
+  public boolean isUseCache() {
+    return targetDescriptor.isBeanCaching();
   }
 
   /**
@@ -1012,7 +1022,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Read the collection as JSON.
    */
-  public Object jsonReadCollection(String json) throws IOException {
+  private Object jsonReadCollection(String json) throws IOException {
     SpiJsonReader ctx = descriptor.createJsonReader(json);
     JsonParser parser = ctx.getParser();
     JsonToken event = parser.nextToken();
@@ -1025,7 +1035,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Write the collection to JSON.
    */
-  public void jsonWriteCollection(SpiJsonWriter ctx, String name, Object value, boolean explicitInclude) throws IOException {
+  private void jsonWriteCollection(SpiJsonWriter ctx, String name, Object value, boolean explicitInclude) throws IOException {
     help.jsonWrite(ctx, name, value, explicitInclude);
   }
 
@@ -1039,7 +1049,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     }
 
     BeanCollection<?> collection = createEmpty(parentBean);
-    BeanCollectionAdd add = getBeanCollectionAdd(collection, null);
+    BeanCollectionAdd add = getBeanCollectionAdd(collection);
     do {
       EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name);
       if (detailBean == null) {

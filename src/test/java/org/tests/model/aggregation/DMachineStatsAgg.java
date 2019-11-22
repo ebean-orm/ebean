@@ -1,6 +1,7 @@
 package org.tests.model.aggregation;
 
 import io.ebean.annotation.Aggregation;
+import io.ebean.annotation.Sum;
 import io.ebean.annotation.View;
 
 import javax.persistence.Entity;
@@ -17,16 +18,10 @@ public class DMachineStatsAgg {
 
   LocalDate date;
 
-  /**
-   * Matching with column underscore.
-   */
-  @Aggregation("sum(totalKms)")
+  @Sum  // which is the same as: @Aggregation("sum(totalKms)")
   long totalKms;
 
-  /**
-   * Matching with no underscore.
-   */
-  @Aggregation("sum(hours)")
+  @Aggregation("sum(hours)") // which is the same as: @Sum
   long hours;
 
   @Aggregation("max(rate)")

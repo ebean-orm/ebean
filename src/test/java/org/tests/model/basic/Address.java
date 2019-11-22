@@ -25,7 +25,7 @@ import java.sql.Timestamp;
 public class Address {
 
   @Id
-  Short id;
+  Integer id;
 
   @Size(max = 100)
   @Column(name = "line_1")
@@ -55,14 +55,14 @@ public class Address {
   /**
    * Return id.
    */
-  public Short getId() {
+  public Integer getId() {
     return id;
   }
 
   /**
    * Set id.
    */
-  public void setId(Short id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

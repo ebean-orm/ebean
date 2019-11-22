@@ -3,6 +3,7 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareSet;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -10,7 +11,6 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.LinkedHashSet;
@@ -20,7 +20,7 @@ import java.util.UUID;
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
-public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> implements ScalarTypeArray {
+public class ScalarTypeArraySet<T> extends ScalarTypeArrayBase<Set<T>> implements ScalarTypeArray {
 
   private static final ScalarTypeArraySet<UUID> UUID = new ScalarTypeArraySet<>("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
   private static final ScalarTypeArraySet<Long> LONG = new ScalarTypeArraySet<>("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
@@ -99,7 +99,8 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
     return arrayType + "[]";
   }
 
-  private Set<T> fromArray(Object[] array1) {
+  @Override
+  protected Set<T> fromArray(Object[] array1) {
     Set<T> set = new LinkedHashSet<>();
     for (Object element : array1) {
       set.add(converter.toElement(element));
@@ -109,16 +110,6 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
 
   protected Object[] toArray(Set<T> value) {
     return converter.toDbArray(value.toArray());
-  }
-
-  @Override
-  public Set<T> read(DataReader reader) throws SQLException {
-    Array array = reader.getArray();
-    if (array == null) {
-      return null;
-    } else {
-      return fromArray((Object[]) array.getArray());
-    }
   }
 
   @Override
@@ -144,7 +135,7 @@ public class ScalarTypeArraySet<T> extends ScalarTypeJsonCollection<Set<T>> impl
     try {
       return EJson.parseSet(value, false);
     } catch (IOException e) {
-      throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
+      throw new TextException("Failed to parse JSON [{}] as Set", value, e);
     }
   }
 

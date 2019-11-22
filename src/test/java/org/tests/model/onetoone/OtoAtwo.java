@@ -4,11 +4,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Size;
 
 @Entity
 public class OtoAtwo {
 
   @Id
+  @Size(max = 100)
   private String id;
 
   private String description;

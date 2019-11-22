@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.DtoQuery;
+import io.ebean.ProfileLocation;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -39,6 +40,8 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
 
   private String label;
 
+  private ProfileLocation profileLocation;
+
   /**
    * Bind parameters when using the query language.
    */
@@ -52,6 +55,7 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
     this.descriptor = descriptor;
     this.ormQuery = ormQuery;
     this.label = ormQuery.getLabel();
+    this.profileLocation = ormQuery.getProfileLocation();
   }
 
   /**
@@ -164,6 +168,35 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public String getLabel() {
     return label;
+  }
+
+  @Override
+  public String getPlanLabel() {
+    if (label != null) {
+      return label;
+    }
+    if (profileLocation != null) {
+      return profileLocation.label();
+    }
+    return null;
+  }
+
+  @Override
+  public void obtainLocation() {
+    if (profileLocation != null) {
+      profileLocation.obtain();
+    }
+  }
+
+  @Override
+  public DtoQuery<T> setProfileLocation(ProfileLocation profileLocation) {
+    this.profileLocation = profileLocation;
+    return this;
+  }
+
+  @Override
+  public ProfileLocation getProfileLocation() {
+    return profileLocation;
   }
 
   @Override

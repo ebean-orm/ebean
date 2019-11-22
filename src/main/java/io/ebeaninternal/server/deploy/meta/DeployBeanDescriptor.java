@@ -37,7 +37,6 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -136,6 +135,8 @@ public class DeployBeanDescriptor<T> {
 
   private List<IndexDefinition> indexDefinitions;
 
+  private String storageEngine;
+
   /**
    * The base database table.
    */
@@ -178,11 +179,6 @@ public class DeployBeanDescriptor<T> {
    * If set overrides the find implementation. Server side only.
    */
   private BeanFindController beanFinder;
-
-  /**
-   * The table joins for this bean. Server side only.
-   */
-  private final ArrayList<DeployTableJoin> tableJoinList = new ArrayList<>(2);
 
   /**
    * Inheritance information. Server side only.
@@ -243,7 +239,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Return true if there is a IdClass set.
    */
-  public boolean isIdClass() {
+  boolean isIdClass() {
     return idClass != null;
   }
 
@@ -268,11 +264,12 @@ public class DeployBeanDescriptor<T> {
     return manager.getDeploy(cls);
   }
 
-  /**
-   * Return true if this beanType is an abstract class.
-   */
-  public boolean isAbstract() {
-    return Modifier.isAbstract(beanType.getModifiers());
+  public void setStorageEngine(String storageEngine) {
+    this.storageEngine = storageEngine;
+  }
+
+  public String getStorageEngine() {
+    return storageEngine;
   }
 
   /**
@@ -315,7 +312,7 @@ public class DeployBeanDescriptor<T> {
     this.partitionMeta = partitionMeta;
   }
 
-  public PartitionMeta  getPartitionMeta() {
+  public PartitionMeta getPartitionMeta() {
     if (partitionMeta != null) {
       DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
       if (beanProperty != null) {
@@ -463,8 +460,8 @@ public class DeployBeanDescriptor<T> {
   /**
    * Set that this type invalidates query caches.
    */
-  public void setInvalidateQueryCache() {
-    this.cacheOptions = CacheOptions.INVALIDATE_QUERY_CACHE;
+  public void setInvalidateQueryCache(String region) {
+    this.cacheOptions = CacheOptions.invalidateQueryCache(region);
   }
 
   /**
@@ -492,7 +489,7 @@ public class DeployBeanDescriptor<T> {
     return cacheOptions;
   }
 
-  public DeployBeanPropertyAssocOne<?> getIdClassProperty() {
+  DeployBeanPropertyAssocOne<?> getIdClassProperty() {
     return idClassProperty;
   }
 
@@ -508,7 +505,7 @@ public class DeployBeanDescriptor<T> {
     this.orderColumn = orderColumn;
   }
 
-  public DeployBeanProperty getOrderColumn() {
+  DeployBeanProperty getOrderColumn() {
     return orderColumn;
   }
 
@@ -551,7 +548,7 @@ public class DeployBeanDescriptor<T> {
     if (indexDefinitions == null) {
       return null;
     } else {
-      return indexDefinitions.toArray(new IndexDefinition[indexDefinitions.size()]);
+      return indexDefinitions.toArray(new IndexDefinition[0]);
     }
   }
 
@@ -940,17 +937,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Add a TableJoin to this type of bean. For Secondary table properties.
-   */
-  public void addTableJoin(DeployTableJoin join) {
-    tableJoinList.add(join);
-  }
-
-  List<DeployTableJoin> getTableJoins() {
-    return tableJoinList;
-  }
-
-  /**
    * Return a collection of all BeanProperty deployment information.
    */
   public Collection<DeployBeanProperty> propertiesAll() {
@@ -1257,7 +1243,8 @@ public class DeployBeanDescriptor<T> {
   /**
    * Returns the jackson annotated class, if jackson is present.
    */
-  public Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
+  @SuppressWarnings("unchecked")
+  Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
     if (jacksonAnnotatedClass == null) {
       jacksonAnnotatedClass = new DeployBeanObtainJackson(serverConfig, beanType).obtain();
     }

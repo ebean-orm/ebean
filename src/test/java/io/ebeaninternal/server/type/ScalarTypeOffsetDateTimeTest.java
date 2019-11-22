@@ -6,7 +6,10 @@ import org.junit.Test;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ScalarTypeOffsetDateTimeTest {
 
@@ -61,7 +64,7 @@ public class ScalarTypeOffsetDateTimeTest {
   @Test
   public void testJson() throws Exception {
 
-    OffsetDateTime now = OffsetDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now().withNano(123_000_000); // jdk11 workaround
 
     JsonTester<OffsetDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
@@ -73,5 +76,17 @@ public class ScalarTypeOffsetDateTimeTest {
     ScalarTypeOffsetDateTime typeIso = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.ISO8601);
     jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
+  }
+
+  @Test
+  public void isoJsonFormatParse() {
+
+    ScalarTypeOffsetDateTime typeIso = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.ISO8601);
+
+    OffsetDateTime now = OffsetDateTime.now();
+    String asJson = typeIso.toJsonISO8601(now);
+
+    OffsetDateTime value = typeIso.fromJsonISO8601(asJson);
+    assertThat(now).isEqualToIgnoringNanos(value);
   }
 }

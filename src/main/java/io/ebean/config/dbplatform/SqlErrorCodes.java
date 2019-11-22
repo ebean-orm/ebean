@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class SqlErrorCodes {
 
-  private Map<String,DataErrorType> map = new HashMap<>();
+  private final Map<String, DataErrorType> map = new HashMap<>();
 
   /**
    * Map the codes to AcquireLockException.
@@ -29,6 +29,13 @@ public class SqlErrorCodes {
    */
   public SqlErrorCodes addDuplicateKey(String... codes) {
     return add(DataErrorType.DuplicateKey, codes);
+  }
+
+  /**
+   * Map the codes to SerializableConflictException.
+   */
+  public SqlErrorCodes addSerializableConflict(String... codes) {
+    return add(DataErrorType.SerializableConflict, codes);
   }
 
   private SqlErrorCodes add(DataErrorType type, String... codes) {

@@ -61,7 +61,7 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     String idSql = r.getBeanDescriptor().getIdBinderIdSql(null);
 
-    request.append(idSql).append(" ");
+    request.append(idSql);
   }
 
   /**

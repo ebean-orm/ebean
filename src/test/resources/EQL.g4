@@ -4,8 +4,13 @@ select_statement
    : select_clause? fetch_clause* where_clause? orderby_clause? limit_clause? EOF
    ;
 
+select_properties
+   : '(' fetch_property_group ')'
+   | fetch_property_group
+   ;
+
 select_clause
-   : 'select' distinct? '(' fetch_property_group ')'
+   : 'select' distinct? select_properties
    ;
 
 distinct
@@ -47,7 +52,7 @@ offset_clause
    ;
 
 fetch_path
-   : 'fetch' fetch_option? PATH_VARIABLE fetch_property_set?
+   : 'fetch' fetch_option? fetch_path_path fetch_property_set?
    ;
 
 fetch_property_set
@@ -58,10 +63,16 @@ fetch_property_group
    : fetch_property (',' fetch_property)*
    ;
 
+fetch_path_path
+   : PATH_VARIABLE
+   | QUOTED_PATH_VARIABLE
+   ;
+
 fetch_property
    : PATH_VARIABLE
    | fetch_query_hint
    | fetch_lazy_hint
+   | PROP_FORMULA
    ;
 
 fetch_query_hint
@@ -109,14 +120,20 @@ conditional_primary
 any_expression
    : comparison_expression
    | like_expression
+   | inrange_expression
    | between_expression
    | propertyBetween_expression
+   | inOrEmpty_expression
    | in_expression
    | isNull_expression
    | isNotNull_expression
    | isEmpty_expression
    | isNotEmpty_expression
    | '(' any_expression ')'
+   ;
+
+inOrEmpty_expression
+   : PATH_VARIABLE 'inOrEmpty' in_value
    ;
 
 in_expression
@@ -130,6 +147,14 @@ in_value
 
 between_expression
    : PATH_VARIABLE 'between' value_expression 'and' value_expression
+   ;
+
+inrange_expression
+   : PATH_VARIABLE inrange_op value_expression 'to' value_expression
+   ;
+
+inrange_op
+   : 'inrange' | 'inRange'
    ;
 
 propertyBetween_expression
@@ -181,8 +206,9 @@ comparison_operator
    | '<'  | 'lt'
    | '<=' | 'le' | 'lte'
    | '<>' | '!=' | 'ne'
-   | 'ieq' 
+   | 'ieq'
    | 'ine'
+   | 'eqOrNull' | 'gtOrNull' | 'ltOrNull'
    ;
 
 value_expression
@@ -199,10 +225,23 @@ literal
 
 INPUT_VARIABLE
    : ':' ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_')*
+   | '?' ('0' .. '9')*
    ;
 
 PATH_VARIABLE
    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '.')*
+   ;
+
+QUOTED_PATH_VARIABLE
+   : ('`')(PATH_VARIABLE)('`')
+   ;
+
+PROP_FORMULA
+   : 'sum(' PATH_VARIABLE ')'
+   | 'max(' PATH_VARIABLE ')'
+   | 'min(' PATH_VARIABLE ')'
+   | 'avg(' PATH_VARIABLE ')'
+   | 'count(' PATH_VARIABLE ')'
    ;
 
 BOOLEAN_LITERAL

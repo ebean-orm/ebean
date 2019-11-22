@@ -2,6 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
@@ -52,6 +53,7 @@ public class TestQueryCache extends BaseTestCase {
   @Test
   public void findSingleAttribute() {
 
+    DB.find(EColAB.class).delete();
     new EColAB("03", "SingleAttribute").save();
     new EColAB("03", "SingleAttribute").save();
 
@@ -260,10 +262,10 @@ public class TestQueryCache extends BaseTestCase {
   @Test
   public void findIds() {
 
+    DB.find(EColAB.class).delete();
     new EColAB("03", "someId").save();
     new EColAB("04", "someId").save();
     new EColAB("05", "someId").save();
-
 
     LoggedSqlCollector.start();
 

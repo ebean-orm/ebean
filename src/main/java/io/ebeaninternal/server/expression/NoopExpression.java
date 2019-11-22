@@ -3,11 +3,11 @@ package io.ebeaninternal.server.expression;
 import io.ebean.QueryDsl;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 
@@ -77,7 +77,7 @@ class NoopExpression implements SpiExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append("1=1 ");
+    request.append("1=1");
   }
 
   @Override

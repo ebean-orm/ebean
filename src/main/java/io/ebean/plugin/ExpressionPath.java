@@ -77,7 +77,7 @@ public interface ExpressionPath {
   /**
    * Return the underlying bean property.
    */
-  public Property getProperty();
+  Property getProperty();
 
   /**
    * The ElPrefix plus name.

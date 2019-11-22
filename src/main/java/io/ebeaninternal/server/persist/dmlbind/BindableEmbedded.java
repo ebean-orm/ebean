@@ -20,7 +20,7 @@ public class BindableEmbedded implements Bindable {
 
   public BindableEmbedded(BeanPropertyAssocOne<?> embProp, List<Bindable> bindList) {
     this.embProp = embProp;
-    this.items = bindList.toArray(new Bindable[bindList.size()]);        //this.props = propList.toArray(new BeanProperty[propList.size()]);
+    this.items = bindList.toArray(new Bindable[0]);
   }
 
   @Override

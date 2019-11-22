@@ -3,6 +3,8 @@ package io.ebeaninternal.server.querydefn;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
+import java.util.Objects;
+
 /**
  * Query plan key for ORM queries.
  */
@@ -23,6 +25,11 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     hc = hc * 92821 + (maxRows);
     hc = hc * 92821 + (firstRow);
     this.planHash = hc;
+  }
+
+  @Override
+  public CQueryPlanKey withDeleteByIds() {
+    return new OrmQueryPlanKey(description + ":deleteByIds", 0, 0, null);
   }
 
   @Override
@@ -50,6 +57,6 @@ class OrmQueryPlanKey implements CQueryPlanKey {
     if (maxRows != that.maxRows) return false;
     if (firstRow != that.firstRow) return false;
     if (!description.equals(that.description)) return false;
-    return rawSqlKey != null ? rawSqlKey.equals(that.rawSqlKey) : that.rawSqlKey == null;
+    return Objects.equals(rawSqlKey, that.rawSqlKey);
   }
 }
