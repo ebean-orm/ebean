@@ -322,7 +322,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   @Override
   public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType) {
-    return getBeanDescriptorByClassName(entityType.getName());
+    BeanDescriptor<T> ret = getBeanDescriptorByClassName(entityType.getName());
+    if (ret == null) {
+      for (Class<?> iface : entityType.getInterfaces()) {
+        ret = getBeanDescriptorByClassName(iface.getName());
+        if (ret != null)
+          break;
+      }
+    }
+    return ret;
   }
 
   @SuppressWarnings("unchecked")
@@ -869,7 +877,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * and descAliases accordingly.
    */
   private void readOverridesAndAliases() {
-    Map<String, DeployBeanInfo<?>> overrides = new HashMap<>();
+    Map<Class<?>, DeployBeanInfo<?>> overrides = new HashMap<>();
 
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       DeployBeanDescriptor<?> desc = info.getDescriptor();
@@ -884,11 +892,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // lowest prio
         DeployBeanInfo<?> override = overrides.get(base);
         if (override == null) {
-          overrides.put(base.getName(), info);
+          overrides.put(base, info);
         } else {
           int delta = override.getDescriptor().getOverridePriority().compareTo(prio);
           if (delta > 0) {
-            overrides.put(base.getName(), info);
+            overrides.put(base, info);
           } else if (delta == 0) {
             throw new IllegalStateException("There are two or more implementations for " + base.getName()
                 + " with priority " + prio + ". Conflicting entity: " + desc.getBeanType().getName() + " - "
@@ -898,21 +906,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       }
     }
 
-    for (Entry<String, DeployBeanInfo<?>> entry : overrides.entrySet()) {
-      deployInfoMap.remove(entry.getKey()); // remove the original descriptor
+    for (Entry<Class<?>, DeployBeanInfo<?>> entry : overrides.entrySet()) {
+      deployInfoMap.remove(entry.getKey().getName()); // remove the original descriptor
 
       DeployBeanDescriptor<?> newDesc = entry.getValue().getDescriptor();
       newDesc.setOverridePriority(null); // clear priority (so no discard will occur)
 
       deployInfoMap.put(newDesc.getBeanType().getName(), entry.getValue());
-      descAliases.put(entry.getKey(), newDesc.getBeanType().getName());
+      descAliases.put(entry.getKey().getName(), newDesc.getBeanType().getName());
     }
     // remove all left overrides classes (they are discarded)
     deployInfoMap.values().removeIf(info -> info.getDescriptor().getOverridePriority() != null);
 
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      for (String iface : info.getDescriptor().getInterfaces()) {
-        String conflict = descAliases.put(iface, info.getDescriptor().getBeanType().getName());
+      for (Class<?> iface : info.getDescriptor().getInterfaces()) {
+        String conflict = descAliases.put(iface.getName(), info.getDescriptor().getBeanType().getName());
         if (conflict != null) {
           throw new IllegalStateException("There are two or more implementations for " + iface
               + ". Conflicting entity: " + conflict + " - " + info.getDescriptor().getBeanType().getName());
