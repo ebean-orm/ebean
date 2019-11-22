@@ -1,8 +1,5 @@
 package io.ebean;
 
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiTransaction;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
@@ -70,7 +67,7 @@ public interface ExtendedServer {
    *
    * @return True if the query finds a matching row in the database
    */
-  <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction);
+  <T> boolean exists(Query<?> ormQuery, Transaction transaction);
 
   /**
    * Return the number of 'top level' or 'root' entities this query should return.
