@@ -392,7 +392,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
           // normal bean loading
           ebi.setLoaded();
         }
-        desc.setMutableOrigValues(ebi);
+        localDesc.setMutableOrigValues(ebi);
 
         if (disableLazyLoad) {
           // bean does not have an Id or is SqlSelect based
