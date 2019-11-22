@@ -372,7 +372,7 @@ public class InheritInfo {
   /**
    * Return the discriminator value for this node.
    */
-  String getDiscriminatorStringValue() {
+  public String getDiscriminatorStringValue() {
     return discriminatorStringValue;
   }
 
