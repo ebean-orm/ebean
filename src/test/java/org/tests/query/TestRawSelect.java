@@ -3,9 +3,12 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Dog;
@@ -54,6 +57,7 @@ public class TestRawSelect extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testFindSingleAttributeInherit() {
 
     Query<Dog> query = Ebean.find(Dog.class);
@@ -74,6 +78,7 @@ public class TestRawSelect extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testFindSingleAttribute() {
 
     Query<Customer> query = Ebean.find(Customer.class);
@@ -94,6 +99,7 @@ public class TestRawSelect extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testFindListInherit() {
 
     Query<Dog> query = Ebean.find(Dog.class);
@@ -121,6 +127,7 @@ public class TestRawSelect extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testFindList() {
 
     Query<Customer> query = Ebean.find(Customer.class);
