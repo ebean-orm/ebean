@@ -505,6 +505,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return tableToDescMap.get(tableName.toLowerCase());
   }
 
+  @Override
+  public boolean isTableManaged(String tableName) {
+    return tableToDescMap.get(tableName.toLowerCase()) != null
+        || tableToViewDescMap.get(tableName.toLowerCase()) != null;
+  }
+
   /**
    * Invalidate entity beans based on views via their dependent tables.
    */

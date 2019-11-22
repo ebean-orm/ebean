@@ -123,8 +123,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
-    if (p.hasJoinTable() && p.getMappedBy() == null) {
-      // only create on other 'owning' side
+    if (p.createJoinTable()) {
 
       // build the create table and fkey constraints
       // putting the DDL into ctx for later output as we are
