@@ -121,7 +121,10 @@ public class OrmQueryDetail implements Serializable {
     }
     if (fetchPaths != null) {
       for (OrmQueryProperties join : fetchPaths.values()) {
-        join.append(" fetch ", sb);
+        if (sb.length() > 0) {
+          sb.append(" ");
+        }
+        join.append("fetch ", sb);
       }
     }
     return sb.toString();

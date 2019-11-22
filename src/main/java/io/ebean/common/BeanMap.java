@@ -237,7 +237,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked"})
   public Set<Entry<K, E>> entrySet() {
     init();
     if (isReadOnly()) {

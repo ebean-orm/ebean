@@ -10,7 +10,7 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
  */
 public class DeployDocPropertyOptions {
 
-  private static DocPropertyOptions EMPTY = new DocPropertyOptions();
+  private static final DocPropertyOptions EMPTY = new DocPropertyOptions();
 
   private DocPropertyOptions mapping;
 

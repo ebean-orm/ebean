@@ -1,10 +1,9 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.SqlUpdate;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebeaninternal.server.core.PersistRequest;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -21,10 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
-class SaveManyBeans extends SaveManyBase {
+public class SaveManyBeans extends SaveManyBase {
 
   private static final Logger log = LoggerFactory.getLogger(SaveManyBeans.class);
 
@@ -36,7 +37,7 @@ class SaveManyBeans extends SaveManyBase {
   private final DeleteMode deleteMode;
 
   private Collection<?> collection;
-  private DefaultPersister persister;
+  private final DefaultPersister persister;
   private boolean deleteMissing;
   private int sortOrder;
 
@@ -84,7 +85,10 @@ class SaveManyBeans extends SaveManyBase {
   }
 
   private boolean isSaveIntersection() {
-    return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
+    if (!many.isManyToMany()) {
+      return true;
+    }
+    return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().rootName());
   }
 
   private boolean isModifyListenMode() {
@@ -220,7 +224,7 @@ class SaveManyBeans extends SaveManyBase {
       }
       if (detailBean instanceof EntityBean) {
         Object id = targetDescriptor.getId((EntityBean) detailBean);
-        if (!DmlUtil.isNullOrZero(id)) {
+        if (!isNullOrZero(id)) {
           // remember the Id (other details not in the collection) will be removed
           detailIds.add(id);
         }
@@ -241,14 +245,29 @@ class SaveManyBeans extends SaveManyBase {
     if (value == null) {
       return;
     }
+    if (request.isQueueManyIntersection()) {
+      // queue/delay until bean persist request is flushed
+      this.deleteMissing = deleteMissingChildren;
+      request.addManyIntersection(this);
+    } else {
+      saveAssocManyIntersection(deleteMissingChildren, false);
+    }
+  }
 
-    //SpiTransaction t = saveManyPropRequest.getTransaction();
+  /**
+   * Push intersection table changes onto batch flush queue.
+   */
+  public void saveIntersectionBatch() {
+    saveAssocManyIntersection(deleteMissing, true);
+  }
+
+  private void saveAssocManyIntersection(boolean deleteMissingChildren, boolean queue) {
+
     boolean vanillaCollection = !(value instanceof BeanCollection<?>);
-
     if (vanillaCollection || deleteMissingChildren) {
       // delete all intersection rows and then treat all
       // beans in the collection as additions
-      persister.deleteAssocManyIntersection(parentBean, many, transaction, publish);
+      persister.deleteManyIntersection(parentBean, many, transaction, publish, queue);
     }
 
     Collection<?> deletions = null;
@@ -284,10 +303,6 @@ class SaveManyBeans extends SaveManyBase {
     transaction.depth(+1);
 
     if (additions != null && !additions.isEmpty()) {
-      // ensure any cascade batch has been flushed prior
-      // to inserting into the intersection table
-      transaction.flushBatch();
-
       for (Object other : additions) {
         EntityBean otherBean = (EntityBean) other;
         // the object from the 'other' side of the ManyToMany
@@ -306,24 +321,20 @@ class SaveManyBeans extends SaveManyBase {
           } else {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
-            SqlUpdate sqlInsert = intRow.createInsert(server);
-            persister.executeSqlUpdate(sqlInsert, transaction);
+            SpiSqlUpdate sqlInsert = intRow.createInsert(server);
+            persister.executeOrQueue(sqlInsert, transaction, queue);
           }
         }
       }
     }
     if (deletions != null && !deletions.isEmpty()) {
-      // ensure any cascade batch has been flushed prior
-      // to inserting into the intersection table
-      transaction.flushBatch();
-
       for (Object other : deletions) {
         EntityBean otherDelete = (EntityBean) other;
         // the object from the 'other' side of the ManyToMany
         // build a intersection row for 'delete'
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
-        SqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
-        persister.executeSqlUpdate(sqlDelete, transaction);
+        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
+        persister.executeOrQueue(sqlDelete, transaction, queue);
       }
     }
 
@@ -346,7 +357,7 @@ class SaveManyBeans extends SaveManyBase {
             EntityBean eb = (EntityBean) removedBean;
             if (!eb._ebean_getIntercept().isNew()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
-              persister.deleteRequest(persister.createPublishRequest(removedBean, transaction, PersistRequest.Type.DELETE, request.getFlags()));
+              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.getFlags()));
             }
           }
         }

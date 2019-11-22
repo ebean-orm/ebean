@@ -28,7 +28,7 @@ public class FactoryBaseProperties {
 
     for (BeanProperty prop : desc.propertiesBaseScalar()) {
       if (!prop.isImportedPrimaryKey()) {
-        Bindable item = factoryProperty.create(prop, mode, withLobs);
+        Bindable item = factoryProperty.create(prop, mode, withLobs, false);
         if (item != null) {
           list.add(item);
         }

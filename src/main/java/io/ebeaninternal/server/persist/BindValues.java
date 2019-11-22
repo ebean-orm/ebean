@@ -5,21 +5,14 @@ import java.util.ArrayList;
 /**
  * Holds a list of bind values for binding to a PreparedStatement.
  */
-public class BindValues {
+class BindValues {
 
-  final ArrayList<Value> list = new ArrayList<>();
+  private final ArrayList<Value> list = new ArrayList<>();
 
   /**
    * Create with a Binder.
    */
   public BindValues() {
-  }
-
-  /**
-   * Return the number of bind values.
-   */
-  public int size() {
-    return list.size();
   }
 
   /**
@@ -53,7 +46,7 @@ public class BindValues {
     /**
      * Create the value.
      */
-    public Value(Object value, int dbType, String name) {
+    Value(Object value, int dbType, String name) {
       this.value = value;
       this.dbType = dbType;
       this.name = name;

@@ -60,7 +60,8 @@ public class ServerConfigTest {
     props.setProperty("backgroundExecutorShutdownSecs", "98");
     props.setProperty("backgroundExecutorSchedulePoolSize", "4");
     props.setProperty("dbOffline", "true");
-    props.setProperty("jsonDateTime", "ISO8601");
+    props.setProperty("jsonDateTime", "MILLIS");
+    props.setProperty("jsonDate", "MILLIS");
     props.setProperty("autoReadOnlyDataSource", "true");
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
@@ -68,6 +69,8 @@ public class ServerConfigTest {
     props.setProperty("mappingLocations", "classpath:/foo;bar");
     props.setProperty("namingConvention", "io.ebean.config.MatchingNamingConvention");
     props.setProperty("idGeneratorAutomatic", "true");
+    props.setProperty("enabledL2Regions", "r0,users,orgs");
+    props.setProperty("caseSensitiveCollation", "false");
 
 
     serverConfig.loadFromProperties(props);
@@ -77,6 +80,7 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
     assertTrue(serverConfig.isIdGeneratorAutomatic());
+    assertFalse(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
 
     assertThat(serverConfig.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 
@@ -84,7 +88,10 @@ public class ServerConfigTest {
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
-    assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
+    assertEquals(JsonConfig.DateTime.MILLIS, serverConfig.getJsonDateTime());
+    assertEquals(JsonConfig.Date.MILLIS, serverConfig.getJsonDate());
+
+    assertEquals("r0,users,orgs", serverConfig.getEnabledL2Regions());
 
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
@@ -111,6 +118,9 @@ public class ServerConfigTest {
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
+
+    serverConfig.setEnabledL2Regions("r0,orgs");
+    assertEquals("r0,orgs", serverConfig.getEnabledL2Regions());
   }
 
   @Test
@@ -121,6 +131,9 @@ public class ServerConfigTest {
 
     serverConfig.setIdGeneratorAutomatic(false);
     assertFalse(serverConfig.isIdGeneratorAutomatic());
+    assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
+    assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
+    assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
   }
 
   @Test

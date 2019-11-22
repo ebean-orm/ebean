@@ -79,6 +79,15 @@ public abstract class BeanRequest {
   }
 
   /**
+   * Clear the transaction from the thread local for implicit transactions.
+   */
+  public void clearTransIfRequired() {
+    if (createdTransaction) {
+      ebeanServer.clearServerTransaction();
+    }
+  }
+
+  /**
    * Return the server processing the request. Made available for
    * BeanController and BeanFinder.
    */

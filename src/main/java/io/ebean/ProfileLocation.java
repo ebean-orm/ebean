@@ -41,6 +41,11 @@ public interface ProfileLocation {
   String shortDescription();
 
   /**
+   * Return the short label.
+   */
+  String label();
+
+  /**
    * Add execution time.
    */
   void add(long executionTime);

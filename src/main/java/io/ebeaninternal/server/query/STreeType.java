@@ -23,11 +23,6 @@ public interface STreeType {
   boolean hasId();
 
   /**
-   * Return true if the type is for ElementCollection (not mapped to an entity type/class).
-   */
-  boolean isElementType();
-
-  /**
    * Return true if the type uses soft delete.
    */
   boolean isSoftDelete();
@@ -120,7 +115,7 @@ public interface STreeType {
   /**
    * Find and return property allowing for dynamic formula properties.
    */
-  STreeProperty findPropertyWithDynamic(String baseName);
+  STreeProperty findPropertyWithDynamic(String baseName, String path);
 
   /**
    * Return an extra join if the property path requires it.

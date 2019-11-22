@@ -21,7 +21,9 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   @Override
   void loadIgnore(DbReadContext ctx) {
     property.targetIdBinder.loadIgnore(ctx);
-    ctx.getDataReader().incrementPos(1);
+    if (inherit.hasChildren()) {
+      ctx.getDataReader().incrementPos(1);
+    }
   }
 
   /**
@@ -74,7 +76,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
-    if (!subQuery) {
+    if (!subQuery && inherit.hasChildren()) {
       // add discriminator column
       String relativePrefix = ctx.getRelativePrefix(property.getName());
       String tableAlias = ctx.getTableAlias(relativePrefix);

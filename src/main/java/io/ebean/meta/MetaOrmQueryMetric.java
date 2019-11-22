@@ -1,7 +1,5 @@
 package io.ebean.meta;
 
-import io.ebean.ProfileLocation;
-
 import java.util.List;
 
 /**
@@ -10,19 +8,14 @@ import java.util.List;
 public interface MetaOrmQueryMetric extends MetaQueryMetric {
 
   /**
-   * Return the profile location.
-   */
-  ProfileLocation getProfileLocation();
-
-  /**
    * Return true if this query plan was tuned by AutoTune.
    */
   boolean isAutoTuned();
 
   /**
-   * Return a string representation of the query plan hash.
+   * Return the hash of the sql.
    */
-  String getQueryPlanHash();
+  String getSqlHash();
 
   /**
    * Return the time of the last query executed using this plan.

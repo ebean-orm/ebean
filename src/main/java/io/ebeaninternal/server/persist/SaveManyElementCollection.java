@@ -2,7 +2,6 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -27,26 +26,15 @@ class SaveManyElementCollection extends SaveManyBase {
     }
 
     Object parentId = request.getBeanId();
-    SpiEbeanServer server = request.getServer();
-
-    if (!insertedParent) {
-      request.preElementCollectionUpdate();
-      SqlUpdate sqlDelete = many.deleteByParentId(parentId, null);
-      server.execute(sqlDelete, transaction);
-    }
+    preElementCollectionUpdate(parentId);
 
     transaction.depth(+1);
-
-    String insert = many.insertElementCollection();
-    SqlUpdate sqlInsert = server.createSqlUpdate(insert);
-
+    SqlUpdate sqlInsert = server.createSqlUpdate(many.insertElementCollection());
     for (Object value : collection) {
-
       sqlInsert.setNextParameter(parentId);
       many.bindElementValue(sqlInsert, value);
       server.execute(sqlInsert, transaction);
     }
-
     transaction.depth(-1);
     resetModifyState();
     postElementCollectionUpdate();

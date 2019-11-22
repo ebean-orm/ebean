@@ -26,7 +26,7 @@ public final class DmlBeanPersister implements BeanPersister {
 
   private final DeleteMeta deleteMeta;
 
-  public DmlBeanPersister(DatabasePlatform dbPlatform, UpdateMeta updateMeta, InsertMeta insertMeta, DeleteMeta deleteMeta) {
+  DmlBeanPersister(DatabasePlatform dbPlatform, UpdateMeta updateMeta, InsertMeta insertMeta, DeleteMeta deleteMeta) {
     this.dbPlatform = dbPlatform;
     this.updateMeta = updateMeta;
     this.insertMeta = insertMeta;

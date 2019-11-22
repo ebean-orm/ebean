@@ -12,13 +12,7 @@ import io.ebeaninternal.server.cache.CachedManyIds;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.OCachedBean;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +138,86 @@ public class TestCacheCollectionIds extends BaseTestCase {
     assertEquals(1, cachedManyIds.getIdList().size());
     assertFalse(cachedManyIds.getIdList().contains("NZ"));
     assertTrue(cachedManyIds.getIdList().contains("AU"));
+  }
+
+  @Test
+  public void testChangingCollectionByEditingConnectedCachedBean() {
+    ResetBasicData.reset();
+
+    OCachedBean cachedBean = new OCachedBean();
+    cachedBean.setName("hello1");
+
+    Ebean.save(cachedBean);
+    awaitL2Cache();
+
+    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(0, dummyToLoad.getChildren().size());
+
+    OCachedBeanChild child1=new OCachedBeanChild();
+    child1.setCachedBean(cachedBean);
+    Ebean.insert(child1);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(1, dummyToLoad.getChildren().size());
+
+    OCachedBeanChild child2=new OCachedBeanChild();
+    child2.setCachedBean(cachedBean);
+    Ebean.insert(child2);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(2, dummyToLoad.getChildren().size());
+
+    Ebean.delete(child2);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(1, dummyToLoad.getChildren().size());
+
+    Ebean.delete(child1);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(0, dummyToLoad.getChildren().size());
+
+    Ebean.delete(cachedBean);
+  }
+
+  @Test
+  public void testChangingCollectionByEditingConnectedNotCachedBean() {
+    ResetBasicData.reset();
+
+    OCachedBean cachedBean = new OCachedBean();
+    cachedBean.setName("hello2");
+
+    Ebean.save(cachedBean);
+    awaitL2Cache();
+
+    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(0, dummyToLoad.getNotCachedChildren().size());
+
+    OBeanChild child1=new OBeanChild();
+    child1.setCachedBean(cachedBean);
+    Ebean.insert(child1);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(1, dummyToLoad.getNotCachedChildren().size());
+
+    OBeanChild child2=new OBeanChild();
+    child2.setCachedBean(cachedBean);
+    Ebean.insert(child2);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(2, dummyToLoad.getNotCachedChildren().size());
+
+    Ebean.delete(child2);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(1, dummyToLoad.getNotCachedChildren().size());
+
+    Ebean.delete(child1);
+    awaitL2Cache();
+    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    assertEquals(0, dummyToLoad.getNotCachedChildren().size());
+
+    Ebean.delete(cachedBean);
   }
 
 

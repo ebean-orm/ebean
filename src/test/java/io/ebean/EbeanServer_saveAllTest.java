@@ -23,10 +23,9 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
-    for (String insertSql : loggedSql) {
-      assertThat(insertSql).contains("insert into e_basicver (");
-      assertThat(insertSql).contains("name, description, other, last_update) values (");
-    }
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
+    assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
 
     for (EBasicVer someBean : someBeans) {
       someBean.setName(someBean.getName() + "-mod");
@@ -37,20 +36,17 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     Ebean.updateAll(someBeans);
 
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("update e_basicver set name=?, last_update=? where id=? ");
-    }
 
+    assertThat(loggedSql).hasSize(3);
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, last_update=? where id=? ");
 
     // act
     LoggedSqlCollector.start();
     Ebean.deleteAll(someBeans);
 
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("delete from e_basicver where id=? ");
-    }
-
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
 
   @Test
@@ -58,8 +54,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     EbeanServer server = Ebean.getDefaultServer();
 
-    Transaction transaction = server.beginTransaction();
-    try {
+    try (Transaction transaction = server.beginTransaction()) {
       transaction.setBatchMode(true);
       LoggedSqlCollector.start();
 
@@ -86,9 +81,6 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
       // and we have our SQL from jdbc batch flush
       assertThat(LoggedSqlCollector.stop()).isNotEmpty();
-
-    } finally {
-      transaction.end();
     }
 
   }
@@ -121,20 +113,16 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    Transaction txn = server.beginTransaction();
-    try {
+    try (Transaction txn = server.beginTransaction()) {
       server.saveAll(someBeans, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
 
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
-    for (String insertSql : loggedSql) {
-      assertThat(insertSql).contains("insert into e_basicver (");
-      assertThat(insertSql).contains("name, description, other, last_update) values (");
-    }
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
+    assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
 
     for (EBasicVer someBean : someBeans) {
       someBean.setName(someBean.getName() + "-mod");
@@ -142,33 +130,24 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    txn = server.beginTransaction();
-    try {
+
+    try (Transaction txn = server.beginTransaction()) {
       server.updateAll(someBeans, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("update e_basicver set name=?, last_update=? where id=? ");
-    }
-
+    assertThat(loggedSql).hasSize(3);
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, last_update=? where id=? ");
 
     // act
     LoggedSqlCollector.start();
-    txn = server.beginTransaction();
-    try {
+    try (Transaction txn = server.beginTransaction()) {
       server.deleteAll(someBeans, txn);
       txn.commit();
-    } finally {
-      txn.end();
     }
     loggedSql = LoggedSqlCollector.stop();
-    for (String updateSql : loggedSql) {
-      assertThat(updateSql).contains("delete from e_basicver where id=? ");
-    }
-
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
 
 

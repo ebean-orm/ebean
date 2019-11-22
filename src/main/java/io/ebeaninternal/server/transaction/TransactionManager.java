@@ -30,7 +30,6 @@ import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
-import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
@@ -46,6 +45,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Manages transactions.
@@ -57,9 +57,9 @@ public class TransactionManager implements SpiTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
-  public static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
+  private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
-  protected final BeanDescriptorManager beanDescriptorManager;
+  private final BeanDescriptorManager beanDescriptorManager;
 
   /**
    * Ebean defaults this to true but for EJB compatible behaviour set this to
@@ -70,39 +70,41 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Prefix for transaction id's (logging).
    */
-  protected final String prefix;
+  final String prefix;
 
-  protected final String externalTransPrefix;
+  private final String externalTransPrefix;
+
+  private final AtomicLong counter = new AtomicLong(1000L);
 
   /**
    * The dataSource of connections.
    */
-  protected final DataSourceSupplier dataSourceSupplier;
+  private final DataSourceSupplier dataSourceSupplier;
 
   /**
    * Flag to indicate the default Isolation is READ COMMITTED. This enables us
    * to close queryOnly transactions rather than commit or rollback them.
    */
-  protected final OnQueryOnly onQueryOnly;
+  private final OnQueryOnly onQueryOnly;
 
-  protected final BackgroundExecutor backgroundExecutor;
+  private final BackgroundExecutor backgroundExecutor;
 
-  protected final ClusterManager clusterManager;
+  private final ClusterManager clusterManager;
 
-  protected final String serverName;
+  private final String serverName;
 
-  protected final boolean docStoreActive;
+  private final boolean docStoreActive;
 
   /**
    * The elastic search index update processor.
    */
-  protected final DocStoreUpdateProcessor docStoreUpdateProcessor;
+  final DocStoreUpdateProcessor docStoreUpdateProcessor;
 
-  protected final boolean persistBatch;
+  private final boolean persistBatch;
 
-  protected final boolean persistBatchOnCascade;
+  private final boolean persistBatchOnCascade;
 
-  protected final BulkEventListenerMap bulkEventListenerMap;
+  private final BulkEventListenerMap bulkEventListenerMap;
 
   /**
    * Used to prepare the change set setting user context information in the
@@ -120,9 +122,9 @@ public class TransactionManager implements SpiTransactionManager {
    */
   private final boolean changeLogAsync;
 
-  protected final boolean notifyL2CacheInForeground;
+  final boolean notifyL2CacheInForeground;
 
-  protected final boolean viewInvalidation;
+  private final boolean viewInvalidation;
 
   private final boolean skipCacheAfterWrite;
 
@@ -130,6 +132,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final SpiLogManager logManager;
   private final SpiLogger txnLogger;
+  private final boolean txnDebug;
 
   private final DatabasePlatform databasePlatform;
 
@@ -142,7 +145,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private final TableModState tableModState;
   private final ServerCacheNotify cacheNotify;
-  private final ClockService clockService;
+  private final boolean supportsSavepointId;
 
   /**
    * Create the TransactionManager
@@ -151,7 +154,9 @@ public class TransactionManager implements SpiTransactionManager {
 
     this.logManager = options.logManager;
     this.txnLogger = logManager.txn();
+    this.txnDebug = txnLogger.isDebug();
     this.databasePlatform = options.config.getDatabasePlatform();
+    this.supportsSavepointId = databasePlatform.isSupportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
     this.persistBatch = PersistBatch.ALL == options.config.getPersistBatch();
@@ -167,7 +172,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.scopeManager = options.scopeManager;
     this.tableModState = options.tableModState;
     this.cacheNotify = options.cacheNotify;
-    this.clockService = options.clockService;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
     this.docStoreActive = options.config.getDocStoreConfig().isActive();
@@ -187,13 +191,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnNamed = metricFactory.createTimedMetricMap(MetricType.TXN, "txn.named.");
 
     scopeManager.register(this);
-  }
-
-  /**
-   * Return the NOW timestamp in epoch millis.
-   */
-  public long clockNowMillis() {
-    return clockService.nowMillis();
   }
 
   /**
@@ -228,7 +225,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the current active transaction as a scoped transaction.
    */
-  public ScopedTransaction getActiveScoped() {
+  private ScopedTransaction getActiveScoped() {
     return (ScopedTransaction) scopeManager.getActive();
   }
 
@@ -252,15 +249,22 @@ public class TransactionManager implements SpiTransactionManager {
     }
   }
 
-  public boolean isDocStoreActive() {
+  /**
+   * Return true if the DB platform supports SavepointId().
+   */
+  boolean isSupportsSavepointId() {
+    return supportsSavepointId;
+  }
+
+  boolean isDocStoreActive() {
     return docStoreActive;
   }
 
-  public DocStoreTransaction createDocStoreTransaction(int docStoreBatchSize) {
+  DocStoreTransaction createDocStoreTransaction(int docStoreBatchSize) {
     return docStoreUpdateProcessor.createTransaction(docStoreBatchSize);
   }
 
-  public boolean isSkipCacheAfterWrite() {
+  boolean isSkipCacheAfterWrite() {
     return skipCacheAfterWrite;
   }
 
@@ -268,11 +272,11 @@ public class TransactionManager implements SpiTransactionManager {
     return beanDescriptorManager;
   }
 
-  public BulkEventListenerMap getBulkEventListenerMap() {
+  BulkEventListenerMap getBulkEventListenerMap() {
     return bulkEventListenerMap;
   }
 
-  public boolean getPersistBatch() {
+  boolean getPersistBatch() {
     return persistBatch;
   }
 
@@ -292,7 +296,7 @@ public class TransactionManager implements SpiTransactionManager {
    * just for queries do need to be committed or rollback after the query.
    * </p>
    */
-  protected OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
+  OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
 
     // first check for a system property 'override'
     String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
@@ -321,7 +325,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Defines the type of behavior to use when closing a transaction that was used to query data only.
    */
-  public OnQueryOnly getOnQueryOnly() {
+  OnQueryOnly getOnQueryOnly() {
     return onQueryOnly;
   }
 
@@ -329,14 +333,13 @@ public class TransactionManager implements SpiTransactionManager {
    * Wrap the externally supplied Connection.
    */
   public SpiTransaction wrapExternalConnection(Connection c) {
-
     return wrapExternalConnection(externalTransPrefix + c.hashCode(), c);
   }
 
   /**
    * Wrap an externally supplied Connection with a known transaction id.
    */
-  public SpiTransaction wrapExternalConnection(String id, Connection c) {
+  private SpiTransaction wrapExternalConnection(String id, Connection c) {
 
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
 
@@ -363,14 +366,21 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new transaction.
    */
-  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
+  SpiTransaction createTransaction(boolean explicit, Connection c) {
+    return new JdbcTransaction(nextTxnId(), explicit, c, this);
+  }
 
-    return new JdbcTransaction(prefix + id, explicit, c, this);
+  /**
+   * Return the next transaction id.
+   */
+  String nextTxnId() {
+    return txnDebug ? prefix + counter.incrementAndGet() : prefix;
   }
 
   /**
    * Process a local rolled back transaction.
    */
+  @Override
   public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
 
     try {
@@ -390,8 +400,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Query only transaction in read committed isolation.
    */
+  @Override
   public void notifyOfQueryOnly(SpiTransaction transaction) {
-
     // Nothing that interesting here
     if (txnLogger.isTrace()) {
       txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
@@ -425,8 +435,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Process a local committed transaction.
    */
+  @Override
   public void notifyOfCommit(SpiTransaction transaction) {
-
     try {
       if (txnLogger.isDebug()) {
         txnLogger.debug(transaction.getLogPrefix() + "Commit");
@@ -452,7 +462,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
 
-    TransactionEvent event = new TransactionEvent(clockNowMillis());
+    TransactionEvent event = new TransactionEvent();
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
@@ -469,7 +479,7 @@ public class TransactionManager implements SpiTransactionManager {
       clusterLogger.debug("processing {}", remoteEvent);
     }
 
-    CacheChangeSet changeSet = new CacheChangeSet(clockNowMillis());
+    CacheChangeSet changeSet = new CacheChangeSet();
 
     RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
     if (tableMod != null) {
@@ -498,14 +508,14 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Process the docstore / ElasticSearch updates.
    */
-  public void processDocStoreUpdates(DocStoreUpdates docStoreUpdates, int bulkBatchSize) {
+  void processDocStoreUpdates(DocStoreUpdates docStoreUpdates, int bulkBatchSize) {
     docStoreUpdateProcessor.process(docStoreUpdates, bulkBatchSize);
   }
 
   /**
    * Prepare and then send/log the changeSet.
    */
-  public void sendChangeLog(final ChangeSet changeSet) {
+  void sendChangeLog(final ChangeSet changeSet) {
 
     // can set userId, userIpAddress & userContext if desired
     if (changeLogPrepare.prepare(changeSet)) {
@@ -522,39 +532,39 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Invalidate the query caches for entities based on views.
    */
-  public void processTouchedTables(Set<String> touchedTables, long modTimestamp) {
-    tableModState.touch(touchedTables, modTimestamp);
+  void processTouchedTables(Set<String> touchedTables) {
+    tableModState.touch(touchedTables);
     if (viewInvalidation) {
       beanDescriptorManager.processViewInvalidation(touchedTables);
     }
-    cacheNotify.notify(new ServerCacheNotification(modTimestamp, touchedTables));
+    cacheNotify.notify(new ServerCacheNotification(touchedTables));
   }
 
   /**
    * Process the collected transaction profiling information.
    */
-  public void profileCollect(TransactionProfile transactionProfile) {
+  void profileCollect(TransactionProfile transactionProfile) {
     profileHandler.collectTransactionProfile(transactionProfile);
   }
 
   /**
    * Collect execution time for an explicit transaction.
    */
-  public void collectMetric(long exeMicros) {
+  void collectMetric(long exeMicros) {
     txnMain.add(exeMicros);
   }
 
   /**
    * Collect execution time for implicit read only transaction.
    */
-  public void collectMetricReadOnly(long exeMicros) {
+  void collectMetricReadOnly(long exeMicros) {
     txnReadOnly.add(exeMicros);
   }
 
   /**
    * Collect execution time for a named transaction.
    */
-  public void collectMetricNamed(long exeMicros, String label) {
+  void collectMetricNamed(long exeMicros, String label) {
     txnNamed.add(label, exeMicros);
   }
 
@@ -565,6 +575,13 @@ public class TransactionManager implements SpiTransactionManager {
     for (TimedProfileLocation timedLocation : TimedProfileLocationRegistry.registered()) {
       timedLocation.visit(visitor);
     }
+  }
+
+  /**
+   * Clear an implicit transaction from thread local scope.
+   */
+  public void clearServerTransaction() {
+    scopeManager.clear();
   }
 
   /**
@@ -590,7 +607,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   @Override
   public void externalRemoveTransaction() {
-    scopeManager.replace(null);
+    scopeManager.clearExternal();
   }
 
   /**
@@ -705,6 +722,7 @@ public class TransactionManager implements SpiTransactionManager {
   private boolean isCreateNewTransaction(SpiTransaction current, TxType type) {
     switch (type) {
       case REQUIRED:
+      case SUPPORTS:
         return current == null;
 
       case REQUIRES_NEW:
@@ -715,9 +733,6 @@ public class TransactionManager implements SpiTransactionManager {
           throw new PersistenceException("Transaction missing when MANDATORY");
         }
         return false;
-
-      case SUPPORTS:
-        return current == null;
 
       case NEVER:
         if (current != null) {
@@ -731,6 +746,13 @@ public class TransactionManager implements SpiTransactionManager {
       default:
         throw new RuntimeException("Should never get here?");
     }
+  }
+
+  /**
+   * Return true if Transaction debug is on.
+   */
+  public boolean isTxnDebug() {
+    return txnDebug;
   }
 
   public SpiLogManager log() {

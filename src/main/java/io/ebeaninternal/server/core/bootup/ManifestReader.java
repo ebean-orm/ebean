@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core.bootup;
 
 import io.ebean.util.StringHelper;
+import io.ebeaninternal.util.UrlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ class ManifestReader {
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);
       while (resources.hasMoreElements()) {
-        try (InputStream is = resources.nextElement().openStream()) {
+        try (InputStream is = UrlHelper.openNoCache(resources.nextElement())) {
           read(new Manifest(is));
         }
       }

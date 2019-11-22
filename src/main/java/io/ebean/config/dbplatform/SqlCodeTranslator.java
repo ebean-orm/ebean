@@ -3,6 +3,7 @@ package io.ebean.config.dbplatform;
 import io.ebean.AcquireLockException;
 import io.ebean.DataIntegrityException;
 import io.ebean.DuplicateKeyException;
+import io.ebean.SerializableConflictException;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -14,12 +15,12 @@ import java.util.Map;
  */
 public class SqlCodeTranslator implements SqlExceptionTranslator {
 
-  private final Map<String,DataErrorType> map;
+  private final Map<String, DataErrorType> map;
 
   /**
    * Create given the map of SQLState codes to error types.
    */
-  public SqlCodeTranslator(Map<String,DataErrorType> map) {
+  public SqlCodeTranslator(Map<String, DataErrorType> map) {
     this.map = map;
   }
 
@@ -46,6 +47,8 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
           return new DuplicateKeyException(message, e);
         case DataIntegrity:
           return new DataIntegrityException(message, e);
+        case SerializableConflict:
+          return new SerializableConflictException(message, e);
       }
     }
     // return a generic exception

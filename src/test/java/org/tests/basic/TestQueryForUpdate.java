@@ -2,8 +2,8 @@ package org.tests.basic;
 
 import io.ebean.AcquireLockException;
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
@@ -30,7 +30,7 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .forUpdate()
       .order().desc("id");
 
@@ -49,16 +49,16 @@ public class TestQueryForUpdate extends BaseTestCase {
   public void testForUpdate_when_alreadyInPC() {
 
     EBasic basic = new EBasic("test PC cache");
-    Ebean.save(basic);
+    DB.save(basic);
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
       LoggedSqlCollector.start();
 
-      EBasic basic0 = Ebean.find(EBasic.class, basic.getId());
+      EBasic basic0 = DB.find(EBasic.class, basic.getId());
       assertThat(basic0).isNotNull();
 
-      EBasic basic1 = Ebean.find(EBasic.class)
+      EBasic basic1 = DB.find(EBasic.class)
         .setId( basic.getId())
         .forUpdate()
         .findOne();
@@ -86,7 +86,7 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .forUpdateNoWait()
       .order().desc("id");
 
@@ -110,10 +110,10 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
-    try (Transaction txn = Ebean.beginTransaction()) {
-      Query<Customer> query = Ebean.find(Customer.class)
+    try (Transaction txn = DB.beginTransaction()) {
+      Query<Customer> query = DB.find(Customer.class)
         .forUpdateNoWait()
         .setMaxRows(1)
         .order().desc("id");
@@ -131,12 +131,12 @@ public class TestQueryForUpdate extends BaseTestCase {
       // row is locked and we can't acquire it
       try (Transaction txn2 = server.createTransaction()) {
         logger.info("... attempt another acquire using 2nd transaction");
-        Query<Customer> query2 =
-          server.find(Customer.class)
-            .where().idEq(first.getId())
-            .forUpdateNoWait();
+        server.find(Customer.class)
+          .where().idEq(first.getId())
+          .forUpdateNoWait()
+          .usingTransaction(txn2)
+          .findOne();
 
-        server.extended().findOne(query2, txn2);
         assertTrue(false); // never get here
       } catch (AcquireLockException e) {
         logger.info("... got AcquireLockException " + e);

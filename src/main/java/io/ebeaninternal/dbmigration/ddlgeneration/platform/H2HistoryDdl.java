@@ -14,9 +14,10 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
 
   private static final String TRIGGER_CLASS = H2HistoryTrigger.class.getName();
 
-  public H2HistoryDdl() {
+  H2HistoryDdl() {
     this.sysPeriodType = "timestamp";
-    this.currentTimestamp = "now()";
+    this.now = "now()";
+    this.sysPeriodEndValue = "now()";
   }
 
   @Override
