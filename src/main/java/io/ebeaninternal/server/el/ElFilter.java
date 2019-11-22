@@ -210,6 +210,11 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
   @Override
+  public Filter<T> inRange(String propertyName, Object min, Object max) {
+    return root.inRange(propertyName, min, max);
+  }
+
+  @Override
   public Filter<T> between(String propertyName, Object min, Object max) {
     return root.between(propertyName, min, max);
   }

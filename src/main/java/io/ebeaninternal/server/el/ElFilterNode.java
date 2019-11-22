@@ -299,6 +299,18 @@ class ElFilterNode<T> implements Filter<T>, ElMatcher<T> {
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Filter<T> inRange(String propertyName, Object min, Object max) {
+
+    ElPropertyValue elGetValue = getElGetValue(propertyName);
+    Comparable minC = (Comparable) elGetValue.convert(min);
+    Comparable maxC = (Comparable) elGetValue.convert(max);
+
+    matches.add(new ElMatchBuilder.InRange<>(elGetValue, minC, maxC));
+    return this;
+  }
+
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Filter<T> between(String propertyName, Object min, Object max) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);

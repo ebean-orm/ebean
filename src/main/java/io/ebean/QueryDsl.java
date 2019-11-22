@@ -41,6 +41,14 @@ public interface QueryDsl<T, F extends QueryDsl<T, F>> {
    */
   F between(String propertyName, Object value1, Object value2);
 
+  /**
+   * In Range - property >= value1 and property < value2.
+   * <p>
+   * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
+   * </p>
+   */
+  F inRange(String propertyName, Object value1, Object value2);
+
 //  CHECKME: can this be implemented in Filter?
 //  /**
 //   * Between - value between the two properties.
