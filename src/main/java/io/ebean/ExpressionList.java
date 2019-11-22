@@ -854,6 +854,7 @@ public interface ExpressionList<T> extends QueryDsl<T, ExpressionList<T>> {
    * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
    * </p>
    */
+  @Override
   ExpressionList<T> inRange(String propertyName, Object value1, Object value2);
 
   /**
