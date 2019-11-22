@@ -23,6 +23,7 @@ public class TestFileType extends BaseTestCase {
 
   private File newTempFile() throws IOException {
     File tempFile = File.createTempFile("testfile", "txt");
+    tempFile.deleteOnExit();
     try (PrintStream ps = new PrintStream(tempFile)) {
       ps.println("Hello World!");
     }

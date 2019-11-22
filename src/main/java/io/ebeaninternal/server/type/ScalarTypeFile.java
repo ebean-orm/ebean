@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.TempFileProvider;
 import io.ebean.text.TextException;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -27,29 +28,23 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
 
   private static final Logger logger = LoggerFactory.getLogger(ScalarTypeFile.class);
 
-  private final String prefix;
-
-  private final String suffix;
-
-  private final File directory;
+  private final TempFileProvider tempFileProvider;
 
   private final int bufferSize;
 
   /**
-   * Construct with reasonable defaults of Blob and 8096 buffer size.
+   * Construct with reasonable defaults of Blob and 8192 buffer size.
    */
-  public ScalarTypeFile() {
-    this(Types.LONGVARBINARY, "db-", null, null, 8096);
+  public ScalarTypeFile(TempFileProvider tempFileProvider) {
+    this(Types.LONGVARBINARY, tempFileProvider, 8192);
   }
 
   /**
    * Create the ScalarTypeFile.
    */
-  public ScalarTypeFile(int jdbcType, String prefix, String suffix, File directory, int bufferSize) {
+  public ScalarTypeFile(int jdbcType, TempFileProvider tempFileProvider, int bufferSize) {
     super(File.class, false, jdbcType);
-    this.prefix = prefix;
-    this.suffix = suffix;
-    this.directory = directory;
+    this.tempFileProvider = tempFileProvider;
     this.bufferSize = bufferSize;
   }
 
@@ -78,7 +73,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
 
     try {
       // stream from db into our temp file
-      File tempFile = File.createTempFile(prefix, suffix, directory);
+      File tempFile = tempFileProvider.createTempFile();
       OutputStream os = getOutputStream(tempFile);
       pump(is, os);
 
@@ -123,7 +118,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
 
   @Override
   public File jsonRead(JsonParser parser) throws IOException {
-    File tempFile = File.createTempFile(prefix, suffix, directory);
+    File tempFile = tempFileProvider.createTempFile();
     try (OutputStream os = getOutputStream(tempFile)) {
       parser.readBinaryValue(os);
       os.flush();
