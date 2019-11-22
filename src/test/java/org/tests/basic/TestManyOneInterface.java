@@ -32,7 +32,13 @@ public class TestManyOneInterface extends BaseTestCase {
 
     p.setDefaultAddress(a);
 
-    Ebean.save(a);
+
+    IAddress ea1 = Ebean.getDefaultServer().getPluginApi().createEntityBean(IAddress.class);
+    IAddress ea2 = Ebean.getDefaultServer().getPluginApi().createEntityBean(IAddress.class);
+
+    p.getExtraAddresses().add(ea1);
+    p.getExtraAddresses().add(ea2);
+
     Ebean.save(p);
 
 
