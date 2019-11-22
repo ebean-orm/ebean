@@ -9,9 +9,9 @@ import io.ebeaninternal.server.deploy.BeanProperty;
  */
 public class GeneratedWhoCreated implements GeneratedProperty {
 
-  final CurrentUserProvider currentUserProvider;
+  private final CurrentUserProvider currentUserProvider;
 
-  public GeneratedWhoCreated(CurrentUserProvider currentUserProvider) {
+  GeneratedWhoCreated(CurrentUserProvider currentUserProvider) {
     this.currentUserProvider = currentUserProvider;
   }
 

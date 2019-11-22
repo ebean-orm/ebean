@@ -47,7 +47,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     StringBuilder sb = new StringBuilder(200);
     sb.append("insert into ").append(many.targetTable()).append(" (");
-    append(sb, "", ",", "");
+    append(sb);
 
     Cols cols = new Cols(sb);
     VisitAllUsing.visitOne(many.targetDescriptor, cols);
@@ -59,7 +59,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     return sb.toString();
   }
 
-  public String insertElementCollection() {
+  String insertElementCollection() {
     return elementCollectionInsertSql;
   }
 
@@ -191,16 +191,16 @@ class BeanPropertyAssocManySqlHelp<T> {
     }
   }
 
-  private void append(StringBuilder sb, String tableAlias, String prefix, String suffix) {
+  private void append(StringBuilder sb) {
     for (int i = 0; i < exportedProperties.length; i++) {
       String fkColumn = exportedProperties[i].getForeignDbColumn();
       if (i > 0) {
-        sb.append(prefix);
+        sb.append(",");
       }
-      sb.append(tableAlias).append(fkColumn);
-      sb.append(suffix);
+      sb.append(fkColumn);
     }
   }
+
   private String deriveWhereParentIdSql(boolean inClause, String tableAlias) {
 
     StringBuilder sb = new StringBuilder();

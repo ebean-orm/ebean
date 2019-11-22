@@ -61,7 +61,7 @@ public class FormulaPropertyPathTest extends BaseTestCase {
 
   private void assertFormula(String input, String funcName, String expression, String cast, String alias) {
 
-    FormulaPropertyPath propertyPath = new FormulaPropertyPath(customerDesc, input);
+    FormulaPropertyPath propertyPath = new FormulaPropertyPath(customerDesc, input, null);
 
     assertThat(propertyPath.internalExpression()).isEqualTo(expression);
     assertThat(propertyPath.outerFunction()).isEqualTo(funcName);
@@ -76,8 +76,6 @@ public class FormulaPropertyPathTest extends BaseTestCase {
       assertThat(propertyPath.alias()).isNull();
     }
 
-    STreeProperty treeProperty = propertyPath.build();
-
-    assertThat(treeProperty).isNotNull();
+    assertThat(propertyPath.build()).isNotNull();
   }
 }

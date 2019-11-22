@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 /**
- * Used to provide some automatic configuration early in the creation of an EbeanServer.
+ * Used to provide some automatic configuration early in the creation of a Database.
  */
 public interface AutoConfigure {
 

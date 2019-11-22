@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+
 class BeanDescriptorJsonHelp<T> {
 
   private final BeanDescriptor<T> desc;
@@ -193,7 +195,7 @@ class BeanDescriptorJsonHelp<T> {
     }
     Object contextBean = null;
     Object id = desc.beanId(bean);
-    if (id != null) {
+    if (!isNullOrZero(id)) {
       // check if the bean has already been loaded
       contextBean = readJson.persistenceContextPutIfAbsent(id, bean, desc);
     }

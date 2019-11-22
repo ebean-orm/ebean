@@ -11,6 +11,8 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
  */
 class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
+  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
+
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
   private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
@@ -62,6 +64,12 @@ class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
   }
 
   @Override
+  public FetchGroupBuilder<T> fetchCache(String path) {
+    detail.fetch(path, null, FETCH_CACHE);
+    return this;
+  }
+
+  @Override
   public FetchGroupBuilder<T> fetchLazy(String path) {
     detail.fetch(path, null, FETCH_LAZY);
     return this;
@@ -76,6 +84,12 @@ class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
   @Override
   public FetchGroupBuilder<T> fetchQuery(String path, String properties) {
     detail.fetch(path, properties, FETCH_QUERY);
+    return this;
+  }
+
+  @Override
+  public FetchGroupBuilder<T> fetchCache(String path, String properties) {
+    detail.fetch(path, properties, FETCH_CACHE);
     return this;
   }
 

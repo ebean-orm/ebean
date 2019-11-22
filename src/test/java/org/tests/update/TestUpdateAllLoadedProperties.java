@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import org.tests.model.basic.EBasicVer;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +29,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
 
     EbeanServer server = Ebean.getDefaultServer();
-    Transaction txn = server.beginTransaction();
-    try {
+    try (Transaction txn = server.beginTransaction()) {
 
       txn.setUpdateAllLoadedProperties(true);
 
@@ -49,11 +48,8 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
       assertEquals(2, loggedSql.size());
       // all properties in the bean
-      assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; --bind(");
-      assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; --bind(");
-
-    } finally {
-      txn.end();
+      assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; -- bind(");
+      assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, description=?, other=?, last_update=? where id=? and last_update=?; -- bind(");
     }
 
     testPartiallyLoaded(basic1.getId(), basic2.getId());
@@ -99,8 +95,8 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(2);
-    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, other=? where id=?; --bind(");
-    assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, other=? where id=?; --bind(");
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, other=? where id=?; -- bind(");
+    assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, other=? where id=?; -- bind(");
 
   }
 }

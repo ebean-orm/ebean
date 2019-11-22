@@ -14,7 +14,7 @@ public class BetweenPropertyExpressionTest extends BaseExpressionTest {
   public void sqlExpression() {
     TDSpiExpressionRequest request = new TDSpiExpressionRequest(null);
     exp("a", "b", 10).addSql(request);
-    assertThat(request.getSql()).isEqualTo(" ? between a and b ");
+    assertThat(request.getSql()).isEqualTo(" ? between a and b");
   }
 
   @Test

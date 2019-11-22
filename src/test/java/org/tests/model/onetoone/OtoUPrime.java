@@ -1,5 +1,7 @@
 package org.tests.model.onetoone;
 
+import io.ebean.annotation.DbForeignKey;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -21,6 +23,7 @@ public class OtoUPrime {
    */
   @OneToOne
   @PrimaryKeyJoinColumn
+  @DbForeignKey(noConstraint = true)
   OtoUPrimeExtra extra;
 
   @Version
@@ -32,7 +35,7 @@ public class OtoUPrime {
 
   @Override
   public String toString() {
-    return "id:"+ pid +" name:"+name+" extra:"+extra;
+    return "id:" + pid + " name:" + name + " extra:" + extra;
   }
 
   public UUID getPid() {

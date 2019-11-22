@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,8 +22,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
   public void test() {
 
     LoggedSqlCollector.start();
-    Transaction txn = Ebean.beginTransaction();
-    try {
+    try (Transaction txn = Ebean.beginTransaction()) {
       txn.setBatchMode(true);
 
       EdParent parent = new EdParent();
@@ -38,28 +38,25 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       Ebean.save(parent);
 
       // nothing flushed yet
-      assertEquals(0, LoggedSqlCollector.start().size());
+      assertThat(LoggedSqlCollector.start()).isEmpty();
 
       txn.flushBatch();
 
       List<String> loggedSql1 = LoggedSqlCollector.start();
-      assertEquals(loggedSql1.toString(), 2, loggedSql1.size());
+      assertThat(loggedSql1).hasSize(4);
 
       parent.setName("MyDesk");
       Ebean.save(parent);
 
       // nothing flushed yet
-      assertEquals(0, LoggedSqlCollector.start().size());
+      assertThat(LoggedSqlCollector.start()).isEmpty();
 
       Ebean.commitTransaction();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSqlCollector.start();
-      assertEquals(1, loggedSql2.size());
-      assertTrue(loggedSql2.get(0).contains(" update td_parent "));
-
-    } finally {
-      Ebean.endTransaction();
+      assertThat(loggedSql2).hasSize(2);
+      assertThat(loggedSql2.get(0)).contains(" update td_parent ");
     }
   }
 

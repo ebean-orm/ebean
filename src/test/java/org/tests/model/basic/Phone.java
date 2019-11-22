@@ -27,7 +27,7 @@ public class Phone implements Serializable {
 
   @Id
   @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
-  @Column(name = "ID", unique = true, nullable = false)
+  @Column(name = "id", unique = true, nullable = false)
   public Long getId() {
     return id;
   }
@@ -36,7 +36,7 @@ public class Phone implements Serializable {
     this.id = id;
   }
 
-  @Column(name = "PHONE_NUMBER", nullable = false, unique = true, columnDefinition = "varchar(7)")
+  @Column(name = "phone_number", nullable = false, unique = true, columnDefinition = "varchar(7)")
   public String getPhoneNumber() {
     return phoneNumber;
   }
@@ -47,7 +47,7 @@ public class Phone implements Serializable {
 
   @NotNull
   @ManyToOne(targetEntity = Person.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "PERSON_ID", nullable = false)
+  @JoinColumn(name = "person_id", nullable = false)
   public Person getPerson() {
     return person;
   }

@@ -7,7 +7,7 @@ import io.ebeaninternal.server.dto.DtoColumn;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.query.dto.DtoQueryEngine;
+import io.ebeaninternal.server.query.DtoQueryEngine;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
 
@@ -37,6 +37,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     super(server, query, null);
     this.queryEngine = engine;
     this.query = query;
+    query.obtainLocation();
   }
 
   /**
@@ -44,6 +45,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
    */
   @Override
   public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+    startNano = System.nanoTime();
     SpiQuery<?> ormQuery = query.getOrmQuery();
     if (ormQuery != null) {
       ormQuery.setType(type);

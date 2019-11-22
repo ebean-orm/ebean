@@ -263,11 +263,9 @@ public final class IdBinderEmbedded implements IdBinder {
   public Object convertIdFromJson(Object value) {
 
     Map<String, Object> map = (Map<String, Object>) value;
-
     EntityBean idValue = idDesc.createEntityBean();
     for (BeanProperty prop : props) {
-      Object val = map.get(prop.getName());
-      prop.setValue(idValue, val);
+      prop.setValue(idValue, map.get(prop.getName()));
     }
     return idValue;
   }
@@ -346,19 +344,20 @@ public final class IdBinderEmbedded implements IdBinder {
   public Object read(DbReadContext ctx) throws SQLException {
 
     EntityBean embId = idDesc.createEntityBean();
-    boolean notNull = true;
+    boolean nullValue = true;
 
     for (BeanProperty prop : props) {
-      Object value = prop.readSet(ctx, embId);
-      if (value == null) {
-        notNull = false;
+      Object value = prop.read(ctx);
+      if (value != null) {
+        prop.setValue(embId, value);
+        nullValue = false;
       }
     }
 
-    if (notNull) {
-      return embId;
-    } else {
+    if (nullValue) {
       return null;
+    } else {
+      return embId;
     }
   }
 
@@ -464,7 +463,14 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public Object convertId(Object idValue) {
-    // can not cast/convert if it is embedded
+    if (idValue instanceof String) {
+      final EntityBean embId = idDesc.createEntityBean();
+      final String[] rawVals = ((String)idValue).split("\\|");
+      for (int i = 0; i < props.length; i++) {
+        props[i].setValue(embId, props[i].parse(rawVals[i]));
+      }
+      return embId;
+    }
     return idValue;
   }
 

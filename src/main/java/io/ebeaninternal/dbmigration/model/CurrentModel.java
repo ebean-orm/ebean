@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration.model;
 import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
@@ -37,6 +38,8 @@ public class CurrentModel {
 
   private DdlWrite write;
 
+  private DdlOptions ddlOptions = new DdlOptions();
+
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
    */
@@ -63,18 +66,22 @@ public class CurrentModel {
     this.jaxbPresent = server.getServerConfig().getClassLoadConfig().isJavaxJAXBPresent();
   }
 
+  public DdlOptions getDdlOptions() {
+    return ddlOptions;
+  }
+
   /**
    * Return true if the model contains tables that are partitioned.
    */
   public boolean isTablePartitioning() {
-    return model.isTablePartitioning();
+    return read().isTablePartitioning();
   }
 
   /**
    * Return the tables that have partitioning.
    */
   public List<MTable> getPartitionedTables() {
-    return model.getPartitionedTables();
+    return read().getPartitionedTables();
   }
 
   private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
@@ -150,7 +157,7 @@ public class CurrentModel {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
         if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
-          ddl.append(prefix + script.getName()).append('\n');
+          ddl.append(prefix).append(script.getName()).append('\n');
           ddl.append(script.getValue());
         }
       }
@@ -183,7 +190,7 @@ public class CurrentModel {
     if (write == null) {
       ChangeSet createChangeSet = getChangeSet();
 
-      write = new DdlWrite(new MConfiguration(), model);
+      write = new DdlWrite(new MConfiguration(), model, ddlOptions);
 
       DdlHandler handler = handler();
       handler.generateProlog(write);

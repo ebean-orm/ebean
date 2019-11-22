@@ -98,7 +98,7 @@ public class ProfileOrigin {
     }
   }
 
-  private OrmQueryDetail buildDetail(BeanDescriptor<?> rootDesc) {
+  OrmQueryDetail buildDetail(BeanDescriptor<?> rootDesc) {
 
     PathProperties pathProps = new PathProperties();
     for (ProfileOriginNodeUsage statsNode : nodeUsageMap.values()) {
@@ -107,8 +107,7 @@ public class ProfileOrigin {
 
     OrmQueryDetail detail = new OrmQueryDetail();
 
-    Collection<Props> pathProperties = pathProps.getPathProps();
-    for (Props props : pathProperties) {
+    for (Props props : pathProps.getPathProps()) {
       if (!props.isEmpty()) {
         detail.fetch(props.getPath(), props.getPropertiesAsString(), null);
       }
@@ -151,12 +150,8 @@ public class ProfileOrigin {
    * Collect the usage information for from a instance for this node.
    */
   public void collectUsageInfo(NodeUsageCollector profile) {
-
-    //logger.info("COLLECT USAGE {}", profile.toString());
-
     if (!profile.isEmpty()) {
-      ProfileOriginNodeUsage nodeStats = getNodeStats(profile.getNode().getPath());
-      nodeStats.collectUsageInfo(profile);
+      getNodeStats(profile.getNode().getPath()).collectUsageInfo(profile);
     }
   }
 

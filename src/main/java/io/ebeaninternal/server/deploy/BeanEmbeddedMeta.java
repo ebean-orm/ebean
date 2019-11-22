@@ -3,9 +3,9 @@ package io.ebeaninternal.server.deploy;
 public class BeanEmbeddedMeta {
 
 
-  final BeanProperty[] properties;
+  private final BeanProperty[] properties;
 
-  public BeanEmbeddedMeta(BeanProperty[] properties) {
+  BeanEmbeddedMeta(BeanProperty[] properties) {
     this.properties = properties;
   }
 

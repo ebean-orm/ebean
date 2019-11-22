@@ -4,13 +4,10 @@ import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.transaction.TableModState;
+import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
-
-import java.time.Clock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +22,7 @@ public class DefaultCacheHolderTest {
   private CacheManagerOptions options() {
     return new CacheManagerOptions(null, new ServerConfig(), true)
       .with(defaultOptions, defaultOptions)
-      .with(cacheFactory, new TableModState(new ClockService(Clock.systemUTC())));
+      .with(cacheFactory, new TableModState());
   }
 
 
@@ -34,19 +31,22 @@ public class DefaultCacheHolderTest {
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options());
 
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
-    assertThat(cache.getName()).isEqualTo("customer_B");
+    DefaultServerCache cache = cache(holder, Customer.class);
+    assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
+    assertThat(cache.getShortName()).isEqualTo("Customer_B");
 
-    DefaultServerCache cache1 = cache(holder, Customer.class, "customer");
+    DefaultServerCache cache1 = cache(holder, Customer.class);
     assertThat(cache1).isSameAs(cache);
 
-    DefaultServerCache cache2 = cache(holder, Contact.class, "contact");
+    DefaultServerCache cache2 = cache(holder, Contact.class);
     assertThat(cache1).isNotSameAs(cache2);
-    assertThat(cache2.getName()).isEqualTo("contact_B");
+    assertThat(cache2.getName()).isEqualTo("org.tests.model.basic.Contact_B");
+    assertThat(cache2.getShortName()).isEqualTo("Contact_B");
+
   }
 
-  private DefaultServerCache cache(DefaultCacheHolder holder, Class<?> type, String name) {
-    return (DefaultServerCache) holder.getCache(type, name, ServerCacheType.BEAN);
+  private DefaultServerCache cache(DefaultCacheHolder holder, Class<?> type) {
+    return (DefaultServerCache) holder.getCache(type, ServerCacheType.BEAN);
   }
 
   @Test
@@ -57,8 +57,9 @@ public class DefaultCacheHolderTest {
     DefaultCacheHolder holder = new DefaultCacheHolder(builder);
 
     tenantId.set("ten_1");
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
-    assertThat(cache.getName()).isEqualTo("customer_B");
+    DefaultServerCache cache = cache(holder, Customer.class);
+    assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
+    assertThat(cache.getShortName()).isEqualTo("Customer_B");
 
     cache.put("1", "value-for-tenant1");
     cache.put("2", "an other value-for-tenant1");
@@ -114,7 +115,7 @@ public class DefaultCacheHolderTest {
   public void clearAll() {
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options());
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
+    DefaultServerCache cache = cache(holder, Customer.class);
     cache.put("foo", "foo");
     assertThat(cache.size()).isEqualTo(1);
     holder.clearAll();
@@ -128,7 +129,7 @@ public class DefaultCacheHolderTest {
     CacheManagerOptions options = options().with(tenantId::get);
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options);
-    DefaultServerCache cache = cache(holder, Customer.class, "customer");
+    DefaultServerCache cache = cache(holder, Customer.class);
     cache.put("foo", "foo");
     assertThat(cache.size()).isEqualTo(1);
 

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.text.TextException;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
 import io.ebeaninternal.json.ModifyAwareOwner;
@@ -208,7 +209,7 @@ public class ScalarTypeJsonObjectMapper {
       try {
         return objectReader.readValue(json, deserType);
       } catch (IOException e) {
-        throw new SQLException("Unable to convert JSON", e);
+        throw new TextException("Failed to parse JSON [{}] as " + deserType, json, e);
       }
     }
 
@@ -258,7 +259,7 @@ public class ScalarTypeJsonObjectMapper {
       try {
         return objectReader.readValue(value, deserType);
       } catch (IOException e) {
-        throw new PersistenceException("Unable to convert JSON", e);
+        throw new TextException("Failed to parse JSON [{}] as " + deserType, value, e);
       }
     }
 

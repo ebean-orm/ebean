@@ -149,7 +149,7 @@ public class AutoTuneDiffCollection {
     origin.setKey(point.getKey());
     origin.setBeanType(point.getBeanType());
     origin.setDetail(entry.getDetail().toString());
-    origin.setCallStack(point.getCallStack().description("\n"));
+    origin.setCallStack(point.getCallOrigin().getFullDescription());
     origin.setOriginal(query);
 
     if (updateTuning) {
