@@ -272,6 +272,12 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
+  @Override
+  public SqlUpdate setNextParameter(Object value, int jdbcType) {
+    setParameter(++addPos, value, jdbcType);
+    return this;
+  }
+
   private SqlUpdate setParamWithBindExpansion(int position, Collection values, String bindLiteral) {
 
     StringBuilder sqlExpand = new StringBuilder(values.size() * 2);
@@ -305,6 +311,16 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public SqlUpdate setParameter(int position, Object value, int jdbcType) {
+    if (value == null) {
+      setNull(position, jdbcType);
+    } else {
+      setParameter(position, value);
+    }
+    return this;
+  }
+
+  @Override
   public SqlUpdate setNull(int position, int jdbcType) {
     bindParams.setNullParameter(bindExpansion + position, jdbcType);
     return this;
@@ -319,6 +335,16 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   @Override
   public SqlUpdate setParameter(String name, Object param) {
     bindParams.setParameter(name, param);
+    return this;
+  }
+
+  @Override
+  public SqlUpdate setParameter(String name, Object value, int jdbcType) {
+    if (value == null) {
+      setNull(name, jdbcType);
+    } else {
+      setParameter(name, value);
+    }
     return this;
   }
 
