@@ -14,6 +14,9 @@ import java.io.IOException;
  */
 public interface SpiExpression extends Expression {
 
+  static final String SQL_TRUE = "1=1";
+  static final String SQL_FALSE = "1=0";
+
   /**
    * Simplify nested expressions if possible.
    */

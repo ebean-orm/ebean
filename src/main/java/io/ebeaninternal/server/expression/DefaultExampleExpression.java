@@ -203,7 +203,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public void addSql(SpiExpressionRequest request) {
 
     if (list.isEmpty()) {
-      request.append("1=1");
+      request.append(SQL_TRUE);
     } else {
       request.append("(");
       for (int i = 0; i < list.size(); i++) {

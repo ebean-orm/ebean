@@ -98,7 +98,7 @@ class InPairsExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     if (entries.isEmpty()) {
-      String expr = not ? "1=1" : "1=0";
+      String expr = not ? SQL_TRUE : SQL_FALSE;
       request.append(expr);
       return;
     }

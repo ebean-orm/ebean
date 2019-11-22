@@ -77,7 +77,7 @@ class NoopExpression implements SpiExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append("1=1");
+    request.append(SQL_TRUE);
   }
 
   @Override
