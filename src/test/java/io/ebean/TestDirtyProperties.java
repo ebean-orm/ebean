@@ -4,19 +4,41 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 
 import org.tests.model.basic.DirtyTestEntity;
+import org.tests.model.basic.cache.CInhRoot;
+import org.tests.model.basic.cache.CInhTwo;
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class TestDirtyProperties extends BaseTestCase {
 
+  @Test
+  public void testOnInherited() {
+    CInhTwo two = new CInhTwo();
+    two.setLicenseNumber("Test Dirty");
+    DB.save(two);
+
+    List<CInhTwo> beans = Ebean.find(CInhTwo.class)
+        .where().eq("licenseNumber", "Test Dirty").findList();
+    for (CInhTwo bean : beans) {
+      assertFalse(DB.getBeanState(bean).isNewOrDirty());
+    }
+
+    List<CInhRoot> rootBeans = Ebean.find(CInhRoot.class)
+        .where().eq("licenseNumber", "Test Dirty").findList();
+    for (CInhRoot rootBean : rootBeans) {
+      assertFalse(DB.getBeanState(rootBean).isNewOrDirty());
+    }
+  }
 
   @Test
   public void testOnNewBean() throws Exception {

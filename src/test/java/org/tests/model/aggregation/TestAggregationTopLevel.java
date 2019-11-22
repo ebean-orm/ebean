@@ -3,6 +3,9 @@ package org.tests.model.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,6 +37,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void query_count() {
 
     Query<DMachineStatsAgg> query = DB.find(DMachineStatsAgg.class)

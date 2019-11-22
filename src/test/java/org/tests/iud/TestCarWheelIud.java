@@ -4,6 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.carwheel.Car;
@@ -61,6 +64,7 @@ public class TestCarWheelIud extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.SQLSERVER)
   public void aggregatePaging() {
 
     DB.find(Car.class).delete();

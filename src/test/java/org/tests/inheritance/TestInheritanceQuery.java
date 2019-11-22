@@ -26,18 +26,17 @@ public class TestInheritanceQuery extends BaseTestCase {
     server().save(b1);
     server().save(b2);
 
-
-    LoggedSqlCollector.start();
-
     Query<Parent> query = Ebean.find(Parent.class);
 
     query.where().in("val", 90, 91); // restrict to a & b1
 
     assertThat(query.findList()).hasSize(2); // a & b1
 
+    LoggedSqlCollector.start();
     Query<Parent> query2 = query.copy();
     query2.setInheritType(ChildA.class);
 
+    assertThat(query.findList()).hasSize(2);
     assertThat(query2.findList()).containsExactly(a);
 
     query2.setInheritType(ChildB.class);
