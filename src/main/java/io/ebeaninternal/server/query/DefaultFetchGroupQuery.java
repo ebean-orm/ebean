@@ -589,4 +589,9 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   public Query<T> orderById(boolean orderById) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
+
+  @Override
+  public Filter<T> filter() {
+    throw new RuntimeException("Not allowed on fetch group query ");
+  }
 }
