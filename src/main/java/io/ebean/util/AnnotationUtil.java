@@ -7,8 +7,12 @@ import io.ebean.annotation.Where;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +22,62 @@ import java.util.concurrent.ConcurrentMap;
  * Annotation utility methods to find annotations recursively - taken from the spring framework.
  */
 public class AnnotationUtil {
+
+  private static Map<AnnotatedElement, AnnotationMeta> annotationMeta = new ConcurrentHashMap<>();
+
+  private static final ConcurrentMap<Class<? extends Annotation>, Method> valueMethods = new ConcurrentHashMap<>();
+  // only a non-null-marker the valueMethods - Cache
+  private static final Method nullMethod = getNullMethod();
+
+  /**
+   * Caches all annotations for an annotated element.
+   */
+  static class AnnotationMeta {
+    final Map<Class<? extends Annotation>, Set<Annotation>> annotations = new HashMap<>();
+
+    AnnotationMeta(AnnotatedElement elem) {
+      Annotation[] anns = elem.getAnnotations();
+      Set<Annotation> visited = new HashSet<>();
+      scanAnnotations(anns, visited);
+      // seal the metadata
+      for (Entry<Class<? extends Annotation>, Set<Annotation>> entry : annotations.entrySet()) {
+        entry.setValue(Collections.unmodifiableSet(entry.getValue()));
+      }
+    }
+
+    <A extends Annotation> void scanAnnotations(A[] anns, Set<Annotation> visited) {
+      for (Annotation ann : anns) {
+        if (visited.add(ann)) {
+          if (!isInJavaLangAnnotationPackage(ann)) {
+            Class<? extends Annotation> type = ann.annotationType();
+            annotations.computeIfAbsent(type, k -> new LinkedHashSet<>()).add(ann);
+            scanAnnotations(type.getAnnotations(), visited);
+
+            Method method = valueMethods.computeIfAbsent(type, AnnotationUtil::getValueMethod);
+            if (method != nullMethod) {
+              try {
+                @SuppressWarnings("unchecked")
+                A[] repeatedAnns = (A[]) method.invoke(ann);
+                scanAnnotations(repeatedAnns, visited);
+              } catch (Exception e) { // catch all exceptions (thrown by invoke)
+                throw new RuntimeException(e);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    <A extends Annotation> Set<A> findAnnotations(Class<A> annotationType) {
+      return (Set<A>) annotations.getOrDefault(annotationType, Collections.emptySet());
+    }
+    @SuppressWarnings("unchecked")
+    <A extends Annotation>  A findAnnotation(Class<A> annotationType) {
+      Set<Annotation> set =  annotations.get(annotationType);
+      return set == null ? null : (A) set.iterator().next();
+    }
+  }
 
   /**
    * Determine if the supplied {@link Annotation} is defined in the core JDK {@code java.lang.annotation} package.
@@ -35,27 +95,12 @@ public class AnnotationUtil {
    * does not execute specialized search algorithms for classes or methods. It only traverses through Annotations!
    * It also does not filter out platform dependent annotations!
    */
-  @SuppressWarnings("unchecked")
   public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
-    // check if directly present, if not, start search for meta-annotations.
-    Annotation[] anns = annotatedElement.getAnnotations();
-    if (anns.length == 0) {
-      return null; // no annotations present, so searching for meta annotations not required
-    }
 
-    // As we need the anns array anyway, we iterate over this instead
-    // of using annotatedElement.getAnnotation(...) which is synchronized internally
-    for (Annotation ann : anns) {
-      if (ann.annotationType() == annotationType) {
-        return (A) ann;
-      }
-    }
-
-    return findAnnotation(anns, annotationType, new HashSet<>());
-
+    return annotationMeta.computeIfAbsent(annotatedElement, AnnotationMeta::new).findAnnotation(annotationType);
   }
 
   /**
@@ -64,28 +109,16 @@ public class AnnotationUtil {
    * the supplied element.
    * <p><strong>Note</strong>: this method searches for annotations at class & superClass(es)!
    */
-  @SuppressWarnings("unchecked")
   public static <A extends Annotation> A findAnnotationRecursive(Class<?> clazz, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
 
     while (clazz != null && clazz != Object.class) {
-      // check if directly present, if not, start search for meta-annotations.
-      Annotation[] anns = clazz.getAnnotations();
-      if (anns.length != 0) {
-        for (Annotation ann : anns) {
-          if (ann.annotationType() == annotationType) {
-            return (A) ann;
-          }
-        }
-
-        A ann = findAnnotation(anns, annotationType, new HashSet<>());
-        if (ann != null) {
-          return ann;
-        }
+      A ann = findAnnotation(clazz, annotationType);
+      if (ann != null) {
+        return ann;
       }
-      // no meta-annotation present at this class - traverse to superclass
       clazz = clazz.getSuperclass();
     }
     return null;
@@ -125,39 +158,12 @@ public class AnnotationUtil {
   private static <A extends Annotation> void findMetaAnnotationsRecursive(Class<?> clazz,
       Class<A> annotationType, Set<A> ret,
       Set<Annotation> visited, Set<Class<?>> visitedInterfaces) {
-    findMetaAnnotations(clazz, annotationType, ret, visited);
+    ret.addAll(findAnnotations(clazz, annotationType));
     for (Class<?> iface : clazz.getInterfaces()) {
       if (!iface.getName().startsWith("java.lang.") && visitedInterfaces.add(iface)) {
         findMetaAnnotationsRecursive(iface, annotationType, ret, visited, visitedInterfaces);
       }
     }
-  }
-
-  /**
-   * Perform the search algorithm avoiding endless recursion by tracking which
-   * annotations have already been visited.
-   */
-  @SuppressWarnings("unchecked")
-  private static <A extends Annotation> A findAnnotation(Annotation[] anns, Class<A> annotationType, Set<Annotation> visited) {
-
-
-    for (Annotation ann : anns) {
-      if (!isInJavaLangAnnotationPackage(ann) && visited.add(ann)) {
-        Annotation[] metaAnns = ann.annotationType().getAnnotations();
-        for (Annotation metaAnn : metaAnns) {
-          if (metaAnn.annotationType() == annotationType) {
-            return (A) metaAnn;
-          }
-        }
-        if (metaAnns.length > 0) {
-          A annotation = findAnnotation(metaAnns, annotationType, visited);
-          if (annotation != null) {
-            return annotation;
-          }
-        }
-      }
-    }
-    return null;
   }
 
   /**
@@ -172,41 +178,7 @@ public class AnnotationUtil {
     if (annotationType == null) {
       return null;
     }
-    Set<A> ret = new LinkedHashSet<>();
-    findMetaAnnotations(annotatedElement, annotationType, ret, new HashSet<>());
-    return ret;
-  }
-
-  /**
-   * Perform the search algorithm avoiding endless recursion by tracking which
-   * annotations have already been visited.
-   */
-  @SuppressWarnings("unchecked")
-  private static <A extends Annotation> void findMetaAnnotations(AnnotatedElement annotatedElement, Class<A> annotationType, Set<A> ret, Set<Annotation> visited) {
-
-    Annotation[] anns = annotatedElement.getAnnotations();
-    for (Annotation ann : anns) {
-      if (!isInJavaLangAnnotationPackage(ann) && visited.add(ann)) {
-        if (ann.annotationType() == annotationType) {
-          ret.add((A) ann);
-        } else {
-          Method repeatableValueMethod = getRepeatableValueMethod(ann, annotationType);
-          if (repeatableValueMethod != null) {
-            try {
-              A[] repeatedAnns = (A[]) repeatableValueMethod.invoke(ann);
-              for (Annotation repeatedAnn : repeatedAnns) {
-                ret.add((A) repeatedAnn);
-                findMetaAnnotations(repeatedAnn.annotationType(), annotationType, ret, visited);
-              }
-            } catch (Exception e) { // catch all exceptions (thrown by invoke)
-              throw new RuntimeException(e);
-            }
-          } else {
-            findMetaAnnotations(ann.annotationType(), annotationType, ret, visited);
-          }
-        }
-      }
-    }
+    return annotationMeta.computeIfAbsent(annotatedElement, AnnotationMeta::new).findAnnotations(annotationType);
   }
 
   // caches for getRepeatableValueMethod
@@ -218,39 +190,22 @@ public class AnnotationUtil {
     }
   }
 
-  private static final ConcurrentMap<Annotation, Method> valueMethods = new ConcurrentHashMap<>();
-  // only a non-null-marker the valueMethods - Cache
-  private static final Method nullMethod = getNullMethod();
 
 
-  /**
-   * Returns the <code>value()</code> method for a possible containerAnnotation.
-   * Method is retuned only, if its signature is <code>array of containingType</code>.
-   */
-  private static <A extends Annotation> Method getRepeatableValueMethod(
-    Annotation containerAnnotation, Class<A> containingType) {
-
-    Method method = valueMethods.get(containerAnnotation);
-    if (method == null) {
-      try {
-        method = containerAnnotation.annotationType().getMethod("value");
-      } catch (NoSuchMethodException e) {
-        method = nullMethod;
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      Method prev = valueMethods.putIfAbsent(containerAnnotation, method);
-      method = prev == null ? method : prev;
-    }
-    if (method != nullMethod) {
-      Class<?> retType = method.getReturnType();
-      if (retType.isArray() && retType.getComponentType() == containingType) {
+  private static Method getValueMethod( Class<? extends Annotation> annType) {
+    try {
+      Method method = annType.getMethod("value");
+      if (method.getReturnType().isArray() &&
+          Annotation.class.isAssignableFrom(method.getReturnType().getComponentType())) {
         return method;
       }
+    } catch (NoSuchMethodException e) {
+      // nop
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    return null;
+    return nullMethod;
   }
-
 
   /**
    * Finds a suitable annotation from <code>Set<T> anns</code> for this platform.
