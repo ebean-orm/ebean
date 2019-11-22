@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>11.45.2-SNAPSHOT</version>
+  <version>11.45.2-FOC2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -19,10 +19,11 @@
     <jackson-core.version>2.9.9</jackson-core.version>
     <jackson-databind.version>2.9.9.2</jackson-databind.version>
     <snakeyaml.version>1.21</snakeyaml.version>
+    <agent.version>11.45.2-FOC1</agent.version>
   </properties>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -177,7 +178,7 @@
     <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
-      <version>1.1.0.Final</version>
+      <version>2.0.1.Final</version>
       <scope>provided</scope>
     </dependency>
 
@@ -253,7 +254,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.197</version>
+      <version>1.4.199</version>
       <scope>provided</scope>
     </dependency>
 
@@ -293,6 +294,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <version>2.2.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <version>3.0.0</version>
@@ -325,12 +333,28 @@
 
 
   <build>
-    <plugins>
+    
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
 
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <localCheckout>true</localCheckout>
+          <pushChanges>true</pushChanges>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>11.45.1</version>
+        <version>${agent.version}</version>
         <executions>
           <execution>
             <id>test</id>
@@ -380,6 +404,7 @@
         <configuration>
           <archive>
             <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+            <addMavenDescriptor>false</addMavenDescriptor>
           </archive>
         </configuration>
       </plugin>
@@ -419,8 +444,61 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>      
     </plugins>
 
+	<extensions>
+		<extension>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-ssh</artifactId>
+			<version>2.10</version>
+		</extension>
+	</extensions>     
   </build>
+  
+  <repositories>
+  	<repository>
+  	  <id>foconis-release</id>
+  	  <url>https://repo.foconis.de/maven-release/</url>
+  	</repository>
+  	<repository>
+  	  <id>foconis-snapshot</id>
+  	  <url>https://repo.foconis.de/maven-snapshot/</url>
+  	</repository>
+  </repositories>
+  
+  <pluginRepositories>
+    <pluginRepository>
+      <id>foconis-release</id>
+      <url>https://repo.foconis.de/maven-release/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>foconis-snapshot</id>
+      <url>https://repo.foconis.de/maven-snapshot/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <!-- 
+  use   mvn clean source:jar deploy -DaltDeploymentRepository=foconis::default::sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-snapshot/
+ 
+   -->
+  <distributionManagement>
+    <repository>
+      <id>foconis-snapshot</id>
+      <name>Default Deploy Repository</name>
+      <url>sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-release/</url>
+    </repository>
+    <snapshotRepository>
+      <id>foconis-snapshot</id>
+      <name>Default Deploy Repository</name>
+      <url>sftp://bamboo@repo.foconis.de/var/www/html/repo/maven-snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 </project>
