@@ -387,8 +387,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
-      for (Map.Entry<Class<?>, DeployBeanInfo<?>> entry : deployInfoMap.entrySet()) {
-        customDeployParserManager.parse(entry.getValue());
+      for (DeployBeanInfo<?> entry : deployInfoMap.values()) {
+        customDeployParserManager.parse(entry);
       }
       setProfileIds();
       // creates the BeanDescriptors
