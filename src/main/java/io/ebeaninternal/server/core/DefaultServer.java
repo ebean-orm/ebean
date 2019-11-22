@@ -1353,7 +1353,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+  public <T> boolean exists(Query<?> ormQuery, Transaction transaction) {
 
     ormQuery.setMaxRows(1);
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, ormQuery, transaction);
