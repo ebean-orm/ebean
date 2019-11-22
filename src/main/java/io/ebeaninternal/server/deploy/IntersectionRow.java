@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.SqlUpdate;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.expression.IdInExpression;
@@ -45,7 +45,7 @@ public class IntersectionRow {
     values.put(key, value);
   }
 
-  public SqlUpdate createInsert(SpiEbeanServer server) {
+  public SpiSqlUpdate createInsert(SpiEbeanServer server) {
 
     BindParams bindParams = new BindParams();
 
@@ -73,7 +73,7 @@ public class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SqlUpdate createDelete(SpiEbeanServer server, DeleteMode deleteMode) {
+  public SpiSqlUpdate createDelete(SpiEbeanServer server, DeleteMode deleteMode) {
 
     BindParams bindParams = new BindParams();
 
@@ -108,7 +108,7 @@ public class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SqlUpdate createDeleteChildren(SpiEbeanServer server) {
+  public SpiSqlUpdate createDeleteChildren(SpiEbeanServer server) {
 
     BindParams bindParams = new BindParams();
 

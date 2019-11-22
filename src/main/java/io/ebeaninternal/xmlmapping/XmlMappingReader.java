@@ -1,5 +1,6 @@
 package io.ebeaninternal.xmlmapping;
 
+import io.ebeaninternal.util.UrlHelper;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
 import org.avaje.classpath.scanner.Resource;
 
@@ -41,7 +42,7 @@ public class XmlMappingReader {
       List<XmEbean> mappings = new ArrayList<>();
       while (resources.hasMoreElements()) {
         URL url = resources.nextElement();
-        try (InputStream is = url.openStream()) {
+        try (InputStream is = UrlHelper.openNoCache(url)) {
           mappings.add(XmlMappingReader.read(is));
         }
       }

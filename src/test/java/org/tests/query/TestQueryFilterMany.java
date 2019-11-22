@@ -12,6 +12,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -42,6 +43,61 @@ public class TestQueryFilterMany extends BaseTestCase {
     Ebean.refreshMany(customer, "orders");
 
   }
+
+  @Test
+  public void test_with_findOne() {
+
+    ResetBasicData.reset();
+
+    Customer customer = Ebean.find(Customer.class)
+      .setMaxRows(1)
+      .orderBy().asc("id")
+      .fetch("orders")
+      .filterMany("orders").raw("1 = 0")
+      .findOne();
+
+    assertThat(customer).isNotNull();
+  }
+
+  @Test
+  public void test_with_findOneOrEmpty() {
+
+    ResetBasicData.reset();
+
+    Optional<Customer> customer = Ebean.find(Customer.class)
+      .setMaxRows(1)
+      .orderBy().asc("id")
+      .fetch("orders")
+      .filterMany("orders").raw("1 = 0")
+      .findOneOrEmpty();
+
+    assertThat(customer).isPresent();
+  }
+
+  @Test
+  public void test_filterMany_with_isNotEmpty() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .fetch("orders")
+      .filterMany("orders").raw("1=0")
+      .where().isNotEmpty("orders")
+      .query();
+
+    List<Customer> list = query.findList();
+    for (Customer customer : list) {
+      assertThat(customer.getOrders()).isEmpty();
+    }
+
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
+    assertThat(sqlList.get(0)).contains("where exists (select 1 from o_order x where x.kcustomer_id = t0.id)");
+    assertThat(sqlList.get(1)).contains("and 1=0");
+  }
+
 
   @Test
   public void test_filterMany_in_findCount() {
@@ -98,7 +154,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertEquals(2, sql.size());
-    assertThat(sql.get(1)).contains("and (t0.status = ?  or t0.order_date = ?");
+    assertThat(sql.get(1)).contains("and (t0.status = ? or t0.order_date = ?");
   }
 
   @Test
@@ -119,5 +175,24 @@ public class TestQueryFilterMany extends BaseTestCase {
     assertThat(sql.get(1)).contains(" and t0.first_name is not null");
     platformAssertIn(sql.get(2), " from contact_note t0 where (t0.contact_id)");
     assertThat(sql.get(2)).contains(" and lower(t0.title) like");
+  }
+
+  @Test
+  public void testFilterManyUsingExpression() {
+
+    ResetBasicData.reset();
+    LoggedSqlCollector.start();
+
+    Ebean.find(Customer.class)
+      .where()
+      .filterMany("contacts", "firstName isNotNull and email istartsWith ?", "rob")
+      .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains(" from o_customer t0");
+    assertThat(sql.get(1)).contains("from contact t0 where ");
+    assertThat(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ? escape'|' )");
   }
 }

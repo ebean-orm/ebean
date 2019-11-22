@@ -21,7 +21,9 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
   @Override
   void loadIgnore(DbReadContext ctx) {
     property.targetIdBinder.loadIgnore(ctx);
-    ctx.getDataReader().incrementPos(1);
+    if (inherit.hasChildren()) {
+      ctx.getDataReader().incrementPos(1);
+    }
   }
 
   /**

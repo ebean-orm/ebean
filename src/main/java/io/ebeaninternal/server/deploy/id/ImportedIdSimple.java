@@ -35,17 +35,15 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   private static final EntryComparator COMPARATOR = new EntryComparator();
 
-  protected final BeanPropertyAssoc<?> owner;
+  final BeanPropertyAssoc<?> owner;
 
-  protected final String localDbColumn;
+  final String localDbColumn;
 
-  protected final String localSqlFormula;
+  private final String localSqlFormula;
 
-  protected final String logicalName;
+  final BeanProperty foreignProperty;
 
-  protected final BeanProperty foreignProperty;
-
-  protected final int position;
+  private final int position;
 
   /**
    * If true include in insert.
@@ -66,7 +64,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     this.position = position;
     this.insertable = insertable;
     this.updateable = updateable;
-    this.logicalName = InternString.intern(owner.getName() + "." + foreignProperty.getName());
   }
 
   public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position) {
@@ -78,7 +75,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
    */
   public static ImportedIdSimple[] sort(List<ImportedIdSimple> list) {
 
-    ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[list.size()]);
+    ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[0]);
 
     // sort into the same order as the BeanProperties
     Arrays.sort(importedIds, COMPARATOR);
@@ -88,7 +85,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   /**
    * Return true if it should be included in the update (or insert).
    */
-  public boolean isInclude(boolean update) {
+  boolean isInclude(boolean update) {
     return (update) ? updateable : insertable;
   }
 
@@ -100,7 +97,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public int compareTo(ImportedIdSimple other) {
-    return (position < other.position ? -1 : (position == other.position ? 0 : 1));
+    return Integer.compare(position, other.position);
   }
 
   @Override
@@ -157,7 +154,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
       ctx.appendColumn(localDbColumn);
     }
   }
-
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {

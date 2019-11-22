@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Factory for creating InsertMeta UpdateMeta and DeleteMeta.
  */
-public class MetaFactory {
+class MetaFactory {
 
   private final FactoryBaseProperties baseFact;
   private final FactoryEmbedded embeddedFact;
@@ -39,16 +39,11 @@ public class MetaFactory {
 
   private final DatabasePlatform dbPlatform;
 
-  private final boolean emptyStringAsNull;
-
   MetaFactory(DatabasePlatform dbPlatform) {
     this.dbPlatform = dbPlatform;
-    this.emptyStringAsNull = dbPlatform.isTreatEmptyStringsAsNull();
-
     // to bind encryption data before or after the encryption key
     DbEncrypt dbEncrypt = dbPlatform.getDbEncrypt();
     boolean bindEncryptDataFirst = dbEncrypt == null || dbEncrypt.isBindEncryptDataFirst();
-
     this.baseFact = new FactoryBaseProperties(bindEncryptDataFirst);
     this.embeddedFact = new FactoryEmbedded(bindEncryptDataFirst);
   }
@@ -75,7 +70,7 @@ public class MetaFactory {
 
     BindableList setBindable = new BindableList(setList);
 
-    return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, version, tenantId);
+    return new UpdateMeta(desc, setBindable, id, version, tenantId);
   }
 
   /**
@@ -86,8 +81,7 @@ public class MetaFactory {
     BindableId id = idFact.createId(desc);
     Bindable version = versionFact.createForDelete(desc);
     Bindable tenantId = versionFact.createTenantId(desc);
-
-    return new DeleteMeta(emptyStringAsNull, desc, id, version, tenantId);
+    return new DeleteMeta(desc, id, version, tenantId);
   }
 
   /**

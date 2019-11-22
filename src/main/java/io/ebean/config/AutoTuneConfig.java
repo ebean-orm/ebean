@@ -1,11 +1,11 @@
 package io.ebean.config;
 
 /**
- * Defines the AutoTune behaviour for a EbeanServer.
+ * Defines the AutoTune behaviour for a Database.
  */
 public class AutoTuneConfig {
 
-  private AutoTuneMode mode = AutoTuneMode.DEFAULT_ON;
+  private AutoTuneMode mode = AutoTuneMode.DEFAULT_OFF;
 
   private String queryTuningFile = "ebean-autotune.xml";
 

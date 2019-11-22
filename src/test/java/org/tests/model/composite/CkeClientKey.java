@@ -3,6 +3,8 @@ package org.tests.model.composite;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Size;
+
 import java.util.Objects;
 
 @Embeddable
@@ -14,6 +16,7 @@ public class CkeClientKey {
 
   @Basic(optional = false)
   @Column(name = "cod_client")
+  @Size(max=100)
   private String codClient;
 
   public CkeClientKey(int codCompany, String codClient) {

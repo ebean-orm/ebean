@@ -2,6 +2,8 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.query.CQueryCollectionAdd;
 
 
 /**
@@ -10,10 +12,10 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 public class BeanCollectionHelpFactory {
 
   @SuppressWarnings("rawtypes")
-  static final BeanListHelp LIST_HELP = new BeanListHelp();
+  private static final BeanListHelp LIST_HELP = new BeanListHelp();
 
   @SuppressWarnings("rawtypes")
-  static final BeanSetHelp SET_HELP = new BeanSetHelp();
+  private static final BeanSetHelp SET_HELP = new BeanSetHelp();
 
   /**
    * Create the helper based on the many property.
@@ -36,7 +38,7 @@ public class BeanCollectionHelpFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> BeanCollectionHelp<T> create(SpiQuery.Type manyType, OrmQueryRequest<T> request) {
+  public static <T> CQueryCollectionAdd<T> create(SpiQuery.Type manyType, OrmQueryRequest<T> request) {
 
     if (manyType == SpiQuery.Type.LIST) {
       return LIST_HELP;
@@ -44,10 +46,13 @@ public class BeanCollectionHelpFactory {
     } else if (manyType == SpiQuery.Type.SET) {
       return SET_HELP;
 
-    } else {
+    } else if (manyType == SpiQuery.Type.MAP) {
       BeanDescriptor<T> target = request.getBeanDescriptor();
-      String mapKey = request.getQuery().getMapKey();
-      return new BeanMapHelp<>(target, mapKey);
+      ElPropertyValue elProperty = target.getElGetValue(request.getQuery().getMapKey());
+      return new BeanMapQueryHelp<>(elProperty);
+
+    } else {
+      return null;
     }
   }
 

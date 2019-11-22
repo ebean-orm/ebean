@@ -2,12 +2,15 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
+import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.Postgres8Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
@@ -80,6 +83,9 @@ public class DatabasePlatformFactory {
     if (dbName.equals("mysql")) {
       return new MySqlPlatform();
     }
+    if (dbName.equals("mysql55")) {
+      return new MySql55Platform();
+    }
     if (dbName.equals("postgres") || dbName.equals("postgres9")) {
       return new PostgresPlatform();
     }
@@ -103,6 +109,12 @@ public class DatabasePlatformFactory {
     }
     if (dbName.equals("db2")) {
       return new DB2Platform();
+    }
+    if (dbName.equals("clickhouse")) {
+      return new ClickHousePlatform();
+    }
+    if (dbName.equals("nuodb")) {
+      return new NuoDbPlatform();
     }
     if (dbName.equals("sqlite")) {
       return new SQLitePlatform();
@@ -139,21 +151,24 @@ public class DatabasePlatformFactory {
    */
   private DatabasePlatform byDatabaseMeta(DatabaseMetaData metaData, Connection connection) throws SQLException {
 
-    String dbProductName = metaData.getDatabaseProductName();
-    dbProductName = dbProductName.toLowerCase();
+    String dbProductName = metaData.getDatabaseProductName().toLowerCase();
+    final int majorVersion = metaData.getDatabaseMajorVersion();
+    final int minorVersion = metaData.getDatabaseMinorVersion();
 
     if (dbProductName.contains("oracle")) {
       return new OraclePlatform();
     } else if (dbProductName.contains("microsoft")) {
       throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via ServerConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
     } else if (dbProductName.contains("mysql")) {
-      return new MySqlPlatform();
+      return mysqlVersion(majorVersion, minorVersion);
     } else if (dbProductName.contains("h2")) {
       return new H2Platform();
     } else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
       return readPostgres(connection);
+    } else if (dbProductName.contains("nuo")) {
+      return new NuoDbPlatform();
     } else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
     } else if (dbProductName.contains("db2")) {
@@ -162,16 +177,25 @@ public class DatabasePlatformFactory {
       return new SqlAnywherePlatform();
     } else if (dbProductName.contains("hdb")) {
       return new HanaPlatform();
+    } else if (dbProductName.contains("clickhouse")) {
+      return new ClickHousePlatform();
     }
 
     // use the standard one
     return new DatabasePlatform();
   }
 
+  private DatabasePlatform mysqlVersion(int majorVersion, int minorVersion) {
+    if (majorVersion <= 5 && minorVersion <= 5) {
+      return new MySql55Platform();
+    }
+    return new MySqlPlatform();
+  }
+
   /**
    * Use a select version() query as it could be Postgres or CockroachDB.
    */
-  private static PostgresPlatform readPostgres(Connection connection) {
+  private static DatabasePlatform readPostgres(Connection connection) {
     // Postgres driver uses a hardcoded product name so use version() query
     PreparedStatement statement = null;
     ResultSet resultSet = null;

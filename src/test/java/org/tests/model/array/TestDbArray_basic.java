@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestDbArray_basic extends BaseTestCase {
 
@@ -189,5 +190,57 @@ public class TestDbArray_basic extends BaseTestCase {
 
     Ebean.saveAll(all);
     Ebean.deleteAll(all);
+  }
+
+  @Test
+  public void nullItems() {
+    EArrayBean bean = new EArrayBean();
+    bean.setName("null items");
+
+    List<Double> doubles = new ArrayList<>();
+    doubles.add(1.3);
+    doubles.add(null);
+    doubles.add(2.4);
+
+    bean.getPhoneNumbers().add("111222333");
+    bean.getPhoneNumbers().add(null);
+    bean.getPhoneNumbers().add("333222111");
+
+    bean.getOtherIds().add(15L);
+    bean.getOtherIds().add(null);
+    bean.getOtherIds().add(30L);
+    bean.getOtherIds().add(null);
+
+    bean.getUids().add(UUID.randomUUID());
+    bean.getUids().add(null);
+    bean.getUids().add(UUID.randomUUID());
+
+    bean.setDoubs(doubles);
+
+    bean.setStatuses(new ArrayList<>());
+    bean.getStatuses().add(EArrayBean.Status.ONE);
+    bean.getStatuses().add(null);
+    bean.getStatuses().add(EArrayBean.Status.THREE);
+
+    bean.getVcEnums().add(VarcharEnum.ONE);
+    bean.getVcEnums().add(null);
+    bean.getVcEnums().add(VarcharEnum.TWO);
+
+    bean.getIntEnums().add(null);
+    bean.getIntEnums().add(IntEnum.ZERO);
+    bean.getIntEnums().add(null);
+    bean.getIntEnums().add(IntEnum.TWO);
+
+    Ebean.save(bean);
+
+    found = Ebean.find(EArrayBean.class, bean.getId());
+    assertThat(found.getPhoneNumbers()).containsExactly("111222333", null, "333222111");
+    assertThat(found.getOtherIds()).containsExactly(15L, null, 30L, null);
+    assertNull(found.getUids().get(1));
+    assertThat(found.getDoubs()).containsExactly(1.3, null, 2.4);
+    assertThat(found.getStatuses()).containsExactly(EArrayBean.Status.ONE, null, EArrayBean.Status.THREE);
+    assertThat(found.getVcEnums()).containsExactly(VarcharEnum.ONE, null, VarcharEnum.TWO);
+    assertThat(found.getIntEnums()).containsExactly(null, IntEnum.ZERO, null, IntEnum.TWO);
+    Ebean.delete(bean);
   }
 }

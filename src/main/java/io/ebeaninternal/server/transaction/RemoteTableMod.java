@@ -15,7 +15,12 @@ public class RemoteTableMod implements BinaryWritable {
 
   private final Set<String> tables;
 
-  public RemoteTableMod(long timestamp, Set<String> tables) {
+  public RemoteTableMod(Set<String> tables) {
+    this.tables = tables;
+    this.timestamp = System.currentTimeMillis();
+  }
+
+  private RemoteTableMod(long timestamp, Set<String> tables) {
     this.timestamp = timestamp;
     this.tables = tables;
   }

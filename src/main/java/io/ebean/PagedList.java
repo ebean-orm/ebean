@@ -24,8 +24,7 @@ import java.util.concurrent.Future;
  *     // We want to find the first 50 new orders
  *     //  ... so we don't really need setFirstRow(0)
  *
- *     PagedList<Order> pagedList
- *       = ebeanServer.find(Order.class)
+ *     PagedList<Order> pagedList = DB.find(Order.class)
  *       .where().eq("status", Order.Status.NEW)
  *       .order().asc("id")
  *       .setFirstRow(0)

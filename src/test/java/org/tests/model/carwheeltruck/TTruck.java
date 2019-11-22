@@ -13,7 +13,7 @@ import javax.persistence.InheritanceType;
 @DiscriminatorValue("truck")
 public class TTruck extends TCar {
 
-  @Column(name = "truckLoad")
+  @Column(name = "truckload")
   Long load;
 
   public Long getLoad() {

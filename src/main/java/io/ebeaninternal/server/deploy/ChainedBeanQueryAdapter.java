@@ -24,7 +24,7 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
    */
   public ChainedBeanQueryAdapter(List<BeanQueryAdapter> list) {
     this.list = list;
-    BeanQueryAdapter[] c = list.toArray(new BeanQueryAdapter[list.size()]);
+    BeanQueryAdapter[] c = list.toArray(new BeanQueryAdapter[0]);
     Arrays.sort(c, SORTER);
     this.chain = c;
   }
@@ -89,10 +89,7 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 
     @Override
     public int compare(BeanQueryAdapter o1, BeanQueryAdapter o2) {
-
-      int i1 = o1.getExecutionOrder();
-      int i2 = o2.getExecutionOrder();
-      return (i1 < i2 ? -1 : (i1 == i2 ? 0 : 1));
+      return Integer.compare(o1.getExecutionOrder(), o2.getExecutionOrder());
     }
 
   }

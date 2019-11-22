@@ -25,7 +25,7 @@ public enum ServerCacheType {
    */
   QUERY("_Q");
 
-  private String code;
+  private final String code;
 
   ServerCacheType(String code) {
     this.code = code;

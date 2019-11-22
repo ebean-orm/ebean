@@ -9,6 +9,7 @@ import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.PostgresHelper;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
@@ -107,7 +108,7 @@ public class Binder {
         if (isLob(dt)) {
           bindBuf.append("[LOB]");
         } else {
-          bindBuf.append(String.valueOf(val));
+          bindBuf.append(val);
         }
       }
     }
@@ -123,7 +124,7 @@ public class Binder {
   /**
    * Bind the list of positionedParameters in BindParams.
    */
-  public String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
+  private String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
 
     StringBuilder bindLog = new StringBuilder();
     bind(bindParams, dataBind, bindLog);
@@ -141,7 +142,7 @@ public class Binder {
   /**
    * Bind the list of parameters..
    */
-  public void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog) throws SQLException {
+  private void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog) throws SQLException {
 
     CallableStatement cstmt = null;
 
@@ -260,7 +261,7 @@ public class Binder {
    * default is that both are converted to java.sql.Timestamp.
    * </p>
    */
-  public void bindObject(DataBind dataBind, Object data, int dbType) throws SQLException {
+  private void bindObject(DataBind dataBind, Object data, int dbType) throws SQLException {
 
     if (data == null) {
       dataBind.setNull(dbType);
@@ -297,8 +298,6 @@ public class Binder {
     try {
       switch (dataType) {
         case java.sql.Types.BOOLEAN:
-          b.setBoolean((Boolean) data);
-          break;
         case java.sql.Types.BIT:
           // Types.BIT should map to Java Boolean
           b.setBoolean((Boolean) data);
@@ -333,18 +332,12 @@ public class Binder {
           break;
 
         case java.sql.Types.FLOAT:
+        case java.sql.Types.DOUBLE:
           // DB Float in theory maps to Java Double type
           b.setDouble((Double) data);
           break;
 
-        case java.sql.Types.DOUBLE:
-          b.setDouble((Double) data);
-          break;
-
         case java.sql.Types.NUMERIC:
-          b.setBigDecimal((BigDecimal) data);
-          break;
-
         case java.sql.Types.DECIMAL:
           b.setBigDecimal((BigDecimal) data);
           break;
@@ -362,25 +355,24 @@ public class Binder {
           break;
 
         case java.sql.Types.BINARY:
-          b.setBytes((byte[]) data);
-          break;
-
         case java.sql.Types.VARBINARY:
           b.setBytes((byte[]) data);
           break;
 
         case DbPlatformType.UUID:
+        case java.sql.Types.JAVA_OBJECT:
+          // Not too sure about this.
           // native UUID support in H2 and Postgres
           b.setObject(data);
           break;
 
-        case java.sql.Types.OTHER:
-          b.setObject(data, dataType);
+        case DbPlatformType.INET:
+          // data is always a String at this point
+          b.setObject(PostgresHelper.asInet(data.toString()));
           break;
 
-        case java.sql.Types.JAVA_OBJECT:
-          // Not too sure about this.
-          b.setObject(data);
+        case java.sql.Types.OTHER:
+          b.setObject(data, dataType);
           break;
 
         default:
@@ -434,12 +426,9 @@ public class Binder {
   private boolean isLob(int dbType) {
     switch (dbType) {
       case Types.CLOB:
-        return true;
-      case Types.LONGVARCHAR:
-        return true;
-      case Types.BLOB:
-        return true;
       case Types.LONGVARBINARY:
+      case Types.BLOB:
+      case Types.LONGVARCHAR:
         return true;
 
       default:

@@ -233,7 +233,7 @@ public class CsvUtilReader {
       }
     } while (inQuotes);
     tokensOnThisLine.add(sb.toString().trim());
-    return tokensOnThisLine.toArray(new String[tokensOnThisLine.size()]);
+    return tokensOnThisLine.toArray(new String[0]);
   }
 
   /**

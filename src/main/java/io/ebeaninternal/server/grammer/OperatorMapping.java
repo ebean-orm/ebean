@@ -5,9 +5,9 @@ import java.util.Map;
 
 class OperatorMapping {
 
-  Map<String, EqlOperator> map = new HashMap<>();
+  private final Map<String, EqlOperator> map = new HashMap<>();
 
-  public OperatorMapping() {
+  OperatorMapping() {
     map.put("eq", EqlOperator.EQ);
     map.put("=", EqlOperator.EQ);
     map.put("ieq", EqlOperator.IEQ);
@@ -41,7 +41,12 @@ class OperatorMapping {
     map.put("iendsWith", EqlOperator.IENDS_WITH);
     map.put("ilike", EqlOperator.ILIKE);
 
+    map.put("inrange", EqlOperator.INRANGE);
+    map.put("inRange", EqlOperator.INRANGE);
     map.put("between", EqlOperator.BETWEEN);
+    map.put("eqOrNull", EqlOperator.EQORNULL);
+    map.put("gtOrNull", EqlOperator.GTORNULL);
+    map.put("ltOrNull", EqlOperator.LTORNULL);
   }
 
   public EqlOperator get(String key) {

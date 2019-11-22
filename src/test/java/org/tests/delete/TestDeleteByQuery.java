@@ -4,16 +4,16 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
+import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
 import org.tests.model.basic.BBookmarkUser;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -50,7 +50,13 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("delete from bbookmark_user where name =");
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(loggedSql.get(0)).contains("delete from bbookmark_user t0 where t0.name =");
+    } else if (isMySql()){
+      assertThat(loggedSql.get(0)).contains("delete t0 from bbookmark_user t0 where t0.name =");
+    } else {
+      assertThat(loggedSql.get(0)).contains("delete from bbookmark_user where name =");
+    }
 
 
     server.find(BBookmarkUser.class).select("id").where().eq("name", "NotARealFirstName").delete();
@@ -102,8 +108,13 @@ public class TestDeleteByQuery extends BaseTestCase {
     Ebean.find(BBookmarkUser.class).setId(7000).delete();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("delete from bbookmark_user where id = ?");
-    assertThat(sql.get(1)).contains("delete from bbookmark_user where id = ?");
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(sql.get(0)).contains("delete from bbookmark_user t0 where t0.id = ?");
+      assertThat(sql.get(1)).contains("delete from bbookmark_user t0 where t0.id = ?");
+    } else if (!isMySql()) {
+      assertThat(sql.get(0)).contains("delete from bbookmark_user where id = ?");
+      assertThat(sql.get(1)).contains("delete from bbookmark_user where id = ?");
+    }
 
     // and note this is the easiest option
     Ebean.delete(BBookmarkUser.class, 7000);
@@ -127,6 +138,27 @@ public class TestDeleteByQuery extends BaseTestCase {
   }
 
   @Test
+  public void queryDelete_withTransactionNoCascade() {
+
+    LoggedSqlCollector.start();
+
+    try (Transaction transaction = Ebean.beginTransaction()) {
+      transaction.setPersistCascade(false);
+
+      Ebean.find(Contact.class).where().eq("id", 7001).delete();
+
+      transaction.commit();
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    if (isPlatformSupportsDeleteTableAlias()) {
+      assertThat(sql.get(0)).contains("delete from contact t0 where t0.id = ?");
+    } else if (!isMySql()){
+      assertThat(sql.get(0)).contains("delete from contact where id = ?");
+    }
+  }
+
+  @Test
   public void testWithForUpdate() {
 
     LoggedSqlCollector.start();
@@ -138,7 +170,11 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id from o_customer t0 where t0.name = ?");
+    if (isSqlServer()) {
+      assertThat(sql.get(0)).contains("select t0.id from o_customer t0 with (updlock) where t0.name = ?");
+    } else {
+      assertThat(sql.get(0)).contains("select t0.id from o_customer t0 where t0.name = ?");
+    }
   }
 
   @Test

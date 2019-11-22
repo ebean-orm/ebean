@@ -116,6 +116,7 @@
       <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>
       <xsd:attribute name="sequenceAllocate" type="xsd:positiveInteger"/>
       <xsd:attribute name="pkName" type="xsd:string"/>
+      <xsd:attribute name="storageEngine" type="xsd:string"/>
       <xsd:attributeGroup ref="tablespaceAttributes"/>
     </xsd:complexType>
   </xsd:element>

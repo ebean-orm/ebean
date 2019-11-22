@@ -22,6 +22,17 @@ public class LogicExpressionTest extends BaseExpressionTest {
   }
 
   @Test
+  public void addSql() {
+
+    DefaultExpressionRequest expReq = newExpressionRequest();
+
+    LogicExpression and = and(eq("a", 10), eq("b", 10));
+    and.addSql(expReq);
+
+    assertThat(expReq.getSql()).isEqualTo("(a = ? and b = ?)");
+  }
+
+  @Test
   public void isSameByPlan_when_same() {
 
     same(and(eq("a", 10), eq("b", 10))

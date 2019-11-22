@@ -53,7 +53,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Derived list of exported property and matching foreignKey
    */
-  protected ExportedProperty[] exportedProperties;
+  ExportedProperty[] exportedProperties;
 
   /**
    * Persist settings.
@@ -70,7 +70,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * The type of the joined bean.
    */
-  final Class<T> targetType;
+  private final Class<T> targetType;
 
   /**
    * The join table information.
@@ -79,18 +79,18 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
 
   final String mappedBy;
 
-  final String docStoreDoc;
+  private final String docStoreDoc;
 
-  final String extraWhere;
+  private final String extraWhere;
 
-  final int fetchPreference;
+  private final int fetchPreference;
 
-  boolean saveRecurseSkippable;
+  private boolean saveRecurseSkippable;
 
   /**
    * Construct the property.
    */
-  public BeanPropertyAssoc(BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
+  BeanPropertyAssoc(BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
     super(descriptor, deploy);
     this.foreignKey = deploy.getForeignKey();
     this.extraWhere = InternString.intern(deploy.getExtraWhere());
@@ -102,6 +102,23 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     this.targetType = deploy.getTargetType();
     this.cascadeInfo = deploy.getCascadeInfo();
     this.fetchPreference = deploy.getFetchPreference();
+  }
+
+  /**
+   * Copy constructor for ManyToOne inside Embeddable.
+   */
+  @SuppressWarnings("unchecked")
+  BeanPropertyAssoc(BeanPropertyAssoc source, BeanPropertyOverride override) {
+    super(source, override);
+    foreignKey = source.foreignKey;
+    extraWhere = source.extraWhere;
+    beanTable = source.beanTable;
+    mappedBy = source.mappedBy;
+    docStoreDoc = source.docStoreDoc;
+    targetType = source.targetType;
+    cascadeInfo = source.cascadeInfo;
+    fetchPreference = source.fetchPreference;
+    tableJoin = source.tableJoin.withOverrideColumn(override.getDbColumn());
   }
 
   /**
@@ -139,9 +156,23 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   /**
+   * Return true if foreign key constraint is enabled on this relationship (not disabled).
+   */
+  public boolean hasForeignKeyConstraint() {
+    return foreignKey == null || !foreignKey.isNoConstraint();
+  }
+
+  /**
+   * Return true if foreign key index is enabled on this relationship (not disabled).
+   */
+  public boolean hasForeignKeyIndex() {
+    return foreignKey == null || !foreignKey.isNoIndex();
+  }
+
+  /**
    * Create a ElPropertyValue for a *ToOne or *ToMany.
    */
-  protected ElPropertyValue createElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
+  ElPropertyValue createElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 
     // associated or embedded bean
     BeanDescriptor<?> embDesc = getTargetDescriptor();
@@ -211,7 +242,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
 
   /**
    * Create a new query for the target type.
-   *
+   * <p>
    * We use target descriptor rather than target property type to support ElementCollection.
    */
   public SpiQuery<T> newQuery(SpiEbeanServer server) {
@@ -238,12 +269,11 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Return true if REFRESH should cascade.
    */
-  public boolean isCascadeRefresh() {
+  boolean isCascadeRefresh() {
     return cascadeInfo.isRefresh();
   }
 
   public boolean isSaveRecurseSkippable(Object bean) {
-
     return saveRecurseSkippable && bean instanceof EntityBean && !((EntityBean) bean)._ebean_getIntercept().isNewOrDirty();
   }
 
@@ -267,14 +297,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
 
     BeanDescriptor<?> targetDesc = getTargetDescriptor();
     BeanProperty idProp = targetDesc.getIdProperty();
-    if (idProp != null) {
-      Object value = idProp.getValue(bean);
-      if (value == null) {
-        return false;
-      }
-    }
     // all the unique properties are non-null
-    return true;
+    return idProp == null || idProp.getValue(bean) != null;
   }
 
   /**
@@ -300,7 +324,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Return the elastic search doc for this embedded property.
    */
-  public String getDocStoreDoc() {
+  private String getDocStoreDoc() {
     return docStoreDoc;
   }
 
@@ -331,7 +355,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Include the property in the document store by default.
    */
-  protected void docStoreIncludeByDefault(PathProperties pathProps) {
+  void docStoreIncludeByDefault(PathProperties pathProps) {
     pathProps.addToPath(null, name);
   }
 
@@ -413,7 +437,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Build the list of imported property. Matches BeanProperty from the target
    * descriptor back to local database columns in the TableJoin.
    */
-  protected ImportedId createImportedId(BeanPropertyAssoc<?> owner, BeanDescriptor<?> target, TableJoin join) {
+  ImportedId createImportedId(BeanPropertyAssoc<?> owner, BeanDescriptor<?> target, TableJoin join) {
 
     BeanProperty idProp = target.getIdProperty();
     BeanProperty[] others = target.propertiesBaseScalar();
