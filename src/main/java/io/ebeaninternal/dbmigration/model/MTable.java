@@ -298,6 +298,9 @@ public class MTable {
       }
     }
 
+    compareDroppedCompoundKeys(modelDiff, newTable);
+    compareDroppedUniqueKeys(modelDiff, newTable);
+
     compareColumns(modelDiff, newTable);
 
     if (MColumn.different(comment, newTable.comment)) {
@@ -312,8 +315,8 @@ public class MTable {
     }
 
 
-    compareCompoundKeys(modelDiff, newTable);
-    compareUniqueKeys(modelDiff, newTable);
+    compareAddedCompoundKeys(modelDiff, newTable);
+    compareAddedUniqueKeys(modelDiff, newTable);
   }
 
   private void compareColumns(ModelDiff modelDiff, MTable newTable) {
@@ -352,35 +355,46 @@ public class MTable {
   }
 
 
-  private void compareCompoundKeys(ModelDiff modelDiff, MTable newTable) {
-    List<MCompoundForeignKey> newKeys = new ArrayList<>(newTable.getCompoundKeys());
+  private void compareDroppedCompoundKeys(ModelDiff modelDiff, MTable newTable) {
     List<MCompoundForeignKey> currentKeys = new ArrayList<>(getCompoundKeys());
 
     // remove keys that have not changed
     currentKeys.removeAll(newTable.getCompoundKeys());
-    newKeys.removeAll(getCompoundKeys());
 
     for (MCompoundForeignKey currentKey : currentKeys) {
       modelDiff.addAlterForeignKey(currentKey.dropForeignKey(name));
     }
+  }
+
+  private void compareAddedCompoundKeys(ModelDiff modelDiff, MTable newTable) {
+    List<MCompoundForeignKey> newKeys = new ArrayList<>(newTable.getCompoundKeys());
+
+    // remove keys that have not changed
+    newKeys.removeAll(getCompoundKeys());
 
     for (MCompoundForeignKey newKey : newKeys) {
       modelDiff.addAlterForeignKey(newKey.addForeignKey(name));
     }
   }
 
-  private void compareUniqueKeys(ModelDiff modelDiff, MTable newTable) {
-    List<MCompoundUniqueConstraint> newKeys = new ArrayList<>(newTable.getUniqueConstraints());
+  private void compareDroppedUniqueKeys(ModelDiff modelDiff, MTable newTable) {
     List<MCompoundUniqueConstraint> currentKeys = new ArrayList<>(getUniqueConstraints());
 
     // remove keys that have not changed
     currentKeys.removeAll(newTable.getUniqueConstraints());
-    newKeys.removeAll(getUniqueConstraints());
 
     for (MCompoundUniqueConstraint currentKey: currentKeys) {
       modelDiff.addUniqueConstraint(currentKey.dropUniqueConstraint(name));
     }
-    for (MCompoundUniqueConstraint newKey: newKeys) {
+  }
+
+  private void compareAddedUniqueKeys(ModelDiff modelDiff, MTable newTable) {
+    List<MCompoundUniqueConstraint> newKeys = new ArrayList<>(newTable.getUniqueConstraints());
+
+    // remove keys that have not changed
+    newKeys.removeAll(getUniqueConstraints());
+
+    for (MCompoundUniqueConstraint newKey : newKeys) {
       modelDiff.addUniqueConstraint(newKey.addUniqueConstraint(name));
     }
   }

@@ -44,6 +44,13 @@ public class MCompoundUniqueConstraint {
   }
 
   /**
+   * Return the columns that can contain null.
+   */
+  public String[] getNullableColumns() {
+    return nullableColumns;
+  }
+
+  /**
    * Return true if this unqiue constraint is specifically for OneToOne mapping.
    */
   public boolean isOneToOne() {

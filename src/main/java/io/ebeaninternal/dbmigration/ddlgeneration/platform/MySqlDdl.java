@@ -52,6 +52,11 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+    buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+  }
+
+  @Override
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
     if (USE_CHECK_CONSTRAINT) {
       return super.alterTableAddCheckConstraint(tableName, checkConstraintName, checkConstraint);

@@ -27,6 +27,8 @@ import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
+import io.ebeaninternal.dbmigration.model.MCompoundUniqueConstraint;
+import io.ebeaninternal.dbmigration.model.MIndex;
 import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.io.IOException;
@@ -87,6 +89,10 @@ public class BaseTableDdl implements TableDdl {
   private final boolean strictMode;
 
   private final HistorySupport historySupport;
+
+  private List<MIndex> droppedIndices;
+
+  private List<MCompoundUniqueConstraint> droppedUniqueConstraints;
 
   /**
    * Helper class that is used to execute the migration ddl before and after the migration action.
@@ -797,9 +803,18 @@ public class BaseTableDdl implements TableDdl {
     }
     boolean alterBaseAttributes = false;
     if (hasValue(alterColumn.getType())) {
-      alterColumnType(writer, alterColumn);
+
+      if (platformDdl.isDropConstraintsOnAlter()) {
+        dropColumnConstraints(writer, alterColumn);
+        alterColumnType(writer, alterColumn);
+        restoreColumnConstraints(writer, alterColumn);
+
+      } else {
+        alterColumnType(writer, alterColumn);
+      }
       alterBaseAttributes = true;
     }
+
     if (hasValue(alterColumn.getDefaultValue())) {
       alterColumnDefaultValue(writer, alterColumn);
       alterBaseAttributes = true;
@@ -816,6 +831,31 @@ public class BaseTableDdl implements TableDdl {
       addCheckConstraint(writer, alterColumn);
     }
     ddlHelp.writeAfter(writer.apply());
+  }
+
+
+  private void dropColumnConstraints(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+    droppedIndices = writer.findIndices(alterColumn.getTableName(), alterColumn.getColumnName());
+    for (MIndex index : droppedIndices) {
+      writer.apply().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName()));
+    }
+
+    droppedUniqueConstraints = writer.findUniqueConstraints(alterColumn.getTableName(), alterColumn.getColumnName());
+    for (MCompoundUniqueConstraint uniqueConstraint : droppedUniqueConstraints) {
+      writer.apply().appendStatement(
+          platformDdl.alterTableDropUniqueConstraint(alterColumn.getTableName(), uniqueConstraint.getName()));
+    }
+  }
+
+  private void restoreColumnConstraints(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+    for (MIndex index : droppedIndices) {
+      writer.applyForeignKeys().appendStatement(platformDdl.createIndex(index.getIndexName(), index.getTableName(),
+          index.getColumns().toArray(new String[0])));
+    }
+    for (MCompoundUniqueConstraint uq : droppedUniqueConstraints) {
+      writer.applyForeignKeys().appendStatement(platformDdl.alterTableAddUniqueConstraint(
+          alterColumn.getTableName(), uq.getName(), uq.getColumns(), uq.getNullableColumns()));
+    }
   }
 
   private void alterColumnComment(DdlWrite writer, AlterColumn alterColumn) throws IOException {
