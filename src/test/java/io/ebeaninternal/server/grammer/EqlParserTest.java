@@ -496,7 +496,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.first_name, t2.last_name, t2.phone, t2.mobile, t2.email, t2.cretime, t2.updtime, t2.customer_id, t2.group_id from o_customer t0");
+    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.first_name, t2.last_name, t2.phone, t2.mobile, t2.email, t2.is_member, t2.cretime, t2.updtime, t2.customer_id, t2.group_id from o_customer t0");
   }
 
 

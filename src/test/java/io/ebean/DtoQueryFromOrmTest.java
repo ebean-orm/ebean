@@ -271,6 +271,24 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
   }
 
   @Test
+  public void toDto_withIsBooleanProperty() {
+
+    ResetBasicData.reset();
+
+    DB.sqlUpdate("update contact set is_member=? where last_name like ?")
+      .setParams(true, "B%")
+      .execute();
+
+    final List<ContactMemberDto> contacts =
+      DB.find(Contact.class).select("lastName, isMember")
+        .where().eq("isMember", true)
+        .asDto(ContactMemberDto.class)
+        .findList();
+
+    assertThat(contacts).isNotEmpty();
+  }
+
+  @Test
   public void toDto_fromExpressionList() {
 
     ResetBasicData.reset();
@@ -341,6 +359,28 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     public void setId(Integer id) {
       this.id = id;
+    }
+  }
+
+  public static class ContactMemberDto {
+
+    String lastName;
+    boolean member;
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public void setLastName(String lastName) {
+      this.lastName = lastName;
+    }
+
+    public boolean isMember() {
+      return member;
+    }
+
+    public void setMember(boolean member) {
+      this.member = member;
     }
   }
 }

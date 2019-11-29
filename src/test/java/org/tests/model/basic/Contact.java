@@ -39,6 +39,8 @@ public class Contact {
   String mobile;
   String email;
 
+  boolean isMember;
+
   @DocEmbedded(doc = "id,name")
   @ManyToOne(optional = false)
   Customer customer;
@@ -127,6 +129,14 @@ public class Contact {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public boolean isMember() {
+    return isMember;
+  }
+
+  public void setMember(boolean member) {
+    isMember = member;
   }
 
   public Customer getCustomer() {

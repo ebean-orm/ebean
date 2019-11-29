@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebean.util.StringHelper;
-
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.ebean.util.StringHelper.replaceString;
 
 /**
  * Holds property and constructor meta data for a given DTO bean type.
@@ -123,9 +123,11 @@ class DtoMeta {
 
     String upperLabel = label.toUpperCase();
     DtoMetaProperty property = propMap.get(upperLabel);
+    if (property == null && upperLabel.startsWith("IS_")) {
+      property = propMap.get(upperLabel.substring(3));
+    }
     if (property == null) {
-      upperLabel = StringHelper.replaceString(upperLabel, "_", "");
-      property = propMap.get(upperLabel);
+      property = propMap.get(replaceString(upperLabel, "_", ""));
     }
     return property;
   }
