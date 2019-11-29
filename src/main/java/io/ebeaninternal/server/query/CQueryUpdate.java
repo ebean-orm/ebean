@@ -93,7 +93,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
 
       long executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
-      if (queryPlan.executionTime(rowCount, executionTimeMicros, null)) {
+      if (queryPlan.executionTime(rowCount, executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
       t.profileEvent(this);

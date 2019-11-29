@@ -28,7 +28,6 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.meta.MetaInfoManager;
 import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
 
@@ -414,10 +413,6 @@ public class ServerConfig {
   private DbEncrypt dbEncrypt;
 
   private ServerCachePlugin serverCachePlugin;
-
-  private boolean collectQueryStatsByNode = true;
-
-  private boolean collectQueryOrigins = true;
 
   /**
    * The default PersistenceContextScope used if one is not explicitly set on a query.
@@ -2419,52 +2414,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if query statistics should be collected by ObjectGraphNode.
-   */
-  public boolean isCollectQueryStatsByNode() {
-    return collectQueryStatsByNode;
-  }
-
-  /**
-   * Set to true to collection query execution statistics by ObjectGraphNode.
-   * <p>
-   * These statistics can be used to highlight code/query 'origin points' that result in lots of lazy loading.
-   * </p>
-   * <p>
-   * It is considered safe/fine to have this set to true for production.
-   * </p>
-   * <p>
-   * This information can be later retrieved via {@link MetaInfoManager}.
-   * </p>
-   *
-   * @see MetaInfoManager
-   */
-  public void setCollectQueryStatsByNode(boolean collectQueryStatsByNode) {
-    this.collectQueryStatsByNode = collectQueryStatsByNode;
-  }
-
-  /**
-   * Return true if query plans should also collect their 'origins'. This means for a given query plan you
-   * can identify the code/origin points where this query resulted from including lazy loading origins.
-   */
-  public boolean isCollectQueryOrigins() {
-    return collectQueryOrigins;
-  }
-
-  /**
-   * Set to true if query plans should collect their 'origin' points. This means for a given query plan you
-   * can identify the code/origin points where this query resulted from including lazy loading origins.
-   * <p>
-   * This information can be later retrieved via {@link MetaInfoManager}.
-   * </p>
-   *
-   * @see MetaInfoManager
-   */
-  public void setCollectQueryOrigins(boolean collectQueryOrigins) {
-    this.collectQueryOrigins = collectQueryOrigins;
-  }
-
-  /**
    * Returns the resource directory.
    */
   public String getResourceDirectory() {
@@ -2920,9 +2869,6 @@ public class ServerConfig {
 
     String packagesProp = p.get("search.packages", p.get("packages", null));
     packages = getSearchList(packagesProp, packages);
-
-    collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
-    collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
 
     skipCacheAfterWrite = p.getBoolean("skipCacheAfterWrite", skipCacheAfterWrite);
     updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);

@@ -240,18 +240,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final boolean updateAllPropertiesInBatch;
 
-  private final boolean collectQueryOrigins;
-
-  private final boolean collectQueryStatsByNode;
-
   private final long slowQueryMicros;
 
   private final SlowQueryListener slowQueryListener;
-
-  /**
-   * Cache used to collect statistics based on ObjectGraphNode (used to highlight lazy loading origin points).
-   */
-  protected final ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics> objectGraphStats;
 
   /**
    * Create the DefaultServer.
@@ -261,7 +252,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
     this.serverConfig = config.getServerConfig();
-    this.objectGraphStats = new ConcurrentHashMap<>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
@@ -282,8 +272,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     beanDescriptorManager.setEbeanServer(this);
 
     this.updateAllPropertiesInBatch = serverConfig.isUpdateAllPropertiesInBatch();
-    this.collectQueryOrigins = serverConfig.isCollectQueryOrigins();
-    this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.callStackFactory = initCallStackFactory(serverConfig);
 
     this.persister = config.createPersister(this);
@@ -350,11 +338,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public SpiLogManager log() {
     return logManager;
-  }
-
-  @Override
-  public boolean isCollectQueryOrigins() {
-    return collectQueryOrigins;
   }
 
   @Override
@@ -2355,21 +2338,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public SpiJsonContext jsonExtended() {
     return jsonContext;
-  }
-
-  @Override
-  public void collectQueryStats(ObjectGraphNode node, long loadedBeanCount, long timeMicros) {
-
-    if (collectQueryStatsByNode) {
-      CObjectGraphNodeStatistics nodeStatistics = objectGraphStats.get(node);
-      if (nodeStatistics == null) {
-        // race condition here but I actually don't care too much if we miss a
-        // few early statistics - especially when the server is warming up etc
-        nodeStatistics = new CObjectGraphNodeStatistics(node);
-        objectGraphStats.put(node, nodeStatistics);
-      }
-      nodeStatistics.add(loadedBeanCount, timeMicros);
-    }
   }
 
   @Override

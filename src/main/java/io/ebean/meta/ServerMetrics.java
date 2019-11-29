@@ -13,14 +13,9 @@ public interface ServerMetrics {
   List<MetaTimedMetric> getTimedMetrics();
 
   /**
-   * Return the DTO query metrics.
+   * Return the query metrics.
    */
-  List<MetaQueryMetric> getDtoQueryMetrics();
-
-  /**
-   * Return the ORM query metrics.
-   */
-  List<MetaOrmQueryMetric> getOrmQueryMetrics();
+  List<MetaQueryMetric> getQueryMetrics();
 
   /**
    * Return the Counter metrics.

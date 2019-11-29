@@ -3,7 +3,6 @@ package io.ebeaninternal.server.core;
 import io.ebean.Database;
 import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaMetric;
-import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
@@ -110,25 +109,16 @@ class DumpMetricsJson implements ServerMetricsAsJson {
         }
       }
 
-      List<MetaOrmQueryMetric> ormQueryMetrics = serverMetrics.getOrmQueryMetrics();
-      if (!ormQueryMetrics.isEmpty()) {
+      List<MetaQueryMetric> queryMetrics = serverMetrics.getQueryMetrics();
+      if (!queryMetrics.isEmpty()) {
         if (sortBy != null) {
-          ormQueryMetrics.sort(sortBy);
+          queryMetrics.sort(sortBy);
         }
-        for (MetaOrmQueryMetric metric : ormQueryMetrics) {
+        for (MetaQueryMetric metric : queryMetrics) {
           logQuery(metric);
         }
       }
 
-      List<MetaQueryMetric> dtoQueryMetrics = serverMetrics.getDtoQueryMetrics();
-      if (!dtoQueryMetrics.isEmpty()) {
-        if (sortBy != null) {
-          dtoQueryMetrics.sort(sortBy);
-        }
-        for (MetaQueryMetric metric : dtoQueryMetrics) {
-          logQuery(metric);
-        }
-      }
       end();
     } catch (IOException e) {
       throw new RuntimeException("Error writing metrics as JSON", e);

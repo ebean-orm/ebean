@@ -121,7 +121,7 @@ public class NamedDtoQueryTest extends BaseTestCase {
     BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
     server().getMetaInfoManager().visitMetrics(basic);
 
-    List<MetaQueryMetric> stats = basic.getDtoQueryMetrics();
+    List<MetaQueryMetric> stats = basic.getQueryMetrics();
     assertThat(stats).hasSize(1);
 
     MetaQueryMetric queryMetric = stats.get(0);
@@ -137,7 +137,7 @@ public class NamedDtoQueryTest extends BaseTestCase {
 
     BasicMetricVisitor metric2 = server().getMetaInfoManager().visitBasic();
 
-    stats = metric2.getDtoQueryMetrics();
+    stats = metric2.getQueryMetrics();
     assertThat(stats).hasSize(2);
 
     log.info("stats " + stats);

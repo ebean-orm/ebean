@@ -9,9 +9,8 @@ import java.util.List;
 public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerMetrics {
 
   private final List<MetaTimedMetric> timed = new ArrayList<>();
-  private final List<MetaQueryMetric> dtoQuery = new ArrayList<>();
-  private final List<MetaOrmQueryMetric> ormQuery = new ArrayList<>();
-  private final List<MetaCountMetric> countMetrics = new ArrayList<>();
+  private final List<MetaQueryMetric> query = new ArrayList<>();
+  private final List<MetaCountMetric> count = new ArrayList<>();
 
   /**
    * Construct to reset and collect everything.
@@ -27,33 +26,19 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
     super(reset, collectTransactionMetrics, collectQueryMetrics, collectL2Metrics);
   }
 
-  /**
-   * Return timed metrics for Transactions, labelled SqlQuery, labelled SqlUpdate.
-   */
   @Override
   public List<MetaTimedMetric> getTimedMetrics() {
     return timed;
   }
 
-  /**
-   * Return the DTO query metrics.
-   */
   @Override
-  public List<MetaQueryMetric> getDtoQueryMetrics() {
-    return dtoQuery;
-  }
-
-  /**
-   * Return the ORM query metrics.
-   */
-  @Override
-  public List<MetaOrmQueryMetric> getOrmQueryMetrics() {
-    return ormQuery;
+  public List<MetaQueryMetric> getQueryMetrics() {
+    return query;
   }
 
   @Override
   public List<MetaCountMetric> getCountMetrics() {
-    return countMetrics;
+    return count;
   }
 
   @Override
@@ -63,16 +48,11 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
 
   @Override
   public void visitQuery(MetaQueryMetric metric) {
-    dtoQuery.add(metric);
-  }
-
-  @Override
-  public void visitOrmQuery(MetaOrmQueryMetric metric) {
-    ormQuery.add(metric);
+    query.add(metric);
   }
 
   @Override
   public void visitCount(MetaCountMetric metric) {
-    countMetrics.add(metric);
+    count.add(metric);
   }
 }

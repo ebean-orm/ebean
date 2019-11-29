@@ -3,7 +3,7 @@ package org.tests.query.finder;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.QueryPlanRequest;
@@ -178,10 +178,10 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
 
-    List<MetaOrmQueryMetric> planStats = metrics.getOrmQueryMetrics();
+    List<MetaQueryMetric> planStats = metrics.getQueryMetrics();
     assertThat(planStats.size()).isGreaterThan(4);
 
-    for (MetaOrmQueryMetric planStat : planStats) {
+    for (MetaQueryMetric planStat : planStats) {
       System.out.println(planStat);
     }
 

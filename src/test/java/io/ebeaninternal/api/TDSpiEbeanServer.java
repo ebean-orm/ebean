@@ -34,7 +34,6 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.ObjectGraphNode;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -141,11 +140,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public SpiServer getPluginApi() {
     return null;
-  }
-
-  @Override
-  public boolean isCollectQueryOrigins() {
-    return false;
   }
 
   @Override
@@ -319,10 +313,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public boolean isSupportedType(Type genericType) {
     return false;
-  }
-
-  @Override
-  public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros) {
   }
 
   @Override
