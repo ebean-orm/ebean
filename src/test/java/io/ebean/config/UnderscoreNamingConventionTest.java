@@ -9,7 +9,28 @@ public class UnderscoreNamingConventionTest {
   private UnderscoreNamingConvention namingConvention = new UnderscoreNamingConvention();
 
   @Test
-  public void getColumnFromProperty() throws Exception {
+  public void simple() {
+    String col = namingConvention.getColumnFromProperty(null, "helloThere");
+    assertThat(col).isEqualTo("hello_there");
+
+    assertThat(namingConvention.toCamelFromUnderscore(col)).isEqualTo("helloThere");
+  }
+
+  @Test
+  public void with_suffix_Id() {
+    String col = namingConvention.getColumnFromProperty(null, "helloId");
+    assertThat(col).isEqualTo("hello_id");
+
+    assertThat(namingConvention.toCamelFromUnderscore(col)).isEqualTo("helloId");
+
+    col = namingConvention.getColumnFromProperty(null, "helloThereId");
+    assertThat(col).isEqualTo("hello_there_id");
+
+    assertThat(namingConvention.toCamelFromUnderscore(col)).isEqualTo("helloThereId");
+  }
+
+  @Test
+  public void getColumnFromProperty() {
 
     String fkCol = "bridgetab_user_id";
 
