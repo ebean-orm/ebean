@@ -11,6 +11,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
   private final DQueryPlanMeta meta;
   private final DTimedMetric metric;
+  private boolean collected;
 
   DQueryPlanMetric(DQueryPlanMeta meta, DTimedMetric metric) {
     this.meta = meta;
@@ -21,7 +22,8 @@ class DQueryPlanMetric implements QueryPlanMetric {
   public void visit(MetricVisitor visitor) {
     TimedMetricStats stats = metric.collect(visitor.isReset());
     if (stats != null) {
-      visitor.visitQuery(new Stats(meta, stats));
+      visitor.visitQuery(new Stats(meta, stats, collected));
+      collected = true;
     }
   }
 
@@ -34,10 +36,12 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
     private final DQueryPlanMeta meta;
     private final TimedMetricStats stats;
+    private final boolean collected;
 
-    private Stats(DQueryPlanMeta meta, TimedMetricStats stats) {
+    private Stats(DQueryPlanMeta meta, TimedMetricStats stats, boolean collected) {
       this.meta = meta;
       this.stats = stats;
+      this.collected = collected;
     }
 
     @Override
@@ -53,6 +57,11 @@ class DQueryPlanMetric implements QueryPlanMetric {
     @Override
     public Class<?> getType() {
       return meta.getType();
+    }
+
+    @Override
+    public boolean initialCollection() {
+      return !collected;
     }
 
     @Override

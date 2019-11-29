@@ -21,10 +21,18 @@ class DumpMetricsJson implements ServerMetricsAsJson {
 
   private Appendable writer;
 
+  /**
+   * By default include SQL for the initial collection only.
+   */
+  private int includeSqlMode = 1;
+
+  /**
+   * By default include with the initial SQL collection only.
+   */
+  private int includeLocation = 1;
+
   private boolean withHeader = true;
   private boolean withHash = true;
-  private boolean withSql = true;
-  private boolean withLocation = true;
   private String newLine = "\n";
 
   private Comparator<MetaTimedMetric> sortBy = SortMetric.NAME;
@@ -44,13 +52,13 @@ class DumpMetricsJson implements ServerMetricsAsJson {
 
   @Override
   public ServerMetricsAsJson withLocation(boolean withLocation) {
-    this.withLocation = withLocation;
+    this.includeLocation = withLocation ? 2 : 0;
     return this;
   }
 
   @Override
   public ServerMetricsAsJson withSql(boolean withSql) {
-    this.withSql = withSql;
+    this.includeSqlMode = withSql ? 2 : 0;
     return this;
   }
 
@@ -118,7 +126,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
           dtoQueryMetrics.sort(sortBy);
         }
         for (MetaQueryMetric metric : dtoQueryMetrics) {
-          logDtoQuery(metric);
+          logQuery(metric);
         }
       }
       end();
@@ -196,7 +204,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   private void log(MetaTimedMetric metric) throws IOException {
     metricStart(metric);
     appendCounters(metric);
-    if (withLocation) {
+    if (includeLocation != 0) {
       appendLocation(metric.getLocation());
     }
     metricEnd();
@@ -209,7 +217,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricEnd();
   }
 
-  private void logQuery(MetaOrmQueryMetric metric) throws IOException {
+  private void logQuery(MetaQueryMetric metric) throws IOException {
     metricStart(metric);
     appendCounters(metric);
     if (withHash) {
@@ -220,21 +228,21 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricEnd();
   }
 
-  private void logDtoQuery(MetaQueryMetric metric) throws IOException {
-    metricStart(metric);
-    appendCounters(metric);
-    appendLocationAndSql(metric);
-    metricEnd();
-  }
-
   private void appendLocationAndSql(MetaQueryMetric metric) throws IOException {
-    if (withLocation) {
+    if (includeLocation == 2) {
       appendLocation(metric.getLocation());
     }
-    if (withSql) {
+    if (isIncludeSql(metric)) {
+      if (includeLocation == 1) {
+        appendLocation(metric.getLocation());
+      }
       key("sql");
       val(metric.getSql());
     }
+  }
+
+  private boolean isIncludeSql(MetaQueryMetric metric) {
+    return includeSqlMode == 2 || includeSqlMode == 1 && metric.initialCollection();
   }
 
   private void appendLocation(String location) throws IOException {

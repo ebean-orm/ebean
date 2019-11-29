@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaOrmQueryOrigin;
@@ -23,6 +22,8 @@ public final class CQueryPlanStats {
   private final CQueryPlan queryPlan;
 
   private final TimedMetric timedMetric;
+
+  private boolean collected;
 
   private long lastQueryTime;
 
@@ -94,7 +95,9 @@ public final class CQueryPlanStats {
 
     TimedMetricStats collect = timedMetric.collect(reset);
     List<MetaOrmQueryOrigin> origins = getOrigins(reset);
-    return new Snapshot(queryPlan, collect, lastQueryTime, origins);
+    Snapshot snapshot = new Snapshot(collected, queryPlan, collect, lastQueryTime, origins);
+    collected = true;
+    return snapshot;
   }
 
   /**
@@ -150,12 +153,14 @@ public final class CQueryPlanStats {
    */
   static class Snapshot implements MetaOrmQueryMetric {
 
+    private final boolean collected;
     private final CQueryPlan queryPlan;
     private final TimedMetricStats metrics;
     private final long lastQueryTime;
     private final List<MetaOrmQueryOrigin> origins;
 
-    Snapshot(CQueryPlan queryPlan, TimedMetricStats metrics, long lastQueryTime, List<MetaOrmQueryOrigin> origins) {
+    Snapshot(boolean collected, CQueryPlan queryPlan, TimedMetricStats metrics, long lastQueryTime, List<MetaOrmQueryOrigin> origins) {
+      this.collected = collected;
       this.queryPlan = queryPlan;
       this.metrics = metrics;
       this.lastQueryTime = lastQueryTime;
@@ -240,6 +245,11 @@ public final class CQueryPlanStats {
     @Override
     public String getSql() {
       return queryPlan.getSql();
+    }
+
+    @Override
+    public boolean initialCollection() {
+      return !collected;
     }
 
     @Override
