@@ -275,7 +275,7 @@ public class TestCustomerFinder extends BaseTestCase {
       .write(buffer);
 
     String metricsJson = buffer.toString();
-    assertThat(metricsJson).contains("{\"db\":\"h2\", \"metrics\":[");
+    assertThat(metricsJson).contains(" \"metrics\":[");
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
   }
