@@ -23,6 +23,41 @@ import static org.junit.Assert.assertTrue;
 public class TestCustomerFinder extends BaseTestCase {
 
   @Test
+  public void a_runFirst_metricsAsJson_sqlInInitialCollectionOnly() {
+
+    ResetBasicData.reset();
+
+    runQueries();
+
+    StringBuilder buffer0 = new StringBuilder();
+    server().getMetaInfoManager()
+      .collectMetricsAsJson()
+      .withHeader(false)
+      .write(buffer0);
+
+    String json0 = buffer0.toString();
+    System.out.println(json0);
+    assertThat(json0).contains("\"name\":\"txn.main\"");
+    assertThat(json0).contains("\"name\":\"Customer.findList\"");
+    //assertThat(json0).contains("\"sql\":\"select t0.id, t0.status, t0.name");
+
+    runQueries();
+
+    StringBuilder buffer1 = new StringBuilder();
+    server().getMetaInfoManager()
+      .collectMetricsAsJson()
+      .withHeader(false)
+      .write(buffer1);
+
+    String json1 = buffer1.toString();
+    System.out.println(json1);
+    assertThat(json1).contains("\"name\":\"txn.main\"");
+    assertThat(json1).contains("\"name\":\"Customer.findList\"");
+    assertThat(json1).doesNotContain("\"sql\":\"select t0.id, t0.status, t0.name");
+
+  }
+
+  @Test
   public void test_ref() {
 
     ResetBasicData.reset();
@@ -243,41 +278,6 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("{\"db\":\"h2\", \"metrics\":[");
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
-  }
-
-  @Test
-  public void test_metricsAsJson_sqlInInitialCollectionOnly() {
-
-    ResetBasicData.reset();
-
-    runQueries();
-
-    StringBuilder buffer0 = new StringBuilder();
-    server().getMetaInfoManager()
-      .collectMetricsAsJson()
-      .withHeader(false)
-      .write(buffer0);
-
-    String json0 = buffer0.toString();
-    System.out.println(json0);
-    assertThat(json0).contains("\"name\":\"txn.main\"");
-    assertThat(json0).contains("\"name\":\"Customer.findList\"");
-    assertThat(json0).contains("\"sql\":\"select t0.id, t0.status, t0.name");
-
-    runQueries();
-
-    StringBuilder buffer1 = new StringBuilder();
-    server().getMetaInfoManager()
-      .collectMetricsAsJson()
-      .withHeader(false)
-      .write(buffer1);
-
-    String json1 = buffer1.toString();
-    System.out.println(json1);
-    assertThat(json1).contains("\"name\":\"txn.main\"");
-    assertThat(json1).contains("\"name\":\"Customer.findList\"");
-    assertThat(json1).doesNotContain("\"sql\":\"select t0.id, t0.status, t0.name");
-
   }
 
   private void runQueries() {
