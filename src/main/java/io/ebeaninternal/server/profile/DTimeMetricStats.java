@@ -14,26 +14,20 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private String location;
 
-  private final long startTime;
-
   private final long count;
 
   private final long total;
 
   private final long max;
 
-  private final long beanCount;
-
-  DTimeMetricStats(MetricType metricType, String name, long collectionStart, long count, long total, long max, long beanCount) {
+  DTimeMetricStats(MetricType metricType, String name, long count, long total, long max) {
     this.metricType = metricType;
     this.name = name;
-    this.startTime = collectionStart;
     this.count = count;
     this.total = total;
     // collection is racy so sanitize the max value if it has not been set
     // this most likely would happen when count = 1 so max = mean
     this.max = max != Long.MIN_VALUE ? max : (count < 1 ? 0 : Math.round(total / count));
-    this.beanCount = beanCount;
   }
 
   @Override
@@ -77,14 +71,6 @@ class DTimeMetricStats implements TimedMetricStats {
   }
 
   /**
-   * Return the time the counter started statistics collection.
-   */
-  @Override
-  public long getStartTime() {
-    return startTime;
-  }
-
-  /**
    * Return the count of values collected.
    */
   @Override
@@ -116,8 +102,4 @@ class DTimeMetricStats implements TimedMetricStats {
     return (count < 1) ? 0L : Math.round((double)(total / count));
   }
 
-  @Override
-  public long getBeanCount() {
-    return beanCount;
-  }
 }

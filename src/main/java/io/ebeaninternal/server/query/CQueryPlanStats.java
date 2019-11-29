@@ -36,8 +36,8 @@ public final class CQueryPlanStats {
   /**
    * Add a query execution to the statistics.
    */
-  public void add(long loadedBeanCount, long timeMicros) {
-    timedMetric.add(timeMicros, loadedBeanCount);
+  public void add(long timeMicros) {
+    timedMetric.add(timeMicros);
     // not safe but should be atomic
     lastQueryTime = System.currentTimeMillis();
   }
@@ -113,11 +113,6 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long getBeanCount() {
-      return metrics.getBeanCount();
-    }
-
-    @Override
     public long getCount() {
       return metrics.getCount();
     }
@@ -135,11 +130,6 @@ public final class CQueryPlanStats {
     @Override
     public long getMean() {
       return metrics.getMean();
-    }
-
-    @Override
-    public long getStartTime() {
-      return metrics.getStartTime();
     }
 
     @Override

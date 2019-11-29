@@ -165,7 +165,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   @Override
   public void postExecute() {
     if (startNanos > 0) {
-      persistExecute.collectSqlUpdate(label, startNanos, rowCount);
+      persistExecute.collectSqlUpdate(label, startNanos);
     }
     if (transaction.isLogSql() && !batchThisRequest) {
       transaction.logSql(Str.add(TrimLogSql.trim(updateSql.getGeneratedSql()), "; -- bind(", bindLog, ") rows(", String.valueOf(rowCount), ")"));

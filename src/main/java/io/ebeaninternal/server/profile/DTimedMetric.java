@@ -4,7 +4,6 @@ import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.TimedMetric;
 
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -20,15 +19,11 @@ class DTimedMetric implements TimedMetric {
 
   private final String name;
 
-  private final LongAdder beanCount = new LongAdder();
-
   private final LongAdder count = new LongAdder();
 
   private final LongAdder total = new LongAdder();
 
   private final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
-
-  private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
 
   DTimedMetric(MetricType metricType, String name) {
     this.metricType = metricType;
@@ -51,11 +46,6 @@ class DTimedMetric implements TimedMetric {
     add((System.nanoTime() - startNanos) / 1000L);
   }
 
-  @Override
-  public void addSinceNanos(long startNanos, long beans) {
-    add((System.nanoTime() - startNanos) / 1000L, beans);
-  }
-
   /**
    * Add a value. Usually the value is Time or Bytes etc.
    */
@@ -68,12 +58,6 @@ class DTimedMetric implements TimedMetric {
   }
 
   @Override
-  public void add(long micros, long beans) {
-    add(micros);
-    beanCount.add(beans);
-  }
-
-  @Override
   public boolean isEmpty() {
     return count.sum() == 0;
   }
@@ -83,11 +67,9 @@ class DTimedMetric implements TimedMetric {
    */
   @Override
   public void reset() {
-    startTime.set(System.currentTimeMillis());
     max.reset();
     count.reset();
     total.reset();
-    beanCount.reset();
   }
 
   @Override
@@ -101,14 +83,7 @@ class DTimedMetric implements TimedMetric {
   @Override
   public DTimeMetricStats collect(boolean reset) {
     boolean empty = count.sum() == 0;
-    if (empty) {
-      if (reset) {
-        startTime.set(System.currentTimeMillis());
-      }
-      return null;
-    } else {
-      return getStatistics(reset);
-    }
+    return empty ? null : getStatistics(reset);
   }
 
   /**
@@ -119,15 +94,13 @@ class DTimedMetric implements TimedMetric {
     if (reset) {
       // Note these values are not guaranteed to be consistent wrt each other
       // but should be reasonably consistent (small time between count and total)
-      final long beans = beanCount.sumThenReset();
       final long maxVal = max.getThenReset();
       final long totalVal = total.sumThenReset();
       final long countVal = count.sumThenReset();
-      final long startTimeVal = startTime.getAndSet(System.currentTimeMillis());
-      return new DTimeMetricStats(metricType, name, startTimeVal, countVal, totalVal, maxVal, beans);
+      return new DTimeMetricStats(metricType, name, countVal, totalVal, maxVal);
 
     } else {
-      return new DTimeMetricStats(metricType, name, startTime.get(), count.sum(), total.sum(), max.get(), beanCount.sum());
+      return new DTimeMetricStats(metricType, name, count.sum(), total.sum(), max.get());
     }
   }
 

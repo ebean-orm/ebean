@@ -16,8 +16,8 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan {
   }
 
   @Override
-  public void collect(long exeTime, int rows) {
-    metric.add(exeTime, rows);
+  public void collect(long exeTime) {
+    metric.add(exeTime);
   }
 
   @Override

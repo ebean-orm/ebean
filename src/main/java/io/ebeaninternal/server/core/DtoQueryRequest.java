@@ -31,8 +31,6 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
 
   private DataReader dataReader;
 
-  private int beanCount;
-
   DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query) {
     super(server, query, null);
     this.queryEngine = engine;
@@ -85,7 +83,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   protected void requestComplete() {
     if (plan != null) {
       long exeMicros = (System.nanoTime() - startNano) / 1000L;
-      plan.collect(exeMicros, beanCount);
+      plan.collect(exeMicros);
     }
   }
 
@@ -103,7 +101,6 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
 
   @SuppressWarnings("unchecked")
   public T readNextBean() throws SQLException {
-    beanCount++;
     dataReader.resetColumnPosition();
     return (T)plan.readRow(dataReader);
   }

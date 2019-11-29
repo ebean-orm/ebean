@@ -13,11 +13,6 @@ public interface TimedMetric {
   void add(long micros);
 
   /**
-   * Add a time event with the number of loaded beans or rows.
-   */
-  void add(long micros, long beans);
-
-  /**
    * Add a time event for a batch of beans.
    */
   void addBatchSince(long startNanos, int batch);
@@ -26,11 +21,6 @@ public interface TimedMetric {
    * Add a time event given the start nanos.
    */
   void addSinceNanos(long startNanos);
-
-  /**
-   * Add a time event given the start nanos and bean count.
-   */
-  void addSinceNanos(long startNanos, long beans);
 
   /**
    * Return true if there are no metrics collected since the last collection.

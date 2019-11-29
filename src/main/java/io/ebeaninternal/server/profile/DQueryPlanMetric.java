@@ -90,11 +90,6 @@ class DQueryPlanMetric implements QueryPlanMetric {
     }
 
     @Override
-    public long getStartTime() {
-      return stats.getStartTime();
-    }
-
-    @Override
     public long getCount() {
       return stats.getCount();
     }
@@ -112,11 +107,6 @@ class DQueryPlanMetric implements QueryPlanMetric {
     @Override
     public long getMean() {
       return stats.getMean();
-    }
-
-    @Override
-    public long getBeanCount() {
-      return stats.getBeanCount();
     }
   }
 }

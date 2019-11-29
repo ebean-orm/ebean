@@ -51,7 +51,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     String label = query.getLabel();
     if (label != null) {
       long exeMicros = (System.nanoTime() - startNano) / 1000L;
-      queryEngine.collect(label, exeMicros, rows);
+      queryEngine.collect(label, exeMicros);
     }
   }
 

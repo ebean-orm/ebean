@@ -55,21 +55,18 @@ final class DefaultPersistExecute implements PersistExecute {
   }
 
   @Override
-  public void collectOrmUpdate(String label, long startNanos, int rowCount) {
-    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
-    ormUpdateMetric.add(label, exeMicros, rowCount);
+  public void collectOrmUpdate(String label, long startNanos) {
+    ormUpdateMetric.addSinceNanos(label, startNanos);
   }
 
   @Override
-  public void collectSqlUpdate(String label, long startNanos, int rowCount) {
-    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
-    sqlUpdateMetric.add(label, exeMicros, rowCount);
+  public void collectSqlUpdate(String label, long startNanos) {
+    sqlUpdateMetric.addSinceNanos(label, startNanos);
   }
 
   @Override
-  public void collectSqlCall(String label, long startNanos, int rowCount) {
-    long exeMicros = (System.nanoTime() - startNanos) / 1000L;
-    sqlCallMetric.add(label, exeMicros, rowCount);
+  public void collectSqlCall(String label, long startNanos) {
+    sqlCallMetric.addSinceNanos(label, startNanos);
   }
 
   @Override

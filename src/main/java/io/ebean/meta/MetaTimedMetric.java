@@ -12,11 +12,6 @@ public interface MetaTimedMetric extends MetaMetric {
   String getLocation();
 
   /**
-   * Return the time the counters started from.
-   */
-  long getStartTime();
-
-  /**
    * Return the total count.
    */
   long getCount();
@@ -35,11 +30,4 @@ public interface MetaTimedMetric extends MetaMetric {
    * Return the mean execution time in micros.
    */
   long getMean();
-
-  /**
-   * Return the total beans or rows processed or loaded.
-   * <p>
-   * This will be 0 if the metric isn't a query plan (like transaction execution statistics).
-   */
-  long getBeanCount();
 }

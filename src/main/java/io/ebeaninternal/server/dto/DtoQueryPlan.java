@@ -18,7 +18,7 @@ public interface DtoQueryPlan {
   /**
    * Add an event to the query execution statistics.
    */
-  void collect(long exeMicros, int rows);
+  void collect(long exeMicros);
 
   /**
    * Visit the metric (if not empty).

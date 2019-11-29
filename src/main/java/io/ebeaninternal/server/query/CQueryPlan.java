@@ -312,8 +312,8 @@ public class CQueryPlan {
   /**
    * Register an execution time against this query plan;
    */
-  boolean executionTime(long loadedBeanCount, long timeMicros) {
-    stats.add(loadedBeanCount, timeMicros);
+  boolean executionTime(long timeMicros) {
+    stats.add(timeMicros);
     return bindCapture != null && bindCapture.collectFor(timeMicros);
   }
 

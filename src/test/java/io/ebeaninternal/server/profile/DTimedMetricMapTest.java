@@ -26,7 +26,7 @@ public class DTimedMetricMapTest {
     assertThat(timedMetric.getCount()).isEqualTo(1);
     assertThat(timedMetric.getTotal()).isGreaterThan(10);
 
-    metricMap.addSinceNanos("some", nanos, 42);
+    metricMap.addSinceNanos("some", nanos);
 
     visitor = new BasicMetricVisitor();
     metricMap.visit(visitor);
@@ -34,6 +34,5 @@ public class DTimedMetricMapTest {
     timedMetric = visitor.getTimedMetrics().get(0);
     assertThat(timedMetric.getCount()).isEqualTo(1);
     assertThat(timedMetric.getTotal()).isGreaterThan(10);
-    assertThat(timedMetric.getBeanCount()).isEqualTo(42);
   }
 }

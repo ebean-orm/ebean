@@ -87,7 +87,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
   @Override
   public void postExecute() {
     if (startNanos > 0) {
-      persistExecute.collectOrmUpdate(label, startNanos, rowCount);
+      persistExecute.collectOrmUpdate(label, startNanos);
     }
     OrmUpdateType ormUpdateType = ormUpdate.getOrmUpdateType();
     String tableName = ormUpdate.getBaseTable();

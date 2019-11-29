@@ -38,17 +38,17 @@ public interface PersistExecute {
   /**
    * Collect execution metrics for sql update.
    */
-  void collectOrmUpdate(String label, long startNanos, int rowCount);
+  void collectOrmUpdate(String label, long startNanos);
 
   /**
    * Collect execution metrics for sql update.
    */
-  void collectSqlUpdate(String label, long startNanos, int rowCount);
+  void collectSqlUpdate(String label, long startNanos);
 
   /**
    * Collect execution metrics for sql callable.
    */
-  void collectSqlCall(String label, long startNanos, int rowCount);
+  void collectSqlCall(String label, long startNanos);
 
   /**
    * Visit the metrics.

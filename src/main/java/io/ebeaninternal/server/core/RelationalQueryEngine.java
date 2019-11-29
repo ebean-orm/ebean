@@ -60,7 +60,7 @@ public interface RelationalQueryEngine {
   /**
    * Collect SQL query execution statistics.
    */
-  void collect(String label, long exeMicros, int rows);
+  void collect(String label, long exeMicros);
 
   /**
    * Visit the metrics.

@@ -62,6 +62,6 @@ public class SortMetricTest {
   }
 
   private DTimeMetricStats create(String name) {
-    return new DTimeMetricStats(MetricType.L2, name, 0, 0, 0, 0, 0);
+    return new DTimeMetricStats(MetricType.L2, name, 0, 0, 0);
   }
 }

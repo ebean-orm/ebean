@@ -88,7 +88,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
   @Override
   public void postExecute() {
     if (startNanos > 0) {
-      persistExecute.collectSqlCall(label, startNanos, rowCount);
+      persistExecute.collectSqlCall(label, startNanos);
     }
     if (transaction.isLogSummary()) {
       String m = "CallableSql label[" + callableSql.getLabel() + "]" + " rows[" + rowCount + "]" + " bind[" + bindLog + "]";

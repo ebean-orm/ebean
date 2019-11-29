@@ -42,8 +42,8 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public void collect(String label, long exeMicros, int rows) {
-    timedMetricMap.add(label, exeMicros, rows);
+  public void collect(String label, long exeMicros) {
+    timedMetricMap.add(label, exeMicros);
   }
 
   @Override
