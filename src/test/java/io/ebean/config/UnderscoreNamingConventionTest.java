@@ -30,6 +30,19 @@ public class UnderscoreNamingConventionTest {
   }
 
   @Test
+  public void with_suffix_ID() {
+    String col = namingConvention.getColumnFromProperty(null, "helloID");
+    assertThat(col).isEqualTo("hello_id");
+
+    assertThat(namingConvention.toCamelFromUnderscore(col)).isEqualTo("helloId");
+
+    col = namingConvention.getColumnFromProperty(null, "helloThereID");
+    assertThat(col).isEqualTo("hello_there_id");
+
+    assertThat(namingConvention.toCamelFromUnderscore(col)).isEqualTo("helloThereId");
+  }
+
+  @Test
   public void getColumnFromProperty() {
 
     String fkCol = "bridgetab_user_id";
