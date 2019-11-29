@@ -41,11 +41,6 @@ public interface MetricVisitor {
   void visitQuery(MetaQueryMetric metric);
 
   /**
-   * Visit ORM query metrics.
-   */
-  void visitOrmQuery(MetaOrmQueryMetric metric);
-
-  /**
    * Visit a Counter metric.
    */
   void visitCount(MetaCountMetric metric);

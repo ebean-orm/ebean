@@ -3,7 +3,7 @@ package io.ebean;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.meta.MetaOrmQueryMetric;
+import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.ServerMetrics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ? and id > ?");
 
     ServerMetrics metrics = collectMetrics();
-    List<MetaOrmQueryMetric> ormQueryMetrics = metrics.getOrmQueryMetrics();
+    List<MetaQueryMetric> ormQueryMetrics = metrics.getQueryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
     assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
     assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateActive");
@@ -69,7 +69,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(sql.get(0)).contains("update o_customer set status = status");
 
     ServerMetrics metrics = collectMetrics();
-    List<MetaOrmQueryMetric> ormQueryMetrics = metrics.getOrmQueryMetrics();
+    List<MetaQueryMetric> ormQueryMetrics = metrics.getQueryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
     assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
     assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateAll");

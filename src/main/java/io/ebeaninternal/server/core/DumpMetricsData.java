@@ -3,7 +3,6 @@ package io.ebeaninternal.server.core;
 import io.ebean.Database;
 import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaMetric;
-import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.MetricData;
@@ -34,8 +33,7 @@ class DumpMetricsData {
 
     final List<MetaTimedMetric> timedMetrics = serverMetrics.getTimedMetrics();
     final List<MetaCountMetric> countMetrics = serverMetrics.getCountMetrics();
-    final List<MetaOrmQueryMetric> ormQueryMetrics = serverMetrics.getOrmQueryMetrics();
-    final List<MetaQueryMetric> dtoQueryMetrics = serverMetrics.getDtoQueryMetrics();
+    final List<MetaQueryMetric> queryMetrics = serverMetrics.getQueryMetrics();
 
     for (MetaTimedMetric metric : timedMetrics) {
       add(metric);
@@ -43,11 +41,8 @@ class DumpMetricsData {
     for (MetaCountMetric metric : countMetrics) {
       addCount(metric);
     }
-    for (MetaOrmQueryMetric metric : ormQueryMetrics) {
+    for (MetaQueryMetric metric : queryMetrics) {
       addQuery(metric);
-    }
-    for (MetaQueryMetric metric : dtoQueryMetrics) {
-      addDtoQuery(metric);
     }
   }
 
@@ -68,17 +63,11 @@ class DumpMetricsData {
     data.setCount(metric.getCount());
   }
 
-  private void addQuery(MetaOrmQueryMetric metric) {
+  private void addQuery(MetaQueryMetric metric) {
     final MetricData data = create(metric);
     appendCounters(data, metric);
     appendLocationAndSql(data, metric);
     data.setHash(metric.getHash());
-  }
-
-  private void addDtoQuery(MetaQueryMetric metric) {
-    final MetricData data = create(metric);
-    appendCounters(data, metric);
-    appendLocationAndSql(data, metric);
   }
 
   private void appendLocationAndSql(MetricData data, MetaQueryMetric metric) {

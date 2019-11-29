@@ -36,7 +36,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     ServerMetrics metrics = collectMetrics();
 
-    List<MetaQueryMetric> stats = metrics.getDtoQueryMetrics();
+    List<MetaQueryMetric> stats = metrics.getQueryMetrics();
     for (MetaQueryMetric stat : stats) {
       long meanMicros = stat.getMean();
       assertThat(meanMicros).isLessThan(900_000);
@@ -195,7 +195,7 @@ public class DtoQueryTest extends BaseTestCase {
     BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
     server().getMetaInfoManager().visitMetrics(basic);
 
-    List<MetaQueryMetric> stats = basic.getDtoQueryMetrics();
+    List<MetaQueryMetric> stats = basic.getQueryMetrics();
     assertThat(stats).hasSize(1);
 
     MetaQueryMetric queryMetric = stats.get(0);
@@ -211,7 +211,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     ServerMetrics metric2 = server().getMetaInfoManager().collectMetrics();
 
-    stats = metric2.getDtoQueryMetrics();
+    stats = metric2.getQueryMetrics();
     assertThat(stats).hasSize(2);
 
     log.info("stats " + stats);

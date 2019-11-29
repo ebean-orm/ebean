@@ -4,8 +4,6 @@ import io.ebean.meta.AbstractMetricVisitor;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaCountMetric;
 import io.ebean.meta.MetaInfoManager;
-import io.ebean.meta.MetaOrmQueryMetric;
-import io.ebean.meta.MetaOrmQueryNode;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
@@ -15,7 +13,6 @@ import io.ebean.meta.QueryPlanRequest;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.meta.ServerMetricsAsJson;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,18 +63,6 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
     server.visitMetrics(new ResetVisitor());
   }
 
-  @Override
-  public List<MetaOrmQueryNode> collectNodeStatistics(boolean reset) {
-
-    List<MetaOrmQueryNode> list = new ArrayList<>();
-    for (CObjectGraphNodeStatistics nodeStatistics : server.objectGraphStats.values()) {
-      if (!nodeStatistics.isEmpty()) {
-        list.add(nodeStatistics.get(reset));
-      }
-    }
-    return list;
-  }
-
   /**
    * Visitor that resets the statistics but doesn't collect them.
    */
@@ -94,11 +79,6 @@ public class DefaultMetaInfoManager implements MetaInfoManager {
 
     @Override
     public void visitQuery(MetaQueryMetric metric) {
-      // ignore
-    }
-
-    @Override
-    public void visitOrmQuery(MetaOrmQueryMetric metric) {
       // ignore
     }
 

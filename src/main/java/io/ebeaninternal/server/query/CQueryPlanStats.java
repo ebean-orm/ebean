@@ -1,18 +1,9 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.bean.ObjectGraphNode;
-import io.ebean.meta.MetaOrmQueryMetric;
-import io.ebean.meta.MetaOrmQueryOrigin;
+import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetricType;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricStats;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Statistics for a specific query plan that can accumulate.
@@ -27,14 +18,11 @@ public final class CQueryPlanStats {
 
   private long lastQueryTime;
 
-  private final ConcurrentHashMap<ObjectGraphNode, LongAdder> origins;
-
   /**
    * Construct for a given query plan.
    */
-  CQueryPlanStats(CQueryPlan queryPlan, boolean collectQueryOrigins) {
+  CQueryPlanStats(CQueryPlan queryPlan) {
     this.queryPlan = queryPlan;
-    this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<>();
     this.timedMetric = queryPlan.createTimedMetric();
   }
 
@@ -48,25 +36,10 @@ public final class CQueryPlanStats {
   /**
    * Add a query execution to the statistics.
    */
-  public void add(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
-
+  public void add(long loadedBeanCount, long timeMicros) {
     timedMetric.add(timeMicros, loadedBeanCount);
-
     // not safe but should be atomic
     lastQueryTime = System.currentTimeMillis();
-
-    if (origins != null && objectGraphNode != null) {
-      // Maintain the origin points this query fires from
-      // with a simple counter
-      LongAdder counter = origins.get(objectGraphNode);
-      if (counter == null) {
-        // race condition - we can miss counters here but going
-        // to live with that. Don't want to lock/synchronize etc
-        counter = new LongAdder();
-        origins.put(objectGraphNode, counter);
-      }
-      counter.increment();
-    }
   }
 
   /**
@@ -74,11 +47,6 @@ public final class CQueryPlanStats {
    */
   public void reset() {
     timedMetric.reset();
-    if (origins != null) {
-      for (LongAdder counter : origins.values()) {
-        counter.reset();
-      }
-    }
   }
 
   /**
@@ -94,77 +62,24 @@ public final class CQueryPlanStats {
   Snapshot getSnapshot(boolean reset) {
 
     TimedMetricStats collect = timedMetric.collect(reset);
-    List<MetaOrmQueryOrigin> origins = getOrigins(reset);
-    Snapshot snapshot = new Snapshot(collected, queryPlan, collect, lastQueryTime, origins);
+    Snapshot snapshot = new Snapshot(collected, queryPlan, collect);
     collected = true;
     return snapshot;
   }
 
   /**
-   * Return the list/snapshot of the origins and their counter value.
-   */
-  private List<MetaOrmQueryOrigin> getOrigins(boolean reset) {
-    if (origins == null) {
-      return Collections.emptyList();
-    }
-
-    List<MetaOrmQueryOrigin> list = new ArrayList<>(origins.size());
-
-    for (Entry<ObjectGraphNode, LongAdder> entry : origins.entrySet()) {
-      if (reset) {
-        list.add(new OriginSnapshot(entry.getKey(), entry.getValue().sumThenReset()));
-      } else {
-        list.add(new OriginSnapshot(entry.getKey(), entry.getValue().sum()));
-      }
-    }
-    return list;
-  }
-
-  /**
-   * Snapshot of the origin ObjectGraphNode and counter value.
-   */
-  private static class OriginSnapshot implements MetaOrmQueryOrigin {
-    private final ObjectGraphNode objectGraphNode;
-    private final long count;
-
-    OriginSnapshot(ObjectGraphNode objectGraphNode, long count) {
-      this.objectGraphNode = objectGraphNode;
-      this.count = count;
-    }
-
-    @Override
-    public String toString() {
-      return "node[" + objectGraphNode + "] count[" + count + "]";
-    }
-
-    @Override
-    public ObjectGraphNode getObjectGraphNode() {
-      return objectGraphNode;
-    }
-
-    @Override
-    public long getCount() {
-      return count;
-    }
-  }
-
-  /**
    * A snapshot of the current statistics for a query plan.
    */
-  static class Snapshot implements MetaOrmQueryMetric {
+  static class Snapshot implements MetaQueryMetric {
 
     private final boolean collected;
     private final CQueryPlan queryPlan;
     private final TimedMetricStats metrics;
-    private final long lastQueryTime;
-    private final List<MetaOrmQueryOrigin> origins;
 
-    Snapshot(boolean collected, CQueryPlan queryPlan, TimedMetricStats metrics, long lastQueryTime, List<MetaOrmQueryOrigin> origins) {
+    Snapshot(boolean collected, CQueryPlan queryPlan, TimedMetricStats metrics) {
       this.collected = collected;
       this.queryPlan = queryPlan;
       this.metrics = metrics;
-      this.lastQueryTime = lastQueryTime;
-      this.origins = origins;
     }
 
     @Override
@@ -228,16 +143,6 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long getLastQueryTime() {
-      return lastQueryTime;
-    }
-
-    @Override
-    public boolean isAutoTuned() {
-      return queryPlan.isAutoTuned();
-    }
-
-    @Override
     public String getHash() {
       return queryPlan.getHash();
     }
@@ -250,11 +155,6 @@ public final class CQueryPlanStats {
     @Override
     public boolean initialCollection() {
       return !collected;
-    }
-
-    @Override
-    public List<MetaOrmQueryOrigin> getOrigins() {
-      return origins;
     }
 
   }

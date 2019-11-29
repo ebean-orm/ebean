@@ -50,11 +50,6 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader,
   void shutdownManaged();
 
   /**
-   * Return true if query origins should be collected.
-   */
-  boolean isCollectQueryOrigins();
-
-  /**
    * Return true if updates in JDBC batch should include all columns if unspecified on the transaction.
    */
   boolean isUpdateAllPropertiesInBatch();
@@ -200,11 +195,6 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader,
    * Map of known bean types.
    */
   boolean isSupportedType(java.lang.reflect.Type genericType);
-
-  /**
-   * Collect query statistics by ObjectGraphNode. Used for Lazy loading reporting.
-   */
-  void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros);
 
   /**
    * Return the ReadAuditLogger to use for logging all read audit events.

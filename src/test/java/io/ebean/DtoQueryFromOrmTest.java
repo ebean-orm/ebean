@@ -27,7 +27,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
   @AfterClass
   public static void reportStats() {
     ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
-    for (MetaQueryMetric metric : metrics.getDtoQueryMetrics()) {
+    for (MetaQueryMetric metric : metrics.getQueryMetrics()) {
       System.out.println(metric);
     }
 
@@ -59,7 +59,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ServerMetrics metrics = collectMetrics();
 
-    List<MetaQueryMetric> stats = metrics.getDtoQueryMetrics();
+    List<MetaQueryMetric> stats = metrics.getQueryMetrics();
     for (MetaQueryMetric stat : stats) {
       long meanMicros = stat.getMean();
       assertThat(meanMicros).isLessThan(900_000);

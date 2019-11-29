@@ -123,7 +123,7 @@ public class CQueryPlan {
     this.rawSql = rawSql;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
-    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
     this.hash = md5Hash();
@@ -151,7 +151,7 @@ public class CQueryPlan {
     this.rowNumberIncluded = rowNumberIncluded;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
-    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(server.getServerConfig(), query);
     this.hash = md5Hash();
@@ -312,14 +312,8 @@ public class CQueryPlan {
   /**
    * Register an execution time against this query plan;
    */
-  boolean executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
-
-    stats.add(loadedBeanCount, timeMicros, objectGraphNode);
-    if (objectGraphNode != null) {
-      // collect stats based on objectGraphNode for lazy loading reporting
-      server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
-    }
-
+  boolean executionTime(long loadedBeanCount, long timeMicros) {
+    stats.add(loadedBeanCount, timeMicros);
     return bindCapture != null && bindCapture.collectFor(timeMicros);
   }
 

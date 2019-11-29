@@ -1697,7 +1697,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        visitor.visitOrmQuery(queryPlan.getSnapshot(visitor.isReset()));
+        visitor.visitQuery(queryPlan.getSnapshot(visitor.isReset()));
       }
     }
   }

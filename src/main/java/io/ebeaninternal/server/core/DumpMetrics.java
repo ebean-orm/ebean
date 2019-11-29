@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.meta.MetaCountMetric;
-import io.ebean.meta.MetaOrmQueryMetric;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
@@ -92,21 +91,12 @@ class DumpMetrics {
       }
     }
 
-    List<MetaOrmQueryMetric> ormQueryMetrics = serverMetrics.getOrmQueryMetrics();
-    if (!ormQueryMetrics.isEmpty()) {
-      out("\n-- ORM queries --");
-      ormQueryMetrics.sort(sortBy);
-      for (MetaOrmQueryMetric metric : ormQueryMetrics) {
+    List<MetaQueryMetric> queryMetrics = serverMetrics.getQueryMetrics();
+    if (!queryMetrics.isEmpty()) {
+      out("\n-- Queries --");
+      queryMetrics.sort(sortBy);
+      for (MetaQueryMetric metric : queryMetrics) {
         logQuery(metric);
-      }
-    }
-
-    List<MetaQueryMetric> dtoQueryMetrics = serverMetrics.getDtoQueryMetrics();
-    if (!dtoQueryMetrics.isEmpty()) {
-      out("\n-- DTO queries --");
-      dtoQueryMetrics.sort(sortBy);
-      for (MetaQueryMetric metric : dtoQueryMetrics) {
-        logDtoQuery(metric);
       }
     }
   }
@@ -123,7 +113,7 @@ class DumpMetrics {
     System.out.println(sb);
   }
 
-  private void logQuery(MetaOrmQueryMetric metric) {
+  private void logQuery(MetaQueryMetric metric) {
 
     StringBuilder sb = new StringBuilder();
 
@@ -132,17 +122,6 @@ class DumpMetrics {
     if (dumpHash) {
       sb.append("\n hash:").append(metric.getHash());
     }
-    appendProfileAndSql(metric, sb);
-    out(sb.toString());
-  }
-
-
-  private void logDtoQuery(MetaQueryMetric metric) {
-
-    StringBuilder sb = new StringBuilder();
-
-    appendQueryName(metric, sb);
-    appendCounters(metric, sb);
     appendProfileAndSql(metric, sb);
     out(sb.toString());
   }
