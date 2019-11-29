@@ -178,7 +178,6 @@ public class TestCustomerFinder extends BaseTestCase {
       .withSort(SortMetric.TOTAL)
       .json();
 
-    System.out.println(metricsJson);
     assertThat(metricsJson).contains("\"name\":\"txn.main\", \"type\":\"TXN\"");
     assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
@@ -202,12 +201,48 @@ public class TestCustomerFinder extends BaseTestCase {
       .withSort(null)
       .json();
 
-    System.out.println(metricsJson);
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
     assertThat(metricsJson).doesNotContain("\"loc\":");
     assertThat(metricsJson).doesNotContain("\"hash\":");
     assertThat(metricsJson).doesNotContain("\"sql\":");
+  }
+
+  @Test
+  public void test_metricsAsJson_write() {
+
+    ResetBasicData.reset();
+
+    runQueries();
+
+    StringBuilder buffer = new StringBuilder();
+    server().getMetaInfoManager()
+      .collectMetricsAsJson()
+      .withHeader(false)
+      .write(buffer);
+
+    String metricsJson = buffer.toString();
+    assertThat(metricsJson).contains("\"name\":\"txn.main\"");
+    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+  }
+
+  @Test
+  public void test_metricsAsJson_writeWithHeader() {
+
+    ResetBasicData.reset();
+
+    runQueries();
+
+    StringBuilder buffer = new StringBuilder();
+    server().getMetaInfoManager()
+      .collectMetricsAsJson()
+      .withHeader(true)
+      .write(buffer);
+
+    String metricsJson = buffer.toString();
+    assertThat(metricsJson).contains("{\"db\":\"h2\", \"metrics\":[");
+    assertThat(metricsJson).contains("\"name\":\"txn.main\"");
+    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
   }
 
   private void runQueries() {

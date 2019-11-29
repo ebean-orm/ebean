@@ -34,6 +34,18 @@ public interface ServerMetricsAsJson {
   ServerMetricsAsJson withNewLine(boolean withNewLine);
 
   /**
+   * Set to include a heading of the database name.
+   * <p>
+   * When this is false the metrics are written without json array start or array end.
+   */
+  ServerMetricsAsJson withHeader(boolean withHeader);
+
+    /**
+     * Collect and write metrics as JSON to the given buffer.
+     */
+  void write(Appendable buffer);
+
+  /**
    * Return the metrics in raw JSON.
    */
   String json();
