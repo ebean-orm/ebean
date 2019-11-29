@@ -12,9 +12,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 /**
  * Database sequence based IdGenerator.
@@ -42,7 +43,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected final BackgroundExecutor backgroundExecutor;
 
-  protected final ArrayList<Long> idList = new ArrayList<>(50);
+  protected final NavigableSet<Long> idList = new TreeSet<>();
 
   protected final int allocationSize;
 
@@ -97,15 +98,13 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   @Override
   public Object nextId(Transaction t) {
     synchronized (monitor) {
-
       int size = idList.size();
       if (size > 0) {
         maybeLoadMoreInBackground(size);
       } else {
         loadMore(allocationSize);
       }
-
-      return idList.remove(0);
+      return idList.pollFirst();
     }
   }
 
