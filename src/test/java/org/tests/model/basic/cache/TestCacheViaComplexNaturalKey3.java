@@ -12,7 +12,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
@@ -30,9 +32,9 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     if (!loadOnce) {
       Ebean.find(OCachedNatKeyBean3.class).delete();
 
-      List<String> stores =Arrays.asList("abc", "def");
+      List<String> stores = asList("abc", "def");
       for (String store : stores) {
-        List<String> skus = Arrays.asList("1", "2", "3");
+        List<String> skus = asList("1", "2", "3");
         for (String sku : skus) {
           int[] codes = {1000,1001,1002,1003,1004};
           for (int code : codes) {
@@ -92,13 +94,102 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   }
 
   @Test
+  public void findMap_inClause_allHits() {
+
+    setup();
+    loadSomeIntoCache();
+
+    List<Integer> codes = asList(1001);
+
+    LoggedSqlCollector.start();
+
+    Map<String,OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .eq("sku", "2")
+      .in("code", codes)
+      .setUseCache(true)
+      .order().asc("code")
+      .setMapKey("sku")
+      .findMap();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).isEmpty();
+
+    assertThat(list).hasSize(1);
+
+    assertNaturalKeyHitMiss(1, 0);
+    assertBeanCacheHitMiss(1, 0);
+  }
+
+  @Test
+  public void findMap_inClause_someHits() {
+
+    setup();
+    loadSomeIntoCache();
+
+    List<Integer> codes = asList(1001, 1000);
+
+    LoggedSqlCollector.start();
+
+    Map<String,OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .eq("sku", "2")
+      .in("code", codes)
+      .setUseCache(true)
+      .order().asc("code")
+      .setMapKey("sku")
+      .findMap();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      // in clause with only 1 bind param - miss on 1000
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku = ? and t0.code in (?) order by t0.code; --bind(def,2,Array[1]={1000})");
+    }
+    assertThat(list).hasSize(1);
+
+    assertNaturalKeyHitMiss(1, 1);
+    assertBeanCacheHitMiss(1, 0);
+  }
+
+  @Test
+  public void findMap_inClause_noHits() {
+
+    setup();
+
+    LoggedSqlCollector.start();
+
+    Map<String,OCachedNatKeyBean3> map = Ebean.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .eq("sku", "2")
+      .in("code", asList(1002, 1000))
+      .setUseCache(true)
+      .setMapKey("code")
+      .findMap();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      // in clause with only 1 bind param - miss on 1000, 1002
+      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku = ? and t0.code in (?,?); --bind(def,2,Array[2]={1002,1000})");
+    }
+    assertThat(map).hasSize(2);
+
+    assertNaturalKeyHitMiss(0, 2);
+    assertBeanCacheHitMiss(0, 0);
+  }
+
+  @Test
   public void findList_inClause_someHits() {
 
     setup();
     loadSomeIntoCache();
 
 
-    List<Integer> codes = Arrays.asList(1001, 1000, 1002, 1003);
+    List<Integer> codes = asList(1001, 1000, 1002, 1003);
 
     LoggedSqlCollector.start();
 
@@ -131,7 +222,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     setup();
     loadSomeIntoCache();
 
-    List<String> skus = Arrays.asList("2", "3");
+    List<String> skus = asList("2", "3");
 
     LoggedSqlCollector.start();
 
@@ -161,7 +252,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     loadSomeIntoCache();
 
     String storeId = "abc";
-    List<String> skus = Arrays.asList("3", "2", "4");
+    List<String> skus = asList("3", "2", "4");
 
     LoggedSqlCollector.start();
 

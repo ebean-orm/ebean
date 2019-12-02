@@ -1245,16 +1245,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> Set<T> findSet(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.SET, query, t);
-
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (Set<T>) result;
     }
-
     try {
       request.initTransIfRequired();
       return request.findSet();
-
     } finally {
       request.endTransIfRequired();
     }
@@ -1265,16 +1262,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest request = createQueryRequest(Type.MAP, query, t);
-
+    request.resetBeanCacheAutoMode(false);
+    if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
+      // hit bean cache and got all results from cache
+      return request.getBeanCacheHitsAsMap();
+    }
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (Map<K, T>) result;
     }
-
     try {
       request.initTransIfRequired();
       return request.findMap();
-
     } finally {
       request.endTransIfRequired();
     }

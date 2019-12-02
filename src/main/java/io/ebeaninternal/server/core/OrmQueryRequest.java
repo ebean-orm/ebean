@@ -10,6 +10,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
+import io.ebean.common.BeanMap;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
@@ -31,6 +32,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
+import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.query.CancelableQuery;
@@ -586,16 +588,33 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public void mergeCacheHits(BeanCollection<T> result) {
 
     if (cacheBeans != null && !cacheBeans.isEmpty()) {
-      for (T hit : cacheBeans) {
-        result.internalAdd(hit);
+      if (query.getType() == Type.MAP) {
+        mergeCacheHitsToMap(result);
+      } else {
+        mergeCacheHitsToList(result);
       }
-      // resort in memory here after merging the cache hits with the DB hits
-      if (result instanceof BeanList) {
-        OrderBy<T> orderBy = query.getOrderBy();
-        if (orderBy != null) {
-          beanDescriptor.sort(((BeanList<T>)result).getActualList(), orderBy.toStringFormat());
-        }
+    }
+  }
+
+  private void mergeCacheHitsToList(BeanCollection<T> result) {
+    for (T hit : cacheBeans) {
+      result.internalAdd(hit);
+    }
+    if (result instanceof BeanList) {
+      OrderBy<T> orderBy = query.getOrderBy();
+      if (orderBy != null) {
+        // in memory sort after merging the cache hits with the DB hits
+        beanDescriptor.sort(((BeanList<T>) result).getActualList(), orderBy.toStringFormat());
       }
+    }
+  }
+
+  @SuppressWarnings({"rawtypes"})
+  private void mergeCacheHitsToMap(BeanCollection<T> result) {
+    BeanMap map = (BeanMap)result;
+    ElPropertyValue property = mapProperty();
+    for (T bean : cacheBeans) {
+      map.internalPut(property.pathGet(bean), bean);
     }
   }
 
@@ -606,6 +625,33 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
     return cacheBeans;
+  }
+
+  @Override
+  public <K> Map<K, T> getBeanCacheHitsAsMap() {
+    OrderBy<T> orderBy = query.getOrderBy();
+    if (orderBy != null) {
+      beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
+    }
+    return cacheBeansToMap();
+  }
+
+  @SuppressWarnings("unchecked")
+  private <K> Map<K, T> cacheBeansToMap() {
+    ElPropertyValue property = mapProperty();
+    Map<K,T> map = new LinkedHashMap<>();
+    for (T bean : cacheBeans) {
+      map.put((K)property.pathGet(bean), bean);
+    }
+    return map;
+  }
+
+  private ElPropertyValue mapProperty() {
+    ElPropertyValue property = beanDescriptor.getElGetValue(query.getMapKey());
+    if (property == null) {
+      throw new IllegalStateException("Unknown map key property "+query.getMapKey());
+    }
+    return property;
   }
 
   @Override
