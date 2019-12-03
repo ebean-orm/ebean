@@ -213,7 +213,7 @@ public class TestCustomerFinder extends BaseTestCase {
       .withSort(SortMetric.TOTAL)
       .json();
 
-    assertThat(metricsJson).contains("\"name\":\"txn.main\", \"type\":\"TXN\"");
+    assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
     assertThat(metricsJson).contains("\"hash\":\"cc20eb930403cfd418db2d0475c6e26a\"");

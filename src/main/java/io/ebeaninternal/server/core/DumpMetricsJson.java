@@ -183,8 +183,6 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     objStart();
     key("name");
     val(metric.getName());
-    key("type");
-    val(metric.getMetricType().name());
   }
 
   private void metricEnd() throws IOException {
