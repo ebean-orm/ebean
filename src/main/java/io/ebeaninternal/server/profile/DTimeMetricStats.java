@@ -12,6 +12,8 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private String name;
 
+  private final boolean collected;
+
   private String location;
 
   private final long count;
@@ -20,9 +22,10 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private final long max;
 
-  DTimeMetricStats(MetricType metricType, String name, long count, long total, long max) {
+  DTimeMetricStats(MetricType metricType, String name, boolean collected, long count, long total, long max) {
     this.metricType = metricType;
     this.name = name;
+    this.collected = collected;
     this.count = count;
     this.total = total;
     // collection is racy so sanitize the max value if it has not been set
@@ -48,6 +51,11 @@ class DTimeMetricStats implements TimedMetricStats {
   @Override
   public void setLocation(String location) {
     this.location = location;
+  }
+
+  @Override
+  public boolean initialCollection() {
+    return !collected;
   }
 
   @Override

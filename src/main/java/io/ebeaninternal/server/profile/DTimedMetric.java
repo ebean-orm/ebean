@@ -25,6 +25,8 @@ class DTimedMetric implements TimedMetric {
 
   private final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
 
+  private boolean collected;
+
   DTimedMetric(MetricType metricType, String name) {
     this.metricType = metricType;
     this.name = name;
@@ -51,7 +53,6 @@ class DTimedMetric implements TimedMetric {
    */
   @Override
   public void add(long value) {
-
     count.increment();
     total.add(value);
     max.accumulate(value);
@@ -82,25 +83,21 @@ class DTimedMetric implements TimedMetric {
 
   @Override
   public DTimeMetricStats collect(boolean reset) {
-    boolean empty = count.sum() == 0;
-    return empty ? null : getStatistics(reset);
+    return (count.sum() == 0) ? null : getStatistics(reset);
   }
 
   /**
    * Return the current statistics resetting the internal values if reset is true.
    */
   private DTimeMetricStats getStatistics(boolean reset) {
-
-    if (reset) {
-      // Note these values are not guaranteed to be consistent wrt each other
-      // but should be reasonably consistent (small time between count and total)
-      final long maxVal = max.getThenReset();
-      final long totalVal = total.sumThenReset();
-      final long countVal = count.sumThenReset();
-      return new DTimeMetricStats(metricType, name, countVal, totalVal, maxVal);
-
-    } else {
-      return new DTimeMetricStats(metricType, name, count.sum(), total.sum(), max.get());
+    try {
+      if (reset) {
+        return new DTimeMetricStats(metricType, name, collected, count.sumThenReset(), total.sumThenReset(), max.getThenReset());
+      } else {
+        return new DTimeMetricStats(metricType, name, collected, count.sum(), total.sum(), max.get());
+      }
+    } finally {
+      collected = true;
     }
   }
 

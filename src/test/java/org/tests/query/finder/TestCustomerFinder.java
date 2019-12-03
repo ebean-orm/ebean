@@ -1,7 +1,7 @@
 package org.tests.query.finder;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaQueryPlan;
@@ -72,7 +72,7 @@ public class TestCustomerFinder extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> all = Customer.find.all();
-    List<Customer> list = Ebean.find(Customer.class).findList();
+    List<Customer> list = DB.find(Customer.class).findList();
 
     assertThat(all.size()).isEqualTo(list.size());
 
@@ -83,34 +83,34 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(customer.getId()).isEqualTo(customer1.getId());
     assertThat(customer.getName()).isEqualTo(customer1.getName());
 
-    assertThat(Customer.find.db().getName()).isEqualTo(Ebean.getDefaultServer().getName());
+    assertThat(Customer.find.db().getName()).isEqualTo(DB.getDefault().getName());
 
   }
 
   @Test
   public void currentTransaction() {
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      Transaction t1 = Ebean.currentTransaction();
+      Transaction t1 = DB.currentTransaction();
       Transaction t2 = Customer.find.currentTransaction();
       assertThat(t2).isSameAs(t1);
 
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
   }
 
   @Test
   public void flush() {
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       Customer.find.currentTransaction().setBatchMode(true);
 
       LoggedSqlCollector.start();
       EBasic b = new EBasic("junk");
-      Ebean.save(b);
+      DB.save(b);
 
       assertTrue(LoggedSqlCollector.current().isEmpty());
       Customer.find.flush();
@@ -128,7 +128,7 @@ public class TestCustomerFinder extends BaseTestCase {
     Customer customer = new Customer();
     customer.setName("Newbie-879879897");
 
-    Ebean.save(customer);
+    DB.save(customer);
     assertThat(customer.getId()).isNotNull();
 
     Customer customer2 = Customer.find.byName(customer.getName());
@@ -207,9 +207,8 @@ public class TestCustomerFinder extends BaseTestCase {
     String metricsJson = server().getMetaInfoManager()
       .collectMetricsAsJson()
       .withHash(true)
-      .withLocation(true)
+      .withExtraAttributes(true)
       .withNewLine(true)
-      .withSql(true)
       .withSort(SortMetric.TOTAL)
       .json();
 
@@ -230,9 +229,8 @@ public class TestCustomerFinder extends BaseTestCase {
     String metricsJson = server().getMetaInfoManager()
       .collectMetricsAsJson()
       .withHash(false)
-      .withLocation(false)
+      .withExtraAttributes(false)
       .withNewLine(false)
-      .withSql(false)
       .withSort(null)
       .json();
 

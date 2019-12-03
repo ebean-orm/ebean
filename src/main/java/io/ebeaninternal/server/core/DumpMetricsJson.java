@@ -21,14 +21,9 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   private Appendable writer;
 
   /**
-   * By default include SQL for the initial collection only.
+   * By default include sql and location attributes for the initial collection only.
    */
-  private int includeSqlMode = 1;
-
-  /**
-   * By default include with the initial SQL collection only.
-   */
-  private int includeLocation = 1;
+  private int includeExtraAttributes = 1;
 
   private boolean withHeader = true;
   private boolean withHash = true;
@@ -50,14 +45,8 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   }
 
   @Override
-  public ServerMetricsAsJson withLocation(boolean withLocation) {
-    this.includeLocation = withLocation ? 2 : 0;
-    return this;
-  }
-
-  @Override
-  public ServerMetricsAsJson withSql(boolean withSql) {
-    this.includeSqlMode = withSql ? 2 : 0;
+  public ServerMetricsAsJson withExtraAttributes(boolean extraAttributes) {
+    this.includeExtraAttributes = extraAttributes ? 2 : 0;
     return this;
   }
 
@@ -96,7 +85,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     try {
       start();
       for (MetaTimedMetric metric : serverMetrics.getTimedMetrics()) {
-        log(metric);
+        logTimed(metric);
       }
 
       List<MetaCountMetric> countMetrics = serverMetrics.getCountMetrics();
@@ -118,7 +107,6 @@ class DumpMetricsJson implements ServerMetricsAsJson {
           logQuery(metric);
         }
       }
-
       end();
     } catch (IOException e) {
       throw new RuntimeException("Error writing metrics as JSON", e);
@@ -189,15 +177,6 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     objEnd();
   }
 
-  private void log(MetaTimedMetric metric) throws IOException {
-    metricStart(metric);
-    appendCounters(metric);
-    if (includeLocation != 0) {
-      appendLocation(metric.getLocation());
-    }
-    metricEnd();
-  }
-
   private void logCount(MetaCountMetric metric) throws IOException {
     metricStart(metric);
     key("count");
@@ -205,42 +184,40 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricEnd();
   }
 
-  private void logQuery(MetaQueryMetric metric) throws IOException {
+  private void logTimed(MetaTimedMetric metric) throws IOException {
     metricStart(metric);
-    appendCounters(metric);
-    if (withHash) {
-      key("hash");
-      val(metric.getHash());
+    appendTiming(metric);
+    if (isIncludeDetail(metric)) {
+      appendExtra("loc", metric.getLocation());
     }
-    appendLocationAndSql(metric);
     metricEnd();
   }
 
-  private void appendLocationAndSql(MetaQueryMetric metric) throws IOException {
-    if (includeLocation == 2) {
-      appendLocation(metric.getLocation());
+  private void logQuery(MetaQueryMetric metric) throws IOException {
+    metricStart(metric);
+    appendTiming(metric);
+    if (withHash) {
+      appendExtra("hash", metric.getHash());
     }
-    if (isIncludeSql(metric)) {
-      if (includeLocation == 1) {
-        appendLocation(metric.getLocation());
-      }
-      key("sql");
-      val(metric.getSql());
+    if (isIncludeDetail(metric)) {
+      appendExtra("loc", metric.getLocation());
+      appendExtra("sql", metric.getSql());
+    }
+    metricEnd();
+  }
+
+  private boolean isIncludeDetail(MetaTimedMetric metric) {
+    return includeExtraAttributes == 2 || includeExtraAttributes == 1 && metric.initialCollection();
+  }
+
+  private void appendExtra(String key, String val) throws IOException {
+    if (val != null) {
+      key(key);
+      val(val);
     }
   }
 
-  private boolean isIncludeSql(MetaQueryMetric metric) {
-    return includeSqlMode == 2 || includeSqlMode == 1 && metric.initialCollection();
-  }
-
-  private void appendLocation(String location) throws IOException {
-    if (location != null) {
-      key("loc");
-      val(location);
-    }
-  }
-
-  private void appendCounters(MetaTimedMetric timedMetric) throws IOException {
+  private void appendTiming(MetaTimedMetric timedMetric) throws IOException {
     key("count");
     val(timedMetric.getCount());
     key("total");
