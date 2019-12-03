@@ -38,7 +38,7 @@ public class TestCustomerFinder extends BaseTestCase {
     String json0 = buffer0.toString();
     System.out.println(json0);
     assertThat(json0).contains("\"name\":\"txn.main\"");
-    assertThat(json0).contains("\"name\":\"Customer.findList\"");
+    assertThat(json0).contains("\"name\":\"orm.Customer.findList\"");
     //assertThat(json0).contains("\"sql\":\"select t0.id, t0.status, t0.name");
 
     runQueries();
@@ -52,7 +52,7 @@ public class TestCustomerFinder extends BaseTestCase {
     String json1 = buffer1.toString();
     System.out.println(json1);
     assertThat(json1).contains("\"name\":\"txn.main\"");
-    assertThat(json1).contains("\"name\":\"Customer.findList\"");
+    assertThat(json1).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(json1).doesNotContain("\"sql\":\"select t0.id, t0.status, t0.name");
 
   }
@@ -214,9 +214,9 @@ public class TestCustomerFinder extends BaseTestCase {
       .json();
 
     assertThat(metricsJson).contains("\"name\":\"txn.main\", \"type\":\"TXN\"");
-    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+    assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
-    assertThat(metricsJson).contains("\"hash\":\"f089744556e1677b57c7c6ef73f65da8\"");
+    assertThat(metricsJson).contains("\"hash\":\"cc20eb930403cfd418db2d0475c6e26a\"");
     assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
   }
 
@@ -237,7 +237,7 @@ public class TestCustomerFinder extends BaseTestCase {
       .json();
 
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
-    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+    assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).doesNotContain("\"loc\":");
     assertThat(metricsJson).doesNotContain("\"hash\":");
     assertThat(metricsJson).doesNotContain("\"sql\":");
@@ -258,7 +258,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     String metricsJson = buffer.toString();
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
-    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+    assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
   }
 
   @Test
@@ -277,7 +277,7 @@ public class TestCustomerFinder extends BaseTestCase {
     String metricsJson = buffer.toString();
     assertThat(metricsJson).contains(" \"metrics\":[");
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
-    assertThat(metricsJson).contains("\"name\":\"Customer.findList\"");
+    assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
   }
 
   private void runQueries() {

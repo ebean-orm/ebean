@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
-import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
@@ -159,12 +158,12 @@ public class CQueryPlan {
 
   private String deriveName(String label, SpiQuery.Type type) {
     if (label == null) {
-      return beanType.getSimpleName() + "." + type.label();
+      return "orm." + beanType.getSimpleName() + "." + type.label();
     }
     if (label.startsWith(beanType.getSimpleName())) {
-      return label;
+      return "orm." + label;
     }
-    return beanType.getSimpleName() + "_" + label;
+    return "orm." + beanType.getSimpleName() + "_" + label;
   }
 
   private CQueryBindCapture initBindCapture(ServerConfig serverConfig, SpiQuery<?> query) {

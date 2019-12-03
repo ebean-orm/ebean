@@ -17,7 +17,7 @@ class DQueryPlanMeta {
     this.label = label;
     this.profileLocation = profileLocation;
     this.sql = sql;
-    String name = type.getSimpleName();
+    String name = "dto." + type.getSimpleName();
     if (label != null) {
       name += "_" + label;
     }
@@ -63,6 +63,6 @@ class DQueryPlanMeta {
 
   @Override
   public String toString() {
-    return "type:" + type + " label:" + label;
+    return name;
   }
 }
