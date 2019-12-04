@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import io.ebean.FetchPath;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.JsonConfig;
@@ -43,6 +45,8 @@ import java.util.Set;
  */
 public class DJsonContext implements SpiJsonContext {
 
+  private static final PrettyPrinter PRETTY_PRINTER = new Pretty();
+
   private final SpiEbeanServer server;
 
   private final JsonFactory jsonFactory;
@@ -52,6 +56,12 @@ public class DJsonContext implements SpiJsonContext {
   private final JsonConfig.Include defaultInclude;
 
   private final DJsonScalar jsonScalar;
+
+  private static class Pretty extends DefaultPrettyPrinter {
+    Pretty() {
+      _objectFieldValueSeparatorWithSpaces = ": ";
+    }
+  }
 
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
@@ -290,18 +300,26 @@ public class DJsonContext implements SpiJsonContext {
   }
 
   @Override
+  public String toJsonPretty(Object value) throws JsonIOException {
+    return toJsonString(value, null, true);
+  }
+
+  @Override
   public String toJson(Object o) throws JsonIOException {
-    return toJsonString(o, null);
+    return toJsonString(o, null, false);
   }
 
   @Override
   public String toJson(Object o, JsonWriteOptions options) throws JsonIOException {
-    return toJsonString(o, options);
+    return toJsonString(o, options, false);
   }
 
-  private String toJsonString(Object value, JsonWriteOptions options) throws JsonIOException {
+  private String toJsonString(Object value, JsonWriteOptions options, boolean pretty) throws JsonIOException {
     StringWriter writer = new StringWriter(500);
     try (JsonGenerator gen = createGenerator(writer)) {
+      if (pretty) {
+        gen.setPrettyPrinter(PRETTY_PRINTER);
+      }
       toJsonInternal(value, gen, options);
     } catch (IOException e) {
       throw new JsonIOException(e);

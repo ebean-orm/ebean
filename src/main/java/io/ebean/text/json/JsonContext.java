@@ -150,6 +150,13 @@ public interface JsonContext {
   String toJson(Object value) throws JsonIOException;
 
   /**
+   * Return the bean or collection as JSON string in pretty format.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  String toJsonPretty(Object value) throws JsonIOException;
+
+  /**
    * Write the bean or collection in JSON format to the writer.
    *
    * @throws JsonIOException When IOException occurs

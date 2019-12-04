@@ -82,6 +82,20 @@ public class JsonContextTest {
   }
 
   @Test
+  public void test_toJsonPretty() {
+    ResetBasicData.reset();
+
+    List<Order> orders = DB.find(Order.class)
+      .select("status")
+      .fetch("customer", "id, name")
+      .findList();
+
+    String json = DB.json().toJsonPretty(orders);
+    assertThat(json).contains("[ {");
+    assertThat(json).contains("\"customer\": {");
+  }
+
+  @Test
   public void test_toObject() {
 
     JsonContext json = DB.getDefault().json();

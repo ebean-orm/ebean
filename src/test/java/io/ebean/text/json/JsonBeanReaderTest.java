@@ -17,7 +17,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
   static JsonContext json = Ebean.json();
 
   @Test
-  public void read() throws Exception {
+  public void read() {
 
     JsonParser parser = getParser();
     JsonBeanReader<Customer> beanReader = json.createBeanReader(Customer.class, parser, null);
@@ -40,7 +40,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
   }
 
   @Test
-  public void forJson() throws Exception {
+  public void forJson() {
 
     JsonParser parser = getParser();
     JsonBeanReader<Customer> beanReader = json.createBeanReader(Customer.class, parser, null);
