@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * ScalarType for Cdir to Varchar or Postgres CDIR.
+ * ScalarType for Cidr to Varchar or Postgres CIDR.
  */
-public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cidr> {
+public abstract class ScalarTypeCidr extends ScalarTypeBaseVarchar<Cidr> {
 
-  ScalarTypeCdir() {
+  ScalarTypeCidr() {
     super(Cidr.class, false, ExtraDbTypes.CIDR);
   }
 
@@ -41,7 +41,7 @@ public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cidr> {
   /**
    * Cdir to Varchar.
    */
-  public static class Varchar extends ScalarTypeCdir {
+  public static class Varchar extends ScalarTypeCidr {
 
     @Override
     public void bind(DataBind b, Cidr value) throws SQLException {
@@ -56,7 +56,7 @@ public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cidr> {
   /**
    * Cdir to Postgres CDIR.
    */
-  public static class Postgres extends ScalarTypeCdir {
+  public static class Postgres extends ScalarTypeCidr {
 
     @Override
     public void bind(DataBind b, Cidr value) throws SQLException {

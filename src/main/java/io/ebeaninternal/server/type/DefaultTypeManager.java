@@ -993,10 +993,10 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     if (offlineMigrationGeneration || postgres) {
-      addType(Cidr.class, new ScalarTypeCdir.Postgres());
+      addType(Cidr.class, new ScalarTypeCidr.Postgres());
       addType(Inet.class, new ScalarTypeInet.Postgres());
     } else {
-      addType(Cidr.class, new ScalarTypeCdir.Varchar());
+      addType(Cidr.class, new ScalarTypeCidr.Varchar());
       addType(Inet.class, new ScalarTypeInet.Varchar());
     }
 
