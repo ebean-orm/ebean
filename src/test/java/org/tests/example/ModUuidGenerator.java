@@ -1,7 +1,7 @@
 package org.tests.example;
 
+import io.avaje.moduuid.ModUUID;
 import io.ebean.config.IdGenerator;
-import org.avaje.moduuid.ModUUID;
 
 /**
  * A customer Id Generator that can be assigned by @GeneratedValue(generator="shortUid")

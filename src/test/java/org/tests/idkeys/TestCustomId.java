@@ -1,10 +1,10 @@
 package org.tests.idkeys;
 
+import io.avaje.moduuid.ModUUID;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.tests.model.basic.ECustomId;
-import org.avaje.moduuid.ModUUID;
 import org.junit.Test;
+import org.tests.model.basic.ECustomId;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
