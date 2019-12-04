@@ -63,6 +63,7 @@ public class PostgresPlatform extends DatabasePlatform {
 
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("inet", false));
+    dbTypeMap.put(DbType.CIDR, new DbPlatformType("cidr", false));
     dbTypeMap.put(DbType.HSTORE, new DbPlatformType("hstore", false));
     dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("jsonb", false));

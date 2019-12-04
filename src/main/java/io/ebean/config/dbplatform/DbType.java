@@ -36,7 +36,7 @@ public enum DbType {
 
   UUID(ExtraDbTypes.UUID),
   INET(ExtraDbTypes.INET),
-  CDIR(ExtraDbTypes.CDIR),
+  CIDR(ExtraDbTypes.CIDR),
 
   POINT(ExtraDbTypes.POINT),
   POLYGON(ExtraDbTypes.POLYGON),

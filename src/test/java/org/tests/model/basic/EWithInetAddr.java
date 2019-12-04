@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import io.ebean.types.Cdir;
+import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 
 import javax.persistence.Entity;
@@ -25,7 +25,7 @@ public class EWithInetAddr {
 
   Inet inet2;
 
-  Cdir cdir;
+  Cidr cidr;
 
   public Long getId() {
     return id;
@@ -67,11 +67,11 @@ public class EWithInetAddr {
     this.inet2 = inet2;
   }
 
-  public Cdir getCdir() {
-    return cdir;
+  public Cidr getCidr() {
+    return cidr;
   }
 
-  public void setCdir(Cdir cdir) {
-    this.cdir = cdir;
+  public void setCidr(Cidr cidr) {
+    this.cidr = cidr;
   }
 }

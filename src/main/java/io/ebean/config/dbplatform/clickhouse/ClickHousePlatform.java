@@ -47,7 +47,7 @@ public class ClickHousePlatform extends DatabasePlatform {
 
     dbTypeMap.put(DbType.UUID, new DbPlatformType("UUID", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("String", false));
-    dbTypeMap.put(DbType.CDIR, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.CIDR, new DbPlatformType("String", false));
   }
 
   @Override

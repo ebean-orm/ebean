@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import io.ebean.types.Cdir;
+import io.ebean.types.Cidr;
 
 import java.sql.SQLException;
 import java.sql.Types;
@@ -9,33 +9,33 @@ import java.sql.Types;
 /**
  * ScalarType for Cdir to Varchar or Postgres CDIR.
  */
-public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cdir> {
+public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cidr> {
 
   ScalarTypeCdir() {
-    super(Cdir.class, false, ExtraDbTypes.INET);
+    super(Cidr.class, false, ExtraDbTypes.CIDR);
   }
 
   @Override
-  public abstract void bind(DataBind b, Cdir value) throws SQLException;
+  public abstract void bind(DataBind b, Cidr value) throws SQLException;
 
   @Override
-  public Cdir convertFromDbString(String dbValue) {
+  public Cidr convertFromDbString(String dbValue) {
     return parse(dbValue);
   }
 
   @Override
-  public String convertToDbString(Cdir beanValue) {
+  public String convertToDbString(Cidr beanValue) {
     return formatValue(beanValue);
   }
 
   @Override
-  public String formatValue(Cdir value) {
+  public String formatValue(Cidr value) {
     return value.getAddress();
   }
 
   @Override
-  public Cdir parse(String value) {
-    return new Cdir(value);
+  public Cidr parse(String value) {
+    return new Cidr(value);
   }
 
   /**
@@ -44,7 +44,7 @@ public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cdir> {
   public static class Varchar extends ScalarTypeCdir {
 
     @Override
-    public void bind(DataBind b, Cdir value) throws SQLException {
+    public void bind(DataBind b, Cidr value) throws SQLException {
       if (value == null) {
         b.setNull(Types.VARCHAR);
       } else {
@@ -59,7 +59,7 @@ public abstract class ScalarTypeCdir extends ScalarTypeBaseVarchar<Cdir> {
   public static class Postgres extends ScalarTypeCdir {
 
     @Override
-    public void bind(DataBind b, Cdir value) throws SQLException {
+    public void bind(DataBind b, Cidr value) throws SQLException {
       if (value == null) {
         b.setNull(Types.OTHER);
       } else {

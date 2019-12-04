@@ -14,7 +14,7 @@ import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.types.Cdir;
+import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
@@ -993,10 +993,10 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     if (offlineMigrationGeneration || postgres) {
-      addType(Cdir.class, new ScalarTypeCdir.Postgres());
+      addType(Cidr.class, new ScalarTypeCdir.Postgres());
       addType(Inet.class, new ScalarTypeInet.Postgres());
     } else {
-      addType(Cdir.class, new ScalarTypeCdir.Varchar());
+      addType(Cidr.class, new ScalarTypeCdir.Varchar());
       addType(Inet.class, new ScalarTypeInet.Varchar());
     }
 
