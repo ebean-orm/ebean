@@ -1,6 +1,7 @@
 package org.tests.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -384,7 +385,50 @@ public class TestInMemoryQuery extends BaseTestCase {
     }, fiona, nocCust);
 
   }
+  
+  @Test
+  public void testStartsWithInteger() throws Exception {
+    testQuery(condition -> {
+      condition.startsWith("anniversary", "20");
+    }, rob, fiona, nocCust);
+  }
+  
+  @Test
+  public void testContainsInteger() throws Exception {
+    testQuery(condition -> {
+      condition.contains("anniversary", "2");
+    }, rob, fiona, nocCust);
+  }
+  
+  @Test
+  public void testEndsWithInteger() throws Exception {
+    testQuery(condition -> {
+      condition.endsWith("anniversary", "1");
+    }, fiona);
+  }
+  
 
+  @Test
+  public void testStartsWithIntegerInsensitive() throws Exception {
+    testQuery(condition -> {
+      condition.icontains("anniversary", "20");
+    }, rob, fiona, nocCust);
+  }
+  
+  @Test
+  public void testContainsIntegerInsensitive() throws Exception {
+    testQuery(condition -> {
+      condition.icontains("anniversary", "2");
+    }, rob, fiona, nocCust);
+  }
+  
+  @Test
+  public void testEndsWithIntegerInsensitive() throws Exception {
+    testQuery(condition -> {
+      condition.iendsWith("anniversary", "1");
+    }, fiona);
+  }
+  
   private <T> void testQuery(Consumer<QueryDsl<Customer,?>> condition, Customer... expected) {
 
     // Query
