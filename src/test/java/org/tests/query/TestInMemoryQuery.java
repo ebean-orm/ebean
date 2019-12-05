@@ -387,21 +387,21 @@ public class TestInMemoryQuery extends BaseTestCase {
   }
   
   @Test
-  public void testStartsWithInteger() throws Exception {
+  public void testStartsWithNonStringType() throws Exception {
     testQuery(condition -> {
       condition.startsWith("anniversary", "20");
     }, rob, fiona, nocCust);
   }
   
   @Test
-  public void testContainsInteger() throws Exception {
+  public void testContainsNonStringType() throws Exception {
     testQuery(condition -> {
       condition.contains("anniversary", "2");
     }, rob, fiona, nocCust);
   }
   
   @Test
-  public void testEndsWithInteger() throws Exception {
+  public void testEndsWithNonStringType() throws Exception {
     testQuery(condition -> {
       condition.endsWith("anniversary", "1");
     }, fiona);
@@ -409,25 +409,54 @@ public class TestInMemoryQuery extends BaseTestCase {
   
 
   @Test
-  public void testStartsWithIntegerInsensitive() throws Exception {
+  public void testStartsWithNonStringTypeInsensitive() throws Exception {
     testQuery(condition -> {
       condition.icontains("anniversary", "20");
     }, rob, fiona, nocCust);
   }
   
   @Test
-  public void testContainsIntegerInsensitive() throws Exception {
+  public void testContainsNonStringTypeInsensitive() throws Exception {
     testQuery(condition -> {
       condition.icontains("anniversary", "2");
     }, rob, fiona, nocCust);
   }
   
   @Test
-  public void testEndsWithIntegerInsensitive() throws Exception {
+  public void testEndsWithNonStringTypeInsensitive() throws Exception {
     testQuery(condition -> {
       condition.iendsWith("anniversary", "1");
     }, fiona);
   }
+  
+  @Test
+  public void testLike() throws Exception {
+    testQuery(condition -> {
+      condition.like("name", "F_o%");
+    }, fiona);
+  }
+  
+  @Test
+  public void testLikeInsensitive() throws Exception {
+    testQuery(condition -> {
+      condition.ilike("name", "f_O%");
+    }, fiona);
+  }
+  
+  @Test
+  public void testLikeNonStringType() throws Exception {
+    testQuery(condition -> {
+      condition.like("anniversary", "2%");
+    }, rob, fiona, nocCust);
+  }
+  
+  @Test
+  public void testLikeNonStringTypeInsensitive() throws Exception {
+    testQuery(condition -> {
+      condition.ilike("anniversary", "2%");
+    }, rob, fiona, nocCust);
+  }
+  
   
   private <T> void testQuery(Consumer<QueryDsl<Customer,?>> condition, Customer... expected) {
 
