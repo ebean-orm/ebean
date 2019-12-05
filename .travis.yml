@@ -9,7 +9,7 @@ git:
   depth: 3
 
 addons:
-  postgresql: "11.2"
+  postgresql: "9.6"
 #  apt:
 #    packages:
 #    - mysql-server-5.7
