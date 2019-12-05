@@ -1556,7 +1556,7 @@ create table e_withinet (
   name                          varchar(255),
   inet_address                  varchar(50),
   inet2                         varchar(255),
-  cdir                          varchar(50),
+  cidr                          varchar(50),
   version                       bigint not null,
   constraint pk_e_withinet primary key (id)
 );

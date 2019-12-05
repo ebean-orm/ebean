@@ -39,7 +39,7 @@ public abstract class ScalarTypeCidr extends ScalarTypeBaseVarchar<Cidr> {
   }
 
   /**
-   * Cdir to Varchar.
+   * Cidr to Varchar.
    */
   public static class Varchar extends ScalarTypeCidr {
 
@@ -54,7 +54,7 @@ public abstract class ScalarTypeCidr extends ScalarTypeBaseVarchar<Cidr> {
   }
 
   /**
-   * Cdir to Postgres CDIR.
+   * Cidr to Postgres CIDR.
    */
   public static class Postgres extends ScalarTypeCidr {
 
