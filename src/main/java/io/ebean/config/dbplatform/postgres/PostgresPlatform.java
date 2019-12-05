@@ -51,7 +51,7 @@ public class PostgresPlatform extends DatabasePlatform {
       new SqlErrorCodes()
         .addAcquireLock("55P03")
         .addDuplicateKey("23505")
-        .addDataIntegrity("23000","23502","23503","23514")
+        .addDataIntegrity("23000", "23502", "23503", "23514")
         .addSerializableConflict("40001")
         .build();
 
@@ -128,7 +128,6 @@ public class PostgresPlatform extends DatabasePlatform {
 
   @Override
   public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
-
     try (PreparedStatement statement = connection.prepareStatement("select count(*) from pg_inherits i WHERE  i.inhparent = ?::regclass")) {
       statement.setString(1, table);
       try (ResultSet resultSet = statement.executeQuery()) {
@@ -139,18 +138,15 @@ public class PostgresPlatform extends DatabasePlatform {
 
   /**
    * Return SQL using built in partition helper functions to create some initial partitions.
-   *
+   * <p>
    * Only use this if extra-ddl doesn't have some initial partitions defined (which it should).
    */
   @Override
   public String tablePartitionInit(String tableName, PartitionMode mode, String property, String pkey) {
-    if (property == null) {
-      property = "";
-    }
-    if (pkey == null) {
-      pkey = "";
-    }
-    return "select partition('" + mode.name().toLowerCase() + "','" + tableName + "','" + pkey + "','" + property + "',1);";
+    // default partition required pg11 but this is only used for testing but bumped test docker container to pg11 by default
+    return
+      "create table " + tableName + "_default" + " partition of " + tableName + " default;\n" +
+        "select partition('" + mode.name().toLowerCase() + "','" + tableName + "',1);";
   }
 
 }
