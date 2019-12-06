@@ -1,5 +1,7 @@
 package org.tests.model.site;
 
+import io.ebean.Model;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class Site {
+public class Site extends Model {
 
   @Id
   private UUID id;
