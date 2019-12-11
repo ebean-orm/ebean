@@ -129,7 +129,7 @@ public class BootupClasses implements ClassFilter {
 
   /**
    * Adds the list <code>toAdd</code> to <code>instances</code> and removes any pending
-   * candiate, to prevent duplicate instantiiation.
+   * candidate, to prevent duplicate instantiation.
    */
   private <T> void add(List<T> toAdd, List<T> instances, List<Class<? extends T>> candidates) {
     if (toAdd != null) {
@@ -433,9 +433,7 @@ public class BootupClasses implements ClassFilter {
       interesting = true;
     }
 
-    // single instances
-    // TODO: What should happen, if there is already an other
-    // changeLogListener assigned? (Last wins? / Exception?)
+    // single instances, last assigned wins
     if (ChangeLogListener.class.isAssignableFrom(cls)) {
       changeLogListenerClass = (Class<? extends ChangeLogListener>) cls;
       interesting = true;
