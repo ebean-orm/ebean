@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.ContainerConfig;
+import io.ebean.config.ModuleInfoLoader;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.ServerConfigProvider;
 import io.ebean.config.TenantMode;
@@ -85,11 +86,7 @@ public class DefaultContainer implements SpiContainer {
   public SpiEbeanServer createServer(ServerConfig serverConfig) {
 
     synchronized (this) {
-      if (serverConfig.isDefaultServer()) {
-        for (ServerConfigProvider configProvider : ServiceLoader.load(ServerConfigProvider.class)) {
-          configProvider.apply(serverConfig);
-        }
-      }
+      applyConfigServices(serverConfig);
 
       setNamingConvention(serverConfig);
       BootupClasses bootupClasses = getBootupClasses(serverConfig);
@@ -120,7 +117,6 @@ public class DefaultContainer implements SpiContainer {
 
       // executor and l2 caching service setup early (used during server construction)
       SpiBackgroundExecutor executor = createBackgroundExecutor(serverConfig);
-
       InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, serverConfig, bootupClasses);
 
       DefaultServer server = new DefaultServer(c, c.cacheManager());
@@ -128,22 +124,43 @@ public class DefaultContainer implements SpiContainer {
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
       if (!DbOffline.isGenerateMigration()) {
-        server.executePlugins(online);
-
-        // initialise prior to registering with clusterManager
-        server.initialise();
-        if (online) {
-          if (clusterManager.isClustering()) {
-            // register the server once it has been created
-            clusterManager.registerServer(server);
-          }
-        }
-        // start any services after registering with clusterManager
-        server.start();
+        startServer(online, server);
       }
       DbOffline.reset();
       return server;
     }
+  }
+
+  private void applyConfigServices(ServerConfig config) {
+    if (config.isDefaultServer()) {
+      for (ServerConfigProvider configProvider : ServiceLoader.load(ServerConfigProvider.class)) {
+        configProvider.apply(config);
+      }
+      if (config.isAutoLoadModuleInfo()) {
+        // auto register entity classes (default db)
+        for (ModuleInfoLoader loader : ServiceLoader.load(ModuleInfoLoader.class)) {
+          config.addAll(loader.entityClasses());
+        }
+      }
+    } else if (config.isAutoLoadModuleInfo()) {
+      // auto register entity classes (other named db)
+      for (ModuleInfoLoader loader : ServiceLoader.load(ModuleInfoLoader.class)) {
+        config.addAll(loader.entityClassesFor(config.getName()));
+      }
+    }
+  }
+
+  private void startServer(boolean online, DefaultServer server) {
+    server.executePlugins(online);
+    // initialise prior to registering with clusterManager
+    server.initialise();
+    if (online) {
+      if (clusterManager.isClustering()) {
+        clusterManager.registerServer(server);
+      }
+    }
+    // start any services after registering with clusterManager
+    server.start();
   }
 
   /**

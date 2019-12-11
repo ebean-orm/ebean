@@ -71,6 +71,7 @@ public class ServerConfigTest {
     props.setProperty("idGeneratorAutomatic", "true");
     props.setProperty("enabledL2Regions", "r0,users,orgs");
     props.setProperty("caseSensitiveCollation", "false");
+    props.setProperty("loadModuleInfo", "true");
 
 
     serverConfig.loadFromProperties(props);
@@ -79,6 +80,8 @@ public class ServerConfigTest {
     assertTrue(serverConfig.isNotifyL2CacheInForeground());
     assertTrue(serverConfig.isDbOffline());
     assertTrue(serverConfig.isAutoReadOnlyDataSource());
+    assertTrue(serverConfig.isAutoLoadModuleInfo());
+
     assertTrue(serverConfig.isIdGeneratorAutomatic());
     assertFalse(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
 
@@ -134,6 +137,7 @@ public class ServerConfigTest {
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
+    assertFalse(serverConfig.isAutoLoadModuleInfo());
   }
 
   @Test
