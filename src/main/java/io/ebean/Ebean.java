@@ -24,6 +24,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Ebean will be Deprecated - please migrate to use DB.
+ * <p>
  * Ebean is a registry of {@link Database} by name. Ebean has now been renamed to {@link DB}.
  * <p>
  * Ebean is effectively this is an alias for {@link DB} which is the new and improved name for Ebean.
