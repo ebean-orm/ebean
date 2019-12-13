@@ -37,7 +37,7 @@ public class ConditionalTestRunner extends BlockJUnit4ClassRunner {
 
   }
   private boolean platformMath(Platform[] platforms) {
-    Platform current = Ebean.getDefaultServer().getPluginApi().getDatabasePlatform().getPlatform();
+    Platform current = DB.getDefault().getPluginApi().getDatabasePlatform().getPlatform();
     for (Platform p : platforms) {
       if (p.equals(current)) {
         return true;

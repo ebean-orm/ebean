@@ -1,6 +1,6 @@
 package io.ebean.common;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
@@ -93,7 +93,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   void lazyLoadCollection(boolean onlyIds) {
     if (loader == null) {
-      loader = (BeanCollectionLoader) Ebean.getServer(ebeanServerName);
+      loader = (BeanCollectionLoader) DB.byName(ebeanServerName);
     }
     loader.loadMany(this, onlyIds);
     checkEmptyLazyLoad();

@@ -1,6 +1,6 @@
 package io.ebean.bean;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.ValuePair;
 
 import javax.persistence.EntityNotFoundException;
@@ -821,7 +821,7 @@ public final class EntityBeanIntercept implements Serializable {
 
     synchronized (this) {
       if (beanLoader == null) {
-        BeanLoader serverLoader = (BeanLoader) Ebean.getServer(ebeanServerName);
+        BeanLoader serverLoader = (BeanLoader) DB.byName(ebeanServerName);
         if (serverLoader == null) {
           throw new PersistenceException("Server [" + ebeanServerName + "] was not found?");
         }

@@ -126,8 +126,6 @@ public interface SqlUpdate {
    * {@link Transaction#setBatchMode(boolean)} and
    * {@link Transaction#setBatchSize(int)}.
    * </p>
-   *
-   * @see Ebean#execute(SqlUpdate)
    */
   int execute();
 

@@ -21,7 +21,7 @@ public class EbeanVersion {
   static {
     try {
       Properties prop = new Properties();
-      try (InputStream in = Ebean.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties")) {
+      try (InputStream in = DB.class.getResourceAsStream("/META-INF/maven/io.ebean/ebean/pom.properties")) {
         if (in != null) {
           prop.load(in);
           in.close();

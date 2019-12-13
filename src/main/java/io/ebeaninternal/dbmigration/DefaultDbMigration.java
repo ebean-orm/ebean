@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.EbeanServer;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DbConstraintNaming;
@@ -142,8 +143,8 @@ public class DefaultDbMigration implements DbMigration {
    * Typically this is not called explicitly.
    */
   @Override
-  public void setServer(EbeanServer ebeanServer) {
-    this.server = (SpiEbeanServer) ebeanServer;
+  public void setServer(Database database) {
+    this.server = (SpiEbeanServer) database;
     setServerConfig(server.getServerConfig());
   }
 
@@ -671,7 +672,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void setDefaults() {
     if (server == null) {
-      setServer(Ebean.getDefaultServer());
+      setServer(DB.getDefault());
     }
     if (vanillaPlatform || databasePlatform == null) {
       // not explicitly set so use the platform of the server

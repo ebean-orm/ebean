@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TxScope;
 
 /**
@@ -28,7 +28,7 @@ public class HelpScopeTrans {
   }
 
   private static SpiEbeanServer server() {
-    return (SpiEbeanServer) Ebean.getDefaultServer();
+    return (SpiEbeanServer) DB.getDefault();
   }
 
   /**

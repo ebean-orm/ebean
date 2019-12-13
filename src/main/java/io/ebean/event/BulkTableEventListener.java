@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 
 import java.util.Set;
 
@@ -8,7 +8,7 @@ import java.util.Set;
  * Listen for bulk table events that occur.
  * <p>
  * These events can be triggered via
- * {@link Ebean#externalModification(String, boolean, boolean, boolean)} or
+ * {@link DB#externalModification(String, boolean, boolean, boolean)} or
  * automatically determined from Ebean bulk update statements.
  */
 public interface BulkTableEventListener {

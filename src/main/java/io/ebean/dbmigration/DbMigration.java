@@ -1,6 +1,6 @@
 package io.ebean.dbmigration;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.annotation.Platform;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -66,7 +66,7 @@ public interface DbMigration {
    * Set the server to use to determine the current model.
    * Typically this is not called explicitly.
    */
-  void setServer(EbeanServer ebeanServer);
+  void setServer(Database database);
 
   /**
    * Set the serverConfig to use. Typically this is not called explicitly.

@@ -27,7 +27,7 @@ public interface Transaction extends AutoCloseable {
    * @see Database#currentTransaction()
    */
   static Transaction current() {
-    return Ebean.currentTransaction();
+    return DB.currentTransaction();
   }
 
   /**

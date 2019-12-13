@@ -70,7 +70,7 @@ public abstract class BaseTestCase {
     }
     try {
       // First try, if we get the default server. If this fails, all tests will fail.
-      Ebean.getDefaultServer();
+      DB.getDefault();
     } catch (Throwable e) {
       logger.error("Fatal error while getting ebean-server. Exiting...", e);
       System.exit(1);
@@ -239,7 +239,7 @@ public abstract class BaseTestCase {
   }
 
   protected SpiEbeanServer spiEbeanServer() {
-    return (SpiEbeanServer) Ebean.getDefaultServer();
+    return (SpiEbeanServer) DB.getDefault();
   }
 
   protected EbeanServer server() {
@@ -248,7 +248,7 @@ public abstract class BaseTestCase {
 
   protected void loadCountryCache() {
 
-    Ebean.find(Country.class)
+    DB.find(Country.class)
       .setBeanCacheMode(CacheMode.PUT)
       .findList();
   }

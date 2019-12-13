@@ -12,16 +12,16 @@ import java.util.concurrent.Callable;
  * <p>
  * This information matches the features of the Transactional annotation. You
  * can use it directly with Runnable or Callable via
- * {@link Ebean#execute(TxScope, Runnable)} or
- * {@link Ebean#executeCall(TxScope, Callable)}.
+ * {@link DB#execute(TxScope, Runnable)} or
+ * {@link DB#executeCall(TxScope, Callable)}.
  * </p>
  * <p>
  * This object is used internally with the enhancement of a method with
  * Transactional annotation.
  * </p>
  *
- * @see Ebean#execute(TxScope, Runnable)
- * @see Ebean#executeCall(TxScope, Callable)
+ * @see DB#execute(TxScope, Runnable)
+ * @see DB#executeCall(TxScope, Callable)
  */
 public final class TxScope {
 

@@ -86,7 +86,7 @@ public interface Filter<T> {
    * expressions.
    * </p>
    * <p>
-   * Refer to {@link Ebean#sort(List, String)} for more detail.
+   * Refer to {@link DB#sort(List, String)} for more detail.
    * </p>
    */
   Filter<T> sort(String sortByClause);

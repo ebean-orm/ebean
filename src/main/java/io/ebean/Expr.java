@@ -34,14 +34,14 @@ public class Expr {
    * Equal To - property equal to the given value.
    */
   public static Expression eq(String propertyName, Object value) {
-    return Ebean.getExpressionFactory().eq(propertyName, value);
+    return DB.getExpressionFactory().eq(propertyName, value);
   }
 
   /**
    * Not Equal To - property not equal to the given value.
    */
   public static Expression ne(String propertyName, Object value) {
-    return Ebean.getExpressionFactory().ne(propertyName, value);
+    return DB.getExpressionFactory().ne(propertyName, value);
   }
 
   /**
@@ -49,7 +49,7 @@ public class Expr {
    * using a lower() function to make it case insensitive).
    */
   public static Expression ieq(String propertyName, String value) {
-    return Ebean.getExpressionFactory().ieq(propertyName, value);
+    return DB.getExpressionFactory().ieq(propertyName, value);
   }
 
   /**
@@ -59,28 +59,28 @@ public class Expr {
    * </p>
    */
   public static Expression inRange(String propertyName, Object value1, Object value2) {
-    return Ebean.getExpressionFactory().inRange(propertyName, value1, value2);
+    return DB.getExpressionFactory().inRange(propertyName, value1, value2);
   }
 
   /**
    * Between - property between the two given values.
    */
   public static Expression between(String propertyName, Object value1, Object value2) {
-    return Ebean.getExpressionFactory().between(propertyName, value1, value2);
+    return DB.getExpressionFactory().between(propertyName, value1, value2);
   }
 
   /**
    * Between - value between two given properties.
    */
   public static Expression between(String lowProperty, String highProperty, Object value) {
-    return Ebean.getExpressionFactory().betweenProperties(lowProperty, highProperty, value);
+    return DB.getExpressionFactory().betweenProperties(lowProperty, highProperty, value);
   }
 
   /**
    * Greater Than - property greater than the given value.
    */
   public static Expression gt(String propertyName, Object value) {
-    return Ebean.getExpressionFactory().gt(propertyName, value);
+    return DB.getExpressionFactory().gt(propertyName, value);
   }
 
   /**
@@ -88,42 +88,42 @@ public class Expr {
    * value.
    */
   public static Expression ge(String propertyName, Object value) {
-    return Ebean.getExpressionFactory().ge(propertyName, value);
+    return DB.getExpressionFactory().ge(propertyName, value);
   }
 
   /**
    * Less Than - property less than the given value.
    */
   public static Expression lt(String propertyName, Object value) {
-    return Ebean.getExpressionFactory().lt(propertyName, value);
+    return DB.getExpressionFactory().lt(propertyName, value);
   }
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.
    */
   public static Expression le(String propertyName, Object value) {
-    return Ebean.getExpressionFactory().le(propertyName, value);
+    return DB.getExpressionFactory().le(propertyName, value);
   }
 
   /**
    * Is Null - property is null.
    */
   public static Expression isNull(String propertyName) {
-    return Ebean.getExpressionFactory().isNull(propertyName);
+    return DB.getExpressionFactory().isNull(propertyName);
   }
 
   /**
    * Is Not Null - property is not null.
    */
   public static Expression isNotNull(String propertyName) {
-    return Ebean.getExpressionFactory().isNotNull(propertyName);
+    return DB.getExpressionFactory().isNotNull(propertyName);
   }
 
   /**
    * Case insensitive {@link #exampleLike(Object)}
    */
   public static ExampleExpression iexampleLike(Object example) {
-    return Ebean.getExpressionFactory().iexampleLike(example);
+    return DB.getExpressionFactory().iexampleLike(example);
   }
 
   /**
@@ -131,14 +131,14 @@ public class Expr {
    * LikeType.RAW (you need to add you own wildcards % and _).
    */
   public static ExampleExpression exampleLike(Object example) {
-    return Ebean.getExpressionFactory().exampleLike(example);
+    return DB.getExpressionFactory().exampleLike(example);
   }
 
   /**
    * Create the query by Example expression specifying more options.
    */
   public static ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType) {
-    return Ebean.getExpressionFactory().exampleLike(example, caseInsensitive, likeType);
+    return DB.getExpressionFactory().exampleLike(example, caseInsensitive, likeType);
   }
 
   /**
@@ -146,7 +146,7 @@ public class Expr {
    * characters % (percentage) and _ (underscore).
    */
   public static Expression like(String propertyName, String value) {
-    return Ebean.getExpressionFactory().like(propertyName, value);
+    return DB.getExpressionFactory().like(propertyName, value);
   }
 
   /**
@@ -155,14 +155,14 @@ public class Expr {
    * a lower() function to make the expression case insensitive.
    */
   public static Expression ilike(String propertyName, String value) {
-    return Ebean.getExpressionFactory().ilike(propertyName, value);
+    return DB.getExpressionFactory().ilike(propertyName, value);
   }
 
   /**
    * Starts With - property like value%.
    */
   public static Expression startsWith(String propertyName, String value) {
-    return Ebean.getExpressionFactory().startsWith(propertyName, value);
+    return DB.getExpressionFactory().startsWith(propertyName, value);
   }
 
   /**
@@ -170,14 +170,14 @@ public class Expr {
    * lower() function to make the expression case insensitive.
    */
   public static Expression istartsWith(String propertyName, String value) {
-    return Ebean.getExpressionFactory().istartsWith(propertyName, value);
+    return DB.getExpressionFactory().istartsWith(propertyName, value);
   }
 
   /**
    * Ends With - property like %value.
    */
   public static Expression endsWith(String propertyName, String value) {
-    return Ebean.getExpressionFactory().endsWith(propertyName, value);
+    return DB.getExpressionFactory().endsWith(propertyName, value);
   }
 
   /**
@@ -185,14 +185,14 @@ public class Expr {
    * function to make the expression case insensitive.
    */
   public static Expression iendsWith(String propertyName, String value) {
-    return Ebean.getExpressionFactory().iendsWith(propertyName, value);
+    return DB.getExpressionFactory().iendsWith(propertyName, value);
   }
 
   /**
    * Contains - property like %value%.
    */
   public static Expression contains(String propertyName, String value) {
-    return Ebean.getExpressionFactory().contains(propertyName, value);
+    return DB.getExpressionFactory().contains(propertyName, value);
   }
 
   /**
@@ -200,42 +200,42 @@ public class Expr {
    * function to make the expression case insensitive.
    */
   public static Expression icontains(String propertyName, String value) {
-    return Ebean.getExpressionFactory().icontains(propertyName, value);
+    return DB.getExpressionFactory().icontains(propertyName, value);
   }
 
   /**
    * For collection properties that are empty (have not existing elements).
    */
   public static Expression isEmpty(String propertyName) {
-    return Ebean.getExpressionFactory().isEmpty(propertyName);
+    return DB.getExpressionFactory().isEmpty(propertyName);
   }
 
   /**
    * For collection properties that are not empty (have existing elements).
    */
   public static Expression isNotEmpty(String propertyName) {
-    return Ebean.getExpressionFactory().isNotEmpty(propertyName);
+    return DB.getExpressionFactory().isNotEmpty(propertyName);
   }
 
   /**
    * In - property has a value in the array of values.
    */
   public static Expression in(String propertyName, Object[] values) {
-    return Ebean.getExpressionFactory().in(propertyName, values);
+    return DB.getExpressionFactory().in(propertyName, values);
   }
 
   /**
    * In - using a subQuery.
    */
   public static Expression in(String propertyName, Query<?> subQuery) {
-    return Ebean.getExpressionFactory().in(propertyName, subQuery);
+    return DB.getExpressionFactory().in(propertyName, subQuery);
   }
 
   /**
    * In - property has a value in the collection of values.
    */
   public static Expression in(String propertyName, Collection<?> values) {
-    return Ebean.getExpressionFactory().in(propertyName, values);
+    return DB.getExpressionFactory().in(propertyName, values);
   }
 
   /**
@@ -272,14 +272,14 @@ public class Expr {
    * }</pre>
    */
   public static Expression inOrEmpty(String propertyName, Collection<?> values) {
-    return Ebean.getExpressionFactory().inOrEmpty(propertyName, values);
+    return DB.getExpressionFactory().inOrEmpty(propertyName, values);
   }
 
   /**
    * Id Equal to - ID property is equal to the value.
    */
   public static Expression idEq(Object value) {
-    return Ebean.getExpressionFactory().idEq(value);
+    return DB.getExpressionFactory().idEq(value);
   }
 
   /**
@@ -292,7 +292,7 @@ public class Expr {
    * @param propertyMap a map keyed by property names.
    */
   public static Expression allEq(Map<String, Object> propertyMap) {
-    return Ebean.getExpressionFactory().allEq(propertyMap);
+    return DB.getExpressionFactory().allEq(propertyMap);
   }
 
   /**
@@ -303,7 +303,7 @@ public class Expr {
    * </p>
    */
   public static Expression raw(String raw, Object value) {
-    return Ebean.getExpressionFactory().raw(raw, value);
+    return DB.getExpressionFactory().raw(raw, value);
   }
 
   /**
@@ -314,14 +314,14 @@ public class Expr {
    * </p>
    */
   public static Expression raw(String raw, Object[] values) {
-    return Ebean.getExpressionFactory().raw(raw, values);
+    return DB.getExpressionFactory().raw(raw, values);
   }
 
   /**
    * Add raw expression with no parameters.
    */
   public static Expression raw(String raw) {
-    return Ebean.getExpressionFactory().raw(raw);
+    return DB.getExpressionFactory().raw(raw);
   }
 
   /**
@@ -329,7 +329,7 @@ public class Expr {
    */
   public static Expression and(Expression expOne, Expression expTwo) {
 
-    return Ebean.getExpressionFactory().and(expOne, expTwo);
+    return DB.getExpressionFactory().and(expOne, expTwo);
   }
 
   /**
@@ -337,7 +337,7 @@ public class Expr {
    */
   public static Expression or(Expression expOne, Expression expTwo) {
 
-    return Ebean.getExpressionFactory().or(expOne, expTwo);
+    return DB.getExpressionFactory().or(expOne, expTwo);
   }
 
   /**
@@ -345,7 +345,7 @@ public class Expr {
    */
   public static Expression not(Expression exp) {
 
-    return Ebean.getExpressionFactory().not(exp);
+    return DB.getExpressionFactory().not(exp);
   }
 
   /**
@@ -353,7 +353,7 @@ public class Expr {
    */
   public static <T> Junction<T> conjunction(Query<T> query) {
 
-    return Ebean.getExpressionFactory().conjunction(query);
+    return DB.getExpressionFactory().conjunction(query);
   }
 
   /**
@@ -361,6 +361,6 @@ public class Expr {
    */
   public static <T> Junction<T> disjunction(Query<T> query) {
 
-    return Ebean.getExpressionFactory().disjunction(query);
+    return DB.getExpressionFactory().disjunction(query);
   }
 }
