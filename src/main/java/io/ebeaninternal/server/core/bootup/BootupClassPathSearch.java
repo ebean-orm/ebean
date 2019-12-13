@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core.bootup;
 
+import io.avaje.classpath.scanner.ClassPathScanner;
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.core.ClassPathScanners;
-import org.avaje.classpath.scanner.ClassPathScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

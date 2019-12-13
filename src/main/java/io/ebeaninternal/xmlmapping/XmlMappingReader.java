@@ -1,8 +1,8 @@
 package io.ebeaninternal.xmlmapping;
 
+import io.avaje.classpath.scanner.Resource;
 import io.ebeaninternal.util.UrlHelper;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
-import org.avaje.classpath.scanner.Resource;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -36,7 +36,7 @@ public class XmlMappingReader {
   /**
    * Read the deployment XML for the given resource name.
    */
-  public static List<XmEbean> readByResourceName(ClassLoader classLoader, String resourceName){
+  public static List<XmEbean> readByResourceName(ClassLoader classLoader, String resourceName) {
     try {
       Enumeration<URL> resources = classLoader.getResources(resourceName);
       List<XmEbean> mappings = new ArrayList<>();
@@ -55,7 +55,7 @@ public class XmlMappingReader {
   /**
    * Read the deployment XML for the given resources.
    */
-  public static List<XmEbean> readByResourceList(List<Resource> resourceList){
+  public static List<XmEbean> readByResourceList(List<Resource> resourceList) {
     try {
       List<XmEbean> mappings = new ArrayList<>();
       for (Resource xmlMappingRes : resourceList) {

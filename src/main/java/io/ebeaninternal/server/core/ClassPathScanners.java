@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core;
 
+import io.avaje.classpath.scanner.ClassPathScanner;
+import io.avaje.classpath.scanner.ClassPathScannerFactory;
 import io.ebean.config.ServerConfig;
-import org.avaje.classpath.scanner.ClassPathScanner;
-import org.avaje.classpath.scanner.ClassPathScannerFactory;
 
 import java.util.ArrayList;
 import java.util.List;

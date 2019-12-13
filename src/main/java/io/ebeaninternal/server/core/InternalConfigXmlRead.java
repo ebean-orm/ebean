@@ -1,13 +1,13 @@
 package io.ebeaninternal.server.core;
 
+import io.avaje.classpath.scanner.ClassPathScanner;
+import io.avaje.classpath.scanner.Resource;
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.dto.DtoNamedQueries;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmDto;
 import io.ebeaninternal.xmlmapping.model.XmEbean;
 import io.ebeaninternal.xmlmapping.model.XmRawSql;
-import org.avaje.classpath.scanner.ClassPathScanner;
-import org.avaje.classpath.scanner.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

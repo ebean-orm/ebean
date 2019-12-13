@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core.bootup;
 
+import io.avaje.classpath.scanner.ClassFilter;
 import io.ebean.annotation.DocStore;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
@@ -18,7 +19,6 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.type.ScalarType;
-import org.avaje.classpath.scanner.ClassFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
