@@ -1,7 +1,7 @@
 package org.tests.basic.type;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import org.junit.Test;
@@ -23,9 +23,9 @@ public class TestSqlRowUUID extends BaseTestCase {
     TUuidEntity e = new TUuidEntity();
     e.setName("blah");
 
-    Ebean.save(e);
+    DB.save(e);
 
-    SqlQuery q = Ebean.createSqlQuery("select * from tuuid_entity where id = :id");
+    SqlQuery q = DB.sqlQuery("select * from tuuid_entity where id = :id");
     q.setParameter("id", e.getId());
     SqlRow sqlRow = q.findOne();
 
@@ -37,7 +37,7 @@ public class TestSqlRowUUID extends BaseTestCase {
     assertFalse(b);
 
 
-    SqlQuery q2 = Ebean.createSqlQuery("select id from tuuid_entity where id = :id");
+    SqlQuery q2 = DB.sqlQuery("select id from tuuid_entity where id = :id");
     q2.setParameter("id", e.getId());
     UUID value = q2.findSingleAttribute(UUID.class);
 
@@ -52,13 +52,13 @@ public class TestSqlRowUUID extends BaseTestCase {
 
     List<UUID> ids = Arrays.asList(e.getId(), UUID.randomUUID());
 
-    List<SqlRow> result = Ebean.createSqlQuery("select id from tuuid_entity where id = any(?::uuid[])")
+    List<SqlRow> result = DB.sqlQuery("select id from tuuid_entity where id = any(?::uuid[])")
       .setParameter(1, ids)
       .findList();
 
     assertThat(result).hasSize(1);
 
-    List<TUuidEntity> list = Ebean.find(TUuidEntity.class)
+    List<TUuidEntity> list = DB.find(TUuidEntity.class)
       .where().rawOrEmpty("id = any(?::uuid[])", ids)
       .findList();
 

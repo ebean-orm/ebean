@@ -464,8 +464,11 @@ public interface Database {
   SqlQuery sqlQuery(String sql);
 
   /**
+   * Deprecated - migrate to sqlQuery().
+   * <p>
    * This is an alias for {@link #sqlQuery(String)}.
    */
+  @Deprecated
   SqlQuery createSqlQuery(String sql);
 
   /**

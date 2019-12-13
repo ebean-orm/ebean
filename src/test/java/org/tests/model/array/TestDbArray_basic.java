@@ -1,6 +1,7 @@
 package org.tests.model.array;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlRow;
@@ -107,7 +108,7 @@ public class TestDbArray_basic extends BaseTestCase {
       query.findList();
 
 
-      final SqlRow row = Ebean.createSqlQuery("select * from earray_bean").findOne();
+      final SqlRow row = DB.sqlQuery("select * from earray_bean").findOne();
 
       final String[] vcs = (String[]) ((java.sql.Array) row.get("vc_enums")).getArray();
       assertThat(vcs).containsExactly("xXxONE", "xXxTWO");

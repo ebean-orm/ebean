@@ -1,6 +1,7 @@
 package org.tests.query.sqlquery;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
@@ -31,7 +32,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
 
-    List<BigDecimal> lineAmounts = Ebean.createSqlQuery(sql)
+    List<BigDecimal> lineAmounts = DB.sqlQuery(sql)
       .setParameter(1, 3)
       .findSingleAttributeList(BigDecimal.class);
 
@@ -45,7 +46,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
 
-    BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+    BigDecimal maxPrice = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .findSingleDecimal();
 
@@ -59,7 +60,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
 
-    BigDecimal maxPrice = Ebean.createSqlQuery(sql)
+    BigDecimal maxPrice = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .findSingleAttribute(BigDecimal.class);
 
@@ -73,7 +74,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select count(order_qty) from o_order_detail where unit_price > ?";
 
-    long count = Ebean.createSqlQuery(sql)
+    long count = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .findSingleLong();
 
@@ -88,7 +89,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select count(order_qty) from o_order_detail where unit_price > ?";
 
-    long count = Ebean.createSqlQuery(sql)
+    long count = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .findSingleAttribute(Long.class);
 
@@ -102,7 +103,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select min(updtime) from o_order_detail where unit_price > ? and updtime is not null";
 
-    OffsetDateTime minCreated = Ebean.createSqlQuery(sql)
+    OffsetDateTime minCreated = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .findSingleAttribute(OffsetDateTime.class);
 
@@ -144,7 +145,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select id, name, status from o_customer where name = ?";
 
-    CustDto rob = Ebean.createSqlQuery(sql)
+    CustDto rob = DB.sqlQuery(sql)
       .setParameter(1, "Rob")
       .findOne(CUST_MAPPER);
 
@@ -158,7 +159,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select id, name, status from o_customer order by name desc";
 
-    List<CustDto> dtos = Ebean.createSqlQuery(sql)
+    List<CustDto> dtos = DB.sqlQuery(sql)
       .findList(CUST_MAPPER);
 
     assertThat(dtos).isNotEmpty();
@@ -173,7 +174,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     AtomicLong count = new AtomicLong();
 
-    Ebean.createSqlQuery(sql)
+    DB.sqlQuery(sql)
       .findEachRow((resultSet, rowNum) -> {
         count.incrementAndGet();
 
@@ -193,7 +194,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     String sql = "select max(id) from o_customer where name != ?";
 
-    long maxId = Ebean.createSqlQuery(sql)
+    long maxId = DB.sqlQuery(sql)
       .setParameter(1, "Rob")
       .findOne((resultSet, rowNum) -> resultSet.getLong(1));
 
@@ -206,7 +207,7 @@ public class SqlQueryTests extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql = "select * -- \n from o_customer";
-    SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+    SqlQuery sqlQuery = DB.sqlQuery(sql);
 
     List<SqlRow> list = sqlQuery.findList();
     assertThat(list).isNotEmpty();
@@ -218,7 +219,7 @@ public class SqlQueryTests extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql = "select 'hello\nthere' as hello from o_customer";
-    SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+    SqlQuery sqlQuery = DB.sqlQuery(sql);
 
     List<SqlRow> list = sqlQuery.findList();
     assertThat(list).isNotEmpty();
@@ -231,7 +232,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("Select * from o_order");
+    SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order");
     sqlQuery.setFirstRow(3);
     sqlQuery.setMaxRows(10);
 
@@ -260,7 +261,7 @@ public class SqlQueryTests extends BaseTestCase {
 
       ResetBasicData.reset();
 
-      SqlQuery sqlQuery = Ebean.createSqlQuery("Select * from o_order order by id");
+      SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order order by id");
       sqlQuery.setFirstRow(3);
 
       LoggedSqlCollector.start();
@@ -276,7 +277,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("Select * from o_order order by id");
+    SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order order by id");
     sqlQuery.setMaxRows(10);
 
     LoggedSqlCollector.start();
@@ -299,7 +300,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     resetAllMetrics();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order where o_order.id > :id order by id")
+    SqlQuery sqlQuery = DB.sqlQuery("select * from o_order where o_order.id > :id order by id")
       .setParameter("id", 3)
       .setMaxRows(10)
       .setLabel("findList-3-10");
@@ -327,7 +328,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     resetAllMetrics();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("Select * from o_order")
+    SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order")
       .setMaxRows(10)
       .setLabel("findEach-Max10Rows");
 
@@ -357,7 +358,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     final AtomicInteger count = new AtomicInteger();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order");
+    SqlQuery sqlQuery = DB.sqlQuery("select * from o_order");
     sqlQuery.findEach(bean -> count.incrementAndGet());
 
     assertEquals(expectedRows, count.get());
@@ -370,7 +371,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     final AtomicInteger count = new AtomicInteger();
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order order by id");
+    SqlQuery sqlQuery = DB.sqlQuery("select * from o_order order by id");
     sqlQuery.findEachWhile(bean -> {
       count.incrementAndGet();
       Integer id = bean.getInteger("id");

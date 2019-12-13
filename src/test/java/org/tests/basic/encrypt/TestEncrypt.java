@@ -68,7 +68,7 @@ public class TestEncrypt extends BaseTestCase {
 
     DB.save(e);
 
-    SqlRow row = DB.createSqlQuery("select * from e_basicenc where id = :id")
+    SqlRow row = DB.sqlQuery("select * from e_basicenc where id = :id")
       .setParameter("id", e.getId())
       .findOne();
 

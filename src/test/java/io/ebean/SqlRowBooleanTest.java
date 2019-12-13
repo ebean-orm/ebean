@@ -11,15 +11,15 @@ public class SqlRowBooleanTest extends BaseTestCase {
 
     SqlQuery sqlQuery;
     if (isSqlServer()) {
-      sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL");
+      sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL");
     } else if (isOracle() || isNuoDb()) {
-      sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL from dual");
+      sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL from dual");
     } else if (isDb2()) {
-      sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL from SYSIBM.SYSDUMMY1");
+      sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL from SYSIBM.SYSDUMMY1");
     } else if (isHana()) {
-      sqlQuery = Ebean.createSqlQuery("SELECT 1 AS ISNT_NULL from sys.dummy");
+      sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL from sys.dummy");
     } else {
-      sqlQuery = Ebean.createSqlQuery("SELECT 1 IS NOT NULL AS ISNT_NULL");
+      sqlQuery = DB.sqlQuery("SELECT 1 IS NOT NULL AS ISNT_NULL");
     }
     SqlRow row = sqlQuery.findOne();
     Boolean value = row.getBoolean("ISNT_NULL");

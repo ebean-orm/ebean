@@ -1,6 +1,7 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.DuplicateKeyException;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
@@ -24,7 +25,7 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
       .setParams(id, "hi", 1)
       .executeNow();
 
-    UUID foundId = Ebean.createSqlQuery("select id from uuone where id = ?")
+    UUID foundId = DB.sqlQuery("select id from uuone where id = ?")
       .setParams(id)
       .findSingleAttribute(UUID.class);
 

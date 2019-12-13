@@ -38,7 +38,7 @@ public class TestBinaryUUID extends BaseTestCase {
     assertEquals(one1.getName(), fetch1.getName());
 
     String sql = "select id, name from uuone";
-    List<SqlRow> list = DB.createSqlQuery(sql).findList();
+    List<SqlRow> list = DB.sqlQuery(sql).findList();
     for (SqlRow sqlRow : list) {
       Object sqlId = sqlRow.get("id");
       assertNotNull(sqlId);

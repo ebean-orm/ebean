@@ -1,5 +1,6 @@
 package org.tests.refresh;
 
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.SqlRow;
 import io.ebean.TransactionalTestCase;
@@ -61,7 +62,7 @@ public class TestRefreshWithMany extends TransactionalTestCase {
       .setParameter("first", "-alt")
       .execute();
 
-    List<SqlRow> sqlRows = Ebean.createSqlQuery("select id, first_name, last_name from contact").findList();
+    List<SqlRow> sqlRows = DB.sqlQuery("select id, first_name, last_name from contact").findList();
     for (SqlRow sqlRow : sqlRows) {
       sqlRow.get("id");
       sqlRow.get("first_name");

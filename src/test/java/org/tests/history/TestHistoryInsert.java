@@ -1,7 +1,7 @@
 package org.tests.history;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Transaction;
@@ -32,7 +32,7 @@ public class TestHistoryInsert extends BaseTestCase {
     user.setEmail("one@email.com");
     user.setPasswordHash("someHash");
 
-    Ebean.save(user);
+    DB.save(user);
     logger.info("-- initial save");
 
     Thread.sleep(DB_CLOCK_DELTA); // wait, so that our system clock can catch up
@@ -41,20 +41,20 @@ public class TestHistoryInsert extends BaseTestCase {
     List<SqlRow> history = fetchHistory(user);
     assertThat(history).isEmpty();
 
-    List<Version<User>> versions = Ebean.find(User.class).setId(user.getId()).findVersions();
+    List<Version<User>> versions = DB.find(User.class).setId(user.getId()).findVersions();
     assertThat(versions).hasSize(1);
 
     user.setName("Jim v2");
     user.setPasswordHash("anotherHash");
     Thread.sleep(50); // wait, to ensure that whenModified differs
     logger.info("-- update v2");
-    Ebean.save(user);
+    DB.save(user);
 
     history = fetchHistory(user);
     assertThat(history).hasSize(1);
     assertThat(history.get(0).getString("name")).isEqualTo("Jim");
 
-    versions = Ebean.find(User.class).setId(user.getId()).findVersions();
+    versions = DB.find(User.class).setId(user.getId()).findVersions();
     assertThat(versions).hasSize(2);
     assertThat(versions.get(0).getDiff()).containsKeys("name", "version", "whenModified");
 
@@ -63,25 +63,25 @@ public class TestHistoryInsert extends BaseTestCase {
     Thread.sleep(50); // otherwise the timestamp of "whenModified" may not change
 
     logger.info("-- update v3");
-    Ebean.save(user);
+    DB.save(user);
 
     history = fetchHistory(user);
     assertThat(history).hasSize(2);
     assertThat(history.get(1).getString("name")).isEqualTo("Jim v2");
     assertThat(history.get(1).getString("email")).isEqualTo("one@email.com");
 
-    versions = Ebean.find(User.class).setId(user.getId()).findVersions();
+    versions = DB.find(User.class).setId(user.getId()).findVersions();
     assertThat(versions).hasSize(3);
     assertThat(versions.get(0).getDiff()).containsKeys("name", "email", "version", "whenModified");
 
     logger.info("-- delete");
-    Ebean.delete(user);
+    DB.delete(user);
 
-    User earlyVersion = Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
+    User earlyVersion = DB.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
     assertThat(earlyVersion.getName()).isEqualTo("Jim");
     assertThat(earlyVersion.getEmail()).isEqualTo("one@email.com");
 
-    Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
+    DB.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
 
     logger.info("-- last fetchHistory");
 
@@ -90,7 +90,7 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(history.get(2).getString("name")).isEqualTo("Jim v3");
     assertThat(history.get(2).getString("email")).isEqualTo("three@email.com");
 
-    versions = Ebean.find(User.class).setId(user.getId()).findVersions();
+    versions = DB.find(User.class).setId(user.getId()).findVersions();
     assertThat(versions).hasSize(3);
   }
 
@@ -103,28 +103,28 @@ public class TestHistoryInsert extends BaseTestCase {
     user.setEmail("first@email.com");
     user.setPasswordHash("someHash");
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
       // insert and many updates inside transaction
-      Ebean.save(user);
+      DB.save(user);
       user.setEmail("first2@email.com");
-      Ebean.save(user);
+      DB.save(user);
       user.setEmail("first3@email.com");
-      Ebean.save(user);
+      DB.save(user);
       user.setEmail("first4@email.com");
-      Ebean.save(user);
+      DB.save(user);
 
       transaction.commit();
     }
 
     // a couple more updates outside of the first transaction
     user.setEmail("first5@email.com");
-    Ebean.save(user);
+    DB.save(user);
 
     user.setEmail("first6@email.com");
-    Ebean.save(user);
+    DB.save(user);
 
     List<SqlRow> sqlRows =
-      Ebean.createSqlQuery("select lower(sys_period) lowerBound, upper(sys_period) upperBound from c_user_history where id = :id order by when_modified")
+      DB.sqlQuery("select lower(sys_period) lowerBound, upper(sys_period) upperBound from c_user_history where id = :id order by when_modified")
         .setParameter("id", user.getId())
         .findList();
 
@@ -144,7 +144,7 @@ public class TestHistoryInsert extends BaseTestCase {
    * Use SqlQuery to query the history table directly.
    */
   private List<SqlRow> fetchHistory(User user) {
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from c_user_history where id = :id order by when_modified");
+    SqlQuery sqlQuery = DB.sqlQuery("select * from c_user_history where id = :id order by when_modified");
     sqlQuery.setParameter("id", user.getId());
     return sqlQuery.findList();
   }

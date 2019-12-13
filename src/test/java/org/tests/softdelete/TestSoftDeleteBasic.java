@@ -1,6 +1,7 @@
 package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlQuery;
@@ -92,7 +93,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     Ebean.delete(bean);
 
-    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from ebasic_soft_delete where id=?");
+    SqlQuery sqlQuery = DB.sqlQuery("select * from ebasic_soft_delete where id=?");
     sqlQuery.setParameter(1, bean.getId());
     SqlRow sqlRow = sqlQuery.findOne();
     assertThat(sqlRow).isNotNull();

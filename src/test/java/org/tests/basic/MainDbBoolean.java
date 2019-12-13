@@ -130,7 +130,7 @@ public class MainDbBoolean {
     Assert.assertFalse(!list.get(0).isActive());
 
     String sql = "select id, name, active from t_oneb order by id";
-    List<SqlRow> sqlRows = server.createSqlQuery(sql).findList();
+    List<SqlRow> sqlRows = server.sqlQuery(sql).findList();
     Assert.assertTrue(sqlRows.size() == 2);
     Object active0 = sqlRows.get(0).get("active");
     Object active1 = sqlRows.get(1).get("active");

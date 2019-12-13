@@ -1,6 +1,7 @@
 package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
       assertThat(sql.get(1)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
     }
 
-    int intersectionRows = Ebean.createSqlQuery("select count(*) as total from mkeygroup_monkey where mkeygroup_pid = ?")
+    int intersectionRows = DB.sqlQuery("select count(*) as total from mkeygroup_monkey where mkeygroup_pid = ?")
       .setParameter(1, troop.getPid())
       .findOne()
       .getInteger("total");

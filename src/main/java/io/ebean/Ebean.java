@@ -865,6 +865,8 @@ public final class Ebean {
   }
 
   /**
+   * Deprecated - migrate to DB.sqlQuery().
+   * <p>
    * Create a SqlQuery for executing native sql
    * query statements.
    * <p>
@@ -872,8 +874,9 @@ public final class Ebean {
    * annotation for examples.
    * </p>
    */
+  @Deprecated
   public static SqlQuery createSqlQuery(String sql) {
-    return serverMgr.getDefaultServer().createSqlQuery(sql);
+    return serverMgr.getDefaultServer().sqlQuery(sql);
   }
 
   /**

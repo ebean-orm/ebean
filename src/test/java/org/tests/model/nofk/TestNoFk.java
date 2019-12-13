@@ -1,6 +1,7 @@
 package org.tests.model.nofk;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.SqlRow;
 import io.ebean.bean.EntityBean;
@@ -92,7 +93,7 @@ public class TestNoFk extends BaseTestCase {
     assertThat(Ebean.find(EUserNoFk.class).findCount()).isEqualTo(2);
     assertThat(Ebean.find(EUserNoFkSoftDel.class).findCount()).isEqualTo(2);
 
-    SqlRow row = Ebean.createSqlQuery("select count(*) as cnt from efile_no_fk_euser_no_fk").findOne();
+    SqlRow row = DB.sqlQuery("select count(*) as cnt from efile_no_fk_euser_no_fk").findOne();
     assertThat(row.getInteger("cnt")).isEqualTo(3);
     // We should have this data in the database:
     //
@@ -120,7 +121,7 @@ public class TestNoFk extends BaseTestCase {
     assertThat(file2.getFileName()).isEqualTo("java");
 
     // File1 is owned by "root"
-    EntityBeanIntercept ownerEbi = ((EntityBean)file1.getOwner())._ebean_getIntercept();
+    EntityBeanIntercept ownerEbi = ((EntityBean) file1.getOwner())._ebean_getIntercept();
     assertThat(file1.getOwner().getUserId()).isEqualTo(1);
     assertTrue(ownerEbi.isReference());
     assertTrue(ownerEbi.isPartial());
@@ -130,12 +131,11 @@ public class TestNoFk extends BaseTestCase {
     assertFalse(ownerEbi.isPartial());  // and expect, that bean is fully loaded
 
 
-
     // File2 is owned by user #500, but user account does not exist
-    ownerEbi = ((EntityBean)file2.getOwner())._ebean_getIntercept();
+    ownerEbi = ((EntityBean) file2.getOwner())._ebean_getIntercept();
 
     assertThat(file2.getOwner().getUserId()).isEqualTo(500);
-    assertThatThrownBy(()->file2.getOwner().getUserName())
+    assertThatThrownBy(() -> file2.getOwner().getUserName())
       .isInstanceOf(EntityNotFoundException.class)
       .hasMessageContaining("id:500 - Bean has been deleted");
 
@@ -157,7 +157,7 @@ public class TestNoFk extends BaseTestCase {
     assertThat(file2.getFileName()).isEqualTo("java");
 
     // File1 is owned by "root"
-    EntityBeanIntercept ownerEbi = ((EntityBean)file1.getOwner())._ebean_getIntercept();
+    EntityBeanIntercept ownerEbi = ((EntityBean) file1.getOwner())._ebean_getIntercept();
     assertFalse(ownerEbi.isReference());
     assertFalse(ownerEbi.isPartial());
 
@@ -165,10 +165,10 @@ public class TestNoFk extends BaseTestCase {
     assertThat(file1.getOwner().getUserName()).isEqualTo("root");
 
     // File2 is owned by user #500, but user account does not exist
-    ownerEbi = ((EntityBean)file2.getOwner())._ebean_getIntercept();
+    ownerEbi = ((EntityBean) file2.getOwner())._ebean_getIntercept();
 
     assertThat(file2.getOwner().getUserId()).isEqualTo(500);
-    assertThatThrownBy(()->file2.getOwner().getUserName())
+    assertThatThrownBy(() -> file2.getOwner().getUserName())
       .isInstanceOf(EntityNotFoundException.class)
       .hasMessageContaining("id:500 - Bean has been deleted");
 
@@ -201,8 +201,8 @@ public class TestNoFk extends BaseTestCase {
   @Test
   public void testEagerLoadOwner() {
     List<EUserNoFk> owners = Ebean.find(EUserNoFk.class)
-        .fetch("files")
-        .findList();
+      .fetch("files")
+      .findList();
     assertThat(owners).hasSize(2);
 
     EUserNoFk owner1 = owners.get(0);
@@ -232,7 +232,7 @@ public class TestNoFk extends BaseTestCase {
     assertThat(file2.getFileName()).isEqualTo("java");
 
     // File1 is owned by "root"
-    EntityBeanIntercept ownerEbi = ((EntityBean)file1.getOwnerSoftDel())._ebean_getIntercept();
+    EntityBeanIntercept ownerEbi = ((EntityBean) file1.getOwnerSoftDel())._ebean_getIntercept();
     assertThat(file1.getOwnerSoftDel().getUserId()).isEqualTo(1);
     assertTrue(ownerEbi.isReference());
     assertTrue(ownerEbi.isPartial());
@@ -246,7 +246,7 @@ public class TestNoFk extends BaseTestCase {
 
 
     // File2 is owned by user #500, but user account does not exist
-    ownerEbi = ((EntityBean)file2.getOwnerSoftDel())._ebean_getIntercept();
+    ownerEbi = ((EntityBean) file2.getOwnerSoftDel())._ebean_getIntercept();
 
     assertThat(file2.getOwnerSoftDel().getUserId()).isEqualTo(500);
     assertThat(file2.getOwnerSoftDel().isDeleted()).isEqualTo(true);
@@ -269,7 +269,7 @@ public class TestNoFk extends BaseTestCase {
     assertThat(file2.getFileName()).isEqualTo("java");
 
     // File1 is owned by "root"
-    EntityBeanIntercept ownerEbi = ((EntityBean)file1.getOwnerSoftDel())._ebean_getIntercept();
+    EntityBeanIntercept ownerEbi = ((EntityBean) file1.getOwnerSoftDel())._ebean_getIntercept();
     assertFalse(ownerEbi.isReference());
     assertFalse(ownerEbi.isPartial());
 
@@ -278,7 +278,7 @@ public class TestNoFk extends BaseTestCase {
     assertThat(file1.getOwnerSoftDel().getUserName()).isEqualTo("root");
 
     // File2 is owned by user #500, but user account does not exist
-    ownerEbi = ((EntityBean)file2.getOwnerSoftDel())._ebean_getIntercept();
+    ownerEbi = ((EntityBean) file2.getOwnerSoftDel())._ebean_getIntercept();
 //    assertFalse(ownerEbi.isReference());
 //    assertFalse(ownerEbi.isPartial());
 
@@ -312,8 +312,8 @@ public class TestNoFk extends BaseTestCase {
   @Test
   public void testEagerLoadOwnerSoftDel() {
     List<EUserNoFkSoftDel> owners = Ebean.find(EUserNoFkSoftDel.class)
-        .fetch("files")
-        .findList();
+      .fetch("files")
+      .findList();
     assertThat(owners).hasSize(2);
 
     EUserNoFkSoftDel owner1 = owners.get(0);
@@ -386,7 +386,7 @@ public class TestNoFk extends BaseTestCase {
 
 
     assertThat(file2.getEditors().get(2).getUserId()).isEqualTo(501);
-    assertThatThrownBy(()->file2.getEditors().get(2).getUserName())
+    assertThatThrownBy(() -> file2.getEditors().get(2).getUserName())
       .isInstanceOf(EntityNotFoundException.class)
       .hasMessageContaining("id:501 - Bean has been deleted");
 

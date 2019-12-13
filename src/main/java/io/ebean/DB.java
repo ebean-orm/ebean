@@ -736,8 +736,11 @@ public class DB {
   }
 
   /**
+   * Deprecated - migrate to sqlQuery().
+   * <p>
    * This is an alias for {@link #sqlQuery(String)}.
    */
+  @Deprecated
   public static SqlQuery createSqlQuery(String sql) {
     return sqlQuery(sql);
   }
