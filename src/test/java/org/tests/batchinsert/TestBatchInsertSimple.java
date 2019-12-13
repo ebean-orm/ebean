@@ -1,6 +1,7 @@
 package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
@@ -208,4 +209,21 @@ public class TestBatchInsertSimple extends BaseTestCase {
     return detail;
   }
 
+  @Test(expected = Test.None.class)// no exception expected
+  public void npe_addBatch_withoutAnyBindParams() {
+    try (Transaction txn = DB.beginTransaction()) {
+      // don't write code like this please ...
+      DB.sqlUpdate("update ut_master set name='DoNotDoThisPlease' where id=999999999").addBatch();
+      txn.commit();
+    }
+
+    // don't write code like the above but use bind values like:
+    try (Transaction txn = DB.beginTransaction()) {
+      DB.sqlUpdate("update ut_master set name=? where id=?")
+        .setParams("DoNotDoThisPlease", 999999999)
+        .addBatch();
+
+      txn.commit();
+    }
+  }
 }

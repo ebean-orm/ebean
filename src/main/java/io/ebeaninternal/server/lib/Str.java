@@ -13,14 +13,20 @@ public class Str {
   public static String add(String s0, String s1, String... args) {
 
     // determine a decent buffer size
-    int len = 16 + s0.length() + s1.length();
+    int len = 16 + s0.length();
+    if (s1 != null) {
+      len += s1.length();
+    }
     for (String arg1 : args) {
       len += (arg1 == null) ? 0 : arg1.length();
     }
 
     // append all the strings into the buffer
     StringBuilder sb = new StringBuilder(len);
-    sb.append(s0).append(s1);
+    sb.append(s0);
+    if (s1 != null) {
+      sb.append(s1);
+    }
     for (String arg : args) {
       if (arg != null) {
         sb.append(arg);
