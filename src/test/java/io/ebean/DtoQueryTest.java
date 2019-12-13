@@ -164,7 +164,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     List<Integer> ids = Arrays.asList(999999999, 999999998);
 
-    int rows = server().createSqlUpdate("update o_customer set name = ? where id = any(?)")
+    int rows = server().sqlUpdate("update o_customer set name = ? where id = any(?)")
       .setParameter(1, "Junk")
       .setParameter(2, ids)
       .execute();

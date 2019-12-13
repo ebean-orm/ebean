@@ -462,7 +462,7 @@ public final class Ebean {
    * <pre>{@code
    *   public class Order { ...
    *
-   * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
+   *     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
    * 	   List<OrderDetail> details;
    * 	   ...
    *   }
@@ -877,17 +877,18 @@ public final class Ebean {
   }
 
   /**
+   * Deprecated - migrate to DB.sqlUpdate().
+   * <p>
    * Create a sql update for executing native dml statements.
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
    * be native to the database and contain database table and column names.
-   * </p>
    * <p>
    * See {@link SqlUpdate} for example usage.
-   * </p>
    */
+  @Deprecated
   public static SqlUpdate createSqlUpdate(String sql) {
-    return serverMgr.getDefaultServer().createSqlUpdate(sql);
+    return serverMgr.getDefaultServer().sqlUpdate(sql);
   }
 
   /**
@@ -1193,7 +1194,7 @@ public final class Ebean {
    * 	   public void run() {
    * 		   User u1 = Ebean.find(User.class, 1);
    * 		   ...
-   * 	   }
+   *     }
    *   });
    *
    * }</pre>
@@ -1245,7 +1246,7 @@ public final class Ebean {
    * 		   User u1 = Ebean.find(User.class, 1);
    * 		   ...
    * 		   return u1.getEmail();
-   * 	   }
+   *     }
    *   });
    *
    * }</pre>

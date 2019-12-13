@@ -60,9 +60,9 @@ public class ResetBasicData {
     Ebean.execute(() -> {
 
       // orm update use bean name and bean properties
-      server.createSqlUpdate("delete from o_cached_bean_child").execute();
-      server.createSqlUpdate("delete from o_cached_bean_country").execute();
-      server.createSqlUpdate("delete from o_cached_bean").execute();
+      server.sqlUpdate("delete from o_cached_bean_child").execute();
+      server.sqlUpdate("delete from o_cached_bean_country").execute();
+      server.sqlUpdate("delete from o_cached_bean").execute();
 
       server.createUpdate(OrderShipment.class, "delete from orderShipment").execute();
 
@@ -77,8 +77,8 @@ public class ResetBasicData {
       server.createUpdate(Address.class, "delete from address").execute();
 
       // sql update uses table and column names
-      server.createSqlUpdate("delete from o_country").execute();
-      server.createSqlUpdate("delete from o_product").execute();
+      server.sqlUpdate("delete from o_country").execute();
+      server.sqlUpdate("delete from o_product").execute();
 
     });
   }

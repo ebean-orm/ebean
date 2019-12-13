@@ -23,8 +23,8 @@ public class SqlServerStepSequenceTest extends BaseTestCase {
   public void seq() {
 
 
-    server().createSqlUpdate("drop sequence if exists sqls_testseq_9876").execute();
-    server().createSqlUpdate("create sequence sqls_testseq_9876 start with 1 increment by 50").execute();
+    server().sqlUpdate("drop sequence if exists sqls_testseq_9876").execute();
+    server().sqlUpdate("create sequence sqls_testseq_9876 start with 1 increment by 50").execute();
 
     BackgroundExecutor be = server().getBackgroundExecutor();
     DataSource ds = server().getPluginApi().getDataSource();

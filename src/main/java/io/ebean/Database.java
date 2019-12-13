@@ -3,7 +3,6 @@ package io.ebean;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
@@ -485,8 +484,11 @@ public interface Database {
   SqlUpdate sqlUpdate(String sql);
 
   /**
+   * Deprecated - migrate to sqlUpdate().
+   * <p>
    * This is an alias for {@link #sqlUpdate(String)}.
    */
+  @Deprecated
   SqlUpdate createSqlUpdate(String sql);
 
   /**
@@ -856,7 +858,7 @@ public interface Database {
    * <pre>{@code
    *   public class Order { ...
    *
-   * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
+   *     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
    * 	   List<OrderDetail> details;
    * 	   ...
    *   }
@@ -1051,7 +1053,6 @@ public interface Database {
    *   Integer returnValue = (Integer) cs.getObject(3);
    *
    * }</pre>
-   *
    */
   int execute(CallableSql callableSql);
 
@@ -1299,7 +1300,7 @@ public interface Database {
    * 	   public void run() {
    * 		   User u1 = database.find(User.class, 1);
    * 		   ...
-   * 	   }
+   *     }
    *   });
    *
    * }</pre>
@@ -1348,7 +1349,7 @@ public interface Database {
    * 		   User u1 = database.find(User.class, 1);
    * 		   ...
    * 		   return u1.getEmail();
-   * 	   }
+   *     }
    *   });
    *
    * }</pre>

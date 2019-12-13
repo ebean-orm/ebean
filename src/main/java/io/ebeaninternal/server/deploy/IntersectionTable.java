@@ -21,14 +21,14 @@ public class IntersectionTable {
    * Return a SqlUpdate for inserting into the intersection table.
    */
   public SqlUpdate insert(EbeanServer server, boolean draft) {
-    return server.createSqlUpdate(draft ? draftInsertSql : insertSql);
+    return server.sqlUpdate(draft ? draftInsertSql : insertSql);
   }
 
   /**
    * Return a SqlUpdate for deleting from the intersection table.
    */
   public SqlUpdate delete(EbeanServer server, boolean draft) {
-    return server.createSqlUpdate(draft ? draftDeleteSql : deleteSql);
+    return server.sqlUpdate(draft ? draftDeleteSql : deleteSql);
   }
 
 }

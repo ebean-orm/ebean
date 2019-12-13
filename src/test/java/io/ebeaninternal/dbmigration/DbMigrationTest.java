@@ -88,15 +88,15 @@ public class DbMigrationTest extends BaseTestCase {
     runScript(false, "1.0__initial.sql");
 
     if (isOracle() || isHana()) {
-      SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
+      SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
       update.setParameter("false", false);
       assertThat(server().execute(update)).isEqualTo(1);
 
-      update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (2, :true, 1)");
+      update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (2, :true, 1)");
       update.setParameter("true", true);
       assertThat(server().execute(update)).isEqualTo(1);
     } else {
-      SqlUpdate update = server().createSqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
+      SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
       update.setParameter("false", false);
       update.setParameter("true", true);
 
@@ -157,34 +157,34 @@ public class DbMigrationTest extends BaseTestCase {
    *
    */
   private void createHistoryEntities() {
-    SqlUpdate update = server().createSqlUpdate("insert into migtest_e_history (id, test_string) values (1, '42')");
+    SqlUpdate update = server().sqlUpdate("insert into migtest_e_history (id, test_string) values (1, '42')");
     assertThat(server().execute(update)).isEqualTo(1);
-    update = server().createSqlUpdate("update migtest_e_history set test_string = '45' where id = 1");
-    assertThat(server().execute(update)).isEqualTo(1);
-
-    update = server().createSqlUpdate("insert into migtest_e_history2 (id, test_string, obsolete_string1, obsolete_string2) values (1, 'foo', 'bar', null)");
-    assertThat(server().execute(update)).isEqualTo(1);
-    update = server().createSqlUpdate("update migtest_e_history2 set test_string = 'baz' where id = 1");
+    update = server().sqlUpdate("update migtest_e_history set test_string = '45' where id = 1");
     assertThat(server().execute(update)).isEqualTo(1);
 
-    update = server().createSqlUpdate("insert into migtest_e_history3 (id, test_string) values (1, '42')");
+    update = server().sqlUpdate("insert into migtest_e_history2 (id, test_string, obsolete_string1, obsolete_string2) values (1, 'foo', 'bar', null)");
     assertThat(server().execute(update)).isEqualTo(1);
-    update = server().createSqlUpdate("update migtest_e_history3 set test_string = '45' where id = 1");
-    assertThat(server().execute(update)).isEqualTo(1);
-
-    update = server().createSqlUpdate("insert into migtest_e_history4 (id, test_number) values (1, 42)");
-    assertThat(server().execute(update)).isEqualTo(1);
-    update = server().createSqlUpdate("update migtest_e_history4 set test_number = 45 where id = 1");
+    update = server().sqlUpdate("update migtest_e_history2 set test_string = 'baz' where id = 1");
     assertThat(server().execute(update)).isEqualTo(1);
 
-    update = server().createSqlUpdate("insert into migtest_e_history5 (id, test_number) values (1, 42)");
+    update = server().sqlUpdate("insert into migtest_e_history3 (id, test_string) values (1, '42')");
     assertThat(server().execute(update)).isEqualTo(1);
-    update = server().createSqlUpdate("update migtest_e_history5 set test_number = 45 where id = 1");
+    update = server().sqlUpdate("update migtest_e_history3 set test_string = '45' where id = 1");
     assertThat(server().execute(update)).isEqualTo(1);
 
-    update = server().createSqlUpdate("insert into migtest_e_history6 (id, test_number1, test_number2) values (1, 2, 7)");
+    update = server().sqlUpdate("insert into migtest_e_history4 (id, test_number) values (1, 42)");
     assertThat(server().execute(update)).isEqualTo(1);
-    update = server().createSqlUpdate("update migtest_e_history6 set test_number2 = 45 where id = 1");
+    update = server().sqlUpdate("update migtest_e_history4 set test_number = 45 where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().sqlUpdate("insert into migtest_e_history5 (id, test_number) values (1, 42)");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().sqlUpdate("update migtest_e_history5 set test_number = 45 where id = 1");
+    assertThat(server().execute(update)).isEqualTo(1);
+
+    update = server().sqlUpdate("insert into migtest_e_history6 (id, test_number1, test_number2) values (1, 2, 7)");
+    assertThat(server().execute(update)).isEqualTo(1);
+    update = server().sqlUpdate("update migtest_e_history6 set test_number2 = 45 where id = 1");
     assertThat(server().execute(update)).isEqualTo(1);
   }
 

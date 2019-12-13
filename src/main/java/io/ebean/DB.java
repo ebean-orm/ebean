@@ -760,8 +760,11 @@ public class DB {
   }
 
   /**
+   * Deprecated - migrate to sqlUpdate().
+   * <p>
    * This is an alias for {@link #sqlUpdate(String)}.
    */
+  @Deprecated
   public static SqlUpdate createSqlUpdate(String sql) {
     return sqlUpdate(sql);
   }
