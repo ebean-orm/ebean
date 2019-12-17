@@ -2,6 +2,7 @@ package org.tests.model.array;
 
 
 import io.ebean.annotation.DbArray;
+import io.ebean.annotation.NotNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -28,7 +29,7 @@ public class EArrayBean {
   @DbArray(length = 300)
   List<String> phoneNumbers = new ArrayList<>();
 
-  @DbArray
+  @DbArray @NotNull
   List<UUID> uids = new ArrayList<>();
 
   @DbArray

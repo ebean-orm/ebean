@@ -172,7 +172,6 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.setName("some nulls");
     bean.setPhoneNumbers(null);
     bean.setOtherIds(null);
-    bean.setUids(null);
 
     Ebean.save(bean);
     Ebean.delete(bean);
