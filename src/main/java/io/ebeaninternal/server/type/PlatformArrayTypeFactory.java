@@ -10,10 +10,10 @@ public interface PlatformArrayTypeFactory {
   /**
    * Return the ScalarType to handle DB ARRAY for the given element type.
    */
-  ScalarType<?> typeFor(Type valueType);
+  ScalarType<?> typeFor(Type valueType, boolean nullable);
 
   /**
    * Return the ScalarType to handle DB ARRAY for the given enum element type.
    */
-  ScalarType<?> typeForEnum(ScalarType<?> scalarType);
+  ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable);
 }

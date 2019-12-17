@@ -63,7 +63,7 @@ public interface TypeManager {
   /**
    * Return the ScalarType used to handle DB ARRAY.
    */
-  ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType);
+  ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType, boolean nullable);
 
   /**
    * Return the ScalarType used to handle HSTORE (Map<String,String>).

@@ -17,27 +17,28 @@ import java.util.List;
  * Types for mapping List in JSON format to DB types VARCHAR, JSON and JSONB.
  */
 public class ScalarTypeJsonList {
+
   /**
    * Return the appropriate ScalarType based requested dbType and if Postgres.
    */
-  public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType) {
+  public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSONB:
-          return new ScalarTypeJsonList.JsonB(docType);
+          return new ScalarTypeJsonList.JsonB(docType, nullable);
         case DbPlatformType.JSON:
-          return new ScalarTypeJsonList.Json(docType);
+          return new ScalarTypeJsonList.Json(docType, nullable);
       }
     }
-    return new ScalarTypeJsonList.Varchar(docType);
+    return new ScalarTypeJsonList.Varchar(docType, nullable);
   }
 
   /**
    * List mapped to DB VARCHAR.
    */
   public static class Varchar extends ScalarTypeJsonList.Base {
-    public Varchar(DocPropertyType docType) {
-      super(Types.VARCHAR, docType);
+    public Varchar(DocPropertyType docType, boolean nullable) {
+      super(Types.VARCHAR, docType, nullable);
     }
   }
 
@@ -45,8 +46,8 @@ public class ScalarTypeJsonList {
    * List mapped to Postgres JSON.
    */
   private static class Json extends ScalarTypeJsonList.PgBase {
-    public Json(DocPropertyType docType) {
-      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docType);
+    public Json(DocPropertyType docType, boolean nullable) {
+      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docType, nullable);
     }
   }
 
@@ -54,8 +55,8 @@ public class ScalarTypeJsonList {
    * List mapped to Postgres JSONB.
    */
   private static class JsonB extends ScalarTypeJsonList.PgBase {
-    public JsonB(DocPropertyType docType) {
-      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docType);
+    public JsonB(DocPropertyType docType, boolean nullable) {
+      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docType, nullable);
     }
   }
 
@@ -65,8 +66,8 @@ public class ScalarTypeJsonList {
   @SuppressWarnings("rawtypes")
   private abstract static class Base extends ScalarTypeJsonCollection<List> {
 
-    public Base(int dbType, DocPropertyType docType) {
-      super(List.class, dbType, docType);
+    public Base(int dbType, DocPropertyType docType, boolean nullable) {
+      super(List.class, dbType, docType, nullable);
     }
 
     @Override
@@ -81,18 +82,26 @@ public class ScalarTypeJsonList {
     }
 
     @Override
-    public void bind(DataBind b, List value) throws SQLException {
-
+    public void bind(DataBind bind, List value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.VARCHAR);
+        bindNull(bind);
       } else if (value.isEmpty()) {
-        b.setString("[]");
+        bind.setString("[]");
       } else {
         try {
-          b.setString(EJson.write(value));
+          bind.setString(EJson.write(value));
         } catch (IOException e) {
           throw new SQLException("Failed to format List into JSON content", e);
         }
+      }
+    }
+
+    @Override
+    protected void bindNull(DataBind bind) throws SQLException {
+      if (nullable) {
+        bind.setNull(Types.VARCHAR);
+      } else {
+        bind.setString("[]");
       }
     }
 
@@ -123,7 +132,6 @@ public class ScalarTypeJsonList {
     public void jsonWrite(JsonGenerator writer, List value) throws IOException {
       EJson.write(value, writer);
     }
-
   }
 
   /**
@@ -133,17 +141,24 @@ public class ScalarTypeJsonList {
 
     final String pgType;
 
-    PgBase(int jdbcType, String pgType, DocPropertyType docType) {
-      super(jdbcType, docType);
+    PgBase(int jdbcType, String pgType, DocPropertyType docType, boolean nullable) {
+      super(jdbcType, docType, nullable);
       this.pgType = pgType;
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public void bind(DataBind bind, List value) throws SQLException {
+      if (value == null) {
+        bindNull(bind);
+      } else {
+        bind.setObject(PostgresHelper.asObject(pgType, formatValue(value)));
+      }
+    }
 
-      String rawJson = (value == null) ? null : formatValue(value);
-      bind.setObject(PostgresHelper.asObject(pgType, rawJson));
+    @Override
+    protected void bindNull(DataBind bind) throws SQLException {
+      bind.setObject(PostgresHelper.asObject(pgType, nullable ? null : "[]"));
     }
   }
 

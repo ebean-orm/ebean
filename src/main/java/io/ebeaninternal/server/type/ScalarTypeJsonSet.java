@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -23,24 +23,24 @@ public class ScalarTypeJsonSet {
   /**
    * Return the appropriate ScalarType for the requested dbType and Postgres.
    */
-  public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docPropertyType) {
+  public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docPropertyType, boolean nullable) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSONB:
-          return new ScalarTypeJsonSet.JsonB(docPropertyType);
+          return new ScalarTypeJsonSet.JsonB(docPropertyType, nullable);
         case DbPlatformType.JSON:
-          return new ScalarTypeJsonSet.Json(docPropertyType);
+          return new ScalarTypeJsonSet.Json(docPropertyType, nullable);
       }
     }
-    return new ScalarTypeJsonSet.Varchar(docPropertyType);
+    return new ScalarTypeJsonSet.Varchar(docPropertyType, nullable);
   }
 
   /**
    * List mapped to DB VARCHAR.
    */
   public static class Varchar extends ScalarTypeJsonSet.Base {
-    public Varchar(DocPropertyType docPropertyType) {
-      super(Types.VARCHAR, docPropertyType);
+    public Varchar(DocPropertyType docPropertyType, boolean nullable) {
+      super(Types.VARCHAR, docPropertyType, nullable);
     }
   }
 
@@ -48,8 +48,8 @@ public class ScalarTypeJsonSet {
    * List mapped to Postgres JSON.
    */
   private static class Json extends ScalarTypeJsonSet.PgBase {
-    public Json(DocPropertyType docPropertyType) {
-      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docPropertyType);
+    public Json(DocPropertyType docPropertyType, boolean nullable) {
+      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docPropertyType, nullable);
     }
   }
 
@@ -57,8 +57,8 @@ public class ScalarTypeJsonSet {
    * List mapped to Postgres JSONB.
    */
   private static class JsonB extends ScalarTypeJsonSet.PgBase {
-    public JsonB(DocPropertyType docPropertyType) {
-      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docPropertyType);
+    public JsonB(DocPropertyType docPropertyType, boolean nullable) {
+      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docPropertyType, nullable);
     }
   }
 
@@ -68,8 +68,8 @@ public class ScalarTypeJsonSet {
   @SuppressWarnings("rawtypes")
   private abstract static class Base extends ScalarTypeJsonCollection<Set> {
 
-    public Base(int dbType, DocPropertyType docPropertyType) {
-      super(Set.class, dbType, docPropertyType);
+    public Base(int dbType, DocPropertyType docPropertyType, boolean nullable) {
+      super(Set.class, dbType, docPropertyType, nullable);
     }
 
     @Override
@@ -84,18 +84,26 @@ public class ScalarTypeJsonSet {
     }
 
     @Override
-    public void bind(DataBind b, Set value) throws SQLException {
-
+    public void bind(DataBind bind, Set value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.VARCHAR);
+        bindNull(bind);
       } else if (value.isEmpty()) {
-        b.setString("[]");
+        bind.setString("[]");
       } else {
         try {
-          b.setString(EJson.write(value));
+          bind.setString(EJson.write(value));
         } catch (IOException e) {
           throw new SQLException("Failed to format Set into JSON content", e);
         }
+      }
+    }
+
+    @Override
+    protected void bindNull(DataBind bind) throws SQLException {
+      if (nullable) {
+        bind.setNull(Types.VARCHAR);
+      } else {
+        bind.setString("[]");
       }
     }
 
@@ -140,17 +148,24 @@ public class ScalarTypeJsonSet {
 
     final String pgType;
 
-    PgBase(int jdbcType, String pgType, DocPropertyType docPropertyType) {
-      super(jdbcType, docPropertyType);
+    PgBase(int jdbcType, String pgType, DocPropertyType docPropertyType, boolean nullable) {
+      super(jdbcType, docPropertyType, nullable);
       this.pgType = pgType;
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public void bind(DataBind bind, Set value) throws SQLException {
+      if (value == null) {
+        bindNull(bind);
+      } else {
+        bind.setObject(PostgresHelper.asObject(pgType, formatValue(value)));
+      }
+    }
 
-      String rawJson = (value == null) ? null : formatValue(value);
-      bind.setObject(PostgresHelper.asObject(pgType, rawJson));
+    @Override
+    protected void bindNull(DataBind bind) throws SQLException {
+      bind.setObject(PostgresHelper.asObject(pgType, nullable ? null : "[]"));
     }
   }
 

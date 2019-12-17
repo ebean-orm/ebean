@@ -13,20 +13,19 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static java.util.Collections.EMPTY_SET;
 
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
-public class ScalarTypeArraySet<T> extends ScalarTypeArrayBase<Set<T>> implements ScalarTypeArray {
-
-  private static final ScalarTypeArraySet<UUID> UUID = new ScalarTypeArraySet<>("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-  private static final ScalarTypeArraySet<Long> LONG = new ScalarTypeArraySet<>("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-  private static final ScalarTypeArraySet<Integer> INTEGER = new ScalarTypeArraySet<>("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-  private static final ScalarTypeArraySet<Double> DOUBLE = new ScalarTypeArraySet<>("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static final ScalarTypeArraySet<String> STRING = new ScalarTypeArraySet<>("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeArray {
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();
@@ -34,54 +33,46 @@ public class ScalarTypeArraySet<T> extends ScalarTypeArrayBase<Set<T>> implement
 
   static class Factory implements PlatformArrayTypeFactory {
 
+    private final Map<String, ScalarTypeArraySet> cache = new HashMap<>();
+
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    public ScalarTypeArraySet<?> typeFor(Type valueType) {
-      if (valueType.equals(UUID.class)) {
-        return UUID;
+    public ScalarType<?> typeFor(Type valueType, boolean nullable) {
+      synchronized (this) {
+        String key = valueType + ":" + nullable;
+        if (valueType.equals(UUID.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
+        }
+        if (valueType.equals(Long.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG));
+        }
+        if (valueType.equals(Integer.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+        }
+        if (valueType.equals(Double.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+        }
+        if (valueType.equals(String.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+        }
+        throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       }
-      if (valueType.equals(Long.class)) {
-        return LONG;
-      }
-      if (valueType.equals(Integer.class)) {
-        return INTEGER;
-      }
-      if (valueType.equals(Double.class)) {
-        return DOUBLE;
-      }
-      if (valueType.equals(String.class)) {
-        return STRING;
-      }
-      throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping on list");
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public ScalarTypeArraySet typeForEnum(ScalarType<?> scalarType) {
-      final String arrayType;
-      switch (scalarType.getJdbcType()) {
-        case Types.INTEGER:
-          arrayType = "integer";
-          break;
-        case Types.VARCHAR:
-          arrayType = "varchar";
-          break;
-        default:
-          throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
-      }
-      return new ScalarTypeArraySet(arrayType, scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
+    public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
+      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
   private final String arrayType;
 
-  private final ArrayElementConverter<T> converter;
+  private final ArrayElementConverter converter;
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public ScalarTypeArraySet(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter<T> converter) {
-    super((Class) Set.class, Types.ARRAY, docPropertyType);
+  public ScalarTypeArraySet(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+    super(Set.class, Types.ARRAY, docPropertyType, nullable);
     this.arrayType = arrayType;
     this.converter = converter;
   }
@@ -100,29 +91,38 @@ public class ScalarTypeArraySet<T> extends ScalarTypeArrayBase<Set<T>> implement
   }
 
   @Override
-  protected Set<T> fromArray(Object[] array1) {
-    Set<T> set = new LinkedHashSet<>();
+  protected Set fromArray(Object[] array1) {
+    Set set = new LinkedHashSet();
     for (Object element : array1) {
       set.add(converter.toElement(element));
     }
-    return new ModifyAwareSet<>(set);
+    return new ModifyAwareSet(set);
   }
 
-  protected Object[] toArray(Set<T> value) {
+  protected Object[] toArray(Set value) {
     return converter.toDbArray(value.toArray());
   }
 
   @Override
-  public void bind(DataBind bind, Set<T> value) throws SQLException {
+  public void bind(DataBind bind, Set value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.ARRAY);
+      bindNull(bind);
     } else {
       bind.setArray(arrayType, toArray(value));
     }
   }
 
   @Override
-  public String formatValue(Set<T> value) {
+  protected void bindNull(DataBind bind) throws SQLException {
+    if (nullable) {
+      bind.setNull(Types.ARRAY);
+    } else {
+      bind.setArray(arrayType, toArray(EMPTY_SET));
+    }
+  }
+
+  @Override
+  public String formatValue(Set value) {
     try {
       return EJson.write(value);
     } catch (IOException e) {
@@ -131,7 +131,7 @@ public class ScalarTypeArraySet<T> extends ScalarTypeArrayBase<Set<T>> implement
   }
 
   @Override
-  public Set<T> parse(String value) {
+  public Set parse(String value) {
     try {
       return EJson.parseSet(value, false);
     } catch (IOException e) {
@@ -140,12 +140,12 @@ public class ScalarTypeArraySet<T> extends ScalarTypeArrayBase<Set<T>> implement
   }
 
   @Override
-  public Set<T> jsonRead(JsonParser parser) throws IOException {
+  public Set jsonRead(JsonParser parser) throws IOException {
     return EJson.parseSet(parser, parser.getCurrentToken());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Set<T> value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, Set value) throws IOException {
     EJson.write(value, writer);
   }
 

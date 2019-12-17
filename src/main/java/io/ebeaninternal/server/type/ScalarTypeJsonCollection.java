@@ -6,14 +6,29 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Types;
 
 abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements ScalarTypeArray {
 
-  protected DocPropertyType docPropertyType;
+  protected final DocPropertyType docPropertyType;
+  protected final boolean nullable;
 
-  public ScalarTypeJsonCollection(Class<T> type, int dbType, DocPropertyType docPropertyType) {
+  public ScalarTypeJsonCollection(Class<T> type, int dbType, DocPropertyType docPropertyType, boolean nullable) {
     super(type, false, dbType);
     this.docPropertyType = docPropertyType;
+    this.nullable = nullable;
+  }
+
+  /**
+   * Bind null or empty list (when not nullable).
+   */
+  protected void bindNull(DataBind bind) throws SQLException {
+    if (nullable) {
+      bind.setNull(Types.VARCHAR);
+    } else {
+      bind.setString("[]");
+    }
   }
 
   /**

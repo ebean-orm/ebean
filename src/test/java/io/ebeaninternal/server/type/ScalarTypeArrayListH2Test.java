@@ -1,22 +1,20 @@
 package io.ebeaninternal.server.type;
 
-
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.sql.SQLException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ScalarTypeArrayListTest extends BasePlatformArrayTypeFactoryTest {
+public class ScalarTypeArrayListH2Test extends BasePlatformArrayTypeFactoryTest {
 
-  private final PlatformArrayTypeFactory factory = ScalarTypeArrayList.factory();
+  private final PlatformArrayTypeFactory factory = ScalarTypeArrayListH2.factory();
 
   @Test
   public void notSameInstance() {
     assertThat(factory.typeFor(UUID.class, true))
-      .isSameAs(factory.typeFor(UUID.class, false));
+      .isNotSameAs(factory.typeFor(UUID.class, false));
   }
 
   @Test
@@ -29,16 +27,6 @@ public class ScalarTypeArrayListTest extends BasePlatformArrayTypeFactoryTest {
   public void sameInstance_when_nullable() {
     assertThat(factory.typeFor(UUID.class, true))
       .isSameAs(factory.typeFor(UUID.class, true));
-  }
-
-  @Test
-  public void read_when_null() throws SQLException {
-
-    DataReader mock = Mockito.mock(DataReader.class);
-    Mockito.when(mock.getArray()).thenReturn(null);
-
-    ScalarType<?> scalarType = ScalarTypeArrayList.factory().typeFor(Long.class, true);
-    scalarType.read(mock);
   }
 
   @Test

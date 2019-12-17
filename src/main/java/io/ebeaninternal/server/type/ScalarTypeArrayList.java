@@ -14,8 +14,12 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static java.util.Collections.EMPTY_LIST;
 
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
@@ -23,56 +27,43 @@ import java.util.UUID;
 @SuppressWarnings("rawtypes")
 public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTypeArray {
 
-  private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-  private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-  private static ScalarTypeArrayList INTEGER = new ScalarTypeArrayList("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-  private static ScalarTypeArrayList DOUBLE = new ScalarTypeArrayList("float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArrayList STRING = new ScalarTypeArrayList("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
-
   static PlatformArrayTypeFactory factory() {
     return new Factory();
   }
 
   static class Factory implements PlatformArrayTypeFactory {
 
+    private final Map<String, ScalarTypeArrayList> cache = new HashMap<>();
+
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    public ScalarTypeArrayList typeFor(Type valueType) {
-      if (valueType.equals(UUID.class)) {
-        return UUID;
+    public ScalarTypeArrayList typeFor(Type valueType, boolean nullable) {
+      synchronized (this) {
+        String key = valueType + ":" + nullable;
+        if (valueType.equals(UUID.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
+        }
+        if (valueType.equals(Long.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG));
+        }
+        if (valueType.equals(Integer.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+        }
+        if (valueType.equals(Double.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+        }
+        if (valueType.equals(String.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+        }
+        throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       }
-      if (valueType.equals(Long.class)) {
-        return LONG;
-      }
-      if (valueType.equals(Integer.class)) {
-        return INTEGER;
-      }
-      if (valueType.equals(Double.class)) {
-        return DOUBLE;
-      }
-      if (valueType.equals(String.class)) {
-        return STRING;
-      }
-      throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
     }
 
     @Override
-    public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType) {
-      final String arrayType;
-      switch (scalarType.getJdbcType()) {
-        case Types.INTEGER:
-          arrayType = "integer";
-          break;
-        case Types.VARCHAR:
-          arrayType = "varchar";
-          break;
-        default:
-          throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
-      }
-
-      return new ScalarTypeArrayList(arrayType, scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
+    public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType, boolean nullable) {
+      return new ScalarTypeArrayList(nullable, arrayTypeFor(scalarType), scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
@@ -80,8 +71,8 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
 
   private final ArrayElementConverter converter;
 
-  public ScalarTypeArrayList(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
-    super(List.class, Types.ARRAY, docPropertyType);
+  public ScalarTypeArrayList(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+    super(List.class, Types.ARRAY, docPropertyType, nullable);
     this.arrayType = arrayType;
     this.converter = converter;
   }
@@ -120,9 +111,18 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
   @Override
   public void bind(DataBind bind, List value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.ARRAY);
+      bindNull(bind);
     } else {
       bind.setArray(arrayType, toArray(value));
+    }
+  }
+
+  @Override
+  protected void bindNull(DataBind bind) throws SQLException {
+    if (nullable) {
+      bind.setNull(Types.ARRAY);
+    } else {
+      bind.setArray(arrayType, toArray(EMPTY_LIST));
     }
   }
 

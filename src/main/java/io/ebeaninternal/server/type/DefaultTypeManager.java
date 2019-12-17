@@ -354,29 +354,42 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType) {
+  public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType, boolean nullable) {
 
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
-      if (arrayTypeListFactory != null) {
-        if (isEnumType(valueType)) {
-          return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
-        }
-        return arrayTypeListFactory.typeFor(valueType);
-      }
-      // fallback to JSON storage in VARCHAR column
-      return new ScalarTypeJsonList.Varchar(getDocType(valueType));
+      return getArrayScalarTypeList(valueType, nullable);
+
     } else if (type.equals(Set.class)) {
-      if (arrayTypeSetFactory != null) {
-        if (isEnumType(valueType)) {
-          return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null));
-        }
-        return arrayTypeSetFactory.typeFor(valueType);
-      }
-      // fallback to JSON storage in VARCHAR column
-      return new ScalarTypeJsonSet.Varchar(getDocType(valueType));
+      return getArrayScalarTypeSet(valueType, nullable);
+
+    } else {
+      throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
     }
-    throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
+  }
+
+  @SuppressWarnings("rawtypes")
+  private ScalarType<?> getArrayScalarTypeSet(Type valueType, boolean nullable) {
+    if (arrayTypeSetFactory != null) {
+      if (isEnumType(valueType)) {
+        return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
+      }
+      return arrayTypeSetFactory.typeFor(valueType, nullable);
+    }
+    // fallback to JSON storage in VARCHAR column
+    return new ScalarTypeJsonSet.Varchar(getDocType(valueType), nullable);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private ScalarType<?> getArrayScalarTypeList(Type valueType, boolean nullable) {
+    if (arrayTypeListFactory != null) {
+      if (isEnumType(valueType)) {
+        return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
+      }
+      return arrayTypeListFactory.typeFor(valueType, nullable);
+    }
+    // fallback to JSON storage in VARCHAR column
+    return new ScalarTypeJsonList.Varchar(getDocType(valueType), nullable);
   }
 
   private Class<? extends Enum<?>> asEnumClass(Type valueType) {
@@ -398,7 +411,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonList.typeFor(postgres, dbType, docType);
+        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable());
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
@@ -407,7 +420,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType);
+        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable());
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
@@ -432,8 +445,6 @@ public final class DefaultTypeManager implements TypeManager {
             return jsonNodeClob;
           case DbPlatformType.JSONB:
             return jsonNodeJsonb;
-          case DbPlatformType.JSON:
-            return jsonNodeJson;
           default:
             return jsonNodeJson;
         }

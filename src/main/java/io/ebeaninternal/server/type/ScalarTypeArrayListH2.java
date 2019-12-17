@@ -5,18 +5,18 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static java.util.Collections.EMPTY_LIST;
 
 /**
  * H2 database support for DB ARRAY.
  */
+@SuppressWarnings("rawtypes")
 class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
-
-  private static ScalarTypeArrayListH2 UUID = new ScalarTypeArrayListH2("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
-  private static ScalarTypeArrayListH2 LONG = new ScalarTypeArrayListH2("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
-  private static ScalarTypeArrayListH2 INTEGER = new ScalarTypeArrayListH2("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
-  private static ScalarTypeArrayListH2 DOUBLE = new ScalarTypeArrayListH2("double", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE);
-  private static ScalarTypeArrayListH2 STRING = new ScalarTypeArrayListH2("varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING);
 
   static PlatformArrayTypeFactory factory() {
     return new ScalarTypeArrayListH2.Factory();
@@ -24,47 +24,59 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
 
   static class Factory implements PlatformArrayTypeFactory {
 
+    private final Map<String, ScalarTypeArrayListH2> cache = new HashMap<>();
+
     /**
      * Return the ScalarType to use based on the List's generic parameter type.
      */
     @Override
-    public ScalarTypeArrayListH2 typeFor(Type valueType) {
-      if (valueType.equals(java.util.UUID.class)) {
-        return UUID;
+    public ScalarType<?> typeFor(Type valueType, boolean nullable) {
+      synchronized (this) {
+        String key = valueType + ":" + nullable;
+        if (valueType.equals(UUID.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
+        }
+        if (valueType.equals(Long.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG));
+        }
+        if (valueType.equals(Integer.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+        }
+        if (valueType.equals(Double.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+        }
+        if (valueType.equals(String.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+        }
+        throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       }
-      if (valueType.equals(Long.class)) {
-        return LONG;
-      }
-      if (valueType.equals(Integer.class)) {
-        return INTEGER;
-      }
-      if (valueType.equals(Double.class)) {
-        return DOUBLE;
-      }
-      if (valueType.equals(String.class)) {
-        return STRING;
-      }
-      throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
     }
 
     @Override
-    public ScalarType<?> typeForEnum(ScalarType<?> scalarType) {
-      return new ScalarTypeArrayListH2("varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+    public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
+      return new ScalarTypeArrayListH2(nullable, "varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
-  @SuppressWarnings("rawtypes")
-  private ScalarTypeArrayListH2(String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
-    super(arrayType, docPropertyType, converter);
+  private ScalarTypeArrayListH2(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+    super(nullable, arrayType, docPropertyType, converter);
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
   public void bind(DataBind bind, List value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.ARRAY);
+      bindNull(bind);
     } else {
       bind.setObject(toArray(value));
+    }
+  }
+
+  @Override
+  protected void bindNull(DataBind bind) throws SQLException {
+    if (nullable) {
+      bind.setNull(Types.ARRAY);
+    } else {
+      bind.setObject(toArray(EMPTY_LIST));
     }
   }
 }

@@ -221,6 +221,38 @@ public class AnnotationFields extends AnnotationParser {
       util.setLobType(prop);
     }
 
+    Length length = get(prop, Length.class);
+    if (length != null) {
+      prop.setDbLength(length.value());
+    }
+
+    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
+    if (nonNull != null) {
+      prop.setNullable(false);
+    }
+
+    if (validationAnnotations) {
+      NotNull notNull = get(prop, NotNull.class);
+      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
+        // Not null on all validation groups so enable
+        // DDL generation of Not Null Constraint
+        prop.setNullable(false);
+      }
+
+      if (!prop.isLob()) {
+        // take the max size of all @Size annotations
+        int maxSize = -1;
+        for (Size size : getAll(prop, Size.class)) {
+          if (size.max() < Integer.MAX_VALUE) {
+            maxSize = Math.max(maxSize, size.max());
+          }
+        }
+        if (maxSize != -1) {
+          prop.setDbLength(maxSize);
+        }
+      }
+    }
+
     if (get(prop, TenantId.class) != null) {
       prop.setTenantId();
     }
@@ -322,40 +354,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setExcludedFromHistory();
     }
 
-    Length length = get(prop, Length.class);
-    if (length != null) {
-      prop.setDbLength(length.value());
-    }
-
-    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
-    if (nonNull != null) {
-      prop.setNullable(false);
-    }
-
     readDbMigration(prop);
-
-
-    if (validationAnnotations) {
-      NotNull notNull = get(prop, NotNull.class);
-      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-        // Not null on all validation groups so enable
-        // DDL generation of Not Null Constraint
-        prop.setNullable(false);
-      }
-
-      if (!prop.isLob()) {
-        // take the max size of all @Size annotations
-        int maxSize = -1;
-        for (Size size : getAll(prop, Size.class)) {
-          if (size.max() < Integer.MAX_VALUE) {
-            maxSize = Math.max(maxSize, size.max());
-          }
-        }
-        if (maxSize != -1) {
-          prop.setDbLength(maxSize);
-        }
-      }
-    }
 
     // Want to process last so we can use with @Formula
     Transient t = get(prop, Transient.class);

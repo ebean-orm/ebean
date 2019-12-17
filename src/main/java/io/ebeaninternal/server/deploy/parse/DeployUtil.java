@@ -191,7 +191,7 @@ public class DeployUtil {
   void setDbArray(DeployBeanProperty prop, DbArray dbArray) {
 
     Class<?> type = prop.getPropertyType();
-    ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType());
+    ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType(), prop.isNullable());
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName() + "]");
     }
