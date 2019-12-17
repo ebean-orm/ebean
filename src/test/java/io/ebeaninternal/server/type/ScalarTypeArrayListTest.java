@@ -16,7 +16,7 @@ public class ScalarTypeArrayListTest extends BasePlatformArrayTypeFactoryTest {
   @Test
   public void notSameInstance() {
     assertThat(factory.typeFor(UUID.class, true))
-      .isSameAs(factory.typeFor(UUID.class, false));
+      .isNotSameAs(factory.typeFor(UUID.class, false));
   }
 
   @Test
