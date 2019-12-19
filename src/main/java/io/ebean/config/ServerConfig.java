@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import io.avaje.config.Config;
 import io.ebean.DatabaseFactory;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
@@ -13,7 +14,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
@@ -2746,7 +2746,7 @@ public class ServerConfig {
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    this.properties = PropertiesLoader.load();
+    this.properties = Config.asProperties();
     configureFromProperties();
   }
 
@@ -2755,7 +2755,7 @@ public class ServerConfig {
    */
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
-    this.properties = PropertiesLoader.eval(properties);
+    this.properties = Config.asConfiguration().eval(properties);
     configureFromProperties();
   }
 

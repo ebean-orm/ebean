@@ -1,7 +1,7 @@
 package io.ebean.config;
 
+import io.avaje.config.Config;
 import io.ebean.annotation.Platform;
-import io.ebean.config.properties.PropertiesLoader;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class PropertiesWrapperTest {
-
 
   @Test
   public void testGetServerName() {
@@ -61,7 +60,7 @@ public class PropertiesWrapperTest {
     properties.put("somePath", "${HOME}/hello");
     properties.put("someSystemProp", "/aaa/${java.io.tmpdir}/bbb");
 
-    Properties evalCopy = PropertiesLoader.eval(properties);
+    Properties evalCopy = Config.asConfiguration().eval(properties);
     PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", evalCopy, null);
 
     assertEquals(42, pw.getInt("someInt", 99));

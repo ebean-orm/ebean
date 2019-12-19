@@ -1,5 +1,6 @@
 package org.tests.transaction;
 
+import io.avaje.config.Config;
 import io.ebean.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -9,7 +10,6 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
-import io.ebean.config.properties.PropertiesLoader;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.datasource.pool.ConnectionPool;
@@ -34,7 +34,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
   @Test
   public void test() throws SQLException {
 
-    Properties properties = PropertiesLoader.load();
+    Properties properties = Config.asProperties();
 
     DataSourceConfig dsConfig = new DataSourceConfig();
     dsConfig.loadSettings(properties, "h2autocommit2");
