@@ -38,7 +38,6 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
@@ -64,8 +63,10 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.ExtraMetrics;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
+import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiDtoQuery;
@@ -74,6 +75,8 @@ import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
+import io.ebeaninternal.api.SpiQueryBindCapture;
+import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.api.SpiSqlQuery;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
@@ -138,7 +141,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -161,6 +163,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DatabasePlatform databasePlatform;
 
   private final TransactionManager transactionManager;
+
+  private final QueryPlanManager queryPlanManager;
+
+  private final ExtraMetrics extraMetrics;
 
   private final DataTimeZone dataTimeZone;
 
@@ -256,6 +262,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
+    this.queryPlanManager = config.getQueryPlanManager();
+    this.extraMetrics = config.getExtraMetrics();
 
     this.serverName = serverConfig.getName();
     this.lazyLoadBatchSize = serverConfig.getLazyLoadBatchSize();
@@ -2385,7 +2393,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return Collections.emptySet();
   }
 
-
   /**
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
@@ -2430,6 +2437,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       relationalQueryEngine.visitMetrics(visitor);
       persister.visitMetrics(visitor);
     }
+    extraMetrics.visitMetrics(visitor);
     visitor.visitEnd();
   }
 
@@ -2446,5 +2454,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       JdbcClose.close(connection);
     }
     return request.getPlans();
+  }
+
+  @Override
+  public SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan plan) {
+    return queryPlanManager.createBindCapture(plan);
   }
 }

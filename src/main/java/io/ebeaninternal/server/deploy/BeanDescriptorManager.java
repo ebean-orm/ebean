@@ -244,17 +244,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Run periodic trim of query plans.
    */
   public void scheduleBackgroundTrim() {
-    backgroundExecutor.executePeriodically(this::trimQueryPlans, 30L, TimeUnit.SECONDS);
+    backgroundExecutor.executePeriodically(this::trimQueryPlans, 60L, TimeUnit.SECONDS);
   }
 
   private void trimQueryPlans() {
     long lastUsed = System.currentTimeMillis() - (queryPlanTTLSeconds * 1000L);
     for (BeanDescriptor<?> descriptor : immutableDescriptorList) {
       if (!descriptor.isEmbedded()) {
-        List<CQueryPlan> trimmedPlans = descriptor.trimQueryPlans(lastUsed);
-        if (!trimmedPlans.isEmpty()) {
-          logger.trace("trimmed {} query plans for type:{}", trimmedPlans.size(), descriptor.getName());
-        }
+        descriptor.trimQueryPlans(lastUsed);
       }
     }
   }

@@ -1,19 +1,25 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.ExtraMetrics;
+import io.ebeaninternal.api.SpiQueryPlan;
+import io.ebeaninternal.server.type.bindcapture.BindCapture;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 /**
  * A QueryPlanLogger that prefixes "EXPLAIN " to the query. This works for Postgres, H2 and MySql.
  */
 public class QueryPlanLoggerExplain extends QueryPlanLogger {
 
+  public QueryPlanLoggerExplain(ExtraMetrics extraMetrics) {
+    super(extraMetrics);
+  }
+
   @Override
-  public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind)  {
+  public DQueryPlanOutput collect(Connection conn, SpiQueryPlan plan, BindCapture bind) {
 
     try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + plan.getSql())) {
       bind.prepare(explainStmt, conn);

@@ -1714,19 +1714,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Trim query plans not used since the passed in epoch time.
    */
-  List<CQueryPlan> trimQueryPlans(long unusedSince) {
-
-    List<CQueryPlan> list = new ArrayList<>();
-
+  void trimQueryPlans(long unusedSince) {
     Iterator<CQueryPlan> it = queryPlanCache.values().iterator();
     while (it.hasNext()) {
       CQueryPlan queryPlan = it.next();
       if (queryPlan.getLastQueryTime() < unusedSince) {
         it.remove();
-        list.add(queryPlan);
       }
     }
-    return list;
   }
 
   /**

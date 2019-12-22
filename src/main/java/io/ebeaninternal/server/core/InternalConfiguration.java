@@ -23,6 +23,8 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
+import io.ebeaninternal.api.ExtraMetrics;
+import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
@@ -64,9 +66,15 @@ import io.ebeaninternal.server.persist.DefaultPersister;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.CQueryEngine;
+import io.ebeaninternal.server.query.CQueryPlanManager;
 import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
 import io.ebeaninternal.server.query.DtoQueryEngine;
+import io.ebeaninternal.server.query.QueryPlanLogger;
+import io.ebeaninternal.server.query.QueryPlanLoggerExplain;
+import io.ebeaninternal.server.query.QueryPlanLoggerOracle;
+import io.ebeaninternal.server.query.QueryPlanLoggerPostgres;
+import io.ebeaninternal.server.query.QueryPlanLoggerSqlServer;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
@@ -164,8 +172,10 @@ public class InternalConfiguration {
 
   private final SpiLogManager logManager;
 
+  private final ExtraMetrics extraMetrics = new ExtraMetrics();
+
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
-                               ServerConfig serverConfig, BootupClasses bootupClasses) {
+                        ServerConfig serverConfig, BootupClasses bootupClasses) {
 
     this.online = online;
     this.serverConfig = serverConfig;
@@ -240,6 +250,10 @@ public class InternalConfiguration {
 
   ClockService getClockService() {
     return clockService;
+  }
+
+  public ExtraMetrics getExtraMetrics() {
+    return extraMetrics;
   }
 
   /**
@@ -433,8 +447,8 @@ public class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
-                                    indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
-                                    tableModState, cacheNotify, clockService);
+        indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
+        tableModState, cacheNotify, clockService);
 
     if (serverConfig.isExplicitTransactionBeginMode()) {
       return new ExplicitTransactionManager(options);
@@ -527,7 +541,7 @@ public class InternalConfiguration {
   }
 
   private boolean isMySql(Platform platform) {
-     return platform.base() == Platform.MYSQL;
+    return platform.base() == Platform.MYSQL;
   }
 
   public DataTimeZone getDataTimeZone() {
@@ -635,5 +649,29 @@ public class InternalConfiguration {
       .with(factory, tableModState);
 
     return new DefaultServerCacheManager(builder);
+  }
+
+  public QueryPlanManager getQueryPlanManager() {
+    if (!serverConfig.isCollectQueryPlans()) {
+      return QueryPlanManager.NOOP;
+    }
+    long threshold = serverConfig.getCollectQueryPlanThresholdMicros();
+    return new CQueryPlanManager(threshold, queryPlanLogger(databasePlatform.getPlatform()));
+  }
+
+  /**
+   * Returns the logger to log query plans for the given platform.
+   */
+  QueryPlanLogger queryPlanLogger(Platform platform) {
+    switch (platform.base()) {
+      case POSTGRES:
+        return new QueryPlanLoggerPostgres(extraMetrics);
+      case SQLSERVER:
+        return new QueryPlanLoggerSqlServer(extraMetrics);
+      case ORACLE:
+        return new QueryPlanLoggerOracle(extraMetrics);
+      default:
+        return new QueryPlanLoggerExplain(extraMetrics);
+    }
   }
 }

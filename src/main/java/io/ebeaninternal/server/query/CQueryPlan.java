@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
 import io.ebean.meta.QueryPlanRequest;
@@ -10,6 +9,8 @@ import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiQueryBindCapture;
+import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
@@ -47,7 +48,7 @@ import java.util.Set;
  * for performance tuning.
  * </p>
  */
-public class CQueryPlan {
+public class CQueryPlan implements SpiQueryPlan {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
 
@@ -98,13 +99,12 @@ public class CQueryPlan {
 
   private final Set<String> dependentTables;
 
-  private final CQueryBindCapture bindCapture;
+  private final SpiQueryBindCapture bindCapture;
 
   /**
    * Create a query plan based on a OrmQueryRequest.
    */
   CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
-
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
@@ -124,7 +124,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
-    this.bindCapture = initBindCapture(server.getServerConfig(), query);
+    this.bindCapture = initBindCapture(query);
     this.hash = md5Hash();
   }
 
@@ -132,7 +132,6 @@ public class CQueryPlan {
    * Create a query plan for a raw sql query.
    */
   CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rowNumberIncluded, String logWhereSql) {
-
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
@@ -152,7 +151,7 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
-    this.bindCapture = initBindCapture(server.getServerConfig(), query);
+    this.bindCapture = initBindCapture(query);
     this.hash = md5Hash();
   }
 
@@ -166,12 +165,8 @@ public class CQueryPlan {
     return "orm." + beanType.getSimpleName() + "_" + label;
   }
 
-  private CQueryBindCapture initBindCapture(ServerConfig serverConfig, SpiQuery<?> query) {
-    if (serverConfig.isCollectQueryPlans() && !query.getType().isUpdate()) {
-      return new CQueryBindCapture(this, PlatformQueryPlan.getLogger(serverConfig.getDatabasePlatform().getPlatform()));
-    } else {
-      return null;
-    }
+  private SpiQueryBindCapture initBindCapture(SpiQuery<?> query) {
+    return query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
   }
 
   private String location() {
@@ -187,14 +182,27 @@ public class CQueryPlan {
     return beanType + " hash:" + planKey;
   }
 
+  @Override
   public Class<?> getBeanType() {
     return beanType;
   }
 
-  public Set<String> getDependentTables() {
-    return dependentTables;
+  @Override
+  public String getName() {
+    return name;
   }
 
+  @Override
+  public String getHash() {
+    return hash;
+  }
+
+  @Override
+  public String getSql() {
+    return sql;
+  }
+
+  @Override
   public ProfileLocation getProfileLocation() {
     return profileLocation;
   }
@@ -203,8 +211,8 @@ public class CQueryPlan {
     return label;
   }
 
-  public String getName() {
-    return name;
+  public Set<String> getDependentTables() {
+    return dependentTables;
   }
 
   public String getLocation() {
@@ -242,10 +250,6 @@ public class CQueryPlan {
     return asOfTableCount;
   }
 
-  boolean isAutoTuned() {
-    return autoTuned;
-  }
-
   /**
    * Return a key used in audit logging to identify the query.
    */
@@ -275,14 +279,6 @@ public class CQueryPlan {
       logger.error("Failed to MD5 hash the query", e);
       return "error";
     }
-  }
-
-  String getHash() {
-    return hash;
-  }
-
-  public String getSql() {
-    return sql;
   }
 
   SqlTree getSqlTree() {
@@ -347,10 +343,10 @@ public class CQueryPlan {
 
   void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
     try {
+      long startNanos = System.nanoTime();
       DataBindCapture capture = bindCapture();
       predicates.bind(capture);
-      bindCapture.setBind(capture.bindCapture(), executionTimeMicros);
-
+      bindCapture.setBind(capture.bindCapture(), executionTimeMicros, startNanos);
     } catch (SQLException e) {
       logger.error("Error capturing bind values", e);
     }

@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.ExtraMetrics;
+import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 import java.sql.Connection;
@@ -12,8 +14,12 @@ import java.sql.SQLException;
  */
 public class QueryPlanLoggerPostgres extends QueryPlanLogger {
 
+  public QueryPlanLoggerPostgres(ExtraMetrics extraMetrics) {
+    super(extraMetrics);
+  }
+
   @Override
-  public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
+  public DQueryPlanOutput collect(Connection conn, SpiQueryPlan plan, BindCapture bind) {
 
     String explain = "explain analyze " + plan.getSql();
     try (PreparedStatement explainStmt = conn.prepareStatement(explain)) {

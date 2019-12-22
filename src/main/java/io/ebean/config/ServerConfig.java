@@ -498,6 +498,11 @@ public class ServerConfig {
   private boolean collectQueryPlans;
 
   /**
+   * The default threshold in micros for collecting query plans.
+   */
+  private long collectQueryPlanThresholdMicros = Long.MAX_VALUE;
+
+  /**
    * The time in millis used to determine when a query is alerted for being slow.
    */
   private long slowQueryMillis;
@@ -2857,6 +2862,7 @@ public class ServerConfig {
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
+    collectQueryPlanThresholdMicros = p.getLong("collectQueryPlanThresholdMicros", collectQueryPlanThresholdMicros);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
@@ -3240,6 +3246,20 @@ public class ServerConfig {
    */
   public void setCollectQueryPlans(boolean collectQueryPlans) {
     this.collectQueryPlans = collectQueryPlans;
+  }
+
+  /**
+   * Return the query plan collection threshold in microseconds.
+   */
+  public long getCollectQueryPlanThresholdMicros() {
+    return collectQueryPlanThresholdMicros;
+  }
+
+  /**
+   * Set the query plan collection threshold in microseconds.
+   */
+  public void setCollectQueryPlanThresholdMicros(long collectQueryPlanThresholdMicros) {
+    this.collectQueryPlanThresholdMicros = collectQueryPlanThresholdMicros;
   }
 
   /**
