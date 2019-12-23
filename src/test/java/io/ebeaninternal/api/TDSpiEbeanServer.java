@@ -974,4 +974,9 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     return Collections.emptySet();
   }
+
+  @Override
+  public SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan) {
+    return null;
+  }
 }
