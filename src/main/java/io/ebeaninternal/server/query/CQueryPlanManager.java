@@ -61,12 +61,7 @@ public class CQueryPlanManager implements QueryPlanManager {
     if (plans.isEmpty()) {
       return emptyList();
     }
-    long startNanos = System.nanoTime();
-    try {
-      return collectPlans(request);
-    } finally {
-      timeCollection.addSinceNanos(startNanos);
-    }
+    return collectPlans(request);
   }
 
   private List<MetaQueryPlan> collectPlans(QueryPlanRequest request) {
@@ -76,7 +71,6 @@ public class CQueryPlanManager implements QueryPlanManager {
         req.nextCapture();
       }
       return req.getPlans();
-
     } catch (SQLException e) {
       log.error("Error during query plan collection", e);
       return emptyList();
@@ -84,6 +78,11 @@ public class CQueryPlanManager implements QueryPlanManager {
   }
 
   public SpiDbQueryPlan collectPlan(Connection connection, SpiQueryPlan queryPlan, BindCapture last) {
-    return planLogger.collectPlan(connection, queryPlan, last);
+    long startNanos = System.nanoTime();
+    try {
+      return planLogger.collectPlan(connection, queryPlan, last);
+    } finally {
+      timeCollection.addSinceNanos(startNanos);
+    }
   }
 }

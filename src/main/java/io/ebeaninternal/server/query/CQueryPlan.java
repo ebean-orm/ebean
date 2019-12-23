@@ -146,7 +146,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
-    this.bindCapture = initBindCaptureRaw(sql);
+    this.bindCapture = initBindCaptureRaw(sql, query);
     this.hash = md5Hash();
   }
 
@@ -164,8 +164,8 @@ public class CQueryPlan implements SpiQueryPlan {
     return query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
   }
 
-  private SpiQueryBindCapture initBindCaptureRaw(String sql) {
-    return sql.equals(RESULT_SET_BASED_RAW_SQL) ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
+  private SpiQueryBindCapture initBindCaptureRaw(String sql, SpiQuery<?> query) {
+    return sql.equals(RESULT_SET_BASED_RAW_SQL) || query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
   }
 
   private String location() {

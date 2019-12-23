@@ -6,6 +6,7 @@ import io.ebean.Transaction;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetaTimedMetric;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.meta.SortMetric;
@@ -174,6 +175,17 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    // the server has some plans
+    runQueries();
+
+    // enable query plan bind capture on all plans threshold 100 micros
+    QueryPlanInit init = new QueryPlanInit();
+    init.setAll(true);
+    init.setThresholdMicros(100);
+    final List<MetaQueryPlan> appliedToPlans = server().getMetaInfoManager().queryPlanInit(init);
+    assertThat(appliedToPlans.size()).isGreaterThan(4);
+
+    // will collect bind captures
     runQueries();
 
     ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
@@ -189,6 +201,7 @@ public class TestCustomerFinder extends BaseTestCase {
       System.out.println(txnTimed);
     }
 
+    // obtains db query plans ...
     QueryPlanRequest request = new QueryPlanRequest();
     List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanCollectNow(request);
     assertThat(plans).isNotEmpty();
@@ -294,6 +307,10 @@ public class TestCustomerFinder extends BaseTestCase {
     Customer.find.totalCount();
     Customer.find.updateNames("Junk", 2000);
     Customer.find.byId(3);
+    DB.find(Customer.class)
+      .setLabel("someDeleteQuery")
+      .where().eq("name", "JunkNotExists")
+      .delete();
   }
 
 }
