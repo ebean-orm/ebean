@@ -443,6 +443,10 @@ public class MTable {
     return partitionMeta;
   }
 
+  public String getPkName() {
+    return pkName;
+  }
+
   public void setPkName(String pkName) {
     this.pkName = pkName;
   }

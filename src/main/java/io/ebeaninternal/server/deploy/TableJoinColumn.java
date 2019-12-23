@@ -40,7 +40,6 @@ public class TableJoinColumn {
     this.foreignDbColumn = InternString.intern(deploy.getForeignDbColumn());
     this.localSqlFormula = InternString.intern(deploy.getLocalSqlFormula());
     this.foreignSqlFormula = InternString.intern(deploy.getForeignSqlFormula());
-
     this.insertable = deploy.isInsertable();
     this.updateable = deploy.isUpdateable();
     this.queryHash = hash();

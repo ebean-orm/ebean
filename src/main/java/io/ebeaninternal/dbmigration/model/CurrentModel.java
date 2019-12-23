@@ -1,11 +1,11 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebean.config.DbConstraintNaming;
+import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildBeanVisitor;
 import io.ebeaninternal.dbmigration.model.build.ModelBuildContext;
@@ -24,9 +24,9 @@ public class CurrentModel {
 
   private final SpiEbeanServer server;
 
-  private final DbConstraintNaming constraintNaming;
+  private final DatabasePlatform databasePlatform;
 
-  private final DbConstraintNaming.MaxLength maxLength;
+  private final DbConstraintNaming constraintNaming;
 
   private final boolean platformTypes;
 
@@ -60,8 +60,8 @@ public class CurrentModel {
 
   private CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming, boolean platformTypes) {
     this.server = server;
+    this.databasePlatform = server.getDatabasePlatform();
     this.constraintNaming = constraintNaming;
-    this.maxLength = maxLength(server, constraintNaming);
     this.platformTypes = platformTypes;
     this.jaxbPresent = server.getServerConfig().getClassLoadConfig().isJavaxJAXBPresent();
   }
@@ -84,16 +84,6 @@ public class CurrentModel {
     return read().getPartitionedTables();
   }
 
-  private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
-
-    if (naming.getMaxLength() != null) {
-      return naming.getMaxLength();
-    }
-
-    int maxConstraintNameLength = server.getDatabasePlatform().getMaxConstraintNameLength();
-    return new DefaultConstraintMaxLength(maxConstraintNameLength);
-  }
-
   /**
    * Return the current model by reading all the bean descriptors and properties.
    */
@@ -101,7 +91,7 @@ public class CurrentModel {
     if (model == null) {
       model = new ModelContainer();
 
-      ModelBuildContext context = new ModelBuildContext(model, constraintNaming, maxLength, platformTypes);
+      ModelBuildContext context = new ModelBuildContext(model, databasePlatform, constraintNaming, platformTypes);
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
       visit.visitAllBeans();
