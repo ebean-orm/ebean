@@ -20,12 +20,16 @@ public interface SpiQueryBindCapture {
   boolean collectFor(long timeMicros);
 
   /**
-   * Set the bind capture and the related query execution time.
+   * Set the captured bind values that we can use later to collect a query plan.
+   *
+   * @param bindCapture     The bind values of the query
+   * @param queryTimeMicros The query execution time
+   * @param startNanos      The nanos start of this bind capture
    */
-  void setBind(BindCapture bindCapture, long timeMicros, long startNanos);
+  void setBind(BindCapture bindCapture, long queryTimeMicros, long startNanos);
 
   /**
-   * Collect the query execution plan usually executing the query to do so.
+   * Update the threshold micros triggering the bind capture.
    */
-  void collectQueryPlan(QueryPlanRequest request);
+  void queryPlanInit(long thresholdMicros);
 }

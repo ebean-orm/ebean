@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.meta.QueryPlanRequest;
+import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
@@ -9,8 +9,8 @@ class CQueryBindCapture implements SpiQueryBindCapture {
 
   private static final double multiplier = 1.3d;
 
+  private final CQueryPlanManager manager;
   private final SpiQueryPlan queryPlan;
-  private final QueryPlanLogger planLogger;
 
   private BindCapture bindCapture;
   private long queryTimeMicros;
@@ -19,9 +19,9 @@ class CQueryBindCapture implements SpiQueryBindCapture {
 
   private long lastBindCapture;
 
-  CQueryBindCapture(SpiQueryPlan queryPlan, QueryPlanLogger planLogger, long thresholdMicros) {
+  CQueryBindCapture(CQueryPlanManager manager, SpiQueryPlan queryPlan, long thresholdMicros) {
+    this.manager = manager;
     this.queryPlan = queryPlan;
-    this.planLogger = planLogger;
     this.thresholdMicros = thresholdMicros;
   }
 
@@ -33,13 +33,6 @@ class CQueryBindCapture implements SpiQueryBindCapture {
     return timeMicros > thresholdMicros && captureCount < 10;
   }
 
-  /**
-   * Set the captured bind values that we can use later to collect a query plan.
-   *
-   * @param bindCapture     The bind values of the query
-   * @param queryTimeMicros The query execution time
-   * @param startNanos      The nanos start of this bind capture
-   */
   @Override
   public void setBind(BindCapture bindCapture, long queryTimeMicros, long startNanos) {
     synchronized (this) {
@@ -48,27 +41,36 @@ class CQueryBindCapture implements SpiQueryBindCapture {
       this.bindCapture = bindCapture;
       this.queryTimeMicros = queryTimeMicros;
       lastBindCapture = System.currentTimeMillis();
-      planLogger.addBindTimeSince(startNanos);
+      manager.notifyBindCapture(this, startNanos);
     }
+  }
+
+  @Override
+  public void queryPlanInit(long thresholdMicros) {
+    // effective enable bind capture for this plan
+    this.thresholdMicros = thresholdMicros;
+    this.captureCount = 0;
   }
 
   /**
    * Collect the query plan using already captured bind values.
    */
-  @Override
-  public void collectQueryPlan(QueryPlanRequest request) {
-    if (bindCapture == null || request.getSince() > lastBindCapture) {
+  public boolean collectQueryPlan(CQueryPlanRequest request) {
+    if (bindCapture == null || request.getSince() < lastBindCapture) {
       // no bind capture since the last capture
-      return;
+      return false;
     }
 
     final BindCapture last = this.bindCapture;
 
-    DQueryPlanOutput queryPlan = planLogger.collectQueryPlan(request.getConnection(), this.queryPlan, last);
+    SpiDbQueryPlan queryPlan = manager.collectPlan(request.getConnection(), this.queryPlan, last);
     if (queryPlan != null) {
-      queryPlan.with(queryTimeMicros, captureCount, this.queryPlan.getHash());
-      request.process(queryPlan);
+      request.add(queryPlan.with(queryTimeMicros, captureCount));
+      // effectively turn off bind capture for this plan
+      thresholdMicros = Long.MAX_VALUE;
+      return true;
     }
+    return false;
   }
 
 }

@@ -20,8 +20,9 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
-import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
@@ -55,7 +56,6 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
-import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
@@ -1693,12 +1693,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  public void collectQueryPlans(QueryPlanRequest request) {
+  public List<MetaQueryPlan> queryPlanInit(QueryPlanInit request) {
+    List<MetaQueryPlan> list = new ArrayList<>();
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
-      if (request.includeType(desc.getBeanType())) {
-        desc.collectQueryPlans(request);
-      }
+      desc.queryPlanInit(request, list);
     }
+    return list;
   }
 
   /**
@@ -1710,7 +1710,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     @Override
     public int compare(BeanDescriptor<?> o1, BeanDescriptor<?> o2) {
-
       return o1.getName().compareTo(o2.getName());
     }
   }

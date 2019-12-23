@@ -651,12 +651,12 @@ public class InternalConfiguration {
     return new DefaultServerCacheManager(builder);
   }
 
-  public QueryPlanManager getQueryPlanManager() {
+  public QueryPlanManager initQueryPlanManager(DataSource dataSource) {
     if (!serverConfig.isCollectQueryPlans()) {
       return QueryPlanManager.NOOP;
     }
     long threshold = serverConfig.getCollectQueryPlanThresholdMicros();
-    return new CQueryPlanManager(threshold, queryPlanLogger(databasePlatform.getPlatform()));
+    return new CQueryPlanManager(dataSource, threshold, queryPlanLogger(databasePlatform.getPlatform()), extraMetrics);
   }
 
   /**
@@ -665,13 +665,13 @@ public class InternalConfiguration {
   QueryPlanLogger queryPlanLogger(Platform platform) {
     switch (platform.base()) {
       case POSTGRES:
-        return new QueryPlanLoggerPostgres(extraMetrics);
+        return new QueryPlanLoggerPostgres();
       case SQLSERVER:
-        return new QueryPlanLoggerSqlServer(extraMetrics);
+        return new QueryPlanLoggerSqlServer();
       case ORACLE:
-        return new QueryPlanLoggerOracle(extraMetrics);
+        return new QueryPlanLoggerOracle();
       default:
-        return new QueryPlanLoggerExplain(extraMetrics);
+        return new QueryPlanLoggerExplain();
     }
   }
 }

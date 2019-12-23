@@ -1,97 +1,66 @@
 package io.ebean.meta;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Request used to capture query plans.
  */
 public class QueryPlanRequest {
 
-  private final List<MetaQueryPlan> plans = new ArrayList<>();
-
-  private Connection connection;
-
-  private boolean store;
-
   private long since;
 
-  private Set<Class<?>> includedBeanTypes;
+  private int maxCount;
 
-  private Set<String> includedLabels;
-
-  public List<MetaQueryPlan> getPlans() {
-    return plans;
-  }
+  private long maxTimeMillis;
 
   /**
-   * Return the connection to use to capture the query plans.
-   */
-  public Connection getConnection() {
-    return connection;
-  }
-
-  /**
-   * Set the connection to use to capture the query plans.
-   */
-  public void setConnection(Connection connection) {
-    this.connection = connection;
-  }
-
-  /**
-   * Return true if the captured query plan is stored.
-   */
-  public boolean isStore() {
-    return store;
-  }
-
-  /**
-   * Set to true to store the captured query plan.
-   */
-  public void setStore(boolean store) {
-    this.store = store;
-  }
-
-  /**
-   * Return the epoch time after which the query plan was capture (to be included).
+   * Return the epoch time in millis for minimum bind capture time.
+   * <p>
+   * When set this ensures that the bind values used to get the query plan
+   * have been around for a while (e.g. 5 mins) and so reasonably represent
+   * bind values that match the slowest execution for this query plan.
    */
   public long getSince() {
     return since;
   }
 
   /**
-   * Set the epoch time after which the query plan was captured.
-   * <p>
-   * This is used to only capture plans that have changed since a given time (like the time of last capture).
-   * </p>
+   * Set the epoch time (e.g. 5 mins ago) such that the query bind values
+   * reasonably represent bind values that match the slowest execution for this query plan.
    *
-   * @param since The time after which the query plan was captured to be included
+   * @param since The minimum age of the bind values capture.
    */
   public void setSince(long since) {
     this.since = since;
   }
 
   /**
-   * Process consume the query plan.
+   * Return the maximum number of plans to capture.
    */
-  public void process(MetaQueryPlan plan) {
-    plans.add(plan);
+  public int getMaxCount() {
+    return maxCount;
   }
 
   /**
-   * Return true if the bean type should be included in the query plan capture.
+   * Set the maximum number of plans to capture.
    */
-  public boolean includeType(Class<?> beanType) {
-    return includedBeanTypes == null || includedBeanTypes.isEmpty() || includedBeanTypes.contains(beanType);
+  public void setMaxCount(int maxCount) {
+    this.maxCount = maxCount;
   }
 
   /**
-   * Return true if the label should be included in the query plan capture.
+   * Return the maximum amount of time we want to use to capture plans.
+   * <p>
+   * Query plan collection will stop once this time is exceeded.
    */
-  public boolean includeLabel(String label) {
-    return includedLabels == null || includedLabels.isEmpty() || includedLabels.contains(label);
+  public long getMaxTimeMillis() {
+    return maxTimeMillis;
   }
 
+  /**
+   * Set the maximum amount of time we want to use to capture plans.
+   * <p>
+   * Query plan collection will stop once this time is exceeded.
+   */
+  public void setMaxTimeMillis(long maxTimeMillis) {
+    this.maxTimeMillis = maxTimeMillis;
+  }
 }

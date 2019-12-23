@@ -1,6 +1,5 @@
 package io.ebeaninternal.api;
 
-import io.ebean.meta.QueryPlanRequest;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 class NoopQueryBindCapture implements SpiQueryBindCapture {
@@ -16,7 +15,7 @@ class NoopQueryBindCapture implements SpiQueryBindCapture {
   }
 
   @Override
-  public void collectQueryPlan(QueryPlanRequest request) {
+  public void queryPlanInit(long thresholdMicros) {
     // do nothing
   }
 }

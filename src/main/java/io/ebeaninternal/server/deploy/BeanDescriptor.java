@@ -27,8 +27,9 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
-import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -1682,10 +1683,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  void collectQueryPlans(QueryPlanRequest request) {
+  void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
-      if (request.includeLabel(queryPlan.getLabel())) {
-        queryPlan.collectQueryPlan(request);
+      if (request.includeHash(queryPlan.getHash())) {
+        queryPlan.queryPlanInit(request.getThresholdMicros());
+        list.add(queryPlan.createMeta(null, null));
       }
     }
   }

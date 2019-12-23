@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebeaninternal.api.ExtraMetrics;
+import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
@@ -18,13 +18,8 @@ import java.sql.Statement;
  */
 public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
 
-  public QueryPlanLoggerSqlServer(ExtraMetrics extraMetrics) {
-    super(extraMetrics);
-  }
-
   @Override
-  public DQueryPlanOutput collect(Connection conn, SpiQueryPlan plan, BindCapture bind) {
-
+  public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
     try (Statement stmt = conn.createStatement()) {
       stmt.execute("set statistics xml on");
       stmt.execute("begin transaction");
@@ -47,14 +42,14 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
 
       } catch (SQLException e) {
         queryPlanLog.error("Could not log query plan", e);
-
+        return null;
       } finally {
         stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
       queryPlanLog.error("Could not log query plan", e);
+      return null;
     }
-    return null;
   }
 
 }

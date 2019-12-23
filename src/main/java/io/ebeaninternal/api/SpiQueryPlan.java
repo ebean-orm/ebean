@@ -31,4 +31,18 @@ public interface SpiQueryPlan {
    * The related profile location.
    */
   ProfileLocation getProfileLocation();
+
+  /**
+   * Initiate bind capture with the give threshold.
+   */
+  void queryPlanInit(long thresholdMicros);
+
+  /**
+   * Return as Database query plan.
+   *
+   * @param bind       Description of the bind values used
+   * @param planString The raw database query plan
+   */
+  SpiDbQueryPlan createMeta(String bind, String planString);
+
 }

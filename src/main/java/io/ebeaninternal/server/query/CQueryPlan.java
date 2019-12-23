@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebean.ProfileLocation;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.meta.MetricType;
-import io.ebean.meta.QueryPlanRequest;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.CQueryPlanKey;
@@ -55,8 +54,6 @@ public class CQueryPlan implements SpiQueryPlan {
   static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
-
-  private final boolean autoTuned;
 
   private final ProfileLocation profileLocation;
 
@@ -114,7 +111,6 @@ public class CQueryPlan implements SpiQueryPlan {
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType());
     this.location = location();
-    this.autoTuned = query.isAutoTuned();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
@@ -141,7 +137,6 @@ public class CQueryPlan implements SpiQueryPlan {
     this.name = deriveName(label, query.getType());
     this.location = location();
     this.planKey = buildPlanKey(sql, rowNumberIncluded, logWhereSql);
-    this.autoTuned = false;
     this.asOfTableCount = 0;
     this.sql = sql;
     this.sqlTree = sqlTree;
@@ -151,7 +146,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
-    this.bindCapture = initBindCapture(query);
+    this.bindCapture = initBindCaptureRaw(sql);
     this.hash = md5Hash();
   }
 
@@ -167,6 +162,10 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private SpiQueryBindCapture initBindCapture(SpiQuery<?> query) {
     return query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
+  }
+
+  private SpiQueryBindCapture initBindCaptureRaw(String sql) {
+    return sql.equals(RESULT_SET_BASED_RAW_SQL) ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
   }
 
   private String location() {
@@ -217,6 +216,16 @@ public class CQueryPlan implements SpiQueryPlan {
 
   public String getLocation() {
     return location;
+  }
+
+  @Override
+  public void queryPlanInit(long thresholdMicros) {
+    bindCapture.queryPlanInit(thresholdMicros);
+  }
+
+  @Override
+  public DQueryPlanOutput createMeta(String bind, String planString) {
+    return new DQueryPlanOutput(getBeanType(), name, hash, sql, profileLocation, bind, planString);
   }
 
   public DataReader createDataReader(ResultSet rset) {
@@ -342,20 +351,13 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
+    final long startNanos = System.nanoTime();
     try {
-      long startNanos = System.nanoTime();
       DataBindCapture capture = bindCapture();
       predicates.bind(capture);
       bindCapture.setBind(capture.bindCapture(), executionTimeMicros, startNanos);
     } catch (SQLException e) {
       logger.error("Error capturing bind values", e);
-    }
-  }
-
-  public void collectQueryPlan(QueryPlanRequest request) {
-
-    if (!getSql().equals(RESULT_SET_BASED_RAW_SQL) && bindCapture != null) {
-      bindCapture.collectQueryPlan(request);
     }
   }
 }

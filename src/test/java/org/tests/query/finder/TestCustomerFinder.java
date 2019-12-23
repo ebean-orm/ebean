@@ -190,7 +190,7 @@ public class TestCustomerFinder extends BaseTestCase {
     }
 
     QueryPlanRequest request = new QueryPlanRequest();
-    List<MetaQueryPlan> plans = server().getMetaInfoManager().collectQueryPlans(request);
+    List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanCollectNow(request);
     assertThat(plans).isNotEmpty();
 
     for (MetaQueryPlan plan : plans) {
