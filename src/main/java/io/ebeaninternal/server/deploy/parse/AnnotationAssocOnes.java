@@ -172,7 +172,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     if (beanTable == null) {
       throw new IllegalStateException("Looks like a missing @ManyToOne or @OneToOne on property " + prop.getFullBeanName() + " - no related 'BeanTable'");
     }
-    prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
+    prop.getTableJoin().addJoinColumn(util, false, joinColumn, beanTable);
     if (!joinColumn.updatable()) {
       prop.setDbUpdateable(false);
     }

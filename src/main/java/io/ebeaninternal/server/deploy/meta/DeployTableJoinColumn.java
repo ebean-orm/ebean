@@ -54,6 +54,14 @@ public class DeployTableJoinColumn {
     this.updateable = updateable;
   }
 
+  public DeployTableJoinColumn(boolean order, String ref, String name, boolean insertable, boolean updateable, BeanTable beanTable) {
+    this(ref, name, insertable, updateable);
+    setReferencedColumn(beanTable);
+    if (!order) {
+      reverse();
+    }
+  }
+
   void setLocalSqlFormula(String localSqlFormula) {
     if (localSqlFormula != null) {
       this.localSqlFormula = localSqlFormula;
@@ -78,15 +86,6 @@ public class DeployTableJoinColumn {
 
   public String getForeignSqlFormula() {
     return foreignSqlFormula;
-  }
-
-
-  public DeployTableJoinColumn(boolean order, JoinColumn jc, BeanTable beanTable) {
-    this(jc.referencedColumnName(), jc.name(), jc.insertable(), jc.updatable());
-    setReferencedColumn(beanTable);
-    if (!order) {
-      reverse();
-    }
   }
 
   private void setReferencedColumn(BeanTable beanTable) {

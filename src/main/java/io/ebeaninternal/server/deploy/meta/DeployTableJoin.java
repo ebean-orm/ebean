@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.JoinColumn;
@@ -74,31 +75,33 @@ public class DeployTableJoin {
    * The order is generally true for OneToMany and false for ManyToOne relationships.
    * </p>
    */
-  public void addJoinColumn(boolean order, JoinColumn jc, BeanTable beanTable) {
+  public void addJoinColumn(DeployUtil deploy, boolean order, JoinColumn jc, BeanTable beanTable) {
     if (!"".equals(jc.table())) {
-      setTable(jc.table());
+      setTable(deploy.convertQuotes(jc.table()));
     }
     if (!"".equals(jc.name()) || !"".equals(jc.referencedColumnName())) {
       // only add the join column details when name or referencedColumnName is specified
-      addJoinColumn(new DeployTableJoinColumn(order, jc, beanTable));
+      String ref = deploy.convertQuotes(jc.referencedColumnName());
+      String nam = deploy.convertQuotes(jc.name());
+      addJoinColumn(new DeployTableJoinColumn(order, ref, nam, jc.insertable(), jc.updatable(), beanTable));
     }
   }
 
   /**
    * Add a JoinColumn array.
    */
-  public void addJoinColumn(boolean order, JoinColumn[] jcArray, BeanTable beanTable) {
+  public void addJoinColumn(DeployUtil util, boolean order, JoinColumn[] jcArray, BeanTable beanTable) {
     for (JoinColumn aJcArray : jcArray) {
-      addJoinColumn(order, aJcArray, beanTable);
+      addJoinColumn(util, order, aJcArray, beanTable);
     }
   }
 
   /**
    * Add a JoinColumn set.
    */
-  public void addJoinColumn(boolean order, Set<JoinColumn> joinColumns, BeanTable beanTable) {
+  public void addJoinColumn(DeployUtil util, boolean order, Set<JoinColumn> joinColumns, BeanTable beanTable) {
     for (JoinColumn joinColumn : joinColumns) {
-      addJoinColumn(order, joinColumn, beanTable);
+      addJoinColumn(util, order, joinColumn, beanTable);
     }
   }
 
