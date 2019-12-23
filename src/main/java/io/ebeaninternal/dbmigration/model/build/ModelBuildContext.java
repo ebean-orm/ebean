@@ -1,8 +1,10 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 import io.ebean.config.DbConstraintNaming;
+import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MTable;
@@ -30,17 +32,30 @@ public class ModelBuildContext {
 
   private final ModelContainer model;
 
+  private final DatabasePlatform databasePlatform;
+
   private final DbConstraintNaming constraintNaming;
 
   private final DbConstraintNaming.MaxLength maxLength;
 
   private final boolean platformTypes;
 
-  public ModelBuildContext(ModelContainer model, DbConstraintNaming naming, DbConstraintNaming.MaxLength maxLength, boolean platformTypes) {
+  public ModelBuildContext(ModelContainer model, DatabasePlatform databasePlatform, DbConstraintNaming naming, boolean platformTypes) {
     this.model = model;
+    this.databasePlatform = databasePlatform;
     this.constraintNaming = naming;
-    this.maxLength = maxLength;
     this.platformTypes = platformTypes;
+    this.maxLength = maxLength();
+  }
+
+  /**
+   * Create the max length handling for constraint names.
+   */
+  private DbConstraintNaming.MaxLength maxLength() {
+    if (constraintNaming.getMaxLength() != null) {
+      return constraintNaming.getMaxLength();
+    }
+    return new DefaultConstraintMaxLength(databasePlatform.getMaxConstraintNameLength());
   }
 
   /**
@@ -55,40 +70,51 @@ public class ModelBuildContext {
     return constraintNaming.normaliseTable(baseTable);
   }
 
+  /**
+   * Take into account max length and quoted identifiers in constraint and index names.
+   */
+  private String name(String constraintName, int indexCount) {
+    return databasePlatform.convertQuotedIdentifiers(maxLength(constraintName, indexCount));
+  }
+
+  private String maxLength(String constraintName, int indexCount) {
+    return maxLength.maxLength(constraintName, indexCount);
+  }
+
   public String primaryKeyName(String tableName) {
-    return maxLength(constraintNaming.primaryKeyName(tableName), 0);
+    return name(constraintNaming.primaryKeyName(tableName), 0);
   }
 
   public String foreignKeyConstraintName(String tableName, String columnName, int foreignKeyCount) {
-    return maxLength(constraintNaming.foreignKeyConstraintName(tableName, columnName), foreignKeyCount);
+    return name(constraintNaming.foreignKeyConstraintName(tableName, columnName), foreignKeyCount);
   }
 
   public String foreignKeyIndexName(String tableName, String[] columns, int indexCount) {
-    return maxLength(constraintNaming.foreignKeyIndexName(tableName, columns), indexCount);
+    return name(constraintNaming.foreignKeyIndexName(tableName, columns), indexCount);
   }
 
   public String foreignKeyIndexName(String tableName, String column, int indexCount) {
-    return maxLength(constraintNaming.foreignKeyIndexName(tableName, column), indexCount);
+    return name(constraintNaming.foreignKeyIndexName(tableName, column), indexCount);
   }
 
   public String indexName(String tableName, String column, int indexCount) {
-    return maxLength(constraintNaming.indexName(tableName, column), indexCount);
+    return name(constraintNaming.indexName(tableName, column), indexCount);
   }
 
   public String indexName(String tableName, String[] columns, int indexCount) {
-    return maxLength(constraintNaming.indexName(tableName, columns), indexCount);
+    return name(constraintNaming.indexName(tableName, columns), indexCount);
   }
 
   public String uniqueConstraintName(String tableName, String columnName, int indexCount) {
-    return maxLength(constraintNaming.uniqueConstraintName(tableName, columnName), indexCount);
+    return name(constraintNaming.uniqueConstraintName(tableName, columnName), indexCount);
   }
 
   public String uniqueConstraintName(String tableName, String[] columnNames, int indexCount) {
-    return maxLength(constraintNaming.uniqueConstraintName(tableName, columnNames), indexCount);
+    return name(constraintNaming.uniqueConstraintName(tableName, columnNames), indexCount);
   }
 
   public String checkConstraintName(String tableName, String columnName, int checkCount) {
-    return maxLength(constraintNaming.checkConstraintName(tableName, columnName), checkCount);
+    return name(constraintNaming.checkConstraintName(tableName, columnName), checkCount);
   }
 
   public MTable addTable(MTable table) {
@@ -105,10 +131,6 @@ public class ModelBuildContext {
 
   public void addIndex(String indexName, String tableName, String[] columnNames) {
     model.addIndex(indexName, tableName, columnNames);
-  }
-
-  private String maxLength(String constraintName, int indexCount) {
-    return maxLength.maxLength(constraintName, indexCount);
   }
 
   /**

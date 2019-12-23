@@ -17,6 +17,13 @@ public class PlatformConfig {
 
   private boolean allQuotedIdentifiers;
 
+  private DbConstraintNaming constraintNaming;
+
+  /**
+   * Flag set when a supplied constraintNaming is used.
+   */
+  private boolean customConstraintNaming;
+
   /**
    * The database boolean true value (typically either 1, T, or Y).
    */
@@ -63,7 +70,7 @@ public class PlatformConfig {
    * Construct with defaults.
    */
   public PlatformConfig() {
-
+    this.constraintNaming = new DbConstraintNaming();
   }
 
   /**
@@ -80,6 +87,19 @@ public class PlatformConfig {
     this.allQuotedIdentifiers = platformConfig.allQuotedIdentifiers;
     this.databaseInetAddressVarchar = platformConfig.databaseInetAddressVarchar;
     this.customDbTypeMappings = platformConfig.customDbTypeMappings;
+    this.constraintNaming = new DbConstraintNaming(!allQuotedIdentifiers);
+  }
+
+  public DbConstraintNaming getConstraintNaming() {
+    return constraintNaming;
+  }
+
+  /**
+   * Set a custom database constraint naming convention.
+   */
+  public void setConstraintNaming(DbConstraintNaming constraintNaming) {
+    this.customConstraintNaming = true;
+    this.constraintNaming = constraintNaming;
   }
 
   /**
@@ -94,6 +114,9 @@ public class PlatformConfig {
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;
+    if (!customConstraintNaming) {
+      this.constraintNaming = new DbConstraintNaming(!allQuotedIdentifiers);
+    }
   }
 
   /**

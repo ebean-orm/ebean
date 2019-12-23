@@ -354,11 +354,6 @@ public class ServerConfig {
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
 
   /**
-   * Naming convention used in DDL generation for primary keys, foreign keys etc.
-   */
-  private DbConstraintNaming constraintNaming = new DbConstraintNaming();
-
-  /**
    * Behaviour of updates in JDBC batch to by default include all properties.
    */
   private boolean updateAllPropertiesInBatch;
@@ -1609,14 +1604,14 @@ public class ServerConfig {
    * Return the constraint naming convention used in DDL generation.
    */
   public DbConstraintNaming getConstraintNaming() {
-    return constraintNaming;
+    return platformConfig.getConstraintNaming();
   }
 
   /**
    * Set the constraint naming convention used in DDL generation.
    */
   public void setConstraintNaming(DbConstraintNaming constraintNaming) {
-    this.constraintNaming = constraintNaming;
+    platformConfig.setConstraintNaming(constraintNaming);
   }
 
   /**

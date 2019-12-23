@@ -88,7 +88,6 @@ public class DbConstraintNaming {
    * Return the primary key constraint name.
    */
   public String primaryKeyName(String tableName) {
-
     return pkPrefix + normaliseTable(tableName) + pkSuffix;
   }
 
@@ -103,7 +102,6 @@ public class DbConstraintNaming {
    * Return the index name associated with a foreign key constraint given multiple columns.
    */
   public String foreignKeyIndexName(String tableName, String[] columns) {
-
     String colPart = joinColumnNames(columns);
     return fkIndexPrefix + normaliseTable(tableName) + fkIndexMiddle + colPart + fkIndexSuffix;
   }
@@ -112,7 +110,6 @@ public class DbConstraintNaming {
    * Return the index name associated with a foreign key constraint given a single column foreign key.
    */
   public String foreignKeyIndexName(String tableName, String column) {
-
     String colPart = normaliseTable(column);
     return fkIndexPrefix + normaliseTable(tableName) + fkIndexMiddle + colPart + fkIndexSuffix;
   }
@@ -121,7 +118,6 @@ public class DbConstraintNaming {
    * Return the index name for a general index (not associated with a foreign key).
    */
   public String indexName(String tableName, String column) {
-
     String colPart = normaliseTable(column);
     return indexPrefix + normaliseTable(tableName) + indexMiddle + colPart + indexSuffix;
   }
@@ -130,7 +126,6 @@ public class DbConstraintNaming {
    * Return the index name for a general index (not associated with a foreign key).
    */
   public String indexName(String tableName, String[] columns) {
-
     String colPart = joinColumnNames(columns);
     return indexPrefix + normaliseTable(tableName) + indexMiddle + colPart + indexSuffix;
   }
@@ -139,7 +134,6 @@ public class DbConstraintNaming {
    * Join the column names together with underscores.
    */
   protected String joinColumnNames(String[] columns) {
-
     if (columns.length == 1) {
       return normaliseColumn(columns[0]);
     }
@@ -157,7 +151,6 @@ public class DbConstraintNaming {
    * Return the unique constraint name.
    */
   public String uniqueConstraintName(String tableName, String columnName) {
-
     return uqPrefix + normaliseTable(tableName) + "_" + normaliseColumn(columnName) + uqSuffix;
   }
 
@@ -165,7 +158,6 @@ public class DbConstraintNaming {
    * Return the unique constraint name.
    */
   public String uniqueConstraintName(String tableName, String[] columns) {
-
     String colPart = joinColumnNames(columns);
     return uqPrefix + normaliseTable(tableName) + "_" + colPart + uqSuffix;
   }
@@ -174,7 +166,6 @@ public class DbConstraintNaming {
    * Return the check constraint name.
    */
   public String checkConstraintName(String tableName, String columnName) {
-
     return ckPrefix + normaliseTable(tableName) + "_" + normaliseColumn(columnName) + ckSuffix;
   }
 
