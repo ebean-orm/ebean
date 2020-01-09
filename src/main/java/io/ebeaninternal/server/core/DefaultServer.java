@@ -1046,6 +1046,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  @Deprecated
   public SqlQuery createSqlQuery(String sql) {
     return sqlQuery(sql);
   }
@@ -1056,6 +1057,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  @Deprecated
   public SqlUpdate createSqlUpdate(String sql) {
     return sqlUpdate(sql);
   }
@@ -1500,20 +1502,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
-    return findStreamWithSingleContext(false, query, transaction);
+  public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
+    // using list.stream() to ensure all resources are closed
+    return findList(query, transaction).stream();
   }
 
   @Override
-  public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
-    return findStreamWithSingleContext(true, query, transaction);
-  }
-
-  private <T> Stream<T> findStreamWithSingleContext(boolean singleContext, Query<T> query, Transaction transaction) {
+  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
-    if (singleContext) {
-      request.setIterateSingleContext();
-    }
     try {
       request.initTransIfRequired();
       return toStream(request.findIterate());

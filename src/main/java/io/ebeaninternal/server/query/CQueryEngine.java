@@ -208,15 +208,11 @@ public class CQueryEngine {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      if (request.isIterateSingleContext()) {
-        // expected relatively small number of results, single persistence context
-        cquery.prepareBindExecuteQuery();
-      } else if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
+      if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;
       }
-
       if (request.isLogSql()) {
         logSql(cquery);
       }

@@ -706,21 +706,21 @@ public interface Query<T> {
   /**
    * Execute the query returning the result as a Stream.
    * <p>
-   * Note that this will hold all resulting beans in memory using a single
-   * persistence context. Use findLargeStream() for queries that expect to
-   * return a large number of results.
+   * Note that this will return all resulting beans using a single
+   * persistence context. For queries with very large results use
+   * findEach(), findEachWhile() or findLargeStream().
    * </p>
    * <pre>{@code
    *
-   *  // use try with resources to ensure Stream is closed
-   *
-   *  try (Stream<Customer> stream = query.findStream()) {
-   *    stream
+   *  query.findStream()
    *    .map(...)
    *    .collect(...);
    *  }
    *
    * }</pre>
+   * <p>
+   * Note that with findStream() the resources are closed prior to returning
+   * the stream. There is no need to use try with resources or close the stream.
    */
   @Nonnull
   Stream<T> findStream();
@@ -728,9 +728,11 @@ public interface Query<T> {
   /**
    * Execute the query returning the result as a Stream.
    * <p>
-   * Note that this uses multiple persistence contexts such that we can use
+   * Note that we <b>must</b> ensure the stream is closed and should use
+   * <code>try with resources</code> with findLargeStream().
+   * <p>
+   * This uses multiple persistence contexts such that we can use
    * it with a large number of results.
-   * </p>
    * <pre>{@code
    *
    *  // use try with resources to ensure Stream is closed

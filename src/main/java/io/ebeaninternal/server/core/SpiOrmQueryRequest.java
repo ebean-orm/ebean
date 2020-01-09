@@ -177,9 +177,4 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    */
   boolean isDeleteByStatement();
 
-  /**
-   * Set when we want to use a single persistence context for all beans returned
-   * in the query (so all beans are held in memory)
-   */
-  void setIterateSingleContext();
 }

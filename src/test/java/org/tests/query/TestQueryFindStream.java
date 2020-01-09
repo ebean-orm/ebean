@@ -64,8 +64,7 @@ public class TestQueryFindStream extends BaseTestCase {
   public void manualTest_findSteam_when_streamNotClosed_connectionLeak() {
 
     Stream<Customer> stream = DB.find(Customer.class).findStream();
-    // remember a steam MUST be closed or we leak resources
-    // comment out the close(); below to leak a connection
-    stream.close();
+    // ok to not close this stream now with #1905
+    // stream.close();
   }
 }
