@@ -623,13 +623,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   private boolean isAllowOneManyFetch() {
-
-    if (Mode.LAZYLOAD_MANY == getMode()) {
+    if (Mode.LAZYLOAD_MANY == mode) {
       return false;
-    } else if (hasMaxRowsOrFirstRow() && !isRawSql()) {
-      return false;
+    } else {
+      return !hasMaxRowsOrFirstRow() || isRawSql();
     }
-    return true;
   }
 
   @Override
@@ -1402,8 +1400,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> select(FetchGroup fetchGroup) {
-    this.detail = ((SpiFetchGroup) fetchGroup).detail();
+  public DefaultOrmQuery<T> select(FetchGroup<T> fetchGroup) {
+    this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
     return this;
   }
 
@@ -2077,7 +2075,4 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
-  public boolean isOrderById() {
-    return orderById;
-  }
 }
