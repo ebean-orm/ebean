@@ -269,5 +269,12 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   public <A> BeanDescriptor<A> getElementDescriptor() {
     return (BeanDescriptor<A>)elementDescriptor;
   }
+
+  /**
+   * Clear the table join due to an implied mappedBy.
+   */
+  public void clearTableJoin() {
+    tableJoin.clear();
+  }
 }
 

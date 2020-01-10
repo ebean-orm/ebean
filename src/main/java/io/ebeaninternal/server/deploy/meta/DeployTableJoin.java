@@ -178,4 +178,16 @@ public class DeployTableJoin {
       columns.get(0).setLocalDbColumn(dbColumn);
     }
   }
+
+  /**
+   * Clear the join columns due to an implied mappedBy.
+   * <p>
+   * Effectively prior to clear this was considered a unidirectional OneToMany and the
+   * foreign key was defined by naming convention. Clearing this means that it uses the
+   * foreign key as defined by the implied mappedBy property (the only ManyToOne that
+   * maps back to the parent (that holds the OneToMany).
+   */
+  public void clear() {
+    columns.clear();
+  }
 }

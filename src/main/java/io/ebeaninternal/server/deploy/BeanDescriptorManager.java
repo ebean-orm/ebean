@@ -951,6 +951,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     if (matchSet.size() == 1) {
       // all right with the world
+      prop.clearTableJoin();
       return true;
     }
     if (matchSet.size() == 2) {
