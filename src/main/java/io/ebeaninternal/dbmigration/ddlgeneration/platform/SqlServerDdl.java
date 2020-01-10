@@ -105,9 +105,9 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     StringBuilder sb = new StringBuilder();
+    sb.append(dropIndex(uniqueConstraintName, tableName)).append(";\n");
     sb.append("IF (OBJECT_ID('").append(maxConstraintName(uniqueConstraintName)).append("', 'UQ') IS NOT NULL) ");
-    sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
-    sb.append(dropIndex(uniqueConstraintName, tableName));
+    sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName));
     return sb.toString();
   }
   /**
