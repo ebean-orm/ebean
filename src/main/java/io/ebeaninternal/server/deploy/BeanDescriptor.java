@@ -483,7 +483,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.dbComment = deploy.getDbComment();
     this.partitionMeta = deploy.getPartitionMeta();
     this.storageEngine = deploy.getStorageEngine();
-    this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
+    this.autoTunable = beanFinder == null && (entityType == EntityType.ORM || entityType == EntityType.VIEW);
 
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
