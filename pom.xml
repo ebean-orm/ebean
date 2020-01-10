@@ -384,23 +384,7 @@
         <configuration>
           <doctitle>Ebean 12</doctitle>
           <overview>src/main/java/io/ebean/overview.html</overview>
-          <source>1.8</source>
-          <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
           <excludePackageNames>io.ebeaninternal.*:io.ebeanservice:io.ebean.common:io.ebean.bean:io.ebean.service:io.ebean.metric:io.ebean.util:io.ebean.config.properties:io.ebean.config.dbplatform</excludePackageNames>
-          <docletArtifact>
-            <groupId>org.avaje</groupId>
-            <artifactId>pygments-doclet</artifactId>
-            <version>1.0.0</version>
-          </docletArtifact>
-          <!-- for people using JDK11, our javadoc doclet isn't 11 compatible yet -->
-          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>
-          <additionalparam>
-            -Xdoclint:none
-            -include-basedir ${project.basedir}
-            -attributes "idseparator=-; project_name=${project.name}; \
-            project_version=${project.version}; \
-            project_desc=${project.description}"
-          </additionalparam>
           <linksource>true</linksource>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
         </configuration>
