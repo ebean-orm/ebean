@@ -14,6 +14,7 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.VwCustomer;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -286,6 +287,20 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     assertThat(cities).contains("Auckland").containsNull();
     assertThat(sqlOf(query)).contains("select t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+  }
+
+  @Test
+  public void findSingleWithFetchOnView() {
+
+    ResetBasicData.reset();
+
+    Query<VwCustomer> query = Ebean.find(VwCustomer.class)
+      .fetch("billingAddress", "city");
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertThat(cities).contains("Auckland").containsNull();
   }
 
   @Test
