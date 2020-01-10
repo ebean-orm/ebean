@@ -41,7 +41,8 @@ public class DbMigrationGenerateTest {
     // We use src/test/resources as output directory (so we see in GIT if files will change)
 
     migration.setPathToResources("src/test/resources");
-
+    migration.setMigrationPath("db/migration");
+    migration.setMigrationPath(null); // use the default for this test
 
     // migration.addPlatform(Platform.GENERIC, "generic"); there is no ddl handler for generic
     // migration.addPlatform(Platform.SQLANYWHERE, "sqlanywhere"); and sqlanywhere

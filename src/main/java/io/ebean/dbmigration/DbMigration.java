@@ -63,6 +63,23 @@ public interface DbMigration {
   void setPathToResources(String pathToResources);
 
   /**
+   * Set the path where migrations are generated to (which defaults to "dbmigration").
+   * <p>
+   * Normally we only use this when we use Ebean to generate the database migrations
+   * and then use some other tool like FlywayDB to run the migrations.
+   * <p>
+   * Example: with <code>setMigrationPath("db/migration")</code> ... the migrations
+   * are generated into <code>src/resources/db/migration</code>.
+   * <p>
+   * Note that if Ebean migration runner is used we should not use this method but
+   * instead set the migrationPath via a property such that both the migration generator
+   * and migration runner both use the same path.
+   *
+   * @param migrationPath The path that migrations are generated into.
+   */
+  void setMigrationPath(String migrationPath);
+
+  /**
    * Set the server to use to determine the current model.
    * Typically this is not called explicitly.
    */
