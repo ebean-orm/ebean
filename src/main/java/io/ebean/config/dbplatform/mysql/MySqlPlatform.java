@@ -65,6 +65,8 @@ public class MySqlPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.BLOB, new MySqlBlob());
     dbTypeMap.put(DbType.BINARY, new DbPlatformType("binary", 255));
     dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("json", false));
   }
 
   @Override
