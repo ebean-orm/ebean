@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 /**
  * A basic entity to test simple things.
  */
+//@Index(name = "t_detail_foo_name", unique = true, columnNames = "lower(name)")
 @Entity
 @Table(name = "t_detail_with_other_namexxxyy")
 public class TSDetail {

@@ -765,10 +765,7 @@ public class MTable {
       List<String> nullableColumns = new ArrayList<>();
       for (String columnName : uniq.getColumns()) {
         MColumn col = getColumn(columnName);
-        if (col == null) {
-          throw new IllegalStateException("Column '" + columnName + "' not found in table " + getName());
-        }
-        if (!col.isNotnull()) {
+        if (col != null && !col.isNotnull()) {
           nullableColumns.add(columnName);
         }
       }
