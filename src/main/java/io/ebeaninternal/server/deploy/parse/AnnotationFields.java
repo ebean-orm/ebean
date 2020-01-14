@@ -315,11 +315,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Aggregation aggregation = get(prop, Aggregation.class);
     if (aggregation != null) {
-      prop.setAggregation(aggregation.value());
-    }
-    Sum sum = get(prop, Sum.class);
-    if (sum != null) {
-      prop.setAggregation("sum(" + prop.getName() + ")");
+      prop.setAggregation(aggregation.value().replace("$1", prop.getName()));
     }
 
     Version version = get(prop, Version.class);
