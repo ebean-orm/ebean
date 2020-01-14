@@ -1,6 +1,7 @@
 package org.tests.model.aggregation;
 
 import io.ebean.annotation.Aggregation;
+import io.ebean.annotation.Max;
 import io.ebean.annotation.Sum;
 import io.ebean.annotation.View;
 
@@ -24,7 +25,7 @@ public class DMachineStatsAgg {
   @Aggregation("sum(hours)") // which is the same as: @Sum
   long hours;
 
-  @Aggregation("max(rate)")
+  @Max
   BigDecimal rate;
 
   /**
