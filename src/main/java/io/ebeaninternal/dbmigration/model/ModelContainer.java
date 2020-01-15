@@ -2,7 +2,6 @@ package io.ebeaninternal.dbmigration.model;
 
 import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
@@ -21,6 +20,7 @@ import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migration.Sql;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,13 +83,6 @@ public class ModelContainer {
   }
 
   /**
-   * Return the map of all the non unique non fk indexes.
-   */
-  public Map<String, MIndex> getIndexes() {
-    return indexes;
-  }
-
-  /**
    * Return the table by name.
    */
   public MTable getTable(String tableName) {
@@ -97,10 +90,21 @@ public class ModelContainer {
   }
 
   /**
-   * Return the index by name.
+   * Lookup the matching index during DIFF migration processing.
    */
-  public MIndex getIndex(String indexName) {
-    return indexes.get(indexName);
+  public MIndex getIndex(MIndex newIndex) {
+    return indexes.get(newIndex.getKey());
+  }
+
+  public Collection<MIndex> allIndexes() {
+    return indexes.values();
+  }
+
+  /**
+   * Return true if the index does not exist and should be dropped.
+   */
+  public boolean dropIndex(MIndex existingIndex) {
+    return !indexes.containsKey(existingIndex.getKey());
   }
 
   /**
@@ -201,10 +205,7 @@ public class ModelContainer {
     if (DdlHelp.isDropConstraint(change.getColumnNames())) {
       table.getUniqueConstraints().removeIf(constraint -> constraint.getName().equals(change.getConstraintName()));
     } else {
-      MCompoundUniqueConstraint constraint = new MCompoundUniqueConstraint(
-          SplitColumns.split(change.getColumnNames()), change.isOneToOne(), change.getConstraintName());
-      constraint.setNullableColumns(SplitColumns.split(change.getNullableColumns()));
-      table.getUniqueConstraints().add(constraint);
+      table.getUniqueConstraints().add(new MCompoundUniqueConstraint(change));
     }
   }
 
@@ -216,8 +217,7 @@ public class ModelContainer {
     if (DdlHelp.isDropForeignKey(change.getColumnNames())) {
       table.removeForeignKey(change.getName());
     } else {
-      table.addForeignKey(change.getName(), change.getRefTableName(), change.getIndexName(), change.getColumnNames(),
-          change.getRefColumnNames());
+      table.addForeignKey(change.getName(), change.getRefTableName(), change.getIndexName(), change.getColumnNames(), change.getRefColumnNames());
     }
   }
 
@@ -259,7 +259,8 @@ public class ModelContainer {
     if (indexes.containsKey(indexName)) {
       throw new IllegalStateException("Index [" + indexName + "] already exists in model?");
     }
-    indexes.put(createIndex.getIndexName(), new MIndex(createIndex));
+    MIndex index = new MIndex(createIndex);
+    indexes.put(index.getKey(), index);
   }
 
   /**
@@ -321,7 +322,7 @@ public class ModelContainer {
     if (reusedElementCollection != null) {
       final MIndex index = reusedElementCollection.setReusedElementCollection();
       if (index != null) {
-        indexes.put(index.getIndexName(), index);
+        indexes.put(index.getKey(), index);
       }
     } else {
       if (table.isPartitioned()) {
@@ -332,17 +333,10 @@ public class ModelContainer {
   }
 
   /**
-   * Add a single column index.
+   * Add an index.
    */
-  public void addIndex(String indexName, String tableName, String columnName) {
-    indexes.put(indexName, new MIndex(indexName, tableName, columnName));
-  }
-
-  /**
-   * Add a multi column index.
-   */
-  public void addIndex(String indexName, String tableName, String[] columnNames) {
-    indexes.put(indexName, new MIndex(indexName, tableName, columnNames));
+  public void addIndex(MIndex index) {
+    indexes.put(index.getKey(), index);
   }
 
   /**

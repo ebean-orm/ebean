@@ -7,6 +7,9 @@ import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
+import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.splitWithNull;
+
 /**
  * A unique constraint for multiple columns.
  * <p>
@@ -28,12 +31,41 @@ public class MCompoundUniqueConstraint {
    */
   private final String[] columns;
 
+  private final String platforms;
+
   private String[] nullableColumns;
 
-  public MCompoundUniqueConstraint(String[] columns, Boolean oneToOne, String name) {
+  /**
+   * Create for OneToOne.
+   */
+  public MCompoundUniqueConstraint(String[] columns, String name) {
     this.name = name;
     this.columns = columns;
-    this.oneToOne = Boolean.TRUE.equals(oneToOne);
+    this.oneToOne = true;
+    this.platforms = null;
+  }
+
+  public MCompoundUniqueConstraint(String[] columns, boolean oneToOne, String name, String platforms) {
+    this.name = name;
+    this.columns = columns;
+    this.oneToOne = oneToOne;
+    this.platforms = platforms;
+  }
+
+  public MCompoundUniqueConstraint(AddUniqueConstraint change) {
+    this.name = change.getConstraintName();
+    this.columns = split(change.getColumnNames());
+    this.oneToOne = change.isOneToOne();
+    this.platforms = change.getPlatforms();
+    this.nullableColumns = splitWithNull(change.getNullableColumns());
+  }
+
+  public MCompoundUniqueConstraint(UniqueConstraint uq) {
+    this.name = uq.getName();
+    this.columns = split(uq.getColumnNames());
+    this.oneToOne = uq.isOneToOne();
+    this.platforms = uq.getPlatforms();
+    this.nullableColumns = splitWithNull(uq.getNullableColumns());
   }
 
   /**
@@ -44,7 +76,7 @@ public class MCompoundUniqueConstraint {
   }
 
   /**
-   * Return true if this unqiue constraint is specifically for OneToOne mapping.
+   * Return true if this unique constraint is specifically for OneToOne mapping.
    */
   public boolean isOneToOne() {
     return oneToOne;
@@ -57,12 +89,17 @@ public class MCompoundUniqueConstraint {
     return name;
   }
 
+  public String getPlatforms() {
+    return platforms;
+  }
+
   public UniqueConstraint getUniqueConstraint() {
     UniqueConstraint uq = new UniqueConstraint();
     uq.setName(getName());
     uq.setColumnNames(join(columns));
     uq.setNullableColumns(join(nullableColumns));
     uq.setOneToOne(isOneToOne());
+    uq.setPlatforms(platforms);
     return uq;
   }
 
@@ -76,6 +113,7 @@ public class MCompoundUniqueConstraint {
     create.setColumnNames(join(columns));
     create.setNullableColumns(join(nullableColumns));
     create.setOneToOne(isOneToOne());
+    create.setPlatforms(platforms);
     return create;
   }
 
@@ -83,12 +121,13 @@ public class MCompoundUniqueConstraint {
    * Create a AddUniqueConstraint migration with 'DROP CONSTRAINT' set for this index.
    */
   public AddUniqueConstraint dropUniqueConstraint(String tableName) {
-    AddUniqueConstraint dropUniqueConstraint = new AddUniqueConstraint();
-    dropUniqueConstraint.setConstraintName(name);
-    dropUniqueConstraint.setTableName(tableName);
-    dropUniqueConstraint.setColumnNames(DdlHelp.DROP_CONSTRAINT);
-    dropUniqueConstraint.setNullableColumns(join(nullableColumns));
-    return dropUniqueConstraint;
+    AddUniqueConstraint drop = new AddUniqueConstraint();
+    drop.setConstraintName(name);
+    drop.setTableName(tableName);
+    drop.setColumnNames(DdlHelp.DROP_CONSTRAINT);
+    drop.setNullableColumns(join(nullableColumns));
+    drop.setPlatforms(platforms);
+    return drop;
   }
 
   public void setNullableColumns(String[] nullableColumns) {
@@ -127,9 +166,10 @@ public class MCompoundUniqueConstraint {
       return false;
     }
     MCompoundUniqueConstraint other = (MCompoundUniqueConstraint) obj;
-    return Arrays.equals(columns, other.columns)
-      && Arrays.equals(nullableColumns, other.nullableColumns)
+    // not including platforms in equals check
+    return oneToOne == other.oneToOne
       && Objects.equals(name, other.name)
-      && oneToOne == other.oneToOne;
+      && Arrays.equals(columns, other.columns)
+      && Arrays.equals(nullableColumns, other.nullableColumns);
   }
 }

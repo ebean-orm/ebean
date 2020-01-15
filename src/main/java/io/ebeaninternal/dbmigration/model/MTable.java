@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
+
 /**
  * Holds the logical model for a given Table and everything associated to it.
  * <p>
@@ -173,11 +175,8 @@ public class MTable {
     for (Column column : cols) {
       addColumn(column);
     }
-    List<UniqueConstraint> uqConstraints = createTable.getUniqueConstraint();
-    for (UniqueConstraint uq : uqConstraints) {
-      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(SplitColumns.split(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
-      mUq.setNullableColumns(SplitColumns.split(uq.getNullableColumns()));
-      uniqueConstraints.add(mUq);
+    for (UniqueConstraint uq : createTable.getUniqueConstraint()) {
+      uniqueConstraints.add(new MCompoundUniqueConstraint(uq));
     }
 
     for (ForeignKey fk : createTable.getForeignKey()) {
@@ -189,11 +188,10 @@ public class MTable {
     }
   }
 
-
   public void addForeignKey(String name, String refTableName, String indexName, String columnNames, String refColumnNames) {
     MCompoundForeignKey foreignKey = new MCompoundForeignKey(name, refTableName, indexName);
-    String[] cols = SplitColumns.split(columnNames);
-    String[] refCols = SplitColumns.split(refColumnNames);
+    String[] cols = split(columnNames);
+    String[] refCols = split(refColumnNames);
     for (int i = 0; i < cols.length && i < refCols.length; i++) {
       foreignKey.addColumnPair(cols[i], refCols[i]);
     }
@@ -597,19 +595,8 @@ public class MTable {
   /**
    * Add a unique constraint.
    */
-  public void addUniqueConstraint(String[] columns, boolean oneToOne, String constraintName) {
-    uniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne, constraintName));
-  }
-
-  /**
-   * Add a unique constraint.
-   */
-  public void addUniqueConstraint(List<MColumn> columns, boolean oneToOne, String constraintName) {
-    String[] cols = new String[columns.size()];
-    for (int i = 0; i < columns.size(); i++) {
-      cols[i] = columns.get(i).getName();
-    }
-    addUniqueConstraint(cols, oneToOne, constraintName);
+  public void addUniqueConstraint(MCompoundUniqueConstraint uniqueConstraint) {
+    uniqueConstraints.add(uniqueConstraint);
   }
 
   /**

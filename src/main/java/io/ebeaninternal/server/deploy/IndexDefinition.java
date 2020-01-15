@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.annotation.Platform;
+
 /**
  * Holds multiple column unique constraints defined for an entity.
  */
@@ -9,12 +11,18 @@ public class IndexDefinition {
 
   private final String name;
 
+  private final Platform[] platforms;
+
   private final boolean unique;
 
-  public IndexDefinition(String[] columns, String name, boolean unique) {
+  /**
+   * Create from Index annotation.
+   */
+  public IndexDefinition(String[] columns, String name, boolean unique, Platform[] platforms) {
     this.columns = columns;
     this.unique = unique;
     this.name = name;
+    this.platforms = platforms;
   }
 
   /**
@@ -24,6 +32,23 @@ public class IndexDefinition {
     this.columns = columns;
     this.unique = true;
     this.name = null;
+    this.platforms = null;
+  }
+
+  /**
+   * Return true if this can be used as a unique constraint.
+   */
+  public boolean isUniqueConstraint() {
+    return unique && noColumnFormulas();
+  }
+
+  private boolean noColumnFormulas() {
+    for (String column : columns) {
+      if (column.contains("(")) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -47,4 +72,10 @@ public class IndexDefinition {
     return columns;
   }
 
+  /**
+   * Return the platforms this index applies to.
+   */
+  public Platform[] getPlatforms() {
+    return platforms;
+  }
 }

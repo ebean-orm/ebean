@@ -416,7 +416,7 @@ public class AnnotationFields extends AnnotationParser {
     if (columnNames.length == 1 && hasRelationshipItem(prop)) {
       throw new RuntimeException("Can't use Index on foreign key relationships.");
     }
-    descriptor.addIndex(new IndexDefinition(columnNames, index.name(), index.unique()));
+    descriptor.addIndex(new IndexDefinition(columnNames, index.name(), index.unique(), index.platforms()));
   }
 
   private void readJsonAnnotations(DeployBeanProperty prop) {

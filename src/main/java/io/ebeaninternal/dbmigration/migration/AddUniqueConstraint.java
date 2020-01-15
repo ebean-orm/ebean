@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="columnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="oneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="nullableColumns" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="platforms" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -41,6 +42,8 @@ public class AddUniqueConstraint {
   protected Boolean oneToOne;
   @XmlAttribute(name = "nullableColumns")
   protected String nullableColumns;
+  @XmlAttribute(name = "platforms")
+  protected String platforms;
 
   /**
    * Gets the value of the constraintName property.
@@ -142,4 +145,17 @@ public class AddUniqueConstraint {
     this.nullableColumns = value;
   }
 
+  /**
+   * Return the platforms.
+   */
+  public String getPlatforms() {
+    return platforms;
+  }
+
+  /**
+   * Set the platforms.
+   */
+  public void setPlatforms(String platforms) {
+    this.platforms = platforms;
+  }
 }

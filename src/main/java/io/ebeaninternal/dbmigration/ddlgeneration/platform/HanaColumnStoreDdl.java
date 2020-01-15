@@ -13,7 +13,7 @@ public class HanaColumnStoreDdl extends AbstractHanaDdl {
   }
 
   @Override
-  public String createIndex(String indexName, String tableName, String[] columns) {
+  public String createIndex(String indexName, String tableName, String[] columns, boolean unique) {
     if (columns == null || columns.length == 0) {
       return "-- cannot create index: no columns given";
     }

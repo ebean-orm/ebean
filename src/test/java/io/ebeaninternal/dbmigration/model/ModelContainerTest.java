@@ -40,7 +40,7 @@ public class ModelContainerTest {
     assertThat(fkCol.getReferences()).isNull();
     assertThat(fkCol.getForeignKeyName()).isNull();
 
-    final MIndex index = container.getIndex("ix_ec_table");
+    final MIndex index = container.getIndex(new MIndex("ix_ec_table", "ec_table", "foo"));
     assertThat(index.getTableName()).isEqualTo("ec_table");
     assertThat(index.getColumns()).containsOnly("fk_col");
   }
