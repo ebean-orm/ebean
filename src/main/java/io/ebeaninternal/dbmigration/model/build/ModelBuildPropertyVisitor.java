@@ -1,8 +1,11 @@
 package io.ebeaninternal.dbmigration.model.build;
 
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.IndexSet;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
+import io.ebeaninternal.dbmigration.model.MCompoundUniqueConstraint;
+import io.ebeaninternal.dbmigration.model.MIndex;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Used as part of ModelBuildBeanVisitor and generally adds the MColumn to the associated
@@ -42,7 +46,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   private int countUnique;
   private int countCheck;
 
-
   public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, BeanDescriptor<?> beanDescriptor) {
     this.ctx = ctx;
     this.table = table;
@@ -54,29 +57,53 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Add unique constraints defined via JPA UniqueConstraint annotations.
    */
   private void addIndexes(IndexDefinition[] indexes) {
-
     if (indexes != null) {
       for (IndexDefinition index : indexes) {
         String[] columns = index.getColumns();
         indexSet.add(columns);
-
         if (index.isUnique()) {
-          String uqName = index.getName();
-          if (uqName == null || uqName.trim().isEmpty()) {
-            uqName = determineUniqueConstraintName(columns);
-          }
-          table.addUniqueConstraint(columns, false, uqName);
-
+          table.addUniqueConstraint(createMUniqueConstraint(index, columns));
         } else {
           // 'just' an index (not a unique constraint)
-          String idxName = index.getName();
-          if (idxName == null || idxName.trim().isEmpty()) {
-            idxName = determineIndexName(columns);
-          }
-          ctx.addIndex(idxName, table.getName(), columns);
+          ctx.addIndex(createMIndex(indexName(index), table.getName(), index));
         }
       }
     }
+  }
+
+  private MCompoundUniqueConstraint createMUniqueConstraint(IndexDefinition index, String[] columns) {
+    return new MCompoundUniqueConstraint(columns, false, uniqueConstraintName(index), platforms(index.getPlatforms()));
+  }
+
+  private String uniqueConstraintName(IndexDefinition index) {
+    String uqName = index.getName();
+    if (uqName == null || uqName.trim().isEmpty()) {
+      return determineUniqueConstraintName(index.getColumns());
+    }
+    return uqName;
+  }
+
+  private String indexName(IndexDefinition index) {
+    String idxName = index.getName();
+    if (idxName == null || idxName.trim().isEmpty()) {
+      idxName = determineIndexName(index.getColumns());
+    }
+    return idxName;
+  }
+
+  private MIndex createMIndex(String indexName, String tableName, IndexDefinition index) {
+    return new MIndex(indexName, tableName, index.getColumns(), platforms(index.getPlatforms()));
+  }
+
+  private String platforms(Platform[] platforms) {
+    if (platforms == null || platforms.length == 0) {
+      return null;
+    }
+    StringJoiner joiner = new StringJoiner(",");
+    for (Platform platform : platforms) {
+      joiner.add(platform.name());
+    }
+    return joiner.toString();
   }
 
   @Override
@@ -105,7 +132,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     addDraftTable();
-
     table.updateCompoundIndices();
   }
 
@@ -146,9 +172,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
-
     if (p instanceof BeanPropertyAssocOne) {
-      visitOneImported((BeanPropertyAssocOne)p);
+      visitOneImported((BeanPropertyAssocOne<?>)p);
     } else {
       visitScalar(p);
     }
@@ -222,13 +247,13 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       // for MsSqlServer we need different DDL to handle NULL values on this constraint
       if (modelColumns.size() == 1) {
         MColumn col = modelColumns.get(0);
-        col.setUniqueOneToOne(determineUniqueConstraintName(col.getName()));
         indexSetAdd(col.getName());
+        col.setUniqueOneToOne(determineUniqueConstraintName(col.getName()));
 
       } else {
+        String[] cols = indexSetAdd(toColumnNames(modelColumns));
         String uqName = determineUniqueConstraintName(p.getName());
-        table.addUniqueConstraint(modelColumns, true, uqName);
-        indexSetAdd(modelColumns);
+        table.addUniqueConstraint(new MCompoundUniqueConstraint(cols, uqName));
       }
     }
   }
@@ -313,19 +338,23 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     indexSet.add(column);
   }
 
-  private void indexSetAdd(List<MColumn> modelColumns) {
+  private String[] indexSetAdd(String[] cols) {
+    indexSet.add(cols);
+    return cols;
+  }
+
+  private String[] toColumnNames(List<MColumn> modelColumns) {
     String[] cols = new String[modelColumns.size()];
     for (int i = 0; i < modelColumns.size(); i++) {
       cols[i] = modelColumns.get(i).getName();
     }
-    indexSet.add(cols);
+    return cols;
   }
 
   /**
    * Return the primary key constraint name.
    */
   protected String determinePrimaryKeyName() {
-
     return ctx.primaryKeyName(table.getName());
   }
 
@@ -333,12 +362,10 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the foreign key constraint name given a single column foreign key.
    */
   protected String determineForeignKeyConstraintName(String columnName) {
-
     return ctx.foreignKeyConstraintName(table.getName(), columnName, ++countForeignKey);
   }
 
   protected String determineForeignKeyIndexName(String column) {
-
     String[] cols = {column};
     return determineForeignKeyIndexName(cols);
   }
@@ -347,7 +374,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the foreign key constraint name given a single column foreign key.
    */
   protected String determineForeignKeyIndexName(String[] columns) {
-
     return ctx.foreignKeyIndexName(table.getName(), columns, ++countIndex);
   }
 
@@ -355,7 +381,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the index name given a single column foreign key.
    */
   protected String determineIndexName(String column) {
-
     return ctx.indexName(table.getName(), column, ++countIndex);
   }
 
@@ -363,7 +388,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the index name given multiple columns.
    */
   protected String determineIndexName(String[] columns) {
-
     return ctx.indexName(table.getName(), columns, ++countIndex);
   }
 
@@ -371,7 +395,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the unique constraint name.
    */
   protected String determineUniqueConstraintName(String columnName) {
-
     return ctx.uniqueConstraintName(table.getName(), columnName, ++countUnique);
   }
 
@@ -379,7 +402,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the unique constraint name.
    */
   protected String determineUniqueConstraintName(String[] columnNames) {
-
     return ctx.uniqueConstraintName(table.getName(), columnNames, ++countUnique);
   }
 
@@ -387,10 +409,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
    * Return the constraint name.
    */
   protected String determineCheckConstraintName(String columnName) {
-
     return ctx.checkConstraintName(table.getName(), columnName, ++countCheck);
   }
-
 
   private boolean hasValue(String val) {
     return val != null && !val.isEmpty();

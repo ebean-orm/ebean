@@ -16,6 +16,8 @@ public class MIndex {
 
   private String indexName;
 
+  private String platforms;
+
   private List<String> columns = new ArrayList<>();
 
   /**
@@ -25,6 +27,11 @@ public class MIndex {
     this.tableName = tableName;
     this.indexName = indexName;
     this.columns.add(columnName);
+  }
+
+  public MIndex(String indexName, String tableName, String[] columnNames, String platforms) {
+    this(indexName, tableName, columnNames);
+    this.platforms = platforms;
   }
 
   /**
@@ -40,6 +47,12 @@ public class MIndex {
     this.indexName = createIndex.getIndexName();
     this.tableName = createIndex.getTableName();
     this.columns = split(createIndex.getColumns());
+    this.platforms = createIndex.getPlatforms();
+  }
+
+  public String getKey() {
+    // currently indexName should be unique (not indexName + platforms)
+    return indexName;
   }
 
   /**
@@ -71,6 +84,7 @@ public class MIndex {
     create.setIndexName(indexName);
     create.setTableName(tableName);
     create.setColumns(join());
+    create.setPlatforms(platforms);
     return create;
   }
 
@@ -81,6 +95,7 @@ public class MIndex {
     DropIndex dropIndex = new DropIndex();
     dropIndex.setIndexName(indexName);
     dropIndex.setTableName(tableName);
+    dropIndex.setPlatforms(platforms);
     return dropIndex;
   }
 
@@ -88,7 +103,6 @@ public class MIndex {
    * Compare with an index of the same name.
    */
   public void compare(ModelDiff modelDiff, MIndex newIndex) {
-
     if (changed(newIndex)) {
       // drop and recreate the index
       modelDiff.addDropIndex(dropIndex());

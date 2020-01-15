@@ -12,4 +12,13 @@ public class SplitColumns {
     return columns.split(",");
   }
 
+  /**
+   * Split returning null when columns is null or empty.
+   */
+  public static String[] splitWithNull(String columns) {
+    if (columns == null || columns.isEmpty()) {
+      return null;
+    }
+    return columns.split(",");
+  }
 }

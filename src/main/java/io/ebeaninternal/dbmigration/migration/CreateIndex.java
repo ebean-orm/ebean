@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="indexName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="columns" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="platforms" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -35,6 +36,8 @@ public class CreateIndex {
   protected String tableName;
   @XmlAttribute(name = "columns", required = true)
   protected String columns;
+  @XmlAttribute(name = "platforms")
+  protected String platforms;
 
   /**
    * Gets the value of the indexName property.
@@ -96,4 +99,17 @@ public class CreateIndex {
     this.columns = value;
   }
 
+  /**
+   * Return the platforms.
+   */
+  public String getPlatforms() {
+    return platforms;
+  }
+
+  /**
+   * Set the platforms.
+   */
+  public void setPlatforms(String platforms) {
+    this.platforms = platforms;
+  }
 }

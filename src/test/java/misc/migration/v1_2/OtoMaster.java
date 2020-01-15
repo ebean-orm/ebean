@@ -1,9 +1,18 @@
 package misc.migration.v1_2;
 
+import io.ebean.annotation.Index;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import static io.ebean.annotation.Platform.MYSQL;
+import static io.ebean.annotation.Platform.POSTGRES;
+
+@Index(columnNames = "foo(name)", platforms = {POSTGRES})
+@Index(columnNames = "bar(name)", platforms = {MYSQL})
+@Index(unique = true, columnNames = "foo(name)", platforms = {POSTGRES})
+@Index(unique = true, columnNames = "bar(name)", platforms = {MYSQL})
 @Entity
 @Table(name = "migtest_oto_master")
 public class OtoMaster {

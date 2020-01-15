@@ -115,5 +115,6 @@
         </createTable>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
+        <createIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" columns="lower(name)" platforms="POSTGRES"/>
     </changeSet>
 </migration>

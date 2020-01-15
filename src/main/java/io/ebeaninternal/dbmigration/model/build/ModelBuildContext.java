@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DbPlatformTypeMapping;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
+import io.ebeaninternal.dbmigration.model.MIndex;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -125,12 +126,8 @@ public class ModelBuildContext {
     model.addTableElementCollection(table);
   }
 
-  public void addIndex(String indexName, String tableName, String columnName) {
-    model.addIndex(indexName, tableName, columnName);
-  }
-
-  public void addIndex(String indexName, String tableName, String[] columnNames) {
-    model.addIndex(indexName, tableName, columnNames);
+  public void addIndex(MIndex index) {
+    model.addIndex(index);
   }
 
   /**
