@@ -36,6 +36,22 @@ public class IndexDefinition {
   }
 
   /**
+   * Return true if this can be used as a unique constraint.
+   */
+  public boolean isUniqueConstraint() {
+    return unique && noColumnFormulas();
+  }
+
+  private boolean noColumnFormulas() {
+    for (String column : columns) {
+      if (column.contains("(")) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Return true if this is a unique constraint.
    */
   public boolean isUnique() {

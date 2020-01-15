@@ -451,7 +451,7 @@ public class BaseTableDdl implements TableDdl {
     String tableName = lowerTableName(request.table());
     if (request.indexName() != null) {
       // no matching unique constraint so add the index
-      fkeyBuffer.appendStatement(platformDdl.createIndex(request.indexName(), tableName, request.cols()));
+      fkeyBuffer.appendStatement(platformDdl.createIndex(request.indexName(), tableName, request.cols(), false));
     }
 
     alterTableAddForeignKey(write.getOptions(), fkeyBuffer, request);
@@ -609,10 +609,10 @@ public class BaseTableDdl implements TableDdl {
   }
 
   @Override
-  public void generate(DdlWrite writer, CreateIndex createIndex) throws IOException {
-    if (platformInclude(createIndex.getPlatforms())) {
-      writer.apply().appendStatement(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), split(createIndex.getColumns())));
-      writer.dropAll().appendStatement(platformDdl.dropIndex(createIndex.getIndexName(), createIndex.getTableName()));
+  public void generate(DdlWrite writer, CreateIndex index) throws IOException {
+    if (platformInclude(index.getPlatforms())) {
+      writer.apply().appendStatement(platformDdl.createIndex(index.getIndexName(), index.getTableName(), split(index.getColumns()), Boolean.TRUE.equals(index.isUnique())));
+      writer.dropAll().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName()));
     }
   }
 

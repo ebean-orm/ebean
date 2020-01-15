@@ -61,7 +61,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       for (IndexDefinition index : indexes) {
         String[] columns = index.getColumns();
         indexSet.add(columns);
-        if (index.isUnique()) {
+        if (index.isUniqueConstraint()) {
           table.addUniqueConstraint(createMUniqueConstraint(index, columns));
         } else {
           // 'just' an index (not a unique constraint)
@@ -92,7 +92,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   private MIndex createMIndex(String indexName, String tableName, IndexDefinition index) {
-    return new MIndex(indexName, tableName, index.getColumns(), platforms(index.getPlatforms()));
+    return new MIndex(indexName, tableName, index.getColumns(), platforms(index.getPlatforms()), index.isUnique());
   }
 
   private String platforms(Platform[] platforms) {

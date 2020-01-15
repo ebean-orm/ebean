@@ -20,6 +20,8 @@ public class MIndex {
 
   private List<String> columns = new ArrayList<>();
 
+  private boolean unique;
+
   /**
    * Create a single column non unique index.
    */
@@ -29,9 +31,10 @@ public class MIndex {
     this.columns.add(columnName);
   }
 
-  public MIndex(String indexName, String tableName, String[] columnNames, String platforms) {
+  public MIndex(String indexName, String tableName, String[] columnNames, String platforms, boolean unique) {
     this(indexName, tableName, columnNames);
     this.platforms = platforms;
+    this.unique = unique;
   }
 
   /**
@@ -48,6 +51,7 @@ public class MIndex {
     this.tableName = createIndex.getTableName();
     this.columns = split(createIndex.getColumns());
     this.platforms = createIndex.getPlatforms();
+    this.unique = Boolean.TRUE.equals(createIndex.isUnique());
   }
 
   public String getKey() {
@@ -85,6 +89,9 @@ public class MIndex {
     create.setTableName(tableName);
     create.setColumns(join());
     create.setPlatforms(platforms);
+    if (Boolean.TRUE.equals(unique)) {
+      create.setUnique(Boolean.TRUE);
+    }
     return create;
   }
 
@@ -115,6 +122,9 @@ public class MIndex {
    */
   private boolean changed(MIndex newIndex) {
     if (!tableName.equals(newIndex.getTableName())) {
+      return true;
+    }
+    if (unique != newIndex.unique) {
       return true;
     }
     List<String> newColumns = newIndex.getColumns();

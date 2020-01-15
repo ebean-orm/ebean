@@ -109,6 +109,8 @@ public class PlatformDdl {
 
   protected String addForeignKeySkipCheck = "";
 
+  protected String uniqueIndex = "unique";
+
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
    */
@@ -389,12 +391,14 @@ public class PlatformDdl {
   /**
    * Return the create index statement.
    */
-  public String createIndex(String indexName, String tableName, String[] columns) {
-
+  public String createIndex(String indexName, String tableName, String[] columns, boolean unique) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("create index ").append(maxConstraintName(indexName)).append(" on ").append(tableName);
+    buffer.append("create ");
+    if (unique) {
+      buffer.append(uniqueIndex).append(" ");
+    }
+    buffer.append("index ").append(maxConstraintName(indexName)).append(" on ").append(tableName);
     appendColumns(columns, buffer);
-
     return buffer.toString();
   }
 

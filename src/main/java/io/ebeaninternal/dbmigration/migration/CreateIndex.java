@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="indexName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="columns" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="platforms" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -36,6 +37,8 @@ public class CreateIndex {
   protected String tableName;
   @XmlAttribute(name = "columns", required = true)
   protected String columns;
+  @XmlAttribute(name = "unique")
+  protected Boolean unique;
   @XmlAttribute(name = "platforms")
   protected String platforms;
 
@@ -97,6 +100,20 @@ public class CreateIndex {
    */
   public void setColumns(String value) {
     this.columns = value;
+  }
+
+  /**
+   * Return the unique property.
+   */
+  public Boolean isUnique() {
+    return unique;
+  }
+
+  /**
+   * Set the unique property.
+   */
+  public void setUnique(Boolean unique) {
+    this.unique = unique;
   }
 
   /**
