@@ -92,7 +92,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>config</artifactId>
-      <version>0.3</version>
+      <version>1.0</version>
     </dependency>
 
     <!--
