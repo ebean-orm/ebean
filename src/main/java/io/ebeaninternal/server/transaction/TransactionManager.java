@@ -313,6 +313,11 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   @Override
+  public Connection getQueryPlanConnection() throws SQLException {
+    return dataSourceSupplier.getConnection(null);
+  }
+
+  @Override
   public DataSource getDataSource() {
     return dataSourceSupplier.getDataSource();
   }

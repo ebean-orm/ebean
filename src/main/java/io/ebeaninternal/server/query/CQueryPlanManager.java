@@ -8,11 +8,11 @@ import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
+import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -28,7 +28,7 @@ public class CQueryPlanManager implements QueryPlanManager {
 
   private final ConcurrentHashMap<CQueryBindCapture, Object> plans = new ConcurrentHashMap<>();
 
-  private final DataSource dataSource;
+  private final TransactionManager transactionManager;
 
   private final long defaultThreshold;
 
@@ -38,8 +38,8 @@ public class CQueryPlanManager implements QueryPlanManager {
 
   private final TimedMetric timeBindCapture;
 
-  public CQueryPlanManager(DataSource dataSource, long defaultThreshold, QueryPlanLogger planLogger, ExtraMetrics extraMetrics) {
-    this.dataSource = dataSource;
+  public CQueryPlanManager(TransactionManager transactionManager, long defaultThreshold, QueryPlanLogger planLogger, ExtraMetrics extraMetrics) {
+    this.transactionManager = transactionManager;
     this.defaultThreshold = defaultThreshold;
     this.planLogger = planLogger;
     this.timeCollection = extraMetrics.getPlanCollect();
@@ -65,7 +65,7 @@ public class CQueryPlanManager implements QueryPlanManager {
   }
 
   private List<MetaQueryPlan> collectPlans(QueryPlanRequest request) {
-    try (Connection connection = dataSource.getConnection()) {
+    try (Connection connection = transactionManager.getQueryPlanConnection()) {
       CQueryPlanRequest req = new CQueryPlanRequest(connection, request, plans.keySet().iterator());
       while (req.hasNext()) {
         req.nextCapture();

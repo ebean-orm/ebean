@@ -239,9 +239,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   private final int lazyLoadBatchSize;
 
-  /**
-   * The query batch size
-   */
   private final int queryBatchSize;
 
   private final boolean updateAllPropertiesInBatch;
@@ -275,16 +272,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     beanDescriptorManager.setEbeanServer(this);
     this.updateAllPropertiesInBatch = serverConfig.isUpdateAllPropertiesInBatch();
     this.callStackFactory = initCallStackFactory(serverConfig);
-
     this.persister = config.createPersister(this);
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
     this.dtoQueryEngine = config.createDtoQueryEngine();
-
     this.autoTuneService = config.createAutoTuneService(this);
     this.readAuditPrepare = config.getReadAuditPrepare();
     this.readAuditLogger = config.getReadAuditLogger();
-
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
@@ -293,15 +287,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(docStoreComponents.updateProcessor());
     this.documentStore = docStoreComponents.documentStore();
-    this.queryPlanManager = config.initQueryPlanManager(transactionManager.getDataSource());
+    this.queryPlanManager = config.initQueryPlanManager(transactionManager);
     this.metaInfoManager = new DefaultMetaInfoManager(this);
-
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
-
     // Register with the JVM Shutdown hook
     ShutdownManager.registerEbeanServer(this);
   }

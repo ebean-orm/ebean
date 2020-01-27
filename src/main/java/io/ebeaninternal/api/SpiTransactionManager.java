@@ -4,6 +4,8 @@ import io.ebean.TxScope;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Service provider interface for the transaction manager.
@@ -54,5 +56,10 @@ public interface SpiTransactionManager {
    * Notify of a query only transaction commit.
    */
   void notifyOfQueryOnly(SpiTransaction transaction);
+
+  /**
+   * Return a connection used for query plan collection.
+   */
+  Connection getQueryPlanConnection() throws SQLException;
 
 }
