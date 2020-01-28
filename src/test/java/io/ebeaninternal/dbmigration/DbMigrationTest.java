@@ -20,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DbMigrationTest extends BaseTestCase {
 
-  private int runScript(boolean expectErrors, String scriptName) throws IOException {
+  private void runScript(boolean expectErrors, String scriptName) throws IOException {
     String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
-    return runScript(expectErrors, ddl, scriptName);
+    runScript(expectErrors, ddl, scriptName);
   }
 
-  private int runScript(boolean expectErrors, String content, String scriptName) {
+  private void runScript(boolean expectErrors, String content, String scriptName) {
 
     DdlRunner runner = new DdlRunner(expectErrors, scriptName);
 
@@ -35,12 +35,11 @@ public class DbMigrationTest extends BaseTestCase {
       if (expectErrors) {
         connection.setAutoCommit(true);
       }
-      int count = runner.runAll(content, connection);
+      runner.runAll(content, connection);
       if (expectErrors) {
         connection.setAutoCommit(false);
       }
       transaction.commit();
-      return count;
 
     } catch (SQLException e) {
       throw new PersistenceException("Failed to run script", e);
