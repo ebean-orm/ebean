@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration;
 import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.migration.ddl.DdlAutoCommit;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebean.migration.runner.ScriptTransform;
 import io.ebean.util.JdbcClose;
@@ -47,6 +48,7 @@ public class DdlGenerator {
   private final boolean ddlAutoCommit;
   private final String dbSchema;
   private final ScriptTransform scriptTransform;
+  private final String platformName;
 
   private CurrentModel currentModel;
   private String dropAllContent;
@@ -60,13 +62,15 @@ public class DdlGenerator {
     this.extraDdl = serverConfig.isDdlExtra();
     this.createOnly = serverConfig.isDdlCreateOnly();
     this.dbSchema = serverConfig.getDbSchema();
+    final DatabasePlatform databasePlatform = server.getDatabasePlatform();
+    this.platformName = databasePlatform.getPlatform().base().name();
     if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
       this.ddlAutoCommit = false;
     } else {
       this.runDdl = serverConfig.isDdlRun();
-      this.ddlAutoCommit = server.getDatabasePlatform().isDdlAutoCommit();
+      this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
     }
     this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
     this.baseDir = initBaseDir();
@@ -156,25 +160,29 @@ public class DdlGenerator {
   /**
    * Execute all the DDL statements in the script.
    */
-  public int runScript(Connection connection, boolean expectErrors, String content, String scriptName) {
+  public void runScript(Connection connection, boolean expectErrors, String content, String scriptName) {
 
-    DdlRunner runner = new DdlRunner(expectErrors, scriptName);
+    DdlRunner runner = createDdlRunner(expectErrors, scriptName);
     try {
       if (expectErrors || ddlAutoCommit) {
         connection.setAutoCommit(true);
       }
-      int count = runner.runAll(scriptTransform.transform(content), connection);
+      runner.runAll(scriptTransform.transform(content), connection);
       if (expectErrors || ddlAutoCommit) {
         connection.setAutoCommit(false);
       }
       connection.commit();
-      return count;
+      runner.runNonTransactional(connection);
 
     } catch (SQLException e) {
       throw new PersistenceException("Failed to run script", e);
     } finally {
       JdbcClose.rollback(connection);
     }
+  }
+
+  private DdlRunner createDdlRunner(boolean expectErrors, String scriptName) {
+    return new DdlRunner(expectErrors, scriptName, platformName);
   }
 
   protected void runDropSql(Connection connection) throws IOException {

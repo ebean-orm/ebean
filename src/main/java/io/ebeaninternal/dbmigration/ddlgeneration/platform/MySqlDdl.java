@@ -30,7 +30,7 @@ public class MySqlDdl extends PlatformDdl {
    * Return the drop index statement.
    */
   @Override
-  public String dropIndex(String indexName, String tableName) {
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return "drop index " + maxConstraintName(indexName) + " on " + tableName;
   }
 

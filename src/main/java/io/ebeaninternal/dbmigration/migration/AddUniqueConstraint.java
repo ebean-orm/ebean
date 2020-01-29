@@ -146,16 +146,23 @@ public class AddUniqueConstraint {
   }
 
   /**
-   * Return the platforms.
+   * Gets the value of the platforms property.
+   *
+   * @return possible object is
+   * {@link String }
    */
   public String getPlatforms() {
     return platforms;
   }
 
   /**
-   * Set the platforms.
+   * Sets the value of the platforms property.
+   *
+   * @param value allowed object is
+   *              {@link String }
    */
-  public void setPlatforms(String platforms) {
-    this.platforms = platforms;
+  public void setPlatforms(String value) {
+    this.platforms = value;
   }
+
 }

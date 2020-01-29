@@ -8,21 +8,22 @@ import io.ebean.annotation.Platform;
 public class IndexDefinition {
 
   private final String[] columns;
-
   private final String name;
-
   private final Platform[] platforms;
-
   private final boolean unique;
+  private final boolean concurrent;
+  private final String definition;
 
   /**
    * Create from Index annotation.
    */
-  public IndexDefinition(String[] columns, String name, boolean unique, Platform[] platforms) {
+  public IndexDefinition(String[] columns, String name, boolean unique, Platform[] platforms, boolean concurrent, String definition) {
     this.columns = columns;
     this.unique = unique;
     this.name = name;
     this.platforms = platforms;
+    this.concurrent = concurrent;
+    this.definition = definition;
   }
 
   /**
@@ -33,13 +34,19 @@ public class IndexDefinition {
     this.unique = true;
     this.name = null;
     this.platforms = null;
+    this.concurrent = false;
+    this.definition = null;
   }
 
   /**
    * Return true if this can be used as a unique constraint.
    */
   public boolean isUniqueConstraint() {
-    return unique && noColumnFormulas();
+    return unique && !concurrent && noDefinition() && noColumnFormulas();
+  }
+
+  private boolean noDefinition() {
+    return definition == null || definition.isEmpty();
   }
 
   private boolean noColumnFormulas() {
@@ -77,5 +84,19 @@ public class IndexDefinition {
    */
   public Platform[] getPlatforms() {
     return platforms;
+  }
+
+  /**
+   * Return true if this index has the concurrent flag.
+   */
+  public boolean isConcurrent() {
+    return concurrent;
+  }
+
+  /**
+   * Return the raw definition of the index if supplied.
+   */
+  public String getDefinition() {
+    return definition;
   }
 }

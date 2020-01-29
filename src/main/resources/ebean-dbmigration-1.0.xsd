@@ -291,6 +291,8 @@
       <xsd:attribute name="tableName" type="xsd:string" use="required"/>
       <xsd:attribute name="columns" type="xsd:string" use="required"/>
       <xsd:attribute name="unique" type="xsd:boolean"/>
+      <xsd:attribute name="concurrent" type="xsd:boolean"/>
+      <xsd:attribute name="definition" type="xsd:string"/>
       <xsd:attribute name="platforms" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
@@ -299,6 +301,7 @@
     <xsd:complexType>
       <xsd:attribute name="indexName" type="xsd:string" use="required"/>
       <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="concurrent" type="xsd:boolean"/>
       <xsd:attribute name="platforms" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>

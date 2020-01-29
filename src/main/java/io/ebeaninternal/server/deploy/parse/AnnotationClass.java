@@ -134,7 +134,8 @@ public class AnnotationClass extends AnnotationParser {
     }
 
     for (Index index : findAnnotationsRecursive(cls, Index.class)) {
-      descriptor.addIndex(new IndexDefinition(convertColumnNames(index.columnNames()), index.name(), index.unique(), index.platforms()));
+      descriptor.addIndex(new IndexDefinition(convertColumnNames(index.columnNames()), index.name(),
+        index.unique(), index.platforms(), index.concurrent(), index.definition()));
     }
 
     UniqueConstraint uc = findAnnotationRecursive(cls, UniqueConstraint.class);

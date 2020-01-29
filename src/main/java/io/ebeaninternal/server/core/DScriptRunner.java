@@ -22,9 +22,11 @@ class DScriptRunner implements ScriptRunner {
   private static final String NEWLINE = "\n";
 
   private final SpiEbeanServer server;
+  private final String platformName;
 
   DScriptRunner(SpiEbeanServer server) {
     this.server = server;
+    this.platformName = this.server.getDatabasePlatform().getPlatform().base().name();
   }
 
   @Override
@@ -56,7 +58,7 @@ class DScriptRunner implements ScriptRunner {
     }
 
     String content = content(resource);
-    runScript(content, scriptName, placeholderMap);
+    runScript(content, scriptName, placeholderMap, false);
   }
 
   private String content(URL resource) {
@@ -72,21 +74,25 @@ class DScriptRunner implements ScriptRunner {
     }
   }
 
+  @Override
+  public void runScript(String name, String content, boolean useAutoCommit) {
+    runScript(content, name, null, useAutoCommit);
+  }
 
   /**
    * Execute all the DDL statements in the script.
    */
-  private void runScript(String content, String scriptName, Map<String, String> placeholderMap) {
-
+  private void runScript(String content, String scriptName, Map<String, String> placeholderMap, boolean useAutoCommit) {
     try {
       if (placeholderMap != null) {
         content = ScriptTransform.build(null, placeholderMap).transform(content);
       }
 
       try (Connection connection = obtainConnection()) {
-        DdlRunner runner = new DdlRunner(false, scriptName);
+        DdlRunner runner = new DdlRunner(useAutoCommit, scriptName, platformName);
         runner.runAll(content, connection);
         connection.commit();
+        runner.runNonTransactional(connection);
       }
 
     } catch (SQLException e) {

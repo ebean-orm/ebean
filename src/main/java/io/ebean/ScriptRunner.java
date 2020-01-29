@@ -50,4 +50,13 @@ public interface ScriptRunner {
    */
   void run(URL resource, Map<String, String> placeholderMap);
 
+  /**
+   * Run the raw provided DDL or SQL script.
+   *
+   * @param name          The name of the script for logging purposes
+   * @param content       The SQL content
+   * @param useAutoCommit Set to true to use auto commit true and continue when any errors occur
+   */
+  void runScript(String name, String content, boolean useAutoCommit);
+
 }

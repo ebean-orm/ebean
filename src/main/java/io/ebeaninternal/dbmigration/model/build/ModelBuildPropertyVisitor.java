@@ -92,7 +92,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   private MIndex createMIndex(String indexName, String tableName, IndexDefinition index) {
-    return new MIndex(indexName, tableName, index.getColumns(), platforms(index.getPlatforms()), index.isUnique());
+    return new MIndex(indexName, tableName, index.getColumns(), platforms(index.getPlatforms()), index.isUnique(), index.isConcurrent(), index.getDefinition());
   }
 
   private String platforms(Platform[] platforms) {
