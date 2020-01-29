@@ -188,7 +188,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPostgres() {
-    return Platform.POSTGRES == platform();
+    return Platform.POSTGRES == platform().base();
   }
 
   public boolean isMySql() {

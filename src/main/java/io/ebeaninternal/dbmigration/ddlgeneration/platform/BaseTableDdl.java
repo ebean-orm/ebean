@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.annotation.Platform;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.ServerConfig;
@@ -37,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
 
 /**
@@ -168,18 +170,14 @@ public class BaseTableDdl implements TableDdl {
     }
 
     private List<String> getScriptsForPlatform(List<DdlScript> scripts) {
-      String searchPlatform = platformDdl.getPlatform().getName();
-      List<String> ret = Collections.emptyList();
+      Platform searchPlatform = platformDdl.getPlatform().getPlatform();
       for (DdlScript script : scripts) {
-        if (script.getPlatforms() == null || script.getPlatforms().isEmpty()) {
-          ret = script.getDdl();
-        } else for (String platform : StringHelper.splitNames(script.getPlatforms())) {
-          if (platform.equals(searchPlatform)) {
-           return script.getDdl();
-          }
+        if (matchPlatform(searchPlatform, script.getPlatforms())) {
+          // just returns the first match (rather than appends them)
+          return script.getDdl();
         }
       }
-      return ret;
+      return Collections.emptyList();
     }
 
     /**
@@ -511,16 +509,7 @@ public class BaseTableDdl implements TableDdl {
   }
 
   private boolean platformInclude(String platforms) {
-    if (platforms == null || platforms.isEmpty()) {
-      return true;
-    }
-    String currentPlatform = platformDdl.getPlatform().getPlatform().name();
-    for (String name : StringHelper.splitNames(platforms)) {
-      if (currentPlatform.equalsIgnoreCase(name)) {
-        return true;
-      }
-    }
-    return false;
+    return matchPlatform(platformDdl.getPlatform().getPlatform(), platforms);
   }
 
   /**

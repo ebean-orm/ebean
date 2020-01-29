@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ServerConfigSqlServerTest {
 
   @Ignore
-  @ForPlatform({Platform.SQLSERVER, Platform.SQLSERVER17, Platform.SQLSERVER16})
+  @ForPlatform({Platform.SQLSERVER})
   @Test(expected = PersistenceException.class)
   public void need_explicitPlatform() {
 
@@ -55,7 +55,7 @@ public class ServerConfigSqlServerTest {
   }
 
   @Ignore
-  @ForPlatform({Platform.SQLSERVER, Platform.SQLSERVER17, Platform.SQLSERVER16})
+  @ForPlatform({Platform.SQLSERVER})
   @Test
   public void explicit_17() {
 
@@ -85,7 +85,7 @@ public class ServerConfigSqlServerTest {
   }
 
   @Ignore
-  @ForPlatform({Platform.SQLSERVER, Platform.SQLSERVER17, Platform.SQLSERVER16})
+  @ForPlatform({Platform.SQLSERVER})
   @Test
   public void explicit_16() {
 

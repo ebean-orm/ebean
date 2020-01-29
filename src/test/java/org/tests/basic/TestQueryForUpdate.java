@@ -23,9 +23,7 @@ public class TestQueryForUpdate extends BaseTestCase {
 
 
   @Test
-  @ForPlatform({
-    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL
-  })
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL})
   public void testForUpdate() {
 
     ResetBasicData.reset();
@@ -43,9 +41,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({
-    Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL
-  })
+  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL})
   public void testForUpdate_when_alreadyInPC() {
 
     EBasic basic = new EBasic("test PC cache");
@@ -79,9 +75,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({
-    Platform.H2, Platform.POSTGRES, Platform.SQLSERVER, Platform.ORACLE
-  })
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.SQLSERVER, Platform.ORACLE})
   public void testForUpdate_noWait_noMaxRows() {
 
     ResetBasicData.reset();
@@ -103,9 +97,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({
-    Platform.H2, Platform.POSTGRES, Platform.SQLSERVER
-  })
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.SQLSERVER})
   public void testForUpdate_noWait() {
 
     ResetBasicData.reset();

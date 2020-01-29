@@ -1,7 +1,6 @@
 package io.ebeaninternal.extraddl.model;
 
 import io.ebean.annotation.Platform;
-import io.ebean.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +10,8 @@ import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+
 /**
  * Read ExtraDdl from an XML document.
  */
@@ -18,25 +19,21 @@ public class ExtraDdlXmlReader {
 
   private static final Logger logger = LoggerFactory.getLogger(ExtraDdlXmlReader.class);
 
-  private static final String SQLSERVER = Platform.SQLSERVER.name().toLowerCase();
-
   /**
    * Return the combined extra DDL that should be run given the platform name.
    */
-  public static String buildExtra(String platformName, boolean drops) {
-
-    ExtraDdl read = ExtraDdlXmlReader.read("/extra-ddl.xml");
-    return buildExtra(platformName, drops, read);
+  public static String buildExtra(Platform platform, boolean drops) {
+    return buildExtra(platform, drops, read("/extra-ddl.xml"));
   }
 
   /**
    * Return any extra DDL for supporting partitioning given the database platform.
    */
-  public static String buildPartitioning(String platformName) {
-    return buildExtra(platformName, false, readBuiltinTablePartitioning());
+  public static String buildPartitioning(Platform platform) {
+    return buildExtra(platform, false, readBuiltinTablePartitioning());
   }
 
-  private static String buildExtra(String platformName, boolean drops, ExtraDdl read) {
+  private static String buildExtra(Platform platform, boolean drops, ExtraDdl read) {
 
     if (read == null) {
       return null;
@@ -44,7 +41,7 @@ public class ExtraDdlXmlReader {
 
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
-      if (script.isDrop() == drops && matchPlatform(platformName, script.getPlatforms())) {
+      if (script.isDrop() == drops && matchPlatform(platform, script.getPlatforms())) {
         logger.debug("include script {}", script.getName());
         String value = script.getValue();
         sb.append(value);
@@ -56,44 +53,6 @@ public class ExtraDdlXmlReader {
       }
     }
     return sb.toString();
-  }
-
-  /**
-   * Return true if the script platforms is a match/supported for the given platform.
-   *
-   * @param platformName The database platform we are generating/running DDL for
-   * @param platforms    The platforms (comma delimited) this script should run for
-   */
-  public static boolean matchPlatform(String platformName, String platforms) {
-    if (platforms == null || platforms.trim().isEmpty()) {
-      return true;
-    }
-
-    String genericMatch = genericPlatformMatch(platformName);
-
-    for (String name : StringHelper.splitNames(platforms)) {
-      if (name.toLowerCase().contains(platformName)) {
-        return true;
-      } else if (genericMatch != null && genericMatch.equals(name.toLowerCase())) {
-        // allow sqlserver ... to match sqlserver17 and sqlserver16 platforms
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Return a "generic" platform name that can be used. e.g. sqlserver17 -> sqlserver.
-   */
-  private static String genericPlatformMatch(String platformName) {
-    switch (platformName) {
-      case "sqlserver17":
-        return SQLSERVER;
-      case "sqlserver16":
-        return SQLSERVER;
-      default:
-        return null;
-    }
   }
 
   /**
