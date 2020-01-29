@@ -13,25 +13,24 @@ public class HanaColumnStoreDdl extends AbstractHanaDdl {
   }
 
   @Override
-  public String createIndex(String indexName, String tableName, String[] columns, boolean unique) {
+  public String createIndex(WriteCreateIndex create) {
+    final String[] columns = create.getColumns();
     if (columns == null || columns.length == 0) {
       return "-- cannot create index: no columns given";
     }
-
     if (columns.length == 1) {
-      return "-- explicit index \"" + indexName + "\" for single column \"" + columns[0] + "\" of table \"" + tableName
+      return "-- explicit index \"" + create.getIndexName() + "\" for single column \"" + columns[0] + "\" of table \"" + create.getTableName()
           + "\" is not necessary";
     }
 
     StringBuilder buffer = new StringBuilder();
-    buffer.append("create inverted hash index ").append(maxConstraintName(indexName)).append(" on ").append(tableName);
+    buffer.append("create inverted hash index ").append(maxConstraintName(create.getIndexName())).append(" on ").append(create.getTableName());
     appendColumns(columns, buffer);
-
     return buffer.toString();
   }
 
   @Override
-  public String dropIndex(String indexName, String tableName) {
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
     DdlBuffer buffer = new BaseDdlBuffer(null);
     try {
       buffer.append("delimiter $$").newLine();

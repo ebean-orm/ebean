@@ -56,12 +56,12 @@ public class ClickHouseDdl extends PlatformDdl {
   }
 
   @Override
-  public String dropIndex(String indexName, String tableName) {
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return null;
   }
 
   @Override
-  public String createIndex(String indexName, String tableName, String[] columns, boolean unique) {
+  public String createIndex(WriteCreateIndex create) {
     return null;
   }
 

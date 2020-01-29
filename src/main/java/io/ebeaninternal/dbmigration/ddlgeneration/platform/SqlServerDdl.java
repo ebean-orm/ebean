@@ -58,7 +58,7 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   @Override
-  public String dropIndex(String indexName, String tableName) {
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName + "','U') AND name = '"
         + maxConstraintName(indexName) + "') drop index " + maxConstraintName(indexName) + " ON " + tableName;
   }

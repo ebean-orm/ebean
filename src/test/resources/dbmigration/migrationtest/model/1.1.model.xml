@@ -89,6 +89,8 @@
         <createIndex indexName="ix_migtest_oto_child_name" tableName="migtest_oto_child" columns="name" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic"/>
+        <dropIndex indexName="idxd_migtest_0" tableName="migtest_oto_child" platforms="POSTGRES"/>
+        <dropIndex indexName="ix_migtest_oto_child_lowername_id" tableName="migtest_oto_child" concurrent="true" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" platforms="POSTGRES"/>
     </changeSet>
     <changeSet type="pendingDrops">

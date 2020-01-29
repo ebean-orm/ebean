@@ -451,7 +451,7 @@ public class BaseTableDdl implements TableDdl {
     String tableName = lowerTableName(request.table());
     if (request.indexName() != null) {
       // no matching unique constraint so add the index
-      fkeyBuffer.appendStatement(platformDdl.createIndex(request.indexName(), tableName, request.cols(), false));
+      fkeyBuffer.appendStatement(platformDdl.createIndex(new WriteCreateIndex(request.indexName(), tableName, request.cols(), false)));
     }
 
     alterTableAddForeignKey(write.getOptions(), fkeyBuffer, request);
@@ -611,15 +611,15 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, CreateIndex index) throws IOException {
     if (platformInclude(index.getPlatforms())) {
-      writer.apply().appendStatement(platformDdl.createIndex(index.getIndexName(), index.getTableName(), split(index.getColumns()), Boolean.TRUE.equals(index.isUnique())));
-      writer.dropAll().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName()));
+      writer.apply().appendStatement(platformDdl.createIndex(new WriteCreateIndex(index)));
+      writer.dropAll().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName(), Boolean.TRUE.equals(index.isConcurrent())));
     }
   }
 
   @Override
   public void generate(DdlWrite writer, DropIndex dropIndex) throws IOException {
     if (platformInclude(dropIndex.getPlatforms())) {
-      writer.apply().appendStatement(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName()));
+      writer.apply().appendStatement(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName(), Boolean.TRUE.equals(dropIndex.isConcurrent())));
     }
   }
 

@@ -182,7 +182,7 @@ public class DdlGenerator {
   }
 
   private DdlRunner createDdlRunner(boolean expectErrors, String scriptName) {
-    return new DdlRunner(expectErrors, scriptName, DdlAutoCommit.forPlatform(platformName));
+    return new DdlRunner(expectErrors, scriptName, platformName);
   }
 
   protected void runDropSql(Connection connection) throws IOException {
