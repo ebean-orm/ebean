@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
-import io.ebean.meta.MetricType;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.QueryPlanMetric;
@@ -14,23 +13,23 @@ import io.ebean.metric.TimedMetricMap;
 public class DMetricFactory implements MetricFactory {
 
   @Override
-  public TimedMetricMap createTimedMetricMap(MetricType metricType, String name) {
-    return new DTimedMetricMap(metricType, name);
+  public TimedMetricMap createTimedMetricMap(String name) {
+    return new DTimedMetricMap(name);
   }
 
   @Override
-  public TimedMetric createTimedMetric(MetricType metricType, String name) {
-    return new DTimedMetric(metricType, name);
+  public TimedMetric createTimedMetric(String name) {
+    return new DTimedMetric(name);
   }
 
   @Override
-  public CountMetric createCountMetric(MetricType metricType, String name) {
-    return new DCountMetric(metricType, name);
+  public CountMetric createCountMetric(String name) {
+    return new DCountMetric(name);
   }
 
   @Override
-  public QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, ProfileLocation profileLocation, String sql) {
-    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, profileLocation, sql), new DTimedMetric(metricType, label));
+  public QueryPlanMetric createQueryPlanMetric(Class<?> type, String label, ProfileLocation profileLocation, String sql) {
+    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, profileLocation, sql), new DTimedMetric(label));
   }
 
 }

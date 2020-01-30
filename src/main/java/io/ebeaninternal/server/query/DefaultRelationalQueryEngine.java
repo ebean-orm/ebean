@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
 import io.ebean.SqlRow;
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetricMap;
@@ -38,7 +37,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     this.binder = binder;
     this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
     this.binaryOptimizedUUID = binaryOptimizedUUID;
-    this.timedMetricMap = MetricFactory.get().createTimedMetricMap(MetricType.SQL, "sql.query.");
+    this.timedMetricMap = MetricFactory.get().createTimedMetricMap("sql.query.");
   }
 
   @Override

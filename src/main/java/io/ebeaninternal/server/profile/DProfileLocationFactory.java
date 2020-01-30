@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
-import io.ebean.meta.MetricType;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebean.service.SpiProfileLocationFactory;
@@ -19,7 +18,7 @@ public class DProfileLocationFactory implements SpiProfileLocationFactory {
   @Override
   public ProfileLocation create(int lineNumber, String label) {
 
-    TimedMetric timedMetric = MetricFactory.get().createTimedMetric(MetricType.TXN, "txn.named." + label);
+    TimedMetric timedMetric = MetricFactory.get().createTimedMetric("txn.named." + label);
 
     DTimedProfileLocation loc = new DTimedProfileLocation(lineNumber, label, timedMetric);
     TimedProfileLocationRegistry.register(loc);

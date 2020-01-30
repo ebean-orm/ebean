@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetaTimedMetric;
-import io.ebean.meta.MetricType;
 import io.ebean.meta.SortMetric;
 import org.junit.Test;
 
@@ -62,6 +61,6 @@ public class SortMetricTest {
   }
 
   private DTimeMetricStats create(String name) {
-    return new DTimeMetricStats(MetricType.L2, name, false, 0, 0, 0);
+    return new DTimeMetricStats(name, false, 0, 0, 0);
   }
 }

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.CountMetricStats;
@@ -12,14 +11,11 @@ import java.util.concurrent.atomic.LongAdder;
  */
 class DCountMetric implements CountMetric {
 
-  private final MetricType metricType;
-
   private final String name;
 
   private final LongAdder count = new LongAdder();
 
-  DCountMetric(MetricType metricType, String name) {
-    this.metricType = metricType;
+  DCountMetric(String name) {
     this.name = name;
   }
 
@@ -55,25 +51,18 @@ class DCountMetric implements CountMetric {
 
     long val = visitor.isReset() ? count.sumThenReset() : count.sum();
     if (val > 0) {
-      visitor.visitCount(new DCountMetricStats(metricType, name, val));
+      visitor.visitCount(new DCountMetricStats(name, val));
     }
   }
 
   private static class DCountMetricStats implements CountMetricStats {
 
-    private final MetricType metricType;
     private final String name;
     private final long count;
 
-    private DCountMetricStats(MetricType metricType, String name, long count) {
-      this.metricType = metricType;
+    private DCountMetricStats(String name, long count) {
       this.name = name;
       this.count = count;
-    }
-
-    @Override
-    public MetricType getMetricType() {
-      return metricType;
     }
 
     @Override

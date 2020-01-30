@@ -13,7 +13,6 @@ import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
@@ -186,9 +185,9 @@ public class TransactionManager implements SpiTransactionManager {
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
 
     MetricFactory metricFactory = MetricFactory.get();
-    this.txnMain = metricFactory.createTimedMetric(MetricType.TXN, "txn.main");
-    this.txnReadOnly = metricFactory.createTimedMetric(MetricType.TXN, "txn.readonly");
-    this.txnNamed = metricFactory.createTimedMetricMap(MetricType.TXN, "txn.named.");
+    this.txnMain = metricFactory.createTimedMetric("txn.main");
+    this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
+    this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
 
     scopeManager.register(this);
   }
