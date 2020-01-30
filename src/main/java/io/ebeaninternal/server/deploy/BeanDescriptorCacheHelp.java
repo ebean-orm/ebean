@@ -690,7 +690,7 @@ final class BeanDescriptorCacheHelp<T> {
 
       EntityBeanIntercept ebi = bean._ebean_getIntercept();
       // Not using loadContext here so no batch lazy loading for these beans
-      ebi.setBeanLoader(desc.getEbeanServer());
+      ebi.setBeanLoader(desc.l2BeanLoader());
       if (Boolean.TRUE.equals(readOnly)) {
         ebi.setReadOnly(true);
       }

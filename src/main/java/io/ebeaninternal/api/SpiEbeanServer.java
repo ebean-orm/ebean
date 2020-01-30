@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader, BeanCollectionLoader {
+public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollectionLoader {
 
   /**
    * Return the log manager.

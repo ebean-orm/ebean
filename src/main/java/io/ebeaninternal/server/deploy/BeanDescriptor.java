@@ -10,6 +10,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.ServerConfig;
@@ -2040,7 +2041,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       if (disableLazyLoad) {
         ebi.setDisableLazyLoad(true);
       } else {
-        ebi.setBeanLoader(ebeanServer);
+        ebi.setBeanLoader(refBeanLoader());
       }
       ebi.setReference(idPropertyIndex);
       if (Boolean.TRUE == readOnly) {
@@ -2058,6 +2059,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     }
   }
 
+  SingleBeanLoader refBeanLoader() {
+    return new SingleBeanLoader.Ref(ebeanServer);
+  }
+
+  SingleBeanLoader l2BeanLoader() {
+    return new SingleBeanLoader.L2(ebeanServer);
+  }
+
   /**
    * Create a non read only reference bean without checking cacheSharableBeans.
    */
@@ -2072,7 +2081,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
-      ebi.setBeanLoader(ebeanServer);
+      ebi.setBeanLoader(refBeanLoader());
       ebi.setReference(idPropertyIndex);
       if (pc != null) {
         contextPut(pc, id, eb);

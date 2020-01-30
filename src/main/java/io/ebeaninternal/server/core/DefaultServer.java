@@ -580,6 +580,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void loadBean(EntityBeanIntercept ebi) {
     beanLoader.loadBean(ebi);
+    extraMetrics.incrementLoadOneNoLoader();
+  }
+
+  @Override
+  public void loadBeanRef(EntityBeanIntercept ebi) {
+    beanLoader.loadBean(ebi);
+    extraMetrics.incrementLoadOneRef();
+  }
+
+  @Override
+  public void loadBeanL2(EntityBeanIntercept ebi) {
+    beanLoader.loadBean(ebi);
+    extraMetrics.incrementLoadOneL2();
   }
 
   @Override

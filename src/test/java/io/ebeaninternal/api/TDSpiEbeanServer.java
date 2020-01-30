@@ -324,10 +324,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void loadBean(EntityBeanIntercept ebi) {
-  }
-
-  @Override
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
   }
 
