@@ -191,7 +191,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Return the id used to identify a particular query for the given bean type.
    */
-  short getProfileId();
+  String getProfileId();
 
   /**
    * Return the profile location for this query.

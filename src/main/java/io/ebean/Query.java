@@ -1525,17 +1525,6 @@ public interface Query<T> {
   }
 
   /**
-   * Set an id to identify this query for profiling purposes.
-   * <p>
-   * The profileId is expected to be unique for a given bean type.
-   * </p>
-   * <p>
-   * Note that the profileId is treated as a short internally and has a MAX value of 32,767.
-   * </p>
-   */
-  Query<T> setProfileId(int profileId);
-
-  /**
    * Set the profile location of this query. This is used to relate query execution metrics
    * back to a location like a specific line of code.
    */

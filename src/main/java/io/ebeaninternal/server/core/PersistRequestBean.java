@@ -244,7 +244,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public void profile(long offset, int flushCount) {
-    profileBase(type.profileEventId, offset, beanDescriptor.getProfileId(), flushCount);
+    profileBase(type.profileEventId, offset, beanDescriptor.getName(), flushCount);
   }
 
   /**
@@ -1332,7 +1332,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public void profile() {
-    profileBase(type.profileEventId, profileOffset, beanDescriptor.getProfileId(), 1);
+    profileBase(type.profileEventId, profileOffset, beanDescriptor.getName(), 1);
   }
 
   /**

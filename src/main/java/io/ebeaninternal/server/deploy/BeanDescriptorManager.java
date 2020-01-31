@@ -787,13 +787,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       .collect(Collectors.toList());
 
     deployDescriptors.sort(Comparator.comparing(DeployBeanDescriptor::getFullName));
-
-    short id = 0;
-    for (DeployBeanDescriptor<?> desc : deployDescriptors) {
-      if (!desc.isEmbedded()) {
-        desc.setProfileId(++id);
-      }
-    }
   }
 
   /**
