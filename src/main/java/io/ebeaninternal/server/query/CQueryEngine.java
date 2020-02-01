@@ -113,7 +113,7 @@ public class CQueryEngine {
       if (request.isLogSummary()) {
         request.getTransaction().logSummary(rcQuery.getSummary());
       }
-      if (request.isQueryCachePut() && !list.isEmpty()) {
+      if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.getDependentTables());
 
         list = Collections.unmodifiableList(list);
