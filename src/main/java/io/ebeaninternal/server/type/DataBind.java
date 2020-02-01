@@ -141,7 +141,7 @@ public class DataBind {
   }
 
   public void setDate(java.sql.Date v) throws SQLException {
-    Calendar timeZone = dataTimeZone.getTimeZone();
+    Calendar timeZone = dataTimeZone.getDateTimeZone();
     if (timeZone != null) {
       pstmt.setDate(++pos, v, timeZone);
     } else {
