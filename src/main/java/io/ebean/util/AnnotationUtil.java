@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Annotation utility methods to find annotations recursively - taken from the spring framework.
@@ -72,11 +73,27 @@ public class AnnotationUtil {
     <A extends Annotation> Set<A> findAnnotations(Class<A> annotationType) {
       return (Set<A>) annotations.getOrDefault(annotationType, Collections.emptySet());
     }
+
     @SuppressWarnings("unchecked")
-    <A extends Annotation>  A findAnnotation(Class<A> annotationType) {
-      Set<Annotation> set =  annotations.get(annotationType);
+    <A extends Annotation> A findAnnotation(Class<A> annotationType) {
+      Set<Annotation> set = annotations.get(annotationType);
       return set == null ? null : (A) set.iterator().next();
     }
+  }
+
+  private static LongAdder time = new LongAdder();
+  private static LongAdder count = new LongAdder();
+
+  private static void inc(long start) {
+    time.add(System.nanoTime() - start);
+    count.increment();
+  }
+
+  public static long scanTime() {
+    return time.sum();
+  }
+  public static long scanCount() {
+    return count.sum();
   }
 
   /**
@@ -95,12 +112,20 @@ public class AnnotationUtil {
    * does not execute specialized search algorithms for classes or methods. It only traverses through Annotations!
    * It also does not filter out platform dependent annotations!
    */
-  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
+  private static <A extends Annotation> A _findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
-
     return annotationMeta.computeIfAbsent(annotatedElement, AnnotationMeta::new).findAnnotation(annotationType);
+  }
+
+  public static <A extends Annotation> A findAnnotation(AnnotatedElement annotatedElement, Class<A> annotationType) {
+    long start = System.nanoTime();
+    try {
+      return _findAnnotation(annotatedElement, annotationType);
+    } finally {
+      inc(start);
+    }
   }
 
   /**
@@ -113,16 +138,19 @@ public class AnnotationUtil {
     if (annotationType == null) {
       return null;
     }
-
-    while (clazz != null && clazz != Object.class) {
-      A ann = findAnnotation(clazz, annotationType);
-      if (ann != null) {
-        return ann;
+    long start = System.nanoTime();
+    try {
+      while (clazz != null && clazz != Object.class) {
+        A ann = _findAnnotation(clazz, annotationType);
+        if (ann != null) {
+          return ann;
+        }
+        clazz = clazz.getSuperclass();
       }
-      clazz = clazz.getSuperclass();
+      return null;
+    } finally {
+      inc(start);
     }
-    return null;
-
   }
 
   /**
@@ -133,32 +161,42 @@ public class AnnotationUtil {
     if (annotationType == null) {
       return null;
     }
-    Set<A> anns = findAnnotations(annotatedElement, annotationType);
-    return getPlatformMatchingAnnotation(anns, platform);
+    long start = System.nanoTime();
+    try {
+      Set<A> anns = _findAnnotations(annotatedElement, annotationType);
+      return getPlatformMatchingAnnotation(anns, platform);
+    } finally {
+      inc(start);
+    }
   }
 
   /**
    * Finds all annotations recusively for a class and its superclasses or interfaces.
    */
   public static <A extends Annotation> Set<A> findAnnotationsRecursive(Class<?> clazz, Class<A> annotationType) {
-    Objects.requireNonNull(annotationType);
-    Set<A> ret = new LinkedHashSet<>();
-    Set<Annotation> visited = new HashSet<>();
-    Set<Class<?>> visitedInterfaces = new HashSet<>();
-    while (clazz != null && !clazz.getName().startsWith("java.lang.")) {
-      findMetaAnnotationsRecursive(clazz, annotationType, ret, visited, visitedInterfaces);
-      clazz = clazz.getSuperclass();
+    long start = System.nanoTime();
+    try {
+      Objects.requireNonNull(annotationType);
+      Set<A> ret = new LinkedHashSet<>();
+      Set<Annotation> visited = new HashSet<>();
+      Set<Class<?>> visitedInterfaces = new HashSet<>();
+      while (clazz != null && !clazz.getName().startsWith("java.lang.")) {
+        findMetaAnnotationsRecursive(clazz, annotationType, ret, visited, visitedInterfaces);
+        clazz = clazz.getSuperclass();
+      }
+      return ret;
+    } finally {
+      inc(start);
     }
-    return ret;
   }
 
   /**
    * Searches the interfaces for annotations.
    */
   private static <A extends Annotation> void findMetaAnnotationsRecursive(Class<?> clazz,
-      Class<A> annotationType, Set<A> ret,
-      Set<Annotation> visited, Set<Class<?>> visitedInterfaces) {
-    ret.addAll(findAnnotations(clazz, annotationType));
+                                                                          Class<A> annotationType, Set<A> ret,
+                                                                          Set<Annotation> visited, Set<Class<?>> visitedInterfaces) {
+    ret.addAll(_findAnnotations(clazz, annotationType));
     for (Class<?> iface : clazz.getInterfaces()) {
       if (!iface.getName().startsWith("java.lang.") && visitedInterfaces.add(iface)) {
         findMetaAnnotationsRecursive(iface, annotationType, ret, visited, visitedInterfaces);
@@ -174,14 +212,22 @@ public class AnnotationUtil {
    * <strong>Warning</strong>: this method operates generically on annotated elements. In other words, this method
    * does not execute specialized search algorithms for classes or methods. It only traverses through Annotations!
    */
+  private static <A extends Annotation> Set<A> _findAnnotations(AnnotatedElement annotatedElement, Class<A> annotationType) {
+    return annotationMeta.computeIfAbsent(annotatedElement, AnnotationMeta::new).findAnnotations(annotationType);
+  }
+
   public static <A extends Annotation> Set<A> findAnnotations(AnnotatedElement annotatedElement, Class<A> annotationType) {
     if (annotationType == null) {
       return null;
     }
-    return annotationMeta.computeIfAbsent(annotatedElement, AnnotationMeta::new).findAnnotations(annotationType);
+    long start = System.nanoTime();
+    try {
+      return _findAnnotations(annotatedElement, annotationType);
+    } finally {
+      inc(start);
+    }
   }
-
-  // caches for getRepeatableValueMethod
+    // caches for getRepeatableValueMethod
   private static Method getNullMethod() {
     try {
       return AnnotationUtil.class.getDeclaredMethod("getNullMethod");
@@ -190,13 +236,11 @@ public class AnnotationUtil {
     }
   }
 
-
-
-  private static Method getValueMethod( Class<? extends Annotation> annType) {
+  private static Method getValueMethod(Class<? extends Annotation> annType) {
     try {
       Method method = annType.getMethod("value");
       if (method.getReturnType().isArray() &&
-          Annotation.class.isAssignableFrom(method.getReturnType().getComponentType())) {
+        Annotation.class.isAssignableFrom(method.getReturnType().getComponentType())) {
         return method;
       }
     } catch (NoSuchMethodException e) {
@@ -223,7 +267,7 @@ public class AnnotationUtil {
    * </ol>
    * (This mechanism is currently used by {@link Where} and {@link Formula})
    */
-  public static <T extends Annotation> T getPlatformMatchingAnnotation(Set<T> anns, Platform matchPlatform) {
+  private static <T extends Annotation> T getPlatformMatchingAnnotation(Set<T> anns, Platform matchPlatform) {
     if (anns.isEmpty()) {
       return null;
     }

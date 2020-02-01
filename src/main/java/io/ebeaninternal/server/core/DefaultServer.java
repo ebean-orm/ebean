@@ -63,6 +63,7 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraMetrics;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
@@ -442,6 +443,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (TenantMode.DB != serverConfig.getTenantMode()) {
       serverConfig.runDbMigration(serverConfig.getDataSource());
     }
+    System.out.println("scan time: " + AnnotationUtil.scanTime() + " count:" + AnnotationUtil.scanCount());
   }
 
   /**
