@@ -82,7 +82,7 @@ public final class Ebean {
 
       } catch (DataSourceConfigurationException e) {
         String msg = "Configuration error creating DataSource for the default Database." +
-          " This typically means a missing application-test.yaml or missing ebean-test-config dependency." +
+          " This typically means a missing application-test.yaml or missing ebean-test dependency." +
           " See https://ebean.io/docs/trouble-shooting#datasource";
         throw new DataSourceConfigurationException(msg, e);
 
