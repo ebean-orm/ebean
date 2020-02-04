@@ -121,11 +121,6 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   }
 
   @Override
-  public Query<T> setProfileId(int profileId) {
-    return this;
-  }
-
-  @Override
   public Query<T> setProfileLocation(ProfileLocation profileLocation) {
     return this;
   }

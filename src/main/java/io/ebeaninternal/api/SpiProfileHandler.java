@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.ProfileLocation;
 import io.ebeaninternal.server.transaction.ProfileStream;
 import io.ebeaninternal.server.transaction.TransactionProfile;
 
@@ -24,7 +25,7 @@ public interface SpiProfileHandler {
    * Create a profiling stream if we are profiling this transaction.
    * Return null if we are not profiling this transaction.
    *
-   * @param profileId The transaction profileId
+   * @param location The profile location
    */
-  ProfileStream createProfileStream(int profileId);
+  ProfileStream createProfileStream(ProfileLocation location);
 }

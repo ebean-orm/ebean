@@ -90,8 +90,8 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
    */
   public abstract int executeNow();
 
-  void profileBase(String event, long offset, short beanTypeId, int beanCount) {
-    transaction.profileStream().addPersistEvent(event, offset, beanTypeId, beanCount);
+  void profileBase(String event, long offset, String beanName, int beanCount) {
+    transaction.profileStream().addPersistEvent(event, offset, beanName, beanCount);
   }
 
   @Override

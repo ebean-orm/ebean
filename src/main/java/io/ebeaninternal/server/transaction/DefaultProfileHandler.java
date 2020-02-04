@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.ProfileLocation;
 import io.ebean.config.ProfilingConfig;
-import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiProfileHandler;
@@ -34,10 +34,8 @@ import static java.time.temporal.ChronoField.YEAR;
  * Default profile handler.
  * <p>
  * Uses ConcurrentLinkedQueue to minimise contention on threads calling collectTransactionProfile().
- * </p>
  * <p>
  * Uses a sleep backoff on the single threaded consumer that reads the profiles and writes them to files.
- * </p>
  */
 public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
@@ -71,8 +69,6 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
   private final long minMicros;
 
-  private final int[] includeIds;
-
   private final long profilesPerFile;
 
   private final boolean verbose;
@@ -91,7 +87,6 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   public DefaultProfileHandler(ProfilingConfig config) {
     this.verbose = config.isVerbose();
     this.minMicros = config.getMinimumMicros();
-    this.includeIds = config.getIncludeProfileIds();
     this.profilesPerFile = config.getProfilesPerFile();
 
     // dedicated single threaded executor for consuming the
@@ -114,28 +109,11 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   }
 
   /**
-   * Create and return a ProfileStream if we are profiling for the given transaction profileId.
+   * Create and return a ProfileStream.
    */
   @Override
-  public ProfileStream createProfileStream(int profileId) {
-
-    if (profileId < 1) {
-      // not this transaction
-      return null;
-    }
-
-    if (includeIds.length == 0) {
-      return new DefaultProfileStream(profileId, verbose);
-    }
-
-    // check if we are profiling this specific transaction profileId, just
-    // perform linear search as this is expected to be a small array
-    for (int includeId : includeIds) {
-      if (includeId == profileId) {
-        return new DefaultProfileStream(profileId, verbose);
-      }
-    }
-    return null;
+  public ProfileStream createProfileStream(ProfileLocation location) {
+    return new DefaultProfileStream(location, verbose);
   }
 
   private void flushCurrentFile() {
@@ -199,7 +177,7 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
       // header
       sb.append(profile.getStartTime()).append(' ')
-        .append(profile.getProfileId()).append(' ')
+        .append(profile.getLabel()).append(' ')
         .append(profile.getTotalMicros()).append(' ');
 
       // summary
@@ -268,14 +246,7 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
   @Override
   public void configure(SpiServer server) {
-
-    StringBuilder sb = new StringBuilder(200);
-    sb.append("Bean profile mapping - ");
-    for (BeanType<?> type : server.getBeanTypes()) {
-      sb.append("profileId:").append(type.getProfileId())
-        .append(" ").append(type.getName()).append(", ");
-    }
-    log.info(sb.toString());
+    // do nothing
   }
 
   @Override

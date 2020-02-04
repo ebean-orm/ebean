@@ -283,11 +283,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean orderById;
 
-  /**
-   * Identity the query for profiling purposes (expected to be unique for a bean type).
-   */
-  private short profileId;
-
   private ProfileLocation profileLocation;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
@@ -350,14 +345,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public short getProfileId() {
-    return profileId;
-  }
-
-  @Override
-  public Query<T> setProfileId(int profileId) {
-    this.profileId = (short) profileId;
-    return this;
+  public String getProfileId() {
+    return getPlanLabel();
   }
 
   @Override

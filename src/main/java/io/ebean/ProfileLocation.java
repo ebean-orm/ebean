@@ -31,9 +31,9 @@ public interface ProfileLocation {
   }
 
   /**
-   * Obtain the location description.
+   * Obtain the description returning true if this is the initial call.
    */
-  String obtain();
+  boolean obtain();
 
   /**
    * Return a short version of the location description.
@@ -46,7 +46,22 @@ public interface ProfileLocation {
   String label();
 
   /**
+   * Return the full location.
+   */
+  String fullLocation();
+
+  /**
    * Add execution time.
    */
   void add(long executionTime);
+
+  /**
+   * Return true if this request should be traced.
+   */
+  boolean trace();
+
+  /**
+   * Set the number of times to trace the transactions for this profile location.
+   */
+  void setTraceCount(int traceCount);
 }

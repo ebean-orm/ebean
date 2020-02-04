@@ -13,12 +13,12 @@ public interface ProfileStream {
   /**
    * Add a query event.
    */
-  void addQueryEvent(String event, long offset, short beanTypeId, int beanCount, short queryId);
+  void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId);
 
   /**
    * Add a persist event.
    */
-  void addPersistEvent(String event, long offset, short beanTypeId, int beanCount);
+  void addPersistEvent(String event, long offset, String beanName, int beanCount);
 
   /**
    * Add the commit/rollback event.

@@ -139,8 +139,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final Map<String, String> namedQuery;
 
-  private final short profileBeanId;
-
   private final boolean multiValueSupported;
   private boolean batchEscalateOnCascadeInsert;
   private boolean batchEscalateOnCascadeDelete;
@@ -441,7 +439,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
@@ -569,14 +566,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
-  }
-
-  /**
-   * Return the id used in profiling to identify the bean type.
-   */
-  @Override
-  public short getProfileId() {
-    return profileBeanId;
   }
 
   /**

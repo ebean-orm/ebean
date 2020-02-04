@@ -214,8 +214,6 @@ public class DeployBeanDescriptor<T> {
   private DeployBeanProperty idProperty;
   private TableJoin primaryKeyJoin;
 
-  private short profileId;
-
   private Object jacksonAnnotatedClass;
 
   /**
@@ -686,20 +684,6 @@ public class DeployBeanDescriptor<T> {
     this.entityType = EntityType.VIEW;
     this.dependentTables = dependentTables;
     setBaseTable(new TableName(viewName), "", "");
-  }
-
-  /**
-   * Set the profileId to identity this bean type.
-   */
-  public void setProfileId(short profileId) {
-    this.profileId = profileId;
-  }
-
-  /**
-   * Return the profileId to identify this bean type.
-   */
-  public short getProfileId() {
-    return profileId;
   }
 
   /**
