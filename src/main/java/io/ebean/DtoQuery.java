@@ -136,4 +136,8 @@ public interface DtoQuery<T> {
    */
   DtoQuery<T> setBufferFetchSizeHint(int bufferFetchSizeHint);
 
+  /**
+   * Use the explicit transaction to execute the query.
+   */
+  DtoQuery<T> usingTransaction(Transaction transaction);
 }

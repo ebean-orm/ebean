@@ -32,7 +32,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   private DataReader dataReader;
 
   DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query) {
-    super(server, query, null);
+    super(server, query, query.getTransaction());
     this.queryEngine = engine;
     this.query = query;
     query.obtainLocation();
