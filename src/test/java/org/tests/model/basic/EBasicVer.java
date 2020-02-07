@@ -1,5 +1,6 @@
 package org.tests.model.basic;
 
+import io.ebean.Model;
 import io.ebean.annotation.Cache;
 
 import javax.persistence.Entity;
@@ -11,7 +12,7 @@ import java.sql.Timestamp;
 @Cache(enableQueryCache = true)
 @Entity
 @Table(name = "e_basicver")
-public class EBasicVer {
+public class EBasicVer extends Model {
 
   @Id
   Integer id;
