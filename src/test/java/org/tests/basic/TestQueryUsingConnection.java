@@ -41,7 +41,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    try (Transaction transaction = DB.getDefault().createTransaction()) {
+    try (Transaction transaction = DB.createTransaction()) {
 
       Transaction current = Transaction.current();
       assertThat(current).isNull();

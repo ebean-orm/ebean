@@ -177,6 +177,18 @@ public class DB {
   }
 
   /**
+   * Create a new transaction that is not held in TransactionThreadLocal.
+   * <p>
+   * You will want to do this if you want multiple Transactions in a single
+   * thread or generally use transactions outside of the TransactionThreadLocal
+   * management.
+   * </p>
+   */
+  public static Transaction createTransaction() {
+    return getDefault().createTransaction();
+  }
+
+  /**
    * Start a transaction additionally specifying the isolation level.
    *
    * @param isolation the Transaction isolation level
