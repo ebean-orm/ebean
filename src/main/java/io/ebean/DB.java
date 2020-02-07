@@ -455,6 +455,13 @@ public class DB {
   }
 
   /**
+   * Save all the beans from a Collection.
+   */
+  public static int saveAll(Object... beans) throws OptimisticLockException {
+    return getDefault().saveAll(beans);
+  }
+
+  /**
    * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
    * properties that violates an unique / primary key. This may be done in an UI save action to
    * validate if the user has entered correct values.

@@ -882,6 +882,11 @@ public interface Database {
   int saveAll(Collection<?> beans) throws OptimisticLockException;
 
   /**
+   * Save all the beans.
+   */
+  int saveAll(Object... beans) throws OptimisticLockException;
+
+  /**
    * Delete the bean.
    * <p>
    * This will return true if the bean was deleted successfully or JDBC batch is being used.

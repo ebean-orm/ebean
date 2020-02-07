@@ -902,6 +902,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public int saveAll(Object... beans) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
   public int saveAll(Collection<?> beans) throws OptimisticLockException {
     return 0;
   }

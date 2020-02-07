@@ -131,6 +131,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1914,6 +1915,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public int saveAll(Collection<?> beans) throws OptimisticLockException {
     return saveAllInternal(beans, null);
+  }
+
+  @Override
+  public int saveAll(Object... beans) throws OptimisticLockException {
+    return saveAllInternal(Arrays.asList(beans), null);
   }
 
   /**
