@@ -1184,6 +1184,30 @@ public interface Query<T> {
   Query<T> setParameter(int position, Object value);
 
   /**
+   * Bind the next positioned parameter.
+   *
+   * <pre>{@code
+   *
+   * // a query with a positioned parameters
+   * String oql = "where status = ? and name = ?";
+   *
+   * List<Order> list = DB.createQuery(Order.class, oql)
+   *   .setParameter(OrderStatus.NEW)
+   *   .setParameter("Rob")
+   *   .findList();
+   *
+   * }</pre>
+   */
+  Query<T> setParameter(Object value);
+
+  /**
+   * Bind all the positioned parameters.
+   * <p>
+   * A convenience for multiple calls to {@link #setParameter(Object)}
+   */
+  Query<T> setParameters(Object... values);
+
+  /**
    * Set the Id value to query. This is used with findOne().
    * <p>
    * You can use this to have further control over the query. For example adding

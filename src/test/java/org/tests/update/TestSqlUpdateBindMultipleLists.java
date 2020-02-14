@@ -46,7 +46,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
 
     assertEquals("delete from o_customer where id in (?,?,?)", sqlUpdate.getGeneratedSql());
 
-    sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (?1)");
+    sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (?1)");
 
     sqlUpdate.setParameter(1, asList(9991, 9993));
     sqlUpdate.execute();
@@ -77,8 +77,8 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
   @Test
   public void positionParamsExpansion_withPrePost_usingParam() {
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?");
-    sqlUpdate.setParams(90, asList(9991, 9992, 9993), 91);
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?");
+    sqlUpdate.setParameters(90, asList(9991, 9992, 9993), 91);
     sqlUpdate.execute();
 
     assertEquals("delete from o_customer where id > ? and id in (?,?,?) and id < ?", sqlUpdate.getGeneratedSql());
@@ -104,13 +104,13 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setBatchMode(true);
 
-      upd.setParams(asList(9991), asList("Foo"), asList(9994));
+      upd.setParameters(asList(9991), asList("Foo"), asList(9994));
       upd.execute();
 
-      upd.setParams(asList(9991, 9992), asList("Foo", "Bar"), asList(1,2,3,4));
+      upd.setParameters(asList(9991, 9992), asList("Foo", "Bar"), asList(1,2,3,4));
       upd.execute();
 
-      upd.setParams(asList(9991), asList("Foo", "Bar", "Baz"), asList(1,2));
+      upd.setParameters(asList(9991), asList("Foo", "Bar", "Baz"), asList(1,2));
       upd.execute();
 
       transaction.commit();
@@ -137,13 +137,13 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setBatchMode(true);
 
-      upd.setParams(asList(9991, 9992, 9993), "Foo");
+      upd.setParameters(asList(9991, 9992, 9993), "Foo");
       upd.execute();
 
-      upd.setParams(asList(9991, 9992), "Bar");
+      upd.setParameters(asList(9991, 9992), "Bar");
       upd.execute();
 
-      upd.setParams(asList(9991, 9992, 9999), "Baz");
+      upd.setParameters(asList(9991, 9992, 9999), "Baz");
       upd.execute();
 
       transaction.commit();
@@ -158,13 +158,13 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setBatchMode(true);
 
-      upd.setParams(asList(9991, 9992, 9993), "Foo");
+      upd.setParameters(asList(9991, 9992, 9993), "Foo");
       upd.addBatch();
 
-      upd.setParams(asList(9991, 9992), "Bar");
+      upd.setParameters(asList(9991, 9992), "Bar");
       upd.addBatch();
 
-      upd.setParams(asList(9991, 9992, 9999), "Baz");
+      upd.setParameters(asList(9991, 9992, 9999), "Baz");
       upd.addBatch();
 
       transaction.commit();
@@ -183,7 +183,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?,?,?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
-      sqlUpdate.setParams(asList(9991, 9992), asList("rob", "jim", "sd"));
+      sqlUpdate.setParameters(asList(9991, 9992), asList("rob", "jim", "sd"));
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?,?) and name in (?,?,?)", sqlUpdate.getGeneratedSql());
 
@@ -192,12 +192,12 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?,?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
-      sqlUpdate.setParams(asList(9991), asList("rob", "jim"));
+      sqlUpdate.setParameters(asList(9991), asList("rob", "jim"));
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
 
-      sqlUpdate.setParams(asList(9992), asList("ro3b", "j3im"));
+      sqlUpdate.setParameters(asList(9992), asList("ro3b", "j3im"));
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
@@ -223,7 +223,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?,?,?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
-      sqlUpdate.setParams(asList(9991, 9992), asList("rob", "jim", "sd"));
+      sqlUpdate.setParameters(asList(9991, 9992), asList("rob", "jim", "sd"));
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?,?) and name in (?,?,?)", sqlUpdate.getGeneratedSql());
 
@@ -232,12 +232,12 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?,?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
-      sqlUpdate.setParams(asList(9991), asList("rob", "jim"));
+      sqlUpdate.setParameters(asList(9991), asList("rob", "jim"));
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 
 
-      sqlUpdate.setParams(asList(9992), asList("ro3b", "j3im"));
+      sqlUpdate.setParameters(asList(9992), asList("ro3b", "j3im"));
       sqlUpdate.execute();
       assertEquals("delete from o_customer where id in (?) and name in (?,?)", sqlUpdate.getGeneratedSql());
 

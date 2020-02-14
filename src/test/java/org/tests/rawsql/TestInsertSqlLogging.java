@@ -26,19 +26,19 @@ public class TestInsertSqlLogging extends BaseTestCase {
       txn.setBatchMode(true);
       txn.setBatchSize(2);
 
-      insert.setNextParameter(10000);
-      insert.setNextParameter("hello");
-      insert.setNextParameter("rob");
+      insert.setParameter(10000);
+      insert.setParameter("hello");
+      insert.setParameter("rob");
       insert.execute();
 
-      insert.setNextParameter(10001);
-      insert.setNextParameter("goodbye");
-      insert.setNextParameter("rob");
+      insert.setParameter(10001);
+      insert.setParameter("goodbye");
+      insert.setParameter("rob");
       insert.execute();
 
-      insert.setNextParameter(10002);
-      insert.setNextParameter("chow");
-      insert.setNextParameter("bob");
+      insert.setParameter(10002);
+      insert.setParameter("chow");
+      insert.setParameter("bob");
       insert.execute();
 
       txn.commit();
@@ -55,19 +55,19 @@ public class TestInsertSqlLogging extends BaseTestCase {
 
     try (Transaction txn = Ebean.beginTransaction()) {
 
-      insert.setNextParameter(10000);
-      insert.setNextParameter("hello");
-      insert.setNextParameter("rob");
+      insert.setParameter(10000);
+      insert.setParameter("hello");
+      insert.setParameter("rob");
       insert.addBatch();
 
-      insert.setNextParameter(10001);
-      insert.setNextParameter("goodbye");
-      insert.setNextParameter("rob");
+      insert.setParameter(10001);
+      insert.setParameter("goodbye");
+      insert.setParameter("rob");
       insert.addBatch();
 
-      insert.setNextParameter(10002);
-      insert.setNextParameter("chow");
-      insert.setNextParameter("bob");
+      insert.setParameter(10002);
+      insert.setParameter("chow");
+      insert.setParameter("bob");
       insert.addBatch();
 
       int[] rows = insert.executeBatch();

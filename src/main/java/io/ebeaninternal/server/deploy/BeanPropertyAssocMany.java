@@ -816,7 +816,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       parentBean = (EntityBean) idProp.getValue(parentBean);
     }
     for (ExportedProperty exportedProperty : exportedProperties) {
-      sql.setNextParameter(exportedProperty.getValue(parentBean));
+      sql.setParameter(exportedProperty.getValue(parentBean));
     }
     importedId.bindImport(sql, other);
   }

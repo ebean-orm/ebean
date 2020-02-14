@@ -276,7 +276,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     ResetBasicData.reset();
 
     DB.sqlUpdate("update contact set is_member=? where last_name like ?")
-      .setParams(true, "B%")
+      .setParameters(true, "B%")
       .execute();
 
     final List<ContactMemberDto> contacts =

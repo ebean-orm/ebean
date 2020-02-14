@@ -131,7 +131,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     if (value == null) {
       throw new PersistenceException("Foreign Key value null?");
     }
-    sql.setNextParameter(value);
+    sql.setParameter(value);
   }
 
   @Override

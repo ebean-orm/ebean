@@ -21,12 +21,12 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
 
     UUID id = UUID.randomUUID();
 
-    Ebean.createSqlUpdate(sql)
-      .setParams(id, "hi", 1)
+    DB.sqlUpdate(sql)
+      .setParameters(id, "hi", 1)
       .executeNow();
 
     UUID foundId = DB.sqlQuery("select id from uuone where id = ?")
-      .setParams(id)
+      .setParameters(id)
       .findSingleAttribute(UUID.class);
 
     assertThat(foundId).isEqualTo(id);

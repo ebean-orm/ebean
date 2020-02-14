@@ -22,7 +22,7 @@ public class OptimisticLockExceptionThrowingDao {
     inMethodTransaction = server.currentTransaction();
 
     Transaction t = server.createTransaction();
-    SqlUpdate u = server.createSqlUpdate("update e_basicver set last_update = last_update+1 where id = ?");
+    SqlUpdate u = server.sqlUpdate("update e_basicver set last_update = last_update+1 where id = ?");
     u.setParameter(1, v.getId());
     int count = server.execute(u, t);
     Assert.assertEquals(1, count);

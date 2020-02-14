@@ -31,7 +31,7 @@ public class TestNativeWithEmbedded extends BaseTestCase {
     LoggedSqlCollector.start();
 
     Query<EPerson> query = Ebean.findNative(EPerson.class, sql);
-    query.setParameter(1, person.getId());
+    query.setParameter(person.getId());
     EPerson one = query.findOne();
 
     assertThat(one.getName()).isEqualTo("Frank");

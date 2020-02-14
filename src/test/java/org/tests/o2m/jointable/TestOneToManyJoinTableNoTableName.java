@@ -49,7 +49,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
     }
 
     int intersectionRows = DB.sqlQuery("select count(*) as total from mkeygroup_monkey where mkeygroup_pid = ?")
-      .setParameter(1, troop.getPid())
+      .setParameter(troop.getPid())
       .findOne()
       .getInteger("total");
 

@@ -23,7 +23,7 @@ public class CustomerRepository extends BeanRepository<Integer, Customer> {
 
   public Customer findMatchName(String matchName) {
     return nativeSql("select id, name from o_customer where name = ?")
-      .setParameter(1, matchName)
+      .setParameter(matchName)
       .findOne();
   }
 

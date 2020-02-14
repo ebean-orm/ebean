@@ -127,7 +127,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
     String nativeSql = "select id, name from o_customer where id > ?";
 
     List<Customer> customers = Ebean.findNative(Customer.class, nativeSql)
-      .setParameter(1, 1)
+      .setParameter(1)
       .findList();
 
     for (Customer customer : customers) {
@@ -191,7 +191,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
     String nativeSql = "select * from o_customer where id > ?";
     List<Customer> customers =
         Ebean.findNative(Customer.class, nativeSql)
-        .setParameter(1, 1)
+        .setParameter(1)
         .fetchQuery("contacts")
         .findList();
 

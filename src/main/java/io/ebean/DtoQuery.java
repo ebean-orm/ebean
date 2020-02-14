@@ -77,12 +77,29 @@ public interface DtoQuery<T> {
   Optional<T> findOneOrEmpty();
 
   /**
-   * The same as bind for named parameters.
+   * Bind all the parameters using index positions.
+   * <p>
+   * Binds each parameter moving the index position each time.
+   * <p>
+   * A convenience for multiple calls to {@link #setParameter(Object)}
+   */
+  DtoQuery<T> setParameters(Object... value);
+
+  /**
+   * Bind the next parameter using index position.
+   * <p>
+   * Bind the parameter using index position starting at 1 and incrementing.
+   * <p>
+   */
+  DtoQuery<T> setParameter(Object value);
+
+  /**
+   * Bind the named parameter.
    */
   DtoQuery<T> setParameter(String name, Object value);
 
   /**
-   * The same as bind for positioned parameters.
+   * Bind the parameter by its index position (1 based like JDBC).
    */
   DtoQuery<T> setParameter(int position, Object value);
 
