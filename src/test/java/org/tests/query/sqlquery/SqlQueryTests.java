@@ -33,7 +33,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
 
     List<BigDecimal> lineAmounts = DB.sqlQuery(sql)
-      .setParameter(1, 3)
+      .setParameter(3)
       .findSingleAttributeList(BigDecimal.class);
 
     assertThat(lineAmounts).isNotEmpty();
@@ -61,7 +61,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
 
     BigDecimal maxPrice = DB.sqlQuery(sql)
-      .setParameter(1, 2)
+      .setParameter(2)
       .findSingleAttribute(BigDecimal.class);
 
     assertThat(maxPrice).isNotNull();
@@ -146,7 +146,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select id, name, status from o_customer where name = ?";
 
     CustDto rob = DB.sqlQuery(sql)
-      .setParameter(1, "Rob")
+      .setParameter("Rob")
       .findOne(CUST_MAPPER);
 
     assertThat(rob.name).isEqualTo("Rob");
@@ -195,7 +195,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select max(id) from o_customer where name != ?";
 
     long maxId = DB.sqlQuery(sql)
-      .setParameter(1, "Rob")
+      .setParameter("Rob")
       .findOne((resultSet, rowNum) -> resultSet.getLong(1));
 
     assertThat(maxId).isGreaterThan(0);

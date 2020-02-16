@@ -46,7 +46,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     int rowCount = server()
       .findNative(Contact.class, sql)
-      .setParameter(1, "J%")
+      .setParameter("J%")
       .findCount();
 
     List<Integer> nativeIds =
@@ -72,7 +72,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     PagedList<Contact> pagedList = server()
       .findNative(Contact.class, sql)
-      .setParameter(1, "J%")
+      .setParameter("J%")
       .setMaxRows(100)
       .findPagedList();
 
@@ -99,7 +99,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     PagedList<Contact> pagedList = server()
       .findNative(Contact.class, sql)
-      .setParameter(1, 100)
+      .setParameter(100)
       .setMaxRows(100)
       .findPagedList();
 
@@ -159,7 +159,7 @@ public class TestQueryFindNative extends BaseTestCase {
     List<Contact> contacts =
       server()
         .findNative(Contact.class, sql)
-        .setParameter(1, "Rob")
+        .setParameter("Rob")
         .findList();
 
 
@@ -206,8 +206,8 @@ public class TestQueryFindNative extends BaseTestCase {
     LoggedSqlCollector.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
-      .setParameter(1, LocalDate.now())
-      .setParameter(2, LocalDate.now())
+      .setParameter(LocalDate.now())
+      .setParameter(LocalDate.now())
       .setFirstRow(1)
       .setMaxRows(10)
       .findList();

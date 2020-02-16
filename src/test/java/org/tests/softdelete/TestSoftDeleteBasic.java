@@ -94,7 +94,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     Ebean.delete(bean);
 
     SqlQuery sqlQuery = DB.sqlQuery("select * from ebasic_soft_delete where id=?");
-    sqlQuery.setParameter(1, bean.getId());
+    sqlQuery.setParameter(bean.getId());
     SqlRow sqlRow = sqlQuery.findOne();
     assertThat(sqlRow).isNotNull();
 

@@ -201,7 +201,7 @@ public class NamedDtoQueryTest extends BaseTestCase {
     ResetBasicData.reset();
 
     List<DCust3> robs = server().createNamedDtoQuery(DCust3.class, "findByNameLike")
-      .setParameter(1, "Rob")
+      .setParameter("Rob")
       .setMaxRows(10)
       .findList();
 

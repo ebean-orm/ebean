@@ -1596,6 +1596,24 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findPagedList(this, transaction);
   }
 
+  @Override
+  public DefaultOrmQuery<T> setParameter(Object value) {
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
+    bindParams.setNextParameter(value);
+    return this;
+  }
+
+  @Override
+  public DefaultOrmQuery<T> setParameters(Object... values) {
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
+    bindParams.setNextParameters(values);
+    return this;
+  }
+
   /**
    * Set an ordered bind parameter according to its position. Note that the position starts at 1 to
    * be consistent with JDBC PreparedStatement. You need to set a parameter value for each ? you
@@ -1615,7 +1633,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public DefaultOrmQuery<T> setParameter(String name, Object value) {
-
     if (namedParams != null) {
       ONamedParam param = namedParams.get(name);
       if (param != null) {

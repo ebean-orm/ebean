@@ -239,11 +239,19 @@ public interface SqlUpdate {
    *   String sql = "insert into audit_log (id, name, version) values (?,?,?)";
    *
    *   DB.sqlUpdate(sql)
-   *       .setParams(UUID.randomUUID(), "Hello", 1)
+   *       .setParameters(UUID.randomUUID(), "Hello", 1)
    *       .executeNow();
    *
    *
    *   // is the same as ...
+   *
+   *   DB.sqlUpdate(sql)
+   *       .setParameter(UUID.randomUUID())
+   *       .setParameter("Hello")
+   *       .setParameter(1)
+   *       .executeNow();
+   *
+   *   // which is the same as ...
    *
    *   DB.sqlUpdate(sql)
    *       .setParameter(1, UUID.randomUUID())
@@ -252,15 +260,26 @@ public interface SqlUpdate {
    *       .executeNow();
    *
    * }</pre>
-   *
    */
+  SqlUpdate setParameters(Object... values);
+
+  /**
+   * Deprecated migrate to setParameters(Object... values).
+   */
+  @Deprecated
   SqlUpdate setParams(Object... values);
 
   /**
-   * Set the next positioned parameter.
+   * Set the next bind parameter by position.
    *
    * @param value The value to bind
    */
+  SqlUpdate setParameter(Object value);
+
+  /**
+   * Deprecated migrate to setParameter(value).
+   */
+  @Deprecated
   SqlUpdate setNextParameter(Object value);
 
   /**

@@ -155,7 +155,7 @@ public class ImportedIdEmbedded implements ImportedId {
     }
     for (ImportedIdSimple anImported : imported) {
       Object scalarValue = anImported.foreignProperty.getValue(embeddedId);
-      sql.setNextParameter(scalarValue);
+      sql.setParameter(scalarValue);
     }
   }
 

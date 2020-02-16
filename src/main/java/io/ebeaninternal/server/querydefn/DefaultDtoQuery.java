@@ -143,6 +143,26 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   }
 
   @Override
+  public DtoQuery<T> setParameters(Object... values) {
+    if (ormQuery != null) {
+      ormQuery.setParameters(values);
+    } else {
+      bindParams.setNextParameters(values);
+    }
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> setParameter(Object value) {
+    if (ormQuery != null) {
+      ormQuery.setParameter(value);
+    } else {
+      bindParams.setNextParameter(value);
+    }
+    return this;
+  }
+
+  @Override
   public String toString() {
     return "DtoQuery [" + sql + "]";
   }

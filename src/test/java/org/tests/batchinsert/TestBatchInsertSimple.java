@@ -220,7 +220,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     // don't write code like the above but use bind values like:
     try (Transaction txn = DB.beginTransaction()) {
       DB.sqlUpdate("update ut_master set name=? where id=?")
-        .setParams("DoNotDoThisPlease", 999999999)
+        .setParameters("DoNotDoThisPlease", 999999999)
         .addBatch();
 
       txn.commit();

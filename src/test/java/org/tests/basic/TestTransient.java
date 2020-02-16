@@ -2,31 +2,35 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
-import org.junit.Assert;
+import io.ebean.DB;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
+
+import java.sql.Types;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestTransient extends BaseTestCase {
 
   @Test
   public void testTransient() {
 
-    ResetBasicData.reset();
-
     Customer cnew = new Customer();
     cnew.setName("testTrans");
 
-    Ebean.save(cnew);
+    DB.save(cnew);
     Integer custId = cnew.getId();
 
-    Customer c = Ebean.find(Customer.class).setAutoTune(false).setId(custId).findOne();
+    Customer c = DB.find(Customer.class).setId(custId).findOne();
 
-    Assert.assertNotNull(c);
+    assertNotNull(c);
 
-    BeanState beanState = Ebean.getBeanState(c);
-    Assert.assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
+    BeanState beanState = DB.getBeanState(c);
+    assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
 
     c.getLock().tryLock();
     try {
@@ -36,33 +40,59 @@ public class TestTransient extends BaseTestCase {
     }
 
     Boolean selected = c.getSelected();
-    Assert.assertNotNull(selected);
+    assertNotNull(selected);
 
-    Assert.assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
+    assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
 
-    Ebean.save(c);
+    DB.save(c);
 
     selected = c.getSelected();
-    Assert.assertNotNull(selected);
+    assertNotNull(selected);
 
     c.setName("Modified");
-    Assert.assertTrue("dirty now", beanState.isNewOrDirty());
+    assertTrue("dirty now", beanState.isNewOrDirty());
 
     selected = c.getSelected();
-    Assert.assertNotNull(selected);
+    assertNotNull(selected);
 
-    Ebean.save(c);
-    Assert.assertFalse("Not dirty after save", beanState.isNewOrDirty());
+    DB.save(c);
+    assertFalse("Not dirty after save", beanState.isNewOrDirty());
 
     selected = c.getSelected();
-    Assert.assertNotNull(selected);
+    assertNotNull(selected);
 
-    String updateStmt = "update customer set name = 'testTrans2' where id = :id";
-    int rows = Ebean.createUpdate(Customer.class, updateStmt).set("id", custId).execute();
+    String updateStmt = "update customer set smallnote = 'testTrans2' where id = :id";
+    int rows = DB.createUpdate(Customer.class, updateStmt)
+      .setParameter("id", custId).execute();
+    assertEquals(1, rows);
+    assertEquals("testTrans2", findNote(custId));
 
-    Assert.assertTrue("changed name back", 1 == rows);
+    rows = DB.createUpdate(Customer.class, "update customer set smallnote = ? where id = ?")
+      .setNull(1, Types.VARCHAR)
+      .setParameter(2, custId).execute();
+    assertEquals(1, rows);
+    assertNull(findNote(custId));
+
+    rows = DB.createUpdate(Customer.class, "update customer set smallnote = ? where id = ?")
+      .setParameter(1, "Foo")
+      .setParameter(2, custId).execute();
+    assertEquals(1, rows);
+    assertEquals("Foo", findNote(custId));
+
+    rows = DB.createUpdate(Customer.class, "update customer set smallnote = :name where id = :id")
+      .setNullParameter("name", Types.VARCHAR)
+      .setParameter("id", custId).execute();
+    assertEquals(1, rows);
+    assertNull(findNote(custId));
 
     // cleanup
-    Ebean.delete(Customer.class, custId);
+    DB.delete(Customer.class, custId);
   }
+
+  private String findNote(Integer custId) {
+    return DB.sqlQuery("select smallnote from o_customer where id = ?")
+        .setParameter(custId)
+        .findSingleAttribute(String.class);
+  }
+
 }

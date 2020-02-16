@@ -927,7 +927,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public void bindElementValue(SqlUpdate insert, Object value) {
     EntityBean bean = (EntityBean) value;
     for (BeanProperty property : propertiesBaseScalar) {
-      insert.setNextParameter(property.getValue(bean));
+      insert.setParameter(property.getValue(bean));
     }
   }
 
@@ -1090,7 +1090,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     Object[] bindValues = idBinder.getBindValues(id);
     for (Object bindValue : bindValues) {
-      sqlDelete.setNextParameter(bindValue);
+      sqlDelete.setParameter(bindValue);
     }
 
     return sqlDelete;
