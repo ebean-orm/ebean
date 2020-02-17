@@ -1,7 +1,9 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
+import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
@@ -42,6 +44,37 @@ public class TestQueryFilterMany extends BaseTestCase {
     // Currently this does not include the query filter
     Ebean.refreshMany(customer, "orders");
 
+  }
+
+  @Test
+  public void test_firstMaxRows() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      .order().asc("id").setMaxRows(5);
+
+    final ExpressionList<Customer> filterMany = query.filterMany("orders").eq("status", Order.Status.NEW);
+    filterMany.setMaxRows(100);
+    filterMany.setFirstRow(3);
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
+
+    assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
+    assertThat(sqlList.get(1)).contains("status = ?");
+
+    if (isH2() || isPostgres()) {
+      assertThat(sqlList.get(0)).doesNotContain("offset");
+      assertThat(sqlList.get(0)).contains(" limit 5");
+      assertThat(sqlList.get(1)).contains(" offset 3");
+      assertThat(sqlList.get(1)).contains(" limit 100");
+    }
   }
 
   @Test

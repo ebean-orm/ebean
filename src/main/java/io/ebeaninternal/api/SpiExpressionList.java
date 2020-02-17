@@ -36,4 +36,11 @@ public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
    * Write the top level where expressions taking into account possible extra idEquals expression.
    */
   void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException;
+
+  /**
+   * Apply firstRow maxRows limits on the filterMany query.
+   */
+  default void applyRowLimits(SpiQuery<?> query) {
+    // do nothing by default
+  }
 }
