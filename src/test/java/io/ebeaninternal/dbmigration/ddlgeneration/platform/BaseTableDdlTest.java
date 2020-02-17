@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 
 public class BaseTableDdlTest {
@@ -96,6 +97,21 @@ public class BaseTableDdlTest {
 
     String ddl = write.apply().getBuffer();
     assertThat(ddl).contains("comment on column mytab.acol is 'my comment'");
+  }
+
+  @Test
+  public void alterTableAddColumnWithComment() throws IOException {
+    BaseTableDdl ddl = new BaseTableDdl(serverConfig, h2ddl);
+    DdlWrite write = new DdlWrite();
+    Column column = new Column();
+    column.setName("my_column");
+    column.setComment("some comment");
+    column.setType("int");
+
+    ddl.alterTableAddColumn(write.apply(), "my_table", column, false, false);
+    assertEquals(
+      "alter table my_table add column my_column int;\n" +
+      "comment on column my_table.my_column is 'some comment';\n", write.apply().getBuffer());
   }
 
   @Test

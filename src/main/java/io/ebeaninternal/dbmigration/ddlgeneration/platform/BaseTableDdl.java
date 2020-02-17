@@ -951,6 +951,10 @@ public class BaseTableDdl implements TableDdl {
     }
 
     platformDdl.alterTableAddColumn(buffer, tableName, column, onHistoryTable, help.getDefaultValue());
+    final String comment = column.getComment();
+    if (comment != null && !comment.isEmpty()) {
+      platformDdl.addColumnComment(buffer, tableName, column.getName(), comment);
+    }
 
     if (!onHistoryTable) {
       help.writeAfter(buffer);
