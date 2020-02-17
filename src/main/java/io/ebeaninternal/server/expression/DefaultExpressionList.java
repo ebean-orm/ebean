@@ -675,8 +675,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonExists(String propertyName, String path) {
-    add(expr.jsonExists(propertyName, path));
-    return this;
+    return add(expr.jsonExists(propertyName, path));
   }
 
   /**
@@ -684,8 +683,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonNotExists(String propertyName, String path) {
-    add(expr.jsonNotExists(propertyName, path));
-    return this;
+    return add(expr.jsonNotExists(propertyName, path));
   }
 
   /**
@@ -693,8 +691,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value) {
-    add(expr.jsonEqualTo(propertyName, path, value));
-    return this;
+    return add(expr.jsonEqualTo(propertyName, path, value));
   }
 
   /**
@@ -702,8 +699,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val) {
-    add(expr.jsonNotEqualTo(propertyName, path, val));
-    return this;
+    return add(expr.jsonNotEqualTo(propertyName, path, val));
   }
 
   /**
@@ -711,8 +707,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val) {
-    add(expr.jsonGreaterThan(propertyName, path, val));
-    return this;
+    return add(expr.jsonGreaterThan(propertyName, path, val));
   }
 
   /**
@@ -720,8 +715,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val) {
-    add(expr.jsonGreaterOrEqual(propertyName, path, val));
-    return this;
+    return add(expr.jsonGreaterOrEqual(propertyName, path, val));
   }
 
   /**
@@ -729,8 +723,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val) {
-    add(expr.jsonLessThan(propertyName, path, val));
-    return this;
+    return add(expr.jsonLessThan(propertyName, path, val));
   }
 
   /**
@@ -738,8 +731,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val) {
-    add(expr.jsonLessOrEqualTo(propertyName, path, val));
-    return this;
+    return add(expr.jsonLessOrEqualTo(propertyName, path, val));
   }
 
   /**
@@ -747,8 +739,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
-    add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
-    return this;
+    return add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
   }
 
   @Override
@@ -759,104 +750,87 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> bitwiseAny(String propertyName, long flags) {
-    add(expr.bitwiseAny(propertyName, flags));
-    return this;
+    return add(expr.bitwiseAny(propertyName, flags));
   }
 
   @Override
   public ExpressionList<T> bitwiseNot(String propertyName, long flags) {
-    add(expr.bitwiseAnd(propertyName, flags, 0));
-    return this;
+    return add(expr.bitwiseAnd(propertyName, flags, 0));
   }
 
   @Override
   public ExpressionList<T> bitwiseAll(String propertyName, long flags) {
-    add(expr.bitwiseAll(propertyName, flags));
-    return this;
+    return add(expr.bitwiseAll(propertyName, flags));
   }
 
   @Override
   public ExpressionList<T> bitwiseAnd(String propertyName, long flags, long match) {
-    add(expr.bitwiseAnd(propertyName, flags, match));
-    return this;
+    return add(expr.bitwiseAnd(propertyName, flags, match));
   }
 
   @Override
   public ExpressionList<T> eq(String propertyName, Object value) {
-    add(expr.eq(propertyName, value));
-    return this;
+    return add(expr.eq(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> eqOrNull(String propertyName, Object value) {
-    add(expr.eqOrNull(propertyName, value));
-    return this;
+    return add(expr.eqOrNull(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> ieq(String propertyName, String value) {
-    add(expr.ieq(propertyName, value));
-    return this;
+    return add(expr.ieq(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> ine(String propertyName, String value) {
-    add(expr.ine(propertyName, value));
-    return this;
+    return add(expr.ine(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> ne(String propertyName, Object value) {
-    add(expr.ne(propertyName, value));
-    return this;
+    return add(expr.ne(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> allEq(Map<String, Object> propertyMap) {
-    add(expr.allEq(propertyMap));
-    return this;
+    return add(expr.allEq(propertyMap));
   }
 
   @Override
   public ExpressionList<T> and(Expression expOne, Expression expTwo) {
-    add(expr.and(expOne, expTwo));
-    return this;
+    return add(expr.and(expOne, expTwo));
   }
 
   @Override
   public ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value) {
-    add(expr.inRangeWith(lowProperty, highProperty, value));
-    return this;
+    return add(expr.inRangeWith(lowProperty, highProperty, value));
   }
 
   @Override
   public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
-    add(expr.inRange(propertyName, value1, value2));
-    return this;
+    return add(expr.inRange(propertyName, value1, value2));
   }
 
   @Override
   public ExpressionList<T> between(String propertyName, Object value1, Object value2) {
-    add(expr.between(propertyName, value1, value2));
-    return this;
+    return add(expr.between(propertyName, value1, value2));
   }
 
   @Override
   public ExpressionList<T> betweenProperties(String lowProperty, String highProperty, Object value) {
-    add(expr.betweenProperties(lowProperty, highProperty, value));
-    return this;
+    return add(expr.betweenProperties(lowProperty, highProperty, value));
   }
 
   @Override
   public ExpressionList<T> contains(String propertyName, String value) {
-    add(expr.contains(propertyName, value));
-    return this;
+    return add(expr.contains(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> endsWith(String propertyName, String value) {
-    add(expr.endsWith(propertyName, value));
-    return this;
+    return add(expr.endsWith(propertyName, value));
   }
 
   @Override
@@ -867,8 +841,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> gt(String propertyName, Object value) {
-    add(expr.gt(propertyName, value));
-    return this;
+    return add(expr.gt(propertyName, value));
   }
 
   @Override
@@ -879,20 +852,17 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> icontains(String propertyName, String value) {
-    add(expr.icontains(propertyName, value));
-    return this;
+    return add(expr.icontains(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> idIn(Object... idValues) {
-    add(expr.idIn(idValues));
-    return this;
+    return add(expr.idIn(idValues));
   }
 
   @Override
   public ExpressionList<T> idIn(Collection<?> idCollection) {
-    add(expr.idIn(idCollection));
-    return this;
+    return add(expr.idIn(idCollection));
   }
 
   @Override
@@ -907,32 +877,27 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> iendsWith(String propertyName, String value) {
-    add(expr.iendsWith(propertyName, value));
-    return this;
+    return add(expr.iendsWith(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> ilike(String propertyName, String value) {
-    add(expr.ilike(propertyName, value));
-    return this;
+    return add(expr.ilike(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> inPairs(Pairs pairs) {
-    add(expr.inPairs(pairs));
-    return this;
+    return add(expr.inPairs(pairs));
   }
 
   @Override
   public ExpressionList<T> in(String propertyName, Query<?> subQuery) {
-    add(expr.in(propertyName, subQuery));
-    return this;
+    return add(expr.in(propertyName, subQuery));
   }
 
   @Override
   public ExpressionList<T> in(String propertyName, Collection<?> values) {
-    add(expr.in(propertyName, values));
-    return this;
+    return add(expr.in(propertyName, values));
   }
 
   @Override
@@ -945,158 +910,132 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> in(String propertyName, Object... values) {
-    add(expr.in(propertyName, values));
-    return this;
+    return add(expr.in(propertyName, values));
   }
 
   @Override
   public ExpressionList<T> notIn(String propertyName, Object... values) {
-    add(expr.notIn(propertyName, values));
-    return this;
+    return add(expr.notIn(propertyName, values));
   }
 
   @Override
   public ExpressionList<T> notIn(String propertyName, Collection<?> values) {
-    add(expr.notIn(propertyName, values));
-    return this;
+    return add(expr.notIn(propertyName, values));
   }
 
   @Override
   public ExpressionList<T> notIn(String propertyName, Query<?> subQuery) {
-    add(expr.notIn(propertyName, subQuery));
-    return this;
+    return add(expr.notIn(propertyName, subQuery));
   }
 
   @Override
   public ExpressionList<T> isEmpty(String propertyName) {
-    add(expr.isEmpty(propertyName));
-    return this;
+    return add(expr.isEmpty(propertyName));
   }
 
   @Override
   public ExpressionList<T> isNotEmpty(String propertyName) {
-    add(expr.isNotEmpty(propertyName));
-    return this;
+    return add(expr.isNotEmpty(propertyName));
   }
 
   @Override
   public ExpressionList<T> exists(Query<?> subQuery) {
-    add(expr.exists(subQuery));
-    return this;
+    return add(expr.exists(subQuery));
   }
 
   @Override
   public ExpressionList<T> notExists(Query<?> subQuery) {
-    add(expr.notExists(subQuery));
-    return this;
+    return add(expr.notExists(subQuery));
   }
 
   @Override
   public ExpressionList<T> isNotNull(String propertyName) {
-    add(expr.isNotNull(propertyName));
-    return this;
+    return add(expr.isNotNull(propertyName));
   }
 
   @Override
   public ExpressionList<T> isNull(String propertyName) {
-    add(expr.isNull(propertyName));
-    return this;
+    return add(expr.isNull(propertyName));
   }
 
   @Override
   public ExpressionList<T> istartsWith(String propertyName, String value) {
-    add(expr.istartsWith(propertyName, value));
-    return this;
+    return add(expr.istartsWith(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> le(String propertyName, Object value) {
-    add(expr.le(propertyName, value));
-    return this;
+    return add(expr.le(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> exampleLike(Object example) {
-    add(expr.exampleLike(example));
-    return this;
+    return add(expr.exampleLike(example));
   }
 
   @Override
   public ExpressionList<T> iexampleLike(Object example) {
-    add(expr.iexampleLike(example));
-    return this;
+    return add(expr.iexampleLike(example));
   }
 
   @Override
   public ExpressionList<T> like(String propertyName, String value) {
-    add(expr.like(propertyName, value));
-    return this;
+    return add(expr.like(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> lt(String propertyName, Object value) {
-    add(expr.lt(propertyName, value));
-    return this;
+    return add(expr.lt(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> ltOrNull(String propertyName, Object value) {
-    add(expr.ltOrNull(propertyName, value));
-    return this;
+    return add(expr.ltOrNull(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> not(Expression exp) {
-    add(expr.not(exp));
-    return this;
+    return add(expr.not(exp));
   }
 
   @Override
   public ExpressionList<T> or(Expression expOne, Expression expTwo) {
-    add(expr.or(expOne, expTwo));
-    return this;
+    return add(expr.or(expOne, expTwo));
   }
 
   @Override
   public ExpressionList<T> arrayContains(String propertyName, Object... elementValue) {
-    add(expr.arrayContains(propertyName, elementValue));
-    return this;
+    return add(expr.arrayContains(propertyName, elementValue));
   }
 
   @Override
   public ExpressionList<T> arrayNotContains(String propertyName, Object... values) {
-    add(expr.arrayNotContains(propertyName, values));
-    return this;
+    return add(expr.arrayNotContains(propertyName, values));
   }
 
   @Override
   public ExpressionList<T> arrayIsEmpty(String propertyName) {
-    add(expr.arrayIsEmpty(propertyName));
-    return this;
+    return add(expr.arrayIsEmpty(propertyName));
   }
 
   @Override
   public ExpressionList<T> arrayIsNotEmpty(String propertyName) {
-    add(expr.arrayIsNotEmpty(propertyName));
-    return this;
+    return add(expr.arrayIsNotEmpty(propertyName));
   }
 
   @Override
   public ExpressionList<T> raw(String raw, Object value) {
-    add(expr.raw(raw, value));
-    return this;
+    return add(expr.raw(raw, value));
   }
 
   @Override
   public ExpressionList<T> raw(String raw, Object... values) {
-    add(expr.raw(raw, values));
-    return this;
+    return add(expr.raw(raw, values));
   }
 
   @Override
   public ExpressionList<T> raw(String raw) {
-    add(expr.raw(raw));
-    return this;
+    return add(expr.raw(raw));
   }
 
   @Override
@@ -1113,8 +1052,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> startsWith(String propertyName, String value) {
-    add(expr.startsWith(propertyName, value));
-    return this;
+    return add(expr.startsWith(propertyName, value));
   }
 
   @Override
@@ -1124,9 +1062,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> match(String propertyName, String search, Match options) {
-    add(expr.textMatch(propertyName, search, options));
     setUseDocStore(true);
-    return this;
+    return add(expr.textMatch(propertyName, search, options));
   }
 
   @Override
@@ -1137,29 +1074,25 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> multiMatch(String query, MultiMatch options) {
     setUseDocStore(true);
-    add(expr.textMultiMatch(query, options));
-    return this;
+    return add(expr.textMultiMatch(query, options));
   }
 
   @Override
   public ExpressionList<T> textSimple(String search, TextSimple options) {
     setUseDocStore(true);
-    add(expr.textSimple(search, options));
-    return this;
+    return add(expr.textSimple(search, options));
   }
 
   @Override
   public ExpressionList<T> textQueryString(String search, TextQueryString options) {
     setUseDocStore(true);
-    add(expr.textQueryString(search, options));
-    return this;
+    return add(expr.textQueryString(search, options));
   }
 
   @Override
   public ExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
     setUseDocStore(true);
-    add(expr.textCommonTerms(search, options));
-    return this;
+    return add(expr.textCommonTerms(search, options));
   }
 
   protected Junction<T> junction(Junction.Type type) {
