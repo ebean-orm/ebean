@@ -196,7 +196,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     Query<Customer> query = server.find(Customer.class)
       .setAutoTune(false)
       .where().gt("id", "JUNK_NOT_A_LONG")
-      .setMaxRows(2);
+      .setMaxRows(2).query();
 
     // this throws an exception immediately
     query.findEach(bean -> {
@@ -221,7 +221,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     Query<Customer> query = server.find(Customer.class)
       .setAutoTune(false)
       .where().gt("id", 0)
-      .setMaxRows(2);
+      .setMaxRows(2).query();
 
     query.findEach(customer -> {
       if (customer != null) {

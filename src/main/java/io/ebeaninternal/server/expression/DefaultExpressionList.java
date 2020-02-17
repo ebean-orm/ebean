@@ -480,9 +480,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> filterMany(String manyProperty, String expressions, Object... params) {
-    query.filterMany(manyProperty).where(expressions, params);
-    return query;
+  public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
+    return query.filterMany(manyProperty).where(expressions, params);
   }
 
   @Override
@@ -521,13 +520,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> setFirstRow(int firstRow) {
-    return query.setFirstRow(firstRow);
+  public ExpressionList<T> setFirstRow(int firstRow) {
+    query.setFirstRow(firstRow);
+    return this;
   }
 
   @Override
-  public Query<T> setMaxRows(int maxRows) {
-    return query.setMaxRows(maxRows);
+  public ExpressionList<T> setMaxRows(int maxRows) {
+    query.setMaxRows(maxRows);
+    return this;
   }
 
   @Override

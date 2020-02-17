@@ -47,6 +47,34 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  public void filterMany_firstMaxRows_fluidStyle() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      // fluid style adding maxRows/firstRow to filterMany
+      .filterMany("orders").eq("status", Order.Status.NEW).setMaxRows(100).setFirstRow(3)
+      .order().asc("id").setMaxRows(5);
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
+    assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
+    assertThat(sqlList.get(1)).contains("status = ?");
+
+    if (isH2() || isPostgres()) {
+      assertThat(sqlList.get(0)).doesNotContain("offset");
+      assertThat(sqlList.get(0)).contains(" limit 5");
+      assertThat(sqlList.get(1)).contains(" offset 3");
+      assertThat(sqlList.get(1)).contains(" limit 100");
+    }
+  }
+
+  @Test
   public void test_firstMaxRows() {
 
     ResetBasicData.reset();
@@ -57,6 +85,7 @@ public class TestQueryFilterMany extends BaseTestCase {
       .where().ieq("name", "Rob")
       .order().asc("id").setMaxRows(5);
 
+    // non-fluid style adding maxRows/firstRow
     final ExpressionList<Customer> filterMany = query.filterMany("orders").eq("status", Order.Status.NEW);
     filterMany.setMaxRows(100);
     filterMany.setFirstRow(3);
@@ -66,6 +95,34 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(2, sqlList.size());
 
+    assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
+    assertThat(sqlList.get(1)).contains("status = ?");
+
+    if (isH2() || isPostgres()) {
+      assertThat(sqlList.get(0)).doesNotContain("offset");
+      assertThat(sqlList.get(0)).contains(" limit 5");
+      assertThat(sqlList.get(1)).contains(" offset 3");
+      assertThat(sqlList.get(1)).contains(" limit 100");
+    }
+  }
+
+  @Test
+  public void filterMany_firstMaxRows_expressionFluidStyle() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      // use expression + fluid style adding maxRows/firstRow to filterMany
+      .filterMany("orders", "status = ?", Order.Status.NEW).setMaxRows(100).setFirstRow(3)
+      .order().asc("id").setMaxRows(5);
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
     assertThat(sqlList.get(1)).contains("status = ?");
 

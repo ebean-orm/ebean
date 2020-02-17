@@ -337,7 +337,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> filterMany(String manyProperty, String expressions, Object... params) {
+  public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
     throw new IllegalStateException("filterMany not allowed on Junction expression list");
   }
 
@@ -864,7 +864,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> setFirstRow(int firstRow) {
+  public ExpressionList<T> setFirstRow(int firstRow) {
     return exprList.setFirstRow(firstRow);
   }
 
@@ -874,7 +874,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> setMaxRows(int maxRows) {
+  public ExpressionList<T> setMaxRows(int maxRows) {
     return exprList.setMaxRows(maxRows);
   }
 

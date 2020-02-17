@@ -516,7 +516,7 @@ public interface ExpressionList<T> {
    * @param expressions  Filter expressions with and, or and ? or ?1 type bind parameters
    * @param params       Bind parameters used in the expressions
    */
-  Query<T> filterMany(String manyProperty, String expressions, Object... params);
+  ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params);
 
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial
@@ -567,14 +567,14 @@ public interface ExpressionList<T> {
    *
    * @see Query#setFirstRow(int)
    */
-  Query<T> setFirstRow(int firstRow);
+  ExpressionList<T> setFirstRow(int firstRow);
 
   /**
    * Set the maximum number of rows to fetch.
    *
    * @see Query#setMaxRows(int)
    */
-  Query<T> setMaxRows(int maxRows);
+  ExpressionList<T> setMaxRows(int maxRows);
 
   /**
    * Set the name of the property which values become the key of a map.

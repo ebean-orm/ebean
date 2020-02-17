@@ -154,15 +154,15 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public Query<T> setMaxRows(int maxRows) {
+  public ExpressionList<T> setMaxRows(int maxRows) {
     this.maxRows = maxRows;
-    return rootQuery;
+    return this;
   }
 
   @Override
-  public Query<T> setFirstRow(int firstRow) {
+  public ExpressionList<T> setFirstRow(int firstRow) {
     this.firstRow = firstRow;
-    return rootQuery;
+    return this;
   }
 
   @Override

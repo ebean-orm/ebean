@@ -53,7 +53,7 @@ public class TestLimitQuery extends BaseTestCase {
       .fetch("details")
       .where().gt("details.id", 0)
       .setMaxRows(3)
-      .setFirstRow(0);
+      .setFirstRow(0).query();
 
     query.findList();
 
@@ -96,7 +96,7 @@ public class TestLimitQuery extends BaseTestCase {
       .setAutoTune(false)
       .fetch("details")
       .where().gt("details.id", 0)
-      .setMaxRows(10);
+      .setMaxRows(10).query();
     //.findList();
 
     List<Order> list = query.findList();
