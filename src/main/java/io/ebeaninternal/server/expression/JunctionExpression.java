@@ -814,6 +814,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public Query<T> orderById(boolean orderById) {
+    return exprList.orderById(orderById);
+  }
+
+  @Override
   public Query<T> query() {
     return exprList.query();
   }

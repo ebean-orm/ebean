@@ -355,6 +355,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> orderById(boolean orderById) {
+    return query.orderById(orderById);
+  }
+
+  @Override
   public Query<T> apply(FetchPath fetchPath) {
     return query.apply(fetchPath);
   }
