@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  * </p>
  * <p>
  * The ExpressionList also duplicates methods that are found on the Query such
- * as findList() and orderBy(). The purpose of these methods is provide a fluid
+ * as findList() and order(). The purpose of these methods is provide a fluid
  * API. The upside of this approach is that you can build and execute a query
  * via chained methods. The down side is that this ExpressionList object has
  * more methods than you would initially expect (the ones duplicated from
@@ -332,7 +332,7 @@ public interface ExpressionList<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -345,7 +345,7 @@ public interface ExpressionList<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1449,7 +1449,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findList();
    * }</pre>
    */
@@ -1470,7 +1470,7 @@ public interface ExpressionList<T> {
    *    .or()
    *      .eq("status", Customer.Status.ACTIVE)
    *      .isNull("anniversary")
-   *    .orderBy().asc("name")
+   *    .order().asc("name")
    *    .findList();
    *
    * }</pre>
@@ -1490,7 +1490,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findList();
    *
    * }</pre>
@@ -1524,7 +1524,7 @@ public interface ExpressionList<T> {
    *       .gt("id", 1)
    *       .eq("anniversary", onAfter)
    *       .endNot()
-   *     .orderBy()
+   *     .order()
    *       .asc("name")
    *     .findList();
    *

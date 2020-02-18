@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
- *     .orderBy("customer.id, id desc")
+ *     .order("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
  *
@@ -885,7 +885,7 @@ public interface Query<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -898,7 +898,7 @@ public interface Query<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1359,10 +1359,6 @@ public interface Query<T> {
    * This follows SQL syntax using commas between each property with the
    * optional asc and desc keywords representing ascending and descending order
    * respectively.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #orderBy(String)}.
-   * </p>
    */
   Query<T> order(String orderByClause);
 

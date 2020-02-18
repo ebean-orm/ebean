@@ -796,7 +796,7 @@ public final class Ebean {
    *   // find orders and their customers
    *   List<Order> list = Ebean.find(Order.class)
    *     .fetch("customer")
-   *     .orderBy("id")
+   *     .order("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate
