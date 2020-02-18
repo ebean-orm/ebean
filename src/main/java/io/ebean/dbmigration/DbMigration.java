@@ -93,7 +93,7 @@ public interface DbMigration {
   /**
    * Set the specific platform to generate DDL for.
    * <p>
-   * If not set this defaults to the platform of the default server.
+   * If not set this defaults to the platform of the default database.
    * </p>
    */
   void setPlatform(Platform platform);
@@ -101,7 +101,7 @@ public interface DbMigration {
   /**
    * Set the specific platform to generate DDL for.
    * <p>
-   * If not set this defaults to the platform of the default server.
+   * If not set this defaults to the platform of the default database.
    * </p>
    */
   void setPlatform(DatabasePlatform databasePlatform);

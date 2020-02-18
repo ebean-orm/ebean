@@ -34,14 +34,14 @@ public class DatabaseFactory {
   }
 
   /**
-   * Create using ebean.properties to configure the server.
+   * Create using ebean.properties to configure the database.
    */
   public static synchronized Database create(String name) {
     return EbeanServerFactory.create(name);
   }
 
   /**
-   * Create using the ServerConfig object to configure the server.
+   * Create using the ServerConfig object to configure the database.
    */
   public static synchronized Database create(DatabaseConfig config) {
     return EbeanServerFactory.create(config);

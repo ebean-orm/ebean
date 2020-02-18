@@ -29,7 +29,7 @@ public class DocStoreConfig {
   protected boolean create;
 
   /**
-   * The URL of the Document store server. For example: http://localhost:9200.
+   * The URL of the Document store. For example: http://localhost:9200.
    */
   protected String url;
 
@@ -131,7 +131,7 @@ public class DocStoreConfig {
   }
 
   /**
-   * Set the URL to the Document store server.
+   * Set the URL to the Document store.
    * <p>
    * For a local ElasticSearch server this would be: http://localhost:9200
    */

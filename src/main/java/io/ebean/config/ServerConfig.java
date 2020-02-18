@@ -1886,7 +1886,7 @@ public class ServerConfig {
   }
 
   /**
-   * Return the database platform to use for this server.
+   * Return the database platform to use for this database.
    */
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
@@ -2282,7 +2282,7 @@ public class ServerConfig {
    * </p>
    *
    * @param cls the entity type (or other type) that should be registered by this
-   *            server.
+   *            database.
    */
   public void addClass(Class<?> cls) {
     classes.add(cls);
@@ -2329,7 +2329,7 @@ public class ServerConfig {
 
   /**
    * Set the list of classes (entities, listeners, scalarTypes etc) that should
-   * be used for this server.
+   * be used for this database.
    * <p>
    * If no classes are specified then the classes are found automatically via
    * searching the class path.
@@ -2343,7 +2343,7 @@ public class ServerConfig {
   }
 
   /**
-   * Return the classes registered for this server. Typically this includes
+   * Return the classes registered for this database. Typically this includes
    * entities and perhaps listeners.
    */
   public List<Class<?>> getClasses() {

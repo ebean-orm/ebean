@@ -187,7 +187,7 @@ public final class Ebean {
   }
 
   /**
-   * Return the ExpressionFactory from the default server.
+   * Return the ExpressionFactory from the default database.
    * <p>
    * The ExpressionFactory is used internally by the query and ExpressionList to
    * build the WHERE and HAVING clauses. Alternatively you can use the
@@ -209,14 +209,14 @@ public final class Ebean {
 
   /**
    * Register the server with this Ebean singleton. Specify if the registered
-   * server is the primary/default server.
+   * server is the primary/default database.
    */
   public static void register(EbeanServer server, boolean defaultServer) {
     serverMgr.register(server, defaultServer);
   }
 
   /**
-   * Backdoor for registering a mock implementation of EbeanServer as the default server.
+   * Backdoor for registering a mock implementation of EbeanServer as the default database.
    */
   protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
     EbeanServer originalPrimaryServer = serverMgr.defaultServer;

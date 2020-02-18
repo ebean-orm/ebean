@@ -122,7 +122,7 @@ public interface Database {
   String getName();
 
   /**
-   * Return the ExpressionFactory for this server.
+   * Return the ExpressionFactory for this database.
    */
   ExpressionFactory getExpressionFactory();
 

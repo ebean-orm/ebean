@@ -13,7 +13,7 @@ package io.ebean.search;
  *    .lowFreqOperatorAnd(true)
  *    .highFreqOperatorAnd(true);
  *
- *  List<Customer> customers = server.find(Customer.class)
+ *  List<Customer> customers = database.find(Customer.class)
  *    .text()
  *    .textCommonTerms("the brown", options)
  *    .findList();

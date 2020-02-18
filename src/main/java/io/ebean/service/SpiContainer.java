@@ -12,7 +12,7 @@ public interface SpiContainer {
   /**
    * Create the EbeanServer for a given configuration.
    *
-   * @param configuration The configuration information for this server.
+   * @param configuration The configuration information for this database.
    */
   EbeanServer createServer(ServerConfig configuration);
 

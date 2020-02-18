@@ -15,8 +15,8 @@ package io.ebean.event;
  *
  *   Object extaBeanToSave = ...;
  *   Transaction t = request.getTransaction();
- *   EbeanServer server = request.getEbeanServer();
- *   server.save(extraBeanToSave, t);
+ *   Database server = request.getEbeanServer();
+ *   database.save(extraBeanToSave, t);
  *
  * }</pre>
  * <p>

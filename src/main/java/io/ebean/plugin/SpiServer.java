@@ -20,7 +20,7 @@ public interface SpiServer extends EbeanServer, BeanLoader {
   ServerConfig getServerConfig();
 
   /**
-   * Return the DatabasePlatform for this server.
+   * Return the DatabasePlatform for this database.
    */
   DatabasePlatform getDatabasePlatform();
 

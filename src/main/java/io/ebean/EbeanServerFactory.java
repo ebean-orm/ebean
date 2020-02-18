@@ -48,7 +48,7 @@ public class EbeanServerFactory {
   }
 
   /**
-   * Create using ebean.properties to configure the server.
+   * Create using ebean.properties to configure the database.
    */
   public static synchronized EbeanServer create(String name) {
 
@@ -59,7 +59,7 @@ public class EbeanServerFactory {
   }
 
   /**
-   * Create using the ServerConfig object to configure the server.
+   * Create using the ServerConfig object to configure the database.
    */
   public static synchronized EbeanServer create(ServerConfig config) {
 

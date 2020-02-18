@@ -295,7 +295,7 @@ public interface Transaction extends AutoCloseable {
    *
    * <pre>{@code
    *
-   * try (Transaction transaction = server.beginTransaction()) {
+   * try (Transaction transaction = database.beginTransaction()) {
    *
    *   // turn on JDBC batch
    *   transaction.setBatchMode(true);
@@ -318,7 +318,7 @@ public interface Transaction extends AutoCloseable {
    * </p>
    * <pre>{@code
    *
-   * try (Transaction transaction = server.beginTransaction()) {
+   * try (Transaction transaction = database.beginTransaction()) {
    *
    *   transaction.setBatchMode(true);
    *   transaction.setBatchSize(100);
