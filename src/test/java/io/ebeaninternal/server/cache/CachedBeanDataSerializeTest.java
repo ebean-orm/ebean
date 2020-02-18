@@ -65,7 +65,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> customers = Ebean.find(Customer.class)
-      .orderBy().asc("id")
+      .order().asc("id")
       .setMaxRows(1).findList();
 
     Customer customer = customers.get(0);

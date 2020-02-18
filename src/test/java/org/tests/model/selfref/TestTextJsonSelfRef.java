@@ -34,7 +34,7 @@ public class TestTextJsonSelfRef extends BaseTestCase {
       }
     });
 
-    List<SelfRefCustomer> customers = Ebean.find(SelfRefCustomer.class).orderBy("id desc").findList();
+    List<SelfRefCustomer> customers = Ebean.find(SelfRefCustomer.class).order("id desc").findList();
 
     // Check that there are no 'reference' beans here
     for (SelfRefCustomer cust : customers) {

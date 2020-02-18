@@ -15,7 +15,7 @@ public class TestQueryOrderById extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .select("id,name")
-      .orderBy("id")
+      .order("id")
       .setFirstRow(1)
       .setMaxRows(5);
 

@@ -28,7 +28,7 @@ public class TestPersistenceContextScopeUsingOrders extends BaseTestCase {
       .setPersistenceContextScope(QUERY)
       .fetch("customer", "id, name")
       .where().istartsWith("customer.name", "rob").eq("customer.id", 1)
-      .orderBy().asc("customer.name")
+      .order().asc("customer.name")
       .findList();
 
     assertTrue(!orders.isEmpty());

@@ -1347,17 +1347,9 @@ public interface Query<T> {
   Query<T> having(Expression addExpressionToHaving);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #order(String)}.
-   * </p>
+   * Deprecated migrate to {@link #order(String)}
    */
+  @Deprecated
   Query<T> orderBy(String orderByClause);
 
   /**
@@ -1380,40 +1372,24 @@ public interface Query<T> {
    * <p>
    * This will never return a null. If no order by clause exists then an 'empty'
    * OrderBy object is returned.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #orderBy()}.
-   * </p>
    */
   OrderBy<T> order();
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #order()}.
-   * </p>
+   * Deprecated migrate to order().
    */
+  @Deprecated
   OrderBy<T> orderBy();
 
   /**
    * Set an OrderBy object to replace any existing OrderBy clause.
-   * <p>
-   * This is EXACTLY the same as {@link #setOrderBy(OrderBy)}.
-   * </p>
    */
   Query<T> setOrder(OrderBy<T> orderBy);
 
   /**
-   * Set an OrderBy object to replace any existing OrderBy clause.
-   * <p>
-   * This is EXACTLY the same as {@link #setOrder(OrderBy)}.
-   * </p>
+   * Deprecated migrate to {@link #setOrder(OrderBy)}
    */
+  @Deprecated
   Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**

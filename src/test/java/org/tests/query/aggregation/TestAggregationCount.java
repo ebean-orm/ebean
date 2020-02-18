@@ -100,7 +100,7 @@ public class TestAggregationCount extends BaseTestCase {
       .startsWith("logs.description", "a")
       .having()
       .ge("count", 1)
-      .orderBy().asc("name");
+      .order().asc("name");
 
     List<TEventOne> list = query2.findList();
     for (TEventOne eventOne : list) {
@@ -125,7 +125,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     Query<TEventOne> query = Ebean.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount")
-      .orderBy().asc("totalUnits").order().asc("name");
+      .order().asc("totalUnits").order().asc("name");
 
     List<TEventOne> list = query.findList();
     assertThat(list).isNotEmpty();
@@ -184,7 +184,7 @@ public class TestAggregationCount extends BaseTestCase {
     Query<TEventOne> query1 = Ebean.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount")
       .having().ge("count", 1)
-      .orderBy().asc("name");
+      .order().asc("name");
 
     query1.findList();
     assertThat(query1.getGeneratedSql()).contains("having count(u1.id) >= ? order by t0.name");
@@ -403,7 +403,7 @@ public class TestAggregationCount extends BaseTestCase {
       Ebean.find(Contact.class)
         .select(concat("lastName",", ","firstName"))
         .where().isNull("phone")
-        .orderBy().asc("lastName")
+        .order().asc("lastName")
         .findSingleAttributeList();
 
     assertThat(names).isNotEmpty();
@@ -424,7 +424,7 @@ public class TestAggregationCount extends BaseTestCase {
       Ebean.find(Contact.class)
         .select(concat("updtime",", ","firstName")+"::String")
         .where().isNull("phone")
-        .orderBy().asc("lastName")
+        .order().asc("lastName")
         .findSingleAttributeList();
 
     assertThat(names).isNotEmpty();
@@ -466,7 +466,7 @@ public class TestAggregationCount extends BaseTestCase {
       Ebean.find(Contact.class)
         .select("email, " + concat("lastName",", ","firstName") + " as lastName")
         .where().isNull("phone")
-        .orderBy().asc("lastName")
+        .order().asc("lastName")
         .findList();
 
     assertThat(contacts).isNotEmpty();

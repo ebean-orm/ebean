@@ -151,7 +151,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     query.setFirstRow(1);
     query.setMaxRows(2);
-    query.orderBy("id");
+    query.order("id");
 
     List<Customer> list = query.findList();
 

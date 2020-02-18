@@ -268,8 +268,8 @@ public class CQueryEngine {
     }
 
     // order by id asc, lower sys period desc
-    query.orderBy().asc(request.getBeanDescriptor().getIdProperty().getName());
-    query.orderBy().desc(sysPeriodLower);
+    query.order().asc(request.getBeanDescriptor().getIdProperty().getName());
+    query.order().desc(sysPeriodLower);
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     try {

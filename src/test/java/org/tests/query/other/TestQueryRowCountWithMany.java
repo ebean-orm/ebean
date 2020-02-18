@@ -27,7 +27,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .fetch("details")
       .where().eq("details.product.id", productId)
-      .orderBy("cretime asc");
+      .order("cretime asc");
 
     List<Order> list = query.findList();
 

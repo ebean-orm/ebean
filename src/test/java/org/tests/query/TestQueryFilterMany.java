@@ -51,7 +51,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     Customer customer = Ebean.find(Customer.class)
       .setMaxRows(1)
-      .orderBy().asc("id")
+      .order().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("1 = 0")
       .findOne();
@@ -66,7 +66,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     Optional<Customer> customer = Ebean.find(Customer.class)
       .setMaxRows(1)
-      .orderBy().asc("id")
+      .order().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("1 = 0")
       .findOneOrEmpty();
