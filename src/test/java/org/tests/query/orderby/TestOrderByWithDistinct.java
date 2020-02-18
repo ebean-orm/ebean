@@ -31,7 +31,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .where()
       .eq("junk", "blah")
       .eq("name", "jim")
-      .orderBy("id desc,path.that.does.not.exist,contacts.group.name asc");
+      .order("id desc,path.that.does.not.exist,contacts.group.name asc");
 
     Set<String> unknownProperties = query.validate();
     assertThat(unknownProperties).isNotEmpty();
@@ -49,7 +49,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     Query<MUser> query = Ebean.find(MUser.class)
       .where()
       .eq("roles", role)
-      .orderBy("userName asc nulls first");
+      .order("userName asc nulls first");
 
     query.findList();
 
@@ -124,7 +124,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .fetch("userType", "name")
       .where()
       .eq("roles.roleName", "A")
-      .orderBy("userType.name, userName");
+      .order("userType.name, userName");
     List<MUser> list = query.findList();
 
     // select distinct t0.userid c0, t0.user_name c1, t1.id c2, t1.name c3
@@ -158,7 +158,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .fetch("userType", "name")
       .where()
       .eq("roles.roleName", "A")
-      .orderBy("userType.name");
+      .order("userType.name");
     list = query.findList();
 
     Assert.assertEquals(1, list.size());

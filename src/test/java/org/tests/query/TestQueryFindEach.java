@@ -24,7 +24,7 @@ public class TestQueryFindEach extends BaseTestCase {
     Query<Customer> query
       = server.find(Customer.class)
       .setAutoTune(false)
-      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
+      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).order("id")
       .setMaxRows(2);
 
     final AtomicInteger counter = new AtomicInteger(0);
@@ -48,7 +48,7 @@ public class TestQueryFindEach extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class).setAutoTune(false)
-      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
+      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).order("id")
       .setMaxRows(2);
 
     final AtomicInteger counter = new AtomicInteger(0);

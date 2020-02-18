@@ -34,7 +34,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .setDistinct(true)
         .select("name")
         .where().eq("status", Customer.Status.NEW)
-        .orderBy().asc("name")
+        .order().asc("name")
         .setMaxRows(100)
         .findSingleAttributeList();
 
@@ -51,7 +51,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .setDistinct(true)
         .select("anniversary")
         .where().isNotNull("anniversary")
-        .orderBy().asc("anniversary")
+        .order().asc("anniversary")
         .findSingleAttributeList();
 
     assertThat(dates).isNotNull();
@@ -368,7 +368,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
       .select("customer")
-      .orderBy().desc("customer");
+      .order().desc("customer");
 
     query.findSingleAttributeList();
 
@@ -383,7 +383,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
       .select("customer.id")
-      .orderBy().desc("customer.id");
+      .order().desc("customer.id");
 
     query.findSingleAttributeList();
 
@@ -398,7 +398,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
-      .orderBy().desc("customer.billingAddress");
+      .order().desc("customer.billingAddress");
 
     query.findSingleAttributeList();
 
@@ -414,7 +414,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -435,7 +435,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Short> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -456,7 +456,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -477,7 +477,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.shippingAddress.city", "Auckland") // query on shippingAddress
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Short> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();

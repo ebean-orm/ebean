@@ -19,10 +19,10 @@ public class TestOrderByClear extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-      .orderBy().asc("orderDate");
+      .order().asc("orderDate");
 
 
-    OrderBy<Order> orderBy = query.orderBy();
+    OrderBy<Order> orderBy = query.order();
     assertTrue(orderBy.containsProperty("orderDate"));
 
     orderBy.clear();

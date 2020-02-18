@@ -26,7 +26,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
       .select("id, name")
       .setBeanCacheMode(CacheMode.PUT)
       .setReadOnly(true)
-      .orderBy().asc("id")
+      .order().asc("id")
       .findMap();
 
     assertTrue(!map.isEmpty());

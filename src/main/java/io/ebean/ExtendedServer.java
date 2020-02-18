@@ -357,7 +357,7 @@ public interface ExtendedServer {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -369,7 +369,7 @@ public interface ExtendedServer {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *

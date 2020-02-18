@@ -25,7 +25,7 @@ import java.util.Iterator;
  *
  *  Query<Customer> query = database.find(Customer.class)
  *     .where().gt("id", 0)
- *     .orderBy("id")
+ *     .order("id")
  *     .setMaxRows(2);
  *
  *  QueryIterator<Customer> it = query.findIterate();

@@ -375,7 +375,7 @@ public interface Database {
    *   // find orders and their customers
    *   List<Order> list = database.find(Order.class)
    *     .fetch("customer")
-   *     .orderBy("id")
+   *     .order("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate

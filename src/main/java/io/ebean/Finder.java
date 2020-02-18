@@ -32,7 +32,7 @@ import java.util.List;
  *   public List<Customer> findNew() {
  *     return query().where()
  *       .eq("status", Customer.Status.NEW)
- *       .orderBy("name")
+ *       .order("name")
  *       .findList()
  *   }
  * }

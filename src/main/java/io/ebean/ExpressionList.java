@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  * </p>
  * <p>
  * The ExpressionList also duplicates methods that are found on the Query such
- * as findList() and orderBy(). The purpose of these methods is provide a fluid
+ * as findList() and order(). The purpose of these methods is provide a fluid
  * API. The upside of this approach is that you can build and execute a query
  * via chained methods. The down side is that this ExpressionList object has
  * more methods than you would initially expect (the ones duplicated from
@@ -67,10 +67,6 @@ public interface ExpressionList<T> {
    * This follows SQL syntax using commas between each property with the
    * optional asc and desc keywords representing ascending and descending order
    * respectively.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #orderBy(String)}.
-   * </p>
    */
   Query<T> order(String orderByClause);
 
@@ -85,27 +81,21 @@ public interface ExpressionList<T> {
   OrderBy<T> order();
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * </p>
+   * Deprecated migrate to order().
    */
+  @Deprecated
   OrderBy<T> orderBy();
 
   /**
-   * Add an orderBy clause to the query.
-   *
-   * @see Query#orderBy(String)
+   * Deprecated migrate to {@link #order(String)}
    */
+  @Deprecated
   Query<T> orderBy(String orderBy);
 
   /**
-   * Add an orderBy clause to the query.
-   *
-   * @see Query#orderBy(String)
+   * Deprecated migrate to {@link #order(String)}
    */
+  @Deprecated
   Query<T> setOrderBy(String orderBy);
 
   /**
@@ -342,7 +332,7 @@ public interface ExpressionList<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -355,7 +345,7 @@ public interface ExpressionList<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1459,7 +1449,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findList();
    * }</pre>
    */
@@ -1480,7 +1470,7 @@ public interface ExpressionList<T> {
    *    .or()
    *      .eq("status", Customer.Status.ACTIVE)
    *      .isNull("anniversary")
-   *    .orderBy().asc("name")
+   *    .order().asc("name")
    *    .findList();
    *
    * }</pre>
@@ -1500,7 +1490,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findList();
    *
    * }</pre>
@@ -1534,7 +1524,7 @@ public interface ExpressionList<T> {
    *       .gt("id", 1)
    *       .eq("anniversary", onAfter)
    *       .endNot()
-   *     .orderBy()
+   *     .order()
    *       .asc("name")
    *     .findList();
    *

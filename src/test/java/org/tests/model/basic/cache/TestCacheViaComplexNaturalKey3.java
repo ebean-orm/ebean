@@ -232,7 +232,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .in("sku", skus)
       .eq("code", 1001)
       .setUseCache(true)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -262,7 +262,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .in("sku", skus)
       .eq("code", 1001)
       .setUseCache(true)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -357,7 +357,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .eq("store", "def")
       .inPairs(pairs)
       .setUseCache(true)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -400,7 +400,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .eq("store", "def")
       .inPairs(pairs)
       .setBeanCacheMode(CacheMode.ON)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();

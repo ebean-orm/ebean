@@ -155,7 +155,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     LoggedSql.start();
 
-    List<Order> orders1 =  Ebean.find(Order.class).orderBy("id").findList();
+    List<Order> orders1 =  Ebean.find(Order.class).order("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" join o_customer") // ensure that we do not left join the customer
@@ -166,7 +166,7 @@ public class TestOuterJoin extends BaseTestCase {
     LoggedSql.start();
 
     List<Order> orders2 =  Ebean.find(Order.class)
-        .fetch("details", "id").orderBy("id").findList();
+        .fetch("details", "id").order("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" left join o_order_detail ");

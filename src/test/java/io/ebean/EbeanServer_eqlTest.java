@@ -133,7 +133,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setMaxRows(10);
     query.setFirstRow(3);
     if (isSqlServer()) {
-      query.orderBy("id");
+      query.order("id");
     }
     query.findList();
 

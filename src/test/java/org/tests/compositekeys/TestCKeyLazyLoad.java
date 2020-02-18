@@ -93,7 +93,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
   private void exerciseMaxRowsQuery_with_embeddedId() {
 
     PagedList<CKeyParent> siteUserPage = Ebean.find(CKeyParent.class).where()
-      .orderBy("name asc")
+      .order("name asc")
       .setMaxRows(10)
       .findPagedList();
     siteUserPage.getList();

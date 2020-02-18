@@ -66,7 +66,7 @@ public class TestSelfRefExample extends BaseTestCase {
     assertThat(e3Searched.getChildren()).extracting("id").contains(e7.getId());
 
     // If we get all the items, you can see the structure goes down a fair bit further.
-    Query<SelfRefExample> examples2 = Ebean.createQuery(SelfRefExample.class).orderBy("id asc");
+    Query<SelfRefExample> examples2 = Ebean.createQuery(SelfRefExample.class).order("id asc");
     List<SelfRefExample> list2 = examples2.findList();
 
     assertEquals(e1.getId(), list2.get(0).getId());

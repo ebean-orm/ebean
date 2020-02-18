@@ -118,7 +118,7 @@ public class LoadManyRequest extends LoadRequest {
     SpiQuery<?> query = many.newQuery(server);
     String orderBy = many.getLazyFetchOrderBy();
     if (orderBy != null) {
-      query.orderBy(orderBy);
+      query.order(orderBy);
     }
 
     String extraWhere = many.getExtraWhere();

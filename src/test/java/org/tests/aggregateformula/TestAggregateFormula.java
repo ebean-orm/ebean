@@ -30,7 +30,7 @@ public class TestAggregateFormula extends BaseTestCase {
     List<Contact> contacts = Ebean.find(Contact.class)
       .setDistinct(true)
       .select("lastName, min(customer)")
-      .orderBy("min(customer) asc nulls last")
+      .order("min(customer) asc nulls last")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
