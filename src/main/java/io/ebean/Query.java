@@ -657,6 +657,11 @@ public interface Query<T> {
   Query<T> usingConnection(Connection connection);
 
   /**
+   * Execute the query using the given database.
+   */
+  Query<T> usingDatabase(Database database);
+
+  /**
    * Execute the query returning the list of Id's.
    * <p>
    * This query will execute against the Database that was used to create it.
