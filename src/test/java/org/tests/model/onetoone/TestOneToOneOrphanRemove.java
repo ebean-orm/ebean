@@ -39,7 +39,7 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     assertSqlBind(sql.get(1));
     assertSql(sql.get(2)).contains("update oto_cust set version=? where cid=? and version=?");
     assertThat(sql.get(3)).contains("insert into oto_cust_address ");
-    assertThat(sql.get(4)).contains("-- bind(other1");
+    assertThat(sql.get(4)).contains("-- bind(");
 
     jack.setAddress(null);
     Ebean.save(jack);

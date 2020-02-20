@@ -19,7 +19,7 @@ public class EUserNoFkSoftDel {
 
   @SoftDelete
   @Formula(select = "${ta}.user_id is null")
-  @Formula(select = "CASE WHEN ${ta}.user_id is null THEN 1 ELSE 0 END", platforms = Platform.SQLSERVER17)
+  @Formula(select = "CASE WHEN ${ta}.user_id is null THEN 1 ELSE 0 END", platforms = {Platform.SQLSERVER17, Platform.ORACLE})
   // evaluates to true in a left join if bean has been deleted.
   boolean deleted;
 

@@ -10,7 +10,6 @@ class H2DbExpression extends BasicDbExpression {
 
   @Override
   public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
-
     bitwiseFunction(request, propName, operator, compare);
   }
 }

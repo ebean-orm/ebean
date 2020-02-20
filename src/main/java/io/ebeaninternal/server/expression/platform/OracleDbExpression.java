@@ -10,6 +10,11 @@ import io.ebeaninternal.server.expression.Op;
 public class OracleDbExpression extends BaseDbExpression {
 
   @Override
+  public String concat(String property0, String separator, String property1, String suffix) {
+    return concatOperator(property0, separator, property1, suffix);
+  }
+
+  @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
 
     if (operator == Op.EXISTS) {

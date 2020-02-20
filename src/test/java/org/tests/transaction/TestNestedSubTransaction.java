@@ -65,7 +65,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
   }
 
 
-  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA})
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA, Platform.ORACLE})
   @Test
   public void nestedUseSavepoint_doubleNested_rollbackCommit() {
 
@@ -102,7 +102,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA})
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA, Platform.ORACLE})
   @Test
   public void nestedUseSavepoint_doubleNested_commitRollback() {
 
@@ -139,7 +139,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA})
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA, Platform.ORACLE})
   @Test
   public void nestedUseSavepoint_nested_RequiresNew() {
 
@@ -175,7 +175,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
     assertNull(after);
   }
 
-  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA})
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA, Platform.ORACLE})
   @Test
   public void nestedUseSavepoint() {
 
