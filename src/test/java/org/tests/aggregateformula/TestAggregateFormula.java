@@ -34,7 +34,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select distinct t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name order by min(t0.customer_id) nulls last");
+    assertSql(sql.get(0)).contains("select distinct t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name order by min(t0.customer_id) nulls last");
 
     assertThat(contacts).isNotEmpty();
 
@@ -56,7 +56,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
+    assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
 
     assertThat(contacts).isNotEmpty();
 
@@ -86,8 +86,8 @@ public class TestAggregateFormula extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
-    assertThat(sql.get(1)).contains("select t0.id, t0.name, t0.status from o_customer t0 where");
+    assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
+    assertSql(sql.get(1)).contains("select t0.id, t0.name, t0.status from o_customer t0 where");
 
     assertThat(contacts).isNotEmpty();
 
@@ -121,8 +121,8 @@ public class TestAggregateFormula extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
-    assertThat(sql.get(1)).contains("select t0.id, t0.name, t0.status, t1.id, t1.city, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where");
+    assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
+    assertSql(sql.get(1)).contains("select t0.id, t0.name, t0.status, t1.id, t1.city, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where");
 
     assertThat(contacts).isNotEmpty();
 
@@ -144,7 +144,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.status, sum(t0.id) from o_order t0 group by t0.status");
+    assertSql(sql.get(0)).contains("select t0.status, sum(t0.id) from o_order t0 group by t0.status");
 
     assertThat(orders).isNotEmpty();
     for (Order order : orders) {
@@ -165,7 +165,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.status, sum(t0.id) id from o_order t0 group by t0.status");
+    assertSql(sql.get(0)).contains("select t0.status, sum(t0.id) id from o_order t0 group by t0.status");
 
     assertThat(orders).isNotEmpty();
     for (Order order : orders) {
@@ -186,7 +186,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.customer_id, min(t0.cretime) from contact t0 group by t0.customer_id");
+    assertSql(sql.get(0)).contains("select t0.customer_id, min(t0.cretime) from contact t0 group by t0.customer_id");
 
     assertThat(contacts).isNotEmpty();
   }
@@ -203,7 +203,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.customer_id, min(t0.cretime), max(t0.updtime) from contact t0 group by t0.customer_id");
+    assertSql(sql.get(0)).contains("select t0.customer_id, min(t0.cretime), max(t0.updtime) from contact t0 group by t0.customer_id");
 
     assertThat(contacts).isNotEmpty();
   }

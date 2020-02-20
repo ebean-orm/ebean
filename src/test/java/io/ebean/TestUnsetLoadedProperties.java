@@ -118,6 +118,6 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     updUser.save();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("where id=?;");
+    assertSql(sql.get(0)).contains("where id=?;");
   }
 }

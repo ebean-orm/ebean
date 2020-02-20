@@ -80,8 +80,8 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
-    assertThat(sql.get(1)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
+    assertSql(sql.get(0)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
+    assertSql(sql.get(1)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
   }
 
   @Test
@@ -129,7 +129,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       .query();
 
     List<EBasicSoftDelete> list = query.findList();
-    assertThat(query.getGeneratedSql()).contains("deleted = ?");
+    assertSql(query).contains("deleted = ?");
     assertThat(list).hasSize(1);
 
     // Cleanup created entity

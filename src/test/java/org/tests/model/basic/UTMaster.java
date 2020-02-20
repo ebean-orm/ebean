@@ -23,7 +23,7 @@ public class UTMaster extends Model {
 
   String description;
 
-  LocalDate date;
+  LocalDate eventDate;
 
   @Version
   Integer version;
@@ -55,12 +55,12 @@ public class UTMaster extends Model {
     this.name = name;
   }
 
-  public LocalDate getDate() {
-    return date;
+  public LocalDate getEventDate() {
+    return eventDate;
   }
 
-  public void setDate(LocalDate date) {
-    this.date = date;
+  public void setEventDate(LocalDate eventDate) {
+    this.eventDate = eventDate;
   }
 
   public String getDescription() {

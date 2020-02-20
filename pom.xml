@@ -28,33 +28,6 @@
 
   <profiles>
     <profile>
-      <!-- Note: to use this profile, you need credentials for the oracle repository in your
-        settings.xml as described here:
-        http://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010 -->
-      <id>oracle</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc8</artifactId>
-          <version>12.2.0.1</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <repositories>
-        <repository>
-          <id>maven.oracle.com</id>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <url>https://maven.oracle.com</url>
-          <layout>default</layout>
-        </repository>
-      </repositories>
-    </profile>
-    <profile>
       <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
         After that, install it into your local maven repository:
 
@@ -221,17 +194,17 @@
       <scope>test</scope>
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>oracle</groupId>-->
-    <!--<artifactId>oracle-jdbc</artifactId>-->
-    <!--<version>7.0</version>-->
-    <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.oracle.ojdbc</groupId>
+      <artifactId>ojdbc10</artifactId>
+      <version>19.3.0.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>io.ebean.test</groupId>
       <artifactId>ebean-test-docker</artifactId>
-      <version>2.10.3</version>
+      <version>3.1.2</version>
       <scope>test</scope>
     </dependency>
 

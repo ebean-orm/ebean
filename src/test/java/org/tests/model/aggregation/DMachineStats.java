@@ -1,5 +1,6 @@
 package org.tests.model.aggregation;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -18,6 +19,7 @@ public class DMachineStats {
   @ManyToOne(optional = false)
   DMachine machine;
 
+  @Column(name="edate")
   LocalDate date;
 
   long totalKms;

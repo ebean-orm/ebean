@@ -41,8 +41,8 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("insert into cke_client (cod_cpny, cod_client, notes, username) values (?,?,?,?)");
-    assertThat(sql.get(1)).contains("update cke_client set notes=?, username=? where cod_cpny=? and cod_client=?");
+    assertSql(sql.get(0)).contains("insert into cke_client (cod_cpny, cod_client, notes, username) values (?,?,?,?)");
+    assertSql(sql.get(1)).contains("update cke_client set notes=?, username=? where cod_cpny=? and cod_client=?");
 
     Ebean.delete(client);
 

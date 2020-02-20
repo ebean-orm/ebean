@@ -58,7 +58,7 @@ public class DtoQueryTest extends BaseTestCase {
       .findEach(it -> log.info("got " + it.getId() + " " + it.getName()));
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select id, name from o_customer where id > ?");
+    assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
   @Test
@@ -75,7 +75,7 @@ public class DtoQueryTest extends BaseTestCase {
       });
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select id, name from o_customer where id > ?");
+    assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
   @Test

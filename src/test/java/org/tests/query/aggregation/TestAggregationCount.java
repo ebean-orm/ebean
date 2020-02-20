@@ -73,7 +73,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(count).isGreaterThan(1);
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select count(*) from tevent_one t0 where t0.name is not null");
+    assertSql(sql.get(0)).contains("select count(*) from tevent_one t0 where t0.name is not null");
   }
 
   @Test
@@ -369,7 +369,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(maxLastName).isNotNull();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select max(t0.last_name) from contact t0");
+    assertSql(sql.get(0)).contains("select max(t0.last_name) from contact t0");
   }
 
   @Test
@@ -388,7 +388,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(count).isNotNull();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select count(distinct t0.last_name) from contact t0 where not exists (select 1 from contact_note x where x.contact_id = t0.id)");
+    assertSql(sql.get(0)).contains("select count(distinct t0.last_name) from contact t0 where not exists (select 1 from contact_note x where x.contact_id = t0.id)");
   }
 
   @Test
@@ -409,7 +409,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(names).isNotEmpty();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select " + concat("t0.last_name",", ","t0.first_name") + " from contact t0 where t0.phone is null order by t0.last_name");
+    assertSql(sql.get(0)).contains("select " + concat("t0.last_name",", ","t0.first_name") + " from contact t0 where t0.phone is null order by t0.last_name");
   }
 
   @Test
@@ -430,7 +430,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(names).isNotEmpty();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select " + concat("t0.updtime",", ","t0.first_name") + " from contact t0");
+    assertSql(sql.get(0)).contains("select " + concat("t0.updtime",", ","t0.first_name") + " from contact t0");
   }
 
   @Test
@@ -450,7 +450,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(instant).isNotNull();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select max(t0.updtime) from contact t0 where t0.phone is null");
+    assertSql(sql.get(0)).contains("select max(t0.updtime) from contact t0 where t0.phone is null");
   }
 
 
@@ -477,7 +477,7 @@ public class TestAggregationCount extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.email, " + concat("t0.last_name",", ","t0.first_name") + " lastName from contact t0 where t0.phone is null order by t0.last_name; --bind()");
+    assertSql(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name",", ","t0.first_name") + " lastName from contact t0 where t0.phone is null order by t0.last_name; --bind()");
   }
 
 }

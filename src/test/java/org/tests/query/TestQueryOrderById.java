@@ -21,9 +21,9 @@ public class TestQueryOrderById extends BaseTestCase {
 
     query.findList();
     if (isSqlServer()) {
-      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
+      assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
     } else {
-      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
+      assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
     }
   }
 
@@ -38,9 +38,9 @@ public class TestQueryOrderById extends BaseTestCase {
 
     query.findList();
     if (isSqlServer()) {
-      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
+      assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
     } else {
-      assertThat(sqlOf(query)).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
+      assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
     }
   }
 }

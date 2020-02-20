@@ -216,12 +216,12 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("top 100 ");
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc");
+      assertSql(query).contains("top 100 ");
+      assertSql(query).contains("order by o.ship_date desc");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("a  where rownum <= 100 )");
+      assertSql(query).contains("a  where rownum <= 100 )");
     } else {
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc limit 100");
+      assertSql(query).contains("order by o.ship_date desc limit 100");
     }
 
     // check also select count(*)
@@ -251,12 +251,12 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).contains("top 100 ");
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id");
+      assertSql(query).contains("top 100 ");
+      assertSql(query).contains("order by o.ship_date desc, o.id");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("a  where rownum <= 100 )");
+      assertSql(query).contains("a  where rownum <= 100 )");
     } else {
-      assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc, o.id limit 100");
+      assertSql(query).contains("order by o.ship_date desc, o.id limit 100");
     }
 
     // check also select count(*)
@@ -295,7 +295,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();
 
-      assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc limit 100");
+      assertSql(query).contains("order by coalesce(o.ship_date, now()) desc limit 100");
     }
   }
 
@@ -328,7 +328,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();
 
-      assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
+      assertSql(query).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
     }
   }
 

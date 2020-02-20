@@ -1,5 +1,6 @@
 package org.tests.o2m;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -10,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-public class TestOneToManyNoMappedBy {
+public class TestOneToManyNoMappedBy extends BaseTestCase {
 
   @Test
   public void test() {
@@ -36,6 +37,6 @@ public class TestOneToManyNoMappedBy {
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(1)).contains("select t0.banana_rama_id, t0.id, t0.description, t0.banana_rama_id from om_account_child_dbo t0 where");
+    assertSql(sql.get(1)).contains("select t0.banana_rama_id, t0.id, t0.description, t0.banana_rama_id from om_account_child_dbo t0 where");
   }
 }

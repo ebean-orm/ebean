@@ -58,7 +58,7 @@ public class TestHstore extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the map as it is not dirty
-    assertThat(sql.get(0)).contains("update ebasic_hstore set name=?, version=? where");
+    assertSql(sql.get(0)).contains("update ebasic_hstore set name=?, version=? where");
   }
 
   void update_when_dirty() {
@@ -71,7 +71,7 @@ public class TestHstore extends BaseTestCase {
     Ebean.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertThat(sql.get(0)).contains("update ebasic_hstore set name=?, map=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update ebasic_hstore set name=?, map=?, version=? where id=? and version=?");
   }
 
   void insert_when_null() {

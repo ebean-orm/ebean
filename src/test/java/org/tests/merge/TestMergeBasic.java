@@ -50,13 +50,13 @@ public class TestMergeBasic extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     // fetch the Ids ... used to identity inserts, updates and deletes
-    assertThat(sql.get(0)).contains("select t0.id, t1.id from uuone t0 left join uutwo t1 on t1.master_id = t0.id  where t0.id = ?");
+    assertSql(sql.get(0)).contains("select t0.id, t1.id from uuone t0 left join uutwo t1 on t1.master_id = t0.id  where t0.id = ?");
 
     // deletes of Ids that are no longer in the graph
-    assertThat(sql.get(1)).contains("delete from uutwo where id=?");
+    assertSql(sql.get(1)).contains("delete from uutwo where id=?");
 
     // cascade persist ... master
-    assertThat(sql.get(2)).contains("update uuone set name=?, description=?, version=? where id=? and version=?");
+    assertSql(sql.get(2)).contains("update uuone set name=?, description=?, version=? where id=? and version=?");
 
     // persist children ...
     if (isPersistBatchOnCascade()) {
@@ -98,13 +98,13 @@ public class TestMergeBasic extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     // fetch the Ids ... used to identity inserts, updates and deletes
-    assertThat(sql.get(0)).contains("select t0.id, t1.id from uuone t0 left join uutwo t1 on t1.master_id = t0.id  where t0.id = ?");
+    assertSql(sql.get(0)).contains("select t0.id, t1.id from uuone t0 left join uutwo t1 on t1.master_id = t0.id  where t0.id = ?");
 
     // deletes of Ids that are no longer in the graph
-    assertThat(sql.get(1)).contains("delete from uutwo where id=?");
+    assertSql(sql.get(1)).contains("delete from uutwo where id=?");
 
     // cascade persist ... master
-    assertThat(sql.get(2)).contains("update uuone set name=?, description=?, version=? where id=? and version=?");
+    assertSql(sql.get(2)).contains("update uuone set name=?, description=?, version=? where id=? and version=?");
 
     // persist children ...
     if (isPersistBatchOnCascade()) {

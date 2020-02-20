@@ -63,7 +63,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("update audit_log set description = description where id = ?");
+    assertSql(sql.get(0)).contains("update audit_log set description = description where id = ?");
     assertSqlBind(sql, 1, 2);
   }
 
@@ -90,8 +90,8 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("update audit_log set description = description where id = ?; -- bind(999999)");
-    assertThat(sql.get(1)).contains("update audit_log set description = description where id = ?; -- bind(999998)");
+    assertSql(sql.get(0)).contains("update audit_log set description = description where id = ?; -- bind(999999)");
+    assertSql(sql.get(1)).contains("update audit_log set description = description where id = ?; -- bind(999998)");
   }
 
   @Test

@@ -26,8 +26,8 @@ public class TestTreeModel extends BaseTestCase {
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(5);
-    assertThat(sql.get(0)).contains("insert into tree_entity");
-    assertThat(sql.get(1)).contains("insert into tree_entity");
+    assertSql(sql.get(0)).contains("insert into tree_entity");
+    assertSql(sql.get(1)).contains("insert into tree_entity");
     assertThat(sql.get(3)).contains("insert into tree_entity");
   }
 

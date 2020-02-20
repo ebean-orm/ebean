@@ -33,12 +33,15 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       Ebean.find(Customer.class)
         .setDistinct(true)
         .select("name")
-        .where().eq("status", Customer.Status.NEW)
+        .where().eq("status", Customer.Status.NEW).startsWith("name", "R")
         .order().asc("name")
         .setMaxRows(100)
         .findSingleAttributeList();
 
     assertThat(names).isNotNull();
+    for (String name : names) {
+      assertThat(name).startsWith("R");
+    }
   }
 
   @Test
@@ -589,7 +592,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
     } else if (isDb2()) {
-      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 2 ROWS ONLY");
+      assertSql(query).endsWith("FETCH FIRST 2 ROWS ONLY");
     } else {
       assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");
     }

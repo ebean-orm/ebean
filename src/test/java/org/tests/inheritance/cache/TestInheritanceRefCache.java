@@ -40,7 +40,7 @@ public class TestInheritanceRefCache extends BaseTestCase {
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("from cinh_ref").contains("left join cinh_root");
+    assertSql(sql.get(0)).contains("from cinh_ref").contains("left join cinh_root");
 
     // fetch again - from cache (but fetch second bean from cache)
     LoggedSqlCollector.start();
@@ -50,7 +50,7 @@ public class TestInheritanceRefCache extends BaseTestCase {
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("from cinh_root");
+    assertSql(sql.get(0)).contains("from cinh_root");
 
 
     // fetch again - both from cache
@@ -91,7 +91,7 @@ public class TestInheritanceRefCache extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("from cinh_root");
+    assertSql(sql.get(0)).contains("from cinh_root");
 
     // try some cache finds
     Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();

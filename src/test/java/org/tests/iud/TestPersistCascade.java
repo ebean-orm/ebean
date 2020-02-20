@@ -27,8 +27,8 @@ public class TestPersistCascade extends BaseTestCase {
     final List<String> sql = LoggedSqlCollector.stop();
 
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(0)).contains("insert into pcf_country");
-      assertThat(sql.get(1)).contains("insert into pcf_person");
+      assertSql(sql.get(0)).contains("insert into pcf_country");
+      assertSql(sql.get(1)).contains("insert into pcf_person");
       assertSqlBind(sql, 2, 7);
       assertThat(sql.get(8)).contains("insert into pcf_calendar");
       assertSqlBind(sql, 9, 20);

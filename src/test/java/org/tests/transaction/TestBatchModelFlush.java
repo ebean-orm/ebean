@@ -77,10 +77,10 @@ public class TestBatchModelFlush extends BaseTestCase {
     assertThat(sql).hasSize(9);
 
     // first saved to batch - (depth 100)
-    assertThat(sql.get(0)).contains("insert into mny_b");
+    assertSql(sql.get(0)).contains("insert into mny_b");
     if (idType() == IdType.IDENTITY) {
-      assertThat(sql.get(1)).contains(" -- bind(BatchMultipleTop_0");
-      assertThat(sql.get(2)).contains(" -- bind(BatchMultipleTop_1");
+      assertSql(sql.get(1)).contains(" -- bind(BatchMultipleTop_0");
+      assertSql(sql.get(2)).contains(" -- bind(BatchMultipleTop_1");
     }
     // second saved to batch - (depth 101)
     assertThat(sql.get(3)).contains("insert into mt_role");

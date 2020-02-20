@@ -1,5 +1,6 @@
 package org.tests.aggregateformula;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -9,7 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestAggregateInheritFormula {
+public class TestAggregateInheritFormula extends BaseTestCase {
 
   @Test
   public void test() {
@@ -34,6 +35,6 @@ public class TestAggregateInheritFormula {
     final List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(segments).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.segment_id_zat, min(t0.status_id) from iaf_segment t0 where t0.ptype = 'target' and t0.segment_id_zat = ? group by t0.segment_id_zat");
+    assertSql(sql.get(0)).contains("select t0.segment_id_zat, min(t0.status_id) from iaf_segment t0 where t0.ptype = 'target' and t0.segment_id_zat = ? group by t0.segment_id_zat");
   }
 }

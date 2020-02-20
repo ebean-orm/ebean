@@ -5,6 +5,7 @@ import io.ebean.annotation.Max;
 import io.ebean.annotation.Sum;
 import io.ebean.annotation.View;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ public class DMachineStatsAgg {
   @ManyToOne
   DMachine machine;
 
+  @Column(name="edate")
   LocalDate date;
 
   @Sum  // which is the same as: @Aggregation("sum(totalKms)")

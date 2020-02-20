@@ -117,7 +117,7 @@ public class TestCustomerFinder extends BaseTestCase {
       Customer.find.flush();
 
       List<String> sql = LoggedSqlCollector.stop();
-      assertThat(sql.get(0)).contains("insert into e_basic");
+      assertSql(sql.get(0)).contains("insert into e_basic");
     } finally {
       transaction.end();
     }

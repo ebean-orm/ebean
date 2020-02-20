@@ -94,10 +94,10 @@ public class TestDbArray_basic extends BaseTestCase {
       assertThat(intEnums).containsExactly(IntEnum.ZERO, IntEnum.TWO);
       assertThat(varcharEnums).containsExactly(VarcharEnum.ONE, VarcharEnum.TWO);
 
-      assertThat(query.getGeneratedSql()).contains(" t0.other_ids @> array[?,?]::bigint[] ");
-      assertThat(query.getGeneratedSql()).contains(" t0.uids @> array[?] ");
-      assertThat(query.getGeneratedSql()).contains(" t0.phone_numbers @> array[?] ");
-      assertThat(query.getGeneratedSql()).contains(" coalesce(cardinality(t0.phone_numbers),0) <> 0");
+      assertSql(query).contains(" t0.other_ids @> array[?,?]::bigint[] ");
+      assertSql(query).contains(" t0.uids @> array[?] ");
+      assertSql(query).contains(" t0.phone_numbers @> array[?] ");
+      assertSql(query).contains(" coalesce(cardinality(t0.phone_numbers),0) <> 0");
       assertThat(list).hasSize(1);
 
       query = Ebean.find(EArrayBean.class)
@@ -116,8 +116,8 @@ public class TestDbArray_basic extends BaseTestCase {
       final Integer[] ints = (Integer[]) ((java.sql.Array) row.get("int_enums")).getArray();
       assertThat(ints).containsExactly(100, 102);
 
-      assertThat(query.getGeneratedSql()).contains(" coalesce(cardinality(t0.other_ids),0) = 0");
-      assertThat(query.getGeneratedSql()).contains(" not (t0.uids @> array[?])");
+      assertSql(query).contains(" coalesce(cardinality(t0.other_ids),0) = 0");
+      assertSql(query).contains(" not (t0.uids @> array[?])");
     }
 
     json_parse_format();
@@ -148,7 +148,7 @@ public class TestDbArray_basic extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update earray_bean set name=?, version=? where");
+    assertSql(sql.get(0)).contains("update earray_bean set name=?, version=? where");
   }
 
   //@Test//(dependsOnMethods = "update_when_notDirty")
@@ -161,7 +161,7 @@ public class TestDbArray_basic extends BaseTestCase {
     Ebean.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertThat(sql.get(0)).contains("update earray_bean set phone_numbers=?, uids=?, version=? where");
+    assertSql(sql.get(0)).contains("update earray_bean set phone_numbers=?, uids=?, version=? where");
   }
 
   @Test

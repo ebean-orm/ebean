@@ -113,8 +113,8 @@ public class TestInheritInsert extends BaseTestCase {
 
     Car result = query.findOne();
 
-    assertThat(query.getGeneratedSql()).contains("order by t0.id, t2.location_code");
-    assertThat(query.getGeneratedSql()).contains("left join car_fuse t2 on t2.id = t1.fuse_id");
+    assertSql(query).contains("order by t0.id, t2.location_code");
+    assertSql(query).contains("left join car_fuse t2 on t2.id = t1.fuse_id");
 
     assertNotNull(result);
   }

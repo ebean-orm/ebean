@@ -76,7 +76,7 @@ public class TestOneToOnePrimaryKeyJoinBidi extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from oto_ubprime_extra where");
-    assertThat(sql.get(1)).contains("delete from oto_ubprime where");
+    assertSql(sql.get(0)).contains("delete from oto_ubprime_extra where");
+    assertSql(sql.get(1)).contains("delete from oto_ubprime where");
   }
 }

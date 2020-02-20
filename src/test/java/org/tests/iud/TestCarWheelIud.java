@@ -87,8 +87,8 @@ public class TestCarWheelIud extends BaseTestCase {
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     if (isH2() || isPostgres()) {
-      assertThat(sql.get(0)).contains("select t0.brand, sum(t0.sold) from sa_car t0 group by t0.brand limit 10");
-      assertThat(sql.get(1)).contains("select count(*) from ( select t0.brand, sum(t0.sold) from sa_car t0 group by t0.brand)");
+      assertSql(sql.get(0)).contains("select t0.brand, sum(t0.sold) from sa_car t0 group by t0.brand limit 10");
+      assertSql(sql.get(1)).contains("select count(*) from ( select t0.brand, sum(t0.sold) from sa_car t0 group by t0.brand)");
     }
 
   }

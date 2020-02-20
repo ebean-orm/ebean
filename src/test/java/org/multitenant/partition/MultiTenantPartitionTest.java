@@ -1,5 +1,6 @@
 package org.multitenant.partition;
 
+import io.ebean.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MultiTenantPartitionTest {
+public class MultiTenantPartitionTest extends BaseTestCase {
 
   private static String[] names = {"Ace", "Base", "Case", "Dae", "Eva"};
 
@@ -41,18 +42,18 @@ public class MultiTenantPartitionTest {
     server.save(content);
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql.get(0)).contains("insert into mt_content (title, body, when_modified, when_created, version, tenant_id) values (?,?,?,?,?,?)");
+    assertSql(sql.get(0)).contains("insert into mt_content (title, body, when_modified, when_created, version, tenant_id) values (?,?,?,?,?,?)");
 
     content.setBody("some body");
     server.save(content);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql.get(0)).contains("update mt_content set body=?, when_modified=?, version=? where id=? and tenant_id=? and version=?");
+    assertSql(sql.get(0)).contains("update mt_content set body=?, when_modified=?, version=? where id=? and tenant_id=? and version=?");
 
     server.delete(content);
 
     sql = LoggedSqlCollector.current();
-    assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=? and version=?");
+    assertSql(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=? and version=?");
 
     LoggedSqlCollector.stop();
   }
@@ -69,7 +70,7 @@ public class MultiTenantPartitionTest {
     int rows = server.delete(MtContent.class, content.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
+    assertSql(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
     assertThat(rows).isEqualTo(1);
 
     rows = server.delete(MtContent.class, 99999);
@@ -92,7 +93,7 @@ public class MultiTenantPartitionTest {
     assertThat(rows).isEqualTo(2);
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
+    assertSql(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
   }
 
   private MtContent newContent(String title) {

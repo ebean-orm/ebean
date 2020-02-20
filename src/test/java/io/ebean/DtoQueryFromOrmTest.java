@@ -88,7 +88,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
+    assertSql(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
   }
 
 //  @ForPlatform(Platform.H2)
@@ -110,7 +110,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 //
 //    List<String> sql = LoggedSqlCollector.stop();
 //    assertThat(sql).hasSize(2);
-//    assertThat(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
+//    assertSql(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
 //  }
 
   @Test
@@ -136,7 +136,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+    assertSql(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 
@@ -161,7 +161,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+    assertSql(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 
@@ -186,11 +186,11 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("select top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
 
     } else {
-      assertThat(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     }
   }
@@ -216,11 +216,11 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("select top 10 t0.id, t0.email, "
+      assertSql(sql.get(0)).contains("select top 10 t0.id, t0.email, "
         + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     } else {
-      assertThat(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     }
   }
@@ -245,7 +245,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select " + concat("t0.last_name", ", ", "t0.first_name") + " fullName from contact t0 where");
+    assertSql(sql.get(0)).contains("select " + concat("t0.last_name", ", ", "t0.first_name") + " fullName from contact t0 where");
   }
 
   @Test
@@ -267,7 +267,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null group by t0.last_name having count(*) > ?");
+    assertSql(sql.get(0)).contains("select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null group by t0.last_name having count(*) > ?");
   }
 
   @Test

@@ -3,6 +3,7 @@ package org.tests.model.aggregation;
 import io.ebean.annotation.Sum;
 import io.ebean.annotation.View;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ public class DMachineAuxUseAgg {
 
   private String name;
 
+  @Column(name="edate")
   private LocalDate date;
 
   @Sum

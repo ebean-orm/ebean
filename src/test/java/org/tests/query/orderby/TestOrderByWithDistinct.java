@@ -68,26 +68,26 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     Query<MUser> query = Ebean.find(MUser.class);
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain("order by");
-    assertThat(query.getGeneratedSql()).doesNotContain("select distinct");
+    assertSql(query).doesNotContain("order by");
+    assertSql(query).doesNotContain("select distinct");
 
     query.setMaxRows(1000);
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("from muser t0 limit 1000");
+      assertSql(query).contains("from muser t0 limit 1000");
     }
     query = Ebean.find(MUser.class)
         .where()
         .eq("roles.roleName", "A")
         .query();
     query.findList();
-    assertThat(query.getGeneratedSql()).doesNotContain("order by");
-    assertThat(query.getGeneratedSql()).contains("select distinct");
+    assertSql(query).doesNotContain("order by");
+    assertSql(query).contains("select distinct");
 
     query.setMaxRows(1000);
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where u1.role_name = ? limit 1000");
+      assertSql(query).contains("where u1.role_name = ? limit 1000");
     }
   }
 

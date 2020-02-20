@@ -36,7 +36,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(" where (t0.status = ? or (t0.order_date < ? and t0.ship_date is null) or t1.name like ?)");
+    assertSql(query).contains(" where (t0.status = ? or (t0.order_date < ? and t0.ship_date is null) or t1.name like ?)");
   }
 
   @Test

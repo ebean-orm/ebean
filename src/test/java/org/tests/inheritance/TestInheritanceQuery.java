@@ -48,8 +48,8 @@ public class TestInheritanceQuery extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(4);
-    assertThat(sql.get(1)).contains("where t0.type = 'A'");
-    assertThat(sql.get(2)).contains("where t0.type = 'B'");
+    assertSql(sql.get(1)).contains("where t0.type = 'A'");
+    assertSql(sql.get(2)).contains("where t0.type = 'B'");
     assertThat(sql.get(3)).contains("where t0.type = 'B'");
 
     Ebean.delete(a);

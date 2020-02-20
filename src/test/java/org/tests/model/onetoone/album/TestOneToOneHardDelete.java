@@ -37,8 +37,8 @@ public class TestOneToOneHardDelete extends BaseTestCase {
     // assert we loaded the missing/unloaded foreign key
     assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.cover_id from album t0 where t0.id = ?");
     // assert soft delete cascaded
-    assertThat(sql.get(1)).contains("update album set deleted=?, last_update=? where id=?");
-    assertThat(sql.get(2)).contains("update cover set deleted=? where id=?");
+    assertSql(sql.get(1)).contains("update album set deleted=?, last_update=? where id=?");
+    assertSql(sql.get(2)).contains("update cover set deleted=? where id=?");
 
     Album found2 = Album.find.query().setId(album.getId()).setIncludeSoftDeletes().findOne();
 
@@ -54,7 +54,7 @@ public class TestOneToOneHardDelete extends BaseTestCase {
     // assert we loaded the missing/unloaded foreign key
     assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.cover_id from album t0 where t0.id = ?");
     // assert hard delete cascaded
-    assertThat(sql.get(1)).contains("delete from album where");
-    assertThat(sql.get(2)).contains("delete from cover where");
+    assertSql(sql.get(1)).contains("delete from album where");
+    assertSql(sql.get(2)).contains("delete from cover where");
   }
 }

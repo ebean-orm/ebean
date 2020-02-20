@@ -181,8 +181,8 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains(" from o_order ");
-    assertThat(sql.get(1)).contains(" from o_customer ");
+    assertSql(sql.get(0)).contains(" from o_order ");
+    assertSql(sql.get(1)).contains(" from o_customer ");
   }
 
   private void initDataClearCache() {

@@ -2,6 +2,7 @@ package org.tests.model.aggregation;
 
 import io.ebean.Model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -20,6 +21,7 @@ public class DMachineUse extends Model {
   @ManyToOne(optional = false)
   private DMachine machine;
 
+  @Column(name="edate")
   private LocalDate date;
 
   private long distanceKms;

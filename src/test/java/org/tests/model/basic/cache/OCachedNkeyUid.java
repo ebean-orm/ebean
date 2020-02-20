@@ -5,21 +5,21 @@ import io.ebean.annotation.Cache;
 import javax.persistence.Entity;
 import java.util.UUID;
 
-@Cache(naturalKey = "uid")
+@Cache(naturalKey = "cid")
 @Entity
 public class OCachedNkeyUid extends OCacheBase {
 
-  private UUID uid;
+  private UUID cid;
 
   private String other;
 
-  public OCachedNkeyUid(UUID uid, String other) {
-    this.uid = uid;
+  public OCachedNkeyUid(UUID cid, String other) {
+    this.cid = cid;
     this.other = other;
   }
 
-  public UUID getUid() {
-    return uid;
+  public UUID getCid() {
+    return cid;
   }
 
   public String getOther() {

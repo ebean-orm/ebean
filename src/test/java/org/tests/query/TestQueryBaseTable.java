@@ -43,9 +43,9 @@ public class TestQueryBaseTable extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("from O_CUSTOMER");
-    assertThat(sql.get(1)).contains("from o_customer");
-    assertThat(sql.get(2)).contains("from O_CUSTOMER");
+    assertSql(sql.get(0)).contains("from O_CUSTOMER");
+    assertSql(sql.get(1)).contains("from o_customer");
+    assertSql(sql.get(2)).contains("from O_CUSTOMER");
 
   }
 }

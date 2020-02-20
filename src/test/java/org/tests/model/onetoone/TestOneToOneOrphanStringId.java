@@ -83,9 +83,9 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(5);
-    assertThat(sql.get(0)).contains("insert into oto_aone");
+    assertSql(sql.get(0)).contains("insert into oto_aone");
     assertSqlBind(sql.get(1));
-    assertThat(sql.get(2)).contains("update oto_atwo set aone_id=? where id=?");
+    assertSql(sql.get(2)).contains("update oto_atwo set aone_id=? where id=?");
     assertThat(sql.get(3)).contains("delete from oto_aone where id=?");
     assertSqlBind(sql.get(4));
 

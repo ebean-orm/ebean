@@ -36,7 +36,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name eq 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+    assertSql(query).contains("where t0.name = ?");
   }
 
   @Test
@@ -44,7 +44,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name eqOrNull 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+    assertSql(query).contains("where (t0.name = ? or t0.name is null)");
   }
 
   @Test
@@ -53,7 +53,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("name", "Rob");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+    assertSql(query).contains("where (t0.name = ? or t0.name is null)");
   }
 
   @Test
@@ -62,7 +62,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name eqOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or t0.name is null)");
+      assertSql(query).contains("where (t0.name = ? or t0.name is null)");
     }
   }
 
@@ -72,7 +72,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name eqOrNull ?", (String)null);
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("(t0.name is null or t0.name is null)");
+      assertSql(query).contains("(t0.name is null or t0.name is null)");
     }
   }
 
@@ -82,7 +82,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name gtOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.name > ? or t0.name is null)");
+      assertSql(query).contains("where (t0.name > ? or t0.name is null)");
     }
   }
 
@@ -92,7 +92,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name ltOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.name < ? or t0.name is null)");
+      assertSql(query).contains("where (t0.name < ? or t0.name is null)");
     }
   }
 
@@ -102,7 +102,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where 'Rob' eq name");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+    assertSql(query).contains("where t0.name = ?");
   }
 
   @Test
@@ -110,7 +110,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where 'Rob' > name");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where t0.name < ?");
+    assertSql(query).contains("where t0.name < ?");
   }
 
   @Test
@@ -118,7 +118,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where 'Rob' >= name");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where t0.name <= ?");
+    assertSql(query).contains("where t0.name <= ?");
   }
 
   @Test
@@ -126,7 +126,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where 'Rob' < name");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where t0.name > ?");
+    assertSql(query).contains("where t0.name > ?");
   }
 
   @Test
@@ -134,7 +134,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where 'Rob' <= name");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where t0.name >= ?");
+    assertSql(query).contains("where t0.name >= ?");
   }
 
   @Test
@@ -143,7 +143,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name ieq 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) = ?");
+    assertSql(query).contains("where lower(t0.name) = ?");
   }
 
   @Test
@@ -152,7 +152,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name ine 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) != ?");
+    assertSql(query).contains("where lower(t0.name) != ?");
   }
 
   @Test
@@ -160,7 +160,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where 'Rob' ieq name");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) = ?");
+    assertSql(query).contains("where lower(t0.name) = ?");
   }
 
   @Test
@@ -169,7 +169,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where 'Rob' ine name");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) != ?");
+    assertSql(query).contains("where lower(t0.name) != ?");
   }
 
   @Test
@@ -178,7 +178,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name = 'Rob'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+    assertSql(query).contains("where t0.name = ?");
   }
 
   @Test
@@ -188,7 +188,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("name", "Rob");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+    assertSql(query).contains("where t0.name = ?");
   }
 
   @Test
@@ -197,7 +197,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("nm", "Rob");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name > ?");
+    assertSql(query).contains("where t0.name > ?");
   }
 
   @Test
@@ -207,7 +207,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("name", "Rob");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name like ");
+    assertSql(query).contains("where t0.name like ");
   }
 
   @Test
@@ -217,7 +217,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name = 'Rob' or (status = 'NEW' and smallnote is null)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name = ? or (t0.status = ? and t0.smallnote is null))");
+    assertSql(query).contains("where (t0.name = ? or (t0.status = ? and t0.smallnote is null))");
   }
 
   @Test
@@ -227,7 +227,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name = 'Rob' or (status = 'N' and smallnote is null)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
+    assertSql(query).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
   }
 
   @Test
@@ -237,7 +237,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where ((t0.name = ? or t0.status = ?) and t0.smallnote is null)");
+    assertSql(query).contains("where ((t0.name = ? or t0.status = ?) and t0.smallnote is null)");
   }
 
   @Test
@@ -247,7 +247,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where (name = 'Rob' or status = 'N') and smallnote is null");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
+    assertSql(query).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
   }
 
   @Test
@@ -256,15 +256,15 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ? and t0.status = ?)");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not ((name = 'Rob' and status = 'NEW'))");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ? and t0.status = ?)");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not (((name = 'Rob') and (status = 'NEW')))");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ? and t0.status = ?)");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
   }
 
   @Test
@@ -273,15 +273,15 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'N')");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
 
     query = parse("where not ((name = 'Rob' and status = 'N'))");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
 
     query = parse("where not (((name = 'Rob') and (status = 'N')))");
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
   }
 
   @Test
@@ -357,7 +357,7 @@ public class EqlParserTest extends BaseTestCase {
 
     final Query<Customer> query = where("name inOrEmpty ?", new ArrayList());
     query.findList();
-    assertThat(query.getGeneratedSql()).doesNotContain("where");
+    assertSql(query).doesNotContain("where");
   }
 
   @Test
@@ -366,7 +366,7 @@ public class EqlParserTest extends BaseTestCase {
     List<String> names = null;
     final Query<Customer> query = where("name inOrEmpty ?", names);
     query.findList();
-    assertThat(query.getGeneratedSql()).doesNotContain("where");
+    assertSql(query).doesNotContain("where");
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -389,7 +389,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("names", new ArrayList<>());
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain("where");
+    assertSql(query).doesNotContain("where");
   }
 
   @Test
@@ -398,7 +398,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name inrange 'As' to 'B'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name >= ? and t0.name < ?)");
+    assertSql(query).contains("where (t0.name >= ? and t0.name < ?)");
   }
 
   @Test
@@ -409,7 +409,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "b");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.name >= ? and t0.name < ?)");
+    assertSql(query).contains("where (t0.name >= ? and t0.name < ?)");
   }
 
   @Test
@@ -418,7 +418,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name between 'As' and 'B'");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name between ? and ?");
+    assertSql(query).contains("where t0.name between ? and ?");
   }
 
   @Test
@@ -429,7 +429,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("two", "b");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name between ? and ?");
+    assertSql(query).contains("where t0.name between ? and ?");
   }
 
   @Test
@@ -438,7 +438,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where 'x' between name and smallnote");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where  ? between t0.name and t0.smallnote");
+    assertSql(query).contains("where  ? between t0.name and t0.smallnote");
   }
 
   @Test
@@ -448,7 +448,7 @@ public class EqlParserTest extends BaseTestCase {
     query.setParameter("some", "A");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where  ? between t0.name and t0.smallnote");
+    assertSql(query).contains("where  ? between t0.name and t0.smallnote");
   }
 
   @Test
@@ -457,7 +457,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.line_2, t1.city, t1.cretime, t1.updtime, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertSql(query).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.line_2, t1.city, t1.cretime, t1.updtime, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
   }
 
   @Test
@@ -468,7 +468,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name, status fetch billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id, t0.name, t0.status, t1.id, t1.line_1, t1.line_2, t1.city, t1.cretime, t1.updtime, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertSql(query).contains("select t0.id, t0.name, t0.status, t1.id, t1.line_1, t1.line_2, t1.city, t1.cretime, t1.updtime, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
   }
 
   @Test
@@ -477,7 +477,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) ");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertSql(query, 12).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
   }
 
   @Test
@@ -487,7 +487,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch shippingAddress (line1) limit 10");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_address t2 on t2.id = t0.shipping_address_id");
+    assertSql(query, 12).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_address t2 on t2.id = t0.shipping_address_id");
   }
 
   @Test
@@ -496,7 +496,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.first_name, t2.last_name, t2.phone, t2.mobile, t2.email, t2.is_member, t2.cretime, t2.updtime, t2.customer_id, t2.group_id from o_customer t0");
+    assertSql(query, 16).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.first_name, t2.last_name, t2.phone, t2.mobile, t2.email, t2.is_member, t2.cretime, t2.updtime, t2.customer_id, t2.group_id from o_customer t0");
   }
 
 
@@ -506,7 +506,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts (email)");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.email from o_customer t0");
+    assertSql(query, 12).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.email from o_customer t0");
   }
 
   @Test
@@ -522,8 +522,8 @@ public class EqlParserTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address");
-    assertThat(sql.get(1)).contains("select t0.customer_id, t0.id, t0.email from contact t0 where (t0.customer_id)");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address");
+    assertSql(sql.get(1)).contains("select t0.customer_id, t0.id, t0.email from contact t0 where (t0.customer_id)");
   }
 
   @Test
@@ -532,7 +532,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.id");
+    assertSql(query).contains(", t1.id");
   }
 
   @Test
@@ -541,7 +541,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (city)");
     query.findList();
 
-    assertThat(sqlOf(query, 10)).contains(", t1.id, t1.city");
+    assertSql(query, 10).contains(", t1.id, t1.city");
   }
 
   @Test
@@ -550,7 +550,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress(city)");
     query.findList();
 
-    assertThat(sqlOf(query, 10)).contains(", t1.id, t1.city");
+    assertSql(query, 10).contains(", t1.id, t1.city");
   }
 
   @Test
@@ -559,8 +559,8 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress fetch shippingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(", t1.city");
-    assertThat(query.getGeneratedSql()).contains(", t2.city");
+    assertSql(query).contains(", t1.city");
+    assertSql(query).contains(", t2.city");
   }
 
   @Test
@@ -569,7 +569,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (city) fetch shippingAddress (city)");
     query.findList();
 
-    assertThat(sqlOf(query, 12)).contains(", t1.id, t1.city, t2.id, t2.city");
+    assertSql(query, 12).contains(", t1.id, t1.city, t2.id, t2.city");
   }
 
   @Test
@@ -578,7 +578,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch lazy billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
+    assertSql(query).doesNotContain(", t1.city");
   }
 
   @Test
@@ -587,7 +587,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch lazy(50) billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
+    assertSql(query).doesNotContain(", t1.city");
   }
 
   @Test
@@ -597,7 +597,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch query(50) billingAddress");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
+    assertSql(query).doesNotContain(", t1.city");
   }
 
   @Test
@@ -607,7 +607,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (+query(50),city)");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
+    assertSql(query).doesNotContain(", t1.city");
   }
 
   @Test
@@ -617,7 +617,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("fetch billingAddress (+lazy(50),city) order by id");
     List<Customer> list = query.findList();
 
-    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city");
+    assertSql(query).doesNotContain(", t1.city");
 
     Customer customer = list.get(0);
     customer.getBillingAddress().getCity();
@@ -630,11 +630,11 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("select (name)");
     query.findList();
-    assertThat(sqlOf(query, 1)).contains("select t0.id, t0.name from o_customer t0");
+    assertSql(query).contains("select t0.id, t0.name from o_customer t0");
 
     Query<Customer> query2 = parse("select name");
     query2.findList();
-    assertThat(sqlOf(query2, 1)).contains("select t0.id, t0.name from o_customer t0");
+    assertSql(query2).contains("select t0.id, t0.name from o_customer t0");
   }
 
   @Test
@@ -644,7 +644,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("select (sum(id))");
     query.findSingleAttribute();
-    assertThat(sqlOf(query, 1)).contains("select sum(t0.id) from o_customer t0");
+    assertSql(query).contains("select sum(t0.id) from o_customer t0");
   }
 
   @Test
@@ -654,11 +654,11 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("select (max(cretime))");
     query.findSingleAttribute();
-    assertThat(sqlOf(query, 1)).contains("select max(t0.cretime) from o_customer t0");
+    assertSql(query).contains("select max(t0.cretime) from o_customer t0");
 
     Query<Customer> query2 = parse("select max(cretime)");
     query2.findSingleAttribute();
-    assertThat(sqlOf(query2, 1)).contains("select max(t0.cretime) from o_customer t0");
+    assertSql(query2).contains("select max(t0.cretime) from o_customer t0");
   }
 
   @Test
@@ -670,7 +670,7 @@ public class EqlParserTest extends BaseTestCase {
     List<Customer> customers = query.findList();
 
     assertThat(customers).isNotEmpty();
-    assertThat(sqlOf(query, 1)).contains("select t0.status, max(t0.cretime) from o_customer t0 group by t0.status");
+    assertSql(query).contains("select t0.status, max(t0.cretime) from o_customer t0 group by t0.status");
   }
 
   @Test
@@ -682,7 +682,7 @@ public class EqlParserTest extends BaseTestCase {
     List<OrderDetail> details = query.findList();
 
     assertThat(details).isNotEmpty();
-    assertThat(sqlOf(query, 1)).contains("select sum(t0.order_qty), t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id  group by t1.id");
+    assertSql(query).contains("select sum(t0.order_qty), t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id  group by t1.id");
   }
 
   @Test
@@ -692,7 +692,7 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("select distinct (name)");
     query.findList();
-    assertThat(sqlOf(query, 1)).contains("select distinct t0.name from o_customer t0");
+    assertSql(query).contains("select distinct t0.name from o_customer t0");
   }
 
 
@@ -704,7 +704,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("limit 10");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" limit 10");
+      assertSql(query).contains(" limit 10");
     }
   }
 
@@ -716,7 +716,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("order by name limit 10 offset 5");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" limit 10 offset 5");
+      assertSql(query).contains(" limit 10 offset 5");
     }
   }
 
@@ -728,7 +728,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("order by id");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("from o_customer t0 order by t0.id");
+      assertSql(query).contains("from o_customer t0 order by t0.id");
     }
   }
 
@@ -740,7 +740,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("order by id desc");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("from o_customer t0 order by t0.id desc");
+      assertSql(query).contains("from o_customer t0 order by t0.id desc");
     }
   }
 
@@ -756,7 +756,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("order by id desc nulls last");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 order by t0.id desc nulls last");
+      assertSql(query).contains(" from o_customer t0 order by t0.id desc nulls last");
     }
   }
 
@@ -771,7 +771,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("order by id nulls first");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 order by t0.id nulls first");
+      assertSql(query).contains(" from o_customer t0 order by t0.id nulls first");
     }
   }
 
@@ -786,7 +786,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("order by billingAddress.city desc nulls last, name, id desc nulls last");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" order by t1.city desc nulls last, t0.name, t0.id desc nulls last");
+      assertSql(query).contains(" order by t1.city desc nulls last, t0.name, t0.id desc nulls last");
     }
   }
 
@@ -803,7 +803,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name isNotNull");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 where t0.name is not null");
+      assertSql(query).contains(" from o_customer t0 where t0.name is not null");
     }
   }
 
@@ -813,7 +813,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("id isNotNull and name = ? and smallnote istartsWith ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.id is not null and t0.name = ? and lower(t0.smallnote) like ? escape'|' )");
+      assertSql(query).contains("where (t0.id is not null and t0.name = ? and lower(t0.smallnote) like ? escape'|' )");
     }
   }
 
@@ -823,7 +823,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name = ?1 and smallnote istartsWith ?2 and name like ?1", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains(" where (t0.name = ? and lower(t0.smallnote) like ? escape'|'  and t0.name like ? escape'' )");
+      assertSql(query).contains(" where (t0.name = ? and lower(t0.smallnote) like ? escape'|'  and t0.name like ? escape'' )");
     }
   }
 
@@ -833,7 +833,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("id isNotNull or name = ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.id is not null or t0.name = ?)");
+      assertSql(query).contains("where (t0.id is not null or t0.name = ?)");
     }
   }
 
@@ -843,7 +843,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("(id isNotNull or name = ?) and smallnote istartsWith ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|' )");
+      assertSql(query).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|' )");
     }
   }
 
@@ -853,7 +853,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("anniversary inrange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
+      assertSql(query).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
     }
   }
 
@@ -863,7 +863,7 @@ public class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("anniversary inRange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
     query.findList();
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
+      assertSql(query).contains("where (t0.anniversary >= ? and t0.anniversary < ?)");
     }
   }
 

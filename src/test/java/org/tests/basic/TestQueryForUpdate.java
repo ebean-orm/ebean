@@ -69,9 +69,9 @@ public class TestQueryForUpdate extends BaseTestCase {
       List<String> sql = LoggedSqlCollector.stop();
       assertThat(sql).hasSize(2);
       if (isH2() || isPostgres()) {
-        assertThat(sql.get(0)).contains("from e_basic t0 where t0.id =");
-        assertThat(sql.get(1)).contains("from e_basic t0 where t0.id =");
-        assertThat(sql.get(1)).contains("for update");
+        assertSql(sql.get(0)).contains("from e_basic t0 where t0.id =");
+        assertSql(sql.get(1)).contains("from e_basic t0 where t0.id =");
+        assertSql(sql.get(1)).contains("for update");
       }
 
       transaction.end();

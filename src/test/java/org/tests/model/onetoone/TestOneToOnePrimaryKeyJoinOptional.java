@@ -99,7 +99,7 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from oto_uprime_extra where");
-    assertThat(sql.get(1)).contains("delete from oto_uprime where");
+    assertSql(sql.get(0)).contains("delete from oto_uprime_extra where");
+    assertSql(sql.get(1)).contains("delete from oto_uprime where");
   }
 }

@@ -180,7 +180,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains(" from o_customer t0 where ");
+    assertSql(sql.get(0)).contains(" from o_customer t0 where ");
   }
 
   @Test

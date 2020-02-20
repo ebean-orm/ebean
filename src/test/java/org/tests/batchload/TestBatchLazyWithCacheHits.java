@@ -71,7 +71,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     System.out.println("sql:" + sql);
 
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("from uuone t0 where t0.name like ");
+    assertSql(sql.get(0)).contains("from uuone t0 where t0.name like ");
     platformAssertIn(sql.get(1), "from uuone t0 where t0.id");
 
     // not lazy loading into bean cache

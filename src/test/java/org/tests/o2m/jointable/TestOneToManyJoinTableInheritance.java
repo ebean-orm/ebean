@@ -37,10 +37,10 @@ public class TestOneToManyJoinTableInheritance extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
 
     assertThat(sql).hasSize(11);
-    assertThat(sql.get(0)).contains("insert into class_super ");
+    assertSql(sql.get(0)).contains("insert into class_super ");
     if (idType() == IdType.IDENTITY) {
-      assertThat(sql.get(1)).contains("-- bind(ClassA)");
-      assertThat(sql.get(2)).contains("-- bind(ClassB)");
+      assertSql(sql.get(1)).contains("-- bind(ClassA)");
+      assertSql(sql.get(2)).contains("-- bind(ClassB)");
     }
     assertThat(sql.get(3)).contains("insert into monkey ");
     if (idType() == IdType.IDENTITY) {

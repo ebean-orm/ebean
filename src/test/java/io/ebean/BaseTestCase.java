@@ -17,6 +17,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
+import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -133,13 +134,24 @@ public abstract class BaseTestCase {
     }
   }
 
-  protected String trimSql(String sql) {
+  protected AbstractCharSequenceAssert<?, String> assertSql(Query<?> query, int count) {
+    return org.assertj.core.api.Assertions.assertThat(sqlOf(query, count));
+  }
 
-    if (sql.contains(" c1,")) {
+  protected AbstractCharSequenceAssert<?, String> assertSql(Query<?> query) {
+    return org.assertj.core.api.Assertions.assertThat(sqlOf(query));
+  }
+
+  protected AbstractCharSequenceAssert<?, String> assertSql(String sql) {
+    return org.assertj.core.api.Assertions.assertThat(trimSql(sql));
+  }
+
+  protected String trimSql(String sql) {
+    if (sql.contains(" c0,") || sql.contains(" c0 ") || sql.contains(" c1,") || sql.contains(" c1 ")) {
       // for oracle we include column alias so lets remove those
       return trimSql(sql, 10);
     }
-    return trimSql(sql, 0);
+    return sql;//trimSql(sql, 0);
   }
 
   /**

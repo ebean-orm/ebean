@@ -32,7 +32,7 @@ public class TestSoftDeleteOtoCascade extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update esoft_del_one_a set deleted=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update esoft_del_one_a set deleted=?, version=? where id=? and version=?");
 
   }
 }

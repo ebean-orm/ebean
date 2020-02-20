@@ -33,7 +33,7 @@ public class TestMyAdHocSqlSelect extends BaseTestCase {
       .query();
 
     assertNotNull(query.findList());
-    assertThat(query.getGeneratedSql()).contains(" group by order_id  having count(*) > ?");
+    assertSql(query).contains(" group by order_id  having count(*) > ?");
   }
 
   @Test
@@ -56,7 +56,7 @@ public class TestMyAdHocSqlSelect extends BaseTestCase {
       .query();
 
     assertNotNull(query.findList());
-    assertThat(query.getGeneratedSql()).contains(" group by order_id  having count(*) > ?");
+    assertSql(query).contains(" group by order_id  having count(*) > ?");
   }
 
 

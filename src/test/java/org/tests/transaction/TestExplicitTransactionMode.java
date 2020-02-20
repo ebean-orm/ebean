@@ -118,12 +118,12 @@ public class TestExplicitTransactionMode extends BaseTestCase {
 
   private void testJsonScalarType(Database ebeanServer) {
     UTMaster bean = new UTMaster("one1");
-    bean.setDate(LocalDate.of(2019, 04, 20));
+    bean.setEventDate(LocalDate.of(2019, 04, 20));
 
     String json = ebeanServer.json().toJson(bean);
-    assertThat(json).isEqualTo("{\"name\":\"one1\",\"date\":\"2019-04-20\"}");
+    assertThat(json).isEqualTo("{\"name\":\"one1\",\"eventDate\":\"2019-04-20\"}");
     UTMaster jsonMaster = ebeanServer.json().toBean(UTMaster.class, json);
-    assertThat(jsonMaster.getDate()).isEqualTo(LocalDate.of(2019, 4, 20));
+    assertThat(jsonMaster.getEventDate()).isEqualTo(LocalDate.of(2019, 4, 20));
   }
 
   public static class ScalarTypeLocalDateAsString extends ScalarTypeLocalDate {

@@ -1,5 +1,6 @@
 package org.tests.model.elementcollection;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Size;
 
@@ -13,6 +14,7 @@ public class EcPhone {
   String area;
 
   @Size(max = 20)
+  @Column(name = "phnum")
   String number;
 
   public EcPhone(String countryCode, String area, String number) {

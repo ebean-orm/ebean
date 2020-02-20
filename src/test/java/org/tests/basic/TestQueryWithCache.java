@@ -67,7 +67,7 @@ public class TestQueryWithCache extends BaseTestCase {
     Query<Country> query = Ebean.find(Country.class).setId("NZ").setUseCache(false);
     query.findOne();
 
-    assertThat(query.getGeneratedSql()).isNotNull();
+    assertSql(query).isNotNull();
   }
 
 }

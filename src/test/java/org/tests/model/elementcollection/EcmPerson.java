@@ -24,7 +24,7 @@ public class EcmPerson {
 
   @ElementCollection
   @MapKeyColumn(name = "type", length = 4)
-  @Column(name = "number", length = 10)
+  @Column(name = "phnum", length = 10)
   Map<String, String> phoneNumbers = new LinkedHashMap<>();
 
   @Transient
