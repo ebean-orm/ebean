@@ -22,11 +22,12 @@ public class OraclePlatform extends DatabasePlatform {
   public OraclePlatform() {
     super();
     this.platform = Platform.ORACLE;
+    this.columnAliasPrefix = null;
     this.supportsDeleteTableAlias = true;
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
-    this.sqlLimiter = new OracleRownumSqlLimiter();
+    this.sqlLimiter = new OracleAnsiSqlRowsLimiter();
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
     this.historySupport = new OracleDbHistorySupport();
     this.truncateTable = "truncate table %s cascade";

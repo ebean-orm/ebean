@@ -191,8 +191,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
     } else if (isOracle()) {
-      assertThat(sqlOf(query)).contains("from (select distinct t0.id from o_customer t0");
-      assertThat(sqlOf(query)).contains("where rownum <= 100");
+      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 fetch next 100 rows only");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
     }
@@ -271,7 +270,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
     } else if (isOracle()) {
-      assertThat(sqlOf(query)).contains("where rownum <= 100");
+      assertThat(sqlOf(query)).contains("fetch next 100 rows only");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
     }
@@ -585,7 +584,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
 
     if (isOracle()) {
-      assertSql(query).contains("select * from (select /*+ FIRST_ROWS(2) */ a.*, rownum rn_ from (select r1.attribute_, count(*) from (select t2.line_1 as attribute_ from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id  where t2.line_1 is not null) r1 group by r1.attribute_ order by r1.attribute_ desc) a  where rownum <= 3)  where rn_ > 1");
+      assertSql(query).contains("select r1.attribute_, count(*) from (select t2.line_1 as attribute_ from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id  where t2.line_1 is not null) r1 group by r1.attribute_ order by r1.attribute_ desc offset 1 rows fetch next 2 rows only");
     } else {
       assertSql(query).contains("select r1.attribute_, count(*) from ("
         + "select t2.line_1 as attribute_ from contact t0 "
@@ -599,7 +598,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     } else if (isDb2()) {
       assertSql(query).endsWith("FETCH FIRST 2 ROWS ONLY");
     } else if (isOracle()) {
-      assertSql(query).contains("where rownum <= 3)  where rn_ > 1");
+      assertSql(query).contains(" offset 1 rows fetch next 2 rows only");
     } else {
       assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");
     }

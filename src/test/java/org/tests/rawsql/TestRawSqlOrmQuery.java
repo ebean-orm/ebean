@@ -219,7 +219,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       assertSql(query).contains("top 100 ");
       assertSql(query).contains("order by o.ship_date desc");
     } else if (isOracle()) {
-      assertSql(query).contains("a  where rownum <= 100)");
+      assertSql(query).contains("fetch next 100 rows only");
     } else {
       assertSql(query).contains("order by o.ship_date desc limit 100");
     }
@@ -254,7 +254,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       assertSql(query).contains("top 100 ");
       assertSql(query).contains("order by o.ship_date desc, o.id");
     } else if (isOracle()) {
-      assertSql(query).contains("a  where rownum <= 100)");
+      assertSql(query).contains("fetch next 100 rows only");
     } else {
       assertSql(query).contains("order by o.ship_date desc, o.id limit 100");
     }
@@ -356,7 +356,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       assertThat(sqlOf(query)).contains("select top 100 ");
       assertThat(sqlOf(query)).contains("order by o.id desc");
     } else if (isOracle()) {
-      assertThat(sqlOf(query)).contains("a  where rownum <= 100)");
+      assertThat(sqlOf(query)).contains("fetch next 100 rows only");
     } else {
       assertThat(sqlOf(query)).contains("order by o.id desc limit 100");
     }
