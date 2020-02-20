@@ -11,6 +11,8 @@ import org.tests.model.basic.Order;
 import org.tests.model.composite.RCustomer;
 import org.tests.model.composite.RCustomerKey;
 import org.junit.Test;
+import org.tests.model.embedded.UserInterestLive;
+import org.tests.model.embedded.UserInterestLiveKey;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -56,13 +58,21 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 
     Customer order = new Customer();
     EntityBeanIntercept ebi = getIntercept(order);
-    assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
+    assertFalse(beanDescriptor.referenceIdPropertyOnly(ebi));
 
     order.setId(23);
-    assertTrue(beanDescriptor.hasIdPropertyOnly(ebi));
+    assertTrue(beanDescriptor.referenceIdPropertyOnly(ebi));
 
     order.setName("custName");
-    assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
+    assertFalse(beanDescriptor.referenceIdPropertyOnly(ebi));
+  }
+
+  @Test
+  public void isReference_withGeneratedOnInsertOnlyProperty_expect_false() {
+    BeanDescriptor<UserInterestLive> descriptor = spiServer.getBeanDescriptor(UserInterestLive.class);
+    UserInterestLive bean = new UserInterestLive(new UserInterestLiveKey(1L, 2L));
+    EntityBeanIntercept ebi = getIntercept(bean);
+    assertFalse(descriptor.referenceIdPropertyOnly(ebi));
   }
 
   @Test

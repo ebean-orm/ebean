@@ -376,7 +376,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final BeanProperty[] propertiesGenInsert;
   private final BeanProperty[] propertiesGenUpdate;
   private final List<BeanProperty[]> propertiesUnique = new ArrayList<>();
-
+  private final boolean idOnlyReference;
   private BeanNaturalKey beanNaturalKey;
 
   /**
@@ -512,7 +512,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.propertiesOneImported = listHelper.getOneImported();
     this.propertiesOneImportedSave = listHelper.getOneImportedSave();
     this.propertiesOneImportedDelete = listHelper.getOneImportedDelete();
-
     this.propertiesMany = listHelper.getMany();
     this.propertiesNonMany = listHelper.getNonMany();
     this.propertiesAggregate = listHelper.getAggregates();
@@ -521,6 +520,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.propertiesManyToMany = listHelper.getManyToMany();
     this.propertiesGenInsert = listHelper.getGeneratedInsert();
     this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
+    this.idOnlyReference = isIdOnlyReference(propertiesBaseScalar);
 
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
 
@@ -566,6 +566,19 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
+  }
+
+  /**
+   * Return true if the bean should be treated as a reference bean when it only has its id populated.
+   * To be true it has other scalar properties that are not generated on insert.
+   */
+  private boolean isIdOnlyReference(BeanProperty[] baseScalar) {
+    for (BeanProperty beanProperty : baseScalar) {
+      if (!beanProperty.isGeneratedOnInsert()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1809,7 +1822,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Find a property annotated with @WhenCreated or @CreatedTimestamp.
    */
   private BeanProperty findWhenCreatedProperty() {
-
     for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
       if (aPropertiesBaseScalar.isGeneratedWhenCreated()) {
         return aPropertiesBaseScalar;
@@ -3301,11 +3313,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public boolean isReference(EntityBeanIntercept ebi) {
-    return ebi.isReference() || hasIdPropertyOnly(ebi);
+    return ebi.isReference() || referenceIdPropertyOnly(ebi);
   }
 
-  boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
-    return propertiesBaseScalar.length > 0 && ebi.hasIdOnly(idPropertyIndex);
+  boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
+    return idOnlyReference && ebi.hasIdOnly(idPropertyIndex);
   }
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
