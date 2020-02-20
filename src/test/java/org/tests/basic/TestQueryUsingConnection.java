@@ -20,21 +20,6 @@ import static org.junit.Assert.assertEquals;
 public class TestQueryUsingConnection extends BaseTestCase {
 
   @Test
-  public void usingDatabase() {
-
-    ResetBasicData.reset();
-
-    final Database database = DB.getDefault();
-
-    int count =
-      DB.find(Country.class)
-        .usingDatabase(database)
-        .findCount();
-
-    assertThat(count).isGreaterThan(0);
-  }
-
-  @Test
   public void usingConnection() throws SQLException {
 
     ResetBasicData.reset();
