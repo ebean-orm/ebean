@@ -2,6 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -17,6 +18,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestQueryUsingConnection extends BaseTestCase {
+
+  @Test
+  public void usingDatabase() {
+
+    ResetBasicData.reset();
+
+    final Database database = DB.getDefault();
+
+    int count =
+      DB.find(Country.class)
+        .usingDatabase(database)
+        .findCount();
+
+    assertThat(count).isGreaterThan(0);
+  }
 
   @Test
   public void usingConnection() throws SQLException {

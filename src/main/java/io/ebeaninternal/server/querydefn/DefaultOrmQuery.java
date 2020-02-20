@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.Database;
 import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -89,13 +90,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private final Class<T> beanType;
 
+  private final ExpressionFactory expressionFactory;
+
   private final BeanDescriptor<T> rootBeanDescriptor;
 
   private BeanDescriptor<T> beanDescriptor;
 
-  private final SpiEbeanServer server;
-
-  private final ExpressionFactory expressionFactory;
+  private SpiEbeanServer server;
 
   private SpiTransaction transaction;
 
@@ -1457,6 +1458,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> usingDatabase(Database database) {
+    this.server = (SpiEbeanServer) database;
+    return this;
+  }
+
+  @Override
   public int delete() {
     return server.delete(this, transaction);
   }
@@ -1664,6 +1671,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  @Deprecated
   public OrderBy<T> orderBy() {
     return order();
   }
@@ -1677,6 +1685,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  @Deprecated
   public DefaultOrmQuery<T> orderBy(String orderByClause) {
     return order(orderByClause);
   }
@@ -1692,6 +1701,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  @Deprecated
   public DefaultOrmQuery<T> setOrderBy(OrderBy<T> orderBy) {
     return setOrder(orderBy);
   }
