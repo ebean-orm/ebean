@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.ebean.config.properties.PropertiesLoader;
+import io.avaje.config.Config;
 
 import java.util.Properties;
 
@@ -10,8 +10,6 @@ import java.util.Properties;
  * Intended for internal use as part of bootup, construction, registration of the default database.
  */
 class PrimaryServer {
-
-  private static Properties globalProperties;
 
   private static String defaultServerName;
 
@@ -43,14 +41,10 @@ class PrimaryServer {
    * Return the default configuration Properties.
    */
   static synchronized Properties getProperties() {
-    if (globalProperties == null) {
-      globalProperties = PropertiesLoader.load();
-    }
     if (defaultServerName == null) {
       defaultServerName = determineDefaultServerName();
     }
-    return globalProperties;
-
+    return Config.asProperties();
   }
 
   /**
@@ -62,15 +56,9 @@ class PrimaryServer {
     defaultServerName = System.getProperty("db", defaultServerName);
     defaultServerName = System.getProperty("ebean_db", defaultServerName);
     if (isEmpty(defaultServerName)) {
-      defaultServerName = System.getProperty("datasource.default");
+      defaultServerName = Config.get("datasource.default", null);
       if (isEmpty(defaultServerName)) {
-        defaultServerName = System.getProperty("ebean.default.datasource");
-        if (isEmpty(defaultServerName)) {
-          defaultServerName = globalProperties.getProperty("datasource.default");
-          if (isEmpty(defaultServerName)) {
-            defaultServerName = globalProperties.getProperty("ebean.default.datasource");
-          }
-        }
+        defaultServerName = Config.get("ebean.default.datasource", null);
       }
     }
     if (defaultServerName == null) {
