@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
@@ -34,15 +33,12 @@ import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.s
  * <p>
  * This effectively represents a table, its columns and all associated
  * constraints, foreign keys and indexes.
- * </p>
  * <p>
  * Migrations can be applied to this such that it represents the state
  * of a given table after various migrations have been applied.
- * </p>
  * <p>
  * This table model can also be derived from the EbeanServer bean descriptor
  * and associated properties.
- * </p>
  */
 public class MTable {
 
@@ -418,6 +414,11 @@ public class MTable {
 
   public String getName() {
     return name;
+  }
+
+  public String getSchema() {
+    int pos = name.indexOf('.');
+    return pos == -1 ? null : name.substring(0, pos);
   }
 
   /**
