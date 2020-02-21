@@ -18,6 +18,7 @@ import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
+import io.ebean.config.dbplatform.oracle.Oracle11Platform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
@@ -820,6 +821,8 @@ public class DefaultDbMigration implements DbMigration {
         return new MySqlPlatform();
       case ORACLE:
         return new OraclePlatform();
+      case ORACLE11:
+        return new Oracle11Platform();
       case SQLANYWHERE:
         return new SqlAnywherePlatform();
       case SQLSERVER16:

@@ -176,7 +176,7 @@ public abstract class BaseTestCase {
    * so tests that do this need to be skipped for SQL Server.
    */
   public boolean isSqlServer() {
-    return Platform.SQLSERVER == platform().base();
+    return Platform.SQLSERVER == platform();
   }
 
   public boolean isH2() {
@@ -204,7 +204,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isMySql() {
-    return Platform.MYSQL == platform().base();
+    return Platform.MYSQL == platform();
   }
 
   public boolean isHana() {
@@ -243,7 +243,7 @@ public abstract class BaseTestCase {
   }
 
   protected Platform platform() {
-    return spiEbeanServer().getDatabasePlatform().getPlatform();
+    return spiEbeanServer().getDatabasePlatform().getPlatform().base();
   }
 
   protected IdType idType() {
