@@ -1,9 +1,9 @@
 package io.ebeaninternal.dbmigration;
 
+import io.ebean.annotation.Platform;
 import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.migration.ddl.DdlAutoCommit;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebean.migration.runner.ScriptTransform;
 import io.ebean.util.JdbcClose;
@@ -48,6 +48,7 @@ public class DdlGenerator {
   private final boolean ddlAutoCommit;
   private final String dbSchema;
   private final ScriptTransform scriptTransform;
+  private final Platform platform;
   private final String platformName;
 
   private CurrentModel currentModel;
@@ -63,7 +64,8 @@ public class DdlGenerator {
     this.createOnly = serverConfig.isDdlCreateOnly();
     this.dbSchema = serverConfig.getDbSchema();
     final DatabasePlatform databasePlatform = server.getDatabasePlatform();
-    this.platformName = databasePlatform.getPlatform().base().name();
+    this.platform = databasePlatform.getPlatform();
+    this.platformName = platform.base().name();
     if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
       this.runDdl = false;
@@ -188,7 +190,7 @@ public class DdlGenerator {
   protected void runDropSql(Connection connection) throws IOException {
     if (!createOnly) {
       if (extraDdl && jaxbPresent) {
-        String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), true);
+        String extraApply = ExtraDdlXmlReader.buildExtra(platform, true);
         if (extraApply != null) {
           runScript(connection, false, extraApply, "extra-ddl");
         }
@@ -209,13 +211,13 @@ public class DdlGenerator {
 
     if (extraDdl && jaxbPresent) {
       if (currentModel().isTablePartitioning()) {
-        String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(server.getDatabasePlatform().getName());
+        String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(platform);
         if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
           runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
         }
       }
 
-      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName(), false);
+      String extraApply = ExtraDdlXmlReader.buildExtra(platform, false);
       if (extraApply != null) {
         runScript(connection, false, extraApply, "extra-ddl");
       }

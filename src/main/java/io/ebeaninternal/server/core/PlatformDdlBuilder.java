@@ -11,6 +11,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.NuoDbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.Postgres9Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.SQLiteDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.SqlServerDdl;
@@ -41,14 +42,13 @@ public class PlatformDdlBuilder {
         return new Oracle10Ddl(platform);
       case SQLITE:
         return new SQLiteDdl(platform);
-      case GENERIC:
-        return new PlatformDdl(platform);
+      case POSTGRES9:
+        return new Postgres9Ddl(platform);
       case POSTGRES:
+      case POSTGRES10:
         return new PostgresDdl(platform);
       case COCKROACH:
         return new CockroachDdl(platform);
-      case SQLANYWHERE:
-        return new PlatformDdl(platform);
       case SQLSERVER16:
       case SQLSERVER17:
       case SQLSERVER:

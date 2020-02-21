@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class DatabasePlatformTest {
 
   @Test
-  public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() throws Exception {
+  public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() {
 
     ServerConfig config = new ServerConfig();
     config.setAllQuotedIdentifiers(true);
@@ -29,7 +29,7 @@ public class DatabasePlatformTest {
   }
 
   @Test
-  public void convertQuotedIdentifiers() throws Exception {
+  public void convertQuotedIdentifiers() {
 
     ServerConfig config = new ServerConfig();
 
@@ -46,7 +46,7 @@ public class DatabasePlatformTest {
   }
 
   @Test
-  public void defaultTypesForDecimalAndVarchar() throws Exception {
+  public void defaultTypesForDecimalAndVarchar() {
 
     DatabasePlatform dbPlatform = new DatabasePlatform();
     assertEquals(defaultDecimalDefn(dbPlatform), "decimal(38)");
@@ -54,7 +54,7 @@ public class DatabasePlatformTest {
   }
 
   @Test
-  public void configure_customType() throws Exception {
+  public void configure_customType() {
 
     PlatformConfig config = new PlatformConfig();
     config.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);

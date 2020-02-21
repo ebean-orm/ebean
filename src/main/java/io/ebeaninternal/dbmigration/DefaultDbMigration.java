@@ -19,6 +19,7 @@ import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
+import io.ebean.config.dbplatform.postgres.Postgres9Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
@@ -48,6 +49,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
 /**
  * Generates DB Migration xml and sql scripts.
@@ -406,7 +409,7 @@ public class DefaultDbMigration implements DbMigration {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
-        if (!script.isDrop() && ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+        if (!script.isDrop() && matchPlatform(dbPlatform.getPlatform(), script.getPlatforms())) {
           writeExtraDdl(migrationDir, script);
         }
       }
@@ -812,7 +815,10 @@ public class DefaultDbMigration implements DbMigration {
         return new H2Platform();
       case HSQLDB:
         return new HsqldbPlatform();
+      case POSTGRES9:
+        return new Postgres9Platform();
       case POSTGRES:
+      case POSTGRES10:
         return new PostgresPlatform();
       case MYSQL55:
         return new MySql55Platform();

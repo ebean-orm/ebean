@@ -17,6 +17,8 @@ import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import java.io.IOException;
 import java.util.List;
 
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+
 /**
  * Reads EbeanServer bean descriptors to build the current model.
  */
@@ -146,7 +148,7 @@ public class CurrentModel {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
-        if (script.isInit() && ExtraDdlXmlReader.matchPlatform(server.getDatabasePlatform().getName(), script.getPlatforms())) {
+        if (script.isInit() && matchPlatform(server.getDatabasePlatform().getPlatform(), script.getPlatforms())) {
           ddl.append(prefix).append(script.getName()).append('\n');
           ddl.append(script.getValue());
         }

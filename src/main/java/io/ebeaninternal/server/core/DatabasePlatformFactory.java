@@ -13,6 +13,7 @@ import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.Postgres8Platform;
+import io.ebean.config.dbplatform.postgres.Postgres9Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
@@ -166,7 +167,7 @@ public class DatabasePlatformFactory {
     } else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
-      return readPostgres(connection);
+      return readPostgres(connection, majorVersion);
     } else if (dbProductName.contains("nuo")) {
       return new NuoDbPlatform();
     } else if (dbProductName.contains("sqlite")) {
@@ -195,28 +196,23 @@ public class DatabasePlatformFactory {
   /**
    * Use a select version() query as it could be Postgres or CockroachDB.
    */
-  private static DatabasePlatform readPostgres(Connection connection) {
-    // Postgres driver uses a hardcoded product name so use version() query
-    PreparedStatement statement = null;
-    ResultSet resultSet = null;
-    try {
-      statement = connection.prepareStatement("SELECT version() AS \"version\"");
-      resultSet = statement.executeQuery();
-      if (resultSet.next()) {
-        String productVersion = resultSet.getString("version").toLowerCase();
-        if (productVersion.contains("cockroach")) {
-          return new CockroachPlatform();
+  private static DatabasePlatform readPostgres(Connection connection, int majorVersion) {
+    try (PreparedStatement statement = connection.prepareStatement("select version() as \"version\"")) {
+      try (ResultSet resultSet = statement.executeQuery()) {
+        if (resultSet.next()) {
+          String productVersion = resultSet.getString("version").toLowerCase();
+          if (productVersion.contains("cockroach")) {
+            return new CockroachPlatform();
+          }
         }
       }
     } catch (SQLException e) {
       logger.warn("Error running detection query on Postgres", e);
-
-    } finally {
-      JdbcClose.close(resultSet);
-      JdbcClose.close(statement);
     }
 
-    // Real Postgres
+    if (majorVersion <= 9) {
+      return new Postgres9Platform();
+    }
     return new PostgresPlatform();
   }
 }
