@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.dto;
 
 import io.ebean.ProfileLocation;
-import io.ebean.meta.MetricType;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.QueryPlanMetric;
 import io.ebeaninternal.api.SpiDtoQuery;
@@ -49,6 +48,6 @@ public class DtoMappingRequest {
   }
 
   public QueryPlanMetric createMetric() {
-    return MetricFactory.get().createQueryPlanMetric(MetricType.DTO, type, label, profileLocation, sql);
+    return MetricFactory.get().createQueryPlanMetric(type, label, profileLocation, sql);
   }
 }

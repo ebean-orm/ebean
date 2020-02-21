@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.ebean.meta.MetricType.L2;
-
 /**
  * The default cache implementation.
  * <p>
@@ -74,12 +72,12 @@ public class DefaultServerCache implements ServerCache {
     MetricFactory factory = MetricFactory.get();
 
     String prefix = "l2n.";
-    this.hitCount = factory.createCountMetric(L2, prefix + shortName + ".hit");
-    this.missCount = factory.createCountMetric(L2, prefix + shortName + ".miss");
-    this.putCount = factory.createCountMetric(L2, prefix + shortName + ".put");
-    this.removeCount = factory.createCountMetric(L2, prefix + shortName + ".remove");
-    this.clearCount = factory.createCountMetric(L2, prefix + shortName + ".clear");
-    this.evictCount = factory.createCountMetric(L2, prefix + shortName + ".evict");
+    this.hitCount = factory.createCountMetric(prefix + shortName + ".hit");
+    this.missCount = factory.createCountMetric(prefix + shortName + ".miss");
+    this.putCount = factory.createCountMetric(prefix + shortName + ".put");
+    this.removeCount = factory.createCountMetric(prefix + shortName + ".remove");
+    this.clearCount = factory.createCountMetric(prefix + shortName + ".clear");
+    this.evictCount = factory.createCountMetric(prefix + shortName + ".evict");
   }
 
   public void periodicTrim(BackgroundExecutor executor) {

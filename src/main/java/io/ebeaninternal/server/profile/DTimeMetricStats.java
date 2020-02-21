@@ -1,14 +1,11 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetricType;
 import io.ebean.metric.TimedMetricStats;
 
 /**
  * Snapshot of the current statistics for a Counter or TimeCounter.
  */
 class DTimeMetricStats implements TimedMetricStats {
-
-  private final MetricType metricType;
 
   private String name;
 
@@ -22,8 +19,7 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private final long max;
 
-  DTimeMetricStats(MetricType metricType, String name, boolean collected, long count, long total, long max) {
-    this.metricType = metricType;
+  DTimeMetricStats(String name, boolean collected, long count, long total, long max) {
     this.name = name;
     this.collected = collected;
     this.count = count;
@@ -61,11 +57,6 @@ class DTimeMetricStats implements TimedMetricStats {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Override
-  public MetricType getMetricType() {
-    return metricType;
   }
 
   @Override

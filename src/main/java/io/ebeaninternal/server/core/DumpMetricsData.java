@@ -47,7 +47,7 @@ class DumpMetricsData {
   }
 
   private MetricData create(MetaMetric metric) {
-    MetricData data = new MetricData(metric.getName(), metric.getMetricType().name());
+    MetricData data = new MetricData(metric.getName());
     list.add(data);
     return data;
   }

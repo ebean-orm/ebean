@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.QueryPlanMetric;
 import io.ebean.metric.TimedMetric;
@@ -47,11 +46,6 @@ class DQueryPlanMetric implements QueryPlanMetric {
     @Override
     public String toString() {
       return meta + " " + stats + " sql:" + getSql();
-    }
-
-    @Override
-    public MetricType getMetricType() {
-      return stats.getMetricType();
     }
 
     @Override

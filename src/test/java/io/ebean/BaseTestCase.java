@@ -5,7 +5,6 @@ import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.meta.MetaTimedMetric;
-import io.ebean.meta.MetricType;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -98,7 +97,7 @@ public abstract class BaseTestCase {
     List<MetaTimedMetric> timedMetrics = visitTimedMetrics();
 
     return timedMetrics.stream()
-      .filter((it) -> it.getMetricType() == MetricType.SQL)
+      .filter((it) -> it.getName().startsWith("sql.") || it.getName().startsWith("orm."))
       .collect(Collectors.toList());
   }
 

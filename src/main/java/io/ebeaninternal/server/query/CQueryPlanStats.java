@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetricType;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricStats;
 
@@ -85,11 +84,6 @@ public final class CQueryPlanStats {
     @Override
     public String toString() {
       return "label:" + getLabel() + " location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
-    }
-
-    @Override
-    public MetricType getMetricType() {
-      return MetricType.ORM;
     }
 
     @Override
