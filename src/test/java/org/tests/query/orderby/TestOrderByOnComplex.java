@@ -34,7 +34,7 @@ public class TestOrderByOnComplex extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-      .orderBy("case when status=3 then 10 when status=2 then 11 else 99 end");
+      .order("case when status=3 then 10 when status=2 then 11 else 99 end");
 
     List<Order> list = query.findList();
 

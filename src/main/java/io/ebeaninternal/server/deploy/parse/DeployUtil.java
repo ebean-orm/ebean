@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.DbJsonType;
+import io.ebean.annotation.DbMap;
 import io.ebean.config.EncryptDeploy;
 import io.ebean.config.EncryptDeployManager;
 import io.ebean.config.EncryptKeyManager;
@@ -290,5 +290,12 @@ public class DeployUtil {
 
   boolean isUseJavaxValidationNotNull() {
     return useJavaxValidationNotNull;
+  }
+
+  /**
+   * Convert quoted identifiers if necessary (including all quoted).
+   */
+  public String convertQuotes(String name) {
+    return dbPlatform.convertQuotedIdentifiers(name);
   }
 }

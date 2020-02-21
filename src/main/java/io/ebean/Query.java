@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
- *     .orderBy("customer.id, id desc")
+ *     .order("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
  *
@@ -657,6 +657,11 @@ public interface Query<T> {
   Query<T> usingConnection(Connection connection);
 
   /**
+   * Execute the query using the given database.
+   */
+  Query<T> usingDatabase(Database database);
+
+  /**
    * Execute the query returning the list of Id's.
    * <p>
    * This query will execute against the Database that was used to create it.
@@ -885,7 +890,7 @@ public interface Query<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -898,7 +903,7 @@ public interface Query<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .orderBy().asc("name")
+   *      .order().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1184,6 +1189,30 @@ public interface Query<T> {
   Query<T> setParameter(int position, Object value);
 
   /**
+   * Bind the next positioned parameter.
+   *
+   * <pre>{@code
+   *
+   * // a query with a positioned parameters
+   * String oql = "where status = ? and name = ?";
+   *
+   * List<Order> list = DB.createQuery(Order.class, oql)
+   *   .setParameter(OrderStatus.NEW)
+   *   .setParameter("Rob")
+   *   .findList();
+   *
+   * }</pre>
+   */
+  Query<T> setParameter(Object value);
+
+  /**
+   * Bind all the positioned parameters.
+   * <p>
+   * A convenience for multiple calls to {@link #setParameter(Object)}
+   */
+  Query<T> setParameters(Object... values);
+
+  /**
    * Set the Id value to query. This is used with findOne().
    * <p>
    * You can use this to have further control over the query. For example adding
@@ -1323,17 +1352,9 @@ public interface Query<T> {
   Query<T> having(Expression addExpressionToHaving);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #order(String)}.
-   * </p>
+   * Deprecated migrate to {@link #order(String)}
    */
+  @Deprecated
   Query<T> orderBy(String orderByClause);
 
   /**
@@ -1343,10 +1364,6 @@ public interface Query<T> {
    * This follows SQL syntax using commas between each property with the
    * optional asc and desc keywords representing ascending and descending order
    * respectively.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #orderBy(String)}.
-   * </p>
    */
   Query<T> order(String orderByClause);
 
@@ -1356,40 +1373,24 @@ public interface Query<T> {
    * <p>
    * This will never return a null. If no order by clause exists then an 'empty'
    * OrderBy object is returned.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #orderBy()}.
-   * </p>
    */
   OrderBy<T> order();
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * </p>
-   * <p>
-   * This is EXACTLY the same as {@link #order()}.
-   * </p>
+   * Deprecated migrate to order().
    */
+  @Deprecated
   OrderBy<T> orderBy();
 
   /**
    * Set an OrderBy object to replace any existing OrderBy clause.
-   * <p>
-   * This is EXACTLY the same as {@link #setOrderBy(OrderBy)}.
-   * </p>
    */
   Query<T> setOrder(OrderBy<T> orderBy);
 
   /**
-   * Set an OrderBy object to replace any existing OrderBy clause.
-   * <p>
-   * This is EXACTLY the same as {@link #setOrder(OrderBy)}.
-   * </p>
+   * Deprecated migrate to {@link #setOrder(OrderBy)}
    */
+  @Deprecated
   Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**
@@ -1523,17 +1524,6 @@ public interface Query<T> {
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
   }
-
-  /**
-   * Set an id to identify this query for profiling purposes.
-   * <p>
-   * The profileId is expected to be unique for a given bean type.
-   * </p>
-   * <p>
-   * Note that the profileId is treated as a short internally and has a MAX value of 32,767.
-   * </p>
-   */
-  Query<T> setProfileId(int profileId);
 
   /**
    * Set the profile location of this query. This is used to relate query execution metrics

@@ -6,6 +6,7 @@ import io.ebeaninternal.dbmigration.migration.DropIndex;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Index as part of the logical model.
@@ -13,10 +14,12 @@ import java.util.List;
 public class MIndex {
 
   private String tableName;
-
   private String indexName;
-
+  private String platforms;
   private List<String> columns = new ArrayList<>();
+  private boolean unique;
+  private boolean concurrent;
+  private String definition;
 
   /**
    * Create a single column non unique index.
@@ -36,10 +39,27 @@ public class MIndex {
     Collections.addAll(this.columns, columnNames);
   }
 
+  public MIndex(String indexName, String tableName, String[] columnNames, String platforms, boolean unique, boolean concurrent, String definition) {
+    this(indexName, tableName, columnNames);
+    this.platforms = platforms;
+    this.unique = unique;
+    this.concurrent = concurrent;
+    this.definition = emptyToNull(definition);
+  }
+
   public MIndex(CreateIndex createIndex) {
     this.indexName = createIndex.getIndexName();
     this.tableName = createIndex.getTableName();
     this.columns = split(createIndex.getColumns());
+    this.platforms = createIndex.getPlatforms();
+    this.unique = Boolean.TRUE.equals(createIndex.isUnique());
+    this.concurrent = Boolean.TRUE.equals(createIndex.isConcurrent());
+    this.definition = emptyToNull(createIndex.getDefinition());
+  }
+
+  public String getKey() {
+    // currently indexName should be unique (not indexName + platforms)
+    return indexName;
   }
 
   /**
@@ -71,7 +91,22 @@ public class MIndex {
     create.setIndexName(indexName);
     create.setTableName(tableName);
     create.setColumns(join());
+    create.setPlatforms(platforms);
+    if (Boolean.TRUE.equals(unique)) {
+      create.setUnique(Boolean.TRUE);
+    }
+    if (Boolean.TRUE.equals(concurrent)) {
+      create.setConcurrent(Boolean.TRUE);
+    }
+    create.setDefinition(emptyToNull(definition));
     return create;
+  }
+
+  private String emptyToNull(String val) {
+    if (val == null || val.isEmpty()) {
+      return null;
+    }
+    return val;
   }
 
   /**
@@ -81,6 +116,10 @@ public class MIndex {
     DropIndex dropIndex = new DropIndex();
     dropIndex.setIndexName(indexName);
     dropIndex.setTableName(tableName);
+    dropIndex.setPlatforms(platforms);
+    if (Boolean.TRUE.equals(concurrent)) {
+      dropIndex.setConcurrent(Boolean.TRUE);
+    }
     return dropIndex;
   }
 
@@ -88,7 +127,6 @@ public class MIndex {
    * Compare with an index of the same name.
    */
   public void compare(ModelDiff modelDiff, MIndex newIndex) {
-
     if (changed(newIndex)) {
       // drop and recreate the index
       modelDiff.addDropIndex(dropIndex());
@@ -101,6 +139,12 @@ public class MIndex {
    */
   private boolean changed(MIndex newIndex) {
     if (!tableName.equals(newIndex.getTableName())) {
+      return true;
+    }
+    if (unique != newIndex.unique) {
+      return true;
+    }
+    if (!Objects.equals(definition, newIndex.definition)) {
       return true;
     }
     List<String> newColumns = newIndex.getColumns();
@@ -117,6 +161,9 @@ public class MIndex {
 
 
   private List<String> split(String columns) {
+    if (columns.isEmpty()) {
+      return Collections.emptyList();
+    }
     String[] cols = columns.split(",");
     List<String> colList = new ArrayList<>(cols.length);
     Collections.addAll(colList, cols);

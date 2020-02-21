@@ -324,10 +324,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void loadBean(EntityBeanIntercept ebi) {
-  }
-
-  @Override
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
   }
 
@@ -621,7 +617,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+  public <T> boolean exists(Query<?> ormQuery, Transaction transaction) {
     return false;
   }
 
@@ -906,6 +902,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public int saveAll(Object... beans) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
   public int saveAll(Collection<?> beans) throws OptimisticLockException {
     return 0;
   }
@@ -973,5 +974,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     return Collections.emptySet();
+  }
+
+  @Override
+  public SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan) {
+    return null;
   }
 }

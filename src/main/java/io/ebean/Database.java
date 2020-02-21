@@ -122,7 +122,7 @@ public interface Database {
   String getName();
 
   /**
-   * Return the ExpressionFactory for this server.
+   * Return the ExpressionFactory for this database.
    */
   ExpressionFactory getExpressionFactory();
 
@@ -375,7 +375,7 @@ public interface Database {
    *   // find orders and their customers
    *   List<Order> list = database.find(Order.class)
    *     .fetch("customer")
-   *     .orderBy("id")
+   *     .order("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate
@@ -880,6 +880,11 @@ public interface Database {
    * Save all the beans in the collection.
    */
   int saveAll(Collection<?> beans) throws OptimisticLockException;
+
+  /**
+   * Save all the beans.
+   */
+  int saveAll(Object... beans) throws OptimisticLockException;
 
   /**
    * Delete the bean.

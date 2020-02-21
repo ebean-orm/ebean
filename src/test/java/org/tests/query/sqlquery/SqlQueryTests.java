@@ -33,7 +33,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
 
     List<BigDecimal> lineAmounts = DB.sqlQuery(sql)
-      .setParameter(1, 3)
+      .setParameter(3)
       .findSingleAttributeList(BigDecimal.class);
 
     assertThat(lineAmounts).isNotEmpty();
@@ -61,7 +61,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
 
     BigDecimal maxPrice = DB.sqlQuery(sql)
-      .setParameter(1, 2)
+      .setParameter(2)
       .findSingleAttribute(BigDecimal.class);
 
     assertThat(maxPrice).isNotNull();
@@ -146,7 +146,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select id, name, status from o_customer where name = ?";
 
     CustDto rob = DB.sqlQuery(sql)
-      .setParameter(1, "Rob")
+      .setParameter("Rob")
       .findOne(CUST_MAPPER);
 
     assertThat(rob.name).isEqualTo("Rob");
@@ -195,7 +195,7 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select max(id) from o_customer where name != ?";
 
     long maxId = DB.sqlQuery(sql)
-      .setParameter(1, "Rob")
+      .setParameter("Rob")
       .findOne((resultSet, rowNum) -> resultSet.getLong(1));
 
     assertThat(maxId).isGreaterThan(0);
@@ -245,11 +245,11 @@ public class SqlQueryTests extends BaseTestCase {
       // FIXME: we should order by primary key ALWAYS (not by first column) when no
       // explicit order is specified. In postgres this leads to strange scrolling
       // artifacts.
-      assertThat(sql.get(0)).contains("order by 1 offset 3 rows fetch next 10 rows only");
+      assertSql(sql.get(0)).contains("order by 1 offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
-      assertThat(sql.get(0)).contains("from o_order offset 3 rows fetch next 10 rows only");
+      assertSql(sql.get(0)).contains("from o_order offset 3 rows fetch next 10 rows only");
     } else {
-      assertThat(sql.get(0)).contains("Select * from o_order limit 10 offset 3; --bind()");
+      assertSql(sql.get(0)).contains("Select * from o_order limit 10 offset 3; --bind()");
     }
     assertThat(list).isNotEmpty();
   }
@@ -268,7 +268,7 @@ public class SqlQueryTests extends BaseTestCase {
       sqlQuery.findList();
       List<String> sql = LoggedSqlCollector.stop();
 
-      assertThat(sql.get(0)).contains("Select * from o_order order by id offset 3");
+      assertSql(sql.get(0)).contains("Select * from o_order order by id offset 3");
     }
   }
 
@@ -285,11 +285,11 @@ public class SqlQueryTests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
+      assertSql(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
     } else if (isOracle()) {
-      assertThat(sql.get(0)).contains("from o_order order by id fetch next 10 rows only;");
+      assertSql(sql.get(0)).contains("from o_order order by id fetch next 10 rows only;");
     } else {
-      assertThat(sql.get(0)).contains("Select * from o_order order by id limit 10");
+      assertSql(sql.get(0)).contains("Select * from o_order order by id limit 10");
     }
   }
 
@@ -311,11 +311,11 @@ public class SqlQueryTests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
+      assertSql(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
     } else if (isOracle()) {
-      assertThat(sql.get(0)).contains("order by id fetch next 10 rows only");
+      assertSql(sql.get(0)).contains("order by id fetch next 10 rows only");
     } else {
-      assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
+      assertSql(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id limit 10;");
     }
 
     assertThat(sqlMetrics()).isNotEmpty();
@@ -337,11 +337,11 @@ public class SqlQueryTests extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     if (isSqlServer()) {
-      assertThat(sql.get(0)).contains("offset 0 rows fetch next 10 rows only");
+      assertSql(sql.get(0)).contains("offset 0 rows fetch next 10 rows only");
     } else if (isOracle()) {
-      assertThat(sql.get(0)).contains("fetch next 10 rows only");
+      assertSql(sql.get(0)).contains("fetch next 10 rows only");
     } else {
-      assertThat(sql.get(0)).contains("limit 10");
+      assertSql(sql.get(0)).contains("limit 10");
     }
 
     List<MetaTimedMetric> sqlMetrics = sqlMetrics();

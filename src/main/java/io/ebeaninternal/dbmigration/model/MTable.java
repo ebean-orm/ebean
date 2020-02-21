@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
@@ -27,20 +26,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
+
 /**
  * Holds the logical model for a given Table and everything associated to it.
  * <p>
  * This effectively represents a table, its columns and all associated
  * constraints, foreign keys and indexes.
- * </p>
  * <p>
  * Migrations can be applied to this such that it represents the state
  * of a given table after various migrations have been applied.
- * </p>
  * <p>
  * This table model can also be derived from the EbeanServer bean descriptor
  * and associated properties.
- * </p>
  */
 public class MTable {
 
@@ -173,11 +171,8 @@ public class MTable {
     for (Column column : cols) {
       addColumn(column);
     }
-    List<UniqueConstraint> uqConstraints = createTable.getUniqueConstraint();
-    for (UniqueConstraint uq : uqConstraints) {
-      MCompoundUniqueConstraint mUq = new MCompoundUniqueConstraint(SplitColumns.split(uq.getColumnNames()), uq.isOneToOne(), uq.getName());
-      mUq.setNullableColumns(SplitColumns.split(uq.getNullableColumns()));
-      uniqueConstraints.add(mUq);
+    for (UniqueConstraint uq : createTable.getUniqueConstraint()) {
+      uniqueConstraints.add(new MCompoundUniqueConstraint(uq));
     }
 
     for (ForeignKey fk : createTable.getForeignKey()) {
@@ -189,11 +184,10 @@ public class MTable {
     }
   }
 
-
   public void addForeignKey(String name, String refTableName, String indexName, String columnNames, String refColumnNames) {
     MCompoundForeignKey foreignKey = new MCompoundForeignKey(name, refTableName, indexName);
-    String[] cols = SplitColumns.split(columnNames);
-    String[] refCols = SplitColumns.split(refColumnNames);
+    String[] cols = split(columnNames);
+    String[] refCols = split(refColumnNames);
     for (int i = 0; i < cols.length && i < refCols.length; i++) {
       foreignKey.addColumnPair(cols[i], refCols[i]);
     }
@@ -422,6 +416,11 @@ public class MTable {
     return name;
   }
 
+  public String getSchema() {
+    int pos = name.indexOf('.');
+    return pos == -1 ? null : name.substring(0, pos);
+  }
+
   /**
    * Return true if this table is a 'Draft' table.
    */
@@ -441,6 +440,10 @@ public class MTable {
    */
   public PartitionMeta getPartitionMeta() {
     return partitionMeta;
+  }
+
+  public String getPkName() {
+    return pkName;
   }
 
   public void setPkName(String pkName) {
@@ -593,19 +596,8 @@ public class MTable {
   /**
    * Add a unique constraint.
    */
-  public void addUniqueConstraint(String[] columns, boolean oneToOne, String constraintName) {
-    uniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne, constraintName));
-  }
-
-  /**
-   * Add a unique constraint.
-   */
-  public void addUniqueConstraint(List<MColumn> columns, boolean oneToOne, String constraintName) {
-    String[] cols = new String[columns.size()];
-    for (int i = 0; i < columns.size(); i++) {
-      cols[i] = columns.get(i).getName();
-    }
-    addUniqueConstraint(cols, oneToOne, constraintName);
+  public void addUniqueConstraint(MCompoundUniqueConstraint uniqueConstraint) {
+    uniqueConstraints.add(uniqueConstraint);
   }
 
   /**
@@ -761,10 +753,7 @@ public class MTable {
       List<String> nullableColumns = new ArrayList<>();
       for (String columnName : uniq.getColumns()) {
         MColumn col = getColumn(columnName);
-        if (col == null) {
-          throw new IllegalStateException("Column '" + columnName + "' not found in table " + getName());
-        }
-        if (!col.isNotnull()) {
+        if (col != null && !col.isNotnull()) {
           nullableColumns.add(columnName);
         }
       }

@@ -77,25 +77,47 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
   /**
    * Find hardware ID.
+   *
+   * We check all non-loopback networkinterfaces for valid hardwareAddresses
+   * We prefer to take the first non virtual "up" device. If no device (with valid addr) is up,
+   * we take the first down device.
    */
   private static byte[] getHardwareId() throws SocketException {
     final Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+    byte[] fallbackAddr = null;
     while (e.hasMoreElements()) {
       NetworkInterface network = e.nextElement();
       try {
         logger.trace("Probing interface {}", network);
         if (!network.isLoopback()) {
           byte[] addr = network.getHardwareAddress();
-          if (addr != null) {
-            logger.debug("Using interface {}", network);
-            return addr;
+          if (validAddr(addr)) {
+            if (network.isUp() && !network.isVirtual()) {
+              logger.debug("Using interface {}", network);
+              return addr;
+            } else if (fallbackAddr == null) {
+              logger.debug("Using interface {} as fallback", network);
+              fallbackAddr = addr;
+            }
           }
         }
       } catch (SocketException ex) {
         logger.debug("Skipping {}", network, ex);
       }
     }
-    return null;
+    return fallbackAddr;
+  }
+
+  /**
+   * checks if addr is valid. Addr is valid if vendor is != 0x000000 or 0xFFFFFF
+   */
+  private static boolean validAddr(byte[] addr) {
+    if (addr != null && addr.length >= 6) { // valid addr has 6 bytes
+      // check if vendor is != 0x000000 or 0xFFFFFF
+      return (addr[0] != 0x00 && addr[1] != 0x00 && addr[2] != 0x00)
+          ||(addr[0] != 0xFF && addr[1] != 0xFF && addr[2] != 0xFF);
+    }
+    return false;
   }
 
   /**

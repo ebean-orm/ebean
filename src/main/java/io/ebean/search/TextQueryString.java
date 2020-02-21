@@ -13,7 +13,7 @@ package io.ebean.search;
  *       .lenient(true)
  *       .opAnd();
  *
- *   List<Customer> customers = server.find(Customer.class)
+ *   List<Customer> customers = database.find(Customer.class)
  *       .text()
  *       .textSimple("quick brown", options)
  *       .findList();
@@ -24,7 +24,7 @@ package io.ebean.search;
  *  // just use default options
  *  TextQueryString options = new TextQueryString();
  *
- *   List<Customer> customers = server.find(Customer.class)
+ *   List<Customer> customers = database.find(Customer.class)
  *       .text()
  *       .textSimple("quick brown", options)
  *       .findList();

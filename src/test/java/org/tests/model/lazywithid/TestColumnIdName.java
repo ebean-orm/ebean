@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestColumnIdName extends BaseTestCase {
   @Test
@@ -18,8 +18,8 @@ public class TestColumnIdName extends BaseTestCase {
 
     final List<Tune> fetchedCollection = Ebean.find(Tune.class).findList();
 
-    assertEquals(1, fetchedCollection.size());
-    assertEquals(1, fetchedCollection.get(0).getLoonies().size());
-    assertEquals("Taz", fetchedCollection.get(0).getLoonies().get(0).getName());
+    assertThat(fetchedCollection).hasSize(1);
+    assertThat(fetchedCollection.get(0).getLoonies()).hasSize(1);
+    assertThat(fetchedCollection.get(0).getLoonies().get(0).getName()).isEqualTo("Taz");
   }
 }

@@ -20,8 +20,9 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
-import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ConcurrencyMode;
@@ -55,7 +56,6 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
-import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
@@ -244,17 +244,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Run periodic trim of query plans.
    */
   public void scheduleBackgroundTrim() {
-    backgroundExecutor.executePeriodically(this::trimQueryPlans, 30L, TimeUnit.SECONDS);
+    backgroundExecutor.executePeriodically(this::trimQueryPlans, 60L, TimeUnit.SECONDS);
   }
 
   private void trimQueryPlans() {
     long lastUsed = System.currentTimeMillis() - (queryPlanTTLSeconds * 1000L);
     for (BeanDescriptor<?> descriptor : immutableDescriptorList) {
       if (!descriptor.isEmbedded()) {
-        List<CQueryPlan> trimmedPlans = descriptor.trimQueryPlans(lastUsed);
-        if (!trimmedPlans.isEmpty()) {
-          logger.trace("trimmed {} query plans for type:{}", trimmedPlans.size(), descriptor.getName());
-        }
+        descriptor.trimQueryPlans(lastUsed);
       }
     }
   }
@@ -790,13 +787,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       .collect(Collectors.toList());
 
     deployDescriptors.sort(Comparator.comparing(DeployBeanDescriptor::getFullName));
-
-    short id = 0;
-    for (DeployBeanDescriptor<?> desc : deployDescriptors) {
-      if (!desc.isEmbedded()) {
-        desc.setProfileId(++id);
-      }
-    }
   }
 
   /**
@@ -954,6 +944,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     if (matchSet.size() == 1) {
       // all right with the world
+      prop.clearTableJoin();
       return true;
     }
     if (matchSet.size() == 2) {
@@ -1696,12 +1687,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  public void collectQueryPlans(QueryPlanRequest request) {
+  public List<MetaQueryPlan> queryPlanInit(QueryPlanInit request) {
+    List<MetaQueryPlan> list = new ArrayList<>();
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
-      if (request.includeType(desc.getBeanType())) {
-        desc.collectQueryPlans(request);
-      }
+      desc.queryPlanInit(request, list);
     }
+    return list;
   }
 
   /**
@@ -1713,7 +1704,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     @Override
     public int compare(BeanDescriptor<?> o1, BeanDescriptor<?> o2) {
-
       return o1.getName().compareTo(o2.getName());
     }
   }

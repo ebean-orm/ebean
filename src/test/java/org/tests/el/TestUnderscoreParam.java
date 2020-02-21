@@ -19,7 +19,7 @@ public class TestUnderscoreParam extends BaseTestCase {
 
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name like ?");
+    assertSql(query).contains("where t0.name like ?");
 
   }
 

@@ -28,6 +28,6 @@ public class TestOnlyIdEntity extends BaseTestCase {
 
     assertThat(bean.getId()).isGreaterThan(0);
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("insert into only_id_entity default values");
+    assertSql(sql.get(0)).contains("insert into only_id_entity default values");
   }
 }

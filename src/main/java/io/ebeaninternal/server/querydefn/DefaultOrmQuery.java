@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.Database;
 import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -89,13 +90,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private final Class<T> beanType;
 
+  private final ExpressionFactory expressionFactory;
+
   private final BeanDescriptor<T> rootBeanDescriptor;
 
   private BeanDescriptor<T> beanDescriptor;
 
-  private final SpiEbeanServer server;
-
-  private final ExpressionFactory expressionFactory;
+  private SpiEbeanServer server;
 
   private SpiTransaction transaction;
 
@@ -283,11 +284,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean orderById;
 
-  /**
-   * Identity the query for profiling purposes (expected to be unique for a bean type).
-   */
-  private short profileId;
-
   private ProfileLocation profileLocation;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
@@ -350,14 +346,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public short getProfileId() {
-    return profileId;
-  }
-
-  @Override
-  public Query<T> setProfileId(int profileId) {
-    this.profileId = (short) profileId;
-    return this;
+  public String getProfileId() {
+    return getPlanLabel();
   }
 
   @Override
@@ -623,13 +613,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   private boolean isAllowOneManyFetch() {
-
-    if (Mode.LAZYLOAD_MANY == getMode()) {
+    if (Mode.LAZYLOAD_MANY == mode) {
       return false;
-    } else if (hasMaxRowsOrFirstRow() && !isRawSql()) {
-      return false;
+    } else {
+      return !hasMaxRowsOrFirstRow() || isRawSql();
     }
-    return true;
   }
 
   @Override
@@ -1402,8 +1390,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> select(FetchGroup fetchGroup) {
-    this.detail = ((SpiFetchGroup) fetchGroup).detail();
+  public DefaultOrmQuery<T> select(FetchGroup<T> fetchGroup) {
+    this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
     return this;
   }
 
@@ -1466,6 +1454,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> usingConnection(Connection connection) {
     this.transaction = new ExternalJdbcTransaction(connection);
+    return this;
+  }
+
+  @Override
+  public Query<T> usingDatabase(Database database) {
+    this.server = (SpiEbeanServer) database;
     return this;
   }
 
@@ -1609,6 +1603,24 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findPagedList(this, transaction);
   }
 
+  @Override
+  public DefaultOrmQuery<T> setParameter(Object value) {
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
+    bindParams.setNextParameter(value);
+    return this;
+  }
+
+  @Override
+  public DefaultOrmQuery<T> setParameters(Object... values) {
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
+    bindParams.setNextParameters(values);
+    return this;
+  }
+
   /**
    * Set an ordered bind parameter according to its position. Note that the position starts at 1 to
    * be consistent with JDBC PreparedStatement. You need to set a parameter value for each ? you
@@ -1628,7 +1640,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public DefaultOrmQuery<T> setParameter(String name, Object value) {
-
     if (namedParams != null) {
       ONamedParam param = namedParams.get(name);
       if (param != null) {
@@ -1660,6 +1671,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  @Deprecated
   public OrderBy<T> orderBy() {
     return order();
   }
@@ -1673,6 +1685,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  @Deprecated
   public DefaultOrmQuery<T> orderBy(String orderByClause) {
     return order(orderByClause);
   }
@@ -1688,6 +1701,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  @Deprecated
   public DefaultOrmQuery<T> setOrderBy(OrderBy<T> orderBy) {
     return setOrder(orderBy);
   }
@@ -2077,7 +2091,4 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
-  public boolean isOrderById() {
-    return orderById;
-  }
 }

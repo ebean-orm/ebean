@@ -45,7 +45,7 @@ public class TestBeanStateReset extends BaseTestCase {
       b.save();
 
       List<String> sql = LoggedSqlCollector.stop();
-      assertThat(sql.get(0)).contains("insert into mny_b (id, name, version, when_created, when_modified, a_id) values (");
+      assertSql(sql.get(0)).contains("insert into mny_b (id, name, version, when_created, when_modified, a_id) values (");
     }
 
   }

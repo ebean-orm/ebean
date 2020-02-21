@@ -31,11 +31,14 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     enableSystemVersioning(writer, baseTable);
   }
 
-  private String getHistoryTable(String baseTable) {
-    String historyTable = baseTable + "_history"; // history must contain schema, otherwise you'll get
-    // Setting SYSTEM_VERSIONING to ON failed because history table 'xxx_history' is not specified in two-part name format.
+  String getHistoryTable(String baseTable) {
+    String historyTable = baseTable + "_history";
+    if (baseTable.startsWith("[")) {
+      historyTable = historyTable.replace("]", "") + "]";
+    }
     if (historyTable.indexOf('.') == -1) {
-      historyTable = "dbo." +historyTable; // so add the default schema, if none was specified.
+      // history must contain schema, add the default schema if none was specified
+      historyTable = "dbo." + historyTable;
     }
     return historyTable;
   }
@@ -86,10 +89,10 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     DdlBuffer apply = writer.applyHistoryView();
     String baseTableName = baseTable.getBaseTable();
     apply.append("-- alter table ").append(baseTableName).append(" set (system_versioning = off (history_table=")
-    .append(getHistoryTable(baseTableName)).append("))").endOfStatement();
+      .append(getHistoryTable(baseTableName)).append("))").endOfStatement();
     apply.append("-- history migration goes here").newLine();
     apply.append("-- alter table ").append(baseTableName).append(" set (system_versioning = on (history_table=")
-    .append(getHistoryTable(baseTableName)).append("))").endOfStatement();
+      .append(getHistoryTable(baseTableName)).append("))").endOfStatement();
 
   }
 }

@@ -29,8 +29,8 @@ public class TestDeleteCascadeWithListener extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(6);
-      assertThat(sql.get(0)).contains("select t0.id from dc_detail t0 where master_id=?");
-      assertThat(sql.get(1)).contains("delete from dc_detail where id=?");
+      assertSql(sql.get(0)).contains("select t0.id from dc_detail t0 where master_id=?");
+      assertSql(sql.get(1)).contains("delete from dc_detail where id=?");
       assertSqlBind(sql, 2, 4);
       assertThat(sql.get(5)).contains("delete from dc_master where id=? and version=?");
     }

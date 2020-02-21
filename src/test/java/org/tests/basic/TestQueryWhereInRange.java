@@ -43,7 +43,7 @@ public class TestQueryWhereInRange extends BaseTestCase {
 
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.order_date = ? or t0.order_date is null)");
+    assertSql(query).contains("where (t0.order_date = ? or t0.order_date is null)");
   }
 
   @Test
@@ -59,7 +59,7 @@ public class TestQueryWhereInRange extends BaseTestCase {
 
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where (t0.order_date > ? or t0.order_date is null)");
+    assertSql(query).contains("where (t0.order_date > ? or t0.order_date is null)");
   }
 
   @Test
@@ -75,7 +75,7 @@ public class TestQueryWhereInRange extends BaseTestCase {
 
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains(" where (t0.order_date < ? or t0.order_date is null)");
+    assertSql(query).contains(" where (t0.order_date < ? or t0.order_date is null)");
   }
 
   @Test
@@ -91,6 +91,6 @@ public class TestQueryWhereInRange extends BaseTestCase {
 
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("(t0.order_date <= ? and (t0.ship_date > ? or t0.ship_date is null))");
+    assertSql(query).contains("(t0.order_date <= ? and (t0.ship_date > ? or t0.ship_date is null))");
   }
 }

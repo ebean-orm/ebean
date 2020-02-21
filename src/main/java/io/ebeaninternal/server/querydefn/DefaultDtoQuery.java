@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
+import io.ebean.Transaction;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -47,6 +48,8 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
    */
   private final BindParams bindParams = new BindParams();
 
+  private Transaction transaction;
+
   /**
    * Create given an underlying ORM query.
    */
@@ -86,6 +89,12 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public void putQueryPlan(Object planKey, DtoQueryPlan plan) {
     descriptor.putQueryPlan(planKey, plan);
+  }
+
+  @Override
+  public DtoQuery<T> usingTransaction(Transaction transaction) {
+    this.transaction = transaction;
+    return this;
   }
 
   @Override
@@ -134,6 +143,26 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   }
 
   @Override
+  public DtoQuery<T> setParameters(Object... values) {
+    if (ormQuery != null) {
+      ormQuery.setParameters(values);
+    } else {
+      bindParams.setNextParameters(values);
+    }
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> setParameter(Object value) {
+    if (ormQuery != null) {
+      ormQuery.setParameter(value);
+    } else {
+      bindParams.setNextParameter(value);
+    }
+    return this;
+  }
+
+  @Override
   public String toString() {
     return "DtoQuery [" + sql + "]";
   }
@@ -146,6 +175,11 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public SpiQuery<?> getOrmQuery() {
     return ormQuery;
+  }
+
+  @Override
+  public Transaction getTransaction() {
+    return transaction;
   }
 
   @Override

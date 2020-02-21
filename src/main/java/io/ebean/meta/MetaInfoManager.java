@@ -34,11 +34,6 @@ public interface MetaInfoManager {
   List<MetricData> collectMetricsAsData();
 
   /**
-   * Collect query plans.
-   */
-  List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request);
-
-  /**
    * Visit the metrics resetting and collecting/reporting as desired.
    */
   void visitMetrics(MetricVisitor visitor);
@@ -53,5 +48,22 @@ public interface MetaInfoManager {
    * Just reset all the metrics. Maybe only useful for testing purposes.
    */
   void resetAllMetrics();
+
+  /**
+   * Initiate query plan collection by turning on "bind capture" on matching query plans.
+   * <p>
+   * Also refer to ServerConfig collectQueryPlans that needs to be set to true
+   * and collectQueryPlanThresholdMicros which is a global defaults that can also
+   * initiate query plan capture.
+   *
+   * @return The query plans that have had bind capture turned on by this request.
+   */
+  List<MetaQueryPlan> queryPlanInit(QueryPlanInit initRequest);
+
+  /**
+   * Collect query plans in the foreground.
+   */
+  List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request);
+
 
 }

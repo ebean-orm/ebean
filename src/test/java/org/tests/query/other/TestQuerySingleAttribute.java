@@ -14,6 +14,7 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.VwCustomer;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -32,12 +33,15 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       Ebean.find(Customer.class)
         .setDistinct(true)
         .select("name")
-        .where().eq("status", Customer.Status.NEW)
-        .orderBy().asc("name")
+        .where().eq("status", Customer.Status.NEW).startsWith("name", "R")
+        .order().asc("name")
         .setMaxRows(100)
         .findSingleAttributeList();
 
     assertThat(names).isNotNull();
+    for (String name : names) {
+      assertThat(name).startsWith("R");
+    }
   }
 
   @Test
@@ -50,7 +54,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .setDistinct(true)
         .select("anniversary")
         .where().isNotNull("anniversary")
-        .orderBy().asc("anniversary")
+        .order().asc("anniversary")
         .findSingleAttributeList();
 
     assertThat(dates).isNotNull();
@@ -289,6 +293,20 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
+  public void findSingleWithFetchOnView() {
+
+    ResetBasicData.reset();
+
+    Query<VwCustomer> query = Ebean.find(VwCustomer.class)
+      .fetch("billingAddress", "city");
+
+    List<String> cities = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select t1.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertThat(cities).contains("Auckland").containsNull();
+  }
+
+  @Test
   public void findSingleSelectOnInheritedBean() {
 
     ResetBasicData.reset();
@@ -353,7 +371,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
       .select("customer")
-      .orderBy().desc("customer");
+      .order().desc("customer");
 
     query.findSingleAttributeList();
 
@@ -368,7 +386,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
       .select("customer.id")
-      .orderBy().desc("customer.id");
+      .order().desc("customer.id");
 
     query.findSingleAttributeList();
 
@@ -383,7 +401,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     Query<Contact> query = Ebean.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
-      .orderBy().desc("customer.billingAddress");
+      .order().desc("customer.billingAddress");
 
     query.findSingleAttributeList();
 
@@ -399,7 +417,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -420,7 +438,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Short> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -441,7 +459,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Integer> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -462,7 +480,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.shippingAddress.city", "Auckland") // query on shippingAddress
-      .orderBy().desc("customer.billingAddress.id");
+      .order().desc("customer.billingAddress.id");
 
     List<Short> ids = query.findSingleAttributeList();
     assertThat(ids).isNotEmpty();
@@ -574,7 +592,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
     } else if (isDb2()) {
-      assertThat(query.getGeneratedSql()).endsWith("FETCH FIRST 2 ROWS ONLY");
+      assertSql(query).endsWith("FETCH FIRST 2 ROWS ONLY");
     } else {
       assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");
     }

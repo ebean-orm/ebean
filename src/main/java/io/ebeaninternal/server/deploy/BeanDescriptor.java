@@ -10,6 +10,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.ServerConfig;
@@ -27,8 +28,9 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
-import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -136,8 +138,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final Map<String, SpiRawSql> namedRawSql;
 
   private final Map<String, String> namedQuery;
-
-  private final short profileBeanId;
 
   private final boolean multiValueSupported;
   private boolean batchEscalateOnCascadeInsert;
@@ -376,7 +376,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final BeanProperty[] propertiesGenInsert;
   private final BeanProperty[] propertiesGenUpdate;
   private final List<BeanProperty[]> propertiesUnique = new ArrayList<>();
-
+  private final boolean idOnlyReference;
   private BeanNaturalKey beanNaturalKey;
 
   /**
@@ -439,7 +439,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.profileBeanId = deploy.getProfileId();
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
@@ -482,7 +481,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.dbComment = deploy.getDbComment();
     this.partitionMeta = deploy.getPartitionMeta();
     this.storageEngine = deploy.getStorageEngine();
-    this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
+    this.autoTunable = beanFinder == null && (entityType == EntityType.ORM || entityType == EntityType.VIEW);
 
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
@@ -513,7 +512,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.propertiesOneImported = listHelper.getOneImported();
     this.propertiesOneImportedSave = listHelper.getOneImportedSave();
     this.propertiesOneImportedDelete = listHelper.getOneImportedDelete();
-
     this.propertiesMany = listHelper.getMany();
     this.propertiesNonMany = listHelper.getNonMany();
     this.propertiesAggregate = listHelper.getAggregates();
@@ -522,6 +520,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.propertiesManyToMany = listHelper.getManyToMany();
     this.propertiesGenInsert = listHelper.getGeneratedInsert();
     this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
+    this.idOnlyReference = isIdOnlyReference(propertiesBaseScalar);
 
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
 
@@ -570,11 +569,16 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Return the id used in profiling to identify the bean type.
+   * Return true if the bean should be treated as a reference bean when it only has its id populated.
+   * To be true it has other scalar properties that are not generated on insert.
    */
-  @Override
-  public short getProfileId() {
-    return profileBeanId;
+  private boolean isIdOnlyReference(BeanProperty[] baseScalar) {
+    for (BeanProperty beanProperty : baseScalar) {
+      if (!beanProperty.isGeneratedOnInsert()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -936,7 +940,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public void bindElementValue(SqlUpdate insert, Object value) {
     EntityBean bean = (EntityBean) value;
     for (BeanProperty property : propertiesBaseScalar) {
-      insert.setNextParameter(property.getValue(bean));
+      insert.setParameter(property.getValue(bean));
     }
   }
 
@@ -1099,7 +1103,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     Object[] bindValues = idBinder.getBindValues(id);
     for (Object bindValue : bindValues) {
-      sqlDelete.setNextParameter(bindValue);
+      sqlDelete.setParameter(bindValue);
     }
 
     return sqlDelete;
@@ -1682,10 +1686,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
   }
 
-  void collectQueryPlans(QueryPlanRequest request) {
+  void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
-      if (request.includeLabel(queryPlan.getLabel())) {
-        queryPlan.collectQueryPlan(request);
+      if (request.includeHash(queryPlan.getHash())) {
+        queryPlan.queryPlanInit(request.getThresholdMicros());
+        list.add(queryPlan.createMeta(null, null));
       }
     }
   }
@@ -1714,19 +1719,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Trim query plans not used since the passed in epoch time.
    */
-  List<CQueryPlan> trimQueryPlans(long unusedSince) {
-
-    List<CQueryPlan> list = new ArrayList<>();
-
+  void trimQueryPlans(long unusedSince) {
     Iterator<CQueryPlan> it = queryPlanCache.values().iterator();
     while (it.hasNext()) {
       CQueryPlan queryPlan = it.next();
       if (queryPlan.getLastQueryTime() < unusedSince) {
         it.remove();
-        list.add(queryPlan);
       }
     }
-    return list;
   }
 
   /**
@@ -1822,7 +1822,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Find a property annotated with @WhenCreated or @CreatedTimestamp.
    */
   private BeanProperty findWhenCreatedProperty() {
-
     for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
       if (aPropertiesBaseScalar.isGeneratedWhenCreated()) {
         return aPropertiesBaseScalar;
@@ -2043,7 +2042,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       if (disableLazyLoad) {
         ebi.setDisableLazyLoad(true);
       } else {
-        ebi.setBeanLoader(ebeanServer);
+        ebi.setBeanLoader(refBeanLoader());
       }
       ebi.setReference(idPropertyIndex);
       if (Boolean.TRUE == readOnly) {
@@ -2061,6 +2060,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     }
   }
 
+  SingleBeanLoader refBeanLoader() {
+    return new SingleBeanLoader.Ref(ebeanServer);
+  }
+
+  SingleBeanLoader l2BeanLoader() {
+    return new SingleBeanLoader.L2(ebeanServer);
+  }
+
   /**
    * Create a non read only reference bean without checking cacheSharableBeans.
    */
@@ -2075,7 +2082,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
-      ebi.setBeanLoader(ebeanServer);
+      ebi.setBeanLoader(refBeanLoader());
       ebi.setReference(idPropertyIndex);
       if (pc != null) {
         contextPut(pc, id, eb);
@@ -3306,11 +3313,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public boolean isReference(EntityBeanIntercept ebi) {
-    return ebi.isReference() || hasIdPropertyOnly(ebi);
+    return ebi.isReference() || referenceIdPropertyOnly(ebi);
   }
 
-  boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
-    return propertiesBaseScalar.length > 0 && ebi.hasIdOnly(idPropertyIndex);
+  boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
+    return idOnlyReference && ebi.hasIdOnly(idPropertyIndex);
   }
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {

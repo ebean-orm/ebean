@@ -45,6 +45,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -146,6 +147,8 @@ public class TransactionManager implements SpiTransactionManager {
   private final TableModState tableModState;
   private final ServerCacheNotify cacheNotify;
   private final boolean supportsSavepointId;
+
+  private final ConcurrentHashMap<String, ProfileLocation> profileLocations = new ConcurrentHashMap<>();
 
   /**
    * Create the TransactionManager
@@ -310,6 +313,11 @@ public class TransactionManager implements SpiTransactionManager {
 
   public String getServerName() {
     return serverName;
+  }
+
+  @Override
+  public Connection getQueryPlanConnection() throws SQLException {
+    return dataSourceSupplier.getConnection(null);
   }
 
   @Override
@@ -684,7 +692,6 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   private void initNewTransaction(SpiTransaction transaction, TxScope txScope) {
-
     if (txScope.isSkipCache()) {
       transaction.setSkipCache(true);
     }
@@ -692,15 +699,20 @@ public class TransactionManager implements SpiTransactionManager {
     if (label != null) {
       transaction.setLabel(label);
     }
-    int profileId = txScope.getProfileId();
-    if (profileId > 0) {
-      transaction.setProfileStream(profileHandler.createProfileStream(profileId));
-    }
     ProfileLocation profileLocation = txScope.getProfileLocation();
     if (profileLocation != null) {
-      profileLocation.obtain();
+      if (profileLocation.obtain()) {
+        registerProfileLocation(profileLocation);
+      }
       transaction.setProfileLocation(profileLocation);
+      if (profileLocation.trace()) {
+        transaction.setProfileStream(profileHandler.createProfileStream(profileLocation));
+      }
     }
+  }
+
+  private void registerProfileLocation(ProfileLocation profileLocation) {
+    profileLocations.put(profileLocation.fullLocation(), profileLocation);
   }
 
   private TxScope initTxScope(TxScope txScope) {

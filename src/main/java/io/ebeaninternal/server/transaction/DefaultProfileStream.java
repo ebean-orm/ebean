@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.ProfileLocation;
+
 /**
  * Default transaction profiling event collection.
  */
@@ -10,9 +12,9 @@ public class DefaultProfileStream implements ProfileStream {
   private final TransactionProfile profile;
   private final TransactionProfile.Summary summary;
 
-  DefaultProfileStream(int profId, boolean verbose) {
+  DefaultProfileStream(ProfileLocation location, boolean verbose) {
     this.startNanos = System.nanoTime();
-    this.profile = new TransactionProfile(System.currentTimeMillis(), profId);
+    this.profile = new TransactionProfile(System.currentTimeMillis(), location);
     this.summary = profile.getSummary();
     this.buffer = (verbose) ? new StringBuilder(200) : null;
   }
@@ -33,11 +35,11 @@ public class DefaultProfileStream implements ProfileStream {
    * Add a query execution event.
    */
   @Override
-  public void addQueryEvent(String event, long offset, short beanTypeId, int beanCount, short queryId) {
+  public void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId) {
     long micros = exeMicros(offset);
     summary.addQuery(micros, beanCount);
     if (buffer != null) {
-      add(micros, event, offset, beanTypeId, beanCount, queryId);
+      add(micros, event, offset, beanName, beanCount, queryId);
     }
   }
 
@@ -45,11 +47,11 @@ public class DefaultProfileStream implements ProfileStream {
    * Add a persist event.
    */
   @Override
-  public void addPersistEvent(String event, long offset, short beanTypeId, int beanCount) {
+  public void addPersistEvent(String event, long offset, String beanName, int beanCount) {
     long micros = exeMicros(offset);
     summary.addPersist(micros, beanCount);
     if (buffer != null) {
-      add(micros, event, offset, beanTypeId, beanCount, (short) 0);
+      add(micros, event, offset, beanName, beanCount, "");
     }
   }
 
@@ -67,11 +69,11 @@ public class DefaultProfileStream implements ProfileStream {
     }
   }
 
-  private void add(long micros, String event, long offset, short beanTypeId, int beanCount, short queryId) {
+  private void add(long micros, String event, long offset, String beanName, int beanCount, String queryId) {
     buffer.append(event).append(',');
     buffer.append(offset).append(',');
     buffer.append(micros).append(',');
-    buffer.append(beanTypeId).append(',');
+    buffer.append(beanName).append(',');
     buffer.append(beanCount).append(',');
     buffer.append(queryId).append(";");
   }
@@ -81,7 +83,6 @@ public class DefaultProfileStream implements ProfileStream {
    */
   @Override
   public void end(TransactionManager manager) {
-
     profile.setTotalMicros(offset());
     if (buffer != null) {
       profile.setData(buffer.toString());

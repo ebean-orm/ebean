@@ -2,6 +2,7 @@ package org.tests.transaction;
 
 import io.avaje.config.Config;
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Query;
@@ -117,18 +118,61 @@ public class TestExplicitTransactionMode extends BaseTestCase {
 
   private void testJsonScalarType(Database ebeanServer) {
     UTMaster bean = new UTMaster("one1");
-    bean.setDate(LocalDate.of(2019, 04, 20));
+    bean.setEventDate(LocalDate.of(2019, 04, 20));
 
     String json = ebeanServer.json().toJson(bean);
-    assertThat(json).isEqualTo("{\"name\":\"one1\",\"date\":\"2019-04-20\"}");
+    assertThat(json).isEqualTo("{\"name\":\"one1\",\"eventDate\":\"2019-04-20\"}");
     UTMaster jsonMaster = ebeanServer.json().toBean(UTMaster.class, json);
-    assertThat(jsonMaster.getDate()).isEqualTo(LocalDate.of(2019, 4, 20));
+    assertThat(jsonMaster.getEventDate()).isEqualTo(LocalDate.of(2019, 4, 20));
   }
 
   public static class ScalarTypeLocalDateAsString extends ScalarTypeLocalDate {
 
     public ScalarTypeLocalDateAsString() {
       super(JsonConfig.Date.ISO8601);
+    }
+  }
+
+  @Test
+  public void modelSaveWithTransaction() {
+
+    try (Transaction txn = DB.getDefault().createTransaction()) {
+
+      UTMaster bean1 = new UTMaster("otherSave");
+      bean1.save(txn);
+      assertThat(DB.find(UTMaster.class).usingTransaction(txn)
+        .where().eq("name", "otherSave").findOne()).isNotNull();
+
+      bean1.deletePermanent(txn);
+      assertThat(DB.find(UTMaster.class).usingTransaction(txn)
+        .where().eq("name", "otherSave").findOne())
+        .isNull();
+
+      UTMaster bean2 = new UTMaster("otherInsert");
+      bean2.insert(txn);
+      assertTrue(DB.find(UTMaster.class).usingTransaction(txn)
+        .where().eq("name", "otherInsert").exists());
+
+      bean2.setDescription("changed description");
+      bean2.update(txn);
+
+      assertThat(DB.find(UTMaster.class).usingTransaction(txn)
+        .where().eq("name", "otherInsert").findOne())
+        .isNotNull()
+        .extracting(UTMaster::getDescription).contains("changed description");
+
+      UTMaster bean3 = new UTMaster("otherThree");
+      bean3.save(txn);
+
+      assertThat(DB.find(UTMaster.class).usingTransaction(txn)
+        .where().eq("name", "otherThree").findOne())
+        .isNotNull();
+
+      bean3.delete(txn);
+
+      assertThat(DB.find(UTMaster.class).usingTransaction(txn)
+        .where().eq("name", "otherThree").findOne())
+        .isNull();
     }
   }
 }

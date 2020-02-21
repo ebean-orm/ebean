@@ -1,6 +1,7 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import io.ebean.annotation.ForPlatform;
@@ -19,10 +20,10 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
 
     String email = "baz@one.com";
 
-    Object key = Ebean.createSqlUpdate(sql)
+    Object key = DB.sqlUpdate(sql)
       .setGetGeneratedKeys(true)
-      .setParameter(1, email)
-      .setParameter(2, true)
+      .setParameter(email)
+      .setParameter(true)
       .executeGetKey();
 
     EPersonOnline found = Ebean.find(EPersonOnline.class, key);
@@ -58,7 +59,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
 
     String email = "foo@one.com";
 
-    Object key = Ebean.createSqlUpdate(sql)
+    Object key = DB.sqlUpdate(sql)
       .setGetGeneratedKeys(true)
       .setParameter(1, email)
       .setParameter(2, true)
@@ -72,7 +73,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
 
 
     String sqlNamed = "insert into e_person_online (email, online_status, when_updated) values (:email, :online, now()) on conflict (email) do update set when_updated=now(), online_status = :online";
-    SqlUpdate sqlUpdate2 = Ebean.createSqlUpdate(sqlNamed)
+    SqlUpdate sqlUpdate2 = DB.sqlUpdate(sqlNamed)
       .setGetGeneratedKeys(true)
       .setParameter("email", email)
       .setParameter("online", false);

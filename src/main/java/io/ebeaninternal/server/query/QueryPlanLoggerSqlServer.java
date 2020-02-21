@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.SpiDbQueryPlan;
+import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 import java.sql.Connection;
@@ -17,8 +19,7 @@ import java.sql.Statement;
 public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
 
   @Override
-  public DQueryPlanOutput logQueryPlan(Connection conn, CQueryPlan plan, BindCapture bind) {
-
+  public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
     try (Statement stmt = conn.createStatement()) {
       stmt.execute("set statistics xml on");
       stmt.execute("begin transaction");
@@ -41,14 +42,14 @@ public class QueryPlanLoggerSqlServer extends QueryPlanLogger {
 
       } catch (SQLException e) {
         queryPlanLog.error("Could not log query plan", e);
-
+        return null;
       } finally {
         stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
       queryPlanLog.error("Could not log query plan", e);
+      return null;
     }
-    return null;
   }
 
 }

@@ -2,6 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -14,6 +15,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TestQueryUsingConnection extends BaseTestCase {
 
@@ -40,7 +42,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    try (Transaction transaction = DB.getDefault().createTransaction()) {
+    try (Transaction transaction = DB.createTransaction()) {
 
       Transaction current = Transaction.current();
       assertThat(current).isNull();
@@ -50,6 +52,15 @@ public class TestQueryUsingConnection extends BaseTestCase {
       x.setName("WillRollThisBack");
 
       DB.getDefault().insert(x, transaction);
+
+      final CountryDto dto = DB.findDto(CountryDto.class, "select code, name from o_country where code=?")
+        .usingTransaction(transaction)
+        .setParameter(1, "xx")
+        .findOne();
+
+      assertThat(dto).isNotNull();
+      assertEquals("xx", dto.code);
+      assertEquals("WillRollThisBack", dto.name);
 
       final int count = DB.find(Country.class)
         .usingTransaction(transaction)
@@ -62,5 +73,15 @@ public class TestQueryUsingConnection extends BaseTestCase {
       assertThat(count).isEqualTo(otherCount + 1);
     }
 
+  }
+
+  public static class CountryDto {
+    final String code;
+    final String name;
+
+    public CountryDto(String code, String name) {
+      this.code = code;
+      this.name = name;
+    }
   }
 }

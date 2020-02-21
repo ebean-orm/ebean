@@ -61,7 +61,7 @@ public interface DocumentStore {
    * <pre>{@code
    *
    * Customer customer =
-   *   server.find(Customer.class)
+   *   database.find(Customer.class)
    *     .setUseDocStore(true)
    *     .setId(42)
    *     .findOne();
@@ -79,7 +79,7 @@ public interface DocumentStore {
    * <pre>{@code
    *
    * List<Customer> newCustomers =
-   *  server.find(Customer.class)
+   *  database.find(Customer.class)
    *    .setUseDocStore(true)
    *    .where().eq("status, Customer.Status.NEW)
    *    .findList();
@@ -99,7 +99,7 @@ public interface DocumentStore {
    * <pre>{@code
    *
    * PagedList<Customer> newCustomers =
-   *  server.find(Customer.class)
+   *  database.find(Customer.class)
    *    .setUseDocStore(true)
    *    .where().eq("status, Customer.Status.NEW)
    *    .setMaxRows(50)
@@ -120,7 +120,7 @@ public interface DocumentStore {
    * </p>
    * <pre>{@code
    *
-   *  server.find(Order.class)
+   *  database.find(Order.class)
    *    .setUseDocStore(true)
    *    .where()... // perhaps add predicates
    *    .findEach((Order order) -> {
@@ -145,7 +145,7 @@ public interface DocumentStore {
    * </p>
    * <pre>{@code
    *
-   *  server.find(Order.class)
+   *  database.find(Order.class)
    *    .setUseDocStore(true)
    *    .where()... // perhaps add predicates
    *    .findEachWhile(new Predicate<Order>() {
@@ -190,7 +190,7 @@ public interface DocumentStore {
    * Drop the index from the document store (similar to DDL drop table).
    * <pre>{@code
    *
-   *   DocumentStore documentStore = server.docStore();
+   *   DocumentStore documentStore = database.docStore();
    *
    *   documentStore.dropIndex("product_copy");
    *
@@ -202,7 +202,7 @@ public interface DocumentStore {
    * Create an index given a mapping file as a resource in the classPath (similar to DDL create table).
    * <pre>{@code
    *
-   *   DocumentStore documentStore = server.docStore();
+   *   DocumentStore documentStore = database.docStore();
    *
    *   // uses product_copy.mapping.json resource
    *   // ... to define mappings for the index
@@ -289,7 +289,7 @@ public interface DocumentStore {
    * <pre>{@code
    *
    *  // predicates to select the source documents to copy
-   *  Query<Product> query = server.find(Product.class)
+   *  Query<Product> query = database.find(Product.class)
    *    .where()
    *      .ge("whenModified", new Timestamp(since))
    *      .ge("name", "A")

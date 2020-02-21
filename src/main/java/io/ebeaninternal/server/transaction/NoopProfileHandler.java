@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.ProfileLocation;
 import io.ebeaninternal.api.SpiProfileHandler;
 
 /**
@@ -13,7 +14,7 @@ public class NoopProfileHandler implements SpiProfileHandler {
   }
 
   @Override
-  public ProfileStream createProfileStream(int profileId) {
+  public ProfileStream createProfileStream(ProfileLocation location) {
     // always return null
     return null;
   }

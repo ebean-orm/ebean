@@ -111,7 +111,7 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, plain_bean=?, version=? where");
+    assertSql(sql.get(0)).contains("update ebasic_json_list set name=?, plain_bean=?, version=? where");
   }
 
   public void update_when_dirty() {
@@ -124,7 +124,7 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, tags=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, tags=?, version=? where id=? and version=?");
   }
 
   public void update_when_dirty_flags() {
@@ -137,7 +137,7 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, flags=?, version=? where id=? and version=?;");
+    assertSql(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, flags=?, version=? where id=? and version=?;");
   }
 
   public void update_when_dirty_SetListMap() {
@@ -152,7 +152,7 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertThat(sql.get(0)).contains("update ebasic_json_list set bean_set=?, bean_list=?, bean_map=?, plain_bean=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update ebasic_json_list set bean_set=?, bean_list=?, bean_map=?, plain_bean=?, version=? where id=? and version=?");
   }
 
   @Test

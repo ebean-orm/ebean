@@ -23,9 +23,9 @@ import java.util.Iterator;
  * <h3>Try finally style</h3>
  * <pre>{@code
  *
- *  Query<Customer> query = server.find(Customer.class)
+ *  Query<Customer> query = database.find(Customer.class)
  *     .where().gt("id", 0)
- *     .orderBy("id")
+ *     .order("id")
  *     .setMaxRows(2);
  *
  *  QueryIterator<Customer> it = query.findIterate();

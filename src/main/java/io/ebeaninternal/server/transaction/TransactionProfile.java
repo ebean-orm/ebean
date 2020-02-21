@@ -1,15 +1,15 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.ProfileLocation;
+
 /**
  * Profiling information for a single transaction that has completed.
  */
 public class TransactionProfile {
 
-  private long startTime;
-  /**
-   * The profileId of the transaction (On @Transactional explicitly or can be automatically set by enhancement).
-   */
-  private int profileId;
+  private final ProfileLocation location;
+  private final String label;
+  private final long startTime;
 
   /**
    * The total execution time of the transaction (for filtering out small/short transactions).
@@ -26,16 +26,18 @@ public class TransactionProfile {
   /**
    * Create with profileId, total micros and encoded profile data.
    */
-  public TransactionProfile(long startTime, int profileId) {
+  public TransactionProfile(long startTime, ProfileLocation location) {
+    this.location = location;
+    this.label = location.label();
     this.startTime = startTime;
-    this.profileId = profileId;
     this.summary = new Summary();
   }
 
   /**
-   * Construct for JSON tools.
+   * Return the transaction location label.
    */
-  public TransactionProfile(){
+  public String getLabel() {
+    return label;
   }
 
   /**
@@ -43,13 +45,6 @@ public class TransactionProfile {
    */
   public long getStartTime() {
     return startTime;
-  }
-
-  /**
-   * Return the transaction profileId.
-   */
-  public int getProfileId() {
-    return profileId;
   }
 
   /**
@@ -64,20 +59,6 @@ public class TransactionProfile {
    */
   public String getData() {
     return data;
-  }
-
-  /**
-   * Set start time (for JSON tools).
-   */
-  public void setStartTime(long startTime) {
-    this.startTime = startTime;
-  }
-
-  /**
-   * Set profileId (for JSON tools).
-   */
-  public void setProfileId(int profileId) {
-    this.profileId = profileId;
   }
 
   /**

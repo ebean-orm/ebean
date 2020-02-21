@@ -5,9 +5,9 @@ import io.avaje.config.Config;
 import java.util.Properties;
 
 /**
- * Provides singleton state for the default server.
+ * Provides singleton state for the default database.
  * <p/>
- * Intended for internal use as part of bootup, construction, registration of the default server.
+ * Intended for internal use as part of bootup, construction, registration of the default database.
  */
 class PrimaryServer {
 
@@ -16,21 +16,21 @@ class PrimaryServer {
   private static boolean skip;
 
   /**
-   * Set whether to skip automatically creating the primary server.
+   * Set whether to skip automatically creating the primary database.
    */
   static synchronized void setSkip(boolean skip) {
     PrimaryServer.skip = skip;
   }
 
   /**
-   * Return true to skip automatically creating the primary server.
+   * Return true to skip automatically creating the primary database.
    */
   static synchronized boolean isSkip() {
     return skip;
   }
 
   /**
-   * Return the default server name.
+   * Return the default database name.
    */
   static synchronized String getDefaultServerName() {
     getProperties();

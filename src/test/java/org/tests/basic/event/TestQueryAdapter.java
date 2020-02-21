@@ -43,14 +43,14 @@ public class TestQueryAdapter extends BaseTestCase {
       .update();
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql.get(0)).contains(" 2=2");
+    assertSql(sql.get(0)).contains(" 2=2");
 
     Ebean.find(TOne.class)
       .where().idEq(o.getId())
       .delete();
 
     sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains(" 3=3");
+    assertSql(sql.get(0)).contains(" 3=3");
 
   }
 }

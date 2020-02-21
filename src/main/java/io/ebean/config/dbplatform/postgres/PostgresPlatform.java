@@ -44,6 +44,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
+    this.dbIdentity.setSupportsIdentity(true);
 
     this.dbDefaultValue.setNow("current_timestamp");
 

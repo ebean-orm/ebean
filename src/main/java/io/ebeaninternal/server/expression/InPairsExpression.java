@@ -93,7 +93,7 @@ class InPairsExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     if (entries.isEmpty()) {
-      String expr = not ? "1=1" : "1=0";
+      String expr = not ? SQL_TRUE : SQL_FALSE;
       request.append(expr);
       return;
     }
@@ -116,7 +116,7 @@ class InPairsExpression extends AbstractExpression {
     builder.append(property1).append("-");
     builder.append(separator).append("-");
     builder.append(suffix).append(" ?");
-    if (!multiValueSupported) {
+    if (!multiValueSupported || entries.isEmpty()) {
       // query plan specific to the number of parameters in the IN clause
       builder.append(entries.size());
     }

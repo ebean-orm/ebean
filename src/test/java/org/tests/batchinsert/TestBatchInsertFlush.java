@@ -66,8 +66,8 @@ public class TestBatchInsertFlush extends BaseTestCase {
       List<String> sql = LoggedSqlCollector.stop();
 
       // we get the 2 master inserts first
-      assertThat(sql.get(0)).contains("insert into t_atable_thatisrelatively");
-      assertThat(sql.get(1)).contains("-- bind(");
+      assertSql(sql.get(0)).contains("insert into t_atable_thatisrelatively");
+      assertSql(sql.get(1)).contains("-- bind(");
       // detail
       assertThat(sql.get(3)).contains("insert into t_detail_with_other_namexxxyy");
 
@@ -102,7 +102,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     Ebean.find(Customer.class).findCount();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select count(*)");
+    assertSql(sql.get(0)).contains("select count(*)");
   }
 
   @Test
@@ -118,7 +118,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     Ebean.find(Customer.class).findCount();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("insert into e_basicver");
+    assertSql(sql.get(0)).contains("insert into e_basicver");
   }
 
   @Test

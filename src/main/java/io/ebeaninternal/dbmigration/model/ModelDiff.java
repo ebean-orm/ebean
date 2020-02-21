@@ -140,9 +140,8 @@ public class ModelDiff {
       }
     }
 
-    Map<String, MIndex> newIndexes = newModel.getIndexes();
-    for (MIndex newIndex : newIndexes.values()) {
-      MIndex currentIndex = baseModel.getIndex(newIndex.getIndexName());
+    for (MIndex newIndex : newModel.allIndexes()) {
+      MIndex currentIndex = baseModel.getIndex(newIndex);
       if (currentIndex == null) {
         addCreateIndex(newIndex.createIndex());
       } else {
@@ -151,8 +150,8 @@ public class ModelDiff {
     }
 
     // search for indexes that are no longer used
-    for (MIndex existingIndex : baseModel.getIndexes().values()) {
-      if (!newIndexes.containsKey(existingIndex.getIndexName())) {
+    for (MIndex existingIndex : baseModel.allIndexes()) {
+      if (newModel.dropIndex(existingIndex)) {
         addDropIndex(existingIndex.dropIndex());
       }
     }

@@ -41,15 +41,18 @@ public class DbConstraintNormalise {
   }
 
   /**
-   * Normalise the column name by removing any quoted identifier characters.
+   * Normalise the column name by removing any quoted identifier characters and formula brackets.
    */
   public String normaliseColumn(String columnName) {
-
-    columnName = trimQuotes(columnName);
+    columnName = trimBrackets(trimQuotes(columnName));
     if (lowerCaseColumns) {
       columnName = columnName.toLowerCase();
     }
     return columnName;
+  }
+
+  private String trimBrackets(String value) {
+    return value.replace("(","").replace(")","");
   }
 
   /**

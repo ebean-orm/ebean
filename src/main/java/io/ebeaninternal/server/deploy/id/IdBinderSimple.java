@@ -146,7 +146,7 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
-    sqlUpdate.setNextParameter(new MultiValueWrapper(ids));
+    sqlUpdate.setParameter(new MultiValueWrapper(ids));
   }
 
   @Override
@@ -171,7 +171,7 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
-    sqlUpdate.setNextParameter(value);
+    sqlUpdate.setParameter(value);
   }
 
   @Override

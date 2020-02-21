@@ -72,7 +72,7 @@ public class ServerConfigTest {
     props.setProperty("enabledL2Regions", "r0,users,orgs");
     props.setProperty("caseSensitiveCollation", "false");
     props.setProperty("loadModuleInfo", "true");
-
+    props.setProperty("collectQueryPlanThresholdMicros", "10000");
 
     serverConfig.loadFromProperties(props);
 
@@ -93,6 +93,7 @@ public class ServerConfigTest {
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.MILLIS, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.MILLIS, serverConfig.getJsonDate());
+    assertEquals(10000, serverConfig.getCollectQueryPlanThresholdMicros());
 
     assertEquals("r0,users,orgs", serverConfig.getEnabledL2Regions());
 
@@ -138,6 +139,7 @@ public class ServerConfigTest {
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
     assertFalse(serverConfig.isAutoLoadModuleInfo());
+    assertEquals(Long.MAX_VALUE, serverConfig.getCollectQueryPlanThresholdMicros());
   }
 
   @Test

@@ -146,7 +146,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - miss on 1000
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku = ? and t0.code in (?) order by t0.code; --bind(def,2,Array[1]={1000})");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku = ? and t0.code in (?) order by t0.code; --bind(def,2,Array[1]={1000})");
     }
     assertThat(list).hasSize(1);
 
@@ -174,7 +174,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - miss on 1000, 1002
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku = ? and t0.code in (?,?); --bind(def,2,Array[2]={1002,1000})");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku = ? and t0.code in (?,?); --bind(def,2,Array[2]={1002,1000})");
     }
     assertThat(map).hasSize(2);
 
@@ -207,7 +207,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - (sku=3 ... we got hits on sku 1 and 2)
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.code in (?) and t0.sku = ? order by t0.sku desc, t0.code; --bind(def,Array[1]={1000},2)");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.code in (?) and t0.sku = ? order by t0.sku desc, t0.code; --bind(def,Array[1]={1000},2)");
     }
 
     assertThat(list).hasSize(4);
@@ -232,7 +232,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .in("sku", skus)
       .eq("code", 1001)
       .setUseCache(true)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -262,14 +262,14 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .in("sku", skus)
       .eq("code", 1001)
       .setUseCache(true)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with 2 bind params as we got not hits on the cache
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku in (?,?,?) and t0.code = ? order by t0.sku desc; --bind(abc,Array[3]={3,2,4},1001)");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and t0.sku in (?,?,?) and t0.code = ? order by t0.sku desc; --bind(abc,Array[3]={3,2,4},1001)");
     }
 
     assertThat(list).hasSize(2);
@@ -357,7 +357,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .eq("store", "def")
       .inPairs(pairs)
       .setUseCache(true)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -369,13 +369,13 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertBeanCacheHitMiss(1, 0);
 
     if (isH2()) {
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,'-',t0.code) in (?,?) order by t0.sku desc; --bind(def,Array[2]={2-1000,3-1000})");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,'-',t0.code) in (?,?) order by t0.sku desc; --bind(def,Array[2]={2-1000,3-1000})");
     } else if (isPostgres()) {
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku||'-'||t0.code)");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku||'-'||t0.code)");
     } else if (isHana()) {
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku, '-'||t0.code)");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku, '-'||t0.code)");
     } else {
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,'-',t0.code)");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,'-',t0.code)");
     }
 
   }
@@ -400,7 +400,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .eq("store", "def")
       .inPairs(pairs)
       .setBeanCacheMode(CacheMode.ON)
-      .orderBy("sku desc")
+      .order("sku desc")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -412,13 +412,13 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertBeanCacheHitMiss(1, 0);
 
     if (isH2()) {
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo') in (?,?) order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo') in (?,?) order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");
     } else if (isPostgres()){
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku||':'||t0.code||'-foo')");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku||':'||t0.code||'-foo')");
     } else if (isHana()){
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku, ':'||t0.code||'-foo')");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku, ':'||t0.code||'-foo')");
     } else {
-      assertThat(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo')");
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo')");
     }
 
   }

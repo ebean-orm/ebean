@@ -20,7 +20,7 @@ public class TestInEmpty extends BaseTestCase {
       .query();
 
     List<Order> list = query.findList();
-    assertThat(query.getGeneratedSql()).contains("1=0");
+    assertSql(query).contains("1=0");
     assertEquals(0, list.size());
   }
 
@@ -31,7 +31,7 @@ public class TestInEmpty extends BaseTestCase {
       .query();
 
     List<Order> list = query.findList();
-    assertThat(query.getGeneratedSql()).contains("1=0");
+    assertSql(query).contains("1=0");
     assertEquals(0, list.size());
   }
 
@@ -42,7 +42,7 @@ public class TestInEmpty extends BaseTestCase {
       .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains("1=1");
+    assertSql(query).contains("1=1");
   }
 
 }

@@ -51,7 +51,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     Customer customer = Ebean.find(Customer.class)
       .setMaxRows(1)
-      .orderBy().asc("id")
+      .order().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("1 = 0")
       .findOne();
@@ -66,7 +66,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     Optional<Customer> customer = Ebean.find(Customer.class)
       .setMaxRows(1)
-      .orderBy().asc("id")
+      .order().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("1 = 0")
       .findOneOrEmpty();
@@ -154,7 +154,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertEquals(2, sql.size());
-    assertThat(sql.get(1)).contains("and (t0.status = ? or t0.order_date = ?");
+    assertSql(sql.get(1)).contains("and (t0.status = ? or t0.order_date = ?");
   }
 
   @Test
@@ -170,11 +170,11 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains(" from o_customer t0; --bind()");
+    assertSql(sql.get(0)).contains(" from o_customer t0; --bind()");
     platformAssertIn(sql.get(1), " from contact t0 where (t0.customer_id)");
-    assertThat(sql.get(1)).contains(" and t0.first_name is not null");
+    assertSql(sql.get(1)).contains(" and t0.first_name is not null");
     platformAssertIn(sql.get(2), " from contact_note t0 where (t0.contact_id)");
-    assertThat(sql.get(2)).contains(" and lower(t0.title) like");
+    assertSql(sql.get(2)).contains(" and lower(t0.title) like");
   }
 
   @Test
@@ -191,8 +191,8 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains(" from o_customer t0");
-    assertThat(sql.get(1)).contains("from contact t0 where ");
-    assertThat(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ?");
+    assertSql(sql.get(0)).contains(" from o_customer t0");
+    assertSql(sql.get(1)).contains("from contact t0 where ");
+    assertSql(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ?");
   }
 }

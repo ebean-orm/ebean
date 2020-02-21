@@ -24,14 +24,14 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(4);
-      assertThat(sql.get(0)).contains("insert into ecbl_person");
-      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
+      assertSql(sql.get(0)).contains("insert into ecbl_person");
+      assertSql(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
       assertSqlBind(sql, 2, 3);
     } else {
       assertThat(sql).hasSize(3);
-      assertThat(sql.get(0)).contains("insert into ecbl_person");
-      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
-      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers");
+      assertSql(sql.get(0)).contains("insert into ecbl_person");
+      assertSql(sql.get(1)).contains("insert into ecbl_person_phone_numbers");
+      assertSql(sql.get(2)).contains("insert into ecbl_person_phone_numbers");
     }
 
     EcblPerson person1 = new EcblPerson("Fiona6409");
@@ -56,8 +56,8 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(2);
-    assertThat(trimSql(sql.get(0))).contains("select t0.id, t0.name, t0.version from ecbl_person");
-    assertThat(trimSql(sql.get(1))).contains("select t0.person_id, t0.country_code, t0.area, t0.number from ecbl_person_phone_numbers");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version from ecbl_person");
+    assertSql(sql.get(1)).contains("select t0.person_id, t0.country_code, t0.area, t0.phnum from ecbl_person_phone_numbers");
 
     List<EcblPerson> found2 =
       DB.find(EcblPerson.class)
@@ -72,7 +72,7 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
     String trimmedSql = trimSql(sql.get(0));
-    assertThat(trimmedSql).contains("select t0.id, t0.name, t0.version, t1.country_code, t1.area, t1.number from ecbl_person t0 left join ecbl_person_phone_numbers t1");
+    assertThat(trimmedSql).contains("select t0.id, t0.name, t0.version, t1.country_code, t1.area, t1.phnum from ecbl_person t0 left join ecbl_person_phone_numbers t1");
 
 
     EcblPerson foundFirst = found2.get(0);
@@ -90,7 +90,7 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update ecbl_person");
+    assertSql(sql.get(0)).contains("update ecbl_person");
 
     updateBoth(bean);
   }
@@ -104,18 +104,18 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
-      assertThat(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
-      assertThat(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertSql(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
+      assertSql(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
       assertSqlBind(sql.get(2));
-      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
       assertSqlBind(sql, 4, 6);
     } else {
       assertThat(sql).hasSize(5);
-      assertThat(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
-      assertThat(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
-      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
-      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
-      assertThat(sql.get(4)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertSql(sql.get(0)).contains("update ecbl_person set name=?, version=? where id=? and version=?");
+      assertSql(sql.get(1)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertSql(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
+      assertThat(sql.get(4)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
     }
 
     updateNothing(bean);
@@ -139,17 +139,17 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
-      assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertSql(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
       assertSqlBind(sql.get(1));
-      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertSql(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
       assertSqlBind(sql, 3, 6);
     } else {
       assertThat(sql).hasSize(5);
-      assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
-      assertThat(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
-      assertThat(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
-      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
-      assertThat(sql.get(4)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,number) values (?,?,?,?)");
+      assertSql(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id=?");
+      assertSql(sql.get(1)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
+      assertSql(sql.get(2)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
+      assertThat(sql.get(3)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
+      assertThat(sql.get(4)).contains("insert into ecbl_person_phone_numbers (person_id,country_code,area,phnum) values (?,?,?,?)");
     }
 
     delete(bean);
@@ -161,8 +161,8 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id = ?");
-    assertThat(sql.get(1)).contains("delete from ecbl_person where id=? and version=?");
+    assertSql(sql.get(0)).contains("delete from ecbl_person_phone_numbers where person_id = ?");
+    assertSql(sql.get(1)).contains("delete from ecbl_person where id=? and version=?");
   }
 
   private void jsonToFrom(EcblPerson foundFirst) {

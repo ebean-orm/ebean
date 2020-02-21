@@ -131,7 +131,7 @@ public interface SqlQuery extends Serializable {
    *   String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
    *
    *   BigDecimal maxPrice = DB.sqlQuery(sql)
-   *     .setParameter(1, 2)
+   *     .setParameter(42)
    *     .findSingleAttribute(BigDecimal.class);
    *
    * }</pre>
@@ -171,31 +171,24 @@ public interface SqlQuery extends Serializable {
    *   " where unit_price > ? " +
    *   " order by (unit_price * order_qty) desc";
    *
-   *   //
    *   List<BigDecimal> lineAmounts =
    *     DB.sqlQuery(sql)
-   *       .setParameter(1, 3)
+   *       .setParameter(42)
    *       .findSingleAttributeList(BigDecimal.class);
    *
    * }</pre>
    *
    * <p>
    * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
-   * </p>
    *
    * @param attributeType The type of the returned value
    */
   <T> List<T> findSingleAttributeList(Class<T> attributeType);
 
   /**
-   * The same as bind for named parameters.
-   */
-  SqlQuery setParameter(String name, Object value);
-
-  /**
    * Set one of more positioned parameters.
    * <p>
-   * This is a convenient alternative to multiple calls setParameter().
+   * This is a convenient alternative to multiple calls to {@link #setParameter(Object)}.
    *
    * <pre>{@code
    *
@@ -203,26 +196,66 @@ public interface SqlQuery extends Serializable {
    *
    *   List<SqlRow> list =
    *     DB.sqlQuery(sql)
-   *       .setParams("Rob", Status.NEW)
+   *       .setParameters("Rob", Status.NEW)
    *       .findList();
    *
    *
-   *   // is the same as ...
+   *   // effectively the same as ...
    *
-   *   List<SqlRow> list =
-   *     DB.sqlQuery(sql)
+   *       .setParameter("Rob")
+   *       .setParameter("Status.NEW)
+   *
+   *   // and ...
+   *
    *       .setParameter(1, "Rob")
    *       .setParameter(2, "Status.NEW)
-   *       .findList();
    *
    * }</pre>
    */
+  SqlQuery setParameters(Object... values);
+
+  /**
+   * Deprecated migrate to setParameters(Object... values)
+   */
+  @Deprecated
   SqlQuery setParams(Object... values);
 
   /**
-   * The same as bind for positioned parameters.
+   * Set the next bind parameter by position.
+   * <pre>{@code
+   *
+   *   String sql = "select id, name from customer where name like ? and status = ?";
+   *
+   *   List<SqlRow> list =
+   *     DB.sqlQuery(sql)
+   *       .setParameter("Rob")
+   *       .setParameter("Status.NEW)
+   *       .findList();
+   *
+   *   // the same as ...
+   *
+   *       .setParameters("Rob", Status.NEW)
+   *
+   *   // and ...
+   *
+   *       .setParameter(1, "Rob")
+   *       .setParameter(2, "Status.NEW)
+   *
+   * }</pre>
+   *
+   * @param value The value to bind
+   */
+  SqlQuery setParameter(Object value);
+
+  /**
+   * Bind the parameter by its index position (1 based like JDBC).
    */
   SqlQuery setParameter(int position, Object value);
+
+  /**
+   * Bind the named parameter value.
+   */
+  SqlQuery setParameter(String name, Object value);
 
   /**
    * Set the index of the first row of the results to return.

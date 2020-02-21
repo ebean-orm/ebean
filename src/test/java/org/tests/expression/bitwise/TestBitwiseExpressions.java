@@ -112,7 +112,7 @@ public class TestBitwiseExpressions extends BaseTestCase {
 
     list = Ebean.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
-      .orderBy().asc("id")
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -121,7 +121,7 @@ public class TestBitwiseExpressions extends BaseTestCase {
 
     list = Ebean.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_SIZE)
-      .orderBy().asc("id")
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -130,7 +130,7 @@ public class TestBitwiseExpressions extends BaseTestCase {
 
     list = Ebean.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_COLOUR)
-      .orderBy().asc("id")
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(3);

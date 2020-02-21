@@ -86,14 +86,14 @@ public class DB {
 
 //  /**
 //   * Register the server with this Ebean singleton. Specify if the registered
-//   * server is the primary/default server.
+//   * server is the primary/default database.
 //   */
 //  public static void register(EbeanServer server, boolean defaultServer) {
 //    serverMgr.register(server, defaultServer);
 //  }
 //
 //  /**
-//   * Backdoor for registering a mock implementation of EbeanServer as the default server.
+//   * Backdoor for registering a mock implementation of EbeanServer as the default database.
 //   */
 //  protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
 //    EbeanServer originalPrimaryServer = serverMgr.defaultServer;
@@ -174,6 +174,18 @@ public class DB {
    */
   public static Transaction beginTransaction() {
     return getDefault().beginTransaction();
+  }
+
+  /**
+   * Create a new transaction that is not held in TransactionThreadLocal.
+   * <p>
+   * You will want to do this if you want multiple Transactions in a single
+   * thread or generally use transactions outside of the TransactionThreadLocal
+   * management.
+   * </p>
+   */
+  public static Transaction createTransaction() {
+    return getDefault().createTransaction();
   }
 
   /**
@@ -443,6 +455,13 @@ public class DB {
   }
 
   /**
+   * Save all the beans from a Collection.
+   */
+  public static int saveAll(Object... beans) throws OptimisticLockException {
+    return getDefault().saveAll(beans);
+  }
+
+  /**
    * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
    * properties that violates an unique / primary key. This may be done in an UI save action to
    * validate if the user has entered correct values.
@@ -650,7 +669,7 @@ public class DB {
    *   // find orders and their customers
    *   List<Order> list = DB.find(Order.class)
    *     .fetch("customer")
-   *     .orderBy("id")
+   *     .order("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate

@@ -51,7 +51,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
   @Override
   public void profile(long offset, int flushCount) {
-    profileBase(EVT_UPDATESQL, offset, (short) 0, flushCount);
+    profileBase(EVT_UPDATESQL, offset, "", flushCount);
   }
 
   /**

@@ -55,7 +55,7 @@ public class TestQueryExists extends BaseTestCase {
 
     List<Order> ordersThatDontHave = query2.findList();
 
-    assertThat(query.getGeneratedSql()).contains(" exists (");
+    assertSql(query).contains(" exists (");
     assertThat(query2.getGeneratedSql()).contains(" not exists (");
 
     assertThat(ordersThatHave).isNotEmpty();
@@ -79,7 +79,7 @@ public class TestQueryExists extends BaseTestCase {
 
     query2.findList();
 
-    assertThat(query.getGeneratedSql()).contains(" exists (");
+    assertSql(query).contains(" exists (");
     assertThat(query2.getGeneratedSql()).contains(" not exists (");
 
     assertThat(customersWithContacts).isNotEmpty();

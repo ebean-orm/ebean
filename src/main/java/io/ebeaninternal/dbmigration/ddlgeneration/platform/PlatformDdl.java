@@ -109,6 +109,9 @@ public class PlatformDdl {
 
   protected String addForeignKeySkipCheck = "";
 
+  protected String uniqueIndex = "unique";
+  protected String indexConcurrent = "";
+
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
    */
@@ -380,21 +383,34 @@ public class PlatformDdl {
   }
 
   /**
-   * Return the drop index statement.
+   * Return the drop index statement for known non concurrent index.
    */
   public String dropIndex(String indexName, String tableName) {
-    return dropIndexIfExists + maxConstraintName(indexName);
+    return dropIndex(indexName, tableName, false);
   }
 
   /**
-   * Return the create index statement.
+   * Return the drop index statement.
    */
-  public String createIndex(String indexName, String tableName, String[] columns) {
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
+    return dropIndexIfExists + maxConstraintName(indexName);
+  }
 
+  public String createIndex(WriteCreateIndex create) {
+    if (create.useDefinition()) {
+      return create.getDefinition();
+    }
     StringBuilder buffer = new StringBuilder();
-    buffer.append("create index ").append(maxConstraintName(indexName)).append(" on ").append(tableName);
-    appendColumns(columns, buffer);
-
+    buffer.append("create ");
+    if (create.isUnique()) {
+      buffer.append(uniqueIndex).append(" ");
+    }
+    buffer.append("index ");
+    if (create.isConcurrent()) {
+      buffer.append(indexConcurrent);
+    }
+    buffer.append(maxConstraintName(create.getIndexName())).append(" on ").append(create.getTableName());
+    appendColumns(create.getColumns(), buffer);
     return buffer.toString();
   }
 

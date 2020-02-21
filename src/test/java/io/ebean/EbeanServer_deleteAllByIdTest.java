@@ -8,9 +8,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 
 public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
+
+  @Test
+  public void saveAllByVarArgs() {
+
+    final EBasicVer bean0 = bean("foo0");
+    final EBasicVer bean1 = bean("foo1");
+    final EBasicVer bean2 = bean("foo2");
+
+    LoggedSqlCollector.start();
+
+    DB.saveAll(bean0, bean1, bean2);
+
+    assertNotNull(bean0.getId());
+    assertNotNull(bean1.getId());
+    assertNotNull(bean2.getId());
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into e_basicver");
+    assertSqlBind(loggedSql, 1, 3);
+
+    List<Integer> ids = new ArrayList<>();
+    ids.add(bean0.getId());
+    ids.add(bean1.getId());
+    ids.add(bean2.getId());
+    DB.deleteAll(EBasicVer.class, ids);
+  }
 
   @Test
   public void deleteAllById() {

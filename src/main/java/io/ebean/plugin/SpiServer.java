@@ -1,6 +1,8 @@
 package io.ebean.plugin;
 
 import io.ebean.EbeanServer;
+import io.ebean.bean.BeanLoader;
+import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
@@ -10,7 +12,7 @@ import java.util.List;
 /**
  * Extensions to Database API made available to plugins.
  */
-public interface SpiServer extends EbeanServer {
+public interface SpiServer extends EbeanServer, BeanLoader {
 
   /**
    * Return the serverConfig.
@@ -18,7 +20,7 @@ public interface SpiServer extends EbeanServer {
   ServerConfig getServerConfig();
 
   /**
-   * Return the DatabasePlatform for this server.
+   * Return the DatabasePlatform for this database.
    */
   DatabasePlatform getDatabasePlatform();
 
@@ -52,4 +54,19 @@ public interface SpiServer extends EbeanServer {
    */
   DataSource getReadOnlyDataSource();
 
+  /**
+   * Invoke lazy loading on this single bean (reference bean).
+   */
+  void loadBeanRef(EntityBeanIntercept ebi);
+
+  /**
+   * Invoke lazy loading on this single bean (L2 cache bean).
+   */
+  void loadBeanL2(EntityBeanIntercept ebi);
+
+  /**
+   * Invoke lazy loading on this single bean when no BeanLoader is set.
+   * Typically due to serialisation or multiple stateless updates.
+   */
+  void loadBean(EntityBeanIntercept ebi);
 }

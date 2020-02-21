@@ -1,6 +1,7 @@
 package io.ebean.bean;
 
 import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.ValuePair;
 
 import javax.persistence.EntityNotFoundException;
@@ -104,9 +105,6 @@ public final class EntityBeanIntercept implements Serializable {
 
   /**
    * Create a intercept with a given entity.
-   * <p>
-   * Refer to agent ProxyConstructor.
-   * </p>
    */
   public EntityBeanIntercept(Object ownerBean) {
     this.owner = (EntityBean) ownerBean;
@@ -821,14 +819,14 @@ public final class EntityBeanIntercept implements Serializable {
 
     synchronized (this) {
       if (beanLoader == null) {
-        BeanLoader serverLoader = (BeanLoader) DB.byName(ebeanServerName);
-        if (serverLoader == null) {
-          throw new PersistenceException("Server [" + ebeanServerName + "] was not found?");
+        final Database database = DB.byName(ebeanServerName);
+        if (database == null) {
+          throw new PersistenceException("Database [" + ebeanServerName + "] was not found?");
         }
 
         // For stand alone reference bean or after deserialisation lazy load
         // using the ebeanServer. Synchronise only on the bean.
-        loadBeanInternal(loadProperty, serverLoader);
+        loadBeanInternal(loadProperty, database.getPluginApi());
         return;
       }
     }

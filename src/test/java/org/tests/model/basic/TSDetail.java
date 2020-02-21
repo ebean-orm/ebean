@@ -1,6 +1,7 @@
 package org.tests.model.basic;
 
 import io.ebean.annotation.Index;
+import io.ebean.annotation.Platform;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,8 @@ import javax.validation.constraints.Size;
 /**
  * A basic entity to test simple things.
  */
+@Index(name = "ix_t_detail_with_other_namexxxyy_lowername", unique = true, columnNames = "lower(name)", concurrent = true, platforms = Platform.POSTGRES)
+@Index(name = "ix_t_detail_with_other_namexxxyy_defn", platforms = Platform.POSTGRES, definition = "create index ix_t_detail_with_other_namexxxyy_defn on t_detail_with_other_namexxxyy using hash (lower(name)) where lower(name) like 'r%'")
 @Entity
 @Table(name = "t_detail_with_other_namexxxyy")
 public class TSDetail {

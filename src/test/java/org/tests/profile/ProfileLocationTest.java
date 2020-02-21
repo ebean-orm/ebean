@@ -11,14 +11,14 @@ public class ProfileLocationTest {
 
   private static ProfileLocation loc2 = ProfileLocation.create();
 
-  private String doIt() {
+  private boolean doIt() {
     return loc.obtain();
   }
 
   @Test
   public void test_obtain() {
-
-    assertThat(doIt()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
+    assertThat(doIt()).isTrue();
+    assertThat(loc.fullLocation()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
     assertThat(loc.location()).isEqualTo("ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
     assertThat(loc.label()).isEqualTo("ProfileLocationTest.doIt");
   }

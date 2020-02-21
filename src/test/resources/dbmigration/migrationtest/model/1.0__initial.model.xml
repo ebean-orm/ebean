@@ -115,5 +115,8 @@
         </createTable>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
+        <createIndex indexName="idxd_migtest_0" tableName="migtest_oto_child" columns="" definition="create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM'" platforms="POSTGRES"/>
+        <createIndex indexName="ix_migtest_oto_child_lowername_id" tableName="migtest_oto_child" columns="lower(name),id" concurrent="true" platforms="POSTGRES"/>
+        <createIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" columns="lower(name)" platforms="POSTGRES"/>
     </changeSet>
 </migration>

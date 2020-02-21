@@ -1,8 +1,8 @@
 package org.tests.persistencecontext;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
-import io.ebean.SqlUpdate;
 import org.junit.Test;
 import org.tests.model.basic.EBasicVer;
 
@@ -27,10 +27,11 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
       EBasicVer bean1 = Ebean.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
-      SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update e_basicver set name=? where id=?");
-      sqlUpdate.setNextParameter("second");
-      sqlUpdate.setNextParameter(bean.getId());
-      int rowCount = sqlUpdate.execute();
+      int rowCount = DB.sqlUpdate("update e_basicver set name=? where id=?")
+        .setParameter("second")
+        .setParameter(bean.getId())
+        .execute();
+
       assertEquals(1, rowCount);
 
       // fetch the bean again... but doesn't hit DB as it

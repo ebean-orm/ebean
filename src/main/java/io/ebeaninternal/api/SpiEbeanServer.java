@@ -12,7 +12,6 @@ import io.ebean.TxScope;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.CallOrigin;
-import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
@@ -32,7 +31,7 @@ import java.util.function.Predicate;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader, BeanCollectionLoader {
+public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollectionLoader {
 
   /**
    * Return the log manager.
@@ -311,4 +310,9 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanLoader,
    * Execute the sql update regardless of transaction batch mode.
    */
   int executeNow(SpiSqlUpdate sqlUpdate);
+
+  /**
+   * Create a query bind capture for the given query plan.
+   */
+  SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan);
 }

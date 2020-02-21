@@ -37,6 +37,7 @@ import java.util.List;
  *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
  *       &lt;attribute name="sequenceAllocate" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
  *       &lt;attribute name="pkName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="storageEngine" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

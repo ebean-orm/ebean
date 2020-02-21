@@ -40,16 +40,16 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(3);
-      assertThat(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+      assertSql(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
       assertSqlBind(sql, 1, 2);
     } else {
       assertThat(sql).hasSize(2);
-      assertThat(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
-      assertThat(sql.get(1)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+      assertSql(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
+      assertSql(sql.get(1)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
     }
 
     int intersectionRows = DB.sqlQuery("select count(*) as total from mkeygroup_monkey where mkeygroup_pid = ?")
-      .setParameter(1, troop.getPid())
+      .setParameter(troop.getPid())
       .findOne()
       .getInteger("total");
 
@@ -65,15 +65,15 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
-    assertThat(trimSql(sql.get(0))).contains("from mkeygroup t0 left join mkeygroup_monkey t1z_ on t1z_.mkeygroup_pid = t0.pid  left join monkey t1 on t1.mid = t1z_.monkey_mid  where t0.pid = ?");
-    assertThat(trimSql(sql.get(0))).contains("select t0.pid, t0.name, t0.version, t1.mid, t1.name, t1.food_preference, t1.version");
+    assertSql(sql.get(0)).contains("from mkeygroup t0 left join mkeygroup_monkey t1z_ on t1z_.mkeygroup_pid = t0.pid  left join monkey t1 on t1.mid = t1z_.monkey_mid  where t0.pid = ?");
+    assertSql(sql.get(0)).contains("select t0.pid, t0.name, t0.version, t1.mid, t1.name, t1.food_preference, t1.version");
 
     Ebean.delete(troop);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("delete from mkeygroup_monkey where mkeygroup_pid = ?");
-    assertThat(sql.get(1)).contains("delete from mkeygroup where pid=? and version=?");
+    assertSql(sql.get(0)).contains("delete from mkeygroup_monkey where mkeygroup_pid = ?");
+    assertSql(sql.get(1)).contains("delete from mkeygroup where pid=? and version=?");
 
   }
 

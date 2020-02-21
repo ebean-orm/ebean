@@ -140,7 +140,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
     Set<JoinColumn> joinColumns = getAll(prop, JoinColumn.class);
     if (joinColumns != null) {
-      prop.getTableJoin().addJoinColumn(true, joinColumns, beanTable);
+      prop.getTableJoin().addJoinColumn(util, true, joinColumns, beanTable);
     }
 
     JoinTable joinTable = get(prop, JoinTable.class);
@@ -210,7 +210,7 @@ class AnnotationAssocManys extends AnnotationParser {
 
     BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
     if (collectionTable != null) {
-      prop.getTableJoin().addJoinColumn(true, collectionTable.joinColumns(), localTable);
+      prop.getTableJoin().addJoinColumn(util, true, collectionTable.joinColumns(), localTable);
     }
     if (!prop.getTableJoin().hasJoinColumns()) {
       BeanProperty localId = localTable.getIdProperty();
@@ -326,11 +326,11 @@ class AnnotationAssocManys extends AnnotationParser {
     intJoin.setTable(intTableName);
 
     // add the source to intersection join columns
-    intJoin.addJoinColumn(true, joinTable.joinColumns(), prop.getBeanTable());
+    intJoin.addJoinColumn(util, true, joinTable.joinColumns(), prop.getBeanTable());
 
     // set the intersection to dest table join columns
     DeployTableJoin destJoin = prop.getTableJoin();
-    destJoin.addJoinColumn(false, joinTable.inverseJoinColumns(), prop.getBeanTable());
+    destJoin.addJoinColumn(util, false, joinTable.inverseJoinColumns(), prop.getBeanTable());
 
     intJoin.setType(SqlJoinType.OUTER);
 

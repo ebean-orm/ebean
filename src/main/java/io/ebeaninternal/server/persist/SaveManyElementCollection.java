@@ -46,7 +46,7 @@ class SaveManyElementCollection extends SaveManyBase {
     Object parentId = request.getBeanId();
     for (Object value : collection) {
       final SpiSqlUpdate sqlInsert = proto.copy();
-      sqlInsert.setNextParameter(parentId);
+      sqlInsert.setParameter(parentId);
       many.bindElementValue(sqlInsert, value);
       persister.addToFlushQueueLast(sqlInsert, transaction);
     }

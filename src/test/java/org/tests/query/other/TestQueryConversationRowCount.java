@@ -31,7 +31,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
       .endJunction()
       .eq("open", true)
       .endJunction()
-      .orderBy("whenCreated desc");
+      .order("whenCreated desc");
 
     query.findList();
     String generatedSql = sqlOf(query, 1);

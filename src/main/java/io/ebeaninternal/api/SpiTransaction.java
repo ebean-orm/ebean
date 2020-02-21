@@ -20,7 +20,6 @@ import java.sql.SQLException;
  * Extends Transaction with additional API required on server.
  * <p>
  * Provides support for batching and TransactionContext.
- * </p>
  */
 public interface SpiTransaction extends Transaction {
 
@@ -65,7 +64,6 @@ public interface SpiTransaction extends Transaction {
    * Add a deleting bean to the registered list.
    * <p>
    * This is to handle bi-directional relationships where both sides Cascade.
-   * </p>
    */
   void registerDeleteBean(Integer hash);
 
@@ -86,7 +84,6 @@ public interface SpiTransaction extends Transaction {
    * the bean when cascade persist is on both sides of a relationship).
    * <p>
    * This will register the bean if it is not already.
-   * </p>
    */
   boolean isRegisteredBean(Object bean);
 
@@ -111,7 +108,6 @@ public interface SpiTransaction extends Transaction {
    * Return the batchSize specifically set for this transaction or 0.
    * <p>
    * Returning 0 implies to use the system wide default batch size.
-   * </p>
    */
   DocStoreMode getDocStoreMode();
 
@@ -125,7 +121,6 @@ public interface SpiTransaction extends Transaction {
    * Return the batchSize specifically set for this transaction or 0.
    * <p>
    * Returning 0 implies to use the system wide default batch size.
-   * </p>
    */
   @Override
   int getBatchSize();
@@ -141,11 +136,9 @@ public interface SpiTransaction extends Transaction {
    * As we cascade save or delete we traverse the object graph tree. Going up
    * to Assoc Ones the depth decreases and going down to Assoc Manys the depth
    * increases.
-   * </p>
    * <p>
    * The depth is used for ordering batching statements. The lowest depth get
    * executed first during save.
-   * </p>
    */
   void depth(int diff);
 
@@ -166,7 +159,6 @@ public interface SpiTransaction extends Transaction {
    * This information is used maintain the table state, cache and text
    * indexes. On commit the Table modifications this generates is broadcast
    * around the cluster (if you have a cluster).
-   * </p>
    */
   TransactionEvent getEvent();
 
@@ -198,7 +190,6 @@ public interface SpiTransaction extends Transaction {
    * You may wish to hold onto this and set it against another transaction
    * later. This is along the lines of 'extended persistence context'
    * behaviour.
-   * </p>
    */
   PersistenceContext getPersistenceContext();
 
@@ -211,7 +202,6 @@ public interface SpiTransaction extends Transaction {
    * is one PersistenceContext per Transaction. The getPersistenceContext()
    * and setPersistenceContext() enable a developer to reuse a single
    * PersistenceContext with multiple transactions.
-   * </p>
    */
   void setPersistenceContext(PersistenceContext context);
 
@@ -221,7 +211,6 @@ public interface SpiTransaction extends Transaction {
    * If the connection is made from Transaction and the user code calls
    * that method we can no longer trust the query only status of a
    * Transaction.
-   * </p>
    */
   Connection getInternalConnection();
 

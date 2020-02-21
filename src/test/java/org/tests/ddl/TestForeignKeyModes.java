@@ -80,9 +80,9 @@ public class TestForeignKeyModes extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("delete from dfk_none_via_mto_m_dfk_one where dfk_none_via_mto_m_id = ?");
+    assertSql(sql.get(0)).contains("delete from dfk_none_via_mto_m_dfk_one where dfk_none_via_mto_m_id = ?");
     assertSqlBind(sql.get(1));
-    assertThat(sql.get(2)).contains("delete from dfk_none_via_mto_m where id=?");
+    assertSql(sql.get(2)).contains("delete from dfk_none_via_mto_m where id=?");
   }
 
   @IgnorePlatform(Platform.NUODB)
@@ -124,7 +124,7 @@ public class TestForeignKeyModes extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("delete from dfk_cascade_one where id=?");
+    assertSql(sql.get(0)).contains("delete from dfk_cascade_one where id=?");
 
     DfkCascade found = Ebean.find(DfkCascade.class, other.getId());
     assertThat(found).isNull();

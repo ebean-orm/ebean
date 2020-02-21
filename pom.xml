@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>12.1.9-SNAPSHOT</version>
+  <version>12.1.14-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -27,33 +27,6 @@
   </scm>
 
   <profiles>
-    <profile>
-      <!-- Note: to use this profile, you need credentials for the oracle repository in your
-        settings.xml as described here:
-        http://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010 -->
-      <id>oracle</id>
-      <dependencies>
-        <dependency>
-          <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc8</artifactId>
-          <version>12.2.0.1</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <repositories>
-        <repository>
-          <id>maven.oracle.com</id>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <url>https://maven.oracle.com</url>
-          <layout>default</layout>
-        </repository>
-      </repositories>
-    </profile>
     <profile>
       <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
         After that, install it into your local maven repository:
@@ -115,7 +88,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>6.1</version>
+      <version>6.4</version>
     </dependency>
 
     <dependency>
@@ -127,13 +100,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
-      <version>4.6.1</version>
+      <version>4.7.3</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>12.1.2</version>
+      <version>12.1.4</version>
     </dependency>
 
     <dependency>
@@ -218,17 +191,17 @@
       <scope>test</scope>
     </dependency>
 
-    <!--<dependency>-->
-    <!--<groupId>oracle</groupId>-->
-    <!--<artifactId>oracle-jdbc</artifactId>-->
-    <!--<version>7.0</version>-->
-    <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.oracle.ojdbc</groupId>
+      <artifactId>ojdbc10</artifactId>
+      <version>19.3.0.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>io.ebean.test</groupId>
       <artifactId>ebean-test-docker</artifactId>
-      <version>2.10.3</version>
+      <version>3.1.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -320,7 +293,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>12.1.8</version>
+        <version>12.1.12</version>
         <executions>
           <execution>
             <id>test</id>
@@ -381,23 +354,7 @@
         <configuration>
           <doctitle>Ebean 12</doctitle>
           <overview>src/main/java/io/ebean/overview.html</overview>
-          <source>1.8</source>
-          <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
           <excludePackageNames>io.ebeaninternal.*:io.ebeanservice:io.ebean.common:io.ebean.bean:io.ebean.service:io.ebean.metric:io.ebean.util:io.ebean.config.properties:io.ebean.config.dbplatform</excludePackageNames>
-          <docletArtifact>
-            <groupId>org.avaje</groupId>
-            <artifactId>pygments-doclet</artifactId>
-            <version>1.0.0</version>
-          </docletArtifact>
-          <!-- for people using JDK11, our javadoc doclet isn't 11 compatible yet -->
-          <javadocExecutable>${env.JAVA8_HOME}/bin/javadoc</javadocExecutable>
-          <additionalparam>
-            -Xdoclint:none
-            -include-basedir ${project.basedir}
-            -attributes "idseparator=-; project_name=${project.name}; \
-            project_version=${project.version}; \
-            project_desc=${project.description}"
-          </additionalparam>
           <linksource>true</linksource>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
         </configuration>

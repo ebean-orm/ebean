@@ -77,9 +77,8 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .findCount();
     assertThat(custs).isEqualTo(1);
 
-    Ebean.createSqlUpdate("update o_address set line_2=? where line_2=?")
-      .setNextParameter("St Lucky3")
-      .setNextParameter("St Lucky2")
+    DB.sqlUpdate("update o_address set line_2=? where line_2=?")
+      .setParameters("St Lucky3", "St Lucky2")
       .execute();
 
     custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)

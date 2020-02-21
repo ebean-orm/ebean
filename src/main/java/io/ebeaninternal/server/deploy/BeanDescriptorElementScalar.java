@@ -26,7 +26,7 @@ class BeanDescriptorElementScalar<T> extends BeanDescriptorElement<T> {
 
   @Override
   public void bindElementValue(SqlUpdate insert, Object value) {
-    insert.setNextParameter(value);
+    insert.setParameter(value);
   }
 
   @Override

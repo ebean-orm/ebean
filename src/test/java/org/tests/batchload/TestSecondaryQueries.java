@@ -119,7 +119,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
     assertThat(generatedSql).contains("from o_customer t0 where t0.id = ?");
 
     assertEquals(2, sql.size());
-    assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) ");
+    assertSql(sql.get(1)).contains("from contact t0 where (t0.customer_id) ");
     platformAssertIn(sql.get(1), " where (t0.customer_id)");
   }
 

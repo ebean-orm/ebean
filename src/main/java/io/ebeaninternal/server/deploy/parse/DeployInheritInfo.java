@@ -178,6 +178,16 @@ public class DeployInheritInfo {
     return discriminatorStringValue;
   }
 
+  public void setDiscriminatorDefaultValue(Class<?> cls) {
+    if (columnType == Types.INTEGER) {
+      discriminatorStringValue = "0";
+      discriminatorObjectValue = 0;
+    } else {
+      discriminatorStringValue = cls.getSimpleName();
+      discriminatorObjectValue = discriminatorStringValue;
+    }
+  }
+
   /**
    * Set the discriminator value for this node.
    */

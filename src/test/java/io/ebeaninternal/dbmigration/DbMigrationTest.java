@@ -3,51 +3,25 @@ package io.ebeaninternal.dbmigration;
 import io.ebean.BaseTestCase;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.migration.ddl.DdlRunner;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import org.junit.Test;
 
-import javax.persistence.PersistenceException;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DbMigrationTest extends BaseTestCase {
 
-  private int runScript(boolean expectErrors, String scriptName) throws IOException {
+  private void runScript(boolean expectErrors, String scriptName) throws IOException {
     String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
-    return runScript(expectErrors, ddl, scriptName);
+    runScript(expectErrors, ddl, scriptName);
   }
 
-  private int runScript(boolean expectErrors, String content, String scriptName) {
-
-    DdlRunner runner = new DdlRunner(expectErrors, scriptName);
-
-    Transaction transaction = server().createTransaction();
-    Connection connection = transaction.getConnection();
-    try {
-      if (expectErrors) {
-        connection.setAutoCommit(true);
-      }
-      int count = runner.runAll(content, connection);
-      if (expectErrors) {
-        connection.setAutoCommit(false);
-      }
-      transaction.commit();
-      return count;
-
-    } catch (SQLException e) {
-      throw new PersistenceException("Failed to run script", e);
-
-    } finally {
-      transaction.end();
-    }
+  private void runScript(boolean useAutoCommit, String content, String scriptName) {
+    server().script().runScript(scriptName, content, useAutoCommit);
   }
 
   @IgnorePlatform({Platform.ORACLE, Platform.NUODB})
@@ -189,21 +163,29 @@ public class DbMigrationTest extends BaseTestCase {
   }
 
   private void cleanup(String ... tables) {
+
+    final boolean sqlServer = isSqlServer();
+    final boolean postgres = isPostgres();
+
     StringBuilder sb = new StringBuilder();
     for (String table : tables) {
       // simple and stupid try to execute all commands on all dialects.
-      sb.append("alter table ").append(table).append(" set ( system_versioning = OFF  );\n");
-      sb.append("alter table ").append(table).append(" drop system versioning;\n");
-      sb.append("drop table ").append(table).append(";\n");
-      sb.append("drop table ").append(table).append(" cascade;\n");
-      sb.append("drop table ").append(table).append("_history;\n");
-      sb.append("drop table ").append(table).append("_history cascade;\n");
+      if (sqlServer) {
+        sb.append("alter table ").append(table).append(" set ( system_versioning = OFF  );\n");
+        sb.append("alter table ").append(table).append(" drop system versioning;\n");
+      }
+      if (postgres) {
+        sb.append("drop table ").append(table).append(" cascade;\n");
+        sb.append("drop table ").append(table).append("_history cascade;\n");
+      } else {
+        sb.append("drop table ").append(table).append(";\n");
+        sb.append("drop table ").append(table).append("_history;\n");
+      }
       sb.append("drop view ").append(table).append("_with_history;\n");
       sb.append("drop sequence ").append(table).append("_seq;\n");
     }
 
     runScript(true, sb.toString(), "cleanup");
     runScript(true, sb.toString(), "cleanup");
-
   }
 }

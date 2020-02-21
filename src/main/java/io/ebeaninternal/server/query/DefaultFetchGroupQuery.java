@@ -2,6 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
+import io.ebean.Database;
 import io.ebean.DtoQuery;
 import io.ebean.Expression;
 import io.ebean.ExpressionFactory;
@@ -121,11 +122,6 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   }
 
   @Override
-  public Query<T> setProfileId(int profileId) {
-    return this;
-  }
-
-  @Override
   public Query<T> setProfileLocation(ProfileLocation profileLocation) {
     return this;
   }
@@ -229,6 +225,11 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
 
   @Override
   public Query<T> usingConnection(Connection connection) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public Query<T> usingDatabase(Database database) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -385,6 +386,16 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
 
   @Override
   public Query<T> setParameter(int position, Object value) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public Query<T> setParameter(Object value) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public Query<T> setParameters(Object... values) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

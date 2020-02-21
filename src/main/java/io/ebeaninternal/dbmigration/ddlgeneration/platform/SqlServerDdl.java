@@ -58,7 +58,7 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   @Override
-  public String dropIndex(String indexName, String tableName) {
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('" + tableName + "','U') AND name = '"
         + maxConstraintName(indexName) + "') drop index " + maxConstraintName(indexName) + " ON " + tableName;
   }
@@ -105,9 +105,9 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     StringBuilder sb = new StringBuilder();
+    sb.append(dropIndex(uniqueConstraintName, tableName)).append(";\n");
     sb.append("IF (OBJECT_ID('").append(maxConstraintName(uniqueConstraintName)).append("', 'UQ') IS NOT NULL) ");
-    sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
-    sb.append(dropIndex(uniqueConstraintName, tableName));
+    sb.append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName));
     return sb.toString();
   }
   /**

@@ -56,6 +56,7 @@
 
   <ddl-script name="oracle only views" platforms="oracle">
     -- oracle only script
+    select * from dual;
   </ddl-script>
 
   <ddl-script name="pg indexes" platforms="postgres">

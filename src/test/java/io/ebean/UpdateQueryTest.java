@@ -36,7 +36,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     query.update();
 
-    assertThat(query.getGeneratedSql()).contains("update o_customer set status=?, updtime=? where status = ? and id > ?");
+    assertSql(query).contains("update o_customer set status=?, updtime=? where status = ? and id > ?");
 
     ServerMetrics metrics = collectMetrics();
     List<MetaQueryMetric> ormQueryMetrics = metrics.getQueryMetrics();
@@ -66,7 +66,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(rows).isGreaterThan(0);
 
-    assertThat(sql.get(0)).contains("update o_customer set status = status");
+    assertSql(sql.get(0)).contains("update o_customer set status = status");
 
     ServerMetrics metrics = collectMetrics();
     List<MetaQueryMetric> ormQueryMetrics = metrics.getQueryMetrics();
@@ -95,7 +95,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(rows).isEqualTo(0);
 
-    assertThat(sql.get(0)).contains("update o_customer set status = status where id > ?");
+    assertSql(sql.get(0)).contains("update o_customer set status = status where id > ?");
   }
 
   @Test
@@ -140,7 +140,7 @@ public class UpdateQueryTest extends BaseTestCase {
     query.alias("cust");
     query.update();
 
-    assertThat(query.getGeneratedSql()).contains("update o_customer cust set status=?, updtime=? where id > ?");
+    assertSql(query).contains("update o_customer cust set status=?, updtime=? where id > ?");
   }
 
   @IgnorePlatform(Platform.MYSQL)
@@ -186,7 +186,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .update();
 
     final List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t1.country_code = ? and t0.id > ? limit 100)");
+    assertSql(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t1.country_code = ? and t0.id > ? limit 100)");
   }
 
   @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.MYSQL})
@@ -206,9 +206,9 @@ public class UpdateQueryTest extends BaseTestCase {
 
     final List<String> sql = LoggedSqlCollector.stop();
     if (isMySql() || isH2()) {
-      assertThat(sql.get(0)).contains("update o_customer set status=? where id > ? limit 100");
+      assertSql(sql.get(0)).contains("update o_customer set status=? where id > ? limit 100");
     } else {
-      assertThat(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 where t0.id > ? limit 100)");
+      assertSql(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 where t0.id > ? limit 100)");
     }
   }
 

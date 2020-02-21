@@ -193,6 +193,13 @@ public abstract class Model {
   }
 
   /**
+   * Save this entity with an explicit transaction.
+   */
+  public void save(Transaction transaction) {
+    db().save(this, transaction);
+  }
+
+  /**
    * Flush any batched changes to the database.
    * <p>
    * When using JDBC batch flushing occurs automatically at commit() time or when the batch size
@@ -213,12 +220,26 @@ public abstract class Model {
   }
 
   /**
+   * Update this entity with an explicit transaction.
+   */
+  public void update(Transaction transaction) {
+    db().update(this, transaction);
+  }
+
+  /**
    * Insert this entity.
    *
    * @see Database#insert(Object)
    */
   public void insert() {
     db().insert(this);
+  }
+
+  /**
+   * Insert with an explicit transaction.
+   */
+  public void insert(Transaction transaction) {
+    db().insert(this, transaction);
   }
 
   /**
@@ -243,6 +264,13 @@ public abstract class Model {
   }
 
   /**
+   * Delete this entity with an explicit transaction.
+   */
+  public boolean delete(Transaction transaction) {
+    return db().delete(this, transaction);
+  }
+
+  /**
    * Delete a bean permanently without soft delete.
    * <p>
    * This is used when the bean contains a <code>@SoftDelete</code> property and we
@@ -253,6 +281,13 @@ public abstract class Model {
    */
   public boolean deletePermanent() {
     return db().deletePermanent(this);
+  }
+
+  /**
+   * Delete a bean permanently without soft delete using an explicit transaction.
+   */
+  public boolean deletePermanent(Transaction transaction) {
+    return db().deletePermanent(this, transaction);
   }
 
   /**

@@ -9,6 +9,7 @@ import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public class DtoQueryTest extends BaseTestCase {
       .findEach(it -> log.info("got " + it.getId() + " " + it.getName()));
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select id, name from o_customer where id > ?");
+    assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
   @Test
@@ -74,7 +75,7 @@ public class DtoQueryTest extends BaseTestCase {
       });
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select id, name from o_customer where id > ?");
+    assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
   @Test
@@ -113,6 +114,31 @@ public class DtoQueryTest extends BaseTestCase {
     assertThat(empty).isNull();
   }
 
+  @Test
+  public void setParameter() {
+    ResetBasicData.reset();
+
+    final List<DCust> list =
+      server().findDto(DCust.class, "select id, name from o_customer where id > ? and name like ? and status = ?")
+      .setParameter(0)
+      .setParameter("Rob%")
+      .setParameter(Customer.Status.NEW)
+      .findList();
+
+    assertThat(list).isNotEmpty();
+  }
+
+  @Test
+  public void setParameters() {
+    ResetBasicData.reset();
+
+    final List<DCust> list =
+      server().findDto(DCust.class, "select id, name from o_customer where id > ? and name like ? and status = ?")
+        .setParameters(0, "Rob%", Customer.Status.NEW)
+        .findList();
+
+    assertThat(list).isNotEmpty();
+  }
 
   @ForPlatform(Platform.POSTGRES)
   @Test
@@ -123,7 +149,7 @@ public class DtoQueryTest extends BaseTestCase {
     List<Integer> ids = Arrays.asList(1, 2);
 
     List<DCust> list = server().findDto(DCust.class, "select id, name from o_customer where id = any(?)")
-      .setParameter(1, ids)
+      .setParameter(ids)
       .findList();
 
     assertThat(list).isNotEmpty();
@@ -149,7 +175,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     assertThat(list).isNotEmpty();
 
-    list = server().createSqlQuery("select id, name from o_customer where id in (:idList)")
+    list = server().sqlQuery("select id, name from o_customer where id in (:idList)")
       .setParameter("idList", ids)
       .findList();
 

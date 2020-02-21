@@ -10,6 +10,8 @@ import java.io.IOException;
  */
 public class PostgresDdl extends PlatformDdl {
 
+  private static final String dropIndexConcurrentlyIfExists = "drop index concurrently if exists ";
+
   public PostgresDdl(DatabasePlatform platform) {
     super(platform);
     this.historyDdl = new PostgresHistoryDdl();
@@ -18,6 +20,7 @@ public class PostgresDdl extends PlatformDdl {
     this.alterTableIfExists = "if exists ";
     this.columnSetNull = "drop not null";
     this.addForeignKeySkipCheck = " not valid";
+    this.indexConcurrent = "concurrently ";
   }
 
   public String setLockTimeout(int lockTimeoutSeconds) {
@@ -39,7 +42,6 @@ public class PostgresDdl extends PlatformDdl {
    */
   @Override
   public String asIdentityColumn(String columnDefn) {
-
     if ("bigint".equalsIgnoreCase(columnDefn)) {
       return "bigserial";
     }
@@ -55,5 +57,10 @@ public class PostgresDdl extends PlatformDdl {
   @Override
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
     apply.append(" partition by range (").append(partitionColumn).append(")");
+  }
+
+  @Override
+  public String dropIndex(String indexName, String tableName, boolean concurrent) {
+    return (concurrent ? dropIndexConcurrentlyIfExists : dropIndexIfExists) + maxConstraintName(indexName);
   }
 }

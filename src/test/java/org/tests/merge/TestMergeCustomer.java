@@ -32,7 +32,7 @@ public class TestMergeCustomer extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
   }
 
   /**
@@ -54,7 +54,7 @@ public class TestMergeCustomer extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
   }
 
   @Test
@@ -72,8 +72,8 @@ public class TestMergeCustomer extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id from mcustomer t0 where t0.id = ?");
-    assertThat(sql.get(1)).contains("update mcustomer set name=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("select t0.id from mcustomer t0 where t0.id = ?");
+    assertSql(sql.get(1)).contains("update mcustomer set name=?, version=? where id=? and version=?");
   }
 
   @Test
@@ -96,8 +96,8 @@ public class TestMergeCustomer extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(5);
-    assertThat(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  where t0.id = ?");
-    assertThat(sql.get(1)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  where t0.id = ?");
+    assertSql(sql.get(1)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
     assertSqlBind(sql, 2, 3);
     assertThat(sql.get(4)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
   }
@@ -125,8 +125,8 @@ public class TestMergeCustomer extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(6);
-    assertThat(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  where t0.id = ?");
-    assertThat(sql.get(1)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
+    assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  where t0.id = ?");
+    assertSql(sql.get(1)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
     assertSqlBind(sql.get(2));
     assertThat(sql.get(3)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
     assertSqlBind(sql.get(4));
@@ -158,11 +158,11 @@ public class TestMergeCustomer extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(7);
-    assertThat(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  where t0.id = ?");
+    assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  where t0.id = ?");
 
     // Additional check to see if the address with the unknown UUID is 'insert' or 'update'
-    assertThat(sql.get(1)).contains("select t0.id from maddress t0 where t0.id = ?");
-    assertThat(sql.get(2)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
+    assertSql(sql.get(1)).contains("select t0.id from maddress t0 where t0.id = ?");
+    assertSql(sql.get(2)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
     assertSqlBind(sql.get(3));
     assertThat(sql.get(4)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
     assertSqlBind(sql.get(5));
@@ -217,8 +217,8 @@ public class TestMergeCustomer extends BaseTestCase {
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(20);
     }
-    assertThat(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id  where t0.id = ?");
-    assertThat(sql.get(1)).contains("delete from mcontact_message where contact_id = ?");
+    assertSql(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id  where t0.id = ?");
+    assertSql(sql.get(1)).contains("delete from mcontact_message where contact_id = ?");
     assertThat(sql.get(3)).contains("delete from mcontact where id=?");
     assertThat(sql.get(19)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
   }
@@ -243,8 +243,8 @@ public class TestMergeCustomer extends BaseTestCase {
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(20);
     }
-    assertThat(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id  where t0.id = ?");
-    assertThat(sql.get(1)).contains("delete from mcontact_message where contact_id = ?");
+    assertSql(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id  where t0.id = ?");
+    assertSql(sql.get(1)).contains("delete from mcontact_message where contact_id = ?");
     assertThat(sql.get(3)).contains("delete from mcontact where id=?");
     assertThat(sql.get(19)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
   }
@@ -280,8 +280,8 @@ public class TestMergeCustomer extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(16);
-      assertThat(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id  where t0.id = ?");
-      assertThat(sql.get(1)).contains("delete from mcontact_message where contact_id = ?");
+      assertSql(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id  where t0.id = ?");
+      assertSql(sql.get(1)).contains("delete from mcontact_message where contact_id = ?");
       assertThat(sql.get(3)).contains("delete from mcontact where id=?");
       assertThat(sql.get(7)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
     }
@@ -320,12 +320,12 @@ public class TestMergeCustomer extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     if (isPersistBatchOnCascade()) {
 
-      assertThat(sql.get(0)).contains("select t0.id, t3.id, t1.id, t2.id from mcustomer t0 left join maddress t3 on t3.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  left join mcontact t2 on t2.customer_id = t0.id  where t0.id = ?");
+      assertSql(sql.get(0)).contains("select t0.id, t3.id, t1.id, t2.id from mcustomer t0 left join maddress t3 on t3.id = t0.shipping_address_id  left join maddress t1 on t1.id = t0.billing_address_id  left join mcontact t2 on t2.customer_id = t0.id  where t0.id = ?");
       if (isH2() || isHana()) {
         // with nested OneToMany .. we need a second query to read the contact message ids
-        assertThat(sql.get(1)).contains("select t0.contact_id, t0.id from mcontact_message t0 where (t0.contact_id) in (?,?,?,?,?,?,?,?,?,?)");
+        assertSql(sql.get(1)).contains("select t0.contact_id, t0.id from mcontact_message t0 where (t0.contact_id) in (?,?,?,?,?,?,?,?,?,?)");
       }
-      assertThat(sql.get(2)).contains("delete from mcontact_message where contact_id = ?");
+      assertSql(sql.get(2)).contains("delete from mcontact_message where contact_id = ?");
       assertThat(sql.get(4)).contains("delete from mcontact where id=?");
       assertThat(sql.get(5)).contains("delete from mcontact_message where contact_id = ?");
       assertThat(sql.get(7)).contains("delete from mcontact where id=?");

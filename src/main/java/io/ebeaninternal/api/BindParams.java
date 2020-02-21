@@ -38,6 +38,11 @@ public class BindParams implements Serializable {
    */
   private String bindHash;
 
+  /**
+   * Helper to add positioned parameters in order.
+   */
+  private int addPos;
+
   public BindParams() {
   }
 
@@ -154,6 +159,19 @@ public class BindParams implements Serializable {
     Param p = getParam(position);
     p.setInValue(value);
     p.setOutType(outType);
+  }
+
+  public void setNextParameters(Object... values) {
+    for (Object value : values) {
+      setNextParameter(value);
+    }
+  }
+
+  /**
+   * Bind the next positioned parameter.
+   */
+  public void setNextParameter(Object value) {
+    setParameter(++addPos, value);
   }
 
   /**

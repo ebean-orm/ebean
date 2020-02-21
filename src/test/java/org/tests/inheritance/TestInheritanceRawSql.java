@@ -85,7 +85,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
 
     Vehicle veh = Ebean.find(Vehicle.class)
       .setRawSql(rawSql)
-      .setParameter(1, truck.getId())
+      .setParameter(truck.getId())
       .findOne();
 
     assertThat(veh).isNotNull();
@@ -104,7 +104,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
 
     Vehicle veh2 = Ebean.find(Vehicle.class)
       .setRawSql(rawSql2)
-      .setParameter(1, truck.getId())
+      .setParameter(truck.getId())
       .findOne();
 
     assertThat(veh2).isNotNull();

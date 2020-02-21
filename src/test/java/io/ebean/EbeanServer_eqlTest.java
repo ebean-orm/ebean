@@ -24,12 +24,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).startsWith("select top 100 ");
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.id");
+      assertSql(query).startsWith("select top 100 ");
+      assertSql(query).endsWith("order by t0.id");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("where rownum <= 100");
+      assertSql(query).contains("where rownum <= 100");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 100");
+      assertSql(query).endsWith("order by t0.id limit 100");
     }
   }
 
@@ -42,12 +42,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).startsWith("select top 10 ");
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.id");
+      assertSql(query).startsWith("select top 10 ");
+      assertSql(query).endsWith("order by t0.id");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("where rownum <= 10");
+      assertSql(query).contains("where rownum <= 10");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10");
+      assertSql(query).endsWith("order by t0.id limit 10");
     }
   }
 
@@ -60,12 +60,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.id offset 3 rows fetch next 10 rows only");
+      assertSql(query).endsWith("order by t0.id offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
-      assertThat(query.getGeneratedSql()).contains("where rn_ > 3");
+      assertSql(query).contains("where rownum <= 13");
+      assertSql(query).contains("where rn_ > 3");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.id limit 10 offset 3");
+      assertSql(query).endsWith("order by t0.id limit 10 offset 3");
     }
 
   }
@@ -81,12 +81,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.name offset 3 rows fetch next 10 rows only");
+      assertSql(query).endsWith("order by t0.name offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
-      assertThat(query.getGeneratedSql()).contains("where rn_ > 3");
+      assertSql(query).contains("where rownum <= 13");
+      assertSql(query).contains("where rn_ > 3");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.name limit 10 offset 3");
+      assertSql(query).endsWith("order by t0.name limit 10 offset 3");
     }
 
     // check also select count(*)
@@ -108,12 +108,12 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id offset 3 rows fetch next 10 rows only");
+      assertSql(query).endsWith("order by t0.name, t0.id offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
-      assertThat(query.getGeneratedSql()).contains("where rn_ > 3");
+      assertSql(query).contains("where rownum <= 13");
+      assertSql(query).contains("where rn_ > 3");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("order by t0.name, t0.id limit 10 offset 3");
+      assertSql(query).endsWith("order by t0.name, t0.id limit 10 offset 3");
     }
 
     // check also select count(*)
@@ -133,17 +133,17 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setMaxRows(10);
     query.setFirstRow(3);
     if (isSqlServer()) {
-      query.orderBy("id");
+      query.order("id");
     }
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).endsWith("from o_customer t0 order by t0.id offset 3 rows fetch next 10 rows only");
+      assertSql(query).endsWith("from o_customer t0 order by t0.id offset 3 rows fetch next 10 rows only");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains("where rownum <= 13");
-      assertThat(query.getGeneratedSql()).contains("where rn_ > 3");
+      assertSql(query).contains("where rownum <= 13");
+      assertSql(query).contains("where rn_ > 3");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("from o_customer t0 limit 10 offset 3");
+      assertSql(query).endsWith("from o_customer t0 limit 10 offset 3");
     }
   }
 
@@ -157,11 +157,11 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findList();
 
     if (isSqlServer()) {
-      assertThat(query.getGeneratedSql()).startsWith("select top 10 ");
+      assertSql(query).startsWith("select top 10 ");
     } else if (isOracle()) {
-      assertThat(query.getGeneratedSql()).contains(" a  where rownum <= 10");
+      assertSql(query).contains(" a  where rownum <= 10");
     } else {
-      assertThat(query.getGeneratedSql()).endsWith("limit 10");
+      assertSql(query).endsWith("limit 10");
     }
   }
 
@@ -176,7 +176,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.orderBy().clear().asc("name");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("order by t0.name");
+    assertSql(query).contains("order by t0.name");
   }
 
 
@@ -189,7 +189,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setParameter("name", "Ro");
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("where t0.name like ");
+    assertSql(query).contains("where t0.name like ");
   }
 
   @Test(expected = PersistenceException.class)
@@ -234,7 +234,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setUseCache(false);
     query.findOne();
 
-    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
+    assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 
   @Test
@@ -249,7 +249,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setUseCache(false);
     query.findOne();
 
-    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
+    assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 
   @Test
@@ -264,6 +264,6 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setUseCache(false);
     query.findOne();
 
-    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
+    assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 }

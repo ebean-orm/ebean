@@ -26,12 +26,12 @@ public class TestOrderedList extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql.size()).isGreaterThan(1);
-    assertThat(sql.get(0)).contains("insert into om_ordered_master");
+    assertSql(sql.get(0)).contains("insert into om_ordered_master");
     boolean hasId = sql.get(1).contains(" (id, name");
     if (hasId) {
-      assertThat(sql.get(1)).contains("insert into om_ordered_detail (id, name, version, sort_order, master_id) values (?,?,?,?,?)");
+      assertSql(sql.get(1)).contains("insert into om_ordered_detail (id, name, version, sort_order, master_id) values (?,?,?,?,?)");
     } else {
-      assertThat(sql.get(1)).contains("insert into om_ordered_detail (name, version, sort_order, master_id) values (?,?,?,?)");
+      assertSql(sql.get(1)).contains("insert into om_ordered_detail (name, version, sort_order, master_id) values (?,?,?,?)");
     }
 
     // update without any changes
@@ -46,7 +46,7 @@ public class TestOrderedList extends BaseTestCase {
     Ebean.save(master);
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
+    assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
 
     fetchAndReorder(master.getId());
   }
@@ -57,7 +57,7 @@ public class TestOrderedList extends BaseTestCase {
     List<OmOrderedDetail> details1 = fresh.getDetails();
 
     List<String> sql = LoggedSqlCollector.current();
-    assertThat(sql.get(0)).contains("order by t0.id, t1.sort_order");
+    assertSql(sql.get(0)).contains("order by t0.id, t1.sort_order");
 
     // fetched, not dirty
     Ebean.save(fresh);
@@ -77,8 +77,8 @@ public class TestOrderedList extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(7);
-    assertThat(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
-    assertThat(sql.get(1)).contains("update om_ordered_detail set version=?, sort_order=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
+    assertSql(sql.get(1)).contains("update om_ordered_detail set version=?, sort_order=? where id=? and version=?");
 
     details1.get(1).setName("was 1");
     fresh.setName("m1-mod3");
@@ -86,8 +86,8 @@ public class TestOrderedList extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(8);
-    assertThat(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
-    assertThat(sql.get(1)).contains("update om_ordered_detail set version=?, sort_order=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
+    assertSql(sql.get(1)).contains("update om_ordered_detail set version=?, sort_order=? where id=? and version=?");
     assertThat(sql.get(3)).contains("update om_ordered_detail set name=?, version=?, sort_order=? where id=? and version=?");
 
 
@@ -95,8 +95,8 @@ public class TestOrderedList extends BaseTestCase {
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
+    assertSql(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
     assertSqlBind(sql.get(1));
-    assertThat(sql.get(2)).contains("delete from om_ordered_master where id=? and version=?");
+    assertSql(sql.get(2)).contains("delete from om_ordered_master where id=? and version=?");
   }
 }

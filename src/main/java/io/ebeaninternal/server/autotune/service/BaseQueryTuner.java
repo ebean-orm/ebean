@@ -142,6 +142,7 @@ public class BaseQueryTuner {
     SpiQuery.Type type = query.getType();
     switch (type) {
       case COUNT:
+      case ATTRIBUTE:
       case ID_LIST:
       case UPDATE:
       case DELETE:

@@ -12,6 +12,8 @@ import org.tests.model.basic.FeatureDescription;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class TestL2CacheWithSharedBean extends BaseTestCase {
 
   private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
@@ -25,7 +27,7 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     FeatureDescription f1 = new FeatureDescription();
     f1.setName("one");
-    f1.setDescription(null);
+    f1.setDescription("helloOne");
 
     Ebean.save(f1);
 
@@ -44,19 +46,20 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     FeatureDescription fd2 = query.findOne(); // LOAD cache
 
-    fd2.getDescription(); // invoke lazy load (this fails)
+    String description0 = fd2.getDescription(); // invoke lazy load
+    assertEquals("helloOne", description0);
 
     // load the cache
     FeatureDescription fetchOne = Ebean.find(FeatureDescription.class, f1.getId());
     Assert.assertNotNull(fetchOne);
-    Assert.assertEquals(1, beanCache.getStatistics(false).getSize());
+    assertEquals(1, beanCache.getStatistics(false).getSize());
 
     FeatureDescription fetchTwo = Ebean.find(FeatureDescription.class, f1.getId());
     FeatureDescription fetchThree = Ebean.find(FeatureDescription.class, f1.getId());
     Assert.assertSame(fetchTwo, fetchThree);
 
-    String description = fetchThree.getDescription();
-    Assert.assertNull(description);
+    String description1 = fetchThree.getDescription();
+    assertEquals("helloOne", description1);
   }
 
 }

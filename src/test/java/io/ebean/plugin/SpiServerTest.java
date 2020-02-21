@@ -5,10 +5,16 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import org.tests.model.basic.Customer;
 import org.junit.Test;
+import org.tests.model.basic.VwCustomer;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class SpiServerTest extends BaseTestCase {
@@ -40,11 +46,15 @@ public class SpiServerTest extends BaseTestCase {
     assertEquals(42, beanType.getBeanId(customer));
 
     List<? extends BeanType<?>> beanTypes = pluginApi.getBeanTypes("o_customer");
-    assertEquals(1, beanTypes.size());
-    assertSame(beanType, beanTypes.get(0));
+    assertEquals(2, beanTypes.size());
+
+    BeanType<VwCustomer> vwBeanType = pluginApi.getBeanType(VwCustomer.class);
+
+    assertThat(beanTypes.contains(beanType)).isTrue();
+    assertThat(beanTypes.contains(vwBeanType)).isTrue();
 
     List<? extends BeanType<?>> allTypes = pluginApi.getBeanTypes();
-    assertTrue(!allTypes.isEmpty());
+    assertFalse(allTypes.isEmpty());
   }
 
 }

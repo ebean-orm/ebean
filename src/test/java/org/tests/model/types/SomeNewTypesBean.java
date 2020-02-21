@@ -48,6 +48,8 @@ public class SomeNewTypesBean {
 
   java.sql.Date sqlDate;
 
+  java.sql.Time sqlTime;
+
   LocalDate localDate;
 
   LocalDateTime localDateTime;
@@ -132,6 +134,14 @@ public class SomeNewTypesBean {
 
   public void setSqlDate(Date sqlDate) {
     this.sqlDate = sqlDate;
+  }
+
+  public java.sql.Time getSqlTime() {
+    return sqlTime;
+  }
+
+  public void setSqlTime(java.sql.Time sqlTime) {
+    this.sqlTime = sqlTime;
   }
 
   public LocalDate getLocalDate() {

@@ -113,7 +113,7 @@ public class CQueryEngine {
       if (request.isLogSummary()) {
         request.getTransaction().logSummary(rcQuery.getSummary());
       }
-      if (request.isQueryCachePut() && !list.isEmpty()) {
+      if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.getDependentTables());
 
         list = Collections.unmodifiableList(list);
@@ -268,8 +268,8 @@ public class CQueryEngine {
     }
 
     // order by id asc, lower sys period desc
-    query.orderBy().asc(request.getBeanDescriptor().getIdProperty().getName());
-    query.orderBy().desc(sysPeriodLower);
+    query.order().asc(request.getBeanDescriptor().getIdProperty().getName());
+    query.order().desc(sysPeriodLower);
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     try {

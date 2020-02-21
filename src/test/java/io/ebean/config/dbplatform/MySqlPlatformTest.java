@@ -16,8 +16,8 @@ public class MySqlPlatformTest {
   public void testTypeConversion() {
     PlatformDdl ddl = PlatformDdlBuilder.create(mySqlPlatform);
     assertThat(ddl.convert("clob", false)).isEqualTo("longtext");
-    assertThat(ddl.convert("json", false)).isEqualTo("longtext");
-    assertThat(ddl.convert("jsonb", false)).isEqualTo("longtext");
+    assertThat(ddl.convert("json", false)).isEqualTo("json");
+    assertThat(ddl.convert("jsonb", false)).isEqualTo("json");
     assertThat(ddl.convert("varchar(20)", false)).isEqualTo("varchar(20)");
     assertThat(ddl.convert("boolean", false)).isEqualTo("tinyint(1)");
     assertThat(ddl.convert("bit", false)).isEqualTo("tinyint(1)");

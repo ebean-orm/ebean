@@ -9,16 +9,24 @@ import io.ebean.Update;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebeaninternal.server.cache.CachedManyIds;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.tests.model.basic.*;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Country;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.OBeanChild;
+import org.tests.model.basic.OCachedBean;
+import org.tests.model.basic.OCachedBeanChild;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderDetail;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class TestCacheCollectionIds extends BaseTestCase {
@@ -88,7 +96,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     List<Contact> contacts2 = customer2.getContacts();
 
     for (Contact contact : contacts2) {
-      contact.getFirstName();
+      assertNotNull(contact.getFirstName());
       contact.getEmail();
     }
     return contacts2.size();
@@ -297,7 +305,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     // assert that the cache contains the expected entry
     assertEquals("countries cache now loaded with 1 entry", 1, cachedBeanCountriesCache.size());
     CachedManyIds dummyEntry = (CachedManyIds) cachedBeanCountriesCache.get(dummyLoad.getId());
-    Assert.assertNotNull(dummyEntry);
+    assertNotNull(dummyEntry);
     assertEquals("2 ids in the entry", 2, dummyEntry.getIdList().size());
     assertTrue(dummyEntry.getIdList().contains("NZ"));
     assertTrue(dummyEntry.getIdList().contains("AU"));

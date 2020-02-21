@@ -128,7 +128,7 @@ public class DeployInherit {
       if (dv != null) {
         info.setDiscriminatorValue(dv.value());
       } else {
-        info.setDiscriminatorValue(cls.getSimpleName());
+        info.setDiscriminatorDefaultValue(cls);
       }
     }
     return info;

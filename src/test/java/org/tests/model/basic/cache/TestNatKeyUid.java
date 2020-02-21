@@ -41,7 +41,7 @@ public class TestNatKeyUid extends BaseTestCase {
 
     return DB.find(OCachedNkeyUid.class)
       .where()
-      .eq("uid", one)
+      .eq("cid", one)
       .findOne();
   }
 
@@ -68,7 +68,7 @@ public class TestNatKeyUid extends BaseTestCase {
     return DB.find(OCachedNkeyUid.class)
       .setUseCache(true)
       .where()
-      .in("uid", one, two)
+      .in("cid", one, two)
       .findList();
   }
 

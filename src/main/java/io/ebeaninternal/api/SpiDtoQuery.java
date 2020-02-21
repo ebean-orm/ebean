@@ -2,6 +2,7 @@ package io.ebeaninternal.api;
 
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
+import io.ebean.Transaction;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 
@@ -64,5 +65,10 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
    * Return an underlying ORM query (if this query is built from an ORM query).
    */
   SpiQuery<?> getOrmQuery();
+
+  /**
+   * Return the explicit transaction used to execute the query.
+   */
+  Transaction getTransaction();
 
 }

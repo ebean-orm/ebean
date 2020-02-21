@@ -40,7 +40,7 @@ public class NoopExpressionTest extends BaseExpressionTest {
     query.findCount();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql.get(0)).contains("select count(*) from cover t0 where 1=1 and");
+    assertSql(sql.get(0)).contains("select count(*) from cover t0 where 1=1 and");
   }
 
   @Test

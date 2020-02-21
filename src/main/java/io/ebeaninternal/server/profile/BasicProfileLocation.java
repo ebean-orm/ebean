@@ -28,8 +28,8 @@ final class BasicProfileLocation implements ProfileLocation {
   }
 
   @Override
-  public String obtain() {
-    return fullLocation;
+  public boolean obtain() {
+    return false;
   }
 
   @Override
@@ -40,6 +40,21 @@ final class BasicProfileLocation implements ProfileLocation {
   @Override
   public String location() {
     return location;
+  }
+
+  @Override
+  public String fullLocation() {
+    return fullLocation;
+  }
+
+  @Override
+  public boolean trace() {
+    return false;
+  }
+
+  @Override
+  public void setTraceCount(int traceCount) {
+    // do nothing
   }
 
   private String shortDesc(String location) {

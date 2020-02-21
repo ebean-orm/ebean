@@ -38,7 +38,6 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
@@ -56,6 +55,7 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
@@ -63,9 +63,10 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.ExtraMetrics;
 import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.LoadManyRequest;
+import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiDtoQuery;
@@ -74,6 +75,8 @@ import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
+import io.ebeaninternal.api.SpiQueryBindCapture;
+import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.api.SpiSqlQuery;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
@@ -128,6 +131,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -138,7 +142,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -161,6 +164,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DatabasePlatform databasePlatform;
 
   private final TransactionManager transactionManager;
+
+  private final QueryPlanManager queryPlanManager;
+
+  private final ExtraMetrics extraMetrics;
 
   private final DataTimeZone dataTimeZone;
 
@@ -233,9 +240,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   private final int lazyLoadBatchSize;
 
-  /**
-   * The query batch size
-   */
   private final int queryBatchSize;
 
   private final boolean updateAllPropertiesInBatch;
@@ -248,15 +252,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Create the DefaultServer.
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
-
     this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
     this.serverConfig = config.getServerConfig();
-    this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
-
+    this.extraMetrics = config.getExtraMetrics();
     this.serverName = serverConfig.getName();
     this.lazyLoadBatchSize = serverConfig.getLazyLoadBatchSize();
     this.queryBatchSize = serverConfig.getQueryBatchSize();
@@ -267,22 +269,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.currentTenantProvider = serverConfig.getCurrentTenantProvider();
     this.slowQueryMicros = config.getSlowQueryMicros();
     this.slowQueryListener = config.getSlowQueryListener();
-
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
-
     this.updateAllPropertiesInBatch = serverConfig.isUpdateAllPropertiesInBatch();
     this.callStackFactory = initCallStackFactory(serverConfig);
-
     this.persister = config.createPersister(this);
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
     this.dtoQueryEngine = config.createDtoQueryEngine();
-
     this.autoTuneService = config.createAutoTuneService(this);
     this.readAuditPrepare = config.getReadAuditPrepare();
     this.readAuditLogger = config.getReadAuditLogger();
-
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
@@ -291,13 +288,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(docStoreComponents.updateProcessor());
     this.documentStore = docStoreComponents.documentStore();
-
+    this.queryPlanManager = config.initQueryPlanManager(transactionManager);
+    this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
-
     // Register with the JVM Shutdown hook
     ShutdownManager.registerEbeanServer(this);
   }
@@ -584,6 +581,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void loadBean(EntityBeanIntercept ebi) {
     beanLoader.loadBean(ebi);
+    extraMetrics.incrementLoadOneNoLoader();
+  }
+
+  @Override
+  public void loadBeanRef(EntityBeanIntercept ebi) {
+    beanLoader.loadBean(ebi);
+    extraMetrics.incrementLoadOneRef();
+  }
+
+  @Override
+  public void loadBeanL2(EntityBeanIntercept ebi) {
+    beanLoader.loadBean(ebi);
+    extraMetrics.incrementLoadOneL2();
   }
 
   @Override
@@ -1331,7 +1341,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+  public <T> boolean exists(Query<?> ormQuery, Transaction transaction) {
 
     Query<?> ormQueryCopy = ormQuery.copy();
     ormQueryCopy.setMaxRows(1);
@@ -1907,6 +1917,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return saveAllInternal(beans, null);
   }
 
+  @Override
+  public int saveAll(Object... beans) throws OptimisticLockException {
+    return saveAllInternal(Arrays.asList(beans), null);
+  }
+
   /**
    * Save all beans in the iterator with an explicit transaction.
    */
@@ -2385,7 +2400,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return Collections.emptySet();
   }
 
-
   /**
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
@@ -2430,21 +2444,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       relationalQueryEngine.visitMetrics(visitor);
       persister.visitMetrics(visitor);
     }
+    extraMetrics.visitMetrics(visitor);
     visitor.visitEnd();
   }
 
-  public List<MetaQueryPlan> collectQueryPlans(QueryPlanRequest request) {
-    Connection connection = null;
-    try {
-      connection = getDataSource().getConnection();
-      request.setConnection(connection);
-      beanDescriptorManager.collectQueryPlans(request);
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
+  @Override
+  public SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan plan) {
+    return queryPlanManager.createBindCapture(plan);
+  }
 
-    } finally {
-      JdbcClose.close(connection);
-    }
-    return request.getPlans();
+  List<MetaQueryPlan> queryPlanInit(QueryPlanInit initRequest) {
+    return beanDescriptorManager.queryPlanInit(initRequest);
+  }
+
+  List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request) {
+    return queryPlanManager.collect(request);
   }
 }

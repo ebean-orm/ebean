@@ -43,6 +43,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setZonedDateTime(ZonedDateTime.now());
     bean.setLocalTime(LocalTime.now());
     bean.setSqlDate(java.sql.Date.valueOf("2019-07-21"));
+    bean.setSqlTime(java.sql.Time.valueOf("12:34:56"));
     bean.setInstant(Instant.now());
     bean.setYear(Year.now());
     bean.setMonth(Month.APRIL);
@@ -79,6 +80,9 @@ public class TestNewTypes extends BaseTestCase {
     assertTrue(!list.isEmpty());
 
     list = DB.find(SomeNewTypesBean.class).where().eq("sqlDate", bean.getSqlDate()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = DB.find(SomeNewTypesBean.class).where().eq("sqlTime", bean.getSqlTime()).findList();
     assertTrue(!list.isEmpty());
 
     list = DB.find(SomeNewTypesBean.class).where().le("localTime", LocalTime.now()).findList();
@@ -118,6 +122,7 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getMonth(), fetched.getMonth());
     assertEquals(bean.getYear(), fetched.getYear());
     assertEquals(bean.getSqlDate(), fetched.getSqlDate());
+    assertEquals(bean.getSqlTime(), fetched.getSqlTime());
     assertEquals(bean.getYearMonth(), fetched.getYearMonth());
     assertEquals(bean.getMonthDay(), fetched.getMonthDay());
     assertEquals(bean.getLocalDate(), fetched.getLocalDate());

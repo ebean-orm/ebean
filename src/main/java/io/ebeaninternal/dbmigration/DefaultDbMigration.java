@@ -91,6 +91,8 @@ public class DefaultDbMigration implements DbMigration {
 
   protected String pathToResources = "src/main/resources";
 
+  protected String migrationPath;
+
   protected DatabasePlatform databasePlatform;
 
   private boolean vanillaPlatform;
@@ -136,6 +138,11 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setPathToResources(String pathToResources) {
     this.pathToResources = pathToResources;
+  }
+
+  @Override
+  public void setMigrationPath(String migrationPath) {
+    this.migrationPath = migrationPath;
   }
 
   /**
@@ -684,6 +691,9 @@ public class DefaultDbMigration implements DbMigration {
       }
       if (applyPrefix != null) {
         migrationConfig.setApplyPrefix(applyPrefix);
+      }
+      if (migrationPath != null) {
+        migrationConfig.setMigrationPath(migrationPath);
       }
       if (header != null) {
         migrationConfig.setDdlHeader(header);

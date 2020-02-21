@@ -1160,6 +1160,10 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return isVersion() || (generatedProperty != null && generatedProperty.isDDLNotNullable());
   }
 
+  boolean isGeneratedOnInsert() {
+    return generatedProperty != null && generatedProperty.includeInInsert();
+  }
+
   /**
    * Return true if this is a generated property mapping to @WhenCreated or @CreatedTimestamp.
    */

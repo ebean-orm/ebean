@@ -19,6 +19,8 @@ class DProfileLocation implements ProfileLocation {
 
   private final int lineNumber;
 
+  private int traceCount;
+
   DProfileLocation() {
     this(0);
   }
@@ -41,17 +43,18 @@ class DProfileLocation implements ProfileLocation {
   }
 
   @Override
-  public String obtain() {
+  public boolean obtain() {
     // atomic assignments so happy enough with this (racing but atomic)
-    if (fullLocation == null) {
-      final String loc = create();
-      final String shortDesc = shortDesc(loc);
-      label = UtilLocation.label(shortDesc);
-      location = shortDesc;
-      fullLocation = loc;
-      initWith(label);
+    if (fullLocation != null) {
+      return false;
     }
-    return fullLocation;
+    final String loc = create();
+    final String shortDesc = shortDesc(loc);
+    label = UtilLocation.label(shortDesc);
+    location = shortDesc;
+    fullLocation = loc;
+    initWith(label);
+    return true;
   }
 
   protected void initWith(String label) {
@@ -66,6 +69,26 @@ class DProfileLocation implements ProfileLocation {
   @Override
   public String location() {
     return location;
+  }
+
+  @Override
+  public String fullLocation() {
+    return fullLocation;
+  }
+
+  @Override
+  public boolean trace() {
+    // racey but atomic and no problem with over or under tracing
+    if (traceCount <= 0) {
+      return false;
+    } else {
+      traceCount--;
+      return true;
+    }
+  }
+
+  public void setTraceCount(int traceCount) {
+    this.traceCount = traceCount;
   }
 
   private String create() {

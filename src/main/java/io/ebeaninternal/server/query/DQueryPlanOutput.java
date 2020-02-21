@@ -2,11 +2,12 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaQueryPlan;
+import io.ebeaninternal.api.SpiDbQueryPlan;
 
 /**
  * Captured query plan details.
  */
-class DQueryPlanOutput implements MetaQueryPlan {
+class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
 
   private final Class<?> beanType;
   private final String label;
@@ -20,13 +21,14 @@ class DQueryPlanOutput implements MetaQueryPlan {
   private long queryTimeMicros;
   private long captureCount;
 
-  DQueryPlanOutput(Class<?> beanType, String label, String sql, String bind, String plan, ProfileLocation profileLocation) {
+  DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
+    this.hash = hash;
     this.sql = sql;
+    this.profileLocation = profileLocation;
     this.bind = bind;
     this.plan = plan;
-    this.profileLocation = profileLocation;
   }
 
   @Override
@@ -104,9 +106,10 @@ class DQueryPlanOutput implements MetaQueryPlan {
   /**
    * Additionally set the query execution time and the number of bind captures.
    */
-  void with(long queryTimeMicros, long captureCount, String hash) {
+  @Override
+  public DQueryPlanOutput with(long queryTimeMicros, long captureCount) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
-    this.hash = hash;
+    return this;
   }
 }
