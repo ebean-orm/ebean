@@ -75,17 +75,15 @@ public interface SqlQuery extends Serializable {
   SqlRow findOne();
 
   /**
-   * Execute the query returning a single result using the mapper.
-   *
-   * @param mapper Used to map each ResultSet row into the result object.
+   * Deprecated migrate to use {@link #mapTo(RowMapper)}
    */
+  @Deprecated
   <T> T findOne(RowMapper<T> mapper);
 
   /**
-   * Execute the query returning a list using the mapper.
-   *
-   * @param mapper Used to map each ResultSet row into the result object.
+   * Deprecated migrate to use {@link #mapTo(RowMapper)}
    */
+  @Deprecated
   <T> List<T> findList(RowMapper<T> mapper);
 
   /**
@@ -125,64 +123,47 @@ public interface SqlQuery extends Serializable {
   Optional<SqlRow> findOneOrEmpty();
 
   /**
-   * Execute the query returning a single scalar attribute.
-   * <pre>@{code
+   * Deprecated - migrate to <code>.mapToScalar(attributeType).findOne()</code>.
+   * <pre>{@code
    *
-   *   String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
-   *
-   *   BigDecimal maxPrice = DB.sqlQuery(sql)
-   *     .setParameter(42)
-   *     .findSingleAttribute(BigDecimal.class);
-   *
-   * }</pre>
-   *
-   * <p>
-   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
-   * </p>
-   *
-   * @param attributeType The type of the returned value
+   *    .mapToScalar(BigDecimal.class)
+   *    .findOne();
+   * }
    */
+  @Deprecated
   <T> T findSingleAttribute(Class<T> attributeType);
 
   /**
-   * Execute the query returning a single BigDecimal value.
-   * <p>
-   * This is an alias for <code>findSingleAttribute(BigDecimal.class)</code>
-   * </p>
+   * Deprecated - migrate to <code>.mapToScalar(BigDecimal.class).findOne()</code>.
+   * <pre>{@code
+   *
+   *    .mapToScalar(BigDecimal.class)
+   *    .findOne();
+   * }
    */
+  @Deprecated
   BigDecimal findSingleDecimal();
 
   /**
-   * Execute the query returning a single Long value.
-   * <p>
-   * This is an alias for <code>findSingleAttribute(Long.class)</code>
-   * </p>
+   * Deprecated - migrate to <code>.mapToScalar(Long.class).findOne()</code>.
+   * <pre>{@code
+   *
+   *    .mapToScalar(Long.class)
+   *    .findOne();
+   * }
    */
+  @Deprecated
   Long findSingleLong();
 
   /**
-   * Execute the query returning a list of scalar attribute values.
-   *
+   * Deprecated - migrate to <code>.mapToScalar(Long.class).findList()</code>.
    * <pre>{@code
    *
-   *   String sql =
-   *   " select (unit_price * order_qty) " +
-   *   " from o_order_detail " +
-   *   " where unit_price > ? " +
-   *   " order by (unit_price * order_qty) desc";
-   *
-   *   List<BigDecimal> lineAmounts =
-   *     DB.sqlQuery(sql)
-   *       .setParameter(42)
-   *       .findSingleAttributeList(BigDecimal.class);
-   *
-   * }</pre>
-   *
-   * <p>
-   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
-   *
-   * @param attributeType The type of the returned value
+   *    .mapToScalar(Long.class)
+   *    .findList();
+   * }
    */
+  @Deprecated
   <T> List<T> findSingleAttributeList(Class<T> attributeType);
 
   /**
@@ -293,4 +274,59 @@ public interface SqlQuery extends Serializable {
    */
   SqlQuery setBufferFetchSizeHint(int bufferFetchSizeHint);
 
+  /**
+   * The query result maps to a single scalar value like Long, BigDecimal,
+   * String, UUID, OffsetDateTime etc.
+   * <p>
+   * Any scalar type Ebean is aware of can be used including java time
+   * types like Instant, LocalDate, OffsetDateTime, UUID, Inet, Cdir etc.
+   *
+   * <pre>{@code
+   *
+   *   String sql = " select min(updtime) from o_order_detail " +
+   *                " where unit_price > ? and updtime is not null ";
+   *
+   *   OffsetDateTime minCreated = DB.sqlQuery(sql)
+   *     .setParameter(42)
+   *     .mapToScalar(OffsetDateTime.class)
+   *     .findOne();
+   *
+   * }</pre>
+   *
+   * @param attributeType The type the result is returned as
+   * @return The query to execute via findOne() findList() etc
+   */
+  <T> TypeQuery<T> mapToScalar(Class<T> attributeType);
+
+  /**
+   * Use a RowMapper to map the result to beans.
+   *
+   * @param mapper Maps rows to beans
+   * @param <T>    The type of beans mapped to
+   * @return The query to execute by findOne() findList() etc
+   */
+  <T> TypeQuery<T> mapTo(RowMapper<T> mapper);
+
+  /**
+   * Query mapping to single scalar values.
+   *
+   * @param <T> The type of the scalar values
+   */
+  interface TypeQuery<T> {
+
+    /**
+     * Return the single value.
+     */
+    T findOne();
+
+    /**
+     * Return the single value that is optional.
+     */
+    Optional<T> findOneOrEmpty();
+
+    /**
+     * Return the list of values.
+     */
+    List<T> findList();
+  }
 }

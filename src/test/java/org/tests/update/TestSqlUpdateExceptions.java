@@ -27,7 +27,8 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
 
     UUID foundId = DB.sqlQuery("select id from uuone where id = ?")
       .setParameters(id)
-      .findSingleAttribute(UUID.class);
+      .mapToScalar(UUID.class)
+      .findOne();
 
     assertThat(foundId).isEqualTo(id);
   }

@@ -7,11 +7,12 @@ import org.junit.Test;
 import org.tests.model.basic.Customer;
 
 import java.sql.Types;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TestTransient extends BaseTestCase {
@@ -65,34 +66,34 @@ public class TestTransient extends BaseTestCase {
     int rows = DB.createUpdate(Customer.class, updateStmt)
       .setParameter("id", custId).execute();
     assertEquals(1, rows);
-    assertEquals("testTrans2", findNote(custId));
+    assertEquals("testTrans2", findNote(custId).get());
 
     rows = DB.createUpdate(Customer.class, "update customer set smallnote = ? where id = ?")
       .setNull(1, Types.VARCHAR)
       .setParameter(2, custId).execute();
     assertEquals(1, rows);
-    assertNull(findNote(custId));
+    assertThat(findNote(custId)).isEmpty();
 
     rows = DB.createUpdate(Customer.class, "update customer set smallnote = ? where id = ?")
       .setParameter(1, "Foo")
       .setParameter(2, custId).execute();
     assertEquals(1, rows);
-    assertEquals("Foo", findNote(custId));
+    assertEquals("Foo", findNote(custId).get());
 
     rows = DB.createUpdate(Customer.class, "update customer set smallnote = :name where id = :id")
       .setNullParameter("name", Types.VARCHAR)
       .setParameter("id", custId).execute();
     assertEquals(1, rows);
-    assertNull(findNote(custId));
+    assertThat(findNote(custId)).isEmpty();
 
     // cleanup
     DB.delete(Customer.class, custId);
   }
 
-  private String findNote(Integer custId) {
+  private Optional<String> findNote(Integer custId) {
     return DB.sqlQuery("select smallnote from o_customer where id = ?")
         .setParameter(custId)
-        .findSingleAttribute(String.class);
+        .mapToScalar(String.class).findOneOrEmpty();
   }
 
 }

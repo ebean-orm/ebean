@@ -34,7 +34,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     List<BigDecimal> lineAmounts = DB.sqlQuery(sql)
       .setParameter(3)
-      .findSingleAttributeList(BigDecimal.class);
+      .mapToScalar(BigDecimal.class)
+      .findList();
 
     assertThat(lineAmounts).isNotEmpty();
   }
@@ -48,7 +49,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     BigDecimal maxPrice = DB.sqlQuery(sql)
       .setParameter(1, 2)
-      .findSingleDecimal();
+      .mapToScalar(BigDecimal.class)
+      .findOne();
 
     assertThat(maxPrice).isNotNull();
   }
@@ -62,7 +64,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     BigDecimal maxPrice = DB.sqlQuery(sql)
       .setParameter(2)
-      .findSingleAttribute(BigDecimal.class);
+      .mapToScalar(BigDecimal.class)
+      .findOne();
 
     assertThat(maxPrice).isNotNull();
   }
@@ -76,7 +79,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     long count = DB.sqlQuery(sql)
       .setParameter(1, 2)
-      .findSingleLong();
+      .mapToScalar(Long.class)
+      .findOne();
 
     assertThat(count).isGreaterThan(0);
   }
@@ -91,7 +95,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     long count = DB.sqlQuery(sql)
       .setParameter(1, 2)
-      .findSingleAttribute(Long.class);
+      .mapToScalar(Long.class).findOne();
 
     assertThat(count).isGreaterThan(0);
   }
@@ -105,7 +109,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     OffsetDateTime minCreated = DB.sqlQuery(sql)
       .setParameter(1, 2)
-      .findSingleAttribute(OffsetDateTime.class);
+      .mapToScalar(OffsetDateTime.class).findOne();
 
     assertThat(minCreated).isBefore(OffsetDateTime.now());
   }
@@ -147,7 +151,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     CustDto rob = DB.sqlQuery(sql)
       .setParameter("Rob")
-      .findOne(CUST_MAPPER);
+      .mapTo(CUST_MAPPER)
+      .findOne();
 
     assertThat(rob.name).isEqualTo("Rob");
   }
@@ -160,7 +165,8 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select id, name, status from o_customer order by name desc";
 
     List<CustDto> dtos = DB.sqlQuery(sql)
-      .findList(CUST_MAPPER);
+      .mapTo(CUST_MAPPER)
+      .findList();
 
     assertThat(dtos).isNotEmpty();
   }
@@ -196,7 +202,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     long maxId = DB.sqlQuery(sql)
       .setParameter("Rob")
-      .findOne((resultSet, rowNum) -> resultSet.getLong(1));
+      .mapTo((resultSet, rowNum) -> resultSet.getLong(1))
+      .findOne();
 
     assertThat(maxId).isGreaterThan(0);
   }
