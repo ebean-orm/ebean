@@ -29,7 +29,7 @@ public class SqlServerSqlLimiter implements SqlLimiter {
       }
       sb.append("top ").append(maxRows).append(" ");
       sb.append(dbSql);
-      return new SqlLimitResponse(sb.toString(), false);
+      return new SqlLimitResponse(sb.toString());
     }
 
     sb.append("select ");
@@ -43,8 +43,7 @@ public class SqlServerSqlLimiter implements SqlLimiter {
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }
-    String sql = sb.toString();
-    return new SqlLimitResponse(sql, false);
+    return new SqlLimitResponse(sb.toString());
   }
 
 }

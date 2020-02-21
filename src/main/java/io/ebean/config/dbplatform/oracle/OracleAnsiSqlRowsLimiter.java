@@ -28,7 +28,7 @@ class OracleAnsiSqlRowsLimiter implements SqlLimiter {
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }
-    return new SqlLimitResponse(sb.toString(), false);
+    return new SqlLimitResponse(sb.toString());
   }
 
 }

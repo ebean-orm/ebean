@@ -29,7 +29,6 @@ public class HanaSqlLimiter implements SqlLimiter {
     }
 
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
-
-    return new SqlLimitResponse(sql, false);
+    return new SqlLimitResponse(sql);
   }
 }

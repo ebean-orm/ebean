@@ -7,14 +7,11 @@ public class SqlLimitResponse {
 
   final String sql;
 
-  final boolean includesRowNumberColumn;
-
   /**
    * Create the response.
    */
-  public SqlLimitResponse(String sql, boolean includesRowNumberColumn) {
+  public SqlLimitResponse(String sql) {
     this.sql = sql;
-    this.includesRowNumberColumn = includesRowNumberColumn;
   }
 
   /**
@@ -22,13 +19,6 @@ public class SqlLimitResponse {
    */
   public String getSql() {
     return sql;
-  }
-
-  /**
-   * Returns true if a ROW_NUMBER column is used in the query.
-   */
-  public boolean isIncludesRowNumberColumn() {
-    return includesRowNumberColumn;
   }
 
 }
