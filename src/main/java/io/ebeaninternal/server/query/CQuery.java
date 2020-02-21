@@ -136,11 +136,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   private final String logWhereSql;
 
   /**
-   * Set to true if the row number column is included in the sql.
-   */
-  private final boolean rowNumberIncluded;
-
-  /**
    * Tree that knows how to build the master and detail beans from the
    * resultSet.
    */
@@ -225,7 +220,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.manyProperty = sqlTree.getManyProperty();
     this.sql = queryPlan.getSql();
     this.rawSql = queryPlan.isRawSql();
-    this.rowNumberIncluded = queryPlan.isRowNumberIncluded();
     this.logWhereSql = queryPlan.getLogWhereSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
@@ -504,10 +498,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
     rowCount++;
     dataReader.resetColumnPosition();
-    if (rowNumberIncluded) {
-      // row_number() column used for limit features
-      dataReader.incrementPos(1);
-    }
     return true;
   }
 

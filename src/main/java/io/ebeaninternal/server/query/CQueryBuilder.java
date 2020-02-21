@@ -117,7 +117,7 @@ class CQueryBuilder {
     }
 
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, false, predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree, predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryUpdate(request, predicates, queryPlan);
   }
@@ -206,7 +206,7 @@ class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates);
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
 
-    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
@@ -305,7 +305,7 @@ class CQueryBuilder {
     }
 
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree, predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(queryPlan, request, predicates);
@@ -550,7 +550,7 @@ class CQueryBuilder {
   private SqlLimitResponse buildSql(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {
     SpiQuery<?> query = request.getQuery();
     if (query.isNativeSql()) {
-      return new SqlLimitResponse(query.getGeneratedSql(), false);
+      return new SqlLimitResponse(query.getGeneratedSql());
     }
     if (query.isRawSql()) {
       return rawSqlHandler.buildSql(request, predicates, query.getRawSql().getSql());
@@ -750,7 +750,7 @@ class CQueryBuilder {
             sb.append(" limit ").append(maxRows);
           }
         }
-        return new SqlLimitResponse(dbPlatform.completeSql(sb.toString(), query), false);
+        return new SqlLimitResponse(dbPlatform.completeSql(sb.toString(), query));
       }
     }
 

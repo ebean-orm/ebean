@@ -35,8 +35,7 @@ public class SqlAnywhereLimiter implements SqlLimiter {
     sb.append(dbSql);
 
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
-
-    return new SqlLimitResponse(sql, false);
+    return new SqlLimitResponse(sql);
   }
 
 }

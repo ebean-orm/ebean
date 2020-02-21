@@ -28,7 +28,7 @@ class CQueryBuilderRawSql {
 
     if (rsql == null) {
       // this is a ResultSet based RawSql query - just use some placeholder for the SQL
-      return new SqlLimitResponse(CQueryPlan.RESULT_SET_BASED_RAW_SQL, false);
+      return new SqlLimitResponse(CQueryPlan.RESULT_SET_BASED_RAW_SQL);
     }
 
     if (!rsql.isParsed()) {
@@ -38,8 +38,7 @@ class CQueryBuilderRawSql {
         // convert named parameters into positioned parameters
         sql = BindParamsParser.parse(bindParams, sql);
       }
-
-      return new SqlLimitResponse(sql, false);
+      return new SqlLimitResponse(sql);
     }
 
     String orderBy = getOrderBy(predicates, rsql);
@@ -56,7 +55,7 @@ class CQueryBuilderRawSql {
       // add back select keyword (it was removed to support sqlQueryLimiter)
       String prefix = "select " + (rsql.isDistinct() ? "distinct " : "");
       sql = prefix + sql;
-      return new SqlLimitResponse(sql, false);
+      return new SqlLimitResponse(sql);
     }
   }
 

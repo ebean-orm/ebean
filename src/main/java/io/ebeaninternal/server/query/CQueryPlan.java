@@ -66,8 +66,6 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private final boolean rawSql;
 
-  private final boolean rowNumberIncluded;
-
   private final String sql;
   private final String hash;
 
@@ -112,7 +110,6 @@ public class CQueryPlan implements SpiQueryPlan {
     this.location = location();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
-    this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
     this.logWhereSql = logWhereSql;
@@ -126,7 +123,7 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Create a query plan for a raw sql query.
    */
-  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, boolean rowNumberIncluded, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, String logWhereSql) {
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
@@ -135,12 +132,11 @@ public class CQueryPlan implements SpiQueryPlan {
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType());
     this.location = location();
-    this.planKey = buildPlanKey(sql, rowNumberIncluded, logWhereSql);
+    this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;
     this.sqlTree = sqlTree;
     this.rawSql = false;
-    this.rowNumberIncluded = rowNumberIncluded;
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.getEncryptedProps();
     this.stats = new CQueryPlanStats(this);
@@ -171,8 +167,8 @@ public class CQueryPlan implements SpiQueryPlan {
     return (profileLocation == null) ? null : profileLocation.location();
   }
 
-  private CQueryPlanKey buildPlanKey(String sql, boolean rowNumberIncluded, String logWhereSql) {
-    return new RawSqlQueryPlanKey(sql, false, rowNumberIncluded, logWhereSql);
+  private CQueryPlanKey buildPlanKey(String sql, String logWhereSql) {
+    return new RawSqlQueryPlanKey(sql, false, logWhereSql);
   }
 
   @Override
@@ -295,10 +291,6 @@ public class CQueryPlan implements SpiQueryPlan {
 
   public boolean isRawSql() {
     return rawSql;
-  }
-
-  boolean isRowNumberIncluded() {
-    return rowNumberIncluded;
   }
 
   String getLogWhereSql() {
