@@ -151,7 +151,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     CustDto rob = DB.sqlQuery(sql)
       .setParameter("Rob")
-      .findOne(CUST_MAPPER);
+      .mapTo(CUST_MAPPER)
+      .findOne();
 
     assertThat(rob.name).isEqualTo("Rob");
   }
@@ -164,7 +165,8 @@ public class SqlQueryTests extends BaseTestCase {
     String sql = "select id, name, status from o_customer order by name desc";
 
     List<CustDto> dtos = DB.sqlQuery(sql)
-      .findList(CUST_MAPPER);
+      .mapTo(CUST_MAPPER)
+      .findList();
 
     assertThat(dtos).isNotEmpty();
   }
@@ -200,7 +202,8 @@ public class SqlQueryTests extends BaseTestCase {
 
     long maxId = DB.sqlQuery(sql)
       .setParameter("Rob")
-      .findOne((resultSet, rowNum) -> resultSet.getLong(1));
+      .mapTo((resultSet, rowNum) -> resultSet.getLong(1))
+      .findOne();
 
     assertThat(maxId).isGreaterThan(0);
   }

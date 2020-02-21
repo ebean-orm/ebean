@@ -208,12 +208,25 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     return query;
   }
 
+  <T> T mapperFindOne(RowMapper<T> mapper) {
+    return server.findOneMapper(this, mapper);
+  }
+
+  <T> List<T> mapperFindList(RowMapper<T> mapper) {
+    return server.findListMapper(this, mapper);
+  }
+
   @Override
-  public <T> ScalarQuery<T> mapToScalar(Class<T> attributeType) {
+  public <T> TypeQuery<T> mapToScalar(Class<T> attributeType) {
     return new Scalar(attributeType);
   }
 
-  private class Scalar<T> implements SqlQuery.ScalarQuery<T> {
+  @Override
+  public <T> TypeQuery<T> mapTo(RowMapper<T> mapper) {
+    return new Mapper(mapper);
+  }
+
+  private class Scalar<T> implements SqlQuery.TypeQuery<T> {
 
     private final Class<T> type;
 
@@ -234,6 +247,30 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     @Override
     public List<T> findList() {
       return findSingleAttributeList(type);
+    }
+  }
+
+  private class Mapper<T> implements SqlQuery.TypeQuery<T> {
+
+    private final RowMapper<T> mapper;
+
+    Mapper(RowMapper<T> mapper) {
+      this.mapper = mapper;
+    }
+
+    @Override
+    public T findOne() {
+      return mapperFindOne(mapper);
+    }
+
+    @Override
+    public Optional<T> findOneOrEmpty() {
+      return Optional.ofNullable(findOne());
+    }
+
+    @Override
+    public List<T> findList() {
+      return mapperFindList(mapper);
     }
   }
 }

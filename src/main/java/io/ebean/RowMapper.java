@@ -18,7 +18,7 @@ import java.sql.SQLException;
  * <pre>{@code
  *
  *    //
- *    // A mapper from ResultSet into our CustomerDto bean
+ *    // Map from ResultSet to CustomerDto bean
  *    //
  *    class CustomerMapper implements RowMapper<CustomerDto> {
  *
@@ -42,7 +42,8 @@ import java.sql.SQLException;
  *
  *  CustomerDto rob = DB.sqlQuery(sql)
  *    .setParameter(1, "Rob")
- *    .findOne(CUSTOMER_MAPPER);
+ *    .mapTo(CUSTOMER_MAPPER)
+ *    .findOne();
  *
  *
  * }</pre>

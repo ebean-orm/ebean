@@ -75,17 +75,15 @@ public interface SqlQuery extends Serializable {
   SqlRow findOne();
 
   /**
-   * Execute the query returning a single result using the mapper.
-   *
-   * @param mapper Used to map each ResultSet row into the result object.
+   * Deprecated migrate to use {@link #mapTo(RowMapper)}
    */
+  @Deprecated
   <T> T findOne(RowMapper<T> mapper);
 
   /**
-   * Execute the query returning a list using the mapper.
-   *
-   * @param mapper Used to map each ResultSet row into the result object.
+   * Deprecated migrate to use {@link #mapTo(RowMapper)}
    */
+  @Deprecated
   <T> List<T> findList(RowMapper<T> mapper);
 
   /**
@@ -158,28 +156,14 @@ public interface SqlQuery extends Serializable {
   Long findSingleLong();
 
   /**
-   * Execute the query returning a list of scalar attribute values.
-   *
+   * Deprecated - migrate to <code>.mapToScalar(Long.class).findList()</code>.
    * <pre>{@code
    *
-   *   String sql =
-   *   " select (unit_price * order_qty) " +
-   *   " from o_order_detail " +
-   *   " where unit_price > ? " +
-   *   " order by (unit_price * order_qty) desc";
-   *
-   *   List<BigDecimal> lineAmounts =
-   *     DB.sqlQuery(sql)
-   *       .setParameter(42)
-   *       .findSingleAttributeList(BigDecimal.class);
-   *
-   * }</pre>
-   *
-   * <p>
-   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
-   *
-   * @param attributeType The type of the returned value
+   *    .mapToScalar(Long.class)
+   *    .findList();
+   * }
    */
+  @Deprecated
   <T> List<T> findSingleAttributeList(Class<T> attributeType);
 
   /**
@@ -312,14 +296,23 @@ public interface SqlQuery extends Serializable {
    * @param attributeType The type the result is returned as
    * @return The query to execute via findOne() findList() etc
    */
-  <T> ScalarQuery<T> mapToScalar(Class<T> attributeType);
+  <T> TypeQuery<T> mapToScalar(Class<T> attributeType);
+
+  /**
+   * Use a RowMapper to map the result to beans.
+   *
+   * @param mapper Maps rows to beans
+   * @param <T>    The type of beans mapped to
+   * @return The query to execute by findOne() findList() etc
+   */
+  <T> TypeQuery<T> mapTo(RowMapper<T> mapper);
 
   /**
    * Query mapping to single scalar values.
    *
    * @param <T> The type of the scalar values
    */
-  interface ScalarQuery<T> {
+  interface TypeQuery<T> {
 
     /**
      * Return the single value.
