@@ -9,6 +9,7 @@ import io.ebean.Junction;
 import io.ebean.OrderBy;
 import io.ebean.Query;
 import io.ebeaninternal.api.SpiExpressionList;
+import io.ebeaninternal.api.SpiQuery;
 
 import javax.persistence.PersistenceException;
 import java.util.Collection;
@@ -24,6 +25,9 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   private final Query<T> rootQuery;
 
   private final FilterExprPath pathPrefix;
+
+  private int firstRow;
+  private int maxRows;
 
   public FilterExpressionList(FilterExprPath pathPrefix, FilterExpressionList<T> original) {
     super(null, original.expr, null, original.getUnderlyingList());
@@ -145,18 +149,20 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public Query<T> setFirstRow(int firstRow) {
-    return rootQuery.setFirstRow(firstRow);
-  }
-
-  @Override
   public Query<T> setMapKey(String mapKey) {
     return rootQuery.setMapKey(mapKey);
   }
 
   @Override
-  public Query<T> setMaxRows(int maxRows) {
-    return rootQuery.setMaxRows(maxRows);
+  public ExpressionList<T> setMaxRows(int maxRows) {
+    this.maxRows = maxRows;
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> setFirstRow(int firstRow) {
+    this.firstRow = firstRow;
+    return this;
   }
 
   @Override
@@ -169,5 +175,14 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
     return rootQuery.where();
   }
 
+  @Override
+  public void applyRowLimits(SpiQuery<?> query) {
+    if (firstRow > 0) {
+      query.setFirstRow(firstRow);
+    }
+    if (maxRows > 0) {
+      query.setMaxRows(maxRows);
+    }
+  }
 
 }
