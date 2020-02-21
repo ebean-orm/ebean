@@ -125,39 +125,36 @@ public interface SqlQuery extends Serializable {
   Optional<SqlRow> findOneOrEmpty();
 
   /**
-   * Execute the query returning a single scalar attribute.
-   * <pre>@{code
+   * Deprecated - migrate to <code>.mapToScalar(attributeType).findOne()</code>.
+   * <pre>{@code
    *
-   *   String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
-   *
-   *   BigDecimal maxPrice = DB.sqlQuery(sql)
-   *     .setParameter(42)
-   *     .findSingleAttribute(BigDecimal.class);
-   *
-   * }</pre>
-   *
-   * <p>
-   * The attributeType can be any scalar type that Ebean supports (includes javax time types, Joda types etc).
-   * </p>
-   *
-   * @param attributeType The type of the returned value
+   *    .mapToScalar(BigDecimal.class)
+   *    .findOne();
+   * }
    */
+  @Deprecated
   <T> T findSingleAttribute(Class<T> attributeType);
 
   /**
-   * Execute the query returning a single BigDecimal value.
-   * <p>
-   * This is an alias for <code>findSingleAttribute(BigDecimal.class)</code>
-   * </p>
+   * Deprecated - migrate to <code>.mapToScalar(BigDecimal.class).findOne()</code>.
+   * <pre>{@code
+   *
+   *    .mapToScalar(BigDecimal.class)
+   *    .findOne();
+   * }
    */
+  @Deprecated
   BigDecimal findSingleDecimal();
 
   /**
-   * Execute the query returning a single Long value.
-   * <p>
-   * This is an alias for <code>findSingleAttribute(Long.class)</code>
-   * </p>
+   * Deprecated - migrate to <code>.mapToScalar(Long.class).findOne()</code>.
+   * <pre>{@code
+   *
+   *    .mapToScalar(Long.class)
+   *    .findOne();
+   * }
    */
+  @Deprecated
   Long findSingleLong();
 
   /**
@@ -293,4 +290,50 @@ public interface SqlQuery extends Serializable {
    */
   SqlQuery setBufferFetchSizeHint(int bufferFetchSizeHint);
 
+  /**
+   * The query result maps to a single scalar value like Long, BigDecimal,
+   * String, UUID, OffsetDateTime etc.
+   * <p>
+   * Any scalar type Ebean is aware of can be used including java time
+   * types like Instant, LocalDate, OffsetDateTime, UUID, Inet, Cdir etc.
+   *
+   * <pre>{@code
+   *
+   *   String sql = " select min(updtime) from o_order_detail " +
+   *                " where unit_price > ? and updtime is not null ";
+   *
+   *   OffsetDateTime minCreated = DB.sqlQuery(sql)
+   *     .setParameter(42)
+   *     .mapToScalar(OffsetDateTime.class)
+   *     .findOne();
+   *
+   * }</pre>
+   *
+   * @param attributeType The type the result is returned as
+   * @return The query to execute via findOne() findList() etc
+   */
+  <T> ScalarQuery<T> mapToScalar(Class<T> attributeType);
+
+  /**
+   * Query mapping to single scalar values.
+   *
+   * @param <T> The type of the scalar values
+   */
+  interface ScalarQuery<T> {
+
+    /**
+     * Return the single value.
+     */
+    T findOne();
+
+    /**
+     * Return the single value that is optional.
+     */
+    Optional<T> findOneOrEmpty();
+
+    /**
+     * Return the list of values.
+     */
+    List<T> findList();
+  }
 }

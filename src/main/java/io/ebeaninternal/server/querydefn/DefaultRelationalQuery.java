@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
+import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -207,4 +208,32 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     return query;
   }
 
+  @Override
+  public <T> ScalarQuery<T> mapToScalar(Class<T> attributeType) {
+    return new Scalar(attributeType);
+  }
+
+  private class Scalar<T> implements SqlQuery.ScalarQuery<T> {
+
+    private final Class<T> type;
+
+    Scalar(Class<T> type) {
+      this.type = type;
+    }
+
+    @Override
+    public T findOne() {
+      return findSingleAttribute(type);
+    }
+
+    @Override
+    public Optional<T> findOneOrEmpty() {
+      return Optional.ofNullable(findOne());
+    }
+
+    @Override
+    public List<T> findList() {
+      return findSingleAttributeList(type);
+    }
+  }
 }

@@ -39,7 +39,7 @@ public class TestSqlRowUUID extends BaseTestCase {
 
     SqlQuery q2 = DB.sqlQuery("select id from tuuid_entity where id = :id");
     q2.setParameter("id", e.getId());
-    UUID value = q2.findSingleAttribute(UUID.class);
+    UUID value = q2.mapToScalar(UUID.class).findOne();
 
     assertThat(value).isEqualTo(e.getId());
 
