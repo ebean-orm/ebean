@@ -229,8 +229,10 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
-    assertThat(metricsJson).contains("\"hash\":\"cc20eb930403cfd418db2d0475c6e26a\"");
-    assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
+    if (!isOracle()) {
+      assertThat(metricsJson).contains("\"hash\":\"cc20eb930403cfd418db2d0475c6e26a\"");
+      assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
+    }
   }
 
   @Test

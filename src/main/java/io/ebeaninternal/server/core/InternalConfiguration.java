@@ -533,7 +533,7 @@ public class InternalConfiguration {
       }
       return new NoDataTimeZone();
     }
-    if (getPlatform() == Platform.ORACLE) {
+    if (getPlatform().base() == Platform.ORACLE) {
       return new CloneDataTimeZone(tz);
     } else {
       return new SimpleDataTimeZone(tz);

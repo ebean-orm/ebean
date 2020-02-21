@@ -27,8 +27,9 @@ public class TestNoFk extends BaseTestCase {
     Ebean.find(EUserNoFk.class).delete();
     Ebean.find(EUserNoFkSoftDel.class).delete();
 
-    Ebean.createSqlUpdate("delete from efile_no_fk_euser_no_fk").execute();
-    Ebean.createSqlUpdate("delete from efile_no_fk_euser_no_fk_soft_del").execute();
+    DB.sqlUpdate("delete from efile_no_fk_euser_no_fk").execute();
+    String tabName = isOracle() ? "efile_no_fk_euser_no_fk_soft_d" : "efile_no_fk_euser_no_fk_soft_del";
+    DB.sqlUpdate("delete from " + tabName).execute();
 
     // There are two user accounts persisted in our database
     EUserNoFk root = new EUserNoFk();

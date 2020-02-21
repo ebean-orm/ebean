@@ -2,6 +2,8 @@ package org.tests.model.history;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -12,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestHistoryOneToMany extends BaseTestCase {
 
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void test() {
 

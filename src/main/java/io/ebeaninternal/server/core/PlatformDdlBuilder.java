@@ -39,6 +39,7 @@ public class PlatformDdlBuilder {
       case NUODB:
         return new NuoDbDdl(platform);
       case ORACLE:
+      case ORACLE11:
         return new Oracle10Ddl(platform);
       case SQLITE:
         return new SQLiteDdl(platform);

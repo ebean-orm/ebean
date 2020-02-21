@@ -56,4 +56,17 @@ abstract class BaseDbExpression implements DbExpressionHandler {
     sb.append(')');
     return sb.toString();
   }
+
+  /**
+   * Concat using operator for Oracle and Postgres.
+   */
+  String concatOperator(String property0, String separator, String property1, String suffix) {
+    StringBuilder sb = new StringBuilder(40);
+    sb.append("(").append(property0).append("||'").append(separator).append("'||").append(property1);
+    if (suffix != null && !suffix.isEmpty()) {
+      sb.append("||'").append(suffix).append('\'');
+    }
+    sb.append(')');
+    return sb.toString();
+  }
 }

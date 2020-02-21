@@ -23,6 +23,7 @@ public class DbExpressionHandlerFactory {
       case MYSQL:
         return new MySqlDbExpression();
       case ORACLE:
+      case ORACLE11:
         return new OracleDbExpression();
       case SQLSERVER16:
       case SQLSERVER17:
