@@ -8,7 +8,7 @@ public class StartPostgres9 {
   public static void main(String[] args) {
 
     PostgresConfig config = new PostgresConfig("9.6");
-    config.setPort("9432");
+    config.setPort(9432);
     config.setDbName("unit");
     config.setUser("unit");
     config.setPassword("unit");
