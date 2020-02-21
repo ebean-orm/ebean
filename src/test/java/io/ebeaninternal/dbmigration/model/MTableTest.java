@@ -11,6 +11,8 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class MTableTest {
 
@@ -51,6 +53,16 @@ public class MTableTest {
     table.addColumn(new MColumn("id", "bigint"));
     table.addColumn(new MColumn("status", "varchar(3)"));
     return table;
+  }
+
+  @Test
+  public void schema() {
+    MTable table = new MTable("tab");
+    assertNull(table.getSchema());
+
+    table = new MTable("foo.tab");
+    assertEquals("foo", table.getSchema());
+    assertEquals("foo.tab", table.getName());
   }
 
   @Test

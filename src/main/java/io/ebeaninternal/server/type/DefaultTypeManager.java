@@ -264,7 +264,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private boolean isPostgres(DatabasePlatform databasePlatform) {
-    return databasePlatform.getPlatform() == Platform.POSTGRES;
+    return databasePlatform.getPlatform().base() == Platform.POSTGRES;
   }
 
   /**

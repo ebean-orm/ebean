@@ -1,7 +1,6 @@
 package io.ebean.metric;
 
 import io.ebean.ProfileLocation;
-import io.ebean.meta.MetricType;
 
 /**
  * Factory to create timed metric counters.
@@ -18,21 +17,21 @@ public interface MetricFactory {
   /**
    * Create a timed metric group.
    */
-  TimedMetricMap createTimedMetricMap(MetricType metricType, String name);
+  TimedMetricMap createTimedMetricMap(String name);
 
   /**
    * Create a Timed metric.
    */
-  TimedMetric createTimedMetric(MetricType metricType, String name);
+  TimedMetric createTimedMetric(String name);
 
   /**
    * Create a counter metric.
    */
-  CountMetric createCountMetric(MetricType metricType, String name);
+  CountMetric createCountMetric(String name);
 
   /**
    * Create a Timed metric.
    */
-  QueryPlanMetric createQueryPlanMetric(MetricType metricType, Class<?> type, String label, ProfileLocation profileLocation, String sql);
+  QueryPlanMetric createQueryPlanMetric(Class<?> type, String label, ProfileLocation profileLocation, String sql);
 
 }

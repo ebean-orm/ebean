@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.persist;
 
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetricMap;
@@ -42,9 +41,9 @@ final class DefaultPersistExecute implements PersistExecute {
     this.exeUpdateSql = new ExeUpdateSql(binder);
     this.exeCallableSql = new ExeCallableSql(binder);
     this.defaultBatchSize = defaultBatchSize;
-    this.ormUpdateMetric = MetricFactory.get().createTimedMetricMap(MetricType.SQL, "orm.update.");
-    this.sqlUpdateMetric = MetricFactory.get().createTimedMetricMap(MetricType.SQL, "sql.update.");
-    this.sqlCallMetric = MetricFactory.get().createTimedMetricMap(MetricType.SQL, "sql.call.");
+    this.ormUpdateMetric = MetricFactory.get().createTimedMetricMap("orm.update.");
+    this.sqlUpdateMetric = MetricFactory.get().createTimedMetricMap("sql.update.");
+    this.sqlCallMetric = MetricFactory.get().createTimedMetricMap("sql.call.");
   }
 
   @Override

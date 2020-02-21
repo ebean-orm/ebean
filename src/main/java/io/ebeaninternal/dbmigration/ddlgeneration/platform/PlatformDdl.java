@@ -21,8 +21,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -32,8 +30,6 @@ import java.util.List;
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
-
-  private static final Logger logger = LoggerFactory.getLogger(PlatformDdl.class);
 
   protected final DatabasePlatform platform;
 
@@ -572,7 +568,6 @@ public class PlatformDdl {
    * </p>
    */
   public String alterColumnType(String tableName, String columnName, String type) {
-
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type, false) + alterColumnSuffix;
   }
 
@@ -583,7 +578,6 @@ public class PlatformDdl {
    * </p>
    */
   public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-
     String suffix = notnull ? columnSetNotnull : columnSetNull;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
   }
@@ -592,7 +586,6 @@ public class PlatformDdl {
    * Alter table adding the check constraint.
    */
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
-
     return "alter table " + tableName + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
   }
 
@@ -625,12 +618,6 @@ public class PlatformDdl {
       buffer.append(lowerColumnName(columns[i].trim()));
     }
     buffer.append(")");
-  }
-
-  protected void appendWithSpace(String content, StringBuilder buffer) {
-    if (hasValue(content)) {
-      buffer.append(" ").append(content);
-    }
   }
 
   /**

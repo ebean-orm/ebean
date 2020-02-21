@@ -2,7 +2,6 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
-import io.ebean.meta.MetricType;
 import io.ebeaninternal.server.core.PersistRequest;
 import org.junit.Test;
 
@@ -29,7 +28,6 @@ public class BeanIudMetricsTest {
 
     assertThat(timed.get(0).getCount()).isEqualTo(4);
     assertThat(timed.get(0).getName()).isEqualTo("iud.one.insertBatch");
-    assertThat(timed.get(0).getMetricType()).isEqualTo(MetricType.IUD);
 
     iudMetrics.addBatch(PersistRequest.Type.UPDATE, startNanos, 1);
     iudMetrics.addBatch(PersistRequest.Type.DELETE_SOFT, startNanos, 2);

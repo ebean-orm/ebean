@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetricType;
 import io.ebean.metric.MetricFactory;
 import org.junit.Test;
 
@@ -11,7 +10,7 @@ public class BasicProfileLocationTest {
   @Test
   public void obtain() {
 
-    DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric(MetricType.TXN, "junk"));
+    DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric("junk"));
 
     assertThat(loc.obtain()).isTrue();
     assertThat(loc.fullLocation()).endsWith(":12)");

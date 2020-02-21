@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.TimedMetric;
 
@@ -15,8 +14,6 @@ import java.util.concurrent.atomic.LongAdder;
  */
 class DTimedMetric implements TimedMetric {
 
-  private final MetricType metricType;
-
   private final String name;
 
   private final LongAdder count = new LongAdder();
@@ -27,8 +24,7 @@ class DTimedMetric implements TimedMetric {
 
   private boolean collected;
 
-  DTimedMetric(MetricType metricType, String name) {
-    this.metricType = metricType;
+  DTimedMetric(String name) {
     this.name = name;
   }
 
@@ -92,9 +88,9 @@ class DTimedMetric implements TimedMetric {
   private DTimeMetricStats getStatistics(boolean reset) {
     try {
       if (reset) {
-        return new DTimeMetricStats(metricType, name, collected, count.sumThenReset(), total.sumThenReset(), max.getThenReset());
+        return new DTimeMetricStats(name, collected, count.sumThenReset(), total.sumThenReset(), max.getThenReset());
       } else {
-        return new DTimeMetricStats(metricType, name, collected, count.sum(), total.sum(), max.get());
+        return new DTimeMetricStats(name, collected, count.sum(), total.sum(), max.get());
       }
     } finally {
       collected = true;

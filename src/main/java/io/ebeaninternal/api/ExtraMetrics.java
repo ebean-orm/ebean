@@ -1,6 +1,5 @@
 package io.ebeaninternal.api;
 
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
@@ -22,11 +21,11 @@ public class ExtraMetrics {
    */
   public ExtraMetrics() {
     final MetricFactory factory = MetricFactory.get();
-    this.bindCapture = factory.createTimedMetric(MetricType.ORM, "ebean.queryplan.bindcapture");
-    this.planCollect = factory.createTimedMetric(MetricType.ORM, "ebean.queryplan.collect");
-    this.loadOneL2 = factory.createCountMetric(MetricType.ORM, "loadone.l2");
-    this.loadOneRef = factory.createCountMetric(MetricType.ORM, "loadone.ref");
-    this.loadOneNoLoader = factory.createCountMetric(MetricType.ORM, "loadone.noloader");
+    this.bindCapture = factory.createTimedMetric("ebean.queryplan.bindcapture");
+    this.planCollect = factory.createTimedMetric("ebean.queryplan.collect");
+    this.loadOneL2 = factory.createCountMetric("loadone.l2");
+    this.loadOneRef = factory.createCountMetric("loadone.ref");
+    this.loadOneNoLoader = factory.createCountMetric("loadone.noloader");
   }
 
   /**

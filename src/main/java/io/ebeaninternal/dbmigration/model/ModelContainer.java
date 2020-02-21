@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Holds all the tables, views, indexes etc that represent the model.
@@ -32,6 +34,8 @@ import java.util.Map;
  * </p>
  */
 public class ModelContainer {
+
+  private final Set<String> schemas = new TreeSet<>();
 
   /**
    * All the tables in the model.
@@ -48,6 +52,13 @@ public class ModelContainer {
   private final List<MTable> partitionedTables = new ArrayList<>();
 
   public ModelContainer() {
+  }
+
+  /**
+   * Return the schemas.
+   */
+  public Set<String> getSchemas() {
+    return schemas;
   }
 
   /**
@@ -309,6 +320,10 @@ public class ModelContainer {
   public MTable addTable(MTable table) {
     if (table.isPartitioned()) {
       partitionedTables.add(table);
+    }
+    String schema = table.getSchema();
+    if (schema != null) {
+      schemas.add(schema);
     }
     return tables.put(table.getName(), table);
   }

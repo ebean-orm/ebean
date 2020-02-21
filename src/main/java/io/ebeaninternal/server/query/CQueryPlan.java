@@ -2,7 +2,6 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.ProfileLocation;
 import io.ebean.config.dbplatform.SqlLimitResponse;
-import io.ebean.meta.MetricType;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.CQueryPlanKey;
@@ -347,7 +346,7 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   TimedMetric createTimedMetric() {
-    return MetricFactory.get().createTimedMetric(MetricType.ORM, label);
+    return MetricFactory.get().createTimedMetric(label);
   }
 
   void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {

@@ -62,19 +62,19 @@ public class DeployPropertyParserTest extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(value = {Platform.H2, Platform.POSTGRES})
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
   public void withQuote_when_match_h2() {
     assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}\"Name\" like ?");
   }
 
   @Test
-  @ForPlatform(value = Platform.SQLSERVER)
+  @ForPlatform(Platform.SQLSERVER)
   public void withQuote_when_match_sqlserver() {
     assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}[Name] like ?");
   }
 
   @Test
-  @ForPlatform(value = Platform.MYSQL)
+  @ForPlatform(Platform.MYSQL)
   public void withQuote_when_match_mysql() {
     assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}`Name` like ?");
   }

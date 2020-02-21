@@ -278,7 +278,7 @@ public class DatabasePlatform {
    * Return true if this matches the given platform.
    */
   public boolean isPlatform(Platform platform) {
-    return this.platform == platform;
+    return this.platform.base() == platform;
   }
 
   /**

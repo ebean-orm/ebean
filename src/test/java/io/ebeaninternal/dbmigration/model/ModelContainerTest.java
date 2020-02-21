@@ -10,6 +10,7 @@ import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -151,6 +152,22 @@ public class ModelContainerTest {
     DropHistoryTable dropHistoryTable = new DropHistoryTable();
     dropHistoryTable.setBaseTable("DoesNotExist");
     container.applyChange(dropHistoryTable);
+  }
+
+  @Test
+  public void getSchemas() {
+
+    MTable t0 = new MTable("foo.one");
+    MTable t1 = new MTable("foo.two");
+    MTable t2 = new MTable("bar.three");
+
+    ModelContainer container = new ModelContainer();
+    container.addTable(t0);
+    container.addTable(t1);
+    container.addTable(t2);
+
+    final Set<String> schemas = container.getSchemas();
+    assertThat(schemas).containsExactly("bar","foo");
   }
 
   private ModelContainer container_2_1() {

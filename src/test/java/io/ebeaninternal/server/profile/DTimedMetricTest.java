@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebean.meta.MetricType;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +9,7 @@ public class DTimedMetricTest {
   @Test
   public void addSinceNanos() throws InterruptedException {
 
-    DTimedMetric metric = new DTimedMetric(MetricType.L2, "addSinceNanos");
+    DTimedMetric metric = new DTimedMetric("addSinceNanos");
 
     long start = System.nanoTime();
     Thread.sleep(10);
@@ -33,7 +32,7 @@ public class DTimedMetricTest {
   @Test
   public void addBatchSince() throws InterruptedException {
 
-    DTimedMetric metric = new DTimedMetric(MetricType.L2, "addSinceNanos");
+    DTimedMetric metric = new DTimedMetric("addSinceNanos");
 
     long start = System.nanoTime();
     Thread.sleep(10);

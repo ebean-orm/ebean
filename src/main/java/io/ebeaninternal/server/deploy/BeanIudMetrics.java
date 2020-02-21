@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.meta.MetricType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
@@ -25,12 +24,12 @@ class BeanIudMetrics {
 
     MetricFactory metricFactory = MetricFactory.get();
     String prefix = "iud." + beanShortName;
-    this.insert = metricFactory.createTimedMetric(MetricType.IUD, prefix + ".insert");
-    this.update = metricFactory.createTimedMetric(MetricType.IUD, prefix + ".update");
-    this.delete = metricFactory.createTimedMetric(MetricType.IUD, prefix + ".delete");
-    this.insertBatch = metricFactory.createTimedMetric(MetricType.IUD, prefix + ".insertBatch");
-    this.updateBatch = metricFactory.createTimedMetric(MetricType.IUD, prefix + ".updateBatch");
-    this.deleteBatch = metricFactory.createTimedMetric(MetricType.IUD, prefix + ".deleteBatch");
+    this.insert = metricFactory.createTimedMetric(prefix + ".insert");
+    this.update = metricFactory.createTimedMetric(prefix + ".update");
+    this.delete = metricFactory.createTimedMetric(prefix + ".delete");
+    this.insertBatch = metricFactory.createTimedMetric(prefix + ".insertBatch");
+    this.updateBatch = metricFactory.createTimedMetric(prefix + ".updateBatch");
+    this.deleteBatch = metricFactory.createTimedMetric(prefix + ".deleteBatch");
   }
 
   /**

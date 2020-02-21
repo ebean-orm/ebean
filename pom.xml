@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean</artifactId>
-  <version>12.1.13-SNAPSHOT</version>
+  <version>12.1.14-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>ebean</name>
@@ -62,13 +62,10 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--
-    Exclude snakeyaml if you desire - it is not strictly required.
-    -->
     <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${snakeyaml.version}</version>
+      <groupId>io.avaje</groupId>
+      <artifactId>config</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <!--
