@@ -18,7 +18,6 @@
   <properties>
     <jackson-core.version>2.10.0</jackson-core.version>
     <jackson-databind.version>2.10.0</jackson-databind.version>
-    <snakeyaml.version>1.21</snakeyaml.version>
   </properties>
 
   <scm>
