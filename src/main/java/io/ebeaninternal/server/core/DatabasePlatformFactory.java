@@ -13,7 +13,6 @@ import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.Oracle11Platform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
-import io.ebean.config.dbplatform.postgres.Postgres8Platform;
 import io.ebean.config.dbplatform.postgres.Postgres9Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
@@ -90,9 +89,6 @@ public class DatabasePlatformFactory {
     }
     if (dbName.equals("postgres") || dbName.equals("postgres9")) {
       return new PostgresPlatform();
-    }
-    if (dbName.equals("postgres8") || dbName.equals("postgres83")) {
-      return new Postgres8Platform();
     }
     if (dbName.equals("oracle11") || dbName.equals("oracle10") || dbName.equals("oracle9")) {
       return new Oracle11Platform();

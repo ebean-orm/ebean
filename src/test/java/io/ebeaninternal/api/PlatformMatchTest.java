@@ -24,7 +24,6 @@ public class PlatformMatchTest {
 
     assertTrue(PlatformMatch.matchPlatform(Platform.POSTGRES, "postgres"));
     assertTrue(PlatformMatch.matchPlatform(Platform.POSTGRES9, "postgres"));
-    assertTrue(PlatformMatch.matchPlatform(Platform.POSTGRES10, "postgres"));
   }
 
   @Test

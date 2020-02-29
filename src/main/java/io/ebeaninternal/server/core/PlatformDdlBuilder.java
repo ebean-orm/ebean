@@ -46,7 +46,6 @@ public class PlatformDdlBuilder {
       case POSTGRES9:
         return new Postgres9Ddl(platform);
       case POSTGRES:
-      case POSTGRES10:
         return new PostgresDdl(platform);
       case COCKROACH:
         return new CockroachDdl(platform);

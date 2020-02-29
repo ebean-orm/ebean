@@ -17,7 +17,6 @@ public class DbExpressionHandlerFactory {
         return new H2DbExpression();
       case POSTGRES:
       case POSTGRES9:
-      case POSTGRES10:
         return new PostgresDbExpression();
       case MYSQL55:
       case MYSQL:

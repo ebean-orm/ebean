@@ -87,7 +87,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>6.7</version>
+      <version>6.8</version>
     </dependency>
 
     <dependency>

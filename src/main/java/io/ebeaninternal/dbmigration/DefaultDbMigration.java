@@ -819,7 +819,6 @@ public class DefaultDbMigration implements DbMigration {
       case POSTGRES9:
         return new Postgres9Platform();
       case POSTGRES:
-      case POSTGRES10:
         return new PostgresPlatform();
       case MYSQL55:
         return new MySql55Platform();
