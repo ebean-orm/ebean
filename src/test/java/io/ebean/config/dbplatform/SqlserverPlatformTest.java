@@ -17,19 +17,19 @@ public class SqlserverPlatformTest {
 
     PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
-    assertThat(ddl.convert("clob", false)).isEqualTo("nvarchar(max)");
-    assertThat(ddl.convert("blob", false)).isEqualTo("image");
-    assertThat(ddl.convert("json", false)).isEqualTo("nvarchar(max)");
-    assertThat(ddl.convert("jsonb", false)).isEqualTo("nvarchar(max)");
+    assertThat(ddl.convert("clob")).isEqualTo("nvarchar(max)");
+    assertThat(ddl.convert("blob")).isEqualTo("image");
+    assertThat(ddl.convert("json")).isEqualTo("nvarchar(max)");
+    assertThat(ddl.convert("jsonb")).isEqualTo("nvarchar(max)");
 
-    assertThat(ddl.convert("double", false)).isEqualTo("float(32)");
-    assertThat(ddl.convert("varchar(20)", false)).isEqualTo("nvarchar(20)");
-    assertThat(ddl.convert("decimal(10)", false)).isEqualTo("numeric(10)");
-    assertThat(ddl.convert("decimal(8,4)", false)).isEqualTo("numeric(8,4)");
-    assertThat(ddl.convert("boolean", false)).isEqualTo("bit");
-    assertThat(ddl.convert("bit", false)).isEqualTo("bit");
-    assertThat(ddl.convert("tinyint", false)).isEqualTo("smallint");
-    assertThat(ddl.convert("binary(16)", false)).isEqualTo("binary(16)");
+    assertThat(ddl.convert("double")).isEqualTo("float(32)");
+    assertThat(ddl.convert("varchar(20)")).isEqualTo("nvarchar(20)");
+    assertThat(ddl.convert("decimal(10)")).isEqualTo("numeric(10)");
+    assertThat(ddl.convert("decimal(8,4)")).isEqualTo("numeric(8,4)");
+    assertThat(ddl.convert("boolean")).isEqualTo("bit");
+    assertThat(ddl.convert("bit")).isEqualTo("bit");
+    assertThat(ddl.convert("tinyint")).isEqualTo("smallint");
+    assertThat(ddl.convert("binary(16)")).isEqualTo("binary(16)");
   }
 
   @Test
