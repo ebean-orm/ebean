@@ -1,6 +1,7 @@
 package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
@@ -21,10 +22,10 @@ public class ParentQueryTest extends BaseTestCase {
   public void clearDb() {
     Ebean.deleteAll(Ebean.find(Data.class).findList());
     //@rob: this does not work as it does not clear the ManyToMany relations.
-    //Ebean.find(Data.class).delete(); 
-    Ebean.find(Parent.class).delete();
+    //Ebean.find(Data.class).delete();
+    DB.truncate(Parent.class);
   }
-  
+
   @Test
   public void QueryParentCollectionFetch() {
 
