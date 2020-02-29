@@ -109,7 +109,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type, String defaultValue,
                                        boolean isNotNull, String generated) throws IOException {
 
-    String platformType = platformDdl.convert(type, false);
+    String platformType = platformDdl.convert(type);
     buffer.append(" ").append(platformDdl.lowerColumnName(columnName));
     buffer.append(" ").append(platformType);
     if (defaultValue != null) {

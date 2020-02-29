@@ -44,8 +44,8 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
     String columnName = alter.getColumnName();
     String currentType = alter.getCurrentType();
     String type = alter.getType() != null ? alter.getType() : currentType;
-    type = convert(type, false);
-    currentType = convert(currentType, false);
+    type = convert(type);
+    currentType = convert(currentType);
     boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
     String notnullClause = notnull ? " not null" : "";
     String defaultValue = DdlHelp.isDropDefault(alter.getDefaultValue()) ? "null"
@@ -103,7 +103,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   protected String convertArrayType(String logicalArrayType) {
     Matcher matcher = ARRAY_PATTERN.matcher(logicalArrayType);
     if (matcher.matches()) {
-      return convert(matcher.group(1), false) + " array" + (matcher.group(2) == null ? "" : matcher.group(2));
+      return convert(matcher.group(1)) + " array" + (matcher.group(2) == null ? "" : matcher.group(2));
     } else {
       return fallbackArrayType;
     }

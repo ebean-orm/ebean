@@ -17,29 +17,29 @@ public class HanaPlatformTest {
 
     PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
-    assertThat(ddl.convert("clob", false)).isEqualTo("nclob");
-    assertThat(ddl.convert("blob", false)).isEqualTo("blob");
-    assertThat(ddl.convert("json", false)).isEqualTo("nclob");
-    assertThat(ddl.convert("jsonb", false)).isEqualTo("nclob");
-    assertThat(ddl.convert("jsonvarchar", false)).isEqualTo("nvarchar(255)");
+    assertThat(ddl.convert("clob")).isEqualTo("nclob");
+    assertThat(ddl.convert("blob")).isEqualTo("blob");
+    assertThat(ddl.convert("json")).isEqualTo("nclob");
+    assertThat(ddl.convert("jsonb")).isEqualTo("nclob");
+    assertThat(ddl.convert("jsonvarchar")).isEqualTo("nvarchar(255)");
 
-    assertThat(ddl.convert("double", false)).isEqualTo("double");
-    assertThat(ddl.convert("varchar(20)", false)).isEqualTo("nvarchar(20)");
-    assertThat(ddl.convert("decimal(10)", false)).isEqualTo("decimal(10)");
-    assertThat(ddl.convert("decimal(8,4)", false)).isEqualTo("decimal(8,4)");
-    assertThat(ddl.convert("boolean", false)).isEqualTo("boolean");
-    assertThat(ddl.convert("bit", false)).isEqualTo("smallint");
-    assertThat(ddl.convert("tinyint", false)).isEqualTo("smallint");
-    assertThat(ddl.convert("binary", false)).isEqualTo("varbinary(255)");
-    assertThat(ddl.convert("binary(16)", false)).isEqualTo("varbinary(16)");
-    
-    assertThat(ddl.convert("point", false)).isEqualTo("st_point");
-    
-    assertThat(ddl.convert("multilinestring", false)).isEqualTo("st_geometry");
-    assertThat(ddl.convert("multipolygon", false)).isEqualTo("st_geometry");
-    assertThat(ddl.convert("multipoint", false)).isEqualTo("st_geometry");
-    assertThat(ddl.convert("linestring", false)).isEqualTo("st_geometry");
-    assertThat(ddl.convert("polygon", false)).isEqualTo("st_geometry");
+    assertThat(ddl.convert("double")).isEqualTo("double");
+    assertThat(ddl.convert("varchar(20)")).isEqualTo("nvarchar(20)");
+    assertThat(ddl.convert("decimal(10)")).isEqualTo("decimal(10)");
+    assertThat(ddl.convert("decimal(8,4)")).isEqualTo("decimal(8,4)");
+    assertThat(ddl.convert("boolean")).isEqualTo("boolean");
+    assertThat(ddl.convert("bit")).isEqualTo("smallint");
+    assertThat(ddl.convert("tinyint")).isEqualTo("smallint");
+    assertThat(ddl.convert("binary")).isEqualTo("varbinary(255)");
+    assertThat(ddl.convert("binary(16)")).isEqualTo("varbinary(16)");
+
+    assertThat(ddl.convert("point")).isEqualTo("st_point");
+
+    assertThat(ddl.convert("multilinestring")).isEqualTo("st_geometry");
+    assertThat(ddl.convert("multipolygon")).isEqualTo("st_geometry");
+    assertThat(ddl.convert("multipoint")).isEqualTo("st_geometry");
+    assertThat(ddl.convert("linestring")).isEqualTo("st_geometry");
+    assertThat(ddl.convert("polygon")).isEqualTo("st_geometry");
   }
 
   @Test

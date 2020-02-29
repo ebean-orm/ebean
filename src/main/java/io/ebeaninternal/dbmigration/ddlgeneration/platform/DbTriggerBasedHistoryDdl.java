@@ -195,7 +195,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    */
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type) throws IOException {
 
-    String platformType = platformDdl.convert(type, false);
+    String platformType = platformDdl.convert(type);
     buffer.append("  ");
     buffer.append(platformDdl.lowerColumnName(columnName), 29);
     buffer.append(platformType);

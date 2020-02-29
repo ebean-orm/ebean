@@ -246,12 +246,14 @@ public class PlatformDdl {
    */
   protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
 
-    boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
-    String platformType = convert(column.getType(), identityColumn);
+    String columnDefn = convert(column.getType());
+    if (useIdentity && isTrue(column.isPrimaryKey())) {
+      columnDefn = asIdentityColumn(columnDefn);
+    }
 
     buffer.append("  ");
     buffer.append(lowerColumnName(column.getName()), 29);
-    buffer.append(platformType);
+    buffer.append(columnDefn);
     if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
       String defaultValue = convertDefaultValue(column.getDefaultValue());
       if (defaultValue != null) {
@@ -297,15 +299,14 @@ public class PlatformDdl {
   /**
    * Convert the standard type to the platform specific type.
    */
-  public String convert(String type, boolean identity) {
+  public String convert(String type) {
     if (type == null) {
       return null;
     }
     if (type.contains("[]")) {
       return convertArrayType(type);
     }
-    String platformType = typeConverter.convert(type);
-    return identity ? asIdentityColumn(platformType) : platformType;
+    return typeConverter.convert(type);
   }
 
   /**
@@ -511,12 +512,11 @@ public class PlatformDdl {
 
   public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
 
-    String convertedType = convert(column.getType(), false);
+    String convertedType = convert(column.getType());
 
     buffer.append("alter table ").append(tableName)
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
-
 
     // Add default value also to history table if it is not excluded
     if (defaultValue != null) {
@@ -568,7 +568,7 @@ public class PlatformDdl {
    * </p>
    */
   public String alterColumnType(String tableName, String columnName, String type) {
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type, false) + alterColumnSuffix;
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type) + alterColumnSuffix;
   }
 
   /**
