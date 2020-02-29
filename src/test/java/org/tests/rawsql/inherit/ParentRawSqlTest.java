@@ -26,9 +26,10 @@ public class ParentRawSqlTest extends BaseTestCase {
   @Before
   public void clearDb() {
     Ebean.deleteAll(Ebean.find(Data.class).findList());
+    Ebean.deleteAll(Ebean.find(Parent.class).findList());
     //@rob: this does not work as it does not clear the ManyToMany relations.
-    //Ebean.find(Data.class).delete();
-    Ebean.find(Parent.class).delete();
+//    Ebean.find(Data.class).delete();
+//    Ebean.find(Parent.class).delete();
   }
 
   @Test
