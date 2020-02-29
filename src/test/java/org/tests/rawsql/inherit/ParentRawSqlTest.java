@@ -1,24 +1,25 @@
 package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
+import org.junit.Before;
+import org.junit.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
 import org.tests.inherit.Parent;
 import org.tests.inherit.ParentAggregate;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ParentRawSqlTest extends BaseTestCase {
 
@@ -27,7 +28,7 @@ public class ParentRawSqlTest extends BaseTestCase {
     Ebean.deleteAll(Ebean.find(Data.class).findList());
     //@rob: this does not work as it does not clear the ManyToMany relations.
     //Ebean.find(Data.class).delete();
-    DB.truncate(Parent.class);
+    Ebean.find(Parent.class).delete();
   }
 
   @Test

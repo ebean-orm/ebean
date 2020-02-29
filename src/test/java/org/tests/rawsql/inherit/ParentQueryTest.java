@@ -23,7 +23,7 @@ public class ParentQueryTest extends BaseTestCase {
     Ebean.deleteAll(Ebean.find(Data.class).findList());
     //@rob: this does not work as it does not clear the ManyToMany relations.
     //Ebean.find(Data.class).delete();
-    DB.truncate(Parent.class);
+    Ebean.find(Parent.class).delete();
   }
 
   @Test
