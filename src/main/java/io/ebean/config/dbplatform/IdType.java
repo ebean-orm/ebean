@@ -35,6 +35,11 @@ public enum IdType {
    * Used when the key is a compound key or lookup table code.
    * </p>
    */
-  EXTERNAL
+  EXTERNAL,
+
+  /**
+   * Auto mapping to platform preferred identity strategy.
+   */
+  AUTO
 
 }

@@ -385,7 +385,7 @@ public class BaseTableDdl implements TableDdl {
     int allocate = toInt(createTable.getSequenceAllocate());
 
     String seqName = explicitSequenceName;
-    if (seqName == null) {
+    if (seqName == null || seqName.isEmpty()) {
       seqName = namingConvention.getSequenceName(createTable.getName(), pk);
     }
 
