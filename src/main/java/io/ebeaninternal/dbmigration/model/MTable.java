@@ -11,13 +11,14 @@ import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
-import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.IdentityMode;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.PartitionMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
+import static io.ebeaninternal.dbmigration.model.MTableIdentity.fromCreateTable;
+import static io.ebeaninternal.dbmigration.model.MTableIdentity.toCreateTable;
 
 /**
  * Holds the logical model for a given Table and everything associated to it.
@@ -84,18 +87,7 @@ public class MTable {
    */
   private String indexTablespace;
 
-  /**
-   * If set then this overrides the platform default so for UUID generated values
-   * or DB's supporting both sequences and autoincrement.
-   */
-  private IdentityType identityType;
-
-  /**
-   * DB sequence name.
-   */
-  private String sequenceName;
-  private int sequenceInitial;
-  private int sequenceAllocate;
+  private IdentityMode identityMode;
 
   /**
    * If set to true this table should has history support.
@@ -130,6 +122,29 @@ public class MTable {
 
   private List<String> droppedColumns = new ArrayList<>();
 
+  public MTable(BeanDescriptor<?> descriptor) {
+    this.name = descriptor.getBaseTable();
+    this.identityMode = descriptor.getIdentityMode();
+    this.storageEngine = descriptor.getStorageEngine();
+    this.partitionMeta = descriptor.getPartitionMeta();
+    this.comment = descriptor.getDbComment();
+    if (descriptor.isHistorySupport()) {
+      withHistory = true;
+      BeanProperty whenCreated = descriptor.getWhenCreatedProperty();
+      if (whenCreated != null) {
+        whenCreatedColumn = whenCreated.getDbColumn();
+      }
+    }
+  }
+
+  /**
+   * Construct for element collection or intersection table.
+   */
+  public MTable(String name) {
+    this.name = name;
+    this.identityMode = IdentityMode.none();
+  }
+
   /**
    * Create a copy of this table structure as a 'draft' table.
    * <p>
@@ -143,7 +158,7 @@ public class MTable {
     draftTable.whenCreatedColumn = whenCreatedColumn;
     // compoundKeys
     // compoundUniqueConstraints
-    draftTable.identityType = identityType;
+    draftTable.identityMode = identityMode;
 
     for (MColumn col : allColumns()) {
       draftTable.addColumn(col.copyForDraft());
@@ -164,9 +179,7 @@ public class MTable {
     this.indexTablespace = createTable.getIndexTablespace();
     this.withHistory = Boolean.TRUE.equals(createTable.isWithHistory());
     this.draft = Boolean.TRUE.equals(createTable.isDraft());
-    this.sequenceName = createTable.getSequenceName();
-    this.sequenceInitial = toInt(createTable.getSequenceInitial());
-    this.sequenceAllocate = toInt(createTable.getSequenceAllocate());
+    this.identityMode = fromCreateTable(createTable);
     List<Column> cols = createTable.getColumn();
     for (Column column : cols) {
       addColumn(column);
@@ -195,20 +208,13 @@ public class MTable {
   }
 
   /**
-   * Construct typically from EbeanServer meta data.
-   */
-  public MTable(String name) {
-    this.name = name;
-  }
-
-  /**
    * Return the DropTable migration for this table.
    */
   public DropTable dropTable() {
     DropTable dropTable = new DropTable();
     dropTable.setName(name);
     // we must add pk col name & sequence name, as we have to delete the sequence also.
-    if (identityType != IdentityType.GENERATOR && identityType != IdentityType.EXTERNAL) {
+    if (identityMode.isDatabaseIdentity()) {
       String pkCol = null;
       for (MColumn column : columns.values()) {
         if (column.isPrimaryKey()) {
@@ -222,7 +228,7 @@ public class MTable {
       }
       if (pkCol != null) {
         dropTable.setSequenceCol(pkCol);
-        dropTable.setSequenceName(sequenceName);
+        dropTable.setSequenceName(identityMode.getSequenceName());
       }
     }
     return dropTable;
@@ -244,10 +250,7 @@ public class MTable {
     createTable.setStorageEngine(storageEngine);
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
-    createTable.setSequenceName(sequenceName);
-    createTable.setSequenceInitial(toBigInteger(sequenceInitial));
-    createTable.setSequenceAllocate(toBigInteger(sequenceAllocate));
-    createTable.setIdentityType(identityType);
+    toCreateTable(identityMode, createTable);
     if (withHistory) {
       createTable.setWithHistory(Boolean.TRUE);
     }
@@ -458,10 +461,6 @@ public class MTable {
     this.comment = comment;
   }
 
-  public void setStorageEngine(String storageEngine) {
-    this.storageEngine = storageEngine;
-  }
-
   public String getTablespace() {
     return tablespace;
   }
@@ -519,34 +518,8 @@ public class MTable {
     return compoundKeys;
   }
 
-  public void setSequenceName(String sequenceName) {
-    this.sequenceName = sequenceName;
-  }
-
-  public void setSequenceInitial(int sequenceInitial) {
-    this.sequenceInitial = sequenceInitial;
-  }
-
-  public void setSequenceAllocate(int sequenceAllocate) {
-    this.sequenceAllocate = sequenceAllocate;
-  }
-
-  public void setWhenCreatedColumn(String whenCreatedColumn) {
-    this.whenCreatedColumn = whenCreatedColumn;
-  }
-
   public String getWhenCreatedColumn() {
     return whenCreatedColumn;
-  }
-
-  /**
-   * Set the identity type to use for this table.
-   * <p>
-   * If set then this overrides the platform default so for UUID generated values
-   * or DB's supporting both sequences and autoincrement.
-   */
-  public void setIdentityType(IdentityType identityType) {
-    this.identityType = identityType;
   }
 
   /**
@@ -671,14 +644,6 @@ public class MTable {
     droppedColumns.add(columnName);
   }
 
-  private int toInt(BigInteger value) {
-    return (value == null) ? 0 : value.intValue();
-  }
-
-  private BigInteger toBigInteger(int value) {
-    return (value == 0) ? null : BigInteger.valueOf(value);
-  }
-
   /**
    * Check if there are duplicate foreign keys.
    * <p>
@@ -772,10 +737,6 @@ public class MTable {
     for (MCompoundForeignKey compoundKey : compoundKeys) {
       compoundKey.setIndexName(null);
     }
-  }
-
-  public void setPartitionMeta(PartitionMeta partitionMeta) {
-    this.partitionMeta = partitionMeta;
   }
 
   /**

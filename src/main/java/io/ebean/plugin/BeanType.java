@@ -8,11 +8,10 @@ import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
 
 /**
  * Information and methods on BeanDescriptors made available to plugins.
@@ -155,11 +154,6 @@ public interface BeanType<T> {
    * Return the identity generation type.
    */
   IdType getIdType();
-
-  /**
-   * Return the sequence name associated to this entity bean type (if there is one).
-   */
-  String getSequenceName();
 
   /**
    * Return true if this bean type has doc store backing.

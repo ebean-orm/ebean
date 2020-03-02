@@ -1354,42 +1354,39 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    if (IdType.SEQUENCE == desc.getIdType() && !dbIdentity.isSupportsSequence()) {
+    final IdentityMode identityMode = desc.getIdentityMode();
+    if (identityMode.isSequence() && !dbIdentity.isSupportsSequence()) {
       // explicit sequence but not supported by the DatabasePlatform
       logger.info("Explicit sequence on " + desc.getFullName() + " but not supported by DB Platform - ignored");
-      desc.setIdType(null);
+      identityMode.setIdType(IdType.AUTO);
     }
-    if (IdType.IDENTITY == desc.getIdType() && !dbIdentity.isSupportsIdentity()) {
+    if (identityMode.isIdentity() && !dbIdentity.isSupportsIdentity()) {
       // explicit identity but not supported by the DatabasePlatform
       logger.info("Explicit Identity on " + desc.getFullName() + " but not supported by DB Platform - ignored");
-      desc.setIdType(null);
+      identityMode.setIdType(IdType.AUTO);
     }
 
-    if (desc.getIdType() == null) {
+    if (identityMode.isAuto()) {
       if (desc.isPrimaryKeyCompoundOrNonNumeric()) {
-        // assuming that this is a user supplied key like ISO country code or ISO currency code or lookup table code
-        logger.debug("Expecting user defined identity on {} - not using db sequence or autoincrement", desc.getFullName());
-        desc.setIdType(IdType.EXTERNAL);
+        identityMode.setIdType(IdType.EXTERNAL);
         return;
       }
       if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
         // use IDENTITY or SEQUENCE based on platform
-        desc.setIdType(dbIdentity.getIdType());
-        desc.setIdTypePlatformDefault();
+        identityMode.setPlatformType(dbIdentity.getIdType());
       } else {
         // externally/application supplied Id values
-        desc.setIdType(IdType.EXTERNAL);
+        identityMode.setIdType(IdType.EXTERNAL);
         return;
       }
     }
 
     if (desc.getBaseTable() == null) {
-      // no base table so not going to set Identity
-      // of sequence information
+      // no base table so not going to set Identity or sequence information
       return;
     }
 
-    if (IdType.IDENTITY == desc.getIdType()) {
+    if (identityMode.isIdentity()) {
       // used when getGeneratedKeys is not supported (SQL Server 2000, SAP Hana)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
       String selectLastInsertedIdDraft = (!desc.isDraftable()) ? selectLastInsertedId : dbIdentity.getSelectLastInsertedId(desc.getDraftTable());
@@ -1397,21 +1394,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    if (IdType.SEQUENCE == desc.getIdType()) {
-      String seqName = desc.getIdGeneratorName();
-      if (seqName != null) {
-        logger.debug("explicit sequence {} on {}", seqName, desc.getFullName());
-      } else {
+    if (identityMode.isSequence()) {
+      String seqName = identityMode.getSequenceName();
+      if (seqName == null || seqName.isEmpty()) {
         String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
-        // use namingConvention to define sequence name
         seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
       }
 
       if (databasePlatform.isSequenceBatchMode()) {
         // use sequence next step 1 as we are going to batch fetch them instead
-        desc.setSequenceAllocationSize(1);
+        desc.setIdentitySequenceBatchMode();
       }
-      int stepSize = desc.getSequenceAllocationSize();
+      int stepSize = identityMode.getIncrement();
+      if (stepSize == 0) {
+        stepSize = 50;
+      }
       desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
   }

@@ -5,9 +5,9 @@ import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbDefault;
-import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
+import io.ebean.annotation.DbMap;
 import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.DocCode;
 import io.ebean.annotation.DocEmbedded;
@@ -21,11 +21,11 @@ import io.ebean.annotation.Encrypted;
 import io.ebean.annotation.Expose;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.HistoryExclude;
+import io.ebean.annotation.Identity;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.JsonIgnore;
 import io.ebean.annotation.Length;
 import io.ebean.annotation.SoftDelete;
-import io.ebean.annotation.Sum;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.UnmappedJson;
 import io.ebean.annotation.UpdatedTimestamp;
@@ -40,6 +40,7 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
+import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -196,10 +197,8 @@ public class AnnotationFields extends AnnotationParser {
     readJsonAnnotations(prop);
 
     if (prop.getDbColumn() == null) {
-      // No @Column annotation or @Column.name() not set
-      // Use the NamingConvention to set the DB column name
-      String dbColumn = namingConvention.getColumnFromProperty(beanType, prop.getName());
-      prop.setDbColumn(dbColumn);
+      // No @Column or @Column.name() so use NamingConvention
+      prop.setDbColumn(namingConvention.getColumnFromProperty(beanType, prop.getName()));
     }
 
     Id id = get(prop, Id.class);
@@ -209,6 +208,10 @@ public class AnnotationFields extends AnnotationParser {
     }
     if (id != null) {
       readIdScalar(prop);
+    }
+    Identity identity = get(prop, Identity.class);
+    if (identity != null) {
+      readIdentity(identity);
     }
 
     // determine the JDBC type using Lob/Temporal
@@ -381,6 +384,11 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
+  private void readIdentity(Identity identity) {
+    final IdType idType = IdentityMode.idType(identity.type());
+    descriptor.setIdentityMode(new IdentityMode(idType, identity.generated(), identity.start(), identity.increment(), identity.sequenceName()));
+  }
+
   private void readDbMigration(DeployBeanProperty prop) {
     DbDefault dbDefault = get(prop, DbDefault.class);
     if (dbDefault != null) {
@@ -521,34 +529,32 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
     descriptor.setIdGeneratedValue();
-    String genName = gen.generator();
 
-    SequenceGenerator sequenceGenerator = find(prop, SequenceGenerator.class);
-    if (sequenceGenerator != null) {
-      if (sequenceGenerator.name().equals(genName)) {
-        genName = sequenceGenerator.sequenceName();
+    SequenceGenerator seq = find(prop, SequenceGenerator.class);
+    if (seq != null) {
+      String seqName = seq.sequenceName();
+      if (seqName.isEmpty()) {
+        seqName = namingConvention.getSequenceName(descriptor.getBaseTable(), prop.getDbColumn());
       }
-      descriptor.setSequenceInitialValue(sequenceGenerator.initialValue());
-      descriptor.setSequenceAllocationSize(sequenceGenerator.allocationSize());
+      descriptor.setIdentitySequence(seq.initialValue(), seq.allocationSize(), seqName);
     }
 
     GenerationType strategy = gen.strategy();
-
     if (strategy == GenerationType.IDENTITY) {
-      descriptor.setIdType(IdType.IDENTITY);
+      descriptor.setIdentityType(IdType.IDENTITY);
 
     } else if (strategy == GenerationType.SEQUENCE) {
-      descriptor.setIdType(IdType.SEQUENCE);
-      if (!genName.isEmpty()) {
-        descriptor.setIdGeneratorName(genName);
+      descriptor.setIdentityType(IdType.SEQUENCE);
+      if (!gen.generator().isEmpty()) {
+        descriptor.setIdentitySequenceGenerator(gen.generator());
       }
 
     } else if (strategy == GenerationType.AUTO) {
-      if (!genName.isEmpty()) {
+      if (!gen.generator().isEmpty()) {
         // use a custom IdGenerator
-        PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(genName);
+        PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(gen.generator());
         if (idGenerator == null) {
-          throw new IllegalStateException("No custom IdGenerator registered with name " + genName);
+          throw new IllegalStateException("No custom IdGenerator registered with name " + gen.generator());
         }
         descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {
