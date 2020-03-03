@@ -408,10 +408,10 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Set use of Ebean side sequence batching.
+   * Return the sequence increment to use given sequence batch mode.
    */
-  public void setIdentitySequenceBatchMode() {
-    identityMode.setSequenceBatchMode();
+  public int setIdentitySequenceBatchMode(boolean sequenceBatchMode) {
+    return identityMode.setSequenceBatchMode(sequenceBatchMode);
   }
 
   public void setIdentityType(IdType type) {
