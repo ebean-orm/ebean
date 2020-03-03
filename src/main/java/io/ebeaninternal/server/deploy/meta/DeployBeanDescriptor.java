@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.Identity;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
@@ -17,6 +18,7 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
+import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.ChainedBeanPersistController;
@@ -25,7 +27,6 @@ import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
-import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.PartitionMeta;
@@ -90,7 +91,7 @@ public class DeployBeanDescriptor<T> {
 
   private DeployBeanPropertyAssocOne<?> idClassProperty;
 
-  private IdentityMode identityMode = IdentityMode.auto();
+  private DeployIdentityMode identityMode = DeployIdentityMode.auto();
 
   private PlatformIdGenerator idGenerator;
 
@@ -377,15 +378,19 @@ public class DeployBeanDescriptor<T> {
     return entityType;
   }
 
-  public IdentityMode getIdentityMode() {
+  /**
+   * Return the immutable IdentityMode.
+   */
+  public IdentityMode buildIdentityMode() {
+    return new IdentityMode(identityMode);
+  }
+
+  public DeployIdentityMode getIdentityMode() {
     return identityMode;
   }
 
-  /**
-   * Set from <code>@Identity</code>
-   */
-  public void setIdentityMode(IdentityMode identityMode) {
-    this.identityMode = identityMode;
+  public void setIdentityMode(Identity identity) {
+    this.identityMode = new DeployIdentityMode(identity);
   }
 
   /**

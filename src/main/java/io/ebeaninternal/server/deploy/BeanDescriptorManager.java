@@ -46,6 +46,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
+import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import io.ebeaninternal.server.deploy.parse.DeployInherit;
@@ -1354,7 +1355,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
 
-    final IdentityMode identityMode = desc.getIdentityMode();
+    final DeployIdentityMode identityMode = desc.getIdentityMode();
     if (identityMode.isSequence() && !dbIdentity.isSupportsSequence()) {
       // explicit sequence but not supported by the DatabasePlatform
       logger.info("Explicit sequence on " + desc.getFullName() + " but not supported by DB Platform - ignored");
