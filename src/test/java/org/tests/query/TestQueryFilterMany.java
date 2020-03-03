@@ -116,7 +116,8 @@ public class TestQueryFilterMany extends BaseTestCase {
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
       // use expression + fluid style adding maxRows/firstRow to filterMany
-      .filterMany("orders", "status = ?", Order.Status.NEW).setMaxRows(100).setFirstRow(3)
+      .filterMany("orders", "status = ?", Order.Status.NEW)
+        .setMaxRows(100).setFirstRow(3) //.order().desc("id")
       .order().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();

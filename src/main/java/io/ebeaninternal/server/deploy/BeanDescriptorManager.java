@@ -1401,15 +1401,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
         seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
       }
-
-      if (databasePlatform.isSequenceBatchMode()) {
-        // use sequence next step 1 as we are going to batch fetch them instead
-        desc.setIdentitySequenceBatchMode();
-      }
-      int stepSize = identityMode.getIncrement();
-      if (stepSize == 0) {
-        stepSize = 50;
-      }
+      int stepSize = desc.setIdentitySequenceBatchMode(databasePlatform.isSequenceBatchMode());
       desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
   }
