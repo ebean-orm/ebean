@@ -28,6 +28,7 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   private int firstRow;
   private int maxRows;
+  private String orderByClause;
 
   public FilterExpressionList(FilterExprPath pathPrefix, FilterExpressionList<T> original) {
     super(null, original.expr, null, original.getUnderlyingList());
@@ -124,21 +125,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public OrderBy<T> order() {
-    return rootQuery.order();
-  }
-
-  @Override
-  public Query<T> order(String orderByClause) {
-    return rootQuery.order(orderByClause);
-  }
-
-  @Override
-  public Query<T> orderBy(String orderBy) {
-    return rootQuery.orderBy(orderBy);
-  }
-
-  @Override
   public Query<T> query() {
     return rootQuery;
   }
@@ -151,6 +137,22 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   @Override
   public Query<T> setMapKey(String mapKey) {
     return rootQuery.setMapKey(mapKey);
+  }
+
+  @Override
+  public OrderBy<T> order() {
+    return rootQuery.order();
+  }
+
+  @Override
+  public Query<T> orderBy(String orderBy) {
+    return rootQuery.orderBy(orderBy);
+  }
+
+  @Override
+  public ExpressionList<T> order(String orderByClause) {
+    this.orderByClause = orderByClause;
+    return this;
   }
 
   @Override
@@ -182,6 +184,9 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
     }
     if (maxRows > 0) {
       query.setMaxRows(maxRows);
+    }
+    if (orderByClause != null) {
+      query.order(orderByClause);
     }
   }
 

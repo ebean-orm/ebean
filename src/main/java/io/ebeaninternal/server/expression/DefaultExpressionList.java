@@ -340,8 +340,9 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> order(String orderByClause) {
-    return query.order(orderByClause);
+  public ExpressionList<T> order(String orderByClause) {
+    query.order(orderByClause);
+    return this;
   }
 
   @Override

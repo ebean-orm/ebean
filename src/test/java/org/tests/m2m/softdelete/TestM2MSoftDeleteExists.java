@@ -23,7 +23,7 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
     Query<MsManyA> query = Ebean.find(MsManyA.class)
       .where().isNotEmpty("manybs")
-      .order("aid");
+      .order("aid").query();
 
     List<MsManyA> list = query.findList();
 

@@ -116,7 +116,8 @@ public class TestQueryFilterMany extends BaseTestCase {
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
       // use expression + fluid style adding maxRows/firstRow to filterMany
-      .filterMany("orders", "status = ?", Order.Status.NEW).setMaxRows(100).setFirstRow(3)
+      .filterMany("orders", "status = ?", Order.Status.NEW)
+        .setMaxRows(100).setFirstRow(3).order("orderDate desc, id")
       .order().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();
@@ -129,8 +130,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     if (isH2() || isPostgres()) {
       assertThat(sqlList.get(0)).doesNotContain("offset");
       assertThat(sqlList.get(0)).contains(" limit 5");
-      assertThat(sqlList.get(1)).contains(" offset 3");
-      assertThat(sqlList.get(1)).contains(" limit 100");
+      assertThat(sqlList.get(1)).contains(" order by t0.order_date desc, t0.id limit 100 offset 3");
     }
   }
 

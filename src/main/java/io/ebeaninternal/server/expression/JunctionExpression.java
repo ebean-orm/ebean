@@ -799,7 +799,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> order(String orderByClause) {
+  public ExpressionList<T> order(String orderByClause) {
     return exprList.order(orderByClause);
   }
 

@@ -68,7 +68,7 @@ public interface ExpressionList<T> {
    * optional asc and desc keywords representing ascending and descending order
    * respectively.
    */
-  Query<T> order(String orderByClause);
+  ExpressionList<T> order(String orderByClause);
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
