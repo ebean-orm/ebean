@@ -13,8 +13,8 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.PartitionMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,7 +142,7 @@ public class MTable {
    */
   public MTable(String name) {
     this.name = name;
-    this.identityMode = IdentityMode.none();
+    this.identityMode = IdentityMode.NONE;
   }
 
   /**

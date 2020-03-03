@@ -40,7 +40,6 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
-import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -385,8 +384,7 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void readIdentity(Identity identity) {
-    final IdType idType = IdentityMode.idType(identity.type());
-    descriptor.setIdentityMode(new IdentityMode(idType, identity.generated(), identity.start(), identity.increment(), identity.sequenceName()));
+    descriptor.setIdentityMode(identity);
   }
 
   private void readDbMigration(DeployBeanProperty prop) {

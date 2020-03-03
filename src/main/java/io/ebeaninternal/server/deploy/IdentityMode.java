@@ -1,106 +1,58 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.annotation.IdentityGenerated;
-import io.ebean.annotation.IdentityType;
 import io.ebean.config.dbplatform.IdType;
+import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 
 public class IdentityMode {
 
-  public static IdentityMode auto() {
-    return new IdentityMode(IdType.AUTO);
-  }
+  public static IdentityMode NONE = new IdentityMode();
 
-  public static IdentityMode none() {
-    return new IdentityMode(null);
-  }
+  private final IdType type;
+  private final IdentityGenerated generated;
+  private final int start;
+  private final int increment;
+  private final int cache;
+  private final String sequenceName;
+  private final boolean platformDefault;
 
-  public static IdType idType(IdentityType type) {
-    switch (type) {
-      case AUTO:
-        return IdType.AUTO;
-      case SEQUENCE:
-        return IdType.SEQUENCE;
-      case IDENTITY:
-        return IdType.IDENTITY;
-      case APPLICATION:
-        return IdType.EXTERNAL;
-      default:
-        throw new IllegalStateException("type " + type + " not expected?");
-    }
-  }
-
-  private IdType type;
-  private IdentityGenerated generated;
-  private int start;
-  private int increment;
-  private int cache;
-  private String sequenceName;
-  private boolean platformDefault;
-
-  public IdentityMode(IdType type, IdentityGenerated generated, int start, int increment, String seqName) {
-    this.type = type;
-    this.generated = generated;
-    this.start = start;
-    this.increment = increment;
-    this.sequenceName = seqName;
+  /**
+   * Create from deployment.
+   */
+  public IdentityMode(DeployIdentityMode deploy) {
+    this.type = deploy.getIdType();
+    this.generated = deploy.getGenerated();
+    this.start = deploy.getStart();
+    this.increment = deploy.getIncrement();
+    this.cache = deploy.getCache();
+    this.sequenceName = deploy.getSequenceName();
+    this.platformDefault = deploy.isPlatformDefault();
   }
 
   /**
-   * Create from <code>@SequenceGenerator</code> annotation.
+   * Create from migration model CreateTable.
    */
-  public IdentityMode(int initialValue, int allocationSize, String sequenceName) {
-    this.type = IdType.AUTO;
-    this.generated = IdentityGenerated.AUTO;
-    this.sequenceName = sequenceName;
-    this.start = initialValue;
-    this.increment = allocationSize;
-    this.cache = 0;
+  public IdentityMode(IdType type, IdentityGenerated auto, int start, int increment, String seqName) {
+    this.type = type;
+    this.generated = auto;
+    this.start = start;
+    this.increment = increment;
+    this.sequenceName = seqName;
+    this.cache = 0; //TODO cache
+    this.platformDefault = false;
   }
 
-  private IdentityMode(IdType type) {
-    this.type = type;
+  /**
+   * NONE constructor.
+   */
+  private IdentityMode() {
+    this.type = null;
     this.generated = IdentityGenerated.AUTO;
-    this.sequenceName = "";
     this.start = 0;
     this.increment = 0;
     this.cache = 0;
-  }
-
-  public void setPlatformType(IdType type) {
-    this.type = type;
-    this.platformDefault = true;
-  }
-
-  public void setSequence(int initialValue, int allocationSize, String sequenceName) {
-    this.start = initialValue;
-    this.increment = allocationSize;
-    this.sequenceName = sequenceName;
-  }
-
-  public void setSequenceGenerator(String genName) {
-    if (sequenceName == null || sequenceName.isEmpty()) {
-      sequenceName = genName;
-    }
-  }
-
-  public void setSequenceBatchMode() {
-    this.increment = 1;
-  }
-
-  public void setIdType(IdType type) {
-    this.type = type;
-  }
-
-  public void setStart(int start) {
-    this.start = start;
-  }
-
-  public void setIncrement(int increment) {
-    this.increment = increment;
-  }
-
-  public void setSequenceName(String sequenceName) {
-    this.sequenceName = sequenceName;
+    this.sequenceName = "";
+    this.platformDefault = false;
   }
 
   public boolean isPlatformDefault() {

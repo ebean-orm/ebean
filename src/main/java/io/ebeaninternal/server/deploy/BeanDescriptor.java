@@ -155,18 +155,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final EntityType entityType;
 
   /**
-   * Type of Identity generation strategy used.
-   */
-  private final IdType idType;
-
-  /**
    * Set when Id property is marked with GeneratedValue annotation.
    */
   private final boolean idGeneratedValue;
-
   private final PlatformIdGenerator idGenerator;
-
   private final IdentityMode identityMode;
+  private final IdType idType;
 
   /**
    * SQL used to return last inserted id. Used for Identity columns where
@@ -447,7 +441,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.changeLogFilter = deploy.getChangeLogFilter();
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
-    this.identityMode = deploy.getIdentityMode();
+    this.identityMode = deploy.buildIdentityMode();
     this.idType = identityMode.getIdType();
     this.idGeneratedValue = deploy.isIdGeneratedValue();
     this.idGenerator = deploy.getIdGenerator();
