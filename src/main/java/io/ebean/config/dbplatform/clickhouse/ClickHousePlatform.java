@@ -16,10 +16,8 @@ public class ClickHousePlatform extends DatabasePlatform {
     //this.dbEncrypt =
     //this.historySupport =
     //this.exceptionTranslator =
-
     this.nativeUuidType = true;
     this.dbDefaultValue.setNow("now()");
-    this.columnAliasPrefix = null;
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(false);

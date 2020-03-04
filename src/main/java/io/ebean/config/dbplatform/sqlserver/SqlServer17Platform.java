@@ -12,7 +12,6 @@ public class SqlServer17Platform extends SqlServerBasePlatform {
   public SqlServer17Platform() {
     super();
     this.platform = Platform.SQLSERVER17;
-    this.columnAliasPrefix = null;
     this.nativeUuidType = true;
     this.dbTypeMap.put(DbType.UUID, new DbPlatformType("uniqueidentifier", false));
   }

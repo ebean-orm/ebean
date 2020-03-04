@@ -64,7 +64,6 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 28));
 
-
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));

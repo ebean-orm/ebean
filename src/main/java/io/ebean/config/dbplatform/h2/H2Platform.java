@@ -26,7 +26,6 @@ public class H2Platform extends DatabasePlatform {
     this.supportsDeleteTableAlias = true;
     this.inlineSqlUpdateLimit = true;
     this.dbDefaultValue.setNow("now()");
-    this.columnAliasPrefix = null;
     this.exceptionTranslator =
       new SqlErrorCodes()
         .addAcquireLock("50200","HYT00")

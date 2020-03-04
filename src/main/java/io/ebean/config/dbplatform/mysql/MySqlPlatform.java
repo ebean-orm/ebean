@@ -31,7 +31,6 @@ public class MySqlPlatform extends DatabasePlatform {
     this.inlineSqlUpdateLimit = true;
     this.dbEncrypt = new MySqlDbEncrypt();
     this.historySupport = new MySqlHistorySupport();
-    this.columnAliasPrefix = null;
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);

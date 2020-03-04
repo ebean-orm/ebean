@@ -146,7 +146,7 @@ public class DatabasePlatform {
 
   protected String truncateTable = "truncate table %s";
 
-  protected String columnAliasPrefix = "c";
+  protected String columnAliasPrefix;
 
   /**
    * Use a BackTick ` at the beginning and end of table or column names that you

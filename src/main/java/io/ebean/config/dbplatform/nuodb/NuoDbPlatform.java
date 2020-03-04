@@ -23,7 +23,6 @@ public class NuoDbPlatform extends DatabasePlatform {
     this.idInExpandedForm = true;
     this.supportsResultSetConcurrencyModeUpdatable = false;
     this.supportsDeleteTableAlias = true;
-    this.columnAliasPrefix = null;
     this.likeClauseRaw = "like ?";
     this.historySupport = new NuoDbHistorySupport();
     //this.dbEncrypt = ...
