@@ -54,7 +54,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   private <T> void flushJdbcBatchOnQuery(OrmQueryRequest<T> request) {
 
     SpiTransaction t = request.getTransaction();
-    if (t.isBatchFlushOnQuery()) {
+    if (t.isFlushOnQuery()) {
       // before we perform a query, we need to flush any
       // previous persist requests that are queued/batched.
       // The query may read data affected by those requests.

@@ -302,11 +302,11 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+  public void setGetGeneratedKeys(boolean getGeneratedKeys) {
   }
 
   @Override
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+  public void setFlushOnMixed(boolean batchFlushOnMixed) {
   }
 
   /**
@@ -325,12 +325,12 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public boolean isBatchFlushOnQuery() {
+  public boolean isFlushOnQuery() {
     return false;
   }
 
   @Override
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+  public void setFlushOnQuery(boolean batchFlushOnQuery) {
   }
 
   /**

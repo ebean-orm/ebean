@@ -171,7 +171,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
         logger.info("Creating transaction, batchSize[" + persistBatchSize + "]");
         transaction.setBatchMode(true);
         transaction.setBatchSize(persistBatchSize);
-        transaction.setBatchGetGeneratedKeys(false);
+        transaction.setGetGeneratedKeys(false);
 
       } else {
         // explicitly turn off JDBC batching in case

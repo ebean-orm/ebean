@@ -269,8 +269,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
-    transaction.setBatchGetGeneratedKeys(getGeneratedKeys);
+  public void setGetGeneratedKeys(boolean getGeneratedKeys) {
+    transaction.setGetGeneratedKeys(getGeneratedKeys);
   }
 
   @Override
@@ -279,18 +279,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
-    transaction.setBatchFlushOnMixed(batchFlushOnMixed);
+  public void setFlushOnMixed(boolean batchFlushOnMixed) {
+    transaction.setFlushOnMixed(batchFlushOnMixed);
   }
 
   @Override
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
-    transaction.setBatchFlushOnQuery(batchFlushOnQuery);
+  public void setFlushOnQuery(boolean batchFlushOnQuery) {
+    transaction.setFlushOnQuery(batchFlushOnQuery);
   }
 
   @Override
-  public boolean isBatchFlushOnQuery() {
-    return transaction.isBatchFlushOnQuery();
+  public boolean isFlushOnQuery() {
+    return transaction.isFlushOnQuery();
   }
 
   @Override

@@ -71,13 +71,13 @@ public class ScopeTrans {
         restoreBatchOnCascade = transaction.isBatchOnCascade();
         restoreBatchSize = transaction.getBatchSize();
         restoreBatchGeneratedKeys = transaction.getBatchGetGeneratedKeys();
-        restoreBatchFlushOnQuery = transaction.isBatchFlushOnQuery();
+        restoreBatchFlushOnQuery = transaction.isFlushOnQuery();
       }
       if (txScope.isBatchSet()) {
         transaction.setBatchMode(txScope.isBatchMode());
       }
       if (!txScope.isFlushOnQuery()) {
-        transaction.setBatchFlushOnQuery(false);
+        transaction.setFlushOnQuery(false);
       }
       if (txScope.isBatchOnCascadeSet()) {
         transaction.setBatchOnCascade(txScope.isBatchOnCascade());
@@ -86,7 +86,7 @@ public class ScopeTrans {
         transaction.setBatchSize(txScope.getBatchSize());
       }
       if (txScope.isSkipGeneratedKeys()) {
-        transaction.setBatchGetGeneratedKeys(false);
+        transaction.setGetGeneratedKeys(false);
       }
     }
 
@@ -136,7 +136,7 @@ public class ScopeTrans {
       transaction.commit();
     } else {
       nestedCommit = true;
-      transaction.setBatchFlushOnQuery(restoreBatchFlushOnQuery);
+      transaction.setFlushOnQuery(restoreBatchFlushOnQuery);
       if (restoreBatch != null) {
         transaction.setBatchMode(restoreBatch);
       }
@@ -147,7 +147,7 @@ public class ScopeTrans {
         transaction.setBatchSize(restoreBatchSize);
       }
       if (restoreBatchGeneratedKeys != null) {
-        transaction.setBatchGetGeneratedKeys(restoreBatchGeneratedKeys);
+        transaction.setGetGeneratedKeys(restoreBatchGeneratedKeys);
       }
     }
   }

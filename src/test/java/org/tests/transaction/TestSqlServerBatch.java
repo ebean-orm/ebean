@@ -49,11 +49,11 @@ public class TestSqlServerBatch extends BaseTestCase {
       txn.setBatchSize(3);
 
       // control flushing when mixing save and queries
-      txn.setBatchFlushOnQuery(false);
+      txn.setFlushOnQuery(false);
 
       // for large batch insert processing when we do not
       // ... need the generatedKeys, don't get them
-      txn.setBatchGetGeneratedKeys(false);
+      txn.setGetGeneratedKeys(false);
 
       // explicitly flush the JDBC batch buffer
       txn.flushBatch();
