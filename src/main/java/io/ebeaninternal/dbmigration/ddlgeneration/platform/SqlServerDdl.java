@@ -114,18 +114,22 @@ public class SqlServerDdl extends PlatformDdl {
    * Generate and return the create sequence DDL.
    */
   @Override
-  public String createSequence(String sequenceName, int initialValue, int allocationSize) {
-
-    StringBuilder sb = new StringBuilder("create sequence ");
-    sb.append(sequenceName);
-    sb.append(" as bigint ");
-    if (initialValue > 1) {
-      sb.append(" start with ").append(initialValue);
+  public String createSequence(String sequenceName, DdlIdentity identity) {
+    StringBuilder sb = new StringBuilder(80);
+    sb.append("create sequence ").append(sequenceName).append(" as bigint");
+    final int start = identity.getStart();
+    if (start > 1) {
+      sb.append(" start with ").append(start);
     } else {
-      sb.append(" start with 1 ");
+      sb.append(" start with 1");
     }
-    if (allocationSize > 1) {
-      sb.append(" increment by ").append(allocationSize);
+    final int increment = identity.getIncrement();
+    if (increment > 1) {
+      sb.append(" increment by ").append(increment);
+    }
+    final int cache = identity.getCache();
+    if (cache > 1) {
+      sb.append(" cache ").append(increment);
     }
     sb.append(";");
     return sb.toString();

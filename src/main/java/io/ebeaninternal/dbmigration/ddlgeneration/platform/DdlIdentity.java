@@ -10,15 +10,18 @@ public class DdlIdentity {
 
   private final IdType idType;
   private final IdentityMode identityMode;
+  private final String sequenceName;
 
-  public DdlIdentity(IdType idType, IdentityMode identityMode) {
+  public DdlIdentity(IdType idType, IdentityMode identityMode, String sequenceName) {
     this.idType = idType;
     this.identityMode = identityMode;
+    this.sequenceName = sequenceName;
   }
 
   private DdlIdentity() {
     this.idType = null;
     this.identityMode = null;
+    this.sequenceName = null;
   }
 
   public boolean useSequence() {
@@ -27,6 +30,10 @@ public class DdlIdentity {
 
   public boolean useIdentity() {
     return idType == IdType.IDENTITY;
+  }
+
+  public String getSequenceName() {
+    return sequenceName;
   }
 
   private String generatedBy() {
@@ -41,16 +48,28 @@ public class DdlIdentity {
     return " generated " + generatedBy() +" as identity";
   }
 
-  public String options(String startWith, String incrementBy, String cache) {
+  public String identityOptions(String startWith, String incrementBy, String cache) {
+    return options(true, startWith, incrementBy, cache);
+  }
+
+  public String sequenceOptions(String startWith, String incrementBy, String cache) {
+    return options(false, startWith, incrementBy, cache);
+  }
+
+  private String options(boolean brackets, String startWith, String incrementBy, String cache) {
     if (!identityMode.hasOptions()) {
       return "";
     }
     StringBuilder sb = new StringBuilder(40);
-    sb.append(" (");
+    if (brackets) {
+      sb.append(" (");
+    }
     optionFor(sb, startWith, identityMode.getStart());
     optionFor(sb, incrementBy, identityMode.getIncrement());
     optionFor(sb, cache, identityMode.getCache());
-    sb.append(")");
+    if (brackets) {
+      sb.append(")");
+    }
     return sb.toString();
   }
 
@@ -63,4 +82,15 @@ public class DdlIdentity {
     }
   }
 
+  public int getStart() {
+    return identityMode.getStart();
+  }
+
+  public int getIncrement() {
+    return identityMode.getIncrement();
+  }
+
+  public int getCache() {
+    return identityMode.getCache();
+  }
 }

@@ -5,14 +5,14 @@ create table migtest_ckey_assoc (
   assoc_one                     nvarchar(255),
   constraint pk_migtest_ckey_assoc primary key (id)
 );
-create sequence migtest_ckey_assoc_seq as bigint  start with 1 ;
+create sequence migtest_ckey_assoc_seq as bigint start with 1;
 
 create table migtest_ckey_detail (
   id                            integer not null,
   something                     nvarchar(255),
   constraint pk_migtest_ckey_detail primary key (id)
 );
-create sequence migtest_ckey_detail_seq as bigint  start with 1 ;
+create sequence migtest_ckey_detail_seq as bigint start with 1;
 
 create table migtest_ckey_parent (
   one_key                       integer not null,
@@ -27,40 +27,40 @@ create table migtest_fk_cascade (
   one_id                        numeric(19),
   constraint pk_migtest_fk_cascade primary key (id)
 );
-create sequence migtest_fk_cascade_seq as bigint  start with 1 ;
+create sequence migtest_fk_cascade_seq as bigint start with 1;
 
 create table migtest_fk_cascade_one (
   id                            numeric(19) not null,
   constraint pk_migtest_fk_cascade_one primary key (id)
 );
-create sequence migtest_fk_cascade_one_seq as bigint  start with 1 ;
+create sequence migtest_fk_cascade_one_seq as bigint start with 1;
 
 create table migtest_fk_none (
   id                            numeric(19) not null,
   one_id                        numeric(19),
   constraint pk_migtest_fk_none primary key (id)
 );
-create sequence migtest_fk_none_seq as bigint  start with 1 ;
+create sequence migtest_fk_none_seq as bigint start with 1;
 
 create table migtest_fk_none_via_join (
   id                            numeric(19) not null,
   one_id                        numeric(19),
   constraint pk_migtest_fk_none_via_join primary key (id)
 );
-create sequence migtest_fk_none_via_join_seq as bigint  start with 1 ;
+create sequence migtest_fk_none_via_join_seq as bigint start with 1;
 
 create table migtest_fk_one (
   id                            numeric(19) not null,
   constraint pk_migtest_fk_one primary key (id)
 );
-create sequence migtest_fk_one_seq as bigint  start with 1 ;
+create sequence migtest_fk_one_seq as bigint start with 1;
 
 create table migtest_fk_set_null (
   id                            numeric(19) not null,
   one_id                        numeric(19),
   constraint pk_migtest_fk_set_null primary key (id)
 );
-create sequence migtest_fk_set_null_seq as bigint  start with 1 ;
+create sequence migtest_fk_set_null_seq as bigint start with 1;
 
 create table migtest_e_basic (
   id                            integer not null,
@@ -85,7 +85,7 @@ create table migtest_e_basic (
 );
 create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
-create sequence migtest_e_basic_seq as bigint  start with 1 ;
+create sequence migtest_e_basic_seq as bigint start with 1;
 
 create table migtest_e_enum (
   id                            integer not null,
@@ -93,14 +93,14 @@ create table migtest_e_enum (
   constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I')),
   constraint pk_migtest_e_enum primary key (id)
 );
-create sequence migtest_e_enum_seq as bigint  start with 1 ;
+create sequence migtest_e_enum_seq as bigint start with 1;
 
 create table migtest_e_history (
   id                            integer not null,
   test_string                   nvarchar(255),
   constraint pk_migtest_e_history primary key (id)
 );
-create sequence migtest_e_history_seq as bigint  start with 1 ;
+create sequence migtest_e_history_seq as bigint start with 1;
 
 create table migtest_e_history2 (
   id                            integer not null,
@@ -109,28 +109,28 @@ create table migtest_e_history2 (
   obsolete_string2              nvarchar(255),
   constraint pk_migtest_e_history2 primary key (id)
 );
-create sequence migtest_e_history2_seq as bigint  start with 1 ;
+create sequence migtest_e_history2_seq as bigint start with 1;
 
 create table migtest_e_history3 (
   id                            integer not null,
   test_string                   nvarchar(255),
   constraint pk_migtest_e_history3 primary key (id)
 );
-create sequence migtest_e_history3_seq as bigint  start with 1 ;
+create sequence migtest_e_history3_seq as bigint start with 1;
 
 create table migtest_e_history4 (
   id                            integer not null,
   test_number                   integer,
   constraint pk_migtest_e_history4 primary key (id)
 );
-create sequence migtest_e_history4_seq as bigint  start with 1 ;
+create sequence migtest_e_history4_seq as bigint start with 1;
 
 create table migtest_e_history5 (
   id                            integer not null,
   test_number                   integer,
   constraint pk_migtest_e_history5 primary key (id)
 );
-create sequence migtest_e_history5_seq as bigint  start with 1 ;
+create sequence migtest_e_history5_seq as bigint start with 1;
 
 create table migtest_e_history6 (
   id                            integer not null,
@@ -138,7 +138,7 @@ create table migtest_e_history6 (
   test_number2                  integer not null,
   constraint pk_migtest_e_history6 primary key (id)
 );
-create sequence migtest_e_history6_seq as bigint  start with 1 ;
+create sequence migtest_e_history6_seq as bigint start with 1;
 
 create table migtest_e_ref (
   id                            integer not null,
@@ -146,42 +146,42 @@ create table migtest_e_ref (
   constraint pk_migtest_e_ref primary key (id)
 );
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
-create sequence migtest_e_ref_seq as bigint  start with 1 ;
+create sequence migtest_e_ref_seq as bigint start with 1;
 
 create table migtest_e_softdelete (
   id                            integer not null,
   test_string                   nvarchar(255),
   constraint pk_migtest_e_softdelete primary key (id)
 );
-create sequence migtest_e_softdelete_seq as bigint  start with 1 ;
+create sequence migtest_e_softdelete_seq as bigint start with 1;
 
 create table migtest_mtm_c (
   id                            integer not null,
   name                          nvarchar(255),
   constraint pk_migtest_mtm_c primary key (id)
 );
-create sequence migtest_mtm_c_seq as bigint  start with 1 ;
+create sequence migtest_mtm_c_seq as bigint start with 1;
 
 create table migtest_mtm_m (
   id                            numeric(19) not null,
   name                          nvarchar(255),
   constraint pk_migtest_mtm_m primary key (id)
 );
-create sequence migtest_mtm_m_seq as bigint  start with 1 ;
+create sequence migtest_mtm_m_seq as bigint start with 1;
 
 create table migtest_oto_child (
   id                            integer not null,
   name                          nvarchar(255),
   constraint pk_migtest_oto_child primary key (id)
 );
-create sequence migtest_oto_child_seq as bigint  start with 1 ;
+create sequence migtest_oto_child_seq as bigint start with 1;
 
 create table migtest_oto_master (
   id                            numeric(19) not null,
   name                          nvarchar(255),
   constraint pk_migtest_oto_master primary key (id)
 );
-create sequence migtest_oto_master_seq as bigint  start with 1 ;
+create sequence migtest_oto_master_seq as bigint start with 1;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

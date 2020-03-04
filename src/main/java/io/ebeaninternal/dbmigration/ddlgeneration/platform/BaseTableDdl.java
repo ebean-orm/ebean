@@ -248,18 +248,19 @@ public class BaseTableDdl implements TableDdl {
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
-    DdlIdentity idMode = DdlIdentity.NONE;
+    DdlIdentity identity = DdlIdentity.NONE;
     if ((pk.size() == 1)) {
       final IdentityMode identityMode = MTableIdentity.fromCreateTable(createTable);
       IdType idType = platformDdl.useIdentityType(identityMode.getIdType());
-      idMode = new DdlIdentity(idType, identityMode);
+      String sequenceName = (IdType.SEQUENCE != idType) ? null : sequenceName(createTable, pk, identity);
+      identity = new DdlIdentity(idType, identityMode, sequenceName);
     }
 
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
-    writeTableColumns(apply, columns, idMode);
+    writeTableColumns(apply, columns, identity);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
@@ -294,9 +295,8 @@ public class BaseTableDdl implements TableDdl {
     // we drop the related sequence (if sequences are used)
     dropTable(writer.dropAll(), tableName);
 
-    if (idMode.useSequence()) {
-      String pkCol = pk.get(0).getName();
-      writeSequence(writer, createTable, pkCol);
+    if (identity.useSequence()) {
+      writeSequence(writer, identity);
     }
 
     // add blank line for a bit of whitespace between tables
@@ -306,6 +306,14 @@ public class BaseTableDdl implements TableDdl {
     if (!platformDdl.isInlineForeignKeys()) {
       writeAddForeignKeys(writer, createTable);
     }
+  }
+
+  private String sequenceName(CreateTable createTable, List<Column> pk, DdlIdentity identity) {
+    String seqName = identity.getSequenceName();
+    if (seqName == null || seqName.isEmpty()) {
+      seqName = namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
+    }
+    return seqName;
   }
 
   /**
@@ -377,18 +385,9 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  protected void writeSequence(DdlWrite writer, CreateTable createTable, String pk) throws IOException {
-    // explicit sequence use or platform decides
-    String explicitSequenceName = createTable.getSequenceName();
-    int initial = toInt(createTable.getSequenceInitial());
-    int allocate = toInt(createTable.getSequenceAllocate());
-
-    String seqName = explicitSequenceName;
-    if (seqName == null || seqName.isEmpty()) {
-      seqName = namingConvention.getSequenceName(createTable.getName(), pk);
-    }
-
-    String createSeq = platformDdl.createSequence(seqName, initial, allocate);
+  protected void writeSequence(DdlWrite writer, DdlIdentity identity) throws IOException {
+    String seqName = identity.getSequenceName();
+    String createSeq = platformDdl.createSequence(seqName, identity);
     if (hasValue(createSeq)) {
       writer.apply().append(createSeq).newLine();
       writer.dropAll().appendStatement(platformDdl.dropSequence(seqName));

@@ -68,6 +68,9 @@ public class PlatformDdl {
   protected String identityStartWith = "start with";
   protected String identityIncrementBy = "increment by";
   protected String identityCache = "cache";
+  protected String sequenceStartWith = "start with";
+  protected String sequenceIncrementBy = "increment by";
+  protected String sequenceCache = "cache";
 
   protected String alterTableIfExists = "";
 
@@ -195,7 +198,7 @@ public class PlatformDdl {
 
     StringBuilder sb = new StringBuilder(columnDefn.length() + 60);
     sb.append(columnDefn).append(identity.optionGenerated());
-    sb.append(identity.options(identityStartWith, identityIncrementBy, identityCache));
+    sb.append(identity.identityOptions(identityStartWith, identityIncrementBy, identityCache));
     return sb.toString();
   }
 
@@ -362,16 +365,10 @@ public class PlatformDdl {
   /**
    * Generate and return the create sequence DDL.
    */
-  public String createSequence(String sequenceName, int initialValue, int allocationSize) {
-
+  public String createSequence(String sequenceName, DdlIdentity identity) {
     StringBuilder sb = new StringBuilder("create sequence ");
     sb.append(sequenceName);
-    if (initialValue > 1) {
-      sb.append(" start with ").append(initialValue);
-    }
-    if (allocationSize > 1) {
-      sb.append(" increment by ").append(allocationSize);
-    }
+    identity.sequenceOptions(sequenceStartWith, sequenceIncrementBy, sequenceCache);
     sb.append(";");
     return sb.toString();
   }
