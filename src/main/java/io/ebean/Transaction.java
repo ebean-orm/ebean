@@ -313,7 +313,7 @@ public interface Transaction extends AutoCloseable {
    * <h3>getGeneratedKeys</h3>
    * <p>
    * Often with large batch inserts we want to turn off getGeneratedKeys. We do
-   * this via {@link #setBatchGetGeneratedKeys(boolean)}.
+   * this via {@link #setGetGeneratedKeys(boolean)}.
    * Also note that some JDBC drivers do not support getGeneratedKeys in JDBC batch mode.
    * </p>
    * <pre>{@code
@@ -342,7 +342,7 @@ public interface Transaction extends AutoCloseable {
    * </p>
    * <p>
    * We use {@link #flush()} to explicitly flush the batch and we can use
-   * {@link #setBatchFlushOnQuery(boolean)} and {@link #setBatchFlushOnMixed(boolean)}
+   * {@link #setFlushOnQuery(boolean)} and {@link #setFlushOnMixed(boolean)}
    * to control the automatic flushing behaviour.
    * </p>
    * <p>
@@ -432,7 +432,15 @@ public interface Transaction extends AutoCloseable {
    * number of objects and you don't care about getting back the ids.
    * </p>
    */
-  void setBatchGetGeneratedKeys(boolean getGeneratedKeys);
+  void setGetGeneratedKeys(boolean getGeneratedKeys);
+
+  /**
+   * Deprecated renamed to setGetGeneratedKeys().
+   */
+  @Deprecated
+  default void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+    setGetGeneratedKeys(getGeneratedKeys);
+  }
 
   /**
    * By default when mixing UpdateSql (or CallableSql) with Beans the batch is
@@ -449,7 +457,15 @@ public interface Transaction extends AutoCloseable {
    * have a 2 step process (delayed binding).
    * </p>
    */
-  void setBatchFlushOnMixed(boolean batchFlushOnMixed);
+  void setFlushOnMixed(boolean batchFlushOnMixed);
+
+  /**
+   * Deprecated renamed to setFlushOnMixed().
+   */
+  @Deprecated
+  default void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+    setFlushOnMixed(batchFlushOnMixed);
+  }
 
   /**
    * By default executing a query will automatically flush any batched
@@ -459,7 +475,15 @@ public interface Transaction extends AutoCloseable {
    * execute a query and the batch will not be automatically flushed.
    * </p>
    */
-  void setBatchFlushOnQuery(boolean batchFlushOnQuery);
+  void setFlushOnQuery(boolean batchFlushOnQuery);
+
+  /**
+   * Deprecated renamed to setFlushOnQuery().
+   */
+  @Deprecated
+  default void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+    setFlushOnQuery(batchFlushOnQuery);
+  }
 
   /**
    * Return true if the batch (of persisted beans or executed UpdateSql etc)
@@ -468,7 +492,15 @@ public interface Transaction extends AutoCloseable {
    * The default is for this to be true.
    * </p>
    */
-  boolean isBatchFlushOnQuery();
+  boolean isFlushOnQuery();
+
+  /**
+   * Deprecated renamed to isFlushOnQuery().
+   */
+  @Deprecated
+  default boolean isBatchFlushOnQuery() {
+    return isFlushOnQuery();
+  }
 
   /**
    * The batch will be flushing automatically but you can use this to explicitly

@@ -589,7 +589,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+  public void setGetGeneratedKeys(boolean getGeneratedKeys) {
     this.batchGetGeneratedKeys = getGeneratedKeys;
     if (batchControl != null) {
       batchControl.setGetGeneratedKeys(getGeneratedKeys);
@@ -597,7 +597,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+  public void setFlushOnMixed(boolean batchFlushOnMixed) {
     this.batchFlushOnMixed = batchFlushOnMixed;
     if (batchControl != null) {
       batchControl.setBatchFlushOnMixed(batchFlushOnMixed);
@@ -624,12 +624,12 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public boolean isBatchFlushOnQuery() {
+  public boolean isFlushOnQuery() {
     return batchFlushOnQuery;
   }
 
   @Override
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+  public void setFlushOnQuery(boolean batchFlushOnQuery) {
     this.batchFlushOnQuery = batchFlushOnQuery;
   }
 

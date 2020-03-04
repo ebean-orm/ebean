@@ -233,19 +233,19 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
+  public void setGetGeneratedKeys(boolean getGeneratedKeys) {
   }
 
   @Override
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
+  public void setFlushOnMixed(boolean batchFlushOnMixed) {
   }
 
   @Override
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
+  public void setFlushOnQuery(boolean batchFlushOnQuery) {
   }
 
   @Override
-  public boolean isBatchFlushOnQuery() {
+  public boolean isFlushOnQuery() {
     return false;
   }
 

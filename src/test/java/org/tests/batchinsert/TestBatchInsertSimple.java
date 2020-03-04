@@ -34,7 +34,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
       transaction.setBatchOnCascade(true);
       transaction.setBatchSize(30);
       // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
-      transaction.setBatchGetGeneratedKeys(false);
+      transaction.setGetGeneratedKeys(false);
 
       for (int i = 0; i < numOfMasters; i++) {
         UTMaster master = createMasterAndDetails(i, 20);
@@ -108,7 +108,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
       transaction.setBatchOnCascade(true);
       transaction.setBatchSize(30);
       // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
-      transaction.setBatchGetGeneratedKeys(false);
+      transaction.setGetGeneratedKeys(false);
 
       for (int i = 0; i < numOfMasters; i++) {
         UTMaster master = createMaster(i);
