@@ -84,12 +84,6 @@ abstract class AnnotationBase {
     if (field != null) {
       a = AnnotationUtil.findAnnotation(field, annClass, platform);
     }
-    if (a == null) {
-      Method method = prop.getReadMethod();
-      if (method != null) {
-        a = AnnotationUtil.findAnnotation(method, annClass, platform);
-      }
-    }
     return a;
   }
 
@@ -102,14 +96,6 @@ abstract class AnnotationBase {
     Field field = prop.getField();
     if (field != null) {
       ret = AnnotationUtil.findAnnotations(field, annClass);
-    }
-    Method method = prop.getReadMethod();
-    if (method != null) {
-      if (ret != null) {
-        ret.addAll(AnnotationUtil.findAnnotations(method, annClass));
-      } else {
-        ret = AnnotationUtil.findAnnotations(method, annClass);
-      }
     }
     return ret;
   }

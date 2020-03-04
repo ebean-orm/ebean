@@ -32,7 +32,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -189,11 +188,6 @@ public class DeployBeanProperty {
   private int dbType;
 
   private final DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
-
-  /**
-   * The method used to read the property.
-   */
-  private Method readMethod;
 
   private int propertyIndex;
 
@@ -451,13 +445,6 @@ public class DeployBeanProperty {
     } else {
       return setter;
     }
-  }
-
-  /**
-   * Return the getter method.
-   */
-  public Method getReadMethod() {
-    return readMethod;
   }
 
   /**
@@ -904,17 +891,6 @@ public class DeployBeanProperty {
    */
   public void setTransient() {
     this.isTransient = true;
-  }
-
-  /**
-   * Set the bean read method.
-   * <p>
-   * NB: That a BeanReflectGetter is used to actually perform the getting of
-   * property values from a bean. This is due to performance considerations.
-   * </p>
-   */
-  public void setReadMethod(Method readMethod) {
-    this.readMethod = readMethod;
   }
 
   /**

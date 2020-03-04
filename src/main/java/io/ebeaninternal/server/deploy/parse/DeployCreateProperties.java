@@ -23,7 +23,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -53,7 +52,6 @@ public class DeployCreateProperties {
    * Create the appropriate properties for a bean.
    */
   public void createProperties(DeployBeanDescriptor<?> desc) {
-
     createProperties(desc, desc.getBeanType(), 0);
     desc.sortProperties();
   }
@@ -89,22 +87,14 @@ public class DeployCreateProperties {
       // ignore all fields on model (_$dbName)
       return;
     }
-    boolean scalaObject = desc.isScalaObject();
 
     try {
-      Method[] declaredMethods = beanType.getDeclaredMethods();
       Field[] fields = beanType.getDeclaredFields();
 
       for (int i = 0; i < fields.length; i++) {
-
         Field field = fields[i];
         if (!ignoreField(field)) {
-          String fieldName = getFieldName(field, beanType);
-          String initFieldName = initCap(fieldName);
-
-          Method getter = findGetter(field, initFieldName, declaredMethods, scalaObject);
-
-          DeployBeanProperty prop = createProp(desc, field, beanType, getter);
+          DeployBeanProperty prop = createProp(desc, field, beanType);
           if (prop != null) {
             // set a order that gives priority to inherited properties
             // push Id/EmbeddedId up and CreatedTimestamp/UpdatedTimestamp down
@@ -135,68 +125,6 @@ public class DeployCreateProperties {
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
-  }
-
-  /**
-   * Make the first letter of the string upper case.
-   */
-  private String initCap(String str) {
-    if (str.length() > 1) {
-      return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-    } else {
-      // only a single char
-      return str.toUpperCase();
-    }
-  }
-
-  /**
-   * Return the bean spec field name (trim of "is" from boolean types)
-   */
-  private String getFieldName(Field field, Class<?> beanType) {
-
-    String name = field.getName();
-
-    if ((Boolean.class.equals(field.getType()) || boolean.class.equals(field.getType()))
-      && name.startsWith("is") && name.length() > 2) {
-
-      // it is a boolean type field starting with "is"
-      char c = name.charAt(2);
-      if (Character.isUpperCase(c)) {
-        String msg = "trimming off 'is' from boolean field name " + name + " in class " + beanType.getName();
-        logger.info(msg);
-
-        return name.substring(2);
-      }
-    }
-    return name;
-  }
-
-  /**
-   * Find a public non-static getter method that matches this field (according to bean-spec rules).
-   */
-  private Method findGetter(Field field, String initFieldName, Method[] declaredMethods, boolean scalaObject) {
-
-    String methGetName = "get" + initFieldName;
-    String methIsName = "is" + initFieldName;
-    String scalaGet = field.getName();
-
-    for (Method m : declaredMethods) {
-      if ((scalaObject && m.getName().equals(scalaGet)) || m.getName().equals(methGetName)
-        || m.getName().equals(methIsName)) {
-
-        Class<?>[] params = m.getParameterTypes();
-        if (params.length == 0) {
-          if (field.getType().equals(m.getReturnType())) {
-            int modifiers = m.getModifiers();
-            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
-              // we find it...
-              return m;
-            }
-          }
-        }
-      }
-    }
-    return null;
   }
 
   @SuppressWarnings({"unchecked"})
@@ -284,8 +212,7 @@ public class DeployCreateProperties {
     return (t != null);
   }
 
-  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType, Method getter) {
-
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType) {
     DeployBeanProperty prop = createProp(desc, field);
     if (prop == null) {
       // transient annotation on unsupported type
@@ -293,9 +220,6 @@ public class DeployCreateProperties {
     } else {
       prop.setOwningType(beanType);
       prop.setName(field.getName());
-
-      // interested in the getter for reading annotations
-      prop.setReadMethod(getter);
       prop.setField(field);
       return prop;
     }
