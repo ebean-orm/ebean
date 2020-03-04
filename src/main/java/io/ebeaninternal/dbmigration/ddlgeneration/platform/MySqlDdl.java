@@ -115,8 +115,8 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
-    super.writeColumnDefinition(buffer, column, useIdentity);
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) throws IOException {
+    super.writeColumnDefinition(buffer, column, identity);
     String comment = column.getComment();
     if (!StringHelper.isNull(comment)) {
       // in mysql 5.5 column comment save in information_schema.COLUMNS.COLUMN_COMMENT(VARCHAR 1024)

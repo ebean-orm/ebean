@@ -295,14 +295,14 @@ public class MColumn {
       for (DbMigrationInfo info : dbMigrationInfos) {
         if (!info.getPreAdd().isEmpty()) {
           DdlScript script = new DdlScript();
-          script.setDdl(info.getPreAdd());
+          script.getDdl().addAll(info.getPreAdd());
           script.setPlatforms(info.joinPlatforms());
           c.getBefore().add(script);
         }
 
         if (!info.getPostAdd().isEmpty()) {
           DdlScript script = new DdlScript();
-          script.setDdl(info.getPostAdd());
+          script.getDdl().addAll(info.getPostAdd());
           script.setPlatforms(info.joinPlatforms());
           c.getAfter().add(script);
         }
@@ -341,14 +341,14 @@ public class MColumn {
         for (DbMigrationInfo info : dbMigrationInfos) {
           if (!info.getPreAlter().isEmpty()) {
             DdlScript script = new DdlScript();
-            script.setDdl(info.getPreAlter());
+            script.getDdl().addAll(info.getPreAlter());
             script.setPlatforms(info.joinPlatforms());
             alterColumn.getBefore().add(script);
           }
 
           if (!info.getPostAlter().isEmpty()) {
             DdlScript script = new DdlScript();
-            script.setDdl(info.getPostAlter());
+            script.getDdl().addAll(info.getPostAlter());
             script.setPlatforms(info.joinPlatforms());
             alterColumn.getAfter().add(script);
           }

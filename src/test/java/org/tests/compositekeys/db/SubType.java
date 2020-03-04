@@ -1,9 +1,15 @@
 package org.tests.compositekeys.db;
 
+import io.ebean.annotation.Identity;
+import io.ebean.annotation.IdentityGenerated;
+
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Version;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
+@Identity(generated = BY_DEFAULT)
 @Entity
 public class SubType {
   @EmbeddedId

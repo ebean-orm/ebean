@@ -1,9 +1,13 @@
 package org.tests.model.onetoone;
 
+import io.ebean.annotation.Identity;
+import io.ebean.annotation.IdentityGenerated;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
+@Identity(generated = IdentityGenerated.BY_DEFAULT)
 @Entity
 public class OtoPrimeExtra {
 

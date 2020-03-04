@@ -33,6 +33,10 @@ import java.util.List;
  *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="draft" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="identityType" type="{http://ebean-orm.github.io/xml/ns/dbmigration}identityType" />
+ *       &lt;attribute name="identityStart" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *       &lt;attribute name="identityIncrement" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *       &lt;attribute name="identityCache" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *       &lt;attribute name="identityGenerated" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
  *       &lt;attribute name="sequenceAllocate" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
@@ -68,6 +72,17 @@ public class CreateTable {
   protected Boolean draft;
   @XmlAttribute(name = "identityType")
   protected IdentityType identityType;
+  @XmlAttribute(name = "identityStart")
+  @XmlSchemaType(name = "positiveInteger")
+  protected BigInteger identityStart;
+  @XmlAttribute(name = "identityIncrement")
+  @XmlSchemaType(name = "positiveInteger")
+  protected BigInteger identityIncrement;
+  @XmlAttribute(name = "identityCache")
+  @XmlSchemaType(name = "positiveInteger")
+  protected BigInteger identityCache;
+  @XmlAttribute(name = "identityGenerated")
+  protected String identityGenerated;
   @XmlAttribute(name = "sequenceName")
   protected String sequenceName;
   @XmlAttribute(name = "sequenceInitial")
@@ -286,6 +301,86 @@ public class CreateTable {
    */
   public void setIdentityType(IdentityType value) {
     this.identityType = value;
+  }
+
+  /**
+   * Gets the value of the identityStart property.
+   *
+   * @return possible object is
+   * {@link BigInteger }
+   */
+  public BigInteger getIdentityStart() {
+    return identityStart;
+  }
+
+  /**
+   * Sets the value of the identityStart property.
+   *
+   * @param value allowed object is
+   *              {@link BigInteger }
+   */
+  public void setIdentityStart(BigInteger value) {
+    this.identityStart = value;
+  }
+
+  /**
+   * Gets the value of the identityIncrement property.
+   *
+   * @return possible object is
+   * {@link BigInteger }
+   */
+  public BigInteger getIdentityIncrement() {
+    return identityIncrement;
+  }
+
+  /**
+   * Sets the value of the identityIncrement property.
+   *
+   * @param value allowed object is
+   *              {@link BigInteger }
+   */
+  public void setIdentityIncrement(BigInteger value) {
+    this.identityIncrement = value;
+  }
+
+  /**
+   * Gets the value of the identityCache property.
+   *
+   * @return possible object is
+   * {@link BigInteger }
+   */
+  public BigInteger getIdentityCache() {
+    return identityCache;
+  }
+
+  /**
+   * Sets the value of the identityCache property.
+   *
+   * @param value allowed object is
+   *              {@link BigInteger }
+   */
+  public void setIdentityCache(BigInteger value) {
+    this.identityCache = value;
+  }
+
+  /**
+   * Gets the value of the identityGenerated property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getIdentityGenerated() {
+    return identityGenerated;
+  }
+
+  /**
+   * Sets the value of the identityGenerated property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setIdentityGenerated(String value) {
+    this.identityGenerated = value;
   }
 
   /**

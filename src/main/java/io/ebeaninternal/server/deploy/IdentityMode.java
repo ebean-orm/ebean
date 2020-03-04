@@ -32,13 +32,13 @@ public class IdentityMode {
   /**
    * Create from migration model CreateTable.
    */
-  public IdentityMode(IdType type, IdentityGenerated auto, int start, int increment, String seqName) {
+  public IdentityMode(IdType type, IdentityGenerated auto, int start, int increment, int cache, String seqName) {
     this.type = type;
     this.generated = auto;
     this.start = start;
     this.increment = increment;
+    this.cache = cache;
     this.sequenceName = seqName;
-    this.cache = 0; //TODO cache
     this.platformDefault = false;
   }
 
@@ -103,4 +103,7 @@ public class IdentityMode {
     return type != IdType.EXTERNAL && type != IdType.GENERATOR;
   }
 
+  public boolean hasOptions() {
+    return start > 0 || cache > 0 || increment > 0;
+  }
 }

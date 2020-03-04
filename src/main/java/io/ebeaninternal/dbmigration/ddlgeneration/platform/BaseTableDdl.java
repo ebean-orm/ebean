@@ -29,6 +29,8 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
 import io.ebeaninternal.dbmigration.model.MTable;
+import io.ebeaninternal.dbmigration.model.MTableIdentity;
+import io.ebeaninternal.server.deploy.IdentityMode;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -246,21 +248,18 @@ public class BaseTableDdl implements TableDdl {
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
-    boolean singleColumnPrimaryKey = (pk.size() == 1);
-    boolean useIdentity = false;
-    boolean useSequence = false;
-
-    if (singleColumnPrimaryKey) {
-      IdType useDbIdentityType = platformDdl.useIdentityType(createTable.getIdentityType());
-      useIdentity = (IdType.IDENTITY == useDbIdentityType);
-      useSequence = (IdType.SEQUENCE == useDbIdentityType);
+    DdlIdentity idMode = DdlIdentity.NONE;
+    if ((pk.size() == 1)) {
+      final IdentityMode identityMode = MTableIdentity.fromCreateTable(createTable);
+      IdType idType = platformDdl.useIdentityType(identityMode.getIdType());
+      idMode = new DdlIdentity(idType, identityMode);
     }
 
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
-    writeTableColumns(apply, columns, useIdentity);
+    writeTableColumns(apply, columns, idMode);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
@@ -295,7 +294,7 @@ public class BaseTableDdl implements TableDdl {
     // we drop the related sequence (if sequences are used)
     dropTable(writer.dropAll(), tableName);
 
-    if (useSequence) {
+    if (idMode.useSequence()) {
       String pkCol = pk.get(0).getName();
       writeSequence(writer, createTable, pkCol);
     }
@@ -348,8 +347,8 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
-    platformDdl.writeTableColumns(apply, columns, useIdentity);
+  private void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) throws IOException {
+    platformDdl.writeTableColumns(apply, columns, identity);
   }
 
   /**

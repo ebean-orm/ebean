@@ -7,6 +7,7 @@ import io.ebean.annotation.DocStore;
 import io.ebean.annotation.Draftable;
 import io.ebean.annotation.DraftableElement;
 import io.ebean.annotation.History;
+import io.ebean.annotation.Identity;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
@@ -120,6 +121,11 @@ public class AnnotationClass extends AnnotationParser {
       } else {
         descriptor.setName(entity.name());
       }
+    }
+
+    Identity identity = findAnnotationRecursive(cls, Identity.class);
+    if (identity != null) {
+      descriptor.setIdentityMode(identity);
     }
 
     IdClass idClass = findAnnotationRecursive(cls, IdClass.class);

@@ -1,6 +1,7 @@
 package org.tests.model.nofk;
 
 import io.ebean.annotation.Formula;
+import io.ebean.annotation.Identity;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.SoftDelete;
 
@@ -9,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.List;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
+@Identity(generated = BY_DEFAULT)
 @Entity
 public class EUserNoFkSoftDel {
 

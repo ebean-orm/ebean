@@ -2,6 +2,7 @@ package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.annotation.Identity;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -89,6 +91,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     beanProperty.findIdsByParentId(1L, null, null, null, true);
   }
 
+  @Identity(generated = BY_DEFAULT)
   @Entity
   @Table(name = "em_user")
   public static class User {

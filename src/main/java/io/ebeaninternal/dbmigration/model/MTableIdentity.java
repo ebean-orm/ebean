@@ -11,19 +11,28 @@ import java.math.BigInteger;
 /**
  * Helper to convert between IdentityMode and CreateTable
  */
-class MTableIdentity {
+public class MTableIdentity {
 
   /**
    * Return the IdentityMode from CreateTable.
    */
-  static IdentityMode fromCreateTable(CreateTable createTable) {
+  public static IdentityMode fromCreateTable(CreateTable createTable) {
 
     IdType type = fromType(createTable.getIdentityType());
-    int start = toInt(createTable.getSequenceInitial());
-    int increment = toInt(createTable.getSequenceAllocate());
+    IdentityGenerated generated = fromGenerated(createTable.getIdentityGenerated());
+    int start = toInt(createTable.getIdentityStart(), createTable.getSequenceInitial());
+    int increment = toInt(createTable.getIdentityIncrement(), createTable.getSequenceAllocate());
+    int cache = toInt(createTable.getIdentityCache(), null);
     String seqName = createTable.getSequenceName();
 
-    return new IdentityMode(type, IdentityGenerated.AUTO, start, increment, seqName);
+    return new IdentityMode(type, generated, start, increment, cache, seqName);
+  }
+
+  private static IdentityGenerated fromGenerated(String identityGenerated) {
+    if (identityGenerated == null) {
+      return IdentityGenerated.AUTO;
+    }
+    return IdentityGenerated.valueOf(identityGenerated.toUpperCase());
   }
 
   /**
@@ -39,8 +48,13 @@ class MTableIdentity {
       createTable.setSequenceName(seqName);
     }
 
-    createTable.setSequenceInitial(toBigInteger(identityMode.getStart()));
-    createTable.setSequenceAllocate(toBigInteger(identityMode.getIncrement()));
+    createTable.setIdentityStart(toBigInteger(identityMode.getStart()));
+    createTable.setIdentityIncrement(toBigInteger(identityMode.getIncrement()));
+    createTable.setIdentityCache(toBigInteger(identityMode.getCache()));
+    final IdentityGenerated generated = identityMode.getGenerated();
+    if (generated != null && generated != IdentityGenerated.AUTO) {
+      createTable.setIdentityGenerated(generated.name().toLowerCase());
+    }
   }
 
 
@@ -81,8 +95,11 @@ class MTableIdentity {
     return null;
   }
 
-  private static int toInt(BigInteger value) {
-    return (value == null) ? 0 : value.intValue();
+  private static int toInt(BigInteger firstVal, BigInteger secVal) {
+    if (firstVal != null) {
+      return firstVal.intValue();
+    }
+    return (secVal == null) ? 0 : secVal.intValue();
   }
 
   private static BigInteger toBigInteger(int value) {

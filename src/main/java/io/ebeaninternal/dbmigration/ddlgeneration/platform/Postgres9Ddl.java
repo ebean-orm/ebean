@@ -12,7 +12,7 @@ public class Postgres9Ddl extends PostgresDdl {
    * Map bigint, integer and smallint into their equivalent serial types.
    */
   @Override
-  public String asIdentityColumn(String columnDefn) {
+  public String asIdentityColumn(String columnDefn, DdlIdentity identity) {
     if ("bigint".equalsIgnoreCase(columnDefn)) {
       return "bigserial";
     }
