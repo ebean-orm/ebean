@@ -76,8 +76,8 @@ public class OraclePlatform extends DatabasePlatform {
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
-    return new OracleSequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int increment, String seqName) {
+    return new OracleDbSequence(be, ds, seqName, increment);
   }
 
   @Override

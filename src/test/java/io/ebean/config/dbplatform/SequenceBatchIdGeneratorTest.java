@@ -39,18 +39,18 @@ public class SequenceBatchIdGeneratorTest {
     }
 
     @Override
-    public String getSql(int batchSize) {
+    public String getSql() {
       return "not used";
     }
 
     @Override
-    protected List<Long> readIds(ResultSet resultSet, int loadSize) {
+    protected List<Long> readIds(ResultSet resultSet) {
       // do nothing
       return null;
     }
 
     @Override
-    protected List<Long> getMoreIds(int requestSize) {
+    protected List<Long> getMoreIds() {
       return null;
     }
 

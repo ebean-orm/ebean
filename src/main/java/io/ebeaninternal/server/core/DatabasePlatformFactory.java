@@ -7,7 +7,6 @@ import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
-import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
@@ -164,8 +163,6 @@ public class DatabasePlatformFactory {
       return mysqlVersion(majorVersion, minorVersion);
     } else if (dbProductName.contains("h2")) {
       return new H2Platform();
-    } else if (dbProductName.contains("hsql database engine")) {
-      return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
       return readPostgres(connection, majorVersion);
     } else if (dbProductName.contains("nuo")) {

@@ -13,19 +13,25 @@ import java.util.List;
  */
 public abstract class SequenceStepIdGenerator extends SequenceIdGenerator {
 
+  private final String nextSql;
   /**
    * Construct with stepSize (typically 50).
    */
-  protected SequenceStepIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int stepSize) {
+  protected SequenceStepIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int stepSize, String nextSql) {
     super(be, ds, seqName, stepSize);
+    this.nextSql = nextSql;
+  }
+
+  @Override
+  public String getSql() {
+    return nextSql;
   }
 
   /**
    * Add the next set of Ids as the next value plus all the following numbers up to the step size.
    */
   @Override
-  protected List<Long> readIds(ResultSet resultSet, int ignoreRequestSize) throws SQLException {
-
+  protected List<Long> readIds(ResultSet resultSet) throws SQLException {
     List<Long> newIds = new ArrayList<>(allocationSize);
     if (resultSet.next()) {
       long start = resultSet.getLong(1);

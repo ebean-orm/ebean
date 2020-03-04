@@ -36,7 +36,6 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
     this.dbIdentity.setSupportsSequence(true);
-    this.sequenceBatchMode = false;
 
     this.exceptionTranslator =
       new SqlErrorCodes()
@@ -95,12 +94,9 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     sb.append('[').append(ch).append(']');
   }
 
-  /**
-   * Create a Postgres specific sequence IdGenerator.
-   */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
-    return new SqlServerStepSequence(be, ds, seqName, stepSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int increment, String seqName) {
+    return new SqlServerDbSequence(be, ds, seqName, increment);
   }
 
   /**

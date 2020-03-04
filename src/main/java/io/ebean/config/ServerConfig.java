@@ -1051,18 +1051,6 @@ public class ServerConfig {
   }
 
   /**
-   * Set the number of sequences to fetch/preallocate when using DB sequences.
-   * <p>
-   * This is a performance optimisation to reduce the number times Ebean
-   * requests a sequence to be used as an Id for a bean (aka reduce network
-   * chatter).
-   * </p>
-   */
-  public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
-  }
-
-  /**
    * Return the default JDBC fetchSize hint for findList queries.
    */
   public int getJdbcFetchSizeFindList() {
@@ -1826,32 +1814,6 @@ public class ServerConfig {
    */
   public void setDatabaseBooleanFalse(String databaseFalse) {
     this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
-  }
-
-  /**
-   * Return the number of DB sequence values that should be preallocated.
-   */
-  public int getDatabaseSequenceBatchSize() {
-    return platformConfig.getDatabaseSequenceBatchSize();
-  }
-
-  /**
-   * Set the number of DB sequence values that should be preallocated and cached
-   * by Ebean.
-   * <p>
-   * This is only used for DB's that use sequences and is a performance
-   * optimisation. This reduces the number of times Ebean needs to get a
-   * sequence value from the Database reducing network chatter.
-   * </p>
-   * <p>
-   * By default this value is 10 so when we need another Id (and don't have one
-   * in our cache) Ebean will fetch 10 id's from the database. Note that when
-   * the cache drops to have full (which is 5 by default) Ebean will fetch
-   * another batch of Id's in a background thread.
-   * </p>
-   */
-  public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
-    this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
   /**

@@ -35,11 +35,6 @@ public class PlatformConfig {
   private String databaseBooleanFalse;
 
   /**
-   * For DB's using sequences this is the number of sequence values prefetched.
-   */
-  private int databaseSequenceBatchSize = 20;
-
-  /**
    * Set for DB's that support both Sequence and Identity (and the default choice is not desired).
    */
   private IdType idType;
@@ -79,7 +74,6 @@ public class PlatformConfig {
   public PlatformConfig(PlatformConfig platformConfig) {
     this.databaseBooleanFalse = platformConfig.databaseBooleanFalse;
     this.databaseBooleanTrue = platformConfig.databaseBooleanTrue;
-    this.databaseSequenceBatchSize = platformConfig.databaseSequenceBatchSize;
     this.idType = platformConfig.idType;
     this.geometrySRID = platformConfig.geometrySRID;
     this.dbUuid = platformConfig.dbUuid;
@@ -171,20 +165,6 @@ public class PlatformConfig {
    */
   public void setDatabaseBooleanFalse(String databaseBooleanFalse) {
     this.databaseBooleanFalse = databaseBooleanFalse;
-  }
-
-  /**
-   * Return the number of DB sequence values that should be preallocated.
-   */
-  public int getDatabaseSequenceBatchSize() {
-    return databaseSequenceBatchSize;
-  }
-
-  /**
-   * Set the number of DB sequence values that should be preallocated.
-   */
-  public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
-    this.databaseSequenceBatchSize = databaseSequenceBatchSize;
   }
 
   /**
@@ -294,7 +274,6 @@ public class PlatformConfig {
   public void loadSettings(PropertiesWrapper p) {
 
     idType = p.getEnum(IdType.class, "idType", idType);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databaseInetAddressVarchar = p.getBoolean("databaseInetAddressVarchar", databaseInetAddressVarchar);

@@ -59,7 +59,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     this.allocationSize = allocationSize;
   }
 
-  public abstract String getSql(int batchSize);
+  public abstract String getSql();
 
   /**
    * Returns the sequence name.
@@ -102,7 +102,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       if (size > 0) {
         maybeLoadMoreInBackground(size);
       } else {
-        loadMore(allocationSize);
+        loadMore();
       }
       return idList.pollFirst();
     }
@@ -116,8 +116,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     }
   }
 
-  private void loadMore(int requestSize) {
-    List<Long> newIds = getMoreIds(requestSize);
+  private void loadMore() {
+    List<Long> newIds = getMoreIds();
     synchronized (monitor) {
       idList.addAll(newIds);
     }
@@ -139,7 +139,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       currentlyBackgroundLoading = true;
 
       backgroundExecutor.execute(() -> {
-        loadMore(requestSize);
+        loadMore();
         synchronized (backgroundLoadMonitor) {
           currentlyBackgroundLoading = false;
         }
@@ -150,14 +150,14 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   /**
    * Read the resultSet returning the list of Id values.
    */
-  protected abstract List<Long> readIds(ResultSet resultSet, int loadSize) throws SQLException;
+  protected abstract List<Long> readIds(ResultSet resultSet) throws SQLException;
 
   /**
    * Get more Id's by executing a query and reading the Id's returned.
    */
-  protected List<Long> getMoreIds(int requestSize) {
+  protected List<Long> getMoreIds() {
 
-    String sql = getSql(requestSize);
+    String sql = getSql();
 
     Connection connection = null;
     PreparedStatement statement = null;
@@ -168,7 +168,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       statement = connection.prepareStatement(sql);
       resultSet = statement.executeQuery();
 
-      List<Long> newIds = readIds(resultSet, requestSize);
+      List<Long> newIds = readIds(resultSet);
       if (logger.isTraceEnabled()) {
         logger.trace("seq:{} loaded:{} sql:{}", seqName, newIds.size(), sql);
       }
