@@ -252,7 +252,10 @@ public class BaseTableDdl implements TableDdl {
     if ((pk.size() == 1)) {
       final IdentityMode identityMode = MTableIdentity.fromCreateTable(createTable);
       IdType idType = platformDdl.useIdentityType(identityMode.getIdType());
-      String sequenceName = (IdType.SEQUENCE != idType) ? null : sequenceName(createTable, pk, identity);
+      String sequenceName = identityMode.getSequenceName();
+      if (IdType.SEQUENCE == idType && (sequenceName == null || sequenceName.isEmpty())) {
+        sequenceName = sequenceName(createTable, pk);
+      }
       identity = new DdlIdentity(idType, identityMode, sequenceName);
     }
 
@@ -308,12 +311,8 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private String sequenceName(CreateTable createTable, List<Column> pk, DdlIdentity identity) {
-    String seqName = identity.getSequenceName();
-    if (seqName == null || seqName.isEmpty()) {
-      seqName = namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
-    }
-    return seqName;
+  private String sequenceName(CreateTable createTable, List<Column> pk) {
+    return namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
   }
 
   /**
