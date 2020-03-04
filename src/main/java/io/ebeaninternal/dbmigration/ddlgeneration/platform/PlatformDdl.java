@@ -368,7 +368,7 @@ public class PlatformDdl {
   public String createSequence(String sequenceName, DdlIdentity identity) {
     StringBuilder sb = new StringBuilder("create sequence ");
     sb.append(sequenceName);
-    identity.sequenceOptions(sequenceStartWith, sequenceIncrementBy, sequenceCache);
+    sb.append(identity.sequenceOptions(sequenceStartWith, sequenceIncrementBy, sequenceCache));
     sb.append(";");
     return sb.toString();
   }

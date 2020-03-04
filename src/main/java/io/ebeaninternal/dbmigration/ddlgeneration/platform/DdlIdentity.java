@@ -63,6 +63,8 @@ public class DdlIdentity {
     StringBuilder sb = new StringBuilder(40);
     if (brackets) {
       sb.append(" (");
+    } else {
+      sb.append(" ");
     }
     optionFor(sb, startWith, identityMode.getStart());
     optionFor(sb, incrementBy, identityMode.getIncrement());
