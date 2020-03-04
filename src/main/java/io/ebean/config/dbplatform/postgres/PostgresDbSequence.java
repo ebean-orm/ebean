@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 class PostgresDbSequence extends SequenceStepIdGenerator {
 
   PostgresDbSequence(BackgroundExecutor be, DataSource ds, String seqName, int stepSize) {
-    super(be, ds, seqName, stepSize, "select nextval('\" + seqName + \"')");
+    super(be, ds, seqName, stepSize, "select nextval('" + seqName + "')");
   }
 
 }
