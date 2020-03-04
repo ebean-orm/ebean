@@ -1,6 +1,5 @@
 package org.tests.model.embedded;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
@@ -18,7 +17,6 @@ public class RevisionId {
     this.primaryId = primaryId;
   }
 
-  @Column(name = "revision")
   public Integer getRevision() {
     return revision;
   }

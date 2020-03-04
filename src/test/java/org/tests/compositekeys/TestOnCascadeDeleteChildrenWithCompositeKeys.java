@@ -95,8 +95,10 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Entity
   @Table(name = "em_user")
   public static class User {
+    @Id
     private Long id;
     private String name;
+    @OneToMany(cascade = CascadeType.REMOVE)
     private Set<UserRole> userRoles;
 
     public User() {
@@ -107,7 +109,6 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
       this.name = name;
     }
 
-    @Id
     public Long getId() {
       return id;
     }
@@ -124,7 +125,6 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
       this.name = name;
     }
 
-    @OneToMany(cascade = CascadeType.REMOVE)
     public Set<UserRole> getUserRoles() {
       return userRoles;
     }
@@ -138,11 +138,18 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Table(name = "em_user_role")
   public static class UserRole implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UserRolePK pk;
-    private User user;
-    private Role role;
 
     @EmbeddedId
+    private UserRolePK pk;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false, insertable = false, updatable = false)
+    private Role role;
+
     public UserRolePK getPk() {
       return pk;
     }
@@ -151,8 +158,6 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
       this.pk = pk;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     public User getUser() {
       return user;
     }
@@ -161,8 +166,6 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
       this.user = user;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false, insertable = false, updatable = false)
     public Role getRole() {
       return role;
     }
@@ -213,11 +216,12 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Entity
   @Table(name = "em_role")
   public static class Role {
+    @Id
     private Long id;
     private String name;
+    @OneToMany(cascade = CascadeType.REMOVE)
     private Set<UserRole> userRoles;
 
-    @Id
     public Long getId() {
       return id;
     }
@@ -234,7 +238,6 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
       this.name = name;
     }
 
-    @OneToMany(cascade = CascadeType.REMOVE)
     public Set<UserRole> getUserRoles() {
       return userRoles;
     }

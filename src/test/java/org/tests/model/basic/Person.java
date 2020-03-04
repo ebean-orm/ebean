@@ -18,18 +18,24 @@ public class Person implements Serializable {
 
   private static final long serialVersionUID = 495045977245770183L;
 
+  @Id
+  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @SequenceGenerator(name = "PERSONS_SEQ", initialValue = 1000, allocationSize = 40)
+  @Column(name = "ID", unique = true, nullable = false)
   private Long id;
+
+  @Column(name = "SURNAME", nullable = false, unique = false, columnDefinition = "varchar(64)")
   private String surname;
+
+  @Column(name = "NAME", nullable = false, unique = false, columnDefinition = "varchar(64)")
   private String name;
+
+  @OneToMany(targetEntity = Phone.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "person")
   private List<Phone> phones;
 
   public Person() {
   }
 
-  @Id
-  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
-  @SequenceGenerator(name = "PERSONS_SEQ", initialValue = 1000, allocationSize = 40)
-  @Column(name = "ID", unique = true, nullable = false)
   public Long getId() {
     return id;
   }
@@ -38,7 +44,6 @@ public class Person implements Serializable {
     this.id = id;
   }
 
-  @Column(name = "SURNAME", nullable = false, unique = false, columnDefinition = "varchar(64)")
   public String getSurname() {
     return surname;
   }
@@ -47,7 +52,6 @@ public class Person implements Serializable {
     this.surname = surname;
   }
 
-  @Column(name = "NAME", nullable = false, unique = false, columnDefinition = "varchar(64)")
   public String getName() {
     return name;
   }
@@ -56,7 +60,6 @@ public class Person implements Serializable {
     this.name = name;
   }
 
-  @OneToMany(targetEntity = Phone.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "person")
   public List<Phone> getPhones() {
     return phones;
   }
