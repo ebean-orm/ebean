@@ -62,11 +62,7 @@ public class DdlScript {
     if (ddl == null) {
       ddl = new ArrayList<>();
     }
-    return ddl;
-  }
-
-  public void setDdl(List<String> ddl) {
-    this.ddl = ddl;
+    return this.ddl;
   }
 
   /**

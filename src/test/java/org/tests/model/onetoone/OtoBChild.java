@@ -1,11 +1,15 @@
 package org.tests.model.onetoone;
 
+import io.ebean.annotation.Identity;
+import io.ebean.annotation.IdentityGenerated;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 
+@Identity(generated = IdentityGenerated.BY_DEFAULT)
 @Entity
 public class OtoBChild {
 

@@ -1,6 +1,7 @@
 package org.tests.model.draftable;
 
 import io.ebean.Model;
+import io.ebean.annotation.Identity;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
 
@@ -9,6 +10,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 import java.sql.Timestamp;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
+@Identity(generated = BY_DEFAULT)
 @MappedSuperclass
 public class BaseDomain extends Model {
 

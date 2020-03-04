@@ -112,6 +112,10 @@
       <xsd:attribute name="withHistory" type="xsd:boolean"/>
       <xsd:attribute name="draft" type="xsd:boolean"/>
       <xsd:attribute name="identityType" type="identityType"/>
+      <xsd:attribute name="identityStart" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityIncrement" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityCache" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityGenerated" type="xsd:string"/>
       <xsd:attribute name="sequenceName" type="xsd:string"/>
       <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>
       <xsd:attribute name="sequenceAllocate" type="xsd:positiveInteger"/>

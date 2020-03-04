@@ -1,11 +1,15 @@
 package org.tests.model.m2m;
 
+import io.ebean.annotation.Identity;
 import org.tests.model.BaseModel;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import java.util.List;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
+@Identity(generated = BY_DEFAULT)
 @Entity
 public class MnyC extends BaseModel {
 

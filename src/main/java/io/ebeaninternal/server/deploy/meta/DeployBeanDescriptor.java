@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.annotation.Identity;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
@@ -17,6 +18,7 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
+import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.ChainedBeanPersistController;
@@ -85,24 +87,11 @@ public class DeployBeanDescriptor<T> {
 
   private DeployBeanProperty orderColumn;
 
-  /**
-   * Type of Identity generation strategy used.
-   */
-  private IdType idType;
-
   private Class<?> idClass;
 
   private DeployBeanPropertyAssocOne<?> idClassProperty;
 
-  /**
-   * Set to true if the identity is default for the platform.
-   */
-  private boolean idTypePlatformDefault;
-
-  /**
-   * The name of an IdGenerator (optional).
-   */
-  private String idGeneratorName;
+  private DeployIdentityMode identityMode = DeployIdentityMode.auto();
 
   private PlatformIdGenerator idGenerator;
 
@@ -110,15 +99,6 @@ public class DeployBeanDescriptor<T> {
    * Set true when explicit auto generated Id.
    */
   private boolean idGeneratedValue;
-
-  /**
-   * The database sequence name (optional).
-   */
-  private String sequenceName;
-
-  private int sequenceInitialValue;
-
-  private int sequenceAllocationSize = 50;
 
   /**
    * Used with Identity columns but no getGeneratedKeys support.
@@ -244,8 +224,7 @@ public class DeployBeanDescriptor<T> {
    */
   public void setPrimaryKeyJoin(TableJoin join) {
     this.primaryKeyJoin = join;
-    this.idType = IdType.EXTERNAL;
-    this.idGeneratorName = null;
+    this.identityMode.setIdType(IdType.EXTERNAL);
     this.idGenerator = null;
   }
 
@@ -399,20 +378,44 @@ public class DeployBeanDescriptor<T> {
     return entityType;
   }
 
-  public void setSequenceInitialValue(int sequenceInitialValue) {
-    this.sequenceInitialValue = sequenceInitialValue;
+  /**
+   * Return the immutable IdentityMode.
+   */
+  public IdentityMode buildIdentityMode() {
+    return new IdentityMode(identityMode);
   }
 
-  public void setSequenceAllocationSize(int sequenceAllocationSize) {
-    this.sequenceAllocationSize = sequenceAllocationSize;
+  public DeployIdentityMode getIdentityMode() {
+    return identityMode;
   }
 
-  public int getSequenceInitialValue() {
-    return sequenceInitialValue;
+  public void setIdentityMode(Identity identity) {
+    this.identityMode = new DeployIdentityMode(identity);
   }
 
-  public int getSequenceAllocationSize() {
-    return sequenceAllocationSize;
+  /**
+   * Set from <code>@Sequence</code>
+   */
+  public void setIdentitySequence(int initialValue, int allocationSize, String seqName) {
+    identityMode.setSequence(initialValue, allocationSize, seqName);
+  }
+
+  /**
+   * Potentially set sequence name from <code>@GeneratedValue</code>.
+   */
+  public void setIdentitySequenceGenerator(String genName) {
+    identityMode.setSequenceGenerator(genName);
+  }
+
+  /**
+   * Return the sequence increment to use given sequence batch mode.
+   */
+  public int setIdentitySequenceBatchMode(boolean sequenceBatchMode) {
+    return identityMode.setSequenceBatchMode(sequenceBatchMode);
+  }
+
+  public void setIdentityType(IdType type) {
+    this.identityMode.setIdType(type);
   }
 
   public String[] getProperties() {
@@ -761,48 +764,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return the identity generation type.
-   */
-  public IdType getIdType() {
-    return idType;
-  }
-
-  /**
-   * Set the identity generation type.
-   */
-  public void setIdType(IdType idType) {
-    this.idType = idType;
-  }
-
-  /**
-   * Set when the identity type is the platform default.
-   */
-  public void setIdTypePlatformDefault() {
-    this.idTypePlatformDefault = true;
-  }
-
-  /**
-   * Return true when the identity is the platform default.
-   */
-  public boolean isIdTypePlatformDefault() {
-    return idTypePlatformDefault;
-  }
-
-  /**
-   * Return the DB sequence name (can be null).
-   */
-  public String getSequenceName() {
-    return sequenceName;
-  }
-
-  /**
-   * Set the DB sequence name.
-   */
-  private void setSequenceName(String sequenceName) {
-    this.sequenceName = sequenceName;
-  }
-
-  /**
    * Return the SQL used to return the last inserted Id.
    * <p>
    * Used with Identity columns where getGeneratedKeys is not supported.
@@ -825,21 +786,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return the name of the IdGenerator that should be used with this type of
-   * bean. A null value could be used to specify the 'default' IdGenerator.
-   */
-  public String getIdGeneratorName() {
-    return idGeneratorName;
-  }
-
-  /**
-   * Set the name of the IdGenerator that should be used with this type of bean.
-   */
-  public void setIdGeneratorName(String idGeneratorName) {
-    this.idGeneratorName = idGeneratorName;
-  }
-
-  /**
    * Return the actual IdGenerator for this bean type (can be null).
    */
   public PlatformIdGenerator getIdGenerator() {
@@ -851,9 +797,6 @@ public class DeployBeanDescriptor<T> {
    */
   public void setIdGenerator(PlatformIdGenerator idGenerator) {
     this.idGenerator = idGenerator;
-    if (idGenerator != null && idGenerator.isDbSequence()) {
-      setSequenceName(idGenerator.getName());
-    }
   }
 
   /**
@@ -871,25 +814,25 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Assign the standard UUID generator.
+   * Assign the standard UUID generator if one has not been set.
    */
   public void setUuidGenerator() {
-    this.idType = IdType.EXTERNAL;
-    this.idGeneratorName = PlatformIdGenerator.AUTO_UUID;
+    if (idGenerator == null) {
+      this.identityMode.setIdType(IdType.EXTERNAL);
+      switch (serverConfig.getUuidVersion()) {
+        case VERSION1:
+          this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
+          break;
 
-    switch (serverConfig.getUuidVersion()) {
-      case VERSION1:
-        this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
-        break;
+        case VERSION1RND:
+          this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
+          break;
 
-      case VERSION1RND:
-        this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
-        break;
-
-      case VERSION4:
-      default:
-        this.idGenerator = UuidV4IdGenerator.INSTANCE;
-        break;
+        case VERSION4:
+        default:
+          this.idGenerator = UuidV4IdGenerator.INSTANCE;
+          break;
+      }
     }
   }
 
@@ -897,8 +840,7 @@ public class DeployBeanDescriptor<T> {
    * Assign a custom external IdGenerator.
    */
   public void setCustomIdGenerator(PlatformIdGenerator idGenerator) {
-    this.idType = IdType.EXTERNAL;
-    this.idGeneratorName = idGenerator.getName();
+    this.identityMode.setIdType(IdType.EXTERNAL);
     this.idGenerator = idGenerator;
   }
 
@@ -951,7 +893,6 @@ public class DeployBeanDescriptor<T> {
    * is non-numeric (and hence not suitable for db identity or sequence.
    */
   public boolean isPrimaryKeyCompoundOrNonNumeric() {
-
     DeployBeanProperty id = idProperty();
     if (id == null) {
       return false;

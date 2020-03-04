@@ -10,7 +10,6 @@ import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Test;
 
@@ -76,7 +75,7 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
-  public void testAlterColumnBaseAttributes() throws Exception {
+  public void testAlterColumnBaseAttributes() {
 
     AlterColumn alterColumn = alterNotNull();
     assertNull(h2Ddl.alterColumnBaseAttributes(alterColumn));
@@ -117,7 +116,7 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
-  public void testAlterColumnType() throws Exception {
+  public void testAlterColumnType() {
 
     String sql = h2Ddl.alterColumnType("mytab", "acol", "varchar(20)");
     assertEquals("alter table mytab alter column acol varchar(20)", sql);
@@ -139,7 +138,7 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
-  public void testAlterColumnNotnull() throws Exception {
+  public void testAlterColumnNotnull() {
 
     String sql = h2Ddl.alterColumnNotnull("mytab", "acol", true);
     assertEquals("alter table mytab alter column acol set not null", sql);
@@ -161,7 +160,7 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
-  public void testAlterColumnNull() throws Exception {
+  public void testAlterColumnNull() {
 
     String sql = h2Ddl.alterColumnNotnull("mytab", "acol", false);
     assertEquals("alter table mytab alter column acol set null", sql);
@@ -183,7 +182,7 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
-  public void testAlterColumnDefaultValue() throws Exception {
+  public void testAlterColumnDefaultValue() {
 
     String sql = h2Ddl.alterColumnDefaultValue("mytab", "acol", "'hi'");
     assertEquals("alter table mytab alter column acol set default 'hi'", sql);
@@ -203,15 +202,14 @@ public class PlatformDdl_AlterColumnTest {
     boolean exceptionCaught = false;
     try {
       hanaDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    }
-    catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException e) {
       exceptionCaught = true;
     }
     assertTrue(exceptionCaught);
   }
 
   @Test
-  public void testAlterColumnDropDefault() throws Exception {
+  public void testAlterColumnDropDefault() {
 
     String sql = h2Ddl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
     assertEquals("alter table mytab alter column acol drop default", sql);
@@ -231,8 +229,7 @@ public class PlatformDdl_AlterColumnTest {
     boolean exceptionCaught = false;
     try {
       hanaDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    }
-    catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException e) {
       exceptionCaught = true;
     }
     assertTrue(exceptionCaught);
@@ -241,49 +238,49 @@ public class PlatformDdl_AlterColumnTest {
   @Test
   public void useIdentityType_h2() {
     assertEquals(h2Ddl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(h2Ddl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(h2Ddl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
-    assertEquals(h2Ddl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
-    assertEquals(h2Ddl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+    assertEquals(h2Ddl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
+    assertEquals(h2Ddl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
+    assertEquals(h2Ddl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
+    assertEquals(h2Ddl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
   }
 
   @Test
   public void useIdentityType_postgres() {
-    assertEquals(pgDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
-    assertEquals(pgDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+    assertEquals(pgDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
+    assertEquals(pgDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
 
     assertEquals(pgDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(pgDdl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(pgDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
+    assertEquals(pgDdl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
+    assertEquals(pgDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
   }
 
   @Test
   public void useIdentityType_mysql() {
 
     assertEquals(mysqlDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(mysqlDdl.useIdentityType(IdentityType.SEQUENCE), IdType.IDENTITY);
-    assertEquals(mysqlDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
-    assertEquals(mysqlDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
-    assertEquals(mysqlDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+    assertEquals(mysqlDdl.useIdentityType(IdType.SEQUENCE), IdType.IDENTITY);
+    assertEquals(mysqlDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
+    assertEquals(mysqlDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
+    assertEquals(mysqlDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
   }
 
   @Test
   public void useIdentityType_oracle() {
 
     assertEquals(oraDdl.useIdentityType(null), IdType.SEQUENCE);
-    assertEquals(oraDdl.useIdentityType(IdentityType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(oraDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
-    assertEquals(oraDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
-    assertEquals(oraDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+    assertEquals(oraDdl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
+    assertEquals(oraDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
+    assertEquals(oraDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
+    assertEquals(oraDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
   }
 
   @Test
   public void useIdentityType_hana() {
 
     assertEquals(hanaDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(hanaDdl.useIdentityType(IdentityType.SEQUENCE), IdType.IDENTITY);
-    assertEquals(hanaDdl.useIdentityType(IdentityType.IDENTITY), IdType.IDENTITY);
-    assertEquals(hanaDdl.useIdentityType(IdentityType.GENERATOR), IdType.GENERATOR);
-    assertEquals(hanaDdl.useIdentityType(IdentityType.EXTERNAL), IdType.EXTERNAL);
+    assertEquals(hanaDdl.useIdentityType(IdType.SEQUENCE), IdType.IDENTITY);
+    assertEquals(hanaDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
+    assertEquals(hanaDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
+    assertEquals(hanaDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
   }
 }

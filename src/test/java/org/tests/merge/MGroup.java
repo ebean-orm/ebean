@@ -1,12 +1,16 @@
 package org.tests.merge;
 
+import io.ebean.annotation.Identity;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
 
 @Entity
 public class MGroup {
 
-  @Id
+  @Id @Identity(generated = BY_DEFAULT)
   private long id;
 
   private String name;

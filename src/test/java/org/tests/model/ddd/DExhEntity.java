@@ -1,5 +1,6 @@
 package org.tests.model.ddd;
 
+import io.ebean.annotation.Identity;
 import org.tests.model.ivo.Oid;
 import org.tests.model.ivo.converter.AnEnumType;
 
@@ -8,6 +9,9 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import java.sql.Timestamp;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
+@Identity(generated = BY_DEFAULT)
 @Entity
 public class DExhEntity {
 

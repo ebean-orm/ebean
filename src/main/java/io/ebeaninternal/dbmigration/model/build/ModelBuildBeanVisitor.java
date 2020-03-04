@@ -1,13 +1,10 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.visitor.BeanVisitor;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.InheritInfo;
 
 /**
@@ -35,19 +32,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
       return null;
     }
 
-    MTable table = new MTable(descriptor.getBaseTable());
-    table.setStorageEngine(descriptor.getStorageEngine());
-    table.setPartitionMeta(descriptor.getPartitionMeta());
-    table.setComment(descriptor.getDbComment());
-    if (descriptor.isHistorySupport()) {
-      table.setWithHistory(true);
-      BeanProperty whenCreated = descriptor.getWhenCreatedProperty();
-      if (whenCreated != null) {
-        table.setWhenCreatedColumn(whenCreated.getDbColumn());
-      }
-    }
-    setIdentity(descriptor, table);
-
+    MTable table = new MTable(descriptor);
     // add the table to the model
     ctx.addTable(table);
 
@@ -64,45 +49,6 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     }
 
     return new ModelBuildPropertyVisitor(ctx, table, descriptor);
-  }
-
-  /**
-   * Set the identity type to use for this table.
-   * <p>
-   * Takes into account the requested identity type and the underlying support in the
-   * database platform.
-   * </p>
-   */
-  private void setIdentity(BeanDescriptor<?> descriptor, MTable table) {
-
-    if (IdType.GENERATOR == descriptor.getIdType()) {
-      // explicit generator like UUID
-      table.setIdentityType(IdentityType.GENERATOR);
-      return;
-    }
-    if (IdType.EXTERNAL == descriptor.getIdType()) {
-      // externally defined code (lookup table, ISO country code etc)
-      table.setIdentityType(IdentityType.EXTERNAL);
-      return;
-    }
-
-    int initialValue = descriptor.getSequenceInitialValue();
-    int allocationSize = descriptor.getSequenceAllocationSize();
-
-    if (!descriptor.isIdTypePlatformDefault() || initialValue > 0 || allocationSize > 0) {
-      // explicitly set to use sequence or identity (generally not recommended practice)
-      if (IdType.IDENTITY == descriptor.getIdType()) {
-        if (!descriptor.isIdTypePlatformDefault()) {
-          table.setIdentityType(IdentityType.IDENTITY);
-        }
-      } else {
-        // explicit sequence defined
-        table.setIdentityType(IdentityType.SEQUENCE);
-        table.setSequenceName(descriptor.getSequenceName());
-        table.setSequenceInitial(initialValue);
-        table.setSequenceAllocate(allocationSize);
-      }
-    }
   }
 
 }

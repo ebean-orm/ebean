@@ -155,27 +155,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final EntityType entityType;
 
   /**
-   * Type of Identity generation strategy used.
-   */
-  private final IdType idType;
-
-  /**
    * Set when Id property is marked with GeneratedValue annotation.
    */
   private final boolean idGeneratedValue;
-
-  private final boolean idTypePlatformDefault;
-
   private final PlatformIdGenerator idGenerator;
-
-  /**
-   * The database sequence name (optional).
-   */
-  private final String sequenceName;
-
-  private final int sequenceInitialValue;
-
-  private final int sequenceAllocationSize;
+  private final IdentityMode identityMode;
+  private final IdType idType;
 
   /**
    * SQL used to return last inserted id. Used for Identity columns where
@@ -456,13 +441,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.changeLogFilter = deploy.getChangeLogFilter();
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
-    this.idType = deploy.getIdType();
+    this.identityMode = deploy.buildIdentityMode();
+    this.idType = identityMode.getIdType();
     this.idGeneratedValue = deploy.isIdGeneratedValue();
-    this.idTypePlatformDefault = deploy.isIdTypePlatformDefault();
     this.idGenerator = deploy.getIdGenerator();
-    this.sequenceName = deploy.getSequenceName();
-    this.sequenceInitialValue = deploy.getSequenceInitialValue();
-    this.sequenceAllocationSize = deploy.getSequenceAllocationSize();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
     this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
@@ -3158,33 +3140,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return idGeneratedValue;
   }
 
-  /**
-   * Return true if the identity is the platform default (not explicitly set).
-   */
-  public boolean isIdTypePlatformDefault() {
-    return idTypePlatformDefault;
-  }
-
-  /**
-   * Return the sequence name.
-   */
-  @Override
-  public String getSequenceName() {
-    return sequenceName;
-  }
-
-  /**
-   * Return the sequence initial value.
-   */
-  public int getSequenceInitialValue() {
-    return sequenceInitialValue;
-  }
-
-  /**
-   * Return the sequence allocation size.
-   */
-  public int getSequenceAllocationSize() {
-    return sequenceAllocationSize;
+  public IdentityMode getIdentityMode() {
+    return identityMode;
   }
 
   /**

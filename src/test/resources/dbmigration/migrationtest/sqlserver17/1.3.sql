@@ -6,7 +6,7 @@ create table migtest_e_ref (
   constraint pk_migtest_e_ref primary key (id)
 );
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
-create sequence migtest_e_ref_seq as bigint  start with 1 ;
+create sequence migtest_e_ref_seq as bigint start with 1;
 
 IF OBJECT_ID('fk_migtest_ckey_detail_parent', 'F') IS NOT NULL alter table migtest_ckey_detail drop constraint fk_migtest_ckey_detail_parent;
 IF OBJECT_ID('fk_migtest_fk_cascade_one_id', 'F') IS NOT NULL alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;

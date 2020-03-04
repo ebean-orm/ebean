@@ -1,8 +1,13 @@
 package org.tests.idkeys.db;
 
+import io.ebean.annotation.Identity;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
+@Identity(generated = BY_DEFAULT, start = 1000, cache = 100)
 @Entity
 // Just let Ebean define Identity mechanism for testing across all DB types
 //@SequenceGenerator(name = "AD_SEQ_NAME", sequenceName = "AD_SEQ")

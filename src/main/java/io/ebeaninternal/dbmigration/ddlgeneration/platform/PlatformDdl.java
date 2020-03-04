@@ -19,7 +19,6 @@ import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.io.IOException;
@@ -66,6 +65,12 @@ public class PlatformDdl {
   protected String foreignKeyOnUpdate = "on update";
 
   protected String identitySuffix = " auto_increment";
+  protected String identityStartWith = "start with";
+  protected String identityIncrementBy = "increment by";
+  protected String identityCache = "cache";
+  protected String sequenceStartWith = "start with";
+  protected String sequenceIncrementBy = "increment by";
+  protected String sequenceCache = "cache";
 
   protected String alterTableIfExists = "";
 
@@ -152,8 +157,7 @@ public class PlatformDdl {
    * Return the identity type to use given the support in the underlying database
    * platform for sequences and identity/autoincrement.
    */
-  public IdType useIdentityType(IdentityType modelIdentity) {
-
+  public IdType useIdentityType(IdType modelIdentity) {
     if (modelIdentity == null) {
       // use the default
       return dbIdentity.getIdType();
@@ -165,8 +169,7 @@ public class PlatformDdl {
    * Determine the id type to use based on requested identityType and
    * the support for that in the database platform.
    */
-  private IdType identityType(IdentityType modelIdentity, IdType platformIdType, boolean supportsSequence, boolean supportsIdentity) {
-
+  private IdType identityType(IdType modelIdentity, IdType platformIdType, boolean supportsSequence, boolean supportsIdentity) {
     switch (modelIdentity) {
       case GENERATOR:
         return IdType.GENERATOR;
@@ -184,8 +187,19 @@ public class PlatformDdl {
   /**
    * Modify and return the column definition for autoincrement or identity definition.
    */
-  public String asIdentityColumn(String columnDefn) {
+  public String asIdentityColumn(String columnDefn, DdlIdentity identity) {
     return columnDefn + identitySuffix;
+  }
+
+  /**
+   * SQl2003 standard identity definition.
+   */
+  protected String asIdentityStandardOptions(String columnDefn, DdlIdentity identity) {
+
+    StringBuilder sb = new StringBuilder(columnDefn.length() + 60);
+    sb.append(columnDefn).append(identity.optionGenerated());
+    sb.append(identity.identityOptions(identityStartWith, identityIncrementBy, identityCache));
+    return sb.toString();
   }
 
   /**
@@ -220,13 +234,13 @@ public class PlatformDdl {
   /**
    * Write all the table columns converting to platform types as necessary.
    */
-  public void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
+  public void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) throws IOException {
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         apply.append(",");
       }
       apply.newLine();
-      writeColumnDefinition(apply, columns.get(i), useIdentity);
+      writeColumnDefinition(apply, columns.get(i), identity);
     }
 
     for (Column column : columns) {
@@ -244,11 +258,11 @@ public class PlatformDdl {
   /**
    * Write the column definition to the create table statement.
    */
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) throws IOException {
 
     String columnDefn = convert(column.getType());
-    if (useIdentity && isTrue(column.isPrimaryKey())) {
-      columnDefn = asIdentityColumn(columnDefn);
+    if (identity.useIdentity() && isTrue(column.isPrimaryKey())) {
+      columnDefn = asIdentityColumn(columnDefn, identity);
     }
 
     buffer.append("  ");
@@ -351,16 +365,10 @@ public class PlatformDdl {
   /**
    * Generate and return the create sequence DDL.
    */
-  public String createSequence(String sequenceName, int initialValue, int allocationSize) {
-
+  public String createSequence(String sequenceName, DdlIdentity identity) {
     StringBuilder sb = new StringBuilder("create sequence ");
     sb.append(sequenceName);
-    if (initialValue > 1) {
-      sb.append(" start with ").append(initialValue);
-    }
-    if (allocationSize > 1) {
-      sb.append(" increment by ").append(allocationSize);
-    }
+    identity.sequenceOptions(sequenceStartWith, sequenceIncrementBy, sequenceCache);
     sb.append(";");
     return sb.toString();
   }

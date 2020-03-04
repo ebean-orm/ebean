@@ -56,7 +56,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
       // fluid style adding maxRows/firstRow to filterMany
-      .filterMany("orders").eq("status", Order.Status.NEW).setMaxRows(100).setFirstRow(3)
+      .filterMany("orders").eq("status", Order.Status.NEW).order("id desc").setMaxRows(100).setFirstRow(3)
       .order().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();
@@ -86,7 +86,7 @@ public class TestQueryFilterMany extends BaseTestCase {
       .order().asc("id").setMaxRows(5);
 
     // non-fluid style adding maxRows/firstRow
-    final ExpressionList<Customer> filterMany = query.filterMany("orders").eq("status", Order.Status.NEW);
+    final ExpressionList<Customer> filterMany = query.filterMany("orders").order("id desc").eq("status", Order.Status.NEW);
     filterMany.setMaxRows(100);
     filterMany.setFirstRow(3);
 

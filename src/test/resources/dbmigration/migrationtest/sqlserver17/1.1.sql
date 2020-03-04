@@ -4,7 +4,7 @@ create table migtest_e_user (
   id                            integer not null,
   constraint pk_migtest_e_user primary key (id)
 );
-create sequence migtest_e_user_seq as bigint  start with 1 ;
+create sequence migtest_e_user_seq as bigint start with 1;
 
 create table migtest_mtm_c_migtest_mtm_m (
   migtest_mtm_c_id              integer not null,

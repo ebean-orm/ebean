@@ -25,8 +25,7 @@ public class CockroachDdl extends PlatformDdl {
    * Map bigint, integer and smallint all into serial.
    */
   @Override
-  public String asIdentityColumn(String columnDefn) {
-
+  public String asIdentityColumn(String columnDefn, DdlIdentity identity) {
     if ("bigint".equalsIgnoreCase(columnDefn)) {
       return "serial";
     }

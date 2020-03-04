@@ -4,6 +4,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheQueryTuning;
 import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DocStore;
+import io.ebean.annotation.Identity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,9 +14,12 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+
 /**
  * Product entity bean.
  */
+@Identity(generated = BY_DEFAULT)
 @DocStore
 @Cache
 @CacheQueryTuning(maxSecsToLive = 15)

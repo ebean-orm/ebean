@@ -29,6 +29,8 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
 import io.ebeaninternal.dbmigration.model.MTable;
+import io.ebeaninternal.dbmigration.model.MTableIdentity;
+import io.ebeaninternal.server.deploy.IdentityMode;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -246,21 +248,22 @@ public class BaseTableDdl implements TableDdl {
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
-    boolean singleColumnPrimaryKey = (pk.size() == 1);
-    boolean useIdentity = false;
-    boolean useSequence = false;
-
-    if (singleColumnPrimaryKey) {
-      IdType useDbIdentityType = platformDdl.useIdentityType(createTable.getIdentityType());
-      useIdentity = (IdType.IDENTITY == useDbIdentityType);
-      useSequence = (IdType.SEQUENCE == useDbIdentityType);
+    DdlIdentity identity = DdlIdentity.NONE;
+    if ((pk.size() == 1)) {
+      final IdentityMode identityMode = MTableIdentity.fromCreateTable(createTable);
+      IdType idType = platformDdl.useIdentityType(identityMode.getIdType());
+      String sequenceName = identityMode.getSequenceName();
+      if (IdType.SEQUENCE == idType && (sequenceName == null || sequenceName.isEmpty())) {
+        sequenceName = sequenceName(createTable, pk);
+      }
+      identity = new DdlIdentity(idType, identityMode, sequenceName);
     }
 
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
-    writeTableColumns(apply, columns, useIdentity);
+    writeTableColumns(apply, columns, identity);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
@@ -295,9 +298,8 @@ public class BaseTableDdl implements TableDdl {
     // we drop the related sequence (if sequences are used)
     dropTable(writer.dropAll(), tableName);
 
-    if (useSequence) {
-      String pkCol = pk.get(0).getName();
-      writeSequence(writer, createTable, pkCol);
+    if (identity.useSequence()) {
+      writeSequence(writer, identity);
     }
 
     // add blank line for a bit of whitespace between tables
@@ -307,6 +309,10 @@ public class BaseTableDdl implements TableDdl {
     if (!platformDdl.isInlineForeignKeys()) {
       writeAddForeignKeys(writer, createTable);
     }
+  }
+
+  private String sequenceName(CreateTable createTable, List<Column> pk) {
+    return namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
   }
 
   /**
@@ -348,8 +354,8 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
-    platformDdl.writeTableColumns(apply, columns, useIdentity);
+  private void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) throws IOException {
+    platformDdl.writeTableColumns(apply, columns, identity);
   }
 
   /**
@@ -378,18 +384,9 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  protected void writeSequence(DdlWrite writer, CreateTable createTable, String pk) throws IOException {
-    // explicit sequence use or platform decides
-    String explicitSequenceName = createTable.getSequenceName();
-    int initial = toInt(createTable.getSequenceInitial());
-    int allocate = toInt(createTable.getSequenceAllocate());
-
-    String seqName = explicitSequenceName;
-    if (seqName == null) {
-      seqName = namingConvention.getSequenceName(createTable.getName(), pk);
-    }
-
-    String createSeq = platformDdl.createSequence(seqName, initial, allocate);
+  protected void writeSequence(DdlWrite writer, DdlIdentity identity) throws IOException {
+    String seqName = identity.getSequenceName();
+    String createSeq = platformDdl.createSequence(seqName, identity);
     if (hasValue(createSeq)) {
       writer.apply().append(createSeq).newLine();
       writer.dropAll().appendStatement(platformDdl.dropSequence(seqName));
