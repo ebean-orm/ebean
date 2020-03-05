@@ -82,7 +82,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
     }
-    Column column = get(prop, Column.class);
+    Column column = getMeta(prop, Column.class);
     if (column != null && !isEmpty(column.name())) {
       // have this in for AssocOnes used on
       // Sql based beans...
@@ -100,7 +100,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setForeignKey(new PropertyForeignKey(dbForeignKey));
     }
 
-    Where where = get(prop, Where.class);
+    Where where = platformAnnotationWhere(prop);
     if (where != null) {
       // not expecting this to be used on assoc one properties
       prop.setExtraWhere(where.clause());

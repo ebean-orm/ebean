@@ -459,7 +459,7 @@ public final class DefaultTypeManager implements TypeManager {
    * are annotated with the &#64;JacksonAnnotation meta annotation. So detection is easy.
    */
   private boolean checkJacksonAnnotations(DeployBeanProperty prop) {
-    return AnnotationUtil.findAnnotation(prop.getField(), com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
+    return AnnotationUtil.getMeta(prop.getField(), com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
   private DocPropertyType getDocType(Type genericType) {
@@ -606,7 +606,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     Field[] fields = enumType.getDeclaredFields();
     for (Field field : fields) {
-      EnumValue enumValue = AnnotationUtil.findAnnotation(field, EnumValue.class);
+      EnumValue enumValue = AnnotationUtil.get(field, EnumValue.class);
       if (enumValue != null) {
         nameValueMap.put(field.getName(), enumValue.value());
         if (integerType && !isIntegerType(enumValue.value())) {
@@ -680,7 +680,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     Method[] methods = enumType.getMethods();
     for (Method method : methods) {
-      DbEnumValue dbValue = AnnotationUtil.findAnnotation(method, DbEnumValue.class);
+      DbEnumValue dbValue = AnnotationUtil.get(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
         return createEnumScalarTypeDbValue(enumType, method, integerValues, dbValue.length());

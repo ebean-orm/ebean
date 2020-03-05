@@ -150,41 +150,41 @@ public class TestAnnotationBase extends BaseTestCase {
     Field fld = TestAnnotationBaseEntity.class.getDeclaredField("direct");
     String s;
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
     // meta
     fld = TestAnnotationBaseEntity.class.getDeclaredField("meta");
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
 
     // mixed
     fld = TestAnnotationBaseEntity.class.getDeclaredField("mixed");
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.MYSQL).clause();
     assertEquals("SELECT 'mysql' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.H2).clause();
     assertEquals("SELECT 'h2' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.POSTGRES).clause();
     assertEquals("SELECT 'other' from 1", s);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.ORACLE).clause();
+    s = AnnotationUtil.findPlatform(fld, Where.class, Platform.ORACLE).clause();
     assertEquals("SELECT 'oracle' from 1", s);
   }
 

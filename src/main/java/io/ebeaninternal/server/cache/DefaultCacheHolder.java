@@ -134,7 +134,7 @@ class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getQueryOptions(Class<?> cls) {
-    CacheQueryTuning tuning = AnnotationUtil.findAnnotation(cls, CacheQueryTuning.class);
+    CacheQueryTuning tuning = AnnotationUtil.get(cls, CacheQueryTuning.class);
     if (tuning != null) {
       return new ServerCacheOptions(tuning).applyDefaults(queryDefault);
     }

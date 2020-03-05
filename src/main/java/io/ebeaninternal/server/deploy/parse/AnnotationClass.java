@@ -31,8 +31,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import static io.ebean.util.AnnotationUtil.findAnnotationRecursive;
-import static io.ebean.util.AnnotationUtil.findAnnotationsRecursive;
+import static io.ebean.util.AnnotationUtil.findAllOnType;
+import static io.ebean.util.AnnotationUtil.getOnType;
 
 /**
  * Read the class level deployment annotations.
@@ -64,7 +64,7 @@ public class AnnotationClass extends AnnotationParser {
   void parseAttributeOverride() {
 
     Class<?> cls = descriptor.getBeanType();
-    AttributeOverride override = findAnnotationRecursive(cls, AttributeOverride.class);
+    AttributeOverride override = getOnType(cls, AttributeOverride.class);
     if (override != null) {
       String propertyName = override.name();
       Column column = override.column();
@@ -106,14 +106,14 @@ public class AnnotationClass extends AnnotationParser {
   private void read(Class<?> cls) {
 
     // maybe doc store only so check for this before @Entity
-    DocStore docStore = findAnnotationRecursive(cls, DocStore.class);
+    DocStore docStore = getOnType(cls, DocStore.class);
     if (docStore != null) {
       descriptor.readDocStore(docStore);
       descriptor.setEntityType(EntityType.DOC);
       descriptor.setName(cls.getSimpleName());
     }
 
-    Entity entity = findAnnotationRecursive(cls, Entity.class);
+    Entity entity = getOnType(cls, Entity.class);
     if (entity != null) {
       descriptor.setEntityType(EntityType.ORM);
       if (entity.name().isEmpty()) {
@@ -123,37 +123,37 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Identity identity = findAnnotationRecursive(cls, Identity.class);
+    Identity identity = getOnType(cls, Identity.class);
     if (identity != null) {
       descriptor.setIdentityMode(identity);
     }
 
-    IdClass idClass = findAnnotationRecursive(cls, IdClass.class);
+    IdClass idClass = getOnType(cls, IdClass.class);
     if (idClass != null) {
       descriptor.setIdClass(idClass.value());
     }
 
-    Embeddable embeddable = findAnnotationRecursive(cls, Embeddable.class);
+    Embeddable embeddable = getOnType(cls, Embeddable.class);
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
-    for (Index index : findAnnotationsRecursive(cls, Index.class)) {
+    for (Index index : findAllOnType(cls, Index.class)) {
       descriptor.addIndex(new IndexDefinition(convertColumnNames(index.columnNames()), index.name(),
         index.unique(), index.platforms(), index.concurrent(), index.definition()));
     }
 
-    UniqueConstraint uc = findAnnotationRecursive(cls, UniqueConstraint.class);
+    UniqueConstraint uc = getOnType(cls, UniqueConstraint.class);
     if (uc != null) {
       descriptor.addIndex(new IndexDefinition(convertColumnNames(uc.columnNames())));
     }
 
-    View view = findAnnotationRecursive(cls, View.class);
+    View view = getOnType(cls, View.class);
     if (view != null) {
       descriptor.setView(view.name(), view.dependentTables());
     }
-    Table table = findAnnotationRecursive(cls, Table.class);
+    Table table = getOnType(cls, Table.class);
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
@@ -161,54 +161,54 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    StorageEngine storage = findAnnotationRecursive(cls, StorageEngine.class);
+    StorageEngine storage = getOnType(cls, StorageEngine.class);
     if (storage != null) {
       descriptor.setStorageEngine(storage.value());
     }
 
-    DbPartition partition = findAnnotationRecursive(cls, DbPartition.class);
+    DbPartition partition = getOnType(cls, DbPartition.class);
     if (partition != null) {
       descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
     }
 
-    Draftable draftable = findAnnotationRecursive(cls, Draftable.class);
+    Draftable draftable = getOnType(cls, Draftable.class);
     if (draftable != null) {
       descriptor.setDraftable();
     }
 
-    DraftableElement draftableElement = findAnnotationRecursive(cls, DraftableElement.class);
+    DraftableElement draftableElement = getOnType(cls, DraftableElement.class);
     if (draftableElement != null) {
       descriptor.setDraftableElement();
     }
 
-    ReadAudit readAudit = findAnnotationRecursive(cls, ReadAudit.class);
+    ReadAudit readAudit = getOnType(cls, ReadAudit.class);
     if (readAudit != null) {
       descriptor.setReadAuditing();
     }
 
-    History history = findAnnotationRecursive(cls, History.class);
+    History history = getOnType(cls, History.class);
     if (history != null) {
       descriptor.setHistorySupport();
     }
 
-    DbComment comment = findAnnotationRecursive(cls, DbComment.class);
+    DbComment comment = getOnType(cls, DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
     }
 
     if (!disableL2Cache) {
-      Cache cache = findAnnotationRecursive(cls, Cache.class);
+      Cache cache = getOnType(cls, Cache.class);
       if (cache != null) {
         descriptor.setCache(cache);
       } else {
-        InvalidateQueryCache invalidateQueryCache = findAnnotationRecursive(cls, InvalidateQueryCache.class);
+        InvalidateQueryCache invalidateQueryCache = getOnType(cls, InvalidateQueryCache.class);
         if (invalidateQueryCache != null) {
           descriptor.setInvalidateQueryCache(invalidateQueryCache.region());
         }
       }
     }
 
-    for (NamedQuery namedQuery : findAnnotationsRecursive(cls, NamedQuery.class)) {
+    for (NamedQuery namedQuery : findAllOnType(cls, NamedQuery.class)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
   }

@@ -123,13 +123,11 @@ public class AnnotationFields extends AnnotationParser {
 
     readJsonAnnotations(prop);
 
-    Id id = get(prop, Id.class);
-    if (id != null) {
+    if (has(prop, Id.class)) {
       readIdAssocOne(prop);
     }
 
-    EmbeddedId embeddedId = get(prop, EmbeddedId.class);
-    if (embeddedId != null) {
+    if (has(prop, EmbeddedId.class)) {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
@@ -140,7 +138,7 @@ public class AnnotationFields extends AnnotationParser {
     if (docEmbedded != null) {
       prop.setDocStoreEmbedded(docEmbedded.doc());
       if (descriptor.isDocStoreOnly()) {
-        if (get(prop, ManyToOne.class) == null) {
+        if (has(prop, ManyToOne.class)) {
           prop.setEmbedded();
           prop.setDbInsertable(true);
           prop.setDbUpdateable(true);
@@ -155,7 +153,7 @@ public class AnnotationFields extends AnnotationParser {
       readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>) prop);
     }
 
-    Formula formula = get(prop, Formula.class);
+    Formula formula = getMeta(prop, Formula.class);
     if (formula != null) {
       prop.setSqlFormula(formula.select(), formula.join());
     }
@@ -165,10 +163,10 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void initWhoProperties(DeployBeanProperty prop) {
-    if (get(prop, WhoModified.class) != null) {
+    if (has(prop, WhoModified.class)) {
       generatedPropFactory.setWhoModified(prop);
     }
-    if (get(prop, WhoCreated.class) != null) {
+    if (has(prop, WhoCreated.class)) {
       generatedPropFactory.setWhoCreated(prop);
     }
   }
@@ -188,7 +186,7 @@ public class AnnotationFields extends AnnotationParser {
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
 
-    Column column = get(prop, Column.class);
+    Column column = getMeta(prop, Column.class);
     if (column != null) {
       readColumn(column, prop);
     }
@@ -219,7 +217,7 @@ public class AnnotationFields extends AnnotationParser {
     if (temporal != null) {
       readTemporal(temporal, prop);
 
-    } else if (get(prop, Lob.class) != null) {
+    } else if (has(prop, Lob.class)) {
       util.setLobType(prop);
     }
 
@@ -228,8 +226,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbLength(length.value());
     }
 
-    io.ebean.annotation.NotNull nonNull = get(prop, io.ebean.annotation.NotNull.class);
-    if (nonNull != null) {
+    if (has(prop, io.ebean.annotation.NotNull.class)) {
       prop.setNullable(false);
     }
 
@@ -255,23 +252,22 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
-    if (get(prop, TenantId.class) != null) {
+    if (has(prop, TenantId.class)) {
       prop.setTenantId();
     }
-    if (get(prop, Draft.class) != null) {
+    if (has(prop, Draft.class)) {
       prop.setDraft();
     }
-    if (get(prop, DraftOnly.class) != null) {
+    if (has(prop, DraftOnly.class)) {
       prop.setDraftOnly();
     }
-    if (get(prop, DraftDirty.class) != null) {
+    if (has(prop, DraftDirty.class)) {
       prop.setDraftDirty();
     }
-    if (get(prop, DraftReset.class) != null) {
+    if (has(prop, DraftReset.class)) {
       prop.setDraftReset();
     }
-    SoftDelete softDelete = get(prop, SoftDelete.class);
-    if (softDelete != null) {
+    if (has(prop, SoftDelete.class)) {
       prop.setSoftDelete();
     }
 
@@ -310,18 +306,17 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDocProperty(docProperty);
     }
 
-    Formula formula = get(prop, Formula.class);
+    Formula formula = getMeta(prop, Formula.class);
     if (formula != null) {
       prop.setSqlFormula(formula.select(), formula.join());
     }
 
-    Aggregation aggregation = get(prop, Aggregation.class);
+    String aggregation = aggregation(prop);
     if (aggregation != null) {
-      prop.setAggregation(aggregation.value().replace("$1", prop.getName()));
+      prop.setAggregation(aggregation.replace("$1", prop.getName()));
     }
 
-    Version version = get(prop, Version.class);
-    if (version != null) {
+    if (has(prop, Version.class)) {
       // explicitly specify a version column
       prop.setVersionColumn();
       generatedPropFactory.setVersion(prop);
@@ -338,25 +333,24 @@ public class AnnotationFields extends AnnotationParser {
       prop.setFetchType(defaultLobFetchType);
     }
 
-    if (get(prop, WhenCreated.class) != null || get(prop, CreatedTimestamp.class) != null) {
+    if (has(prop, WhenCreated.class) || has(prop, CreatedTimestamp.class)) {
       generatedPropFactory.setInsertTimestamp(prop);
     }
 
-    if (get(prop, WhenModified.class) != null || get(prop, UpdatedTimestamp.class) != null) {
+    if (has(prop, WhenModified.class) || has(prop, UpdatedTimestamp.class)) {
       generatedPropFactory.setUpdateTimestamp(prop);
     }
 
     initWhoProperties(prop);
 
-    if (get(prop, HistoryExclude.class) != null) {
+    if (has(prop, HistoryExclude.class)) {
       prop.setExcludedFromHistory();
     }
 
     readDbMigration(prop);
 
     // Want to process last so we can use with @Formula
-    Transient t = get(prop, Transient.class);
-    if (t != null) {
+    if (has(prop, Transient.class)) {
       // it is not a persistent property.
       prop.setDbRead(false);
       prop.setDbInsertable(false);
@@ -445,15 +439,13 @@ public class AnnotationFields extends AnnotationParser {
       prop.setJsonSerialize(jsonIgnore.serialize());
       prop.setJsonDeserialize(jsonIgnore.deserialize());
     }
-    if (get(prop, UnmappedJson.class) != null) {
+    if (has(prop, UnmappedJson.class)) {
       prop.setUnmappedJson();
     }
   }
 
   private boolean hasRelationshipItem(DeployBeanProperty prop) {
-    return get(prop, OneToMany.class) != null ||
-      get(prop, ManyToOne.class) != null ||
-      get(prop, OneToOne.class) != null;
+    return has(prop, OneToMany.class) || has(prop, ManyToOne.class) || has(prop, OneToOne.class);
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {

@@ -255,29 +255,29 @@ public class DeployBeanProperty {
     if (field == null) {
       return 0;
     }
-    if (AnnotationUtil.findAnnotation(field, Id.class) != null) {
+    if (AnnotationUtil.get(field, Id.class) != null) {
       return ID_ORDER;
-    } else if (AnnotationUtil.findAnnotation(field, EmbeddedId.class) != null) {
+    } else if (AnnotationUtil.get(field, EmbeddedId.class) != null) {
       return ID_ORDER;
     } else if (undirectionalShadow) {
       return UNIDIRECTIONAL_ORDER;
     } else if (isAuditProperty()) {
       return AUDITCOLUMN_ORDER;
-    } else if (AnnotationUtil.findAnnotation(field, Version.class) != null) {
+    } else if (AnnotationUtil.get(field, Version.class) != null) {
       return VERSIONCOLUMN_ORDER;
-    } else if (AnnotationUtil.findAnnotation(field, SoftDelete.class) != null) {
+    } else if (AnnotationUtil.get(field, SoftDelete.class) != null) {
       return VERSIONCOLUMN_ORDER;
     }
     return 0;
   }
 
   private boolean isAuditProperty() {
-    return (AnnotationUtil.findAnnotation(field, WhenCreated.class) != null
-      || AnnotationUtil.findAnnotation(field, WhenModified.class) != null
-      || AnnotationUtil.findAnnotation(field, WhoModified.class) != null
-      || AnnotationUtil.findAnnotation(field, WhoCreated.class) != null
-      || AnnotationUtil.findAnnotation(field, UpdatedTimestamp.class) != null
-      || AnnotationUtil.findAnnotation(field, CreatedTimestamp.class) != null);
+    return (AnnotationUtil.has(field, WhenCreated.class)
+      || AnnotationUtil.has(field, WhenModified.class)
+      || AnnotationUtil.has(field, WhoModified.class)
+      || AnnotationUtil.has(field, WhoCreated.class)
+      || AnnotationUtil.has(field, UpdatedTimestamp.class)
+      || AnnotationUtil.has(field, CreatedTimestamp.class));
   }
 
   public String getFullBeanName() {

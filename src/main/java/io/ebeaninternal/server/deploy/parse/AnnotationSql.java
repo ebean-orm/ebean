@@ -16,8 +16,7 @@ class AnnotationSql extends AnnotationParser {
   @Override
   public void parse() {
     Class<?> cls = descriptor.getBeanType();
-    Sql sql = AnnotationUtil.findAnnotationRecursive(cls, Sql.class);
-    if (sql != null) {
+    if (AnnotationUtil.hasOnType(cls, Sql.class)) {
       descriptor.setEntityType(BeanDescriptor.EntityType.SQL);
     }
   }

@@ -125,7 +125,7 @@ class AnnotationAssocManys extends AnnotationParser {
       prop.setMapKey(mapKey.name());
     }
 
-    Where where = get(prop, Where.class);
+    Where where = platformAnnotationWhere(prop);
     if (where != null) {
       prop.setExtraWhere(where.clause());
     }
@@ -194,7 +194,7 @@ class AnnotationAssocManys extends AnnotationParser {
     if (!elementCollection.targetClass().equals(void.class)) {
       prop.setTargetType(elementCollection.targetClass());
     }
-    Column column = get(prop, Column.class);
+    Column column = getMeta(prop, Column.class);
     if (column != null) {
       prop.setDbColumn(column.name());
       prop.setDbLength(column.length());

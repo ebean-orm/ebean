@@ -1,6 +1,12 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.Aggregation;
+import io.ebean.annotation.Avg;
+import io.ebean.annotation.Max;
+import io.ebean.annotation.Min;
 import io.ebean.annotation.Platform;
+import io.ebean.annotation.Sum;
+import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
@@ -10,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Set;
 
 /**
@@ -65,39 +70,42 @@ abstract class AnnotationBase {
   }
 
   /**
-   * Return the annotation for the property.
-   * <p>
-   * Looks first at the field and then at the getter method. It searches for meta-annotations, but not
-   * recursively in the class hierarchy.
-   * </p>
-   * <p>
-   * If a <code>repeatable</code> annotation class is specified and the annotation is platform
-   * specific then the platform specific annotation is returned. Otherwise the first annotation
-   * is returned. Note that you need no longer handle "java 1.6 repeatable containers"
-   * like {@link JoinColumn} / {@link JoinColumns} yourself.
-   * </p>
-   * <p>
+   * True if the annotation platforms match the current platform.
    */
-  <T extends Annotation> T get(DeployBeanProperty prop, Class<T> annClass) {
-    T a = null;
-    Field field = prop.getField();
-    if (field != null) {
-      a = AnnotationUtil.findAnnotation(field, annClass, platform);
+  private boolean matchPlatform(Platform[] platforms) {
+    if (platforms.length == 0) {
+      return true;
+    } else {
+      for (Platform annPlatform : platforms) {
+        if (annPlatform == platform) {
+          return true;
+        }
+      }
     }
-    return a;
+    return false;
   }
 
   /**
-   * Return all annotations for this property. Annotations are not filtered by platfrom and you'll get
+   * Return the annotation for the property - including meta-annotations and platform filter.
+   */
+  <T extends Annotation> T getMeta(DeployBeanProperty prop, Class<T> annClass) {
+    return AnnotationUtil.findPlatform(prop.getField(), annClass, platform);
+  }
+
+  <T extends Annotation> T get(DeployBeanProperty prop, Class<T> annClass) {
+    return AnnotationUtil.get(prop.getField(), annClass);
+  }
+
+  <T extends Annotation> boolean has(DeployBeanProperty prop, Class<T> annClass) {
+    return AnnotationUtil.has(prop.getField(), annClass);
+  }
+
+  /**
+   * Return all annotations for this property. Annotations are not filtered by platform and you'll get
    * really all annotations that are directly, indirectly or meta-present.
    */
   <T extends Annotation> Set<T> getAll(DeployBeanProperty prop, Class<T> annClass) {
-    Set<T> ret = null;
-    Field field = prop.getField();
-    if (field != null) {
-      ret = AnnotationUtil.findAnnotations(field, annClass);
-    }
-    return ret;
+    return AnnotationUtil.findAll(prop.getField(), annClass);
   }
 
   /**
@@ -110,8 +118,53 @@ abstract class AnnotationBase {
   <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
     T a = get(prop, annClass);
     if (a == null) {
-      a = AnnotationUtil.findAnnotation(prop.getOwningType(), annClass, platform);
+      a = AnnotationUtil.findPlatform(prop.getOwningType(), annClass, platform);
     }
     return a;
+  }
+
+  String aggregation(DeployBeanProperty prop) {
+    final Field field = prop.getField();
+    Aggregation agg = AnnotationUtil.get(field, Aggregation.class);
+    if (agg != null) {
+      return agg.value();
+    }
+    Max max = AnnotationUtil.get(field, Max.class);
+    if (max != null) {
+      return "max($1)";
+    }
+    Min min = AnnotationUtil.get(field, Min.class);
+    if (min != null) {
+      return "min($1)";
+    }
+    Sum sum = AnnotationUtil.get(field, Sum.class);
+    if (sum != null) {
+      return "sum($1)";
+    }
+    Avg avg = AnnotationUtil.get(field, Avg.class);
+    if (avg != null) {
+      return "avg($1)";
+    }
+    return null;
+  }
+
+  /**
+   * Return the Where search including repeatable and platform filtering.
+   */
+  Where platformAnnotationWhere(DeployBeanProperty prop) {
+    final Where where = AnnotationUtil.get(prop.getField(), Where.class);
+    if (where != null && matchPlatform(where.platforms())) {
+      return where;
+    }
+    final Where.List list = AnnotationUtil.get(prop.getField(), Where.List.class);
+    if (list != null) {
+      for (Where listWhere : list.value()) {
+        if (matchPlatform(listWhere.platforms())){
+          return listWhere;
+        }
+
+      }
+    }
+    return null;
   }
 }

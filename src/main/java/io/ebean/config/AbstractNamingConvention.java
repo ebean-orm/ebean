@@ -222,8 +222,8 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * Return true if this class is part of entity inheritance.
    */
   protected boolean hasInheritance(Class<?> supCls) {
-    return AnnotationUtil.findAnnotationRecursive(supCls, Inheritance.class) != null
-        || AnnotationUtil.findAnnotation(supCls, DiscriminatorValue.class) != null;
+    return AnnotationUtil.hasOnType(supCls, Inheritance.class)
+        || AnnotationUtil.has(supCls, DiscriminatorValue.class);
   }
 
 
@@ -256,13 +256,11 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    */
   protected TableName getTableNameFromAnnotation(Class<?> beanClass) {
 
-    final Table t = AnnotationUtil.findAnnotationRecursive(beanClass, Table.class);
-
-    // Take the annotation if defined
-    if (t != null && !isEmpty(t.name())) {
+    final Table table = AnnotationUtil.getOnType(beanClass, Table.class);
+    if (table != null && !isEmpty(table.name())) {
       // Note: empty catalog and schema are converted to null
       // Only need to convert quoted identifiers from annotations
-      return new TableName(quoteIdentifiers(t.catalog()), quoteIdentifiers(t.schema()), quoteIdentifiers(t.name()));
+      return new TableName(quoteIdentifiers(table.catalog()), quoteIdentifiers(table.schema()), quoteIdentifiers(table.name()));
     }
 
     // No annotation

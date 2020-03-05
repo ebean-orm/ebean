@@ -28,6 +28,7 @@ public class DMachineUse extends Model {
 
   private long timeSecs;
 
+  @Decimal93
   private BigDecimal fuel;
 
   @Version
