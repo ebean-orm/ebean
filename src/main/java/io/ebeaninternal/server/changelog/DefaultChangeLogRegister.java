@@ -52,7 +52,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
    * Find and return the ChangeLog annotation in the inheritance hierarchy.
    */
   private ChangeLog getChangeLog(Class<?> beanType) {
-    return AnnotationUtil.getOnType(beanType, ChangeLog.class);
+    return AnnotationUtil.typeGet(beanType, ChangeLog.class);
   }
 
   /**

@@ -82,7 +82,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
     }
-    Column column = getMeta(prop, Column.class);
+    Column column = prop.getMetaAnnotation(Column.class);
     if (column != null && !isEmpty(column.name())) {
       // have this in for AssocOnes used on
       // Sql based beans...
@@ -100,7 +100,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
       prop.setForeignKey(new PropertyForeignKey(dbForeignKey));
     }
 
-    Where where = platformAnnotationWhere(prop);
+    Where where = prop.getMetaAnnotationWhere(platform);
     if (where != null) {
       // not expecting this to be used on assoc one properties
       prop.setExtraWhere(where.clause());
@@ -131,11 +131,10 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
-    for (JoinColumn joinColumn : getAll(prop, JoinColumn.class)) {
+    for (JoinColumn joinColumn : annotationJoinColumns(prop)) {
       setFromJoinColumn(prop, beanTable, joinColumn);
       checkForNoConstraint(prop, joinColumn);
     }
-
 
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {

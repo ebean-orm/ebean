@@ -459,7 +459,7 @@ public final class DefaultTypeManager implements TypeManager {
    * are annotated with the &#64;JacksonAnnotation meta annotation. So detection is easy.
    */
   private boolean checkJacksonAnnotations(DeployBeanProperty prop) {
-    return AnnotationUtil.getMeta(prop.getField(), com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
+    return prop.getMetaAnnotation(com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
   private DocPropertyType getDocType(Type genericType) {

@@ -87,7 +87,7 @@ public abstract class AnnotationParser extends AnnotationBase {
    */
   void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
 
-    Set<AttributeOverride> attrOverrides = getAll(prop, AttributeOverride.class);
+    Set<AttributeOverride> attrOverrides = annotationAttributeOverrides(prop);
     if (!attrOverrides.isEmpty()) {
       HashMap<String, String> propMap = new HashMap<>(attrOverrides.size());
       for (AttributeOverride attrOverride : attrOverrides) {
@@ -95,7 +95,6 @@ public abstract class AnnotationParser extends AnnotationBase {
       }
       prop.getDeployEmbedded().putAll(propMap);
     }
-
   }
 
   void readColumn(Column columnAnn, DeployBeanProperty prop) {

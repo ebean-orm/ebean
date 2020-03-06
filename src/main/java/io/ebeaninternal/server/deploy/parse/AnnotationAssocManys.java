@@ -125,7 +125,7 @@ class AnnotationAssocManys extends AnnotationParser {
       prop.setMapKey(mapKey.name());
     }
 
-    Where where = platformAnnotationWhere(prop);
+    Where where = prop.getMetaAnnotationWhere(platform);
     if (where != null) {
       prop.setExtraWhere(where.clause());
     }
@@ -138,8 +138,8 @@ class AnnotationAssocManys extends AnnotationParser {
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
 
-    Set<JoinColumn> joinColumns = getAll(prop, JoinColumn.class);
-    if (joinColumns != null) {
+    Set<JoinColumn> joinColumns = annotationJoinColumns(prop);
+    if (!joinColumns.isEmpty()) {
       prop.getTableJoin().addJoinColumn(util, true, joinColumns, beanTable);
     }
 
@@ -194,7 +194,7 @@ class AnnotationAssocManys extends AnnotationParser {
     if (!elementCollection.targetClass().equals(void.class)) {
       prop.setTargetType(elementCollection.targetClass());
     }
-    Column column = getMeta(prop, Column.class);
+    Column column = prop.getMetaAnnotation(Column.class);
     if (column != null) {
       prop.setDbColumn(column.name());
       prop.setDbLength(column.length());
