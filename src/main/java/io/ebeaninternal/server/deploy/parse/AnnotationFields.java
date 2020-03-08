@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.Aggregation;
 import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbComment;
@@ -344,9 +345,9 @@ public class AnnotationFields extends AnnotationParser {
       prop.setSqlFormula(formula.select(), formula.join());
     }
 
-    String aggregation = aggregation(prop);
+    final Aggregation aggregation = prop.getMetaAnnotation(Aggregation.class);
     if (aggregation != null) {
-      prop.setAggregation(aggregation.replace("$1", prop.getName()));
+      prop.setAggregation(aggregation.value().replace("$1", prop.getName()));
     }
   }
 

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.Aggregation;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
 import io.ebean.config.ServerConfig;
@@ -41,6 +42,7 @@ class ReadAnnotationConfig {
     this.metaAnnotations.add(Formula.List.class);
     this.metaAnnotations.add(Where.class);
     this.metaAnnotations.add(Where.List.class);
+    this.metaAnnotations.add(Aggregation.class);
   }
 
   public void addMetaAnnotation(Class<?> annotation) {

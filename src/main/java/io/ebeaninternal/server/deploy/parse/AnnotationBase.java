@@ -83,31 +83,6 @@ abstract class AnnotationBase {
     return AnnotationUtil.has(prop.getField(), annClass);
   }
 
-  String aggregation(DeployBeanProperty prop) {
-    final Field field = prop.getField();
-    Aggregation agg = AnnotationUtil.get(field, Aggregation.class);
-    if (agg != null) {
-      return agg.value();
-    }
-    Max max = AnnotationUtil.get(field, Max.class);
-    if (max != null) {
-      return "max($1)";
-    }
-    Min min = AnnotationUtil.get(field, Min.class);
-    if (min != null) {
-      return "min($1)";
-    }
-    Sum sum = AnnotationUtil.get(field, Sum.class);
-    if (sum != null) {
-      return "sum($1)";
-    }
-    Avg avg = AnnotationUtil.get(field, Avg.class);
-    if (avg != null) {
-      return "avg($1)";
-    }
-    return null;
-  }
-
   Set<JoinColumn> annotationJoinColumns(DeployBeanProperty prop) {
     return AnnotationFind.joinColumns(prop.getField());
   }
