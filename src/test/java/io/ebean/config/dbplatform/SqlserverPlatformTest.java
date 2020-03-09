@@ -26,6 +26,7 @@ public class SqlserverPlatformTest {
     assertThat(ddl.convert("varchar(20)")).isEqualTo("nvarchar(20)");
     assertThat(ddl.convert("decimal(10)")).isEqualTo("numeric(10)");
     assertThat(ddl.convert("decimal(8,4)")).isEqualTo("numeric(8,4)");
+    assertThat(ddl.convert("decimal")).isEqualTo("numeric(16,3)");
     assertThat(ddl.convert("boolean")).isEqualTo("bit");
     assertThat(ddl.convert("bit")).isEqualTo("bit");
     assertThat(ddl.convert("tinyint")).isEqualTo("smallint");

@@ -58,7 +58,7 @@ public class PlatformTypeConverter {
       } else {
         // scale - varchar(10)
         int scale = Integer.parseInt(columnDefinition.substring(open + 1, close));
-        return dbType.renderType(scale, 0) + suffix;
+        return dbType.renderType(scale, -1) + suffix;
       }
 
     } catch (IllegalArgumentException e) {

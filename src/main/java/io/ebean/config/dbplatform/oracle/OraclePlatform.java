@@ -62,8 +62,7 @@ public class OraclePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("number", 19, 4));
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("number", 5));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("number", 3));
-    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("number", 38));
-
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("number", 16, 3));
     dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar2", 255));
 
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("blob"));

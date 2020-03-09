@@ -21,6 +21,7 @@ public class MySqlPlatformTest {
     assertThat(ddl.convert("varchar(20)")).isEqualTo("varchar(20)");
     assertThat(ddl.convert("boolean")).isEqualTo("tinyint(1)");
     assertThat(ddl.convert("bit")).isEqualTo("tinyint(1)");
+    assertThat(ddl.convert("decimal")).isEqualTo("decimal(16,3)");
   }
 
   @Test

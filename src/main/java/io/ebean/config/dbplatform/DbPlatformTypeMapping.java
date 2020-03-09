@@ -116,7 +116,7 @@ public class DbPlatformTypeMapping {
 
     } else {
       put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
-      put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
+      put(DbType.DECIMAL, new DbPlatformType("decimal", 16, 3));
       put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
       put(DbType.BINARY, new DbPlatformType("binary", 255));
       put(DbType.CHAR, new DbPlatformType("char", 1));

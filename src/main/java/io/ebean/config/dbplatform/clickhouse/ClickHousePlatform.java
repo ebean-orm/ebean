@@ -32,7 +32,7 @@ public class ClickHousePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("UInt16", false));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("UInt32", false));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("UInt64", false));
-    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("Decimal", 16,4));
+    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("Decimal", 16, 3));
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("Float64", false));
 
     dbTypeMap.put(DbType.DATE, new DbPlatformType("Date", false));

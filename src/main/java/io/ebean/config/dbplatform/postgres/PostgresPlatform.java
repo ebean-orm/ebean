@@ -70,7 +70,6 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float"));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
-    dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("decimal", 38));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("timestamptz"));
 
     dbTypeMap.put(DbType.BINARY, dbBytea);

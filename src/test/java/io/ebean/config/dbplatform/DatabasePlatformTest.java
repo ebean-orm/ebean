@@ -49,7 +49,7 @@ public class DatabasePlatformTest {
   public void defaultTypesForDecimalAndVarchar() {
 
     DatabasePlatform dbPlatform = new DatabasePlatform();
-    assertEquals(defaultDecimalDefn(dbPlatform), "decimal(38)");
+    assertEquals(defaultDecimalDefn(dbPlatform), "decimal(16,3)");
     assertEquals(defaultDefn(DbType.VARCHAR, dbPlatform), "varchar(255)");
   }
 
