@@ -1,16 +1,27 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.Aggregation;
+import io.ebean.annotation.Avg;
+import io.ebean.annotation.DbMigration;
+import io.ebean.annotation.Index;
+import io.ebean.annotation.Indices;
+import io.ebean.annotation.Max;
+import io.ebean.annotation.Min;
 import io.ebean.annotation.Platform;
+import io.ebean.annotation.Sum;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
+import javax.persistence.AttributeOverride;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -41,7 +52,7 @@ import java.util.Set;
 abstract class AnnotationBase {
 
   final DatabasePlatform databasePlatform;
-  private final Platform platform;
+  protected final Platform platform;
   final NamingConvention namingConvention;
   final DeployUtil util;
 
@@ -64,68 +75,43 @@ abstract class AnnotationBase {
     return s == null || s.trim().isEmpty();
   }
 
-  /**
-   * Return the annotation for the property.
-   * <p>
-   * Looks first at the field and then at the getter method. It searches for meta-annotations, but not
-   * recursively in the class hierarchy.
-   * </p>
-   * <p>
-   * If a <code>repeatable</code> annotation class is specified and the annotation is platform
-   * specific then the platform specific annotation is returned. Otherwise the first annotation
-   * is returned. Note that you need no longer handle "java 1.6 repeatable containers"
-   * like {@link JoinColumn} / {@link JoinColumns} yourself.
-   * </p>
-   * <p>
-   */
   <T extends Annotation> T get(DeployBeanProperty prop, Class<T> annClass) {
-    T a = null;
-    Field field = prop.getField();
-    if (field != null) {
-      a = AnnotationUtil.findAnnotation(field, annClass, platform);
-    }
-    if (a == null) {
-      Method method = prop.getReadMethod();
-      if (method != null) {
-        a = AnnotationUtil.findAnnotation(method, annClass, platform);
-      }
-    }
-    return a;
+    return AnnotationUtil.get(prop.getField(), annClass);
   }
 
-  /**
-   * Return all annotations for this property. Annotations are not filtered by platfrom and you'll get
-   * really all annotations that are directly, indirectly or meta-present.
-   */
-  <T extends Annotation> Set<T> getAll(DeployBeanProperty prop, Class<T> annClass) {
-    Set<T> ret = null;
-    Field field = prop.getField();
-    if (field != null) {
-      ret = AnnotationUtil.findAnnotations(field, annClass);
-    }
-    Method method = prop.getReadMethod();
-    if (method != null) {
-      if (ret != null) {
-        ret.addAll(AnnotationUtil.findAnnotations(method, annClass));
-      } else {
-        ret = AnnotationUtil.findAnnotations(method, annClass);
-      }
-    }
-    return ret;
+  <T extends Annotation> boolean has(DeployBeanProperty prop, Class<T> annClass) {
+    return AnnotationUtil.has(prop.getField(), annClass);
   }
 
-  /**
-   * Return the annotation for the property.
-   * <p>
-   * Looks first at the field and then at the getter method. then at class level.
-   * (This is used for SequenceGenerator e.g.)
-   * </p>
-   */
-  <T extends Annotation> T find(DeployBeanProperty prop, Class<T> annClass) {
-    T a = get(prop, annClass);
-    if (a == null) {
-      a = AnnotationUtil.findAnnotation(prop.getOwningType(), annClass, platform);
+  Set<JoinColumn> annotationJoinColumns(DeployBeanProperty prop) {
+    return AnnotationFind.joinColumns(prop.getField());
+  }
+
+  Set<AttributeOverride> annotationAttributeOverrides(DeployBeanProperty prop) {
+    return AnnotationFind.attributeOverrides(prop.getField());
+  }
+
+  Set<Index> annotationIndexes(DeployBeanProperty prop) {
+    return AnnotationFind.indexes(prop.getField());
+  }
+
+  Set<DbMigration> annotationDbMigrations(DeployBeanProperty prop) {
+    return AnnotationFind.dbMigrations(prop.getField());
+  }
+
+  Set<Index> annotationClassIndexes(Class<?> cls) {
+    Set<Index> result = AnnotationUtil.typeGetAll(cls, Index.class);
+    for (Indices index : AnnotationUtil.typeGetAll(cls, Indices.class)) {
+      Collections.addAll(result, index.value());
     }
-    return a;
+    return result;
+  }
+
+  Set<NamedQuery> annotationClassNamedQuery(Class<?> cls) {
+    Set<NamedQuery> result = AnnotationUtil.typeGetAll(cls, NamedQuery.class);
+    for (NamedQueries queries : AnnotationUtil.typeGetAll(cls, NamedQueries.class)) {
+      Collections.addAll(result, queries.value());
+    }
+    return result;
   }
 }

@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestWhereAnnotation extends TransactionalTestCase {
 
   @Test
@@ -29,6 +31,6 @@ public class TestWhereAnnotation extends TransactionalTestCase {
 
     q1.findOne();
     String s1 = q1.getGeneratedSql();
-    Assert.assertTrue(s1.contains("t1.order_date is not null"));
+    assertThat(s1).contains("t1.order_date is not null");
   }
 }

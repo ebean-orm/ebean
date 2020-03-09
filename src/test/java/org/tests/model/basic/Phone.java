@@ -18,16 +18,21 @@ public class Phone implements Serializable {
 
   private static final long serialVersionUID = -326610269092956952L;
 
+  @Id
+  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @Column(name = "id", unique = true, nullable = false)
   private Long id;
+
+  @Column(name = "phone_number", nullable = false, unique = true, columnDefinition = "varchar(7)")
   private String phoneNumber;
+
+  @ManyToOne(targetEntity = Person.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinColumn(name = "person_id", nullable = false)
   private Person person;
 
   public Phone() {
   }
 
-  @Id
-  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
-  @Column(name = "id", unique = true, nullable = false)
   public Long getId() {
     return id;
   }
@@ -36,7 +41,6 @@ public class Phone implements Serializable {
     this.id = id;
   }
 
-  @Column(name = "phone_number", nullable = false, unique = true, columnDefinition = "varchar(7)")
   public String getPhoneNumber() {
     return phoneNumber;
   }
@@ -46,8 +50,6 @@ public class Phone implements Serializable {
   }
 
   @NotNull
-  @ManyToOne(targetEntity = Person.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JoinColumn(name = "person_id", nullable = false)
   public Person getPerson() {
     return person;
   }

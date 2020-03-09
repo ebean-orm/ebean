@@ -4,10 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 
 @Entity
-@SequenceGenerator(name = "SEQ_NAME", sequenceName = GenKeySequence.SEQUENCE_NAME)
 public class GenKeySequence {
   public final static String SEQUENCE_NAME = "SEQ";
 

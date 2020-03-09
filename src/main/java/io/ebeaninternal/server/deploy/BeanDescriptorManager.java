@@ -1591,7 +1591,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private boolean isMappedSuperWithNoProperties(Class<?> beanClass) {
     // do not search recursive here
-    MappedSuperclass annotation = AnnotationUtil.findAnnotation(beanClass, MappedSuperclass.class);
+    MappedSuperclass annotation = AnnotationUtil.get(beanClass, MappedSuperclass.class);
     if (annotation == null) {
       return false;
     }

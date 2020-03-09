@@ -473,6 +473,6 @@ public class BootupClasses implements ClassFilter {
    * Returns true if this class has the annotation (or meta annotation). Does not search recursively.
    */
   private boolean has(Class<?> cls, Class<? extends Annotation> ann) {
-    return AnnotationUtil.findAnnotation(cls, ann) != null;
+    return AnnotationUtil.has(cls, ann);
   }
 }

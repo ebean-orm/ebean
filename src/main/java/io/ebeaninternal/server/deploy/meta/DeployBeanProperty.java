@@ -4,10 +4,13 @@ import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DocCode;
 import io.ebean.annotation.DocProperty;
 import io.ebean.annotation.DocSortable;
+import io.ebean.annotation.Formula;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.SoftDelete;
 import io.ebean.annotation.UpdatedTimestamp;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
+import io.ebean.annotation.Where;
 import io.ebean.annotation.WhoCreated;
 import io.ebean.annotation.WhoModified;
 import io.ebean.config.ScalarTypeConverter;
@@ -31,11 +34,13 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import javax.validation.constraints.Size;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -190,11 +195,6 @@ public class DeployBeanProperty {
 
   private final DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
 
-  /**
-   * The method used to read the property.
-   */
-  private Method readMethod;
-
   private int propertyIndex;
 
   private BeanPropertyGetter getter;
@@ -232,6 +232,8 @@ public class DeployBeanProperty {
 
   private List<DbMigrationInfo> dbMigrationInfos;
 
+  private Set<Annotation> metaAnnotations;
+
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
@@ -261,29 +263,29 @@ public class DeployBeanProperty {
     if (field == null) {
       return 0;
     }
-    if (AnnotationUtil.findAnnotation(field, Id.class) != null) {
+    if (AnnotationUtil.get(field, Id.class) != null) {
       return ID_ORDER;
-    } else if (AnnotationUtil.findAnnotation(field, EmbeddedId.class) != null) {
+    } else if (AnnotationUtil.get(field, EmbeddedId.class) != null) {
       return ID_ORDER;
     } else if (undirectionalShadow) {
       return UNIDIRECTIONAL_ORDER;
     } else if (isAuditProperty()) {
       return AUDITCOLUMN_ORDER;
-    } else if (AnnotationUtil.findAnnotation(field, Version.class) != null) {
+    } else if (AnnotationUtil.get(field, Version.class) != null) {
       return VERSIONCOLUMN_ORDER;
-    } else if (AnnotationUtil.findAnnotation(field, SoftDelete.class) != null) {
+    } else if (AnnotationUtil.get(field, SoftDelete.class) != null) {
       return VERSIONCOLUMN_ORDER;
     }
     return 0;
   }
 
   private boolean isAuditProperty() {
-    return (AnnotationUtil.findAnnotation(field, WhenCreated.class) != null
-      || AnnotationUtil.findAnnotation(field, WhenModified.class) != null
-      || AnnotationUtil.findAnnotation(field, WhoModified.class) != null
-      || AnnotationUtil.findAnnotation(field, WhoCreated.class) != null
-      || AnnotationUtil.findAnnotation(field, UpdatedTimestamp.class) != null
-      || AnnotationUtil.findAnnotation(field, CreatedTimestamp.class) != null);
+    return (AnnotationUtil.has(field, WhenCreated.class)
+      || AnnotationUtil.has(field, WhenModified.class)
+      || AnnotationUtil.has(field, WhoModified.class)
+      || AnnotationUtil.has(field, WhoCreated.class)
+      || AnnotationUtil.has(field, UpdatedTimestamp.class)
+      || AnnotationUtil.has(field, CreatedTimestamp.class));
   }
 
   public String getFullBeanName() {
@@ -451,13 +453,6 @@ public class DeployBeanProperty {
     } else {
       return setter;
     }
-  }
-
-  /**
-   * Return the getter method.
-   */
-  public Method getReadMethod() {
-    return readMethod;
   }
 
   /**
@@ -672,7 +667,7 @@ public class DeployBeanProperty {
    */
   private String aggregationJoin(int pos, String dbColumn) {
     String p0 = aggregation.substring(0, pos + 1);
-    aggregationParsed =  p0 + "${ta}." + dbColumn + aggregation.substring(aggregation.length() - 1);
+    aggregationParsed = p0 + "${ta}." + dbColumn + aggregation.substring(aggregation.length() - 1);
     return aggregationParsed;
   }
 
@@ -907,17 +902,6 @@ public class DeployBeanProperty {
   }
 
   /**
-   * Set the bean read method.
-   * <p>
-   * NB: That a BeanReflectGetter is used to actually perform the getting of
-   * property values from a bean. This is due to performance considerations.
-   * </p>
-   */
-  public void setReadMethod(Method readMethod) {
-    this.readMethod = readMethod;
-  }
-
-  /**
    * Return the property type.
    */
   public Class<?> getPropertyType() {
@@ -1122,7 +1106,7 @@ public class DeployBeanProperty {
    */
   public Object /*AnnotatedField*/ getJacksonField() {
     com.fasterxml.jackson.databind.introspect.AnnotatedClass jac =
-        (com.fasterxml.jackson.databind.introspect.AnnotatedClass) getDesc().getJacksonAnnotatedClass();
+      (com.fasterxml.jackson.databind.introspect.AnnotatedClass) getDesc().getJacksonAnnotatedClass();
     for (com.fasterxml.jackson.databind.introspect.AnnotatedField candidate : jac.fields()) {
       if (candidate.getName().equals(getName())) {
         return candidate;
@@ -1130,4 +1114,102 @@ public class DeployBeanProperty {
     }
     return null;
   }
+
+  public void initMetaAnnotations(Set<Class<?>> metaAnnotationsFilter) {
+    metaAnnotations = AnnotationUtil.metaFindAllFor(field, metaAnnotationsFilter);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <A extends Annotation> A getMetaAnnotation(Class<A> annotationType) {
+    for (Annotation ann : metaAnnotations) {
+      if (ann.annotationType() == annotationType) {
+        return (A) ann;
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <A extends Annotation> List<A> getMetaAnnotations(Class<A> annotationType) {
+    List<A> result = new ArrayList<>();
+    for (Annotation ann : metaAnnotations) {
+      if (ann.annotationType() == annotationType) {
+        result.add((A) ann);
+      }
+    }
+    return result;
+  }
+
+  public List<Size> getMetaAnnotationSize() {
+    final List<Size> size = getMetaAnnotations(Size.class);
+    final List<Size.List> lists = getMetaAnnotations(Size.List.class);
+    for (Size.List list : lists) {
+      Collections.addAll(size, list.value());
+    }
+    return size;
+  }
+
+  public Formula getMetaAnnotationFormula(Platform platform) {
+    Formula fallback = null;
+    for (Annotation ann : metaAnnotations) {
+      if (ann.annotationType() == Formula.class) {
+        Formula formula = (Formula) ann;
+        final Platform[] platforms = formula.platforms();
+        if (platforms.length == 0) {
+          fallback = formula;
+        } else if (matchPlatform(platforms, platform)) {
+          return formula;
+        }
+
+      } else if (ann.annotationType() == Formula.List.class) {
+        Formula.List formulaList = (Formula.List) ann;
+        for (Formula formula : formulaList.value()) {
+          final Platform[] platforms = formula.platforms();
+          if (platforms.length == 0) {
+            fallback = formula;
+          } else if (matchPlatform(platforms, platform)) {
+            return formula;
+          }
+        }
+      }
+    }
+    return fallback;
+  }
+
+  public Where getMetaAnnotationWhere(Platform platform) {
+    Where fallback = null;
+    for (Annotation ann : metaAnnotations) {
+      if (ann.annotationType() == Where.class) {
+        Where where = (Where) ann;
+        final Platform[] platforms = where.platforms();
+        if (platforms.length == 0) {
+          fallback = where;
+        } else if (matchPlatform(where.platforms(), platform)) {
+          return where;
+        }
+
+      } else if (ann.annotationType() == Where.List.class) {
+        Where.List whereList = (Where.List) ann;
+        for (Where where : whereList.value()) {
+          final Platform[] platforms = where.platforms();
+          if (platforms.length == 0) {
+            fallback = where;
+          } else if (matchPlatform(where.platforms(), platform)) {
+            return where;
+          }
+        }
+      }
+    }
+    return fallback;
+  }
+
+  private boolean matchPlatform(Platform[] platforms, Platform match) {
+    for (Platform platform : platforms) {
+      if (platform == match) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }

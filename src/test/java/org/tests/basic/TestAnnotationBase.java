@@ -1,15 +1,18 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
+import io.ebean.annotation.Index;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Where;
-import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.IndexDefinition;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.junit.Test;
 import org.tests.model.basic.ValidationGroupSomething;
 
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.lang.annotation.ElementType;
@@ -17,6 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,6 +29,13 @@ import static org.junit.Assert.assertTrue;
 
 
 public class TestAnnotationBase extends BaseTestCase {
+
+  private final Set<Class<?>> metaAnnotationsFilter = new HashSet<>();
+
+  public TestAnnotationBase() {
+    metaAnnotationsFilter.add(Where.class);
+    metaAnnotationsFilter.add(Where.List.class);
+  }
 
   @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
   @Retention(RetentionPolicy.RUNTIME)
@@ -34,8 +46,16 @@ public class TestAnnotationBase extends BaseTestCase {
 
   }
 
+  @Index(name = "ano_1", columnNames = "direct")
+  @Index(name = "ano_2", columnNames = "direct")
+  @MappedSuperclass
+  public static class MappedBaseEntity {
+
+  }
+
+  @Index(name = "ano_3", columnNames = "direct")
   @Entity
-  public static class TestAnnotationBaseEntity {
+  public static class TestAnnotationBaseEntity extends MappedBaseEntity {
 
     @Where(clause = "SELECT 'mysql' from 1", platforms = Platform.MYSQL)
     @Where(clause = "SELECT 'h2' from 1", platforms = Platform.H2)
@@ -44,7 +64,6 @@ public class TestAnnotationBase extends BaseTestCase {
 
     @MetaTest
     private String meta;
-
 
     @MetaTest
     @Where(clause = "SELECT 'oracle' from 1", platforms = Platform.ORACLE)
@@ -132,6 +151,13 @@ public class TestAnnotationBase extends BaseTestCase {
   }
 
   @Test
+  public void annotationClassIndexes() throws SecurityException {
+    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
+    final IndexDefinition[] indexDefinitions = descriptor.getIndexDefinitions();
+    assertEquals(3, indexDefinitions.length);
+  }
+
+  @Test
   public void testNotNullWithGroup() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
 
@@ -147,45 +173,41 @@ public class TestAnnotationBase extends BaseTestCase {
 
   @Test
   public void testFindAnnotation() throws NoSuchFieldException, SecurityException {
-    Field fld = TestAnnotationBaseEntity.class.getDeclaredField("direct");
-    String s;
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
-    assertEquals("SELECT 'mysql' from 1", s);
+    Field directFld = TestAnnotationBaseEntity.class.getDeclaredField("direct");
+    final DeployBeanProperty direct = createProperty(directFld);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
-    assertEquals("SELECT 'h2' from 1", s);
-
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
-    assertEquals("SELECT 'other' from 1", s);
+    assertEquals("SELECT 'mysql' from 1", where(direct, Platform.MYSQL));
+    assertEquals("SELECT 'h2' from 1", where(direct, Platform.H2));
+    assertEquals("SELECT 'other' from 1", where(direct, Platform.POSTGRES));
 
     // meta
-    fld = TestAnnotationBaseEntity.class.getDeclaredField("meta");
+    Field metaFld = TestAnnotationBaseEntity.class.getDeclaredField("meta");
+    final DeployBeanProperty meta = createProperty(metaFld);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
-    assertEquals("SELECT 'mysql' from 1", s);
-
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
-    assertEquals("SELECT 'h2' from 1", s);
-
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
-    assertEquals("SELECT 'other' from 1", s);
-
+    assertEquals("SELECT 'mysql' from 1", where(meta, Platform.MYSQL));
+    assertEquals("SELECT 'h2' from 1", where(meta, Platform.H2));
+    assertEquals("SELECT 'other' from 1", where(meta, Platform.POSTGRES));
 
     // mixed
-    fld = TestAnnotationBaseEntity.class.getDeclaredField("mixed");
+    Field mixedFld = TestAnnotationBaseEntity.class.getDeclaredField("mixed");
+    final DeployBeanProperty mixed = createProperty(mixedFld);
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.MYSQL).clause();
-    assertEquals("SELECT 'mysql' from 1", s);
+    assertEquals("SELECT 'mysql' from 1", where(mixed, Platform.MYSQL));
+    assertEquals("SELECT 'h2' from 1", where(mixed, Platform.H2));
+    assertEquals("SELECT 'other' from 1", where(mixed, Platform.POSTGRES));
+    assertEquals("SELECT 'oracle' from 1", where(mixed, Platform.ORACLE));
+  }
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.H2).clause();
-    assertEquals("SELECT 'h2' from 1", s);
+  private String where(DeployBeanProperty property, Platform platform) {
+    return property.getMetaAnnotationWhere(platform).clause();
+  }
 
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.POSTGRES).clause();
-    assertEquals("SELECT 'other' from 1", s);
-
-    s = AnnotationUtil.findAnnotation(fld, Where.class, Platform.ORACLE).clause();
-    assertEquals("SELECT 'oracle' from 1", s);
+  private DeployBeanProperty createProperty(Field fld) {
+    DeployBeanProperty directProperty = new DeployBeanProperty(null, null, null);
+    directProperty.setField(fld);
+    directProperty.initMetaAnnotations(metaAnnotationsFilter);
+    return directProperty;
   }
 
 }
