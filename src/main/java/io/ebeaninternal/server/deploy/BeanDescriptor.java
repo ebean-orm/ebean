@@ -2053,14 +2053,16 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Create a non read only reference bean without checking cacheSharableBeans.
    */
-  @SuppressWarnings("unchecked")
   public T createReference(Object id, PersistenceContext pc) {
+    if (inheritInfo != null && !inheritInfo.isConcrete()) {
+      return findReferenceBean(id, pc);
+    }
+    return createRef(id, pc);
+  }
 
+  @SuppressWarnings("unchecked")
+  public T createRef(Object id, PersistenceContext pc) {
     try {
-      if (inheritInfo != null && !inheritInfo.isConcrete()) {
-        return findReferenceBean(id, pc);
-      }
-
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
@@ -2071,7 +2073,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         ebi.setPersistenceContext(pc);
       }
       return (T) eb;
-
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }

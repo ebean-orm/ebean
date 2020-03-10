@@ -13,6 +13,7 @@ import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
+import io.ebeaninternal.server.cache.CachedBeanId;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
@@ -433,9 +434,17 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
     if (embedded) {
       return targetDescriptor.cacheEmbeddedBeanExtract((EntityBean) ap);
+    } else if (targetInheritInfo != null) {
+      return createCacheBeanId(ap);
     } else {
       return targetDescriptor.getIdProperty().getCacheDataValue((EntityBean) ap);
     }
+  }
+
+  private Object createCacheBeanId(Object bean) {
+    final BeanDescriptor<?> desc = targetDescriptor.descOf(bean.getClass());
+    final Object id = desc.getIdProperty().getCacheDataValue((EntityBean) bean);
+    return new CachedBeanId(desc.getDiscValue(), id);
   }
 
   @Override
@@ -451,17 +460,29 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (embedded) {
         setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
-        if (cacheData instanceof String) {
-          cacheData = targetDescriptor.getIdProperty().scalarType.parse((String) cacheData);
+        if (cacheData instanceof CachedBeanId) {
+          setValue(bean, refInheritBean((CachedBeanId) cacheData, context));
+        } else {
+          setValue(bean, refBean(targetDescriptor, cacheData, context));
         }
-        // cacheData is the id value, maybe already in persistence context
-        Object assocBean = targetDescriptor.contextGet(context, cacheData);
-        if (assocBean == null) {
-          assocBean = targetDescriptor.createReference(cacheData, context);
-        }
-        setValue(bean, assocBean);
       }
     }
+  }
+
+  private Object refInheritBean(CachedBeanId cacheId, PersistenceContext context) {
+    final InheritInfo rowInheritInfo = targetInheritInfo.readType(cacheId.getDiscValue());
+    return refBean(rowInheritInfo.desc(), cacheId.getId(), context);
+  }
+
+  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context) {
+    if (id instanceof String) {
+      id = desc.getIdProperty().scalarType.parse((String) id);
+    }
+    Object bean = desc.contextGet(context, id);
+    if (bean == null) {
+      bean = desc.createRef(id, context);
+    }
+    return bean;
   }
 
   @Override
@@ -640,14 +661,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public void addTenant(SpiQuery<?> query, Object tenantId) {
-    T refBean = targetDescriptor.createReference(tenantId, null);
-    query.where().eq(name, refBean);
+    query.where().eq(name, targetDescriptor.createRef(tenantId, null));
   }
 
   @Override
   public void setTenantValue(EntityBean entityBean, Object tenantId) {
-    T refBean = targetDescriptor.createReference(tenantId, null);
-    setValue(entityBean, refBean);
+    setValue(entityBean, targetDescriptor.createRef(tenantId, null));
   }
 
   @Override

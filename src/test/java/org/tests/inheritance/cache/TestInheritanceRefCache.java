@@ -49,8 +49,7 @@ public class TestInheritanceRefCache extends BaseTestCase {
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
     sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains("from cinh_root");
+    assertThat(sql).hasSize(0);
 
 
     // fetch again - both from cache
