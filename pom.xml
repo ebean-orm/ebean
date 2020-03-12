@@ -4,7 +4,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-postgis</artifactId>
-  <version>12.1.2-SNAPSHOT</version>
+  <version>12.2.1-SNAPSHOT</version>
 
   <parent>
     <groupId>org.avaje</groupId>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>12.1.1</version>
+      <version>12.2.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.1.1</version>
+      <version>12.2.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -95,7 +95,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.1.1</tile>
+            <tile>io.ebean.tile:enhancement:12.2.1</tile>
           </tiles>
         </configuration>
       </plugin>
