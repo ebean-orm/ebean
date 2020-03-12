@@ -138,8 +138,11 @@ public class ServerConfigTest {
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
-    assertFalse(serverConfig.isAutoLoadModuleInfo());
+    assertTrue(serverConfig.isAutoLoadModuleInfo());
     assertEquals(Long.MAX_VALUE, serverConfig.getCollectQueryPlanThresholdMicros());
+
+    serverConfig.setLoadModuleInfo(false);
+    assertFalse(serverConfig.isAutoLoadModuleInfo());
   }
 
   @Test

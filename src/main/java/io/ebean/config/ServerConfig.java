@@ -139,7 +139,7 @@ public class ServerConfig {
    * Having this on and registering entity classes means we don't need to manually
    * write that code or use classpath scanning to find entity classes.
    */
-  private boolean loadModuleInfo;
+  private boolean loadModuleInfo = true;
 
   /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
@@ -3296,6 +3296,17 @@ public class ServerConfig {
    */
   public boolean isAutoLoadModuleInfo() {
     return loadModuleInfo && classes.isEmpty();
+  }
+
+  /**
+   * Set false to turn off automatic registration of entity beans.
+   * <p>
+   * When using query beans that also generates a module info class that
+   * can register the entity bean classes (to avoid classpath scanning).
+   * This is on by default and setting this to false turns it off.
+   */
+  public void setLoadModuleInfo(boolean loadModuleInfo) {
+    this.loadModuleInfo = loadModuleInfo;
   }
 
   public enum UuidVersion {
