@@ -9,7 +9,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.HanaColumnStoreDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.NuoDbDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.Oracle10Ddl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.OracleDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.Postgres9Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
@@ -40,7 +40,7 @@ public class PlatformDdlBuilder {
         return new NuoDbDdl(platform);
       case ORACLE:
       case ORACLE11:
-        return new Oracle10Ddl(platform);
+        return new OracleDdl(platform);
       case SQLITE:
         return new SQLiteDdl(platform);
       case POSTGRES9:

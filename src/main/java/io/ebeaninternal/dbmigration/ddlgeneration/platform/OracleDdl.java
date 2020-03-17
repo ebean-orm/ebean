@@ -6,9 +6,9 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 /**
  * Oracle platform specific DDL.
  */
-public class Oracle10Ddl extends PlatformDdl {
+public class OracleDdl extends PlatformDdl {
 
-  public Oracle10Ddl(DatabasePlatform platform) {
+  public OracleDdl(DatabasePlatform platform) {
     super(platform);
     this.dropTableIfExists = "drop table ";
     this.dropSequenceIfExists = "drop sequence ";
@@ -46,6 +46,14 @@ public class Oracle10Ddl extends PlatformDdl {
       default:
         // do nothing, defaults to RESTRICT effectively
     }
+  }
+
+  /**
+   * Modify and return the column definition for autoincrement or identity definition.
+   */
+  @Override
+  public String asIdentityColumn(String columnDefn, DdlIdentity identity) {
+    return asIdentityStandardOptions(columnDefn, identity);
   }
 
 }
