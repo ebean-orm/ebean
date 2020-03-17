@@ -267,7 +267,7 @@ public class PlatformDdl_AlterColumnTest {
   @Test
   public void useIdentityType_oracle() {
 
-    assertEquals(oraDdl.useIdentityType(null), IdType.SEQUENCE);
+    assertEquals(oraDdl.useIdentityType(null), IdType.IDENTITY);
     assertEquals(oraDdl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
     assertEquals(oraDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
     assertEquals(oraDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
