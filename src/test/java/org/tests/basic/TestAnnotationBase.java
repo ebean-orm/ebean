@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.ebean.annotation.Platform.H2;
+import static io.ebean.annotation.Platform.POSTGRES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -40,14 +42,14 @@ public class TestAnnotationBase extends BaseTestCase {
   @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
   @Retention(RetentionPolicy.RUNTIME)
   @Where(clause = "SELECT 'mysql' from 1", platforms = Platform.MYSQL)
-  @Where(clause = "SELECT 'h2' from 1", platforms = Platform.H2)
+  @Where(clause = "SELECT 'h2' from 1", platforms = H2)
   @Where(clause = "SELECT 'other' from 1")
   public @interface MetaTest {
 
   }
 
-  @Index(name = "ano_1", columnNames = "direct")
-  @Index(name = "ano_2", columnNames = "direct")
+  @Index(name = "ano_1", columnNames = "direct", platforms = {H2, POSTGRES})
+  @Index(name = "ano_2", columnNames = "direct", platforms = {H2, POSTGRES})
   @MappedSuperclass
   public static class MappedBaseEntity {
 
@@ -58,7 +60,7 @@ public class TestAnnotationBase extends BaseTestCase {
   public static class TestAnnotationBaseEntity extends MappedBaseEntity {
 
     @Where(clause = "SELECT 'mysql' from 1", platforms = Platform.MYSQL)
-    @Where(clause = "SELECT 'h2' from 1", platforms = Platform.H2)
+    @Where(clause = "SELECT 'h2' from 1", platforms = H2)
     @Where(clause = "SELECT 'other' from 1")
     private String direct;
 
@@ -178,7 +180,7 @@ public class TestAnnotationBase extends BaseTestCase {
     final DeployBeanProperty direct = createProperty(directFld);
 
     assertEquals("SELECT 'mysql' from 1", where(direct, Platform.MYSQL));
-    assertEquals("SELECT 'h2' from 1", where(direct, Platform.H2));
+    assertEquals("SELECT 'h2' from 1", where(direct, H2));
     assertEquals("SELECT 'other' from 1", where(direct, Platform.POSTGRES));
 
     // meta
@@ -186,7 +188,7 @@ public class TestAnnotationBase extends BaseTestCase {
     final DeployBeanProperty meta = createProperty(metaFld);
 
     assertEquals("SELECT 'mysql' from 1", where(meta, Platform.MYSQL));
-    assertEquals("SELECT 'h2' from 1", where(meta, Platform.H2));
+    assertEquals("SELECT 'h2' from 1", where(meta, H2));
     assertEquals("SELECT 'other' from 1", where(meta, Platform.POSTGRES));
 
     // mixed
@@ -194,7 +196,7 @@ public class TestAnnotationBase extends BaseTestCase {
     final DeployBeanProperty mixed = createProperty(mixedFld);
 
     assertEquals("SELECT 'mysql' from 1", where(mixed, Platform.MYSQL));
-    assertEquals("SELECT 'h2' from 1", where(mixed, Platform.H2));
+    assertEquals("SELECT 'h2' from 1", where(mixed, H2));
     assertEquals("SELECT 'other' from 1", where(mixed, Platform.POSTGRES));
     assertEquals("SELECT 'oracle' from 1", where(mixed, Platform.ORACLE));
   }
