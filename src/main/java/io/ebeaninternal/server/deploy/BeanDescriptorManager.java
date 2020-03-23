@@ -1002,6 +1002,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     orderProperty.setDbInsertable(orderColumn.isInsertable());
     orderProperty.setDbUpdateable(orderColumn.isUpdatable());
     orderProperty.setDbRead(true);
+    orderProperty.setOwningType(targetDesc.getBeanType());
 
     targetDesc.setOrderColumn(orderProperty);
   }
