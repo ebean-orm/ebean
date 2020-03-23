@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -44,7 +45,10 @@ final class InsertMeta {
 
   private final String[] identityDbColumns;
 
+  private final Platform platform;
+
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
+    this.platform = dbPlatform.getPlatform();
     this.discriminator = getDiscriminator(desc);
     this.id = id;
     this.all = all;
@@ -162,7 +166,11 @@ final class InsertMeta {
 
     request.append("insert into ").append(table);
     if (nullId && noColumnsForInsert(draftTable)) {
-      request.append(" default values");
+      if (this.platform.base() == Platform.MYSQL) {
+        request.append(" values (default)");
+      } else {
+        request.append(" default values");
+      }
       return request.toString();
     }
 
