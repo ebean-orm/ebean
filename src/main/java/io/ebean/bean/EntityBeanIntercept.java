@@ -36,7 +36,7 @@ public final class EntityBeanIntercept implements Serializable {
 
   private transient BeanLoader beanLoader;
 
-  private volatile transient PreGetterCallback preGetterCallback;
+  private transient PreGetterCallback preGetterCallback;
 
   private String ebeanServerName;
 
