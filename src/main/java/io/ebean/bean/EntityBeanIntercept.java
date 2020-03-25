@@ -913,6 +913,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   private void preGetterCallback(int propertyIndex) {
+    PreGetterCallback preGetterCallback = this.preGetterCallback;
     if (preGetterCallback != null) {
       preGetterCallback.preGetterTrigger(propertyIndex);
     }
