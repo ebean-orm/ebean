@@ -44,9 +44,9 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
+import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
-import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import io.ebeaninternal.server.deploy.parse.DeployInherit;
@@ -1003,6 +1003,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     orderProperty.setDbUpdateable(orderColumn.isUpdatable());
     orderProperty.setDbRead(true);
     orderProperty.setOwningType(targetDesc.getBeanType());
+
+    final InheritInfo targetInheritInfo = targetDesc.getInheritInfo();
+    if (targetInheritInfo != null) {
+      for (InheritInfo child : targetInheritInfo.getChildren()) {
+        final DeployBeanDescriptor<?> childDescriptor = deployInfoMap.get(child.getType()).getDescriptor();
+        childDescriptor.setOrderColumn(orderProperty);
+      }
+    }
 
     targetDesc.setOrderColumn(orderProperty);
   }
