@@ -178,6 +178,11 @@ public class SaveManyBeans extends SaveManyBase {
 
         if (!skipSavingThisBean) {
           persister.saveRecurse(detail, transaction, parentBean, request.getFlags());
+          if (many.hasOrderColumn()) {
+            // Clear the bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
+            final BeanDescriptor<?> beanDescriptor = many.getBeanDescriptor();
+            beanDescriptor.contextClear(transaction.getPersistenceContext(), beanDescriptor.getId(parentBean));
+          }
         }
       }
     }
