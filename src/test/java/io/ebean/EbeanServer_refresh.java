@@ -22,8 +22,8 @@ public class EbeanServer_refresh {
     map.put("tableName", "e_basic");
 
     EbeanServer server = Ebean.getDefaultServer();
-    server.script().run("/scripts/test-script.sql");
-    server.script().run("/scripts/test-script-2.sql", map);
+    DB.script().run("/scripts/test-script.sql");
+    DB.script().run("/scripts/test-script-2.sql", map);
     server.script().run(this.getClass().getResource("/scripts/test-script.sql"));
     server.script().run(this.getClass().getResource("/scripts/test-script-2.sql"), map);
 

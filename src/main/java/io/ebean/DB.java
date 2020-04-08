@@ -102,6 +102,22 @@ public class DB {
 //  }
 
   /**
+   * Return the ScriptRunner for the default database.
+   * <p>
+   * Useful to run SQL scripts that are resources. For example a test script
+   * for inserting seed data for a particular test.
+   *
+   * <pre>{@code
+   *
+   *   DB.script().run("/scripts/test-script.sql")
+   *
+   * }</pre>
+   */
+  public static ScriptRunner script() {
+    return getDefault().script();
+  }
+
+  /**
    * Return the ExpressionFactory from the default database.
    * <p>
    * The ExpressionFactory is used internally by the query and ExpressionList to
