@@ -8,9 +8,9 @@ import java.util.Calendar;
  * Used with Oracle JDBC driver as that wants to mutate the Calender.
  * </p>
  */
-public class CloneDataTimeZone extends SimpleDataTimeZone {
+public class OracleDataTimeZone extends SimpleDataTimeZone {
 
-  public CloneDataTimeZone(String zoneId) {
+  public OracleDataTimeZone(String zoneId) {
     super(zoneId);
   }
 

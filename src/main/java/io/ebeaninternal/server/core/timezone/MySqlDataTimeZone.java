@@ -5,11 +5,11 @@ import java.util.Calendar;
 /**
  * Implementation of DataTimeZone when single Calendar instance is used with local timezone.
  */
-public class LocalDataTimeZone implements DataTimeZone {
+public class MySqlDataTimeZone implements DataTimeZone {
 
   protected final Calendar zone;
 
-  public LocalDataTimeZone() {
+  public MySqlDataTimeZone() {
     this.zone = Calendar.getInstance();
   }
 
@@ -19,7 +19,7 @@ public class LocalDataTimeZone implements DataTimeZone {
   }
 
   @Override
-    public Calendar getDateTimeZone() {
-      return zone; // workaround for MySQL. TODO: rename class to MySqlDataTimeZone!?
-    }
+  public Calendar getDateTimeZone() {
+    return zone;
+  }
 }
