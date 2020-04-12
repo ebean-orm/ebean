@@ -357,7 +357,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
   public Map<String, String> deploy(List<XmEbean> mappings) {
-
     try {
       createListeners();
       readEntityDeploymentInitial();
@@ -365,7 +364,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
-      setProfileIds();
       // creates the BeanDescriptors
       readEntityRelationships();
 
@@ -375,9 +373,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       initialiseAll();
       readForeignKeys();
-
       readTableToDescriptor();
-
       logStatus();
 
       // clear collections we no longer need
@@ -776,18 +772,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         }
       }
     }
-  }
-
-  /**
-   * Set profileIds based on descriptor full name order.
-   */
-  private void setProfileIds() {
-
-    List<? extends DeployBeanDescriptor<?>> deployDescriptors = deployInfoMap.values().stream()
-      .map(DeployBeanInfo::getDescriptor)
-      .collect(Collectors.toList());
-
-    deployDescriptors.sort(Comparator.comparing(DeployBeanDescriptor::getFullName));
   }
 
   /**
