@@ -332,18 +332,6 @@ public class ServerConfig {
   private ClassLoadConfig classLoadConfig = new ClassLoadConfig();
 
   /**
-   * Set to true if the DataSource uses autoCommit.
-   * <p>
-   * Indicates that Ebean should use autoCommit friendly Transactions and TransactionManager.
-   */
-  private boolean autoCommitMode;
-
-  /**
-   * Set to true if transaction begin should be started with explicit statement.
-   */
-  private boolean explicitTransactionBeginMode;
-
-  /**
    * The data source JNDI name if using a JNDI DataSource.
    */
   private String dataSourceJndiName;
@@ -1741,42 +1729,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return true if autoCommit mode is on. This indicates to Ebean to use autoCommit friendly Transactions and TransactionManager.
-   */
-  public boolean isAutoCommitMode() {
-    return autoCommitMode;
-  }
-
-  /**
-   * Set to true if autoCommit mode is on and Ebean should use autoCommit friendly Transactions and TransactionManager.
-   */
-  public void setAutoCommitMode(boolean autoCommitMode) {
-    this.autoCommitMode = autoCommitMode;
-  }
-
-  /**
-   * Return true if transaction begin should be started with explicit statement.
-   */
-  public boolean isExplicitTransactionBeginMode() {
-    return explicitTransactionBeginMode;
-  }
-
-  /**
-   * Set to true if transaction begin should be started with explicit statement.
-   * <p>
-   * This works for H2 and Postgres but not for Oracle - only use this if you first name
-   * is Daryl or you have explicitly talked to Rob about this feature.
-   * </p>
-   * <p>
-   * This is generally not expected to be turned on but instead allow transactions to start
-   * implicitly which is generally the standard approach.
-   * </p>
-   */
-  public void setExplicitTransactionBeginMode(boolean explicitTransactionBeginMode) {
-    this.explicitTransactionBeginMode = explicitTransactionBeginMode;
-  }
-
-  /**
    * Return a value used to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
@@ -2862,8 +2814,6 @@ public class ServerConfig {
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
     notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
-    explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
-    autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
     useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
