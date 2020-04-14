@@ -1,5 +1,7 @@
 package io.ebean.common;
 
+import io.ebean.bean.EntityBean;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -54,6 +56,11 @@ class ModifyHolder<E> implements Serializable {
   void modifyAddition(E bean) {
     if (bean != null) {
       touched = true;
+
+      if (bean instanceof EntityBean) {
+        ((EntityBean) bean)._ebean_getIntercept().setDeletedFromCollection(false);
+      }
+
       // If it is to delete then just remove the deletion
       if (!undoDeletion(bean)) {
         // Insert
@@ -70,6 +77,11 @@ class ModifyHolder<E> implements Serializable {
   void modifyRemoval(Object bean) {
     if (bean != null) {
       touched = true;
+
+      if (bean instanceof EntityBean) {
+        ((EntityBean) bean)._ebean_getIntercept().setDeletedFromCollection(true);
+      }
+
       // If it is to be added then just remove the addition
       if (!undoAddition(bean)) {
         modifyDeletions.add((E) bean);

@@ -107,4 +107,41 @@ public class TestOrderColumn extends TransactionalTestCase {
     assertThat(sql.get(2)).contains("bind(tt32");
   }
 
+  @Test
+  public void testRemoveElement() {
+    final OrderMaster master = new OrderMaster();
+
+    for (int i = 0; i < 5; i++) {
+      final OrderReferencedChild child = new OrderReferencedChild("p" + i);
+      child.setChildName("c" + i);
+
+      for (int j = 0; j < 3; j++) {
+        final OrderToy toy = new OrderToy("t" + i + j);
+        child.getToys().add(toy);
+      }
+
+      master.getChildren().add(child);
+    }
+
+    Ebean.save(master);
+
+    final OrderMaster result = Ebean.find(OrderMaster.class).findOne();
+
+    final List<OrderReferencedChild> children = result.getChildren();
+    assertThat(children).hasSize(5);
+
+    final OrderReferencedChild child = children.get(0);
+
+    child.getToys().remove(1);
+
+    LoggedSqlCollector.start();
+    Ebean.save(result);
+    final List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(4);
+    assertSql(sql.get(0)).contains("delete from order_toy where id=?");
+    assertSql(sql.get(2)).contains("update order_toy set sort_order=? where id=?");
+    assertSql(sql.get(3)).contains("bind(2,");
+  }
+
 }

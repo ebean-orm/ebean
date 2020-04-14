@@ -69,7 +69,7 @@ public class SaveManyBeans extends SaveManyBase {
         resetModifyState();
       }
     } else {
-      if (isModifyListenMode()) {
+      if (isModifyListenMode() || many.hasOrderColumn()) {
         // delete any removed beans via private owned. Needs to occur before
         // a 'deleteMissingChildren' statement occurs
         removeAssocManyPrivateOwned();
@@ -348,14 +348,25 @@ public class SaveManyBeans extends SaveManyBase {
 
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();
-      modifyListenReset(c);
+
+      if (insertedParent) {
+        // after insert set the modify listening mode for private owned etc
+        c.setModifyListening(many.getModifyListenMode());
+      }
+
+      // We must not reset when we still have to update other entities in the collection and set their new orderColumn value
+      if (!many.hasOrderColumn()) {
+        c.modifyReset();
+      }
       if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
         for (Object removedBean : modifyRemovals) {
           if (removedBean instanceof EntityBean) {
             EntityBean eb = (EntityBean) removedBean;
             if (!eb._ebean_getIntercept().isNew()) {
-              // only delete if the bean was loaded meaning that it is known to exist in the DB
-              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.getFlags()));
+              if (eb._ebean_intercept().isDeletedFromCollection()) {
+                // only delete if the bean was loaded meaning that it is known to exist in the DB
+                persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.getFlags()));
+              }
             }
           }
         }

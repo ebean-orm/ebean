@@ -40,6 +40,8 @@ public final class EntityBeanIntercept implements Serializable {
 
   private String ebeanServerName;
 
+  private boolean deletedFromCollection;
+
   /**
    * The actual entity bean that 'owns' this intercept.
    */
@@ -1168,5 +1170,19 @@ public final class EntityBeanIntercept implements Serializable {
       }
     }
     return ret;
+  }
+
+  /**
+   * Returns true if the entity was removed from a BeanCollection. This can be used to track movement from one collection to another.
+   */
+  public boolean isDeletedFromCollection() {
+    return deletedFromCollection;
+  }
+
+  /**
+   * Set if the entity was deleted from a BeanCollection.
+   */
+  public void setDeletedFromCollection(final boolean deletedFromCollection) {
+    this.deletedFromCollection = deletedFromCollection;
   }
 }
