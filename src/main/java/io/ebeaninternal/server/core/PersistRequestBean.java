@@ -1399,7 +1399,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
               changes.put(property.getName(), val);
               if (property.isNaturalKey()) {
                 updateNaturalKey = true;
-                changeSet.addNaturalKeyPut(beanDescriptor, key, val.toString());
+                String valStr = (val == null) ? null : val.toString();
+                changeSet.addNaturalKeyPut(beanDescriptor, key, valStr);
               }
             }
           }
