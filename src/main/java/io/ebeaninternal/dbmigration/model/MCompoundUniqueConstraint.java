@@ -55,7 +55,7 @@ public class MCompoundUniqueConstraint {
   public MCompoundUniqueConstraint(AddUniqueConstraint change) {
     this.name = change.getConstraintName();
     this.columns = split(change.getColumnNames());
-    this.oneToOne = change.isOneToOne();
+    this.oneToOne = Boolean.TRUE.equals(change.isOneToOne());
     this.platforms = change.getPlatforms();
     this.nullableColumns = splitWithNull(change.getNullableColumns());
   }
@@ -63,7 +63,7 @@ public class MCompoundUniqueConstraint {
   public MCompoundUniqueConstraint(UniqueConstraint uq) {
     this.name = uq.getName();
     this.columns = split(uq.getColumnNames());
-    this.oneToOne = uq.isOneToOne();
+    this.oneToOne = Boolean.TRUE.equals(uq.isOneToOne());
     this.platforms = uq.getPlatforms();
     this.nullableColumns = splitWithNull(uq.getNullableColumns());
   }
