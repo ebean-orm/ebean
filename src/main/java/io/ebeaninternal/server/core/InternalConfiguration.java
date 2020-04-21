@@ -594,7 +594,9 @@ public class InternalConfiguration {
   }
 
   private ServerCachePlugin initServerCachePlugin() {
-
+    if (serverConfig.isLocalOnlyL2Cache()) {
+      return new DefaultServerCachePlugin();
+    }
     ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
     if (plugin == null) {
       ServiceLoader<ServerCachePlugin> cacheFactories = ServiceLoader.load(ServerCachePlugin.class);
@@ -617,7 +619,7 @@ public class InternalConfiguration {
    */
   private SpiCacheManager initCacheManager() {
 
-    if (!online || serverConfig.isDisableL2Cache() || serverConfig.isLocalOnlyL2Cache()) {
+    if (!online || serverConfig.isDisableL2Cache()) {
       // use local only L2 cache implementation as placeholder
       return new DefaultServerCacheManager();
     }
