@@ -476,6 +476,11 @@ public class ServerConfig {
   private String enabledL2Regions;
 
   /**
+   * Set to true to effectively disable L2 cache plugins.
+   */
+  private boolean localOnlyL2Cache;
+
+  /**
    * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
    * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
    */
@@ -2860,6 +2865,7 @@ public class ServerConfig {
     collectQueryPlanThresholdMicros = p.getLong("collectQueryPlanThresholdMicros", collectQueryPlanThresholdMicros);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
+    localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
     enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
     notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
@@ -3098,6 +3104,20 @@ public class ServerConfig {
    */
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+  }
+
+  /**
+   * Return true to use local only L2 cache. Effectively ignore l2 cache plugin like ebean-redis etc.
+   */
+  public boolean isLocalOnlyL2Cache() {
+    return localOnlyL2Cache;
+  }
+
+  /**
+   * Force the use of local only L2 cache. Effectively ignore l2 cache plugin like ebean-redis etc.
+   */
+  public void setLocalOnlyL2Cache(boolean localOnlyL2Cache) {
+    this.localOnlyL2Cache = localOnlyL2Cache;
   }
 
   /**

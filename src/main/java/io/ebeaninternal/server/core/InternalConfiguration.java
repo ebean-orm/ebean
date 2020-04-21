@@ -617,7 +617,7 @@ public class InternalConfiguration {
    */
   private SpiCacheManager initCacheManager() {
 
-    if (!online || serverConfig.isDisableL2Cache()) {
+    if (!online || serverConfig.isDisableL2Cache() || serverConfig.isLocalOnlyL2Cache()) {
       // use local only L2 cache implementation as placeholder
       return new DefaultServerCacheManager();
     }
