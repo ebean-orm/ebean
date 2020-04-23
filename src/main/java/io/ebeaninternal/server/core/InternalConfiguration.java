@@ -595,6 +595,7 @@ public class InternalConfiguration {
 
   private ServerCachePlugin initServerCachePlugin() {
     if (serverConfig.isLocalOnlyL2Cache()) {
+      localL2Caching = true;
       return new DefaultServerCachePlugin();
     }
     ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
