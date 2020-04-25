@@ -356,6 +356,14 @@ public class TransactionManager implements SpiTransactionManager {
     return t;
   }
 
+  private SpiTransaction createTransaction(TxScope txScope) {
+    if (txScope.isReadonly()) {
+      return createQueryTransaction(null);
+    } else {
+      return createTransaction(true, txScope.getIsolationLevel());
+    }
+  }
+
   /**
    * Create a new Transaction.
    */
@@ -669,7 +677,7 @@ public class TransactionManager implements SpiTransactionManager {
             transaction = NoTransaction.INSTANCE;
             break;
           default:
-            transaction = createTransaction(true, txScope.getIsolationLevel());
+            transaction = createTransaction(txScope);
             initNewTransaction(transaction, txScope);
         }
       }

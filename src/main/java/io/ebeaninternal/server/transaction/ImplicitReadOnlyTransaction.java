@@ -66,6 +66,8 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   private final long startNanos;
 
+  private ProfileLocation profileLocation;
+
   /**
    * Create without a tenantId.
    */
@@ -125,12 +127,12 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
 
   @Override
   public void setProfileLocation(ProfileLocation profileLocation) {
-    throw new IllegalStateException(notExpectedMessage);
+    this.profileLocation = profileLocation;
   }
 
   @Override
   public ProfileLocation getProfileLocation() {
-    return null;
+    return profileLocation;
   }
 
   @Override
