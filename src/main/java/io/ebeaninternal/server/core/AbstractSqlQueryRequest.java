@@ -58,7 +58,7 @@ public abstract class AbstractSqlQueryRequest {
       trans = server.currentServerTransaction();
       if (trans == null || !trans.isActive()) {
         // create a local readOnly transaction
-        trans = server.createQueryTransaction(null);
+        trans = server.createReadOnlyTransaction(null);
         createdTransaction = true;
       }
     }

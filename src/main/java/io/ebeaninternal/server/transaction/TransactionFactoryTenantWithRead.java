@@ -23,7 +23,7 @@ class TransactionFactoryTenantWithRead extends TransactionFactoryTenant {
   }
 
   @Override
-  public SpiTransaction createQueryTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
 
     Connection connection = null;
     try {

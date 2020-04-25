@@ -147,7 +147,7 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
    *
    * @param tenantId For multi-tenant lazy loading provide the tenantId to use.
    */
-  SpiTransaction createQueryTransaction(Object tenantId);
+  SpiTransaction createReadOnlyTransaction(Object tenantId);
 
   /**
    * An event from another server in the cluster used to notify local

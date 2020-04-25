@@ -286,7 +286,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       } else {
         // create an implicit transaction to execute this query
         // potentially using read-only DataSource with autoCommit
-        transaction = ebeanServer.createQueryTransaction(query.getTenantId());
+        transaction = ebeanServer.createReadOnlyTransaction(query.getTenantId());
       }
       createdTransaction = true;
     }

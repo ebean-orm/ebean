@@ -358,7 +358,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private SpiTransaction createTransaction(TxScope txScope) {
     if (txScope.isReadonly()) {
-      return createQueryTransaction(null);
+      return createReadOnlyTransaction(null);
     } else {
       return createTransaction(true, txScope.getIsolationLevel());
     }
@@ -374,8 +374,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new Transaction for query only purposes (can use read only datasource).
    */
-  public SpiTransaction createQueryTransaction(Object tenantId) {
-    return transactionFactory.createQueryTransaction(tenantId);
+  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+    return transactionFactory.createReadOnlyTransaction(tenantId);
   }
 
   /**

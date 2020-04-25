@@ -23,7 +23,7 @@ abstract class TransactionFactory {
    *
    * @param tenantId The tenantId for lazy loading queries.
    */
-  abstract SpiTransaction createQueryTransaction(Object tenantId);
+  abstract SpiTransaction createReadOnlyTransaction(Object tenantId);
 
   /**
    * Return a new transaction.

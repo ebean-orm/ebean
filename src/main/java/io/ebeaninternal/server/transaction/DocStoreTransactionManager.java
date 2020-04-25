@@ -24,7 +24,7 @@ public class DocStoreTransactionManager extends TransactionManager {
   }
 
   @Override
-  public SpiTransaction createQueryTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
     return new DocStoreOnlyTransaction("", false, this);
   }
 

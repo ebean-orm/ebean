@@ -24,7 +24,7 @@ class TransactionFactoryTenant extends TransactionFactory {
   }
 
   @Override
-  public SpiTransaction createQueryTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
     return create(false, tenantId);
   }
 
