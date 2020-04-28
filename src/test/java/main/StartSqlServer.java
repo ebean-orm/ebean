@@ -7,7 +7,7 @@ public class StartSqlServer {
 
   public static void main(String[] args) {
 
-    SqlServerConfig config = new SqlServerConfig("2017-CU4");
+    SqlServerConfig config = new SqlServerConfig("2019-GA-ubuntu-16.04");
     config.setDbName("test_ebean");
     config.setUser("test_ebean");
 

@@ -35,12 +35,10 @@ public class TestInheritanceOrderColumn extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(5);
     // Some platforms insert ids and others don't need to...
-    assertSql(sql.get(1))
-      .matches(
-        "txn\\[] insert into ordered_parent \\((id, )?order_master_inheritance_id, dtype, common_name, ordered_aname, sort_order\\).*");
-    assertSql(sql.get(3))
-      .matches(
-        "txn\\[] insert into ordered_parent \\((id, )?order_master_inheritance_id, dtype, common_name, ordered_bname, sort_order\\).*");
+    assertSql(trimId(sql, 1))
+      .contains("insert into ordered_parent (order_master_inheritance_id, dtype, common_name, ordered_aname, sort_order) values");
+    assertSql(trimId(sql, 3))
+      .contains("insert into ordered_parent (order_master_inheritance_id, dtype, common_name, ordered_bname, sort_order) values");
 
     OrderMasterInheritance result = Ebean.find(OrderMasterInheritance.class).findOne();
     assertThat(result.getReferenced())
@@ -63,6 +61,10 @@ public class TestInheritanceOrderColumn extends BaseTestCase {
     assertThat(result.getReferenced())
       .extracting(OrderedParent::getCommonName)
       .containsExactly("commonOrderedB", "commonOrderedA");
+  }
+
+  private String trimId(List<String> sql, int i) {
+    return sql.get(i).replace("(id, ", "(");
   }
 
 }

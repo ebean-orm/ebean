@@ -28,6 +28,8 @@ public class TestDefaults extends BaseTestCase {
     assertThat(current).isNotEmpty();
     if (isMySql()) {
       assertThat(current.get(0)).contains("insert into defaults_model_draft values (default);");
+    } else if (isSqlServer()) {
+      assertThat(current.get(0)).contains("insert into defaults_model_draft (id) values (?)");
     } else {
       assertThat(current.get(0)).contains("insert into defaults_model_draft default values;");
     }
