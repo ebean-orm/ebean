@@ -2804,7 +2804,7 @@ public class ServerConfig {
    */
   protected void loadDataSourceSettings(PropertiesWrapper p) {
     dataSourceConfig.loadSettings(p.properties, name);
-    readOnlyDataSourceConfig.loadSettings(p.properties, name);
+    readOnlyDataSourceConfig.loadSettings(p.properties, name + "-ro");
   }
 
   /**

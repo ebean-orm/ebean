@@ -8,10 +8,6 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.datasource.DataSourceAlertFactory;
-import io.ebean.datasource.DataSourceConfig;
-import io.ebean.datasource.DataSourceFactory;
-import io.ebean.datasource.DataSourcePoolListener;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -24,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -39,13 +34,8 @@ public class DefaultContainer implements SpiContainer {
 
   private final ClusterManager clusterManager;
 
-  private final JndiDataSourceLookup jndiDataSourceFactory;
-
   public DefaultContainer(ContainerConfig containerConfig) {
-
     this.clusterManager = new ClusterManager(containerConfig);
-    this.jndiDataSourceFactory = new JndiDataSourceLookup();
-
     // register so that we can shutdown any Ebean wide
     // resources such as clustering
     ShutdownManager.registerContainer(this);
@@ -230,75 +220,10 @@ public class DefaultContainer implements SpiContainer {
    * Set the DataSource if it has not already been set.
    */
   private void setDataSource(ServerConfig config) {
-    if (config.getDataSource() == null) {
-      config.setDataSource(getDataSourceFromConfig(config, false));
-    }
-    if (config.getReadOnlyDataSource() == null && config.isAutoReadOnlyDataSource()) {
-      config.setReadOnlyDataSource(getDataSourceFromConfig(config, true));
-    }
-  }
-
-  private DataSource getDataSourceFromConfig(ServerConfig config, boolean readOnly) {
-
     if (isOfflineMode(config)) {
       logger.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
-      return null;
-    }
-
-    if (!readOnly && config.getDataSourceJndiName() != null) {
-      DataSource ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
-      if (ds == null) {
-        throw new PersistenceException("JNDI lookup for DataSource " + config.getDataSourceJndiName() + " returned null.");
-      } else {
-        return ds;
-      }
-    }
-
-    DataSourceConfig dsConfig = (readOnly) ? config.getReadOnlyDataSourceConfig() : config.getDataSourceConfig();
-    if (dsConfig == null) {
-      throw new PersistenceException("No DataSourceConfig defined for " + config.getName());
-    }
-
-    if (dsConfig.isOffline()) {
-      if (config.getDatabasePlatformName() == null) {
-        throw new PersistenceException("You MUST specify a DatabasePlatformName on ServerConfig when offline");
-      }
-      return null;
-    }
-
-    DataSourceFactory factory = DataSourceFactory.get();
-    if (factory == null) {
-      throw new IllegalStateException("No DataSourceFactory service implementation found in class path."
-        + " Probably missing dependency to avaje-datasource?");
-    }
-
-    DataSourceAlertFactory alertFactory = config.service(DataSourceAlertFactory.class);
-    if (alertFactory != null) {
-      dsConfig.setAlert(alertFactory.createAlert());
-    }
-
-    attachListener(config, dsConfig);
-
-    if (readOnly) {
-      // setup to use AutoCommit such that we skip explicit commit
-      dsConfig.setAutoCommit(true);
-      //dsConfig.setReadOnly(true);
-      dsConfig.setDefaults(config.getDataSourceConfig());
-      dsConfig.setIsolationLevel(config.getDataSourceConfig().getIsolationLevel());
-    }
-    String poolName = config.getName() + (readOnly ? "-ro" : "");
-    return factory.createPool(poolName, dsConfig);
-  }
-
-  /**
-   * Create and attach a DataSourcePoolListener if it has been specified via properties and there is not one already attached.
-   */
-  private void attachListener(ServerConfig config, DataSourceConfig dsConfig) {
-    if (dsConfig.getListener() == null) {
-      String poolListener = dsConfig.getPoolListener();
-      if (poolListener != null) {
-        dsConfig.setListener((DataSourcePoolListener) config.getClassLoadConfig().newInstance(poolListener));
-      }
+    } else {
+      InitDataSource.init(config);
     }
   }
 
