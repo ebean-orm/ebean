@@ -8,6 +8,14 @@ import static org.junit.Assert.*;
 
 public class InitDataSourceTest {
 
+  private ServerConfig newConfig(String readOnlyUrl) {
+    ServerConfig config = new ServerConfig();
+    DataSourceConfig roConfig = new DataSourceConfig();
+    roConfig.setUrl(readOnlyUrl);
+    config.setReadOnlyDataSourceConfig(roConfig);
+    return config;
+  }
+
   @Test
   public void readOnlyConfig_nullByDefault() {
     InitDataSource init = new InitDataSource(new ServerConfig());
@@ -19,19 +27,19 @@ public class InitDataSourceTest {
     ServerConfig config = new ServerConfig();
     config.setReadOnlyDataSourceConfig(null);
 
-    InitDataSource init = new InitDataSource(config);
-    assertNull(init.readOnlyConfig());
+    assertNull(new InitDataSource(config).readOnlyConfig());
   }
 
   @Test
   public void readOnlyConfig_null_whenSetNullExplicitly_2() {
-    ServerConfig config = new ServerConfig();
-    DataSourceConfig roConfig = new DataSourceConfig();
-    roConfig.setUrl(null);
-    config.setReadOnlyDataSourceConfig(roConfig);
+    assertNull(new InitDataSource(newConfig(null)).readOnlyConfig());
+  }
 
-    InitDataSource init = new InitDataSource(config);
-    assertNull(init.readOnlyConfig());
+  @Test
+  public void readOnlyConfig_null_whenValueNONE() {
+    assertNull(new InitDataSource(newConfig("none")).readOnlyConfig());
+    assertNull(new InitDataSource(newConfig("None")).readOnlyConfig());
+    assertNull(new InitDataSource(newConfig("NONE")).readOnlyConfig());
   }
 
   @Test
@@ -39,19 +47,14 @@ public class InitDataSourceTest {
     ServerConfig config = new ServerConfig();
     config.setAutoReadOnlyDataSource(true);
 
-    InitDataSource init = new InitDataSource(config);
-    assertNotNull(init.readOnlyConfig());
+    assertNotNull(new InitDataSource(config).readOnlyConfig());
   }
 
   @Test
   public void readOnlyConfig_when_urlSet() {
-    ServerConfig config = new ServerConfig();
-    DataSourceConfig dsConfig = new DataSourceConfig();
-    dsConfig.setUrl("foo");
-    config.setReadOnlyDataSourceConfig(dsConfig);
+    ServerConfig config = newConfig("foo");
 
-    InitDataSource init = new InitDataSource(config);
-    final DataSourceConfig roConfig = init.readOnlyConfig();
+    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
     assertEquals("foo", roConfig.getUrl());
   }
@@ -61,8 +64,7 @@ public class InitDataSourceTest {
     ServerConfig config = new ServerConfig();
     config.getReadOnlyDataSourceConfig().setUrl("foo");
 
-    InitDataSource init = new InitDataSource(config);
-    final DataSourceConfig roConfig = init.readOnlyConfig();
+    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
     assertEquals("foo", roConfig.getUrl());
   }

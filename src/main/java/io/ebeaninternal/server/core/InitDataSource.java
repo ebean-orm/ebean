@@ -74,7 +74,8 @@ class InitDataSource {
       // it has explicitly been set to null, not expected but ok
       return null;
     }
-    if (roConfig.getUrl() == null && !config.isAutoReadOnlyDataSource()) {
+    final String url = roConfig.getUrl();
+    if ("none".equalsIgnoreCase(url) || (url == null && !config.isAutoReadOnlyDataSource())) {
       // no read-only DataSource will be used
       return null;
     }
