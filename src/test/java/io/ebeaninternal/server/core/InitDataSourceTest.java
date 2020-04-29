@@ -33,6 +33,8 @@ public class InitDataSourceTest {
   @Test
   public void readOnlyConfig_null_whenSetNullExplicitly_2() {
     assertNull(new InitDataSource(newConfig(null)).readOnlyConfig());
+    assertNull(new InitDataSource(newConfig("")).readOnlyConfig());
+    assertNull(new InitDataSource(newConfig(" ")).readOnlyConfig());
   }
 
   @Test

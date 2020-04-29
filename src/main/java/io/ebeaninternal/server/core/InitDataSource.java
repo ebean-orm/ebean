@@ -74,12 +74,20 @@ class InitDataSource {
       // it has explicitly been set to null, not expected but ok
       return null;
     }
-    final String url = roConfig.getUrl();
-    if ("none".equalsIgnoreCase(url) || (url == null && !config.isAutoReadOnlyDataSource())) {
+    final String readOnlyUrl = roConfig.getUrl();
+    if ("none".equalsIgnoreCase(readOnlyUrl) || notAutoReadOnly(readOnlyUrl)) {
       // no read-only DataSource will be used
       return null;
     }
     return roConfig;
+  }
+
+  private boolean notAutoReadOnly(String readOnlyUrl) {
+    return isEmpty(readOnlyUrl) && !config.isAutoReadOnlyDataSource();
+  }
+
+  private boolean isEmpty(String url) {
+    return url == null || url.trim().isEmpty();
   }
 
   private DataSource createFromConfig(DataSourceConfig dsConfig, boolean readOnly) {
