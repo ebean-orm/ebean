@@ -36,7 +36,6 @@ public final class IdBinderSimple implements IdBinder {
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
-
   public IdBinderSimple(BeanProperty idProperty, MultiValueBind multiValueBind) {
     this.idProperty = idProperty;
     this.scalarType = idProperty.getScalarType();
@@ -71,7 +70,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
-
     idProperty.buildRawSqlSelectChain(prefix, selectChain);
   }
 
@@ -218,7 +216,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getAssocOneIdExpr(String prefix, String operator) {
-
     StringBuilder sb = new StringBuilder();
     if (prefix != null) {
       sb.append(prefix);
@@ -231,7 +228,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getAssocIdInExpr(String prefix) {
-
     StringBuilder sb = new StringBuilder();
     if (prefix != null) {
       sb.append(prefix);
@@ -243,7 +239,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public Object convertId(Object idValue) {
-
     if (!idValue.getClass().equals(expectedType)) {
       return scalarType.toBeanType(idValue);
     }
@@ -252,12 +247,10 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public Object convertSetId(Object idValue, EntityBean bean) {
-
     if (!idValue.getClass().equals(expectedType)) {
       idValue = scalarType.toBeanType(idValue);
     }
     if (bean != null) {
-      // support PropertyChangeSupport
       idProperty.setValueIntercept(bean, idValue);
     }
     return idValue;

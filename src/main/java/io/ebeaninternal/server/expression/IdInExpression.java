@@ -104,16 +104,18 @@ public class IdInExpression extends NonPrepareExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
-    DefaultExpressionRequest r = (DefaultExpressionRequest) request;
-    BeanDescriptor<?> descriptor = r.getBeanDescriptor();
+    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
     IdBinder idBinder = descriptor.getIdBinder();
     if (idCollection.isEmpty()) {
       request.append(SQL_FALSE); // append false for this stage
     } else {
-      request.append(descriptor.getIdBinderInLHSSql());
-      String inClause = idBinder.getIdInValueExpr(false, idCollection.size());
-      request.append(inClause);
+      if (idBinder.isComplexId()) {
+        request.append(descriptor.getIdBinderInLHSSql());
+        request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
+      } else {
+        request.append(idBinder.getBeanProperty().getName());
+        request.appendInExpression(false, idCollection);
+      }
     }
   }
 

@@ -106,7 +106,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     int rows = server().find(Customer.class)
       .where()
-      .in("id", 1000, 1001, 1002)
+      .idIn(1000, 1001, 1002)
       .asUpdate()
       .setRaw("status = ?", "A")
       .setLabel("asUpdateByIds")
@@ -116,7 +116,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(rows).isEqualTo(0);
 
-    assertSql(sql.get(0)).contains("update o_customer set status = ? where id in (?,?,?)");
+    assertSql(sql.get(0)).contains("update o_customer set status = ? where id in (?,?,?,?,?)"); // bind padding to 5
   }
 
   @Test
