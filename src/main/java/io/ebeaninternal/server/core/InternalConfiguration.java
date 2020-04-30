@@ -15,7 +15,6 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryListener;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.datasource.DataSourcePool;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -45,10 +44,10 @@ import io.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import io.ebeaninternal.server.changelog.DefaultChangeLogRegister;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.core.timezone.OracleDataTimeZone;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.core.timezone.MySqlDataTimeZone;
 import io.ebeaninternal.server.core.timezone.NoDataTimeZone;
+import io.ebeaninternal.server.core.timezone.OracleDataTimeZone;
 import io.ebeaninternal.server.core.timezone.SimpleDataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
@@ -78,12 +77,10 @@ import io.ebeaninternal.server.query.QueryPlanLoggerSqlServer;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
-import io.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import io.ebeaninternal.server.transaction.DataSourceSupplier;
 import io.ebeaninternal.server.transaction.DefaultProfileHandler;
 import io.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
 import io.ebeaninternal.server.transaction.DocStoreTransactionManager;
-import io.ebeaninternal.server.transaction.ExplicitTransactionManager;
 import io.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import io.ebeaninternal.server.transaction.JtaTransactionManager;
 import io.ebeaninternal.server.transaction.NoopProfileHandler;
@@ -100,7 +97,6 @@ import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -450,12 +446,6 @@ public class InternalConfiguration {
         indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
         tableModState, cacheNotify, clockService);
 
-    if (serverConfig.isExplicitTransactionBeginMode()) {
-      return new ExplicitTransactionManager(options);
-    }
-    if (isAutoCommitMode()) {
-      return new AutoCommitTransactionManager(options);
-    }
     if (serverConfig.isDocStoreOnly()) {
       return new DocStoreTransactionManager(options);
     }
@@ -490,18 +480,6 @@ public class InternalConfiguration {
       default:
         return new SimpleDataSourceProvider(serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource());
     }
-  }
-
-  /**
-   * Return true if autoCommit mode is on.
-   */
-  private boolean isAutoCommitMode() {
-    if (serverConfig.isAutoCommitMode()) {
-      // explicitly set
-      return true;
-    }
-    DataSource dataSource = serverConfig.getDataSource();
-    return dataSource instanceof DataSourcePool && ((DataSourcePool) dataSource).isAutoCommit();
   }
 
   /**
