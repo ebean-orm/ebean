@@ -1,6 +1,7 @@
 package io.ebean.config.dbplatform.oracle;
 
 import io.ebean.annotation.Platform;
+import io.ebean.config.dbplatform.IdType;
 
 /**
  * Oracle 11 platform using rownum sql limiting.
@@ -12,5 +13,6 @@ public class Oracle11Platform extends OraclePlatform {
     this.platform = Platform.ORACLE11;
     this.columnAliasPrefix = "c";
     this.sqlLimiter = new OracleRownumSqlLimiter();
+    dbIdentity.setIdType(IdType.SEQUENCE);
   }
 }

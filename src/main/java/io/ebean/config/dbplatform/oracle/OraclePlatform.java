@@ -30,7 +30,7 @@ public class OraclePlatform extends DatabasePlatform {
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
     this.historySupport = new OracleDbHistorySupport();
     this.truncateTable = "truncate table %s cascade";
-    dbIdentity.setIdType(IdType.SEQUENCE);
+    dbIdentity.setIdType(IdType.IDENTITY);
     dbIdentity.setSupportsSequence(true);
     dbIdentity.setSupportsIdentity(true);
     dbIdentity.setSupportsGetGeneratedKeys(true);

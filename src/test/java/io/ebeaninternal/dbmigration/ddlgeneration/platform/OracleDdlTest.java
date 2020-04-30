@@ -6,16 +6,16 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Oracle10DdlTest {
+public class OracleDdlTest {
 
-  Oracle10Ddl create() {
-    return new Oracle10Ddl(new OraclePlatform());
+  OracleDdl create() {
+    return new OracleDdl(new OraclePlatform());
   }
 
   @Test
   public void appendForeignKeyOnDelete_expectEmtpy_when_nullRestrictSetDefault() {
 
-    Oracle10Ddl oracle = create();
+    OracleDdl oracle = create();
 
     StringBuilder sb = new StringBuilder();
     oracle.appendForeignKeyOnDelete(sb, oracle.withDefault(null));
@@ -34,7 +34,7 @@ public class Oracle10DdlTest {
   @Test
   public void appendForeignKeyOnDelete_setNull() {
 
-    Oracle10Ddl oracle = create();
+    OracleDdl oracle = create();
 
     StringBuilder sb = new StringBuilder();
     oracle.appendForeignKeyOnDelete(sb, ConstraintMode.SET_NULL);
@@ -44,7 +44,7 @@ public class Oracle10DdlTest {
   @Test
   public void appendForeignKeyOnDelete_cascade() {
 
-    Oracle10Ddl oracle = create();
+    OracleDdl oracle = create();
 
     StringBuilder sb = new StringBuilder();
     oracle.appendForeignKeyOnDelete(sb, ConstraintMode.CASCADE);

@@ -195,7 +195,6 @@ public class PlatformDdl {
    * SQl2003 standard identity definition.
    */
   protected String asIdentityStandardOptions(String columnDefn, DdlIdentity identity) {
-
     StringBuilder sb = new StringBuilder(columnDefn.length() + 60);
     sb.append(columnDefn).append(identity.optionGenerated());
     sb.append(identity.identityOptions(identityStartWith, identityIncrementBy, identityCache));
