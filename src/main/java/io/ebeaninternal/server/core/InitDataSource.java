@@ -62,10 +62,7 @@ class InitDataSource {
    */
   private DataSource initReadOnlyDataSource() {
     DataSourceConfig roConfig = readOnlyConfig();
-    if (roConfig == null) {
-      return null;
-    }
-    return createFromConfig(roConfig, true);
+    return roConfig == null ? null : createFromConfig(roConfig, true);
   }
 
   DataSourceConfig readOnlyConfig() {
@@ -74,20 +71,25 @@ class InitDataSource {
       // it has explicitly been set to null, not expected but ok
       return null;
     }
-    final String readOnlyUrl = roConfig.getUrl();
-    if ("none".equalsIgnoreCase(readOnlyUrl) || notAutoReadOnly(readOnlyUrl)) {
-      // no read-only DataSource will be used
+    if (urlSet(roConfig.getUrl())) {
+      return roConfig;
+    }
+    // convenient alternate place to set the read-only url
+    final String readOnlyUrl = config.getDataSourceConfig().getReadOnlyUrl();
+    if (urlSet(readOnlyUrl)) {
+      roConfig.setUrl(readOnlyUrl);
+      return roConfig;
+    }
+    if (config.isAutoReadOnlyDataSource()) {
+      roConfig.setUrl(null); // blank out in case it is "none"
+      return roConfig;
+    } else {
       return null;
     }
-    return roConfig;
   }
 
-  private boolean notAutoReadOnly(String readOnlyUrl) {
-    return isEmpty(readOnlyUrl) && !config.isAutoReadOnlyDataSource();
-  }
-
-  private boolean isEmpty(String url) {
-    return url == null || url.trim().isEmpty();
+  private boolean urlSet(String url) {
+    return url != null && !"none".equalsIgnoreCase(url) && !url.trim().isEmpty();
   }
 
   private DataSource createFromConfig(DataSourceConfig dsConfig, boolean readOnly) {
@@ -107,7 +109,7 @@ class InitDataSource {
     if (readOnly) {
       // setup to use AutoCommit such that we skip explicit commit
       dsConfig.setAutoCommit(true);
-      //dsConfig.setReadOnly(true);
+      dsConfig.setReadOnly(true);
       dsConfig.setDefaults(config.getDataSourceConfig());
       dsConfig.setIsolationLevel(config.getDataSourceConfig().getIsolationLevel());
     }

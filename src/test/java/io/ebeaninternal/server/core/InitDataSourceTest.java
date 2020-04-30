@@ -53,12 +53,63 @@ public class InitDataSourceTest {
   }
 
   @Test
+  public void readOnlyConfig_when_autoReadOnlyDataSource_expect_setToNull() {
+    ServerConfig config = newConfig("none");
+    config.setAutoReadOnlyDataSource(true);
+
+    final DataSourceConfig readOnlyConfig = new InitDataSource(config).readOnlyConfig();
+    assertNull(readOnlyConfig.getUrl());
+  }
+
+  @Test
   public void readOnlyConfig_when_urlSet() {
     ServerConfig config = newConfig("foo");
 
     final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
     assertEquals("foo", roConfig.getUrl());
+  }
+
+  @Test
+  public void readOnlyConfig_when_readOnlyUrlSetOnMain() {
+    ServerConfig config = newConfig(null);
+    // alternate location to set read-only url for developer convenience
+    config.getDataSourceConfig().setReadOnlyUrl("bar");
+
+    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    assertNotNull(roConfig);
+    assertEquals("bar", roConfig.getUrl());
+  }
+
+  @Test
+  public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNone() {
+    ServerConfig config = newConfig("None");
+    // alternate location to set read-only url for developer convenience
+    config.getDataSourceConfig().setReadOnlyUrl("bar");
+
+    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    assertNotNull(roConfig);
+    assertEquals("bar", roConfig.getUrl());
+  }
+
+  @Test
+  public void readOnlyConfig_when_bothReadOnlyUrlsSet() {
+    ServerConfig config = newConfig("one");
+    config.getDataSourceConfig().setReadOnlyUrl("two");
+
+    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    assertNotNull(roConfig);
+    assertEquals("one", roConfig.getUrl());
+  }
+
+  @Test
+  public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNoneNone() {
+    ServerConfig config = newConfig("none");
+    // alternate location to set read-only url for developer convenience
+    config.getDataSourceConfig().setReadOnlyUrl("none");
+
+    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    assertNull(roConfig);
   }
 
   @Test

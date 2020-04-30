@@ -99,7 +99,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
-      <version>4.7.3</version>
+      <version>4.9.1</version>
     </dependency>
 
     <dependency>
