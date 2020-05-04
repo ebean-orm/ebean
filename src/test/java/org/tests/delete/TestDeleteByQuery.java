@@ -1,8 +1,8 @@
 package org.tests.delete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
@@ -21,15 +21,50 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDeleteByQuery extends BaseTestCase {
 
+  private void createUser(String name) {
+    BBookmarkUser u1 = new BBookmarkUser(name);
+    DB.save(u1);
+  }
+
+  @Test
+  @IgnorePlatform(Platform.MYSQL)
+  public void deleteWithLimit() {
+    createUser("deleteWithLimit1");
+    createUser("deleteWithLimit2");
+    createUser("deleteWithLimit3");
+    createUser("deleteWithLimit4");
+
+    LoggedSqlCollector.start();
+    final int rows = DB.find(BBookmarkUser.class)
+      .where().startsWith("name", "deleteWithLimit")
+      .setMaxRows(3)
+      .delete();
+
+    assertThat(rows).isEqualTo(3);
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 where t0.name like");
+    if (isH2() || isPostgres()) {
+      assertSql(sql.get(0)).contains("limit 3");
+    }
+
+    final int rowsAfter = DB.find(BBookmarkUser.class)
+      .where().startsWith("name", "deleteWithLimit")
+      .setMaxRows(3)
+      .delete();
+
+    assertThat(rowsAfter).isEqualTo(1);
+  }
+
   @Test
   @IgnorePlatform(Platform.MYSQL)
   // FIXME: MySql does not the sub query selecting from the delete table
   public void deleteWithSubquery() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     BBookmarkUser u1 = new BBookmarkUser("u1");
-    Ebean.save(u1);
+    DB.save(u1);
 
     Query<BBookmarkUser> query = server.find(BBookmarkUser.class)
       .where().eq("org.name", "NahYeahMaybe")
@@ -71,7 +106,7 @@ public class TestDeleteByQuery extends BaseTestCase {
   // FIXME: MySql does not the sub query selecting from the delete table
   public void deleteWithSubquery_withEscalation() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Query<Contact> query = server.find(Contact.class).where().eq("group.name", "NahYeahMaybe").query();
 
@@ -104,8 +139,8 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(BBookmarkUser.class).where().eq("id", 7000).delete();
-    Ebean.find(BBookmarkUser.class).setId(7000).delete();
+    DB.find(BBookmarkUser.class).where().eq("id", 7000).delete();
+    DB.find(BBookmarkUser.class).setId(7000).delete();
 
     List<String> sql = LoggedSqlCollector.stop();
     if (isPlatformSupportsDeleteTableAlias()) {
@@ -117,7 +152,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     }
 
     // and note this is the easiest option
-    Ebean.delete(BBookmarkUser.class, 7000);
+    DB.delete(BBookmarkUser.class, 7000);
   }
 
   @Test
@@ -125,8 +160,8 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Contact.class).where().eq("id", 7000).delete();
-    Ebean.find(Contact.class).setId(7000).delete();
+    DB.find(Contact.class).where().eq("id", 7000).delete();
+    DB.find(Contact.class).setId(7000).delete();
 
     List<String> sql = LoggedSqlCollector.stop();
     // escalate to fetch ids then delete ... but no rows found
@@ -134,7 +169,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     assertSql(sql.get(1)).contains("select t0.id from contact t0 where t0.id = ?");
 
     // and note this is the easiest option
-    Ebean.delete(Contact.class, 7000);
+    DB.delete(Contact.class, 7000);
   }
 
   @Test
@@ -142,10 +177,10 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
       transaction.setPersistCascade(false);
 
-      Ebean.find(Contact.class).where().eq("id", 7001).delete();
+      DB.find(Contact.class).where().eq("id", 7001).delete();
 
       transaction.commit();
     }
@@ -163,7 +198,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .where().eq("name", "Don Roberto")
       .query().forUpdate()
       .delete();
@@ -181,11 +216,11 @@ public class TestDeleteByQuery extends BaseTestCase {
   public void deleteByPredicate() {
 
     BBookmarkUser ud = new BBookmarkUser("deleteQueryByPredicate");
-    Ebean.save(ud);
+    DB.save(ud);
 
-    Ebean.find(BBookmarkUser.class).where().eq("name", "deleteQueryByPredicate").delete();
+    DB.find(BBookmarkUser.class).where().eq("name", "deleteQueryByPredicate").delete();
 
-    BBookmarkUser found = Ebean.find(BBookmarkUser.class, ud.getId());
+    BBookmarkUser found = DB.find(BBookmarkUser.class, ud.getId());
     assertThat(found).isNull();
   }
 
@@ -200,11 +235,11 @@ public class TestDeleteByQuery extends BaseTestCase {
     contact.setLastName("deleteMe");
     contact.setCustomer(all.get(0));
 
-    Ebean.save(contact);
+    DB.save(contact);
 
-    Ebean.find(Contact.class).where().eq("firstName", "DelByQueryFirstName").delete();
+    DB.find(Contact.class).where().eq("firstName", "DelByQueryFirstName").delete();
 
-    Contact contactFind = Ebean.find(Contact.class, contact.getId());
+    Contact contactFind = DB.find(Contact.class, contact.getId());
     assertThat(contactFind).isNull();
   }
 
@@ -214,13 +249,13 @@ public class TestDeleteByQuery extends BaseTestCase {
     Country country = new Country();
     country.setCode("XX");
     country.setName("SecretName");
-    Ebean.save(country);
-    Query<Country> query = Ebean.find(Country.class).where().eq("name", "SecretName").setUseQueryCache(true);
+    DB.save(country);
+    Query<Country> query = DB.find(Country.class).where().eq("name", "SecretName").setUseQueryCache(true);
 
     assertThat(query.findList()).hasSize(1);
     assertThat(query.findCount()).isEqualTo(1);
 
-    Ebean.find(Country.class).where().eq("name", "SecretName").delete();
+    DB.find(Country.class).where().eq("name", "SecretName").delete();
     //Ebean.getDefaultServer().getPluginApi().getBeanType(Country.class).clearQueryCache();
     assertThat(query.findList()).hasSize(0);
     assertThat(query.findCount()).isEqualTo(0);

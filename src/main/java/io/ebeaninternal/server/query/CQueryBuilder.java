@@ -95,7 +95,7 @@ class CQueryBuilder {
 
     SpiQuery<T> query = request.getQuery();
     String rootTableAlias = query.getAlias();
-    query.setupForDeleteOrUpdate(deleteRequest);
+    query.setupForDeleteOrUpdate();
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
     CQueryPlan queryPlan = request.getQueryPlan();
@@ -125,7 +125,7 @@ class CQueryBuilder {
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
 
     String alias = alias(rootTableAlias);
-    if (sqlTree.noJoins()) {
+    if (sqlTree.noJoins() && !request.getQuery().hasMaxRowsOrFirstRow()) {
       if (dbPlatform.isSupportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSqlDelete("delete", request, predicates, sqlTree).getSql(), alias);
