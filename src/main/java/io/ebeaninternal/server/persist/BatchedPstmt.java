@@ -53,8 +53,9 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Create with a given statement.
    */
-  public BatchedPstmt(PreparedStatement pstmt, boolean isGenKeys, String sql, SpiTransaction transaction) {
+  public BatchedPstmt(PreparedStatement pstmt, boolean isGenKeys, String sql, SpiTransaction transaction) throws SQLException {
     this.pstmt = pstmt;
+    this.pstmt.clearBatch();
     this.isGenKeys = isGenKeys;
     this.sql = sql;
     this.transaction = transaction;
@@ -92,7 +93,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   private void flushStatementBatch() throws SQLException {
     final int[] rows = pstmt.executeBatch();
     if (rows.length != list.size()) {
-      throw new IllegalStateException("Invalid state? rows:" + rows.length + " != " + list.size());
+      throw new IllegalStateException("Invalid state on executeBatch, rows:" + rows.length + " != " + list.size());
     }
     for (BatchPostExecute item : list) {
       item.postExecute();
@@ -156,8 +157,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
     try {
       results = pstmt.executeBatch();
       if (results.length != list.size()) {
-        String s = "results array error " + results.length + " " + list.size();
-        throw new SQLException(s);
+        throw new SQLException("Invalid state on executeBatch, rows:" + results.length + " != " + list.size());
       }
       // check for concurrency exceptions...
       for (int i = 0; i < results.length; i++) {
