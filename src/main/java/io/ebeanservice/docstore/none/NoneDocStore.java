@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 public class NoneDocStore implements DocumentStore {
 
   public static IllegalStateException implementationNotInClassPath() {
-    throw new IllegalStateException("DocStore implementation not included in the classPath. You need to add the maven dependency for avaje-ebeanorm-elastic");
+    throw new IllegalStateException("DocStore implementation not included in the classPath. You need to add the maven dependency for io.ebean:ebean-elastic");
   }
 
   @Override
