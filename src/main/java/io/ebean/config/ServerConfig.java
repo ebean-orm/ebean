@@ -44,6 +44,8 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
+ * Deprecated - please migrate to <code>io.ebean.DatabaseConfig</code>.
+ *
  * The configuration used for creating a Database.
  * <p>
  * Used to programmatically construct a Database and optionally register it
@@ -80,6 +82,7 @@ import java.util.ServiceLoader;
  * @author rbygrave
  * @see DatabaseFactory
  */
+@Deprecated
 public class ServerConfig {
 
   /**

@@ -11,6 +11,8 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
+ * Deprecated - please migrate to DatabaseFactory.
+ * <p>
  * Creates EbeanServer instances.
  * <p>
  * This uses either a ServerConfig or properties in the ebean.properties file to
@@ -28,6 +30,7 @@ import java.util.ServiceLoader;
  * convenient way of using the 'default/primary' EbeanServer.
  * </p>
  */
+@Deprecated
 public class EbeanServerFactory {
 
 

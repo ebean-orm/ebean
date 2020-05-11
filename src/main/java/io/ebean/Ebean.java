@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Ebean will be Deprecated - please migrate to use DB.
+ * Deprecated - please migrate to use <code>io.ebean.DB</code>.
  * <p>
  * Ebean is a registry of {@link Database} by name. Ebean has now been renamed to {@link DB}.
  * <p>
@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * The preference is to use DB and Database rather than Ebean and EbeanServer.
  */
+@Deprecated
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
 
