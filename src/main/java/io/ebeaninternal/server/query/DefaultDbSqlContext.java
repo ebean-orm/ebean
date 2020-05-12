@@ -328,11 +328,9 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void appendRawColumn(String rawcolumnWithTableAlias) {
+  public void appendRawColumn(String rawColumnWithAlias) {
     sb.append(COMMA);
-    sb.append(rawcolumnWithTableAlias);
-
-    appendColumnAlias();
+    sb.append(rawColumnWithAlias);
   }
 
   @Override

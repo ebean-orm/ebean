@@ -102,7 +102,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   @SuppressWarnings("unchecked")
   public T readNextBean() throws SQLException {
     dataReader.resetColumnPosition();
-    return (T)plan.readRow(dataReader);
+    return (T) plan.readRow(dataReader);
   }
 
   private DtoMappingRequest mappingRequest() throws SQLException {
@@ -110,19 +110,29 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   }
 
   private DtoColumn[] readMeta() throws SQLException {
-
     ResultSetMetaData metaData = resultSet.getMetaData();
     int cols = metaData.getColumnCount();
     DtoColumn[] meta = new DtoColumn[cols];
     for (int i = 0; i < cols; i++) {
-      int pos = i+1;
+      int pos = i + 1;
       String columnLabel = metaData.getColumnLabel(pos);
       if (columnLabel == null) {
         columnLabel = metaData.getColumnName(pos);
       }
-      meta[i] = new DtoColumn(columnLabel);
+      meta[i] = new DtoColumn(parseColumn(columnLabel));
     }
     return meta;
+  }
+
+  static String parseColumn(String columnLabel) {
+    if (columnLabel.startsWith("_e_")) {
+      // encrypted column alias in the form _e_<tableAlias>_<column>
+      final int pos = columnLabel.indexOf("_", 3);
+      if (pos > -1) {
+        return columnLabel.substring(pos + 1);
+      }
+    }
+    return columnLabel;
   }
 
 }

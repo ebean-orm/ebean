@@ -542,12 +542,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return dbEncryptFunction.getDecryptSql(propertyName);
   }
 
-  public String getDecryptSql() {
-    return dbEncryptFunction.getDecryptSql(this.getDbColumn());
-  }
-
-  private String getDecryptSql(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn());
+  /**
+   * Return the SQL for the column including decryption function and column alias.
+   */
+  private String getDecryptSqlWithColumnAlias(String tableAlias) {
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + " _e_" + tableAlias + "_" + this.getDbColumn();
   }
 
   @Override
@@ -600,8 +599,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       }
 
       if (dbEncrypted) {
-        String decryptSql = getDecryptSql(ctx.peekTableAlias());
-        ctx.appendRawColumn(decryptSql);
+        ctx.appendRawColumn(getDecryptSqlWithColumnAlias(ctx.peekTableAlias()));
         ctx.addEncryptedProp(this);
 
       } else {

@@ -56,6 +56,49 @@ public class TestEncrypt extends BaseTestCase {
   }
 
   @Test
+  public void asDto() {
+    DB.find(EBasicEncrypt.class).delete();
+
+    EBasicEncrypt e = new EBasicEncrypt();
+    e.setName("name2");
+    e.setDescription("descEncrypted2");
+    e.setDob(new Date(System.currentTimeMillis() - 100000));
+
+    DB.save(e);
+
+    final EDto dto = DB.find(EBasicEncrypt.class)
+      .select("name, description")
+      .asDto(EDto.class)
+      .findOne();
+
+    assertThat(dto).isNotNull();
+    assertThat(dto.getName()).isEqualTo("name2");
+    assertThat(dto.getDescription()).isEqualTo("descEncrypted2");
+  }
+
+  public static class EDto {
+    String name;
+    String description;
+    public EDto(){
+    }
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public void setDescription(String description) {
+      this.description = description;
+    }
+  }
+
+  @Test
   @ForPlatform(Platform.H2)
   public void test() {
 
