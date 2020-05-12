@@ -125,7 +125,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   }
 
   static String parseColumn(String columnLabel) {
-    if (columnLabel.startsWith("_e_")) {
+    if (columnLabel.startsWith("_e_") || columnLabel.startsWith("_E_")) {
       // encrypted column alias in the form _e_<tableAlias>_<column>
       final int pos = columnLabel.indexOf("_", 3);
       if (pos > -1) {
