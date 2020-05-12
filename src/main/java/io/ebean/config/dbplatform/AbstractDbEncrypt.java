@@ -43,11 +43,8 @@ public abstract class AbstractDbEncrypt implements DbEncrypt {
   public DbEncryptFunction getDbEncryptFunction(int jdbcType) {
     switch (jdbcType) {
       case Types.VARCHAR:
-        return varcharEncryptFunction;
       case Types.CLOB:
-        return varcharEncryptFunction;
       case Types.CHAR:
-        return varcharEncryptFunction;
       case Types.LONGVARCHAR:
         return varcharEncryptFunction;
 

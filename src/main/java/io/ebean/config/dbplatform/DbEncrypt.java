@@ -7,30 +7,18 @@ package io.ebean.config.dbplatform;
  * As an alternative to using DB encryption you can encrypt/decrypt in java via
  * a special ScalarType but this has the limitation that you can't include that
  * property in query where clauses.
- * </p>
- *
- * @author rbygrave
  */
 public interface DbEncrypt {
 
-  // /**
-  // * Return the SQL for decrypting a column returning a VARCHAR.
-  // */
-  // String getDecryptSql(String columnWithTableAlias);
-  //
-  // /**
-  // * Return the DB function with bind variables used to encrypt a VARCHAR
-  // * value.
-  // */
-  // String getEncryptBindSql();
-
+  /**
+   * Return the DB encrypt function for the given JDBC type.
+   */
   DbEncryptFunction getDbEncryptFunction(int jdbcType);
 
   /**
    * Return the DB type that encrypted Strings are stored in.
    * <p>
    * This is VARCHAR for MySql and VARBINARY for most others.
-   * </p>
    */
   int getEncryptDbType();
 
