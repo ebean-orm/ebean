@@ -1,6 +1,6 @@
 package org.tests.text.csv;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
 import org.junit.Test;
@@ -10,7 +10,6 @@ import org.tests.model.basic.ResetBasicData;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
-import java.util.Locale;
 
 public class TestCsvReader extends TransactionalTestCase {
 
@@ -25,7 +24,7 @@ public class TestCsvReader extends TransactionalTestCase {
 
       FileReader reader = new FileReader(f);
 
-      CsvReader<Customer> csvReader = Ebean.createCsvReader(Customer.class);
+      CsvReader<Customer> csvReader = DB.getDefault().createCsvReader(Customer.class);
 
       csvReader.setPersistBatchSize(2);
 
@@ -33,7 +32,7 @@ public class TestCsvReader extends TransactionalTestCase {
       // csvReader.addProperty("id");
       csvReader.addProperty("status");
       csvReader.addProperty("name");
-      csvReader.addDateTime("anniversary", "dd-MMM-yyyy", Locale.GERMAN);
+      csvReader.addDateTime("anniversary", "dd-MMM-yyyy");
       csvReader.addProperty("billingAddress.line1");
       csvReader.addProperty("billingAddress.city");
       csvReader.addProperty("billingAddress.country.code");
