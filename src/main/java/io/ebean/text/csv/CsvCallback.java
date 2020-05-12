@@ -1,6 +1,6 @@
 package io.ebean.text.csv;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 
 /**
  * Provides callback methods for customisation of CSV processing.
@@ -8,9 +8,6 @@ import io.ebean.EbeanServer;
  * You can provide your own CsvCallback implementation to customise the CSV
  * processing. It is expected that the DefaultCsvCallback provides a good base
  * class that you can extend.
- * </p>
- *
- * @param <T>
  */
 public interface CsvCallback<T> {
 
@@ -21,7 +18,7 @@ public interface CsvCallback<T> {
    * size etc.
    * </p>
    */
-  void begin(EbeanServer server);
+  void begin(Database database);
 
   /**
    * Read the header row.
@@ -73,8 +70,8 @@ public interface CsvCallback<T> {
    * was created.
    * </p>
    *
-   * @param row the row that the error has occured on
-   * @param e   the error that occured
+   * @param row the row that the error has occurred on
+   * @param e   the error that occurred
    */
   void endWithError(int row, Exception e);
 
