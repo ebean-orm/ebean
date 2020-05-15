@@ -809,7 +809,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> orderBy(String orderBy) {
+  public ExpressionList<T> orderBy(String orderBy) {
     return exprList.orderBy(orderBy);
   }
 

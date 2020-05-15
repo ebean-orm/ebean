@@ -1,10 +1,9 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
 import org.junit.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -12,6 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TestQueryRowCountWithMany extends BaseTestCase {
 
@@ -24,7 +24,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
     Long productId = 1L;
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where().eq("details.product.id", productId)
       .order("cretime asc").query();
@@ -66,8 +66,8 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
-    Assert.assertEquals(list.size(), rowCount);
-    Assert.assertEquals(2, sqlLogged.size());
+    assertEquals(list.size(), rowCount);
+    assertEquals(2, sqlLogged.size());
     assertThat(trimSql(sqlLogged.get(1), 1)).contains(
       "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ?)");
 
@@ -81,19 +81,20 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
     Long productId = 1L;
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where().eq("details.product.id", productId)
       .setFirstRow(2)
       .setMaxRows(20)
-      .orderBy("cretime asc");
+      .orderBy("cretime asc")
+      .query();
 
     LoggedSqlCollector.start();
     query.findCount();
 
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
-    Assert.assertEquals(1, sqlLogged.size());
+    assertEquals(1, sqlLogged.size());
     assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ?)");
 
     query.findList();

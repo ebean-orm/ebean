@@ -145,8 +145,9 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public Query<T> orderBy(String orderBy) {
-    return rootQuery.orderBy(orderBy);
+  public ExpressionList<T> orderBy(String orderByClause) {
+    this.orderByClause = orderByClause;
+    return this;
   }
 
   @Override
