@@ -2,7 +2,6 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
@@ -34,21 +33,21 @@ public class TestBeanCache extends BaseTestCase {
 
     OCachedBean bean = new OCachedBean();
     bean.setName("findById");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    OCachedBean bean0 = Ebean.find(OCachedBean.class, bean.getId());
+    OCachedBean bean0 = DB.find(OCachedBean.class, bean.getId());
     assertNotNull(bean0);
 
     // expect to hit the cache, no SQL
     LoggedSqlCollector.start();
-    OCachedBean bean1 = Ebean.find(OCachedBean.class, bean.getId());
+    OCachedBean bean1 = DB.find(OCachedBean.class, bean.getId());
     List<String> sql = LoggedSqlCollector.stop();
     assertNotNull(bean1);
     assertThat(sql).isEmpty();
 
     // expect to hit the cache, no SQL
     LoggedSqlCollector.start();
-    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
+    OCachedBean bean2 = DB.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
     sql = LoggedSqlCollector.stop();
     assertNotNull(bean2);
     assertThat(sql).isEmpty();
@@ -153,7 +152,7 @@ public class TestBeanCache extends BaseTestCase {
   @Test
   public void find_whenNotExits() {
 
-    Country country = Ebean.find(Country.class)
+    Country country = DB.find(Country.class)
       .where()
       .eq("name","NotValid")
       .findOne();
