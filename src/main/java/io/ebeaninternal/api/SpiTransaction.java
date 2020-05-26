@@ -313,4 +313,9 @@ public interface SpiTransaction extends Transaction {
    * Return true when nested transactions should create Savepoints.
    */
   boolean isNestedUseSavepoint();
+
+  /**
+   * Return true if explicitly set to skip cache (ignores skipOnWrite).
+   */
+  boolean isSkipCacheExplicit();
 }

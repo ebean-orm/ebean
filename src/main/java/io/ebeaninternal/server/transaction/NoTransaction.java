@@ -201,6 +201,11 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public boolean isSkipCacheExplicit() {
+    return false;
+  }
+
+  @Override
   public boolean isSkipCache() {
     return false;
   }

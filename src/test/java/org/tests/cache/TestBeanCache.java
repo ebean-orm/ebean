@@ -2,6 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Transaction;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
@@ -26,7 +27,7 @@ public class TestBeanCache extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestBeanCache.class);
 
-  private ServerCache beanCache = DB.getDefault().getServerCacheManager().getBeanCache(OCachedBean.class);
+  private final ServerCache beanCache = DB.getDefault().getServerCacheManager().getBeanCache(OCachedBean.class);
 
   @Test
   public void findById_when_idTypeConverted() {
@@ -54,9 +55,38 @@ public class TestBeanCache extends BaseTestCase {
   }
 
   @Test
+  public void idsIn_explicitCache_expect_cachePut() {
+
+    List<OCachedBean> beans = createBeans(Arrays.asList("k0","k1"));
+    List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
+
+    beanCache.clear();
+    beanCache.getStatistics(true);
+    try (Transaction transaction = DB.beginTransaction()) {
+
+      // skipCacheAfterWrite set after this write ...
+      final OCachedBean junk = createBean("junk");
+      DB.save(junk);
+
+      List<OCachedBean> list = DB.find(OCachedBean.class)
+        .where().idIn(ids)
+        .setUseCache(true)
+        .findList();
+
+      assertThat(list).hasSize(2);
+      transaction.commit();
+    }
+
+    ServerCacheStatistics statistics = beanCache.getStatistics(true);
+    assertThat(statistics.getHitCount()).isEqualTo(0);
+    assertThat(statistics.getMissCount()).isEqualTo(2);
+    assertThat(statistics.getPutCount()).isEqualTo(2);
+  }
+
+  @Test
   public void idsInExpression() {
 
-    List<OCachedBean> beans = createBeans();
+    List<OCachedBean> beans = createBeans(Arrays.asList("z0", "z1", "z2"));
     List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
 
     beanCache.clear();
@@ -133,20 +163,19 @@ public class TestBeanCache extends BaseTestCase {
     assertThat(statistics.getMissCount()).isEqualTo(missCount);
   }
 
-  private List<OCachedBean> createBeans() {
-
-    List<String> names = Arrays.asList("z0", "z1", "z2");
-
+  private List<OCachedBean> createBeans(List<String> names) {
     List<OCachedBean> beans = new ArrayList<>();
     for (String name : names) {
-      OCachedBean bean = new OCachedBean();
-      bean.setName(name);
-      beans.add(bean);
+      beans.add(createBean(name));
     }
-
     DB.saveAll(beans);
-
     return beans;
+  }
+
+  private OCachedBean createBean(String name) {
+    OCachedBean bean = new OCachedBean();
+    bean.setName(name);
+    return bean;
   }
 
   @Test

@@ -294,6 +294,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
+  public boolean isSkipCacheExplicit() {
+    return (skipCache != null && !skipCache);
+  }
+
+  @Override
   public boolean isSkipCache() {
     if (skipCache != null) return skipCache;
     return skipCacheAfterWrite && !queryOnly;

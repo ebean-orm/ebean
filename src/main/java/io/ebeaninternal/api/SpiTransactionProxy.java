@@ -159,6 +159,11 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public boolean isSkipCacheExplicit() {
+    return transaction.isSkipCacheExplicit();
+  }
+
+  @Override
   public boolean isSkipCache() {
     return transaction.isSkipCache();
   }
