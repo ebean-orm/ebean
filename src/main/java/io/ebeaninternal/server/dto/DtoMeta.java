@@ -72,59 +72,16 @@ class DtoMeta {
   }
 
   private DtoQueryPlanConPlus matchMaxArgPlusSetters(DtoMappingRequest request) {
-
-
-    int firstOnes = maxArgConstructor.getArgCount();
-
-    DtoColumn[] cols = request.getColumnMeta();
-
-    DtoReadSet[] setterProps = new DtoReadSet[cols.length - firstOnes];
-
-    int pos = 0;
-    for (int i = firstOnes; i < cols.length; i++) {
-      String label = cols[i].getLabel();
-      DtoReadSet property = findProperty(label);
-      if (property == null || property.isReadOnly()) {
-        if (request.isRelaxedMode()) {
-          property = DtoReadSetColumnSkip.INSTANCE;
-        } else {
-          throw new IllegalStateException(unableToMapColumnMessage(cols[i]));
-        }
-      }
-      setterProps[pos++] = property;
-    }
-
+    DtoReadSet[] setterProps = request.mapArgPlusSetters(this, maxArgConstructor.getArgCount());
     return new DtoQueryPlanConPlus(request, maxArgConstructor, setterProps);
   }
 
-  private String unableToMapColumnMessage(DtoColumn col) {
-    return "Unable to map DB column " + col + " to a property with a setter method on " + dtoType+". Consider query.setRelaxedMode() to skip mapping this column.";
-  }
-
   private DtoQueryPlan matchSetters(DtoMappingRequest request) {
-
-    DtoColumn[] cols = request.getColumnMeta();
-
-    DtoReadSet[] setterProps = new DtoReadSet[cols.length];
-
-    for (int i = 0; i < cols.length; i++) {
-      String label = cols[i].getLabel();
-      DtoReadSet property = findProperty(label);
-      if (property == null || property.isReadOnly()) {
-        if (request.isRelaxedMode()) {
-          property = DtoReadSetColumnSkip.INSTANCE;
-        } else {
-          throw new IllegalStateException(unableToMapColumnMessage(cols[i]));
-        }
-      }
-      setterProps[i] = property;
-    }
-
+    DtoReadSet[] setterProps = request.mapSetters(this);
     return new DtoQueryPlanConSetter(request, defaultConstructor, setterProps);
   }
 
-  private DtoReadSet findProperty(String label) {
-
+  DtoReadSet findProperty(String label) {
     String upperLabel = label.toUpperCase();
     DtoMetaProperty property = propMap.get(upperLabel);
     if (property == null && upperLabel.startsWith("IS_")) {
@@ -134,5 +91,9 @@ class DtoMeta {
       property = propMap.get(replaceString(upperLabel, "_", ""));
     }
     return property;
+  }
+
+  Class<?> dtoType() {
+    return dtoType;
   }
 }
