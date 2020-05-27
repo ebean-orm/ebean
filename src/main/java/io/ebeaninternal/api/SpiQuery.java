@@ -788,7 +788,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   /**
    * Set to true when we only include the Id property if it is explicitly included in the select().
    */
-  void setManualId(boolean manualId);
+  void setManualId();
 
   /**
    * Set default select clauses where none have been explicitly defined.

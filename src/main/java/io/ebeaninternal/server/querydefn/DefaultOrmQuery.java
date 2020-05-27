@@ -1715,8 +1715,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void setManualId(boolean manualId) {
-    this.manualId = manualId;
+  public void setManualId() {
+    if (detail != null && detail.hasSelectClause()) {
+      this.manualId = true;
+    }
   }
 
   /**

@@ -141,6 +141,32 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
   }
 
   @Test
+  public void asDto_withoutSelectClause() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    DtoQuery<ContactDto2> query = DB.find(Contact.class)
+      .where().isNotNull("email").order().asc("lastName")
+      .asDto(ContactDto2.class)
+      .setRelaxedMode();
+
+    List<ContactDto2> dtos = query.findList();
+    assertThat(dtos).isNotEmpty();
+
+    for (ContactDto2 dto : dtos) {
+      assertThat(dto.getEmail()).isNotNull();
+      assertThat(dto.getFirstName()).isNotNull();
+      assertThat(dto.getLastName()).isNotNull();
+      assertThat(dto.getId()).isGreaterThan(0);
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("select t0.id, t0.first_name, t0.last_name");
+  }
+
+  @Test
   public void asDto_withoutExplicitId() {
 
     ResetBasicData.reset();
@@ -323,6 +349,46 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     public void setTotalCount(Long totalCount) {
       this.totalCount = totalCount;
+    }
+  }
+
+  public static class ContactDto2 {
+
+    int id;
+    String firstName;
+    String lastName;
+    String email;
+
+    public int getId() {
+      return id;
+    }
+
+    public void setId(int id) {
+      this.id = id;
+    }
+
+    public String getFirstName() {
+      return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+      this.firstName = firstName;
+    }
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public void setLastName(String lastName) {
+      this.lastName = lastName;
+    }
+
+    public String getEmail() {
+      return email;
+    }
+
+    public void setEmail(String email) {
+      this.email = email;
     }
   }
 

@@ -308,12 +308,19 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   }
 
   @Test
-  public void equals_when_manualId() {
+  public void equals_when_manualId_andSelectClause() {
+    DefaultOrmQuery<Customer> q1 = query().select("name");
+    q1.setManualId();
 
+    assertDifferent(q1, query().select("name"));
+  }
+
+  @Test
+  public void equals_when_manualId_andNoSelectClause() {
     DefaultOrmQuery<Customer> q1 = query();
-    q1.setManualId(true);
+    q1.setManualId();
 
-    assertDifferent(q1, query());
+    assertSame(q1, query());
   }
 
   private CQueryPlanKey planKey(ExpressionList<Customer> id) {

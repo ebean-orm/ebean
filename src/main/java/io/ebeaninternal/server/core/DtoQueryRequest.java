@@ -47,7 +47,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     SpiQuery<?> ormQuery = query.getOrmQuery();
     if (ormQuery != null) {
       ormQuery.setType(type);
-      ormQuery.setManualId(true);
+      ormQuery.setManualId();
 
       // execute the underlying ORM query returning the ResultSet
       SpiResultSet result = server.findResultSet(ormQuery, trans);
