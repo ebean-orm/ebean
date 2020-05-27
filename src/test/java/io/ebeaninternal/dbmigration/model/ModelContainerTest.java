@@ -155,6 +155,16 @@ public class ModelContainerTest {
   }
 
   @Test
+  public void apply_renameColumn() {
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("6.0__renameColumn.model.xml"), ver("6.0"));
+    
+    final MTable table = container.getTable("document");
+    assertThat(table.getColumn("title")).isNotNull();
+    assertThat(table.getColumn("short_title")).isNull();
+  }
+
+  @Test
   public void getSchemas() {
 
     MTable t0 = new MTable("foo.one");

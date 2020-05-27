@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 public class MColumn {
 
-  private final String name;
+  private String name;
   private String type;
   private String checkConstraint;
   private String checkConstraintName;
@@ -88,7 +88,6 @@ public class MColumn {
    * Return a copy of this column used for creating the associated draft table.
    */
   public MColumn copyForDraft() {
-
     MColumn copy = new MColumn(name, type);
     copy.draftOnly = draftOnly;
     copy.checkConstraint = checkConstraint;
@@ -468,6 +467,14 @@ public class MColumn {
 
   public void setDbMigrationInfos(List<DbMigrationInfo> dbMigrationInfos) {
     this.dbMigrationInfos = dbMigrationInfos;
+  }
+
+  /**
+   * Rename the column.
+   */
+  public MColumn rename(String newName) {
+    this.name = newName;
+    return this;
   }
 
   /**

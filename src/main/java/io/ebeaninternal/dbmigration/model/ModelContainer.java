@@ -17,6 +17,7 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
+import io.ebeaninternal.dbmigration.migration.RenameColumn;
 import io.ebeaninternal.dbmigration.migration.Sql;
 
 import java.util.ArrayList;
@@ -163,6 +164,8 @@ public class ModelContainer {
         applyChange((AddColumn) change);
       } else if (change instanceof DropColumn) {
         applyChange((DropColumn) change);
+      } else if (change instanceof RenameColumn) {
+        applyChange((RenameColumn) change);
       } else if (change instanceof CreateIndex) {
         applyChange((CreateIndex) change);
       } else if (change instanceof DropIndex) {
@@ -312,6 +315,14 @@ public class ModelContainer {
       throw new IllegalStateException("Table [" + dropColumn.getTableName() + "] does not exist in model?");
     }
     table.apply(dropColumn);
+  }
+
+  protected void applyChange(RenameColumn renameColumn) {
+    MTable table = tables.get(renameColumn.getTableName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + renameColumn.getTableName() + "] does not exist in model?");
+    }
+    table.apply(renameColumn);
   }
 
   /**

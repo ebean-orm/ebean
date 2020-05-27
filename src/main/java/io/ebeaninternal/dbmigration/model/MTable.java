@@ -11,6 +11,7 @@ import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
+import io.ebeaninternal.dbmigration.migration.RenameColumn;
 import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -413,6 +414,15 @@ public class MTable {
     if (removed == null) {
       throw new IllegalStateException("Column [" + dropColumn.getColumnName() + "] does not exist for DropColumn change on table [" + dropColumn.getTableName() + "]?");
     }
+  }
+
+  public void apply(RenameColumn renameColumn) {
+    checkTableName(renameColumn.getTableName());
+    MColumn column = columns.remove(renameColumn.getOldName());
+    if (column == null) {
+      throw new IllegalStateException("Column [" + renameColumn.getOldName() + "] does not exist for RenameColumn change on table [" + renameColumn.getTableName() + "]?");
+    }
+    addColumn(column.rename(renameColumn.getNewName()));
   }
 
   public String getName() {
