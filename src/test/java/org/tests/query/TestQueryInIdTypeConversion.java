@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -17,7 +17,7 @@ public class TestQueryInIdTypeConversion extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).where().idIn("1", "2").findList();
+    List<Customer> list = DB.find(Customer.class).where().idIn("1", "2").findList();
     assertThat(list).isNotEmpty();
   }
 
@@ -26,7 +26,13 @@ public class TestQueryInIdTypeConversion extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).where().idIn().findList();
+    List<Customer> list = DB.find(Customer.class).where().idIn().findList();
+    assertThat(list).isEmpty();
+  }
+
+  @Test
+  public void test_emptyList_idIn() {
+    List<Customer> list = DB.find(Customer.class).where().idIn(new Object[] {}).findList();
     assertThat(list).isEmpty();
   }
 }
