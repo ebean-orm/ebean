@@ -88,13 +88,17 @@ class DtoMeta {
         if (request.isRelaxedMode()) {
           property = DtoReadSetColumnSkip.INSTANCE;
         } else {
-          throw new IllegalStateException("Unable to map DB column " + cols[i] + " to a property with a setter method on " + dtoType);
+          throw new IllegalStateException(unableToMapColumnMessage(cols[i]));
         }
       }
       setterProps[pos++] = property;
     }
 
     return new DtoQueryPlanConPlus(request, maxArgConstructor, setterProps);
+  }
+
+  private String unableToMapColumnMessage(DtoColumn col) {
+    return "Unable to map DB column " + col + " to a property with a setter method on " + dtoType+". Consider query.setRelaxedMode() to skip mapping this column.";
   }
 
   private DtoQueryPlan matchSetters(DtoMappingRequest request) {
@@ -110,7 +114,7 @@ class DtoMeta {
         if (request.isRelaxedMode()) {
           property = DtoReadSetColumnSkip.INSTANCE;
         } else {
-          throw new IllegalStateException("Unable to map DB column " + cols[i] + " to a property with a setter method on " + dtoType);
+          throw new IllegalStateException(unableToMapColumnMessage(cols[i]));
         }
       }
       setterProps[i] = property;
