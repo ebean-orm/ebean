@@ -245,7 +245,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Run periodic trim of query plans.
    */
   public void scheduleBackgroundTrim() {
-    backgroundExecutor.executePeriodically(this::trimQueryPlans, 60L, TimeUnit.SECONDS);
+    backgroundExecutor.executePeriodically(this::trimQueryPlans, 117L, 60L, TimeUnit.SECONDS);
   }
 
   private void trimQueryPlans() {

@@ -33,7 +33,6 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
   @Override
   public void execute(Runnable r) {
     final Map<String, String> map = MDC.getCopyOfContextMap();
-
     if (map == null) {
       pool.execute(r);
     } else {
@@ -50,10 +49,14 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
-    final Map<String, String> map = MDC.getCopyOfContextMap();
+    executePeriodically(r, delay, delay, unit);
+  }
 
+  @Override
+  public void executePeriodically(Runnable r, long initialDelay, long delay, TimeUnit unit) {
+    final Map<String, String> map = MDC.getCopyOfContextMap();
     if (map == null) {
-      schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
+      schedulePool.scheduleWithFixedDelay(r, initialDelay, delay, unit);
     } else {
       schedulePool.scheduleWithFixedDelay(() -> {
         MDC.setContextMap(map);
@@ -62,14 +65,13 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
         } finally {
           MDC.clear();
         }
-      }, delay, delay, unit);
+      }, initialDelay, delay, unit);
     }
   }
 
   @Override
   public ScheduledFuture<?> schedule(Runnable r, long delay, TimeUnit unit) {
     final Map<String, String> map = MDC.getCopyOfContextMap();
-
     if (map == null) {
       return schedulePool.schedule(r, delay, unit);
     } else {
@@ -87,7 +89,6 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> c, long delay, TimeUnit unit) {
     final Map<String, String> map = MDC.getCopyOfContextMap();
-
     if (map == null) {
       return schedulePool.schedule(c, delay, unit);
     } else {
