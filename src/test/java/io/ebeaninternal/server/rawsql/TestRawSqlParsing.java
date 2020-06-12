@@ -2,7 +2,6 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -53,7 +52,7 @@ public class TestRawSqlParsing extends BaseTestCase {
       .parse(sql)
       .create();
 
-    List<Customer> list = Ebean.createQuery(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .setRawSql(rawSql)
       .setParameter("name", "Rob")
       .findList();
@@ -68,7 +67,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
     RawSql sql = RawSqlBuilder.parse("SELECT id, name FROM o_customer ${where}").create();
 
-    List<Customer> customers = Ebean.createQuery(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .setRawSql(sql)
       .where().gt("id", 1)
       .findList();
@@ -92,7 +91,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse(sql).create();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setRawSql(rawSql)
       .setFirstRow(1)
       .setMaxRows(5);
@@ -178,7 +177,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse(sql).create();
 
-    Query<A2Customer> query = Ebean.createQuery(A2Customer.class)
+    Query<A2Customer> query = DB.find(A2Customer.class)
       .setRawSql(rawSql);
 
     final List<A2Customer> list = query.findList();
@@ -200,7 +199,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse(sql).create();
 
-    Query<ACustomer> query = Ebean.createQuery(ACustomer.class)
+    Query<ACustomer> query = DB.find(ACustomer.class)
       .setRawSql(rawSql);
 
     final List<ACustomer> list = query.findList();
@@ -224,7 +223,7 @@ public class TestRawSqlParsing extends BaseTestCase {
       .columnMapping("v.customerName", "custName")
       .create();
 
-    Query<ACustomer> query = Ebean.createQuery(ACustomer.class)
+    Query<ACustomer> query = DB.find(ACustomer.class)
       .setRawSql(rawSql);
 
     final List<ACustomer> list = query.findList();
