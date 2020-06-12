@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.rawsql;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.RawSql;
@@ -102,6 +103,70 @@ public class TestRawSqlParsing extends BaseTestCase {
     assertThat(sqlOf(query)).contains(") all_split limit 5 offset 1");
   }
 
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void testUnion_explicitWhere() {
+    ResetBasicData.reset();
+
+    String sql =
+      "select id, name from (" +
+        "  select id, name from o_customer where name <= 'f' " +
+        "  union all " +
+        "  select id, name from o_customer where name > 'f' " +
+        ") all_split ${where}";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+    Query<Customer> query = DB.find(Customer.class)
+      .setRawSql(rawSql)
+      .setFirstRow(1)
+      .setMaxRows(5);
+    query.findList();
+
+    assertThat(sqlOf(query)).contains(") all_split limit 5 offset 1");
+
+    Query<Customer> query1 = DB.find(Customer.class)
+      .setRawSql(rawSql)
+      .where().gt("id", 2)
+      .setFirstRow(1)
+      .setMaxRows(5)
+      .query();
+    query1.findList();
+
+    assertThat(sqlOf(query1)).contains("all_split  where id > ? limit 5 offset 1");
+  }
+
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @Test
+  public void testUnion_explicitAndhere() {
+    ResetBasicData.reset();
+
+    String sql =
+      "select id, name from (" +
+        "  select id, name from o_customer where name <= 'f' " +
+        "  union all " +
+        "  select id, name from o_customer where name > 'f' " +
+        ") all_split where 1=1 ${andWhere}";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+    Query<Customer> query = DB.find(Customer.class)
+      .setRawSql(rawSql)
+      .setFirstRow(1)
+      .setMaxRows(5);
+    query.findList();
+
+    assertThat(sqlOf(query)).contains(") all_split where 1=1 limit 5 offset 1");
+
+    Query<Customer> query1 = DB.find(Customer.class)
+      .setRawSql(rawSql)
+      .where().gt("id", 2)
+      .setFirstRow(1)
+      .setMaxRows(5)
+      .query();
+    query1.findList();
+
+    assertThat(sqlOf(query1)).contains("all_split where 1=1  and id > ? limit 5 offset 1");
+  }
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
