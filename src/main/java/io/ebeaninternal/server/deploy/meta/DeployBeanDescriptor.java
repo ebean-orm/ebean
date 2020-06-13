@@ -407,11 +407,8 @@ public class DeployBeanDescriptor<T> {
     identityMode.setSequenceGenerator(genName);
   }
 
-  /**
-   * Return the sequence increment to use given sequence batch mode.
-   */
-  public int setIdentitySequenceBatchMode(boolean sequenceBatchMode) {
-    return identityMode.setSequenceBatchMode(sequenceBatchMode);
+  public int setIdentitySequenceDefaultIncrement() {
+    return identityMode.setSequenceDefaultIncrement();
   }
 
   public void setIdentityType(IdType type) {

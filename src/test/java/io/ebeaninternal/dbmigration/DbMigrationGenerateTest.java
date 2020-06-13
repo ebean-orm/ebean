@@ -48,7 +48,6 @@ public class DbMigrationGenerateTest {
     // migration.addPlatform(Platform.SQLANYWHERE, "sqlanywhere"); and sqlanywhere
     migration.addPlatform(Platform.DB2, "db2");
     migration.addPlatform(Platform.H2, "h2");
-    migration.addPlatform(Platform.HSQLDB, "hsqldb");
     migration.addPlatform(Platform.MYSQL, "mysql");
     migration.addPlatform(Platform.MYSQL55, "mysql55");
     migration.addPlatform(Platform.POSTGRES, "postgres");

@@ -54,11 +54,8 @@ public class DeployIdentityMode {
     }
   }
 
-  public int setSequenceBatchMode(boolean sequenceBatchMode) {
-    if (sequenceBatchMode) {
-      // Ebean batch fetching multiple sequence values
-      increment = 1;
-    } else if (increment == 0) {
+  public int setSequenceDefaultIncrement() {
+    if (increment == 0) {
       // Use JPA default of 50
       increment = 50;
     }

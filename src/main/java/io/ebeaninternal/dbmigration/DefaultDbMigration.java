@@ -14,7 +14,6 @@ import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
-import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
 import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
@@ -814,8 +813,6 @@ public class DefaultDbMigration implements DbMigration {
     switch (platform) {
       case H2:
         return new H2Platform();
-      case HSQLDB:
-        return new HsqldbPlatform();
       case POSTGRES9:
         return new Postgres9Platform();
       case POSTGRES:

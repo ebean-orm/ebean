@@ -107,9 +107,8 @@ public class PostgresPlatform extends DatabasePlatform {
    * Create a Postgres specific sequence IdGenerator.
    */
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
-
-    return new PostgresSequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int increment, String seqName) {
+    return new PostgresDbSequence(be, ds, seqName, increment);
   }
 
   @Override

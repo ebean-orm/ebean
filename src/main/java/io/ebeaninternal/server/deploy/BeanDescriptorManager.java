@@ -1394,13 +1394,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
         seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
       }
-      int stepSize = desc.setIdentitySequenceBatchMode(databasePlatform.isSequenceBatchMode());
-      desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
+      int increment = desc.setIdentitySequenceDefaultIncrement();
+      desc.setIdGenerator(createSequenceIdGenerator(seqName, increment));
     }
   }
 
-  private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
+  private PlatformIdGenerator createSequenceIdGenerator(String seqName, int increment) {
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, increment, seqName);
   }
 
   private void createByteCode(DeployBeanDescriptor<?> deploy) {

@@ -110,10 +110,6 @@ public class DatabasePlatform {
    */
   protected DbIdentity dbIdentity = new DbIdentity();
 
-  protected boolean sequenceBatchMode = true;
-
-  protected int sequenceBatchSize = 20;
-
   /**
    * The history support for this database platform.
    */
@@ -235,7 +231,6 @@ public class DatabasePlatform {
    * Configure the platform given the server configuration.
    */
   public void configure(PlatformConfig config) {
-    this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
     this.caseSensitiveCollation = config.isCaseSensitiveCollation();
     configureIdType(config.getIdType());
     configure(config, config.isAllQuotedIdentifiers());
@@ -296,20 +291,6 @@ public class DatabasePlatform {
    */
   public String getName() {
     return platform.name().toLowerCase();
-  }
-
-  /**
-   * Return true if we are using Sequence batch mode rather than STEP.
-   */
-  public boolean isSequenceBatchMode() {
-    return sequenceBatchMode;
-  }
-
-  /**
-   * Set to false to not use sequence batch mode but instead STEP mode.
-   */
-  public void setSequenceBatchMode(boolean sequenceBatchMode) {
-    this.sequenceBatchMode = sequenceBatchMode;
   }
 
   /**
@@ -381,13 +362,13 @@ public class DatabasePlatform {
   /**
    * Return a DB Sequence based IdGenerator.
    *
-   * @param be       the BackgroundExecutor that can be used to load the sequence if
-   *                 desired
-   * @param ds       the DataSource
-   * @param stepSize the sequence allocation size as defined by mapping (defaults to 50)
-   * @param seqName  the name of the sequence
+   * @param be        the BackgroundExecutor that can be used to load the sequence if
+   *                  desired
+   * @param ds        the DataSource
+   * @param increment the sequence allocation size as defined by mapping (defaults to 50)
+   * @param seqName   the name of the sequence
    */
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int increment, String seqName) {
     return null;
   }
 

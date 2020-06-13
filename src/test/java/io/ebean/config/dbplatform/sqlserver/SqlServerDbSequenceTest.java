@@ -13,9 +13,9 @@ import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SqlServerStepSequenceTest extends BaseTestCase {
+public class SqlServerDbSequenceTest extends BaseTestCase {
 
-  private static final Logger log = LoggerFactory.getLogger(SqlServerStepSequenceTest.class);
+  private static final Logger log = LoggerFactory.getLogger(SqlServerDbSequenceTest.class);
 
   @Ignore
   @ForPlatform(Platform.SQLSERVER)
@@ -29,7 +29,7 @@ public class SqlServerStepSequenceTest extends BaseTestCase {
     BackgroundExecutor be = server().getBackgroundExecutor();
     DataSource ds = server().getPluginApi().getDataSource();
 
-    SqlServerStepSequence s = new SqlServerStepSequence(be, ds, "sqls_testseq_9876", 50);
+    SqlServerDbSequence s = new SqlServerDbSequence(be, ds, "sqls_testseq_9876", 50);
 
     Object id = s.nextId(null);
     assertThat(id).isEqualTo(1L);

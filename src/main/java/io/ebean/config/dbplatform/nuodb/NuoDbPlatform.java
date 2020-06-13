@@ -43,8 +43,8 @@ public class NuoDbPlatform extends DatabasePlatform {
   }
 
   @Override
-  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
-    return new NuoDbSequence(be, ds, seqName, stepSize);
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int increment, String seqName) {
+    return new NuoDbSequence(be, ds, seqName, increment);
   }
 
   @Override
