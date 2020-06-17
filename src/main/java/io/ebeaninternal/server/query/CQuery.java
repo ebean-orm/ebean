@@ -608,12 +608,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
-
-    if (bufferSize > 0) {
-      return new CQueryIteratorWithBuffer<>(this, request, bufferSize);
-
-    } else {
+    if (bufferSize < 2) {
       return new CQueryIteratorSimple<>(this, request);
+    } else {
+      return new CQueryIteratorWithBuffer<>(this, request, bufferSize);
     }
   }
 

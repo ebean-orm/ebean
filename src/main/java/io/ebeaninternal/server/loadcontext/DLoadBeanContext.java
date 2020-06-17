@@ -175,7 +175,6 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
       // A synchronized (this) is effectively held by EntityBeanIntercept.loadBean()
-
       if (context.desc.lazyLoadMany(ebi)) {
         // lazy load property was a Many
         return;
@@ -183,7 +182,6 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
       if (context.hitCache) {
         Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(list, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
-
         list.removeAll(hits);
         if (list.isEmpty() || hits.contains(ebi)) {
           // successfully hit the L2 cache so don't invoke DB lazy loading
@@ -193,6 +191,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi, context.hitCache);
       context.desc.getEbeanServer().loadBean(req);
+      list.clear();
     }
   }
 

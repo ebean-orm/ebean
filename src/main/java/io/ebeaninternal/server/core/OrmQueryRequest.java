@@ -316,7 +316,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public JsonReadOptions createJsonReadOptions() {
-
     persistenceContext = getPersistenceContext(query, transaction);
     if (query.getPersistenceContext() == null) {
       query.setPersistenceContext(persistenceContext);
@@ -327,7 +326,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       loadContext = new DLoadContext(this, secondaryQueries);
       jsonRead.setLoadContext(loadContext);
     }
-
     return jsonRead;
   }
 
@@ -335,8 +333,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * For iterate queries reset the persistenceContext and loadContext.
    */
   public void flushPersistenceContextOnIterate() {
-    if (!iterateSingleContext) {
-      persistenceContext = new DefaultPersistenceContext();
+    if (!iterateSingleContext && persistenceContext.resetLimit()) {
+      persistenceContext = persistenceContext.forIterateReset();
       loadContext.resetPersistenceContext(persistenceContext);
       if (jsonRead != null) {
         jsonRead.setPersistenceContext(persistenceContext);
@@ -350,7 +348,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * transaction scoped.
    */
   private PersistenceContext getPersistenceContext(SpiQuery<?> query, SpiTransaction t) {
-
     // check if there is already a persistence context set which is the case
     // when lazy loading or query joins are executed
     PersistenceContext ctx = query.getPersistenceContext();
@@ -358,7 +355,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
     // determine the scope (from the query and then server)
     PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
-    return (scope == PersistenceContextScope.QUERY || t == null) ? new DefaultPersistenceContext() : t.getPersistenceContext();
+    if (scope == PersistenceContextScope.QUERY || t == null) {
+      return new DefaultPersistenceContext();
+    }
+    if (Type.ITERATE == query.getType()) {
+      return t.getPersistenceContext().forIterate();
+    } else {
+      return t.getPersistenceContext();
+    }
   }
 
   /**
@@ -590,7 +594,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Merge in prior L2 bean cache hits with the query result.
    */
   public void mergeCacheHits(BeanCollection<T> result) {
-
     if (cacheBeans != null && !cacheBeans.isEmpty()) {
       if (query.getType() == Type.MAP) {
         mergeCacheHitsToMap(result);

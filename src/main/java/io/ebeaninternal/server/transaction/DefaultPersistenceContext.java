@@ -34,10 +34,53 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   private final Monitor monitor = new Monitor();
 
+  private int putCount;
+
   /**
    * Create a new PersistenceContext.
    */
   public DefaultPersistenceContext() {
+  }
+
+  /**
+   * Create as a shallow copy with initial or types that have not been added to.
+   */
+  private DefaultPersistenceContext(DefaultPersistenceContext parent, boolean initial) {
+    for (Map.Entry<Class<?>, ClassContext> entry : parent.typeCache.entrySet()) {
+      typeCache.put(entry.getKey(), entry.getValue().copy(initial));
+    }
+  }
+
+  /**
+   * Return the initial shallow copy with each ClassContext noting it's initialSize (to detect additions).
+   */
+  @Override
+  public PersistenceContext forIterate() {
+    return new DefaultPersistenceContext(this, true);
+  }
+
+  /**
+   * Return a shallow copy including each ClassContext that has had no additions (still at initialSize).
+   */
+  @Override
+  public PersistenceContext forIterateReset() {
+    return new DefaultPersistenceContext(this, false);
+  }
+
+  public boolean resetLimit() {
+    synchronized (monitor) {
+      if (putCount < 100) {
+        return false;
+      }
+      putCount = 0;
+      for (ClassContext value : typeCache.values()) {
+        if (value.resetLimit()) {
+          return true;
+        }
+      }
+      // checking after another 100 puts
+      return false;
+    }
   }
 
   /**
@@ -46,6 +89,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   @Override
   public void put(Class<?> rootType, Object id, Object bean) {
     synchronized (monitor) {
+      putCount++;
       getClassContext(rootType).put(id, bean);
     }
   }
@@ -53,6 +97,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   @Override
   public Object putIfAbsent(Class<?> rootType, Object id, Object bean) {
     synchronized (monitor) {
+      putCount++;
       return getClassContext(rootType).putIfAbsent(id, bean);
     }
   }
@@ -133,7 +178,6 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   }
 
   private ClassContext getClassContext(Class<?> rootType) {
-
     return typeCache.computeIfAbsent(rootType, k -> new ClassContext());
   }
 
@@ -143,7 +187,43 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
     private Set<Object> deleteSet;
 
+    private int initialSize;
+
     private ClassContext() {
+    }
+
+    /**
+     * Create as a shallow copy.
+     */
+    private ClassContext(ClassContext parent, boolean initial) {
+      if (initial || parent.isInitialSize()) {
+        this.map.putAll(parent.map);
+        this.initialSize = map.size();
+        if (parent.deleteSet != null) {
+          this.deleteSet = new HashSet<>(parent.deleteSet);
+        }
+      }
+    }
+
+    /**
+     * True if the map has not changed from it's initial size (no additions).
+     */
+    private boolean isInitialSize() {
+      return map.size() == initialSize;
+    }
+
+    /**
+     * Return a shallow copy if initial copy or it has not grown (still at initialSize).
+     */
+    private ClassContext copy(boolean initial) {
+      return new ClassContext(this, initial);
+    }
+
+    /**
+     * Return true if grown above the reset limit size.
+     */
+    private boolean resetLimit() {
+      return map.size() > initialSize + 1000;
     }
 
     @Override
@@ -164,7 +244,6 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
 
     private Object putIfAbsent(Object id, Object bean) {
-
       Object existingValue = map.get(id);
       if (existingValue != null) {
         // it is not absent

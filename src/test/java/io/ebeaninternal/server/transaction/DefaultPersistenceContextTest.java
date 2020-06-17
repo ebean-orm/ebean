@@ -2,12 +2,16 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.deploy.PersistenceContextUtil;
-import org.tests.model.basic.Car;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Vehicle;
 import org.junit.Test;
+import org.tests.model.basic.Car;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.Product;
+import org.tests.model.basic.Vehicle;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultPersistenceContextTest {
 
@@ -23,12 +27,12 @@ public class DefaultPersistenceContextTest {
     car1.setId(1);
   }
 
-  PersistenceContext pc() {
+  private DefaultPersistenceContext pc() {
     return new DefaultPersistenceContext();
   }
 
-  PersistenceContext pcWith42() {
-    PersistenceContext pc = pc();
+  private DefaultPersistenceContext pcWith42() {
+    DefaultPersistenceContext pc = pc();
     pc.put(Customer.class, 42, customer42);
     return pc;
   }
@@ -38,7 +42,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void put_get_withInheritance() throws Exception {
+  public void put_get_withInheritance() {
 
     PersistenceContext pc = pc();
     pc.put(root(Vehicle.class), 1, car1);
@@ -48,7 +52,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void put_get() throws Exception {
+  public void put_get() {
 
     PersistenceContext pc = pc();
     pc.put(Customer.class, customer42.getId(), customer42);
@@ -58,7 +62,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void putIfAbsent_when_absent() throws Exception {
+  public void putIfAbsent_when_absent() {
 
     PersistenceContext pc = pc();
     Object existing = pc.putIfAbsent(Customer.class, customer42.getId(), customer42);
@@ -67,7 +71,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void putIfAbsent_when_notAbsent() throws Exception {
+  public void putIfAbsent_when_notAbsent() {
 
     PersistenceContext pc = pcWith42();
     Object existing = pc.putIfAbsent(Customer.class, customer42.getId(), new Customer());
@@ -76,21 +80,21 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void get_when_empty() throws Exception {
+  public void get_when_empty() {
     PersistenceContext pc = pc();
     Object found = pc.get(Customer.class, 42);
     assertThat(found).isNull();
   }
 
   @Test
-  public void get_when_there() throws Exception {
+  public void get_when_there() {
     PersistenceContext pc = pcWith42();
     Object found = pc.get(Customer.class, 42);
     assertThat(found).isSameAs(customer42);
   }
 
   @Test
-  public void getWithOption_when_empty() throws Exception {
+  public void getWithOption_when_empty() {
 
     PersistenceContext pc = pc();
     PersistenceContext.WithOption withOption = pc.getWithOption(Customer.class, 42);
@@ -98,7 +102,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void getWithOption_when_there() throws Exception {
+  public void getWithOption_when_there() {
 
     PersistenceContext pc = pcWith42();
 
@@ -107,7 +111,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void getWithOption_when_deleted() throws Exception {
+  public void getWithOption_when_deleted() {
 
     PersistenceContext pc = pcWith42();
     pc.deleted(Customer.class, 42);
@@ -118,21 +122,21 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void size_when_empty() throws Exception {
+  public void size_when_empty() {
 
     PersistenceContext pc = pc();
     assertThat(pc.size(Customer.class)).isEqualTo(0);
   }
 
   @Test
-  public void size_when_some() throws Exception {
+  public void size_when_some() {
 
     PersistenceContext pc = pcWith42();
     assertThat(pc.size(Customer.class)).isEqualTo(1);
   }
 
   @Test
-  public void clear() throws Exception {
+  public void clear() {
 
     PersistenceContext pc = pcWith42();
     pc.clear();
@@ -140,7 +144,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void clearClass() throws Exception {
+  public void clearClass() {
 
     PersistenceContext pc = pcWith42();
     pc.clear(Customer.class);
@@ -148,7 +152,7 @@ public class DefaultPersistenceContextTest {
   }
 
   @Test
-  public void clearClassAndId() throws Exception {
+  public void clearClassAndId() {
 
     PersistenceContext pc = pcWith42();
     pc.put(Customer.class, 43, new Customer());
@@ -158,5 +162,95 @@ public class DefaultPersistenceContextTest {
 
     pc.clear(Customer.class, 43);
     assertThat(pc.size(Customer.class)).isEqualTo(0);
+  }
+
+  @Test
+  public void forIterate() {
+    final DefaultPersistenceContext pc = pcWith42();
+    // act
+    final PersistenceContext pcIterate = pc.forIterate();
+    assertThat(pc).isNotSameAs(pcIterate);
+    assertThat(pcIterate.size(Customer.class)).isEqualTo(1);
+  }
+
+  @Test
+  public void forIterate_many() {
+    DefaultPersistenceContext pc = new DefaultPersistenceContext();
+    addCustomers(pc, 1, 100);
+    addContacts(pc, 1, 1010);
+    assertThat(pc.size(Customer.class)).isEqualTo(100);
+    assertThat(pc.size(Contact.class)).isEqualTo(1010);
+
+    // act
+    final PersistenceContext pcIterate = pc.forIterate();
+    assertThat(pcIterate.size(Customer.class)).isEqualTo(100);
+    assertThat(pcIterate.size(Contact.class)).isEqualTo(1010);
+  }
+
+  @Test
+  public void forIterate_resetLimit_forIterateReset() {
+    DefaultPersistenceContext initialPc = new DefaultPersistenceContext();
+    addCustomers(initialPc, 1, 100);
+    addContacts(initialPc, 1, 1010);
+
+    final PersistenceContext pcIterate = initialPc.forIterate();
+    assertFalse(pcIterate.resetLimit());
+
+    // added 900 NEW contact beans
+    addContacts(pcIterate, 2000, 900);
+    assertThat(pcIterate.size(Contact.class)).isEqualTo(1910);
+    assertFalse(pcIterate.resetLimit());
+
+    // boundary, added 1000 NEW contact beans (still false)
+    addContacts(pcIterate, 3000, 100);
+    assertFalse(pcIterate.resetLimit());
+
+    addContacts(pcIterate, 4000, 1);
+    addProducts(pcIterate, 1, 100);
+    // ACT - over 1000 added beans boundary for contacts so returns true
+    assertTrue(pcIterate.resetLimit());
+
+    assertThat(pcIterate.size(Contact.class)).isEqualTo(2011);
+    assertThat(pcIterate.size(Customer.class)).isEqualTo(100);
+    assertThat(pcIterate.size(Product.class)).isEqualTo(100);
+
+    // ACT - obtain new PC forIterateReset
+    PersistenceContext pcReset = pcIterate.forIterateReset();
+
+    // keeps original customer beans as new added beans there
+    assertThat(pcReset.size(Customer.class)).isEqualTo(100); // customers didn't change
+    // added beans to contacts and products so those where reset
+    assertThat(pcReset.size(Contact.class)).isEqualTo(0);
+    assertThat(pcReset.size(Product.class)).isEqualTo(0);
+  }
+
+  @Test
+  public void toString_sillyTest() {
+    DefaultPersistenceContext pc = pcWith42();
+    assertThat(pc.toString()).contains("org.tests.model.basic.Customer");
+  }
+
+  private void addCustomers(PersistenceContext pc, int start, int loop) {
+    for (int i = start; i < start + loop; i++) {
+      Customer bean = new Customer();
+      bean.setId(i);
+      pc.put(Customer.class, i, bean);
+    }
+  }
+
+  private void addContacts(PersistenceContext pc, int start, int loop) {
+    for (int i = start; i < start + loop; i++) {
+      Contact bean = new Contact();
+      bean.setId(i);
+      pc.put(Contact.class, i, bean);
+    }
+  }
+
+  private void addProducts(PersistenceContext pc, int start, int loop) {
+    for (int i = start; i < start + loop; i++) {
+      Product bean = new Product();
+      bean.setId(i);
+      pc.put(Product.class, i, bean);
+    }
   }
 }
