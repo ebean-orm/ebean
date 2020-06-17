@@ -1,16 +1,18 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class TestQueryFindEachWhile extends BaseTestCase {
 
@@ -19,10 +21,8 @@ public class TestQueryFindEachWhile extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
-
     Query<Customer> query
-      = server.find(Customer.class)
+      = DB.find(Customer.class)
       .setAutoTune(false)
       .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).order("id")
       .setMaxRows(2).query();
@@ -31,11 +31,11 @@ public class TestQueryFindEachWhile extends BaseTestCase {
 
     query.findEachWhile(customer -> {
       counter.incrementAndGet();
-      customer.getName();
+      assertNotNull(customer.getName());
       return true;
     });
 
-    Assert.assertEquals(2, counter.get());
+    assertEquals(2, counter.get());
   }
 
   /**
@@ -46,9 +46,7 @@ public class TestQueryFindEachWhile extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
-
-    Query<Customer> query = server.find(Customer.class).setAutoTune(false)
+    Query<Customer> query = DB.find(Customer.class).setAutoTune(false)
       .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).order("id")
       .setMaxRows(2).query();
 
@@ -62,6 +60,6 @@ public class TestQueryFindEachWhile extends BaseTestCase {
       return true;
     });
 
-    Assert.assertFalse("Never get here - exception thrown", true);
+    fail("Never get here - exception thrown");
   }
 }
