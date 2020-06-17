@@ -1,8 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
 import io.ebean.datasource.DataSourcePool;
@@ -32,9 +31,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
-
-    Query<Customer> query = server.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setMaxRows(2);
 
     final AtomicInteger count = new AtomicInteger();
@@ -54,9 +51,7 @@ public class TestQueryFindIterate extends BaseTestCase {
   public void test_hasNext_hasNext() {
 
     ResetBasicData.reset();
-    EbeanServer server = Ebean.getServer(null);
-
-    QueryIterator<Customer> queryIterator = server.find(Customer.class)
+    QueryIterator<Customer> queryIterator = DB.find(Customer.class)
       .where()
       .isNotNull("name")
       .setMaxRows(3)
@@ -89,9 +84,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
-
-    Query<Customer> query = server.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setAutoTune(false)
       //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
       .setMaxRows(2);
@@ -108,7 +101,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       //.select("orderDate")
       .where().gt("id", 0).le("id", 10)
       .findEach(order -> {
@@ -129,7 +122,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setLazyLoadBatchSize(10)
       .select("status, orderDate")
       .fetch("customer", "name")
@@ -159,10 +152,10 @@ public class TestQueryFindIterate extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // make sure we don't hit the L2 cache for order shipments
-    Ebean.getServerCacheManager().clear(Order.class);
-    Ebean.getServerCacheManager().clear(OrderShipment.class);
+    DB.getServerCacheManager().clear(Order.class);
+    DB.getServerCacheManager().clear(OrderShipment.class);
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setLazyLoadBatchSize(10)
       .setUseCache(false)
       .select("status, orderDate")
@@ -190,10 +183,8 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
-
     // intentionally a query with incorrect type binding
-    Query<Customer> query = server.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setAutoTune(false)
       .where().gt("id", "JUNK_NOT_A_LONG")
       .setMaxRows(2).query();
@@ -203,11 +194,11 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     });
 
-    if (!server.getName().equals("h2")) {
+    if (!DB.getDefault().getName().equals("h2")) {
       // MySql allows the query with type conversion?
       throw new PersistenceException("H2 does expected thing but MySql does not");
     }
-    assertTrue("Never get here as exception thrown", false);
+    fail("Never get here as exception thrown");
   }
 
 
@@ -216,9 +207,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
-
-    Query<Customer> query = server.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setAutoTune(false)
       .where().gt("id", 0)
       .setMaxRows(2).query();
@@ -267,7 +256,8 @@ public class TestQueryFindIterate extends BaseTestCase {
     try  {
       queryIterator.next();
       fail("noSuchElementException expected");
-    } catch (NoSuchElementException e) {}
-
+    } catch (NoSuchElementException e) {
+      logger.debug("Expected NoSuchElementException");
+    }
   }
 }
