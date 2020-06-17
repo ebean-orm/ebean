@@ -6,6 +6,7 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 /**
  * A QueryIterator that uses a buffer to execute secondary queries periodically.
@@ -17,6 +18,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
   private final OrmQueryRequest<T> request;
   private final ArrayList<T> buffer;
 
+  private boolean closed;
   private boolean moreToLoad = true;
 
   CQueryIteratorWithBuffer(CQuery<T> cquery, OrmQueryRequest<T> request, int bufferSize) {
@@ -29,6 +31,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
   @Override
   @SuppressWarnings("unchecked")
   public boolean hasNext() {
+    boolean ret = false;
     try {
       if (buffer.isEmpty() && moreToLoad) {
         // load buffer
@@ -44,23 +47,33 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
         }
         request.executeSecondaryQueries(true);
       }
-      return !buffer.isEmpty();
-
+      ret = !buffer.isEmpty();
+      return ret;
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
+    } finally {
+      if (!ret) {
+        close();
+      }
     }
   }
 
   @Override
   public T next() {
+    if (buffer.isEmpty()) {
+      throw new NoSuchElementException();
+    }
     return buffer.remove(0);
   }
 
   @Override
   public void close() {
-    cquery.updateExecutionStatisticsIterator();
-    cquery.close();
-    request.endTransIfRequired();
+    if (!closed) {
+      closed = true;
+      cquery.updateExecutionStatisticsIterator();
+      cquery.close();
+      request.endTransIfRequired();
+    }
   }
 
   @Override

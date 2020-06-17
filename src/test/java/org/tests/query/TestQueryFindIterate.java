@@ -220,7 +220,16 @@ public class TestQueryFindIterate extends BaseTestCase {
   }
 
   @Test
-  public void testCloseConnection() {
+  public void testCloseConnection_findIterate() {
+    findIterateCloseConnection(false);
+  }
+
+  @Test
+  public void testCloseConnection_findIterate_withBatchLoad() {
+    findIterateCloseConnection(true);
+  }
+
+  public void findIterateCloseConnection(boolean withLoadBatch) {
     ResetBasicData.reset();
 
     SpiServer pluginApi = server().getPluginApi();
@@ -230,12 +239,17 @@ public class TestQueryFindIterate extends BaseTestCase {
     }
 
     int startConns = dsPool.getStatus(false).getBusy();
-    QueryIterator<Customer> queryIterator = server().find(Customer.class)
-        .where()
-        .isNotNull("name")
-        .setMaxRows(3)
-        .order().asc("id")
-        .findIterate();
+    final Query<Customer> query = server().find(Customer.class)
+      .where()
+      .isNotNull("name")
+      .setMaxRows(3)
+      .order().asc("id");
+
+    if (withLoadBatch) {
+      query.setLazyLoadBatchSize(100);
+    }
+
+    QueryIterator<Customer> queryIterator = query.findIterate();
 
     assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
 
