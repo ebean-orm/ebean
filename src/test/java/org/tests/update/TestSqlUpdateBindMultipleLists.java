@@ -2,7 +2,6 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
@@ -21,7 +20,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (:ids)");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (:ids)");
 
     sqlUpdate.setParameter("ids", asList(9991, 9992, 9993));
     sqlUpdate.execute();
@@ -39,7 +38,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
   @Test
   public void positionParamsExpansion() {
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (?1)");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (?1)");
 
     sqlUpdate.setParameter(1, asList(9991, 9992, 9993));
     sqlUpdate.execute();
@@ -53,7 +52,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
 
     assertEquals("delete from o_customer where id in (?,?)", sqlUpdate.getGeneratedSql());
 
-    sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (?1)");
+    sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (?1)");
 
     sqlUpdate.setParameter(1, asList(9993));
     sqlUpdate.execute();
@@ -64,30 +63,41 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
   @Test
   public void positionParamsExpansion_withPrePost() {
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?")
+      .setParameter(1, 90)
+      .setParameter(2, asList(9991, 9992, 9993))
+      .setParameter(3, 91);
 
-    sqlUpdate.setParameter(1, 90);
-    sqlUpdate.setParameter(2, asList(9991, 9992, 9993));
-    sqlUpdate.setParameter(3, 91);
     sqlUpdate.execute();
+    assertEquals("delete from o_customer where id > ? and id in (?,?,?) and id < ?", sqlUpdate.getGeneratedSql());
+  }
 
+  @Test
+  public void positionParamsExpansion_withPrePost_2() {
+
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?")
+      .setParameter(90)
+      .setParameter(asList(9991, 9992, 9993))
+      .setParameter(91);
+
+    sqlUpdate.execute();
     assertEquals("delete from o_customer where id > ? and id in (?,?,?) and id < ?", sqlUpdate.getGeneratedSql());
   }
 
   @Test
   public void positionParamsExpansion_withPrePost_usingParam() {
 
-    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?");
-    sqlUpdate.setParameters(90, asList(9991, 9992, 9993), 91);
-    sqlUpdate.execute();
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id > ? and id in (?2) and id < ?")
+      .setParameters(90, asList(9991, 9992, 9993), 91);
 
+    sqlUpdate.execute();
     assertEquals("delete from o_customer where id > ? and id in (?,?,?) and id < ?", sqlUpdate.getGeneratedSql());
   }
 
   @Test
   public void positionParamsExpansion_withPre() {
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where name = ? and id in (?2)");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where name = ? and id in (?2)");
 
     sqlUpdate.setParameter(1, "Foo");
     sqlUpdate.setParameter(2, asList(9991, 9992, 9993));
@@ -120,7 +130,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
   @Test
   public void positionParamsExpansion_withPost() {
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (?1) and name = ?");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (?1) and name = ?");
 
     sqlUpdate.setParameter(1, asList(9991, 9992, 9993));
     sqlUpdate.setParameter(2, "Foo");
@@ -253,7 +263,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
   @Test
   public void test_multipleLists() {
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from o_customer where id in (:ids) and name in (:names)");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (:ids) and name in (:names)");
 
     sqlUpdate.setParameter("ids", asList(9991, 9992, 9993));
     sqlUpdate.setParameter("names", asList("rob", "jim"));
