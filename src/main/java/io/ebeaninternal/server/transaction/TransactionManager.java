@@ -191,6 +191,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnMain = metricFactory.createTimedMetric("txn.main");
     this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
     this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
+    // Add gauges for db pool size
 
     scopeManager.register(this);
   }

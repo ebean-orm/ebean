@@ -44,10 +44,10 @@ class SimpleDataSourceProvider implements DataSourceSupplier {
   @Override
   public void shutdown(boolean deregisterDriver) {
     if (readOnlyDataSource instanceof DataSourcePool){
-      ((DataSourcePool) readOnlyDataSource).shutdown(false);
+      ((DataSourcePool) readOnlyDataSource).shutdown();
     }
     if (dataSource instanceof DataSourcePool){
-      ((DataSourcePool) dataSource).shutdown(deregisterDriver);
+      ((DataSourcePool) dataSource).shutdown();
     }
   }
 }

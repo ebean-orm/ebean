@@ -57,14 +57,14 @@ public class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
   @Override
   public void shutdown(boolean deregisterDriver) {
     if (readOnlyDataSource instanceof DataSourcePool) {
-      ((DataSourcePool) readOnlyDataSource).shutdown(false);
+      ((DataSourcePool) readOnlyDataSource).shutdown();
     }
     if (dataSource instanceof DataSourcePool) {
-      ((DataSourcePool) dataSource).shutdown(deregisterDriver);
+      ((DataSourcePool) dataSource).shutdown();
     }
   }
 
-  private class CatalogDataSource implements DataSource {
+  private static class CatalogDataSource implements DataSource {
 
     final DataSource dataSource;
     final CurrentTenantProvider tenantProvider;

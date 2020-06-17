@@ -117,12 +117,8 @@ class InitDataSource {
   }
 
   private DataSource create(DataSourceConfig dsConfig, boolean readOnly) {
-    DataSourceFactory factory = DataSourceFactory.get();
-    if (factory == null) {
-      throw new IllegalStateException("No DataSourceFactory service implementation found in class path. Missing dependency to ebean-datasource?");
-    }
     String poolName = config.getName() + (readOnly ? "-ro" : "");
-    return factory.createPool(poolName, dsConfig);
+    return DataSourceFactory.create(poolName, dsConfig);
   }
 
   /**
