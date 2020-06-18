@@ -1251,26 +1251,37 @@ public interface ExpressionList<T> {
   /**
    * Add raw expression with a single parameter.
    * <p>
-   * The raw expression should contain a single ? at the location of the
-   * parameter.
+   * The raw expression should contain a single ? or ?1
+   * at the location of the parameter.  We use ?1 when binding a
+   * collection for an IN expression.
    * </p>
-   * <p>
+   * <p>>
    * When properties in the clause are fully qualified as table-column names
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
    * <p>
-   * <h4>Example:</h4>
+   * <h4>Examples:</h4>
    * <pre>{@code
    *
    *   // use a database function
    *   raw("add_days(orderDate, 10) < ?", someDate)
    *
+   *   raw("name like ?", "Rob%")
+   *
+   *   raw("name in (?1)", asList("Rob", "Fiona", "Jack"))
+   *
+   *   raw("name = any(?)", asList("Rob", "Fiona", "Jack"))
+   *
    * }</pre>
    *
-   * <h4>Subquery example:</h4>
+   * <h4>Subquery examples:</h4>
    * <pre>{@code
    *
+   *   // Bind collection using ?1
+   *   .raw("id in (select c.id from o_customer c where c.name in (?1))", asList("Rob", "Fiona", "Jack"))
+   *
+   *   // Using Postgres ANY expression
    *   .raw("t0.customer_id in (select customer_id from customer_group where group_id = any(?::uuid[]))", groupIds)
    *
    * }</pre>
@@ -1280,14 +1291,25 @@ public interface ExpressionList<T> {
   /**
    * Add raw expression with an array of parameters.
    * <p>
-   * The raw expression should contain the same number of ? as there are
-   * parameters.
-   * </p>
+   * The raw expression should contain the same number of ? or ?1, ?2 ... bind parameters
+   * as there are values. We use ?1, ?2 etc when binding a collection for an IN expression.
    * <p>
    * When properties in the clause are fully qualified as table-column names
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
+   *
+   * <h4>Examples:</h4>
+   * <pre>{@code
+   *
+   *   raw("unitPrice > ? and product.id > ?", 2, 3)
+   *
+   *   raw("(status = ? or (orderDate < ? and shipDate is null) or customer.name like ?)",
+   *         Order.Status.APPROVED,
+   *         new Timestamp(System.currentTimeMillis()),
+   *         "Rob")
+   *
+   * }</pre></pre>
    */
   ExpressionList<T> raw(String raw, Object... values);
 

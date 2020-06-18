@@ -224,12 +224,49 @@ public interface SqlQuery extends Serializable {
    *
    * }</pre>
    *
+   * <p>
+   * When binding a collection of values into a IN expression we should use
+   * indexed parameters like ?1, ?2, ?3 etc rather than just ?.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *   String sql = "select c.id, c.name from customer c where c.name in (?1)";
+   *
+   *   List<SqlRow> rows = DB.sqlQuery(sql)
+   *       .setParameter(asList("Rob", "Fiona", "Jack"))
+   *       .findList();
+   *
+   *
+   *   List<SqlRow> rows = DB.sqlQuery(sql)
+   *       .setParameter(1, asList("Rob", "Fiona", "Jack"))
+   *       .findList();
+   * }</pre>
+   *
    * @param value The value to bind
    */
   SqlQuery setParameter(Object value);
 
   /**
    * Bind the parameter by its index position (1 based like JDBC).
+   * <p>
+   * When binding a collection of values into a IN expression we should use
+   * indexed parameters like ?1, ?2, ?3 etc rather than just ?.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *   String sql = "select c.id, c.name from customer c where c.name in (?1)";
+   *
+   *   List<SqlRow> rows = DB.sqlQuery(sql)
+   *       .setParameter(asList("Rob", "Fiona", "Jack"))
+   *       .findList();
+   *
+   *
+   *   List<SqlRow> rows = DB.sqlQuery(sql)
+   *       .setParameter(1, asList("Rob", "Fiona", "Jack"))
+   *       .findList();
+   * }</pre>
    */
   SqlQuery setParameter(int position, Object value);
 

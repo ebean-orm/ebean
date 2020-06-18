@@ -5,18 +5,16 @@ package io.ebean;
  * <p>
  * Provides a simple way to execute raw SQL insert update or delete statements
  * without having to resort to JDBC.
- * </p>
  * <p>
  * Supports the use of positioned or named parameters and can automatically
  * notify Ebean of the table modified so that Ebean can maintain its cache.
- * </p>
  * <p>
  * Note that {@link #setAutoTableMod(boolean)} and
  * Ebean#externalModification(String, boolean, boolean, boolean)} can be to
  * notify Ebean of external changes and enable Ebean to maintain it's "L2"
  * server cache.
- * </p>
  *
+ * <h2>Positioned parameter example</h2>
  * <pre>{@code
  *
  *   // example using 'positioned' parameters
@@ -30,6 +28,7 @@ package io.ebean;
  *
  * }</pre>
  *
+ * <h2>Named parameter example</h2>
  * <pre>{@code
  *
  *   // example using 'named' parameters
@@ -45,8 +44,31 @@ package io.ebean;
  *   String msg = "There were " + rows + " rows updated";
  *
  * }</pre>
+ *
+ * <h2>Index parameter examples (e.g. ?1, ?2, ?3 ...)</h2>
  * <p>
- * <h3>Example: Using setNextParameter()</h3>
+ * We can use index parameters like ?1, ?2, ?3 etc when binding arrays/collections
+ * of values into an IN expression.
+ * </p>
+ * <pre>{@code
+ *
+ *   // Binding a list of 3 values (9991, 9992, 9993) into an IN expression
+ *
+ *   DB.sqlUpdate("delete from o_customer where name = ? and id in (?2)")
+ *     .setParameter(1, "Foo")
+ *     .setParameter(2, asList(9991, 9992, 9993))
+ *     .execute();
+ *
+ *   // note this effectively is the same as
+ *
+ *   DB.sqlUpdate("delete from o_customer where name = ? and id in (?2)")
+ *     .setParameter("Foo")
+ *     .setParameter(asList(9991, 9992, 9993))
+ *     .execute();
+ *
+ * }</pre>
+ *
+ * <h3>Example: Using setParameter()</h3>
  * <pre>{@code
  *
  *  String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
@@ -56,19 +78,19 @@ package io.ebean;
  *  try (Transaction txn = DB.beginTransaction()) {
  *    txn.setBatchMode(true);
  *
- *    insert.setNextParameter(10000);
- *    insert.setNextParameter("hello");
- *    insert.setNextParameter("rob");
+ *    insert.setParameter(10000);
+ *    insert.setParameter("hello");
+ *    insert.setParameter("rob");
  *    insert.execute();
  *
- *    insert.setNextParameter(10001);
- *    insert.setNextParameter("goodbye");
- *    insert.setNextParameter("rob");
+ *    insert.setParameter(10001);
+ *    insert.setParameter("goodbye");
+ *    insert.setParameter("rob");
  *    insert.execute();
  *
- *    insert.setNextParameter(10002);
- *    insert.setNextParameter("chow");
- *    insert.setNextParameter("bob");
+ *    insert.setParameter(10002);
+ *    insert.setParameter("chow");
+ *    insert.setParameter("bob");
  *    insert.execute();
  *
  *    txn.commit();
@@ -81,19 +103,19 @@ package io.ebean;
  *
  *   try (Transaction txn = DB.beginTransaction()) {
  *
- *     insert.setNextParameter(10000);
- *     insert.setNextParameter("hello");
- *     insert.setNextParameter("rob");
+ *     insert.setParameter(10000);
+ *     insert.setParameter("hello");
+ *     insert.setParameter("rob");
  *     insert.addBatch();
  *
- *     insert.setNextParameter(10001);
- *     insert.setNextParameter("goodbye");
- *     insert.setNextParameter("rob");
+ *     insert.setParameter(10001);
+ *     insert.setParameter("goodbye");
+ *     insert.setParameter("rob");
  *     insert.addBatch();
  *
- *     insert.setNextParameter(10002);
- *     insert.setNextParameter("chow");
- *     insert.setNextParameter("bob");
+ *     insert.setParameter(10002);
+ *     insert.setParameter("chow");
+ *     insert.setParameter("bob");
  *     insert.addBatch();
  *
  *     int[] rows = insert.executeBatch();
