@@ -4,7 +4,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 
-public class MySql55Platform extends MySqlPlatform {
+public class MySql55Platform extends BaseMySqlPlatform {
 
   public MySql55Platform() {
     super();

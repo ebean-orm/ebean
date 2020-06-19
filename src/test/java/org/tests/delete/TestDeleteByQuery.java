@@ -27,7 +27,7 @@ public class TestDeleteByQuery extends BaseTestCase {
   }
 
   @Test
-  @IgnorePlatform(Platform.MYSQL)
+  @IgnorePlatform({Platform.MYSQL, Platform.MARIADB})
   public void deleteWithLimit() {
     createUser("deleteWithLimit1");
     createUser("deleteWithLimit2");

@@ -168,7 +168,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertSql(query).contains("update o_customer cust set status=?, updtime=? where id > ?");
   }
 
-  @IgnorePlatform(Platform.MYSQL)
+  @IgnorePlatform({Platform.MYSQL, Platform.MARIADB})
   @Test
   public void withJoin() {
 
@@ -214,7 +214,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertSql(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t1.country_code = ? and t0.id > ? limit 100)");
   }
 
-  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.MYSQL})
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.MYSQL, Platform.MARIADB})
   @Test
   public void simpleWithLimit() {
 
@@ -230,7 +230,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .update();
 
     final List<String> sql = LoggedSqlCollector.stop();
-    if (isMySql() || isH2()) {
+    if (isMySql() || isH2() || isMariaDB()) {
       assertSql(sql.get(0)).contains("update o_customer set status=? where id > ? limit 100");
     } else {
       assertSql(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 where t0.id > ? limit 100)");

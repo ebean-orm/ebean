@@ -65,55 +65,55 @@ public class TestNewTypes extends BaseTestCase {
     DB.save(bean);
     Thread.sleep(DB_CLOCK_DELTA); // wait, to ensure that instant < Instant.now()
     List<SomeNewTypesBean> list = DB.find(SomeNewTypesBean.class).where().lt("instant", Instant.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().le("localDate", LocalDate.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().lt("localDateTime", LocalDateTime.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().lt("offsetDateTime", OffsetDateTime.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().lt("zonedDateTime", ZonedDateTime.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("sqlDate", bean.getSqlDate()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("sqlTime", bean.getSqlTime()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().le("localTime", LocalTime.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("zoneId", ZoneId.systemDefault().getId()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("zoneOffset", ZonedDateTime.now().getOffset()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().le("yearMonth", YearMonth.of(2014, 9)).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().le("monthDay", MonthDay.of(9,22)).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().le("year", Year.now()).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().le("month", Month.SEPTEMBER).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("path", Paths.get(TEMP_PATH)).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("period", Period.of(4,3,2)).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     list = DB.find(SomeNewTypesBean.class).where().eq("duration", Duration.ofMinutes(5)).findList();
-    assertTrue(!list.isEmpty());
+    assertThat(list).isNotEmpty();
 
     SomeNewTypesBean fetched = DB.find(SomeNewTypesBean.class, bean.getId());
 

@@ -117,7 +117,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
   }
 
   @Test
-  @IgnorePlatform({Platform.MYSQL, Platform.SQLSERVER})
+  @IgnorePlatform({Platform.MYSQL, Platform.MARIADB, Platform.SQLSERVER})
   public void test_upperCaseSql() {
 
     ResetBasicData.reset();

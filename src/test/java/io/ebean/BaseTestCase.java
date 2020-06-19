@@ -206,6 +206,10 @@ public abstract class BaseTestCase {
     return Platform.MYSQL == platform();
   }
 
+  public boolean isMariaDB() {
+    return Platform.MARIADB == platform();
+  }
+
   public boolean isHana() {
     return Platform.HANA == platform();
   }

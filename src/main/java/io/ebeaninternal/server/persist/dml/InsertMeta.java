@@ -13,6 +13,9 @@ import io.ebeaninternal.server.persist.dmlbind.BindableList;
 
 import java.sql.SQLException;
 
+import static io.ebean.annotation.Platform.MARIADB;
+import static io.ebean.annotation.Platform.MYSQL;
+
 /**
  * Meta data for insert handler. The meta data is for a particular bean type. It
  * is considered immutable and is thread safe.
@@ -166,12 +169,7 @@ final class InsertMeta {
 
     request.append("insert into ").append(table);
     if (nullId && noColumnsForInsert(draftTable)) {
-      if (this.platform.base() == Platform.MYSQL) {
-        request.append(" values (default)");
-      } else {
-        request.append(" default values");
-      }
-      return request.toString();
+      return request.append(defaultValues()).toString();
     }
 
     request.append(" (");
@@ -197,6 +195,10 @@ final class InsertMeta {
     request.append(request.getInsertBindBuffer());
     request.append(")");
     return request.toString();
+  }
+
+  private String defaultValues() {
+    return platform.base() == MYSQL || platform.base() == MARIADB ? " values (default)" : " default values";
   }
 
   /**

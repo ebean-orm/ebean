@@ -8,6 +8,7 @@ import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
+import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
 import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
@@ -76,10 +77,12 @@ public class DatabasePlatformFactory {
    * Lookup the platform by name.
    */
   private DatabasePlatform byDatabaseName(String dbName) {
-
     dbName = dbName.toLowerCase();
     if (dbName.equals("h2")) {
       return new H2Platform();
+    }
+    if (dbName.equals("mariadb")) {
+      return new MariaDbPlatform();
     }
     if (dbName.equals("mysql")) {
       return new MySqlPlatform();
@@ -123,7 +126,6 @@ public class DatabasePlatformFactory {
     if (dbName.equals("hana")) {
       return new HanaPlatform();
     }
-
     throw new RuntimeException("database platform " + dbName + " is not known?");
   }
 
@@ -160,14 +162,16 @@ public class DatabasePlatformFactory {
       return new OraclePlatform();
     } else if (dbProductName.contains("microsoft")) {
       throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via ServerConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
-    } else if (dbProductName.contains("mysql")) {
-      return mysqlVersion(majorVersion, minorVersion);
     } else if (dbProductName.contains("h2")) {
       return new H2Platform();
     } else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
       return readPostgres(connection, majorVersion);
+    } else if (dbProductName.contains("mariadb")) {
+      return new MariaDbPlatform();
+    } else if (dbProductName.contains("mysql")) {
+      return mysqlVersion(majorVersion, minorVersion);
     } else if (dbProductName.contains("nuo")) {
       return new NuoDbPlatform();
     } else if (dbProductName.contains("sqlite")) {

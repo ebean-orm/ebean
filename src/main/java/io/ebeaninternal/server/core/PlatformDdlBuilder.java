@@ -7,6 +7,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HanaColumnStoreDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.MariaDbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.NuoDbDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.OracleDdl;
@@ -31,6 +32,8 @@ public class PlatformDdlBuilder {
         return new H2Ddl(platform);
       case DB2:
         return new DB2Ddl(platform);
+      case MARIADB:
+        return new MariaDbDdl(platform);
       case MYSQL55:
       case MYSQL:
         return new MySqlDdl(platform);

@@ -249,6 +249,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <version>2.6.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.sap.cloud.db.jdbc</groupId>
       <artifactId>ngdbc</artifactId>
       <version>2.3.48</version>
