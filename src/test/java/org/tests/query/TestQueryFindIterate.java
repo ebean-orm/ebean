@@ -246,7 +246,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       .order().asc("id");
 
     if (withLoadBatch) {
-      query.setLazyLoadBatchSize(100);
+      query.setLazyLoadBatchSize(1);
     }
 
     QueryIterator<Customer> queryIterator = query.findIterate();

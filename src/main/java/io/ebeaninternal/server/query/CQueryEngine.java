@@ -228,6 +228,8 @@ public class CQueryEngine {
         int queryBatch = request.getQuery().getLazyLoadBatchSize();
         if (queryBatch > 0) {
           iterateBufferSize = queryBatch;
+        } else {
+          iterateBufferSize = 100;
         }
       }
 
