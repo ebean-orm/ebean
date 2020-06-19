@@ -36,6 +36,9 @@ public class TestNewTypes extends BaseTestCase {
 
   @Test
   public void testInsertUpdate() throws  InterruptedException {
+
+    DB.find(SomeNewTypesBean.class).delete();
+
     SomeNewTypesBean bean = new SomeNewTypesBean();
     bean.setLocalDate(LocalDate.now());
     bean.setLocalDateTime(LocalDateTime.now());
