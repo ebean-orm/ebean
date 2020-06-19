@@ -89,8 +89,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   private Set<String> dependentTables;
 
-  private boolean iterateSingleContext;
-
   /**
    * Create the InternalQueryRequest.
    */
@@ -106,15 +104,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {
     return queryEngine.translate(this, bindLog, sql, e);
-  }
-
-  @Override
-  public void setIterateSingleContext() {
-    this.iterateSingleContext = true;
-  }
-
-  public boolean isIterateSingleContext() {
-    return iterateSingleContext;
   }
 
   @Override
@@ -333,7 +322,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * For iterate queries reset the persistenceContext and loadContext.
    */
   public void flushPersistenceContextOnIterate() {
-    if (!iterateSingleContext && persistenceContext.resetLimit()) {
+    if (persistenceContext.resetLimit()) {
       persistenceContext = persistenceContext.forIterateReset();
       loadContext.resetPersistenceContext(persistenceContext);
       if (jsonRead != null) {

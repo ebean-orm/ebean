@@ -92,11 +92,9 @@ public interface ExtendedServer {
    * {@link #findEachWhile(Query, Predicate, Transaction)} is preferred
    * to findIterate(). The reason is that those methods automatically take care of
    * closing the queryIterator (and the underlying jdbc statement and resultSet).
-   * </p>
    * <p>
    * This is similar to findEach in that not all the result beans need to be held
    * in memory at the same time and as such is good for processing large queries.
-   * </p>
    *
    * @see Query#findIterate()
    * @see Query#findEach(Consumer)
@@ -106,7 +104,10 @@ public interface ExtendedServer {
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
   /**
-   * Return the query result as a Stream using a single persistence context.
+   * Execute the query returning the result as a Stream.
+   * <p>
+   * Note that this can support very large queries iterating any number of results.
+   * To do so internally it can use multiple persistence contexts.
    * <p>
    * Note that the stream needs to be closed so use with try with resources.
    * </p>
@@ -115,12 +116,17 @@ public interface ExtendedServer {
   <T> Stream<T> findStream(Query<T> query, Transaction transaction);
 
   /**
-   * Return the query result as a Stream (with multiple persistence contexts).
+   * Deprecated - migrate to findStream().
+   * <p>
+   * Execute the query returning the result as a Stream.
+   * <p>
+   * Note that this can support very large queries iterating any number of results.
+   * To do so internally it can use multiple persistence contexts.
    * <p>
    * Note that the stream needs to be closed so use with try with resources.
-   * </p>
    */
   @Nonnull
+  @Deprecated
   <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction);
 
   /**

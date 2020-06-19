@@ -711,9 +711,9 @@ public interface Query<T> {
   /**
    * Execute the query returning the result as a Stream.
    * <p>
-   * Note that this will hold all resulting beans in memory using a single
-   * persistence context. Use findLargeStream() for queries that expect to
-   * return a large number of results.
+   * Note that this can support very large queries iterating
+   * any number of results. To do so internally it can use
+   * multiple persistence contexts.
    * </p>
    * <pre>{@code
    *
@@ -731,6 +731,8 @@ public interface Query<T> {
   Stream<T> findStream();
 
   /**
+   * Deprecated - migrate to findStream.
+   * <p>
    * Execute the query returning the result as a Stream.
    * <p>
    * Note that this uses multiple persistence contexts such that we can use
@@ -749,6 +751,7 @@ public interface Query<T> {
    * }</pre>
    */
   @Nonnull
+  @Deprecated
   Stream<T> findLargeStream();
 
   /**

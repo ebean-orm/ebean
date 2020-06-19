@@ -1507,19 +1507,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
-    return findStreamWithSingleContext(false, query, transaction);
+    return findStream(query, transaction);
   }
 
   @Override
   public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
-    return findStreamWithSingleContext(true, query, transaction);
-  }
-
-  private <T> Stream<T> findStreamWithSingleContext(boolean singleContext, Query<T> query, Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
-    if (singleContext) {
-      request.setIterateSingleContext();
-    }
     try {
       request.initTransIfRequired();
       return toStream(request.findIterate());
