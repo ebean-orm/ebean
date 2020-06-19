@@ -18,6 +18,8 @@ public class DbExpressionHandlerFactory {
       case POSTGRES:
       case POSTGRES9:
         return new PostgresDbExpression();
+      case MARIADB:
+        return new MariaDbExpression();
       case MYSQL55:
       case MYSQL:
         return new MySqlDbExpression();

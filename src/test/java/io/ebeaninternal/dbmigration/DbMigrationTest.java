@@ -24,7 +24,7 @@ public class DbMigrationTest extends BaseTestCase {
     server().script().runScript(scriptName, content, useAutoCommit);
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.NUODB})
+  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.MARIADB})
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
