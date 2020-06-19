@@ -18,4 +18,9 @@ public @interface ModuleInfo {
    * The db name prefix is added to entity classes for non default databases.
    */
   String[] entities() default {};
+
+  /**
+   * Other classes like Attribute Converters.
+   */
+  String[] other() default {};
 }
