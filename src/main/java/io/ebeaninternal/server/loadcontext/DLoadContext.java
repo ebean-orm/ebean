@@ -73,7 +73,6 @@ public class DLoadContext implements LoadContext {
    * Construct for use with JSON marshalling (doc store).
    */
   public DLoadContext(BeanDescriptor<?> rootDescriptor, PersistenceContext persistenceContext) {
-
     this.useDocStore = true;
     this.rootDescriptor = rootDescriptor;
     this.ebeanServer = rootDescriptor.getEbeanServer();
@@ -100,7 +99,6 @@ public class DLoadContext implements LoadContext {
   }
 
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
-
     this.tenantId = request.getTenantId();
     this.persistenceContext = request.getPersistenceContext();
     this.ebeanServer = request.getServer();
@@ -131,7 +129,6 @@ public class DLoadContext implements LoadContext {
 
     // initialise rootBeanContext after origin and relativePath have been set
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
-
     registerSecondaryQueries(secondaryQueries);
   }
 
@@ -153,14 +150,12 @@ public class DLoadContext implements LoadContext {
    * Register the +query and +lazy secondary queries with their appropriate LoadBeanContext or LoadManyContext.
    */
   private void registerSecondaryQueries(SpiQuerySecondary secondaryQueries) {
-
     this.secQuery = secondaryQueries.getQueryJoins();
     if (secQuery != null) {
       for (OrmQueryProperties pathProperties : secQuery) {
         registerSecondaryQuery(pathProperties);
       }
     }
-
     List<OrmQueryProperties> lazyJoins = secondaryQueries.getLazyJoins();
     if (lazyJoins != null) {
       for (OrmQueryProperties lazyJoin : lazyJoins) {
@@ -174,9 +169,7 @@ public class DLoadContext implements LoadContext {
    * used to build the appropriate query for +query or +lazy loading.
    */
   private void registerSecondaryQuery(OrmQueryProperties props) {
-
     ElPropertyValue elGetValue = rootDescriptor.getElGetValue(props.getPath());
-
     boolean many = elGetValue.getBeanProperty().containsMany();
     registerSecondaryNode(many, props);
   }
@@ -190,11 +183,9 @@ public class DLoadContext implements LoadContext {
    */
   @Override
   public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
-
     if (secQuery == null) {
       return -1;
     }
-
     int maxBatch = 0;
     for (OrmQueryProperties aSecQuery : secQuery) {
       int batchSize = aSecQuery.getQueryFetchBatch();
@@ -211,7 +202,6 @@ public class DLoadContext implements LoadContext {
    */
   @Override
   public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest, boolean forEach) {
-
     if (secQuery != null) {
       for (OrmQueryProperties aSecQuery : secQuery) {
         LoadSecondaryQuery load = getLoadSecondaryQuery(aSecQuery.getPath());
@@ -234,7 +224,6 @@ public class DLoadContext implements LoadContext {
   }
 
   private ObjectGraphNode createObjectGraphNode(String path) {
-
     if (relativePath != null) {
       if (path == null) {
         path = relativePath;
@@ -311,7 +300,6 @@ public class DLoadContext implements LoadContext {
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
-
     int batchSize;
     if (props.isQueryFetch()) {
       batchSize = 100;
@@ -319,7 +307,6 @@ public class DLoadContext implements LoadContext {
       int lazyJoinBatch = props.getLazyFetchBatch();
       batchSize = lazyJoinBatch > 0 ? lazyJoinBatch : defaultBatchSize;
     }
-
     String path = props.getPath();
     if (many) {
       manyMap.put(path, createManyContext(path, batchSize, props));
@@ -336,7 +323,6 @@ public class DLoadContext implements LoadContext {
   }
 
   private DLoadManyContext createManyContext(String path, int batchSize, OrmQueryProperties queryProps) {
-
     BeanPropertyAssocMany<?> p = (BeanPropertyAssocMany<?>) getBeanProperty(rootDescriptor, path);
     return new DLoadManyContext(this, p, path, batchSize, queryProps);
   }
