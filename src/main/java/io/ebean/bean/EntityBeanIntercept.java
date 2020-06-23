@@ -82,14 +82,14 @@ public final class EntityBeanIntercept implements Serializable {
   private static final byte FLAG_CHANGED_PROP = 2;
 
   /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distingush
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
    * between an embedded bean being completely overwritten and one of its
    * embedded properties being made dirty.
    */
   private static final byte FLAG_EMBEDDED_DIRTY = 4;
 
   /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distingush
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
    * between an embedded bean being completely overwritten and one of its
    * embedded properties being made dirty.
    */
@@ -371,13 +371,11 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Set the loaded state to true.
    * <p>
-   * Calls to setter methods after the bean is loaded can result in 'Old Values'
-   * being created to support ConcurrencyMode.ALL
-   * </p>
+   * Calls to setter methods after the bean is loaded can result in
+   * 'Old Values' being created.
    * <p>
    * Worth noting that this is also set after a insert/update. By doing so it
    * 'resets' the bean for making further changes and saving again.
-   * </p>
    */
   public void setLoaded() {
     this.state = STATE_LOADED;
@@ -391,8 +389,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * When finished loading for lazy or refresh on an already partially populated
-   * bean.
+   * When finished loading for lazy or refresh on an already partially populated bean.
    */
   public void setLoadedLazy() {
     this.state = STATE_LOADED;
@@ -423,9 +420,6 @@ public final class EntityBeanIntercept implements Serializable {
 
   /**
    * Set true to turn off lazy loading.
-   * <p>
-   * Typically used to disable lazy loading on SQL based report beans.
-   * </p>
    */
   public void setDisableLazyLoad(boolean disableLazyLoad) {
     this.disableLazyLoad = disableLazyLoad;
@@ -469,8 +463,8 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Finds the index position of a given property. Returns -1 if the property
-   * can not be found.
+   * Finds the index position of a given property. Returns -1 if the
+   * property can not be found.
    */
   public int findProperty(String propertyName) {
     String[] names = owner._ebean_getPropertyNames();
@@ -493,7 +487,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Return the number of properties.s
+   * Return the number of properties.
    */
   public int getPropertyLength() {
     return owner._ebean_getPropertyNames().length;
@@ -515,8 +509,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Set the property to be treated as unloaded. Used for properties initialised in default
-   * constructor.
+   * Set the property to be treated as unloaded. Used for properties initialised in default constructor.
    */
   public void setPropertyUnloaded(int propertyIndex) {
     flags[propertyIndex] &= ~FLAG_LOADED_PROP;
@@ -657,8 +650,7 @@ public final class EntityBeanIntercept implements Serializable {
     for (int i = 0; i < len; i++) {
       if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
         // the property has been changed on this bean
-        String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
-        props.add(propName);
+        props.add((prefix == null ? getProperty(i) : prefix + getProperty(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
@@ -675,7 +667,6 @@ public final class EntityBeanIntercept implements Serializable {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
       if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
-        // the property has been changed on this bean
         if (propertyNames.contains(names[i])) {
           return true;
         }
@@ -752,7 +743,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Add and return a dirty property hash recursing into embedded beans.
+   * Add and return a dirty property hash.
    */
   private void addDirtyPropertyKey(StringBuilder sb) {
     if (sortOrder > 0) {
