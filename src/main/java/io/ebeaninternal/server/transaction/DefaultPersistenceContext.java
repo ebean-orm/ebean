@@ -231,20 +231,20 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       return "size:" + map.size();
     }
 
-    private WithOption getWithOption(Object id) {
-      if (deleteSet != null && deleteSet.contains(id)) {
-        return WithOption.DELETED;
-      }
-      Object bean = map.get(id);
-      return (bean == null) ? null : new WithOption(bean);
-    }
-
     private Object get(Object id) {
       return map.get(id);
     }
 
+    private WithOption getWithOption(Object id) {
+      if (deleteSet != null && deleteSet.contains(id)) {
+        return WithOption.DELETED;
+      }
+      Object bean = get(id);
+      return (bean == null) ? null : new WithOption(bean);
+    }
+
     private Object putIfAbsent(Object id, Object bean) {
-      Object existingValue = map.get(id);
+      Object existingValue = get(id);
       if (existingValue != null) {
         // it is not absent
         return existingValue;
