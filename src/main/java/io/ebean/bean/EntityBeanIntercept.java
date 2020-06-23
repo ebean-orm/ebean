@@ -930,8 +930,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * OneToMany and ManyToMany don't have any interception so just check for
-   * PropertyChangeSupport.
+   * OneToMany and ManyToMany only set loaded state.
    */
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
     if (readOnly) {
