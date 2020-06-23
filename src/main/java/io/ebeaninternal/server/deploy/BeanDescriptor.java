@@ -246,7 +246,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   private final BeanDescriptorMap owner;
 
-
   final String[] properties;
 
   /**
@@ -313,7 +312,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Scalar mutable properties (need to dirty check on update).
    */
   private final BeanProperty[] propertiesMutable;
-
 
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
@@ -382,11 +380,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final EntityBean prototypeEntityBean;
 
   private final IdBinder idBinder;
-
   private String idBinderInLHSSql;
-
   private String idBinderIdSql;
-
   private String deleteByIdSql;
   private String deleteByIdInSql;
   private String whereIdInSql;
@@ -394,29 +389,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private String softDeleteByIdInSql;
 
   private final String name;
-
   private final String baseTableAlias;
-
   private final boolean cacheSharableBeans;
-
   private final String docStoreQueueId;
-
   private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
   private final BeanDescriptorJsonHelp<T> jsonHelp;
   private DocStoreBeanAdapter<T> docStoreAdapter;
   private DocumentMapping docMapping;
   private boolean docStoreEmbeddedInvalidation;
-
   private final String defaultSelectClause;
-
   private SpiEbeanServer ebeanServer;
 
   /**
    * Construct the BeanDescriptor.
    */
   public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
-
     this.owner = owner;
     this.multiValueSupported = owner.isMultiValueSupported();
     this.entityType = deploy.getEntityType();
@@ -431,7 +419,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.namedQuery = deploy.getNamedQuery();
     this.namedRawSql = deploy.getNamedRawSql();
     this.inheritInfo = deploy.getInheritInfo();
-
     this.beanFinder = deploy.getBeanFinder();
     this.persistController = deploy.getPersistController();
     this.persistListener = deploy.getPersistListener();
@@ -439,7 +426,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.beanPostLoad = deploy.getPostLoad();
     this.queryAdapter = deploy.getQueryAdapter();
     this.changeLogFilter = deploy.getChangeLogFilter();
-
     this.defaultSelectClause = deploy.getDefaultSelectClause();
     this.identityMode = deploy.buildIdentityMode();
     this.idType = identityMode.getIdType();
@@ -449,7 +435,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.indexDefinitions = deploy.getIndexDefinitions();
-
     this.readAuditing = deploy.isReadAuditing();
     this.draftable = deploy.isDraftable();
     this.draftableElement = deploy.isDraftableElement();
@@ -464,10 +449,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.partitionMeta = deploy.getPartitionMeta();
     this.storageEngine = deploy.getStorageEngine();
     this.autoTunable = beanFinder == null && (entityType == EntityType.ORM || entityType == EntityType.VIEW);
-
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
-
     this.softDeleteProperty = listHelper.getSoftDeleteProperty();
     // if formula is set, the property is virtual only (there is no column in db) the formula must evaluate to true,
     // if there is a join to a deleted bean. Example: '@Formula(select = "${ta}.user_id is null")'
@@ -503,22 +486,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.propertiesGenInsert = listHelper.getGeneratedInsert();
     this.propertiesGenUpdate = listHelper.getGeneratedUpdate();
     this.idOnlyReference = isIdOnlyReference(propertiesBaseScalar);
-
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
-
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = new BeanDescriptorJsonHelp<>(this);
     this.draftHelp = new BeanDescriptorDraftHelp<>(this);
-
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
     this.docStoreQueueId = docStoreAdapter.getQueueId();
-
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy
     // then we also need to check every BeanDescriptors in the InheritInfo as
     // well. We do that later in initialiseOther().
-
     saveRecurseSkippable = (0 == (propertiesOneExportedSave.length + propertiesOneImportedSave.length + propertiesManySave.length));
 
     // Check if there are no cascade delete associated beans (also subject to
@@ -529,7 +507,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     this.idBinder = owner.createIdBinder(idProperty);
     this.whenModifiedProperty = findWhenModifiedProperty();
     this.whenCreatedProperty = findWhenCreatedProperty();
-
     // derive the index position of the Id and Version properties
     this.abstractType = Modifier.isAbstract(beanType.getModifiers());
     if (abstractType) {
@@ -537,7 +514,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       this.versionPropertyIndex = -1;
       this.unloadProperties = new int[0];
       this.propertiesIndex = new BeanProperty[0];
-
     } else {
       EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
@@ -568,23 +544,19 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * These properties need to be unloaded when populating beans for queries.
    */
   private int[] derivePropertiesToUnload(EntityBean prototypeEntityBean) {
-
     boolean[] loaded = prototypeEntityBean._ebean_getIntercept().getLoaded();
     int[] props = new int[loaded.length];
     int pos = 0;
-
     // collect the positions of the properties initialised in the default constructor.
     for (int i = 0; i < loaded.length; i++) {
       if (loaded[i]) {
         props[pos++] = i;
       }
     }
-
     if (pos == 0) {
       // nothing set in the constructor
       return new int[0];
     }
-
     // populate a smaller/minimal array
     int[] unload = new int[pos];
     System.arraycopy(props, 0, unload, 0, pos);
@@ -665,14 +637,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * These properties need to be initialised prior to the association properties
    * as they are used to get the imported and exported properties.
-   * </p>
    */
   void initialiseId(BeanDescriptorInitContext initContext) {
-
     if (logger.isTraceEnabled()) {
       logger.trace("BeanDescriptor initialise " + fullName);
     }
-
     if (draftable) {
       initContext.addDraft(baseTable, draftTable);
     }
@@ -680,7 +649,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       // add mapping (used to swap out baseTable for asOf queries)
       initContext.addHistory(baseTable, baseTableAsOf);
     }
-
     if (inheritInfo != null) {
       inheritInfo.setDescriptor(this);
     }
@@ -695,12 +663,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Initialise the exported and imported parts for associated properties.
    */
   public void initialiseOther(BeanDescriptorInitContext initContext) {
-
     for (BeanPropertyAssocMany<?> many : propertiesManyToMany) {
       // register associated draft table for M2M intersection
       many.registerDraftIntersectionTable(initContext);
     }
-
     if (historySupport) {
       // history support on this bean so check all associated intersection tables
       // and if they are not excluded register the associated 'with history' table
@@ -730,11 +696,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     idBinderIdSql = idBinder.getBindIdSql(baseTableAlias);
     String idBinderInLHSSqlNoAlias = idBinder.getBindIdInSql(null);
     String idEqualsSql = idBinder.getBindIdSql(null);
-
     deleteByIdSql = "delete from " + baseTable + " where " + idEqualsSql;
     whereIdInSql = " where " + idBinderInLHSSqlNoAlias + " ";
     deleteByIdInSql = "delete from " + baseTable + whereIdInSql;
-
     if (softDelete) {
       softDeleteByIdSql = "update " + baseTable + " set " + getSoftDeleteDbSet() + " where " + idEqualsSql;
       softDeleteByIdInSql = "update " + baseTable + " set " + getSoftDeleteDbSet() + " where " + idBinderInLHSSqlNoAlias + " ";
@@ -792,7 +756,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Perform last initialisation for the descriptor.
    */
   void initLast() {
-
     for (BeanProperty prop : propertiesNonTransient) {
       if (prop.isUnique()) {
         propertiesUnique.add(new BeanProperty[]{prop});
@@ -895,13 +858,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public void merge(EntityBean bean, EntityBean existing) {
-
     EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
     EntityBeanIntercept toEbi = existing._ebean_getIntercept();
-
     int propertyLength = toEbi.getPropertyLength();
     String[] names = getProperties();
-
     for (int i = 0; i < propertyLength; i++) {
 
       if (fromEbi.isLoadedProperty(i)) {
@@ -977,14 +937,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return the bean change for an update generating 'new values' and 'old values' in JSON form.
    */
   private BeanChange updateBeanChange(PersistRequestBean<T> request) {
-
     try {
       BeanChangeJson changeJson = new BeanChangeJson(this, request.isStatelessUpdate());
       request.getEntityBeanIntercept().addDirtyPropertyValues(changeJson);
       changeJson.flush();
-
       return beanChange(ChangeType.UPDATE, request.getBeanId(), changeJson.newJson(), changeJson.oldJson());
-
     } catch (RuntimeException e) {
       logger.error("Failed to write ChangeLog entry for update", e);
       return null;
@@ -995,16 +952,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return the bean change for an insert.
    */
   private BeanChange insertBeanChange(PersistRequestBean<T> request) {
-
     try {
       StringWriter writer = new StringWriter(200);
       SpiJsonWriter jsonWriter = createJsonWriter(writer);
-
       jsonWriteForInsert(jsonWriter, request.getEntityBean());
       jsonWriter.flush();
-
       return beanChange(ChangeType.INSERT, request.getBeanId(), writer.toString(), null);
-
     } catch (IOException e) {
       logger.error("Failed to write ChangeLog entry for insert", e);
       return null;
@@ -1063,12 +1016,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * concurrency checking.
    */
   private SqlUpdate deleteByIdList(List<Object> idList, DeleteMode mode) {
-
     String baseSql = mode.isHard() ? deleteByIdInSql : softDeleteByIdInSql;
     StringBuilder sb = new StringBuilder(baseSql);
     String inClause = idBinder.getIdInValueExprDelete(idList.size());
     sb.append(inClause);
-
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
     idBinder.addIdInBindValues(delete, idList);
     return delete;
@@ -1079,15 +1030,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * concurrency checking.
    */
   private SqlUpdate deleteById(Object id, DeleteMode mode) {
-
     String baseSql = mode.isHard() ? deleteByIdSql : softDeleteByIdSql;
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(baseSql);
-
     Object[] bindValues = idBinder.getBindValues(id);
     for (Object bindValue : bindValues) {
       sqlDelete.setParameter(bindValue);
     }
-
     return sqlDelete;
   }
 
@@ -1210,12 +1158,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Build the Document mapping recursively with the given prefix relative to the root of the document.
    */
   public void docStoreMapping(final DocMappingBuilder mapping, final String prefix) {
-
     if (prefix != null && idProperty != null) {
       // id property not included in the
       idProperty.docStoreMapping(mapping, prefix);
     }
-
     if (inheritInfo != null) {
       String discCol = inheritInfo.getDiscriminatorColumn();
       if (Types.VARCHAR == inheritInfo.getDiscriminatorType()) {
@@ -1816,7 +1762,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Find a property annotated with @WhenModified or @UpdatedTimestamp.
    */
   private BeanProperty findWhenModifiedProperty() {
-
     for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
       if (aPropertiesBaseScalar.isGeneratedWhenModified()) {
         return aPropertiesBaseScalar;
@@ -1829,14 +1774,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return the many property included in the query or null if one is not.
    */
   public BeanPropertyAssocMany<?> getManyProperty(SpiQuery<?> query) {
-
     OrmQueryDetail detail = query.getDetail();
     for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
       if (detail.includesPath(aPropertiesMany.getName())) {
         return aPropertiesMany;
       }
     }
-
     return null;
   }
 
@@ -1905,7 +1848,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Bind the idValue to the preparedStatement.
    * <p>
    * This takes care of the various id types such as embedded beans etc.
-   * </p>
    */
   public void bindId(DataBind dataBind, Object idValue) throws SQLException {
     idBinder.bindId(dataBind, idValue);
@@ -1915,7 +1857,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return the id as an array of scalar bindable values.
    * <p>
    * This 'flattens' any EmbeddedId or multiple Id property cases.
-   * </p>
    */
   public Object[] getBindIdValues(Object idValue) {
     return idBinder.getBindValues(idValue);
@@ -1940,7 +1881,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     }
     try {
       EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
-
       if (beanPostConstructListener != null) {
         beanPostConstructListener.autowire(bean); // calls all registered listeners
         beanPostConstructListener.postConstruct(bean); // calls first the @PostConstruct method and then the listeners
@@ -1959,7 +1899,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         }
       }
       return bean;
-
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -1999,7 +1938,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   @SuppressWarnings("unchecked")
   public T createReference(Boolean readOnly, boolean disableLazyLoad, Object id, PersistenceContext pc) {
-
     if (cacheSharableBeans && !disableLazyLoad && !Boolean.FALSE.equals(readOnly)) {
       CachedBeanData d = cacheHelp.beanCacheGetData(cacheKey(id));
       if (d != null) {
@@ -2016,10 +1954,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       if (inheritInfo != null && !inheritInfo.isConcrete()) {
         return findReferenceBean(id, pc);
       }
-
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
-
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
       if (disableLazyLoad) {
         ebi.setDisableLazyLoad(true);
@@ -2034,9 +1970,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         contextPut(pc, id, eb);
         ebi.setPersistenceContext(pc);
       }
-
       return (T) eb;
-
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -2086,14 +2020,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public BeanProperty findPropertyFromPath(String path) {
     BeanDescriptor<?> other = this;
     while (true) {
-
       String[] split = SplitName.splitBegin(path);
       if (split[1] == null) {
         return other._findBeanProperty(split[0]);
       }
       BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) other._findBeanProperty(split[0]);
       BeanDescriptor<?> targetDesc = assocProp.getTargetDescriptor();
-
       path = split[1];
       other = targetDesc;
     }
@@ -2114,13 +2046,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         return result;
       }
       String[] splitBegin = SplitName.splitBegin(path);
-
       BeanProperty beanProperty = result.findProperty(splitBegin[0]);
       if (beanProperty instanceof BeanPropertyAssoc<?>) {
         BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
         path = splitBegin[1];
         result = assocProp.getTargetDescriptor();
-
       } else {
         throw new PersistenceException("Invalid path " + path + " from " + result.getFullName());
       }
@@ -2147,7 +2077,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * For bidirectional this is a real property on the bean. For unidirectional
    * relationships we have this 'shadow' property which is not externally
    * visible.
-   * </p>
    */
   public BeanPropertyAssocOne<?> getUnidirectional() {
     BeanDescriptor<?> other = this;
@@ -2168,7 +2097,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * If this is false and the Id is null it is assumed that a database auto
    * increment feature is being used to populate the id.
-   * </p>
    */
   public boolean isUseIdGenerator() {
     return idGenerator != null;
@@ -2195,7 +2123,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * If this BeanDescriptor is for a table then this returns the table name
    * instead.
-   * </p>
    */
   @Override
   @Nonnull
@@ -2315,7 +2242,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return the Id value for the bean with embeddedId beans converted into maps.
    * <p>
    * The usage is to provide simple id types for JSON processing (for embeddedId's).
-   * </p>
    */
   public Object getIdForJson(Object bean) {
     return idBinder.getIdForJson((EntityBean) bean);
@@ -2325,7 +2251,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Convert the idValue assuming embeddedId values are Maps.
    * <p>
    * The usage is to provide simple id types for JSON processing (for embeddedId's).
-   * </p>
    */
   Object convertIdFromJson(Object idValue) {
     return idBinder.convertIdFromJson(idValue);
@@ -2359,7 +2284,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * If the bean is not null, the id value is set to the id property of the bean
    * after it has been converted to the correct type.
-   * </p>
    */
   public Object convertSetId(Object idValue, EntityBean bean) {
     return idBinder.convertSetId(idValue, bean);
@@ -2385,9 +2309,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public void sort(List<T> list, String sortByClause) {
-
-    ElComparator<T> comparator = getElComparator(sortByClause);
-    list.sort(comparator);
+    list.sort(getElComparator(sortByClause));
   }
 
   public ElComparator<T> getElComparator(String propNameOrSortBy) {
@@ -2398,10 +2320,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Register all the assoc many properties on this bean that are not populated with the load context.
    * <p>
    * This provides further lazy loading via the load context.
-   * </p>
    */
   public void lazyLoadRegister(String prefix, EntityBeanIntercept ebi, EntityBean bean, LoadContext loadContext) {
-
     // load the List/Set/Map proxy objects (deferred fetching of lists)
     BeanPropertyAssocMany<?>[] manys = propertiesMany();
     for (BeanPropertyAssocMany<?> many : manys) {
@@ -2420,12 +2340,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * define a Reference for the collection and not invoke a query.
    */
   public boolean lazyLoadMany(EntityBeanIntercept ebi) {
-
     int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
     if (lazyLoadProperty == -1) {
       return false;
     }
-
     if (inheritInfo != null) {
       return descOf(ebi.getOwner().getClass()).lazyLoadMany(ebi, lazyLoadProperty);
     }
@@ -2443,7 +2361,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Check for lazy loading of many property.
    */
   private boolean lazyLoadMany(EntityBeanIntercept ebi, int lazyLoadProperty) {
-
     BeanProperty lazyLoadBeanProp = propertiesIndex[lazyLoadProperty];
     if (lazyLoadBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) lazyLoadBeanProp;
@@ -2468,7 +2385,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   @SuppressWarnings("unchecked")
   private ElComparator<T> createComparator(String sortByClause) {
-
     SortByClause sortBy = SortByClauseParser.parse(sortByClause);
     if (sortBy.size() == 1) {
       // simple comparator for a single property
@@ -2477,24 +2393,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
     // create a compound comparator based on the list of properties
     ElComparator<T>[] comparators = new ElComparator[sortBy.size()];
-
     List<SortByClause.Property> sortProps = sortBy.getProperties();
     for (int i = 0; i < sortProps.size(); i++) {
       SortByClause.Property sortProperty = sortProps.get(i);
       comparators[i] = createPropertyComparator(sortProperty);
     }
-
     return new ElComparatorCompound<>(comparators);
   }
 
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
-
     ElPropertyValue elGetValue = getElGetValue(sortProp.getName());
     if (elGetValue == null) {
       logger.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
       return new ElComparatorNoop<>();
     }
-
     if (elGetValue.isAssocMany()) {
       logger.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
       return new ElComparatorNoop<>();
@@ -2539,7 +2451,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Similar to ElPropertyValue but also uses foreign key shortcuts.
    * <p>
    * The foreign key shortcuts means we can avoid unnecessary joins.
-   * </p>
    */
   public ElPropertyDeploy getElPropertyDeploy(String propName) {
     ElPropertyDeploy elProp = elDeployCache.get(propName);
@@ -2560,7 +2471,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   ElPropertyValue buildElGetValue(String propName, ElPropertyChainBuilder chain, boolean propertyDeploy) {
-
     if (propertyDeploy && chain != null) {
       ElPropertyDeploy fk = elDeployCache.get(propName);
       if (fk instanceof BeanFkeyProperty) {
@@ -2568,17 +2478,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         return ((BeanFkeyProperty) fk).create(chain.getExpression(), chain.isContainsMany());
       }
     }
-
     int basePos = propName.indexOf('.');
     if (basePos > -1) {
       // nested or embedded property
       String baseName = propName.substring(0, basePos);
-
       BeanProperty assocProp = _findBeanProperty(baseName);
       if (assocProp == null) {
         return null;
       }
-
       String remainder = propName.substring(basePos + 1);
       return assocProp.buildElPropertyValue(propName, remainder, chain, propertyDeploy);
     }
@@ -2639,7 +2546,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * This searches this BeanDescriptor and then searches further down the
    * inheritance tree (not up).
-   * </p>
    */
   @Override
   public BeanProperty findProperty(String propName) {
@@ -2666,7 +2572,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Reset the many properties to empty state ready for reloading.
    */
   public void resetManyProperties(Object dbBean) {
-
     EntityBean bean = (EntityBean) dbBean;
     for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
       if (aPropertiesMany.isCascadeRefresh()) {
@@ -2680,7 +2585,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * This means is has no relationships and has readOnly=true in its cache
    * options.
-   * </p>
    */
   public boolean isCacheSharableBeans() {
     return cacheSharableBeans;
@@ -2781,8 +2685,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * De-register the BeanPersistListener.
    */
   public void deregister(BeanPersistListener listener) {
-
-    // volatile read...
     BeanPersistListener currentListener = persistListener;
     if (currentListener != null) {
       if (currentListener instanceof ChainedBeanPersistListener) {
@@ -2798,8 +2700,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * De-register the BeanPersistController.
    */
   public void deregister(BeanPersistController controller) {
-
-    // volatile read...
     BeanPersistController currentController = persistController;
     if (currentController != null) {
       if (currentController instanceof ChainedBeanPersistController) {
@@ -2815,9 +2715,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Register the new BeanPersistController.
    */
   public void register(BeanPersistListener newPersistListener) {
-
     if (newPersistListener.isRegisterFor(beanType)) {
-      // volatile read...
       BeanPersistListener currentListener = persistListener;
       if (currentListener == null) {
         persistListener = newPersistListener;
@@ -2837,18 +2735,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Register the new BeanPersistController.
    */
   public void register(BeanPersistController newController) {
-
     if (newController.isRegisterFor(beanType)) {
-      // volatile read...
       BeanPersistController currentController = persistController;
       if (currentController == null) {
         persistController = newController;
       } else {
         if (currentController instanceof ChainedBeanPersistController) {
-          // add it to the existing chain
           persistController = ((ChainedBeanPersistController) currentController).register(newController);
         } else {
-          // build new chain of the 2
           persistController = new ChainedBeanPersistController(currentController, newController);
         }
       }
@@ -2901,17 +2795,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   /**
    * Return the dependent tables for a view based entity.
-   * <p>
-   * These tables
-   * </p>
    */
   public String[] getDependentTables() {
     return dependentTables;
   }
 
   /**
-   * Return the base table. Only properties mapped to the base table are by
-   * default persisted.
+   * Return the base table. Only properties mapped to the base table are by default persisted.
    */
   @Override
   public String getBaseTable() {
@@ -3012,7 +2902,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   @Override
   public ExtraJoin extraJoin(String propertyPath) {
-
     ElPropertyValue elGetValue = getElGetValue(propertyPath);
     if (elGetValue != null) {
       BeanProperty beanProperty = elGetValue.getBeanProperty();
@@ -3150,7 +3039,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * This is only used with Identity columns and getGeneratedKeys is not
    * supported.
-   * </p>
    */
   public String getSelectLastInsertedId(boolean publish) {
     return publish ? selectLastInsertedId : selectLastInsertedIdDraft;
@@ -3198,8 +3086,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Return the beans that are embedded. These share the base table with the
-   * owner bean.
+   * Return the beans that are embedded. These share the base table with the owner bean.
    */
   public BeanPropertyAssocOne<?>[] propertiesEmbedded() {
     return propertiesEmbedded;
@@ -3252,12 +3139,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * @param insertMode true if the 'root request' was an insert rather than an update
    */
   public boolean isInsertMode(EntityBeanIntercept ebi, boolean insertMode) {
-
     if (ebi.isLoaded()) {
       // must be an update as the bean is loaded
       return false;
     }
-
     if (idProperty.isEmbedded()) {
       // not using Id generator so just base on isLoaded()
       return !ebi.isLoaded();
@@ -3329,7 +3214,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public ConcurrencyMode getConcurrencyMode(EntityBeanIntercept ebi) {
-
     if (!hasVersionProperty(ebi)) {
       return ConcurrencyMode.NONE;
     } else {
@@ -3350,15 +3234,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Populate the diff for updates with flattened non-null property values.
    */
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
-
-    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
-      aPropertiesBaseScalar.diff(prefix, map, newBean, oldBean);
+    for (BeanProperty baseScalar : propertiesBaseScalar) {
+      baseScalar.diff(prefix, map, newBean, oldBean);
     }
-    for (BeanPropertyAssocOne<?> aPropertiesOne : propertiesOne) {
-      aPropertiesOne.diff(prefix, map, newBean, oldBean);
+    for (BeanPropertyAssocOne<?> one : propertiesOne) {
+      one.diff(prefix, map, newBean, oldBean);
     }
-    for (BeanPropertyAssocOne<?> aPropertiesEmbedded : propertiesEmbedded) {
-      aPropertiesEmbedded.diff(prefix, map, newBean, oldBean);
+    for (BeanPropertyAssocOne<?> embedded : propertiesEmbedded) {
+      embedded.diff(prefix, map, newBean, oldBean);
     }
   }
 
@@ -3368,10 +3251,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * <p>
    * This is primarily used for paging queries to ensure that an order by clause is provided and that the order by
    * provides unique ordering of the rows (so that the paging is predicable).
-   * </p>
    */
   public void appendOrderById(SpiQuery<T> query) {
-
     if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.getName())) {
       query.order().asc(idProperty.getName());
     }
@@ -3409,7 +3290,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Returns ManyToOnes and OneToOnes on the imported owning side.
    * <p>
    * Excludes OneToOnes on the exported side.
-   * </p>
    */
   public BeanPropertyAssocOne<?>[] propertiesOneImported() {
     return propertiesOneImported;
@@ -3483,7 +3363,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * no version property exists on the bean.
    * <p>
    * Note that this DOES NOT find a version property on an embedded bean.
-   * </p>
    */
   public BeanProperty getVersionProperty() {
     return versionProperty;
