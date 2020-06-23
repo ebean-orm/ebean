@@ -105,7 +105,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,9 +218,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final BeanProperty draftDirty;
 
-  /**
-   * Map of BeanProperty Linked so as to preserve order.
-   */
   private final LinkedHashMap<String, BeanProperty> propMap;
 
   /**
@@ -234,43 +230,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   private final Map<String, BeanPropertyAssoc<?>> tablePath = new HashMap<>();
 
-  /**
-   * The type of bean this describes.
-   */
   final Class<T> beanType;
-
   final Class<?> rootBeanType;
-
-  /**
-   * This is not sent to a remote client.
-   */
   private final BeanDescriptorMap owner;
-
   final String[] properties;
-
-  /**
-   * Intercept pre post on insert,update, and delete .
-   */
-  private volatile BeanPersistController persistController;
 
   private final BeanPostLoad beanPostLoad;
   private final BeanPostConstructListener beanPostConstructListener;
-
-  /**
-   * Listens for post commit insert update and delete events.
-   */
+  private volatile BeanPersistController persistController;
   private volatile BeanPersistListener persistListener;
-
   private final BeanQueryAdapter queryAdapter;
-
-  /**
-   * If set overrides the find implementation. Server side only.
-   */
   private final BeanFindController beanFinder;
-
-  /**
-   * Used for fine grain filtering for the change log.
-   */
   private final ChangeLogFilter changeLogFilter;
 
   /**
@@ -280,22 +250,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
 
   private final boolean abstractType;
 
-  /**
-   * Derived list of properties that make up the unique id.
-   */
   private final BeanProperty idProperty;
-
   private final int idPropertyIndex;
 
-  /**
-   * Derived list of properties that are used for version concurrency checking.
-   */
   private final BeanProperty versionProperty;
-
   private final int versionPropertyIndex;
-
   private final BeanProperty whenModifiedProperty;
-
   private final BeanProperty whenCreatedProperty;
 
   /**
@@ -312,13 +272,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Scalar mutable properties (need to dirty check on update).
    */
   private final BeanProperty[] propertiesMutable;
-
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
 
-  /**
-   * list of properties that are Lists/Sets/Maps (Derived).
-   */
   private final BeanProperty[] propertiesNonMany;
   private final BeanProperty[] propertiesAggregate;
   private final BeanPropertyAssocMany<?>[] propertiesMany;
@@ -330,25 +286,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * list of properties that are associated beans and not embedded (Derived).
    */
   private final BeanPropertyAssocOne<?>[] propertiesOne;
-
   private final BeanPropertyAssocOne<?>[] propertiesOneImported;
   private final BeanPropertyAssocOne<?>[] propertiesOneImportedSave;
   private final BeanPropertyAssocOne<?>[] propertiesOneImportedDelete;
-
-  //private final BeanPropertyAssocOne<?>[] propertiesOneExported;
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedSave;
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedDelete;
-
-  /**
-   * list of properties that are embedded beans.
-   */
   private final BeanPropertyAssocOne<?>[] propertiesEmbedded;
 
-  /**
-   * List of the scalar properties excluding id and secondary table properties.
-   */
   private final BeanProperty[] propertiesBaseScalar;
-
   private final BeanProperty[] propertiesTransient;
 
   /**
@@ -401,9 +346,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final String defaultSelectClause;
   private SpiEbeanServer ebeanServer;
 
-  /**
-   * Construct the BeanDescriptor.
-   */
   public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
     this.owner = owner;
     this.multiValueSupported = owner.isMultiValueSupported();
@@ -670,10 +612,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     if (historySupport) {
       // history support on this bean so check all associated intersection tables
       // and if they are not excluded register the associated 'with history' table
-      for (BeanPropertyAssocMany<?> aPropertiesManyToMany : propertiesManyToMany) {
+      for (BeanPropertyAssocMany<?> manyToMany : propertiesManyToMany) {
         // register associated history table for M2M intersection
-        if (!aPropertiesManyToMany.isExcludedFromHistory()) {
-          TableJoin intersectionTableJoin = aPropertiesManyToMany.getIntersectionTableJoin();
+        if (!manyToMany.isExcludedFromHistory()) {
+          TableJoin intersectionTableJoin = manyToMany.getIntersectionTableJoin();
           initContext.addHistoryIntersection(intersectionTableJoin.getTable());
         }
       }
@@ -729,7 +671,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return false;
   }
 
-  boolean hasCircularImportedIdTo(BeanDescriptor sourceDesc) {
+  boolean hasCircularImportedIdTo(BeanDescriptor<?> sourceDesc) {
     for (BeanPropertyAssocOne<?> assocOne : propertiesOneImportedSave) {
       if (assocOne.getTargetDescriptor() == sourceDesc) {
         return true;
@@ -1048,9 +990,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   void initialiseFkeys() {
-    for (BeanPropertyAssocOne<?> aPropertiesOneImported : propertiesOneImported) {
-      if (!aPropertiesOneImported.isFormula()) {
-        aPropertiesOneImported.addFkey();
+    for (BeanPropertyAssocOne<?> oneImported : propertiesOneImported) {
+      if (!oneImported.isFormula()) {
+        oneImported.addFkey();
       }
     }
   }
@@ -1648,13 +1590,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Trim query plans not used since the passed in epoch time.
    */
   void trimQueryPlans(long unusedSince) {
-    Iterator<CQueryPlan> it = queryPlanCache.values().iterator();
-    while (it.hasNext()) {
-      CQueryPlan queryPlan = it.next();
-      if (queryPlan.getLastQueryTime() < unusedSince) {
-        it.remove();
-      }
-    }
+    queryPlanCache.values().removeIf(queryPlan -> queryPlan.getLastQueryTime() < unusedSince);
   }
 
   /**
@@ -1750,9 +1686,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Find a property annotated with @WhenCreated or @CreatedTimestamp.
    */
   private BeanProperty findWhenCreatedProperty() {
-    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
-      if (aPropertiesBaseScalar.isGeneratedWhenCreated()) {
-        return aPropertiesBaseScalar;
+    for (BeanProperty baseScalar : propertiesBaseScalar) {
+      if (baseScalar.isGeneratedWhenCreated()) {
+        return baseScalar;
       }
     }
     return null;
@@ -1762,9 +1698,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Find a property annotated with @WhenModified or @UpdatedTimestamp.
    */
   private BeanProperty findWhenModifiedProperty() {
-    for (BeanProperty aPropertiesBaseScalar : propertiesBaseScalar) {
-      if (aPropertiesBaseScalar.isGeneratedWhenModified()) {
-        return aPropertiesBaseScalar;
+    for (BeanProperty baseScalar : propertiesBaseScalar) {
+      if (baseScalar.isGeneratedWhenModified()) {
+        return baseScalar;
       }
     }
     return null;
@@ -1775,9 +1711,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public BeanPropertyAssocMany<?> getManyProperty(SpiQuery<?> query) {
     OrmQueryDetail detail = query.getDetail();
-    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
-      if (detail.includesPath(aPropertiesMany.getName())) {
-        return aPropertiesMany;
+    for (BeanPropertyAssocMany<?> many : propertiesMany) {
+      if (detail.includesPath(many.getName())) {
+        return many;
       }
     }
     return null;
@@ -2573,9 +2509,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public void resetManyProperties(Object dbBean) {
     EntityBean bean = (EntityBean) dbBean;
-    for (BeanPropertyAssocMany<?> aPropertiesMany : propertiesMany) {
-      if (aPropertiesMany.isCascadeRefresh()) {
-        aPropertiesMany.resetMany(bean);
+    for (BeanPropertyAssocMany<?> many : propertiesMany) {
+      if (many.isCascadeRefresh()) {
+        many.resetMany(bean);
       }
     }
   }
