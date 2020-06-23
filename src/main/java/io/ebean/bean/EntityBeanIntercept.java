@@ -708,7 +708,7 @@ public final class EntityBeanIntercept implements Serializable {
         String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
         Object newVal = owner._ebean_getField(i);
         Object oldVal = getOrigValue(i);
-        if (!areEqual(oldVal, newVal)) {
+        if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
         }
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
@@ -729,10 +729,9 @@ public final class EntityBeanIntercept implements Serializable {
         // the property has been changed on this bean
         Object newVal = owner._ebean_getField(i);
         Object oldVal = getOrigValue(i);
-        if (!areEqual(oldVal, newVal)) {
+        if (notEqual(oldVal, newVal)) {
           visitor.visit(i, newVal, oldVal);
         }
-
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
@@ -849,7 +848,6 @@ public final class EntityBeanIntercept implements Serializable {
       if (nodeUsageCollector != null) {
         nodeUsageCollector.setLoadProperty(getProperty(lazyLoadProperty));
       }
-
       loader.loadBean(this);
       if (lazyLoadFailure) {
         // failed when lazy loading this bean
@@ -864,32 +862,31 @@ public final class EntityBeanIntercept implements Serializable {
    * Helper method to check if two objects are equal.
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected boolean areEqual(Object obj1, Object obj2) {
+  protected static boolean notEqual(Object obj1, Object obj2) {
     if (obj1 == null) {
-      return (obj2 == null);
+      return (obj2 != null);
     }
     if (obj2 == null) {
-      return false;
+      return true;
     }
     if (obj1 == obj2) {
-      return true;
+      return false;
     }
     if (obj1 instanceof BigDecimal) {
       // Use comparable for BigDecimal as equals
       // uses scale in comparison...
       if (obj2 instanceof BigDecimal) {
         Comparable com1 = (Comparable) obj1;
-        return (com1.compareTo(obj2) == 0);
-
+        return (com1.compareTo(obj2) != 0);
       } else {
-        return false;
+        return true;
       }
     }
     if (obj1 instanceof URL) {
       // use the string format to determine if dirty
-      return obj1.toString().equals(obj2.toString());
+      return !obj1.toString().equals(obj2.toString());
     }
-    return obj1.equals(obj2);
+    return !obj1.equals(obj2);
   }
 
   /**
@@ -970,7 +967,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
-    } else if (!areEqual(oldValue, newValue)) {
+    } else if (notEqual(oldValue, newValue)) {
       setChangedPropertyValue(propertyIndex, intercept, oldValue);
     }
   }
