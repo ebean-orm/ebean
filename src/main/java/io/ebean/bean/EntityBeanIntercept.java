@@ -445,7 +445,6 @@ public final class EntityBeanIntercept implements Serializable {
    * Return true if the embedded bean is new or dirty and hence needs saving.
    */
   public boolean isEmbeddedNewOrDirty(Object embeddedBean) {
-
     if (embeddedBean == null) {
       // if it was previously set then the owning bean would
       // have oldValues containing the previous embedded bean
@@ -453,7 +452,6 @@ public final class EntityBeanIntercept implements Serializable {
     }
     if (embeddedBean instanceof EntityBean) {
       return ((EntityBean) embeddedBean)._ebean_getIntercept().isNewOrDirty();
-
     } else {
       // non-enhanced so must assume it is new and needs to be saved
       return true;
@@ -605,7 +603,6 @@ public final class EntityBeanIntercept implements Serializable {
    * For forced update on a 'New' bean set all the loaded properties to changed.
    */
   public void setNewBeanForUpdate() {
-
     for (int i = 0; i < flags.length; i++) {
       if ((flags[i] & FLAG_LOADED_PROP) != 0) {
         flags[i] |= FLAG_CHANGED_PROP;
@@ -674,7 +671,6 @@ public final class EntityBeanIntercept implements Serializable {
    * Return true if any of the given property names are dirty.
    */
   public boolean hasDirtyProperty(Set<String> propertyNames) {
-
     String[] names = owner._ebean_getPropertyNames();
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
@@ -715,7 +711,6 @@ public final class EntityBeanIntercept implements Serializable {
         if (!areEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
         }
-
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
@@ -818,21 +813,18 @@ public final class EntityBeanIntercept implements Serializable {
    * Load the bean when it is a reference.
    */
   protected void loadBean(int loadProperty) {
-
     synchronized (this) {
       if (beanLoader == null) {
         final Database database = DB.byName(ebeanServerName);
         if (database == null) {
           throw new PersistenceException("Database [" + ebeanServerName + "] was not found?");
         }
-
         // For stand alone reference bean or after deserialisation lazy load
         // using the ebeanServer. Synchronise only on the bean.
         loadBeanInternal(loadProperty, database.getPluginApi());
         return;
       }
     }
-
     synchronized (beanLoader) {
       // Lazy loading using LoadBeanContext which supports batch loading
       // Synchronise on the beanLoader (a 'node' of the LoadBeanContext 'tree')
@@ -844,32 +836,25 @@ public final class EntityBeanIntercept implements Serializable {
    * Invoke the lazy loading. This method is synchronised externally.
    */
   private void loadBeanInternal(int loadProperty, BeanLoader loader) {
-
     if ((flags[loadProperty] & FLAG_LOADED_PROP) != 0) {
       // race condition where multiple threads calling preGetter concurrently
       return;
     }
-
     if (lazyLoadFailure) {
       // failed when batch lazy loaded by another bean in the batch
       throw new EntityNotFoundException("(Lazy) loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");
     }
-
     if (lazyLoadProperty == -1) {
-
       lazyLoadProperty = loadProperty;
-
       if (nodeUsageCollector != null) {
         nodeUsageCollector.setLoadProperty(getProperty(lazyLoadProperty));
       }
 
       loader.loadBean(this);
-
       if (lazyLoadFailure) {
         // failed when lazy loading this bean
         throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted.");
       }
-
       // bean should be loaded and intercepting now. setLoaded() has
       // been called by the lazy loading mechanism
     }
@@ -949,21 +934,17 @@ public final class EntityBeanIntercept implements Serializable {
    * PropertyChangeSupport.
    */
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-
     if (readOnly) {
       throw new IllegalStateException("This bean is readOnly");
     }
-
     setLoadedProperty(propertyIndex);
   }
 
   private void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
-
     if (readOnly) {
       throw new IllegalStateException("This bean is readOnly");
     }
     setChangedProperty(propertyIndex);
-
     if (setDirtyState) {
       setOriginalValue(propertyIndex, origValue);
       setDirtyStatus();
@@ -988,7 +969,6 @@ public final class EntityBeanIntercept implements Serializable {
    * the old values for use with ConcurrencyMode.ALL.
    */
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (!areEqual(oldValue, newValue)) {
@@ -1001,7 +981,6 @@ public final class EntityBeanIntercept implements Serializable {
    * Check for primitive boolean.
    */
   public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
@@ -1013,7 +992,6 @@ public final class EntityBeanIntercept implements Serializable {
    * Check for primitive int.
    */
   public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
@@ -1025,7 +1003,6 @@ public final class EntityBeanIntercept implements Serializable {
    * long.
    */
   public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
@@ -1037,7 +1014,6 @@ public final class EntityBeanIntercept implements Serializable {
    * double.
    */
   public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (Double.compare(oldValue, newValue) != 0) {
@@ -1049,7 +1025,6 @@ public final class EntityBeanIntercept implements Serializable {
    * float.
    */
   public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (Float.compare(oldValue, newValue) != 0) {
@@ -1061,7 +1036,6 @@ public final class EntityBeanIntercept implements Serializable {
    * short.
    */
   public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
@@ -1073,7 +1047,6 @@ public final class EntityBeanIntercept implements Serializable {
    * char.
    */
   public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
@@ -1085,7 +1058,6 @@ public final class EntityBeanIntercept implements Serializable {
    * byte.
    */
   public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (oldValue != newValue) {
@@ -1097,7 +1069,6 @@ public final class EntityBeanIntercept implements Serializable {
    * char[].
    */
   public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (!Arrays.equals(oldValue, newValue)) {
@@ -1109,7 +1080,6 @@ public final class EntityBeanIntercept implements Serializable {
    * byte[].
    */
   public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
-
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (!Arrays.equals(oldValue, newValue)) {
