@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.event.AbstractBeanPersistListener;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistListener;
@@ -14,9 +14,9 @@ import static org.junit.Assert.*;
 public class BeanDescriptor_registerTest {
 
   @Test
-  public void testRegisterDeregister() throws Exception {
+  public void testRegisterDeregister() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2other");
     config.loadFromProperties();
@@ -25,7 +25,7 @@ public class BeanDescriptor_registerTest {
     config.setDefaultServer(false);
     config.getClasses().add(EBasic.class);
 
-    SpiEbeanServer ebeanServer = (SpiEbeanServer) EbeanServerFactory.create(config);
+    SpiEbeanServer ebeanServer = (SpiEbeanServer)DatabaseFactory.create(config);
     BeanDescriptor<EBasic> desc = ebeanServer.getBeanDescriptor(EBasic.class);
 
     persistListenerRegistrationTests(desc);
