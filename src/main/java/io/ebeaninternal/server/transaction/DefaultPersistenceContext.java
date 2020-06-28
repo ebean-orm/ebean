@@ -189,27 +189,34 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
     private int initialSize;
 
+    private ClassContext parent;
+
     private ClassContext() {
     }
 
     /**
      * Create as a shallow copy.
      */
-    private ClassContext(ClassContext parent, boolean initial) {
-      if (initial || parent.isInitialSize()) {
-        this.map.putAll(parent.map);
-        this.initialSize = map.size();
-        if (parent.deleteSet != null) {
-          this.deleteSet = new HashSet<>(parent.deleteSet);
+    private ClassContext(ClassContext source, boolean initial) {
+      if (initial || source.isTransfer()) {
+        parent = source.transferParent();
+        initialSize = parent.size();
+        if (source.deleteSet != null) {
+          deleteSet = new HashSet<>(source.deleteSet);
         }
       }
     }
 
     /**
-     * True if the map has not changed from it's initial size (no additions).
+     * True if this should be transferred to a new iterator persistence context.
      */
-    private boolean isInitialSize() {
-      return map.size() == initialSize;
+    private boolean isTransfer() {
+      // map not added to and has some original/parent beans
+      return map.isEmpty() && initialSize > 0;
+    }
+
+    private ClassContext transferParent() {
+      return (parent != null) ? parent : this;
     }
 
     /**
@@ -220,10 +227,10 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
 
     /**
-     * Return true if grown above the reset limit size.
+     * Return true if grown above the reset limit size of 1000.
      */
     private boolean resetLimit() {
-      return map.size() > initialSize + 1000;
+      return map.size() > 1000;
     }
 
     @Override
@@ -232,7 +239,8 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
 
     private Object get(Object id) {
-      return map.get(id);
+      Object bean = (parent == null) ? null : parent.get(id);
+      return bean != null ? bean : map.get(id);
     }
 
     private WithOption getWithOption(Object id) {
@@ -259,7 +267,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
 
     private int size() {
-      return map.size();
+      return map.size() + initialSize;
     }
 
     private void clear() {

@@ -15,14 +15,13 @@ import static org.junit.Assert.assertTrue;
 
 public class DefaultPersistenceContextTest {
 
-  Customer customer42;
+  private final Customer customer42;
 
-  Car car1;
+  private final Car car1;
 
   public DefaultPersistenceContextTest() {
     customer42 = new Customer();
     customer42.setId(42);
-
     car1 = new Car();
     car1.setId(1);
   }
@@ -167,10 +166,18 @@ public class DefaultPersistenceContextTest {
   @Test
   public void forIterate() {
     final DefaultPersistenceContext pc = pcWith42();
+    final Object origCustomer42 = pc.get(Customer.class, 42);
+
     // act
     final PersistenceContext pcIterate = pc.forIterate();
     assertThat(pc).isNotSameAs(pcIterate);
     assertThat(pcIterate.size(Customer.class)).isEqualTo(1);
+
+    // assert same instance (bean effectively transferred to iterator persistence context
+    final Object customer42 = pcIterate.get(Customer.class, 42);
+    assertThat(customer42).isSameAs(origCustomer42);
+    final PersistenceContext.WithOption option = pcIterate.getWithOption(Customer.class, 42);
+    assertThat(option.getBean()).isSameAs(origCustomer42);
   }
 
   @Test
@@ -217,7 +224,7 @@ public class DefaultPersistenceContextTest {
     // ACT - obtain new PC forIterateReset
     PersistenceContext pcReset = pcIterate.forIterateReset();
 
-    // keeps original customer beans as new added beans there
+    // keeps original customer beans as no new added beans there
     assertThat(pcReset.size(Customer.class)).isEqualTo(100); // customers didn't change
     // added beans to contacts and products so those where reset
     assertThat(pcReset.size(Contact.class)).isEqualTo(0);
