@@ -1,5 +1,7 @@
 package io.ebean.config.dbplatform;
 
+import io.ebean.DB;
+import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.MatchingNamingConvention;
 import io.ebean.config.PlatformConfig;
@@ -9,9 +11,45 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class DatabasePlatformTest {
+
+  @Test
+  @ForPlatform(Platform.H2)
+  public void h2_platform() {
+    final Platform platform = DB.getDefault().getPlatform();
+    assertThat(platform).isSameAs(Platform.H2);
+  }
+
+  @Test
+  @ForPlatform(Platform.POSTGRES)
+  public void postgres_platform() {
+    final Platform platform = DB.getDefault().getPlatform().base();
+    assertThat(platform).isSameAs(Platform.POSTGRES);
+  }
+
+  @Test
+  @ForPlatform(Platform.MYSQL)
+  public void mysql_platform() {
+    final Platform platform = DB.getDefault().getPlatform().base();
+    assertThat(platform).isSameAs(Platform.MYSQL);
+  }
+
+  @Test
+  @ForPlatform(Platform.MARIADB)
+  public void mariadb_platform() {
+    final Platform platform = DB.getDefault().getPlatform().base();
+    assertThat(platform).isSameAs(Platform.MARIADB);
+  }
+
+  @Test
+  @ForPlatform(Platform.SQLSERVER)
+  public void sqlserver_platform() {
+    final Platform platform = DB.getDefault().getPlatform().base();
+    assertThat(platform).isSameAs(Platform.SQLSERVER);
+  }
 
   @Test
   public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() {

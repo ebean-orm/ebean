@@ -33,6 +33,7 @@ import io.ebean.Update;
 import io.ebean.UpdateQuery;
 import io.ebean.ValuePair;
 import io.ebean.Version;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
@@ -381,6 +382,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public MetaInfoManager getMetaInfoManager() {
     return metaInfoManager;
+  }
+
+  @Override
+  public Platform getPlatform() {
+    return databasePlatform.getPlatform();
   }
 
   @Override

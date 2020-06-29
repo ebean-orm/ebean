@@ -37,7 +37,7 @@ public class ConditionalTestRunner extends BlockJUnit4ClassRunner {
 
   }
   private boolean platformMath(Platform[] platforms) {
-    Platform basePlatform = DB.getDefault().getPluginApi().getDatabasePlatform().getPlatform().base();
+    Platform basePlatform = DB.getDefault().getPlatform().base();
     for (Platform platform : platforms) {
       if (platform.equals(basePlatform)) {
         return true;

@@ -1,5 +1,6 @@
 package io.ebean;
 
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.DatabaseConfig;
@@ -131,6 +132,25 @@ public interface Database {
    * such as query execution statistics.
    */
   MetaInfoManager getMetaInfoManager();
+
+  /**
+   * Return the platform used for this database instance.
+   * <p>
+   * Note many platforms have multiple specific platform types so often we want to
+   * get the base platform via {@link Platform#base()}.
+   * </p>
+   * <pre>{@code
+   *
+   *  Platform platform = database.getPlatform().base();
+   *  if (platform == Platform.MYSQL) {
+   *    // do MySql specific function
+   *  }
+   *
+   * }</pre>
+   *
+   * @return platform for this database instance
+   */
+  Platform getPlatform();
 
   /**
    * Return the extended API intended for use by plugins.
