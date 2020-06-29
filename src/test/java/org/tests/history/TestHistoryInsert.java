@@ -23,6 +23,10 @@ public class TestHistoryInsert extends BaseTestCase {
 
   private final Logger logger = LoggerFactory.getLogger(TestHistoryInsert.class);
 
+  /**
+   * Looks like we MUST use useLegacyDatetimeCode=false ... in order for
+   * the correct server timezone to be honored by the MariaDB JDBC driver.
+   */
   @Test
   @ForPlatform({Platform.MARIADB})
   public void mariadb_simple_history() {
@@ -49,7 +53,7 @@ public class TestHistoryInsert extends BaseTestCase {
     Timestamp t3 = new Timestamp(System.currentTimeMillis());
 
     List<Version<User>> versions = DB.find(User.class).setId(user.getId()).findVersionsBetween(t0, t3);
-    //assertThat(versions).hasSize(3);
+    assertThat(versions).hasSize(3);
 
     final User user0 = DB.find(User.class).setId(user.getId()).asOf(t0).findOne();
     final User user1 = DB.find(User.class).setId(user.getId()).asOf(t1).findOne();
@@ -57,12 +61,12 @@ public class TestHistoryInsert extends BaseTestCase {
     final User user3 = DB.find(User.class).setId(user.getId()).asOf(t3).findOne();
 
     // This is broken? Timezone issue with as of queries?
-//    assertThat(user1.getName()).isEqualTo("Jim");
-//    assertThat(user1.getEmail()).isEqualTo("one@email.com");
-//    assertThat(user2.getName()).isEqualTo("NotJim");
-//    assertThat(user2.getEmail()).isEqualTo("one@email.com");
-//    assertThat(user3.getName()).isEqualTo("NotJimV2");
-//    assertThat(user3.getEmail()).isEqualTo("two@email.com");
+    assertThat(user1.getName()).isEqualTo("Jim");
+    assertThat(user1.getEmail()).isEqualTo("one@email.com");
+    assertThat(user2.getName()).isEqualTo("NotJim");
+    assertThat(user2.getEmail()).isEqualTo("one@email.com");
+    assertThat(user3.getName()).isEqualTo("NotJimV2");
+    assertThat(user3.getEmail()).isEqualTo("two@email.com");
     assertThat(user0).isNull();
   }
 
