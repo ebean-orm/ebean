@@ -72,7 +72,7 @@ public class TestHistoryInsert extends BaseTestCase {
 
   private void littleSleep() {
     try {
-      Thread.sleep(1100);
+      Thread.sleep(100);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
