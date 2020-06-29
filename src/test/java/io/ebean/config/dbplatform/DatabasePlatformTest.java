@@ -1,5 +1,6 @@
 package io.ebean.config.dbplatform;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -14,7 +15,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-public class DatabasePlatformTest {
+public class DatabasePlatformTest extends BaseTestCase {
 
   @Test
   @ForPlatform(Platform.H2)

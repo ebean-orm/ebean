@@ -30,10 +30,10 @@ import io.ebean.Update;
 import io.ebean.UpdateQuery;
 import io.ebean.ValuePair;
 import io.ebean.Version;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
-import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -135,6 +135,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public DataTimeZone getDataTimeZone() {
     return null;
+  }
+
+  @Override
+  public Platform getPlatform() {
+    return Platform.GENERIC;
   }
 
   @Override
