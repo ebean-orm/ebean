@@ -42,7 +42,7 @@ alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status2;
-alter table migtest_e_basic alter column status2 type varchar(127);
+alter table migtest_e_basic alter column status2 type varchar(127) using status2::varchar(127);
 alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 
@@ -71,7 +71,7 @@ alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_stat
 
 alter table migtest_e_history alter column test_string TYPE bigint USING (test_string::integer);
 comment on column migtest_e_history.test_string is 'Column altered to long now';
-alter table migtest_e_history alter column test_string type bigint;
+alter table migtest_e_history alter column test_string type bigint using test_string::bigint;
 comment on table migtest_e_history is 'We have history now';
 
 -- NOTE: table has @History - special migration may be necessary
@@ -85,8 +85,8 @@ alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
 alter table migtest_e_history2_history add column new_column varchar(20);
 
-alter table migtest_e_history4 alter column test_number type bigint;
-alter table migtest_e_history4_history alter column test_number type bigint;
+alter table migtest_e_history4 alter column test_number type bigint using test_number::bigint;
+alter table migtest_e_history4_history alter column test_number type bigint using test_number::bigint;
 alter table migtest_e_history5 add column test_boolean boolean default false not null;
 alter table migtest_e_history5_history add column test_boolean boolean default false;
 

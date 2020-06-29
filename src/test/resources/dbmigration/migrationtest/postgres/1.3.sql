@@ -26,7 +26,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status2;
-alter table migtest_e_basic alter column status2 type varchar(1);
+alter table migtest_e_basic alter column status2 type varchar(1) using status2::varchar(1);
 alter table migtest_e_basic alter column status2 set default 'N';
 alter table migtest_e_basic alter column status2 set not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
@@ -57,8 +57,8 @@ alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
 
-alter table migtest_e_history4 alter column test_number type integer;
-alter table migtest_e_history4_history alter column test_number type integer;
+alter table migtest_e_history4 alter column test_number type integer using test_number::integer;
+alter table migtest_e_history4_history alter column test_number type integer using test_number::integer;
 alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 

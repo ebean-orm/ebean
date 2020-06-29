@@ -54,4 +54,9 @@ public class PostgresDdl extends PlatformDdl {
   public String asIdentityColumn(String columnDefn, DdlIdentity identity) {
     return asIdentityStandardOptions(columnDefn, identity);
   }
+
+  @Override
+  public String alterColumnType(String tableName, String columnName, String type) {
+    return super.alterColumnType(tableName, columnName, type) + " using " + columnName + "::" + convert(type);
+  }
 }

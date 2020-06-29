@@ -20,12 +20,12 @@ import static org.junit.Assert.assertTrue;
 
 public class PlatformDdl_AlterColumnTest {
 
-  private PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
-  private PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
-  private PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
-  private PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
-  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
-  private PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
+  private final PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
+  private final PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
+  private final PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
+  private final PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
+  private final PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
+  private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   {
     ServerConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();
@@ -122,7 +122,9 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab alter column acol varchar(20)", sql);
 
     sql = pgDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertEquals("alter table mytab alter column acol type varchar(20)", sql);
+    assertEquals("alter table mytab alter column acol type varchar(20) using acol::varchar(20)", sql);
+    sql = pgDdl.alterColumnType("mytab", "acol", "bigint");
+    assertEquals("alter table mytab alter column acol type bigint using acol::bigint", sql);
 
     sql = oraDdl.alterColumnType("mytab", "acol", "varchar(20)");
     assertEquals("alter table mytab modify acol varchar2(20)", sql);
