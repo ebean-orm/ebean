@@ -55,12 +55,12 @@ public class TestHistoryInsert extends BaseTestCase {
     List<Version<User>> versions = DB.find(User.class).setId(user.getId()).findVersionsBetween(t0, t3);
     assertThat(versions).hasSize(3);
 
+    // use useLegacyDatetimeCode=false with MariaDB JDBC driver
     final User user0 = DB.find(User.class).setId(user.getId()).asOf(t0).findOne();
     final User user1 = DB.find(User.class).setId(user.getId()).asOf(t1).findOne();
     final User user2 = DB.find(User.class).setId(user.getId()).asOf(t2).findOne();
     final User user3 = DB.find(User.class).setId(user.getId()).asOf(t3).findOne();
 
-    // This is broken? Timezone issue with as of queries?
     assertThat(user1.getName()).isEqualTo("Jim");
     assertThat(user1.getEmail()).isEqualTo("one@email.com");
     assertThat(user2.getName()).isEqualTo("NotJim");
