@@ -505,7 +505,7 @@ public class InternalConfiguration {
   private DataTimeZone initDataTimeZone() {
     String tz = serverConfig.getDataTimeZone();
     if (tz == null) {
-      if (isMySqlOrMariaDB(getPlatform())) {
+      if (isMySql(getPlatform())) {
         return new MySqlDataTimeZone();
       }
       return new NoDataTimeZone();
@@ -517,8 +517,8 @@ public class InternalConfiguration {
     }
   }
 
-  private boolean isMySqlOrMariaDB(Platform platform) {
-    return platform.base() == Platform.MYSQL || platform.base() == Platform.MARIADB;
+  private boolean isMySql(Platform platform) {
+    return platform.base() == Platform.MYSQL;
   }
 
   public DataTimeZone getDataTimeZone() {

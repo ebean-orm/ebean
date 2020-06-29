@@ -25,7 +25,7 @@ public class MariaDbHistorySupport extends DbStandardHistorySupport {
      */
     @Override
     public String getSysPeriodLower(String tableAlias, String sysPeriod) {
-        return tableAlias + "." + sysPeriod + "From";
+        return tableAlias + ".row_start";
     }
 
     /**
@@ -33,6 +33,6 @@ public class MariaDbHistorySupport extends DbStandardHistorySupport {
      */
     @Override
     public String getSysPeriodUpper(String tableAlias, String sysPeriod) {
-        return tableAlias + "." + sysPeriod + "To";
+        return tableAlias + ".row_end";
     }
 }
