@@ -188,7 +188,7 @@ public class ServerConfig {
   private JsonConfig.Date jsonDate = JsonConfig.Date.ISO8601;
 
   /**
-   * For writing JSON specify if null values or empty collections should be exluded.
+   * For writing JSON specify if null values or empty collections should be excluded.
    * By default all values are included.
    */
   private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
@@ -528,7 +528,6 @@ public class ServerConfig {
    * Construct a Database Configuration for programmatically creating an Database.
    */
   public ServerConfig() {
-
   }
 
   /**
@@ -593,7 +592,6 @@ public class ServerConfig {
    * Put a service object into configuration such that it can be passed to a plugin.
    * <p>
    * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
-   * </p>
    */
   public void putServiceObject(String key, Object configObject) {
     serviceObject.put(key, configObject);
@@ -705,7 +703,6 @@ public class ServerConfig {
    * Set the JSON include mode used when writing JSON.
    * <p>
    * Set to NON_NULL or NON_EMPTY to suppress nulls or null & empty collections respectively.
-   * </p>
    */
   public void setJsonInclude(JsonConfig.Include jsonInclude) {
     this.jsonInclude = jsonInclude;
@@ -750,7 +747,6 @@ public class ServerConfig {
    * when it is created.
    * <p>
    * By default this is set to true.
-   * </p>
    */
   public boolean isRegister() {
     return register;
@@ -761,7 +757,6 @@ public class ServerConfig {
    * singleton when it is created.
    * <p>
    * By default this is set to true.
-   * </p>
    */
   public void setRegister(boolean register) {
     this.register = register;
@@ -772,7 +767,6 @@ public class ServerConfig {
    * with the Ebean singleton.
    * <p>
    * This is only used when {@link #setRegister(boolean)} is also true.
-   * </p>
    */
   public boolean isDefaultServer() {
     return defaultServer;
@@ -783,7 +777,6 @@ public class ServerConfig {
    * with the DB singleton.
    * <p>
    * This is only used when {@link #setRegister(boolean)} is also true.
-   * </p>
    */
   public void setDefaultServer(boolean defaultServer) {
     this.defaultServer = defaultServer;
@@ -895,7 +888,6 @@ public class ServerConfig {
    * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
    * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
    * or the batch size is meet.
-   * </p>
    */
   public PersistBatch getPersistBatch() {
     return persistBatch;
@@ -907,7 +899,6 @@ public class ServerConfig {
    * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
    * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
    * or the batch size is meet.
-   * </p>
    */
   public void setPersistBatch(PersistBatch persistBatch) {
     this.persistBatch = persistBatch;
@@ -918,10 +909,8 @@ public class ServerConfig {
    * <p>
    * This makes sense when a save() or delete() cascades and executes multiple child statements. The best case
    * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
-   * </p>
    * <p>
    * This only takes effect when the persistBatch mode at the transaction level does not take effect.
-   * </p>
    */
   public PersistBatch getPersistBatchOnCascade() {
     return persistBatchOnCascade;
@@ -932,10 +921,8 @@ public class ServerConfig {
    * <p>
    * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
    * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
-   * </p>
    * <p>
    * This only takes effect when the persistBatch mode at the transaction level does not take effect.
-   * </p>
    */
   public void setPersistBatchOnCascade(PersistBatch persistBatchOnCascade) {
     this.persistBatchOnCascade = persistBatchOnCascade;
@@ -944,17 +931,13 @@ public class ServerConfig {
   /**
    * Deprecated, please migrate to using setPersistBatch().
    * <p>
-   * Set to true if you what to use JDBC batching for persisting and deleting
-   * beans.
-   * </p>
+   * Set to true if you what to use JDBC batching for persisting and deleting beans.
    * <p>
    * With this Ebean will batch up persist requests and use the JDBC batch api.
    * This is a performance optimisation designed to reduce the network chatter.
-   * </p>
    * <p>
    * When true this is equivalent to {@code setPersistBatch(PersistBatch.ALL)} or
    * when false to {@code setPersistBatch(PersistBatch.NONE)}
-   * </p>
    */
   public void setPersistBatching(boolean persistBatching) {
     this.persistBatch = (persistBatching) ? PersistBatch.ALL : PersistBatch.NONE;
@@ -971,7 +954,6 @@ public class ServerConfig {
    * Set the batch size used for JDBC batching. If unset this defaults to 20.
    * <p>
    * You can also set the batch size on the transaction.
-   * </p>
    *
    * @see Transaction#setBatchSize(int)
    */
@@ -1033,14 +1015,11 @@ public class ServerConfig {
    * <p>
    * This is the number of beans or collections loaded when lazy loading is
    * invoked by default.
-   * </p>
    * <p>
    * The default value is for this is 10 (load 10 beans or collections).
-   * </p>
    * <p>
    * You can explicitly control the lazy loading batch size for a given join on
    * a query using +lazy(batchSize) or JoinConfig.
-   * </p>
    */
   public void setLazyLoadBatchSize(int lazyLoadBatchSize) {
     this.lazyLoadBatchSize = lazyLoadBatchSize;
@@ -1052,7 +1031,7 @@ public class ServerConfig {
    * This is a performance optimisation to reduce the number times Ebean
    * requests a sequence to be used as an Id for a bean (aka reduce network
    * chatter).
-   * </p>
+
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
@@ -1091,7 +1070,6 @@ public class ServerConfig {
    * <p>
    * This is used to set user context information to the ChangeSet in the
    * foreground thread prior to the logging occurring in a background thread.
-   * </p>
    */
   public ChangeLogPrepare getChangeLogPrepare() {
     return changeLogPrepare;
@@ -1102,7 +1080,6 @@ public class ServerConfig {
    * <p>
    * This is used to set user context information to the ChangeSet in the
    * foreground thread prior to the logging occurring in a background thread.
-   * </p>
    */
   public void setChangeLogPrepare(ChangeLogPrepare changeLogPrepare) {
     this.changeLogPrepare = changeLogPrepare;
@@ -1199,7 +1176,6 @@ public class ServerConfig {
    * It is expected that an implementation is used that read user context information
    * (user id, user ip address etc) and sets it on the ReadEvent bean before it is sent
    * to the ReadAuditLogger.
-   * </p>
    */
   public void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
     this.readAuditPrepare = readAuditPrepare;
@@ -1270,7 +1246,6 @@ public class ServerConfig {
    * Return the time zone to use when reading/writing Timestamps via JDBC.
    * <p>
    * When set a Calendar object is used in JDBC calls when reading/writing Timestamp objects.
-   * </p>
    */
   public String getDataTimeZone() {
     return System.getProperty("ebean.dataTimeZone", dataTimeZone);
@@ -1533,7 +1508,6 @@ public class ServerConfig {
    * Return the NamingConvention.
    * <p>
    * If none has been set the default UnderscoreNamingConvention is used.
-   * </p>
    */
   public NamingConvention getNamingConvention() {
     return namingConvention;
@@ -1543,7 +1517,6 @@ public class ServerConfig {
    * Set the NamingConvention.
    * <p>
    * If none is set the default UnderscoreNamingConvention is used.
-   * </p>
    */
   public void setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
@@ -1655,11 +1628,9 @@ public class ServerConfig {
    * <p>
    * Note that the DataSource is expected to use AutoCommit true mode avoiding the need
    * for explicit commit (or rollback).
-   * </p>
    * <p>
    * This read only DataSource will be used for implicit query only transactions. It is not
    * used if the transaction is created explicitly or if the query is an update or delete query.
-   * </p>
    */
   public void setReadOnlyDataSource(DataSource readOnlyDataSource) {
     this.readOnlyDataSource = readOnlyDataSource;
@@ -1699,12 +1670,10 @@ public class ServerConfig {
    * Return the configuration for the read only DataSource.
    * <p>
    * This is only used if autoReadOnlyDataSource is true.
-   * </p>
    * <p>
    * The driver, url, username and password default to the configuration for the main DataSource if they are not
    * set on this configuration. This means there is actually no need to set any configuration here and we only
    * set configuration for url, username and password etc if it is different from the main DataSource.
-   * </p>
    */
   public DataSourceConfig getReadOnlyDataSourceConfig() {
     return readOnlyDataSourceConfig;
@@ -1730,7 +1699,6 @@ public class ServerConfig {
    * By default a prefix of "java:comp/env/jdbc/" is used to lookup the
    * DataSource. This prefix is not used if dataSourceJndiName starts with
    * "java:".
-   * </p>
    */
   public void setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
@@ -1740,10 +1708,8 @@ public class ServerConfig {
    * Return a value used to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
-   * </p>
    * <p>
    * The value returned is either a Integer or a String (e.g. "1", or "T").
-   * </p>
    */
   public String getDatabaseBooleanTrue() {
     return platformConfig.getDatabaseBooleanTrue();
@@ -1753,10 +1719,8 @@ public class ServerConfig {
    * Set the value to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
-   * </p>
    * <p>
    * The value set is either a Integer or a String (e.g. "1", or "T").
-   * </p>
    */
   public void setDatabaseBooleanTrue(String databaseTrue) {
     platformConfig.setDatabaseBooleanTrue(databaseTrue);
@@ -1766,10 +1730,8 @@ public class ServerConfig {
    * Return a value used to represent FALSE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
-   * </p>
    * <p>
    * The value returned is either a Integer or a String (e.g. "0", or "F").
-   * </p>
    */
   public String getDatabaseBooleanFalse() {
     return platformConfig.getDatabaseBooleanFalse();
@@ -1779,10 +1741,8 @@ public class ServerConfig {
    * Set the value to represent FALSE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
-   * </p>
    * <p>
    * The value set is either a Integer or a String (e.g. "0", or "F").
-   * </p>
    */
   public void setDatabaseBooleanFalse(String databaseFalse) {
     this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
@@ -1802,13 +1762,11 @@ public class ServerConfig {
    * This is only used for DB's that use sequences and is a performance
    * optimisation. This reduces the number of times Ebean needs to get a
    * sequence value from the Database reducing network chatter.
-   * </p>
    * <p>
    * By default this value is 10 so when we need another Id (and don't have one
    * in our cache) Ebean will fetch 10 id's from the database. Note that when
    * the cache drops to have full (which is 5 by default) Ebean will fetch
    * another batch of Id's in a background thread.
-   * </p>
    */
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
     this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
@@ -1819,7 +1777,6 @@ public class ServerConfig {
    * <p>
    * If null then the platform is determined automatically via the JDBC driver
    * information.
-   * </p>
    */
   public String getDatabasePlatformName() {
     return databasePlatformName;
@@ -1830,16 +1787,13 @@ public class ServerConfig {
    * <p>
    * If none is set then the platform is determined automatically via the JDBC
    * driver information.
-   * </p>
    * <p>
    * This can be used when the Database Platform can not be automatically
    * detected from the JDBC driver (possibly 3rd party JDBC driver). It is also
    * useful when you want to do offline DDL generation for a database platform
    * that you don't have access to.
-   * </p>
    * <p>
    * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
-   * </p>
    */
   public void setDatabasePlatformName(String databasePlatformName) {
     this.databasePlatformName = databasePlatformName;
@@ -1857,7 +1811,6 @@ public class ServerConfig {
    * <p>
    * If none is set then the platform is determined via the databasePlatformName
    * or automatically via the JDBC driver information.
-   * </p>
    */
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
@@ -1888,10 +1841,8 @@ public class ServerConfig {
    * Set the EncryptKeyManager.
    * <p>
    * This is required when you want to use encrypted properties.
-   * </p>
    * <p>
    * You can also set this in ebean.proprerties:
-   * </p>
    * <p>
    * <pre>{@code
    * # set via ebean.properties
@@ -1907,7 +1858,6 @@ public class ServerConfig {
    * <p>
    * This is optionally used to programmatically define which columns are
    * encrypted instead of using the {@link Encrypted} Annotation.
-   * </p>
    */
   public EncryptDeployManager getEncryptDeployManager() {
     return encryptDeployManager;
@@ -1918,7 +1868,6 @@ public class ServerConfig {
    * <p>
    * This is optionally used to programmatically define which columns are
    * encrypted instead of using the {@link Encrypted} Annotation.
-   * </p>
    */
   public void setEncryptDeployManager(EncryptDeployManager encryptDeployManager) {
     this.encryptDeployManager = encryptDeployManager;
@@ -1938,7 +1887,6 @@ public class ServerConfig {
    * <p>
    * Ebean has a default implementation that it will use if you do not set your
    * own Encryptor implementation.
-   * </p>
    */
   public void setEncryptor(Encryptor encryptor) {
     this.encryptor = encryptor;
@@ -1956,7 +1904,6 @@ public class ServerConfig {
    * <p>
    * Typically used to create an Database instance for DDL Migration generation
    * without requiring a real DataSource / Database to connect to.
-   * </p>
    */
   public void setDbOffline(boolean dbOffline) {
     this.dbOffline = dbOffline;
@@ -1967,7 +1914,6 @@ public class ServerConfig {
    * <p>
    * Note that if this is not set then the DbPlatform may already have a
    * DbEncrypt set and that will be used.
-   * </p>
    */
   public DbEncrypt getDbEncrypt() {
     return dbEncrypt;
@@ -1978,7 +1924,6 @@ public class ServerConfig {
    * <p>
    * Note that if this is not set then the DbPlatform may already have a
    * DbEncrypt set (H2, MySql, Postgres and Oracle platforms have a DbEncrypt)
-   * </p>
    */
   public void setDbEncrypt(DbEncrypt dbEncrypt) {
     this.dbEncrypt = dbEncrypt;
@@ -2053,7 +1998,6 @@ public class ServerConfig {
    * Set to true if LocalTime should be persisted with nanos precision.
    * <p>
    * Otherwise it is persisted using java.sql.Time which is seconds precision.
-   * </p>
    */
   public void setLocalTimeWithNanos(boolean localTimeWithNanos) {
     this.localTimeWithNanos = localTimeWithNanos;
@@ -2063,7 +2007,6 @@ public class ServerConfig {
    * Return true if Duration should be persisted with nanos precision (SQL DECIMAL).
    * <p>
    * Otherwise it is persisted with second precision (SQL INTEGER).
-   * </p>
    */
   public boolean isDurationWithNanos() {
     return durationWithNanos;
@@ -2073,7 +2016,6 @@ public class ServerConfig {
    * Set to true if Duration should be persisted with nanos precision (SQL DECIMAL).
    * <p>
    * Otherwise it is persisted with second precision (SQL INTEGER).
-   * </p>
    */
   public void setDurationWithNanos(boolean durationWithNanos) {
     this.durationWithNanos = durationWithNanos;
@@ -2144,7 +2086,6 @@ public class ServerConfig {
    * <p>
    * Typically this is a sql script that inserts test seed data when running tests.
    * Place a sql script in src/test/resources that inserts test seed data.
-   * </p>
    */
   public String getDdlSeedSql() {
     return ddlSeedSql;
@@ -2155,7 +2096,6 @@ public class ServerConfig {
    * <p>
    * Typically this is a sql script that inserts test seed data when running tests.
    * Place a sql script in src/test/resources that inserts test seed data.
-   * </p>
    */
   public void setDdlSeedSql(String ddlSeedSql) {
     this.ddlSeedSql = ddlSeedSql;
@@ -2232,14 +2172,11 @@ public class ServerConfig {
    * <p>
    * The class can be an Entity, Embedded type, ScalarType, BeanPersistListener,
    * BeanFinder or BeanPersistController.
-   * </p>
    * <p>
    * If no classes are specified then the classes are found automatically via
    * searching the class path.
-   * </p>
    * <p>
    * Alternatively the classes can be added via {@link #setClasses(List)}.
-   * </p>
    *
    * @param cls the entity type (or other type) that should be registered by this
    *            database.
@@ -2261,7 +2198,6 @@ public class ServerConfig {
    * Add a package to search for entities via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
-   * </p>
    */
   public void addPackage(String packageName) {
     packages.add(packageName);
@@ -2271,7 +2207,6 @@ public class ServerConfig {
    * Return packages to search for entities via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
-   * </p>
    */
   public List<String> getPackages() {
     return packages;
@@ -2281,7 +2216,6 @@ public class ServerConfig {
    * Set packages to search for entities via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
-   * </p>
    */
   public void setPackages(List<String> packages) {
     this.packages = packages;
@@ -2293,10 +2227,8 @@ public class ServerConfig {
    * <p>
    * If no classes are specified then the classes are found automatically via
    * searching the class path.
-   * </p>
    * <p>
    * Alternatively the classes can contain added via {@link #addClass(Class)}.
-   * </p>
    */
   public void setClasses(List<Class<?>> classes) {
     this.classes = classes;
@@ -2316,7 +2248,6 @@ public class ServerConfig {
    * This defaults to true and means that for "find by id" and "find by natural key"
    * queries that normally hit L2 bean cache automatically will not do so after a write/persist
    * on the transaction.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -2377,7 +2308,6 @@ public class ServerConfig {
    * Set to false if by default updates in JDBC batch should not include all properties.
    * <p>
    * This mode can be explicitly set per transaction.
-   * </p>
    *
    * @see Transaction#setUpdateAllLoadedProperties(boolean)
    */
@@ -2445,7 +2375,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #setQueryAdapters(List)} to set all
    * the BeanQueryAdapter instances.
-   * </p>
    */
   public void add(BeanQueryAdapter beanQueryAdapter) {
     queryAdapters.add(beanQueryAdapter);
@@ -2463,7 +2392,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #add(BeanQueryAdapter)} to add
    * BeanQueryAdapter instances one at a time.
-   * </p>
    */
   public void setQueryAdapters(List<BeanQueryAdapter> queryAdapters) {
     this.queryAdapters = queryAdapters;
@@ -2495,7 +2423,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #setPersistControllers(List)} to set
    * all the BeanPersistController instances.
-   * </p>
    */
   public void add(BeanPersistController beanPersistController) {
     persistControllers.add(beanPersistController);
@@ -2506,7 +2433,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #setPostLoaders(List)} to set
    * all the BeanPostLoad instances.
-   * </p>
    */
   public void add(BeanPostLoad postLoad) {
     postLoaders.add(postLoad);
@@ -2517,7 +2443,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #setPostConstructListeners(List)} to set
    * all the BeanPostConstructListener instances.
-   * </p>
    */
   public void add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
@@ -2577,7 +2502,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #add(BeanPersistController)} to add
    * BeanPersistController instances one at a time.
-   * </p>
    */
   public void setPersistControllers(List<BeanPersistController> persistControllers) {
     this.persistControllers = persistControllers;
@@ -2588,7 +2512,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #setPersistListeners(List)} to set
    * all the BeanPersistListener instances.
-   * </p>
    */
   public void add(BeanPersistListener beanPersistListener) {
     persistListeners.add(beanPersistListener);
@@ -2634,7 +2557,6 @@ public class ServerConfig {
    * <p>
    * Note alternatively you can use {@link #add(BeanPersistListener)} to add
    * BeanPersistListener instances one at a time.
-   * </p>
    */
   public void setPersistListeners(List<BeanPersistListener> persistListeners) {
     this.persistListeners = persistListeners;
@@ -2929,14 +2851,12 @@ public class ServerConfig {
    * @return the classes
    */
   private List<Class<?>> getClasses(PropertiesWrapper properties) {
-
     String classNames = properties.get("classes", null);
     if (classNames == null) {
       return classes;
     }
 
     List<Class<?>> classList = new ArrayList<>();
-
     String[] split = StringHelper.splitNames(classNames);
     for (String cn : split) {
       if (!"class".equalsIgnoreCase(cn)) {
@@ -2952,13 +2872,10 @@ public class ServerConfig {
   }
 
   private List<String> getSearchList(String searchNames, List<String> defaultValue) {
-
     if (searchNames != null) {
       String[] entries = StringHelper.splitNames(searchNames);
-
       List<String> hitList = new ArrayList<>(entries.length);
       Collections.addAll(hitList, entries);
-
       return hitList;
     } else {
       return defaultValue;
@@ -2970,7 +2887,6 @@ public class ServerConfig {
    * platform supports getGeneratedKeys in batch mode.
    */
   public PersistBatch appliedPersistBatchOnCascade() {
-
     if (persistBatchOnCascade == PersistBatch.INHERIT) {
       // use the platform default (ALL except SQL Server which has NONE)
       return databasePlatform.getPersistBatchOnCascade();
@@ -2982,7 +2898,6 @@ public class ServerConfig {
    * Return the Jackson ObjectMapper.
    * <p>
    * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
-   * </p>
    */
   public Object getObjectMapper() {
     return objectMapper;
@@ -2992,7 +2907,6 @@ public class ServerConfig {
    * Set the Jackson ObjectMapper.
    * <p>
    * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
-   * </p>
    */
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
@@ -3011,7 +2925,6 @@ public class ServerConfig {
    * Setting this to true has the effect that eq(propertyName, value), ieq(propertyName, value) and
    * ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
    * which will add "1=1" into the SQL rather than "is null".
-   * </p>
    */
   public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
     this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
@@ -3105,7 +3018,6 @@ public class ServerConfig {
    * In general we don't want to do that as when we use a distributed cache (like Ignite, Hazelcast etc)
    * we are making network calls and we prefer to do this in background and not impact the response time
    * of the executing transaction.
-   * </p>
    */
   public void setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
     this.notifyL2CacheInForeground = notifyL2CacheInForeground;
@@ -3142,7 +3054,6 @@ public class ServerConfig {
    * <p>
    * Typically used in Db Migration generation for many platform targets that might have different
    * configuration for IdType, UUID, quoted identifiers etc.
-   * </p>
    *
    * @param propertiesPath The properties path used for loading and setting properties
    * @param platformPrefix The prefix used for loading and setting properties
@@ -3179,7 +3090,6 @@ public class ServerConfig {
    * Set mapping locations to search for xml mapping via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
-   * </p>
    */
   public void setMappingLocations(List<String> mappingLocations) {
     this.mappingLocations = mappingLocations;
@@ -3265,7 +3175,6 @@ public class ServerConfig {
    * <p>
    * When false we either register entity classes via application code or use classpath
    * scanning to find and register entity classes.
-   * </p>
    */
   public boolean isAutoLoadModuleInfo() {
     return loadModuleInfo && classes.isEmpty();
