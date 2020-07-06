@@ -161,7 +161,7 @@ public class DatabasePlatformFactory {
     if (dbProductName.contains("oracle")) {
       return new OraclePlatform();
     } else if (dbProductName.contains("microsoft")) {
-      throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via ServerConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
+      throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
     } else if (dbProductName.contains("h2")) {
       return new H2Platform();
     } else if (dbProductName.contains("hsql database engine")) {
