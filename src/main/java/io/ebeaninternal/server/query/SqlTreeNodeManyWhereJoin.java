@@ -23,16 +23,21 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   private final STreePropertyAssoc nodeBeanProp;
 
+  private final STreeType target;
+
   /**
    * The many where join which is either INNER or OUTER.
    */
   private final SqlJoinType manyJoinType;
 
-  SqlTreeNodeManyWhereJoin(String prefix, STreePropertyAssoc prop, SqlJoinType manyJoinType) {
+  private final boolean softDelete;
+
+  SqlTreeNodeManyWhereJoin(String prefix, STreePropertyAssoc prop, SqlJoinType manyJoinType, SpiQuery.TemporalMode temporalMode) {
     this.nodeBeanProp = prop;
     this.prefix = prefix;
     this.manyJoinType = manyJoinType;
-
+    this.target = nodeBeanProp.target();
+    this.softDelete = (temporalMode != SpiQuery.TemporalMode.SOFT_DELETED && target.isSoftDelete());
     String[] split = SplitName.split(prefix);
     this.parentPrefix = split[0];
   }
@@ -94,12 +99,16 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
     if (nodeBeanProp instanceof STreePropertyAssocOne) {
       nodeBeanProp.addJoin(joinType, parentAlias, alias, ctx);
-
+      if (softDelete) {
+        ctx.append("and ").append(target.getSoftDeletePredicate(alias)).append(" ");
+      }
     } else {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (!manyProp.hasJoinTable()) {
         manyProp.addJoin(joinType, parentAlias, alias, ctx);
-
+        if (softDelete) {
+          ctx.append("and ").append(target.getSoftDeletePredicate(alias)).append(" ");
+        }
       } else {
         String alias2 = alias + "z_";
 

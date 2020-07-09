@@ -156,7 +156,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     List<EBasicSoftDelete> list = query.findList();
     assertSql(query).contains("t0.deleted = false");
     // Make sure that query includes that the child mustn't've been deleted
-    assertSql(query).contains("t1.deleted = false");
+    assertSql(query).contains("u1.deleted = false");
     assertThat(list).hasSize(0);
 
     // Cleanup created entity
@@ -186,9 +186,41 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     List<EBasicNoSDChild> list = query.findList();
     // Make sure that query includes that the child mustn't've been deleted
-    assertSql(query).contains("t1.deleted = false");
-    assertSql(query).contains("t2.deleted = false");
+    assertSql(query).contains("u1.deleted = false");
+    assertSql(query).contains("u2.deleted = false");
     assertThat(list).hasSize(0);
+
+    // Cleanup created entity
+    query.delete();
+    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(singletonList(bean));
+  }
+
+  @Test
+  public void testNotFindSoftDeletedMultilevel_with_setIncludeSoftDeletes() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("Found with child expression");
+    DB.save(bean);
+    final EBasicSDChild child = new EBasicSDChild(bean, "SoftDelete me", 1L);
+    DB.save(child);
+    DB.delete(child);
+
+    EBasicNoSDChild secondChild = new EBasicNoSDChild(bean, "Never deleted", 2L);
+    DB.save(secondChild);
+
+
+    Query<EBasicNoSDChild> query = DB.find(EBasicNoSDChild.class)
+      .setIncludeSoftDeletes()
+      .where()
+      .eq("id", bean.getId())
+      .eq("owner.children.amount", 1L)
+      .query();
+
+    List<EBasicNoSDChild> list = query.findList();
+    // Make sure that query not not includes the soft delete join predicates
+    assertSql(query).doesNotContain("u1.deleted = false");
+    assertSql(query).doesNotContain("u2.deleted = false");
+    assertThat(list).hasSize(1);
 
     // Cleanup created entity
     query.delete();

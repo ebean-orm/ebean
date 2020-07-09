@@ -299,7 +299,7 @@ public final class SqlTreeBuilder {
     Collection<PropertyJoin> includes = manyWhereJoins.getPropertyJoins();
     for (PropertyJoin joinProp : includes) {
       STreePropertyAssoc beanProperty = (STreePropertyAssoc) desc.findPropertyFromPath(joinProp.getProperty());
-      SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp.getProperty(), beanProperty, joinProp.getSqlJoinType());
+      SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp.getProperty(), beanProperty, joinProp.getSqlJoinType(), temporalMode);
       myJoinList.add(nodeJoin);
     }
     if (manyWhereJoins.isFormulaWithJoin()) {
