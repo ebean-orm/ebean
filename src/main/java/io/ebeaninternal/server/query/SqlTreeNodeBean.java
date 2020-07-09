@@ -107,7 +107,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
   private SqlTreeNodeBean(String prefix, STreePropertyAssoc beanProp, STreeType desc, SqlTreeProperties props,
                           List<SqlTreeNode> myChildren, boolean withId, STreePropertyAssocMany lazyLoadParent,
                           SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
-
     this.lazyLoadParent = lazyLoadParent;
     this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.getIdBinder();
     this.prefix = prefix;
@@ -116,21 +115,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.idBinder = desc.getIdBinder();
     this.temporalMode = temporalMode;
     this.temporalVersions = temporalMode == SpiQuery.TemporalMode.VERSIONS;
-
     this.nodeBeanProp = beanProp;
     this.extraWhere = (beanProp == null) ? null : beanProp.getExtraWhere();
-
     this.aggregation = props.isAggregation();
     boolean aggregationRoot = props.isAggregationRoot();
-
     // the bean has an Id property and we want to use it
     this.readId = !aggregationRoot && withId && desc.hasId();
     this.disableLazyLoad = disableLazyLoad || !readId || desc.isRawSqlBased() || temporalVersions;
-
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[0]);
-
     pathMap = createPathMap(prefix, desc);
   }
 
@@ -163,7 +157,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   private Map<String, String> createPathMap(String prefix, STreeType desc) {
-
     HashMap<String, String> m = new HashMap<>();
     for (STreePropertyAssocMany many : desc.propsMany()) {
       String name = many.getName();
@@ -206,13 +199,11 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   @SuppressWarnings("unchecked")
   public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
-
     // read the sys period lower and upper bounds
     // these are always the first 2 columns in the resultSet
     Timestamp start = ctx.getDataReader().getTimestamp();
     Timestamp end = ctx.getDataReader().getTimestamp();
     T bean = (T) load(ctx, null, null);
-
     return new Version<>(bean, start, end);
   }
 
@@ -326,7 +317,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
     private void readIdNullBean() {
       // bean must be null...
       localBean = null;
-
       // ... but there may exist as reference bean in parent which has to be marked as deleted.
       if (parentBean != null && nodeBeanProp instanceof STreePropertyAssocOne) {
         contextBean = ((STreePropertyAssocOne)nodeBeanProp).getValueAsEntityBean(parentBean);
@@ -355,7 +345,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
         localBean = contextBean;
         lazyLoadMany = true;
       }
-
       // recursively continue reading...
       for (SqlTreeNode aChildren : children) {
         // read each child... and let them set their
@@ -476,7 +465,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   @Override
   public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
-
     Load load = (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
     load.initialise();
     if (load.isLazyLoadManyRoot()) {
@@ -489,7 +477,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
-
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
     if (lazyLoadParent != null) {
@@ -525,19 +512,15 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
-
     if (temporalVersions) {
       // select sys_period lower and upper columns
       ctx.appendHistorySysPeriod();
     }
-
     if (lazyLoadParent != null) {
       lazyLoadParent.addSelectExported(ctx, prefix);
     }
-
     if (readId) {
       if (!subQuery && inheritInfo != null) {
         ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
@@ -551,7 +534,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
       // values back to this localBean
       aChildren.appendSelect(ctx, subQuery);
     }
-
     ctx.popTableAlias();
     ctx.popJoin();
   }
@@ -586,7 +568,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public void appendWhere(DbSqlContext ctx) {
-
     // Only apply inheritance to root node as any join will already have the inheritance join include - see TableJoin
     if (inheritInfo != null && nodeBeanProp == null) {
       if (!inheritInfo.isRoot()) {
@@ -598,9 +579,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
         ctx.append(inheritInfo.getWhere());
       }
     }
-
     appendExtraWhere(ctx);
-
     for (SqlTreeNode aChildren : children) {
       // recursively add to the where clause any
       // fixed predicates (extraWhere etc)
@@ -651,7 +630,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public void addSoftDeletePredicate(SpiQuery<?> query) {
-
     if (desc.isSoftDelete()) {
       query.addSoftDeletePredicate(desc.getSoftDeletePredicate(baseTableAlias));
     }
@@ -688,17 +666,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * table if this is a ManyToMany node.
    */
   SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
-
     SqlJoinType sqlJoinType = appendFromAsJoin(ctx, joinType);
-    if (temporalMode != SpiQuery.TemporalMode.SOFT_DELETED && desc.isSoftDelete()) {
-      // add the soft delete predicate to the join clause
+    if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
       ctx.append("and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix))).append(" ");
     }
     return sqlJoinType;
   }
 
   SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
-
     if (nodeBeanProp instanceof STreePropertyAssocMany) {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (manyProp.hasJoinTable()) {
@@ -714,11 +689,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
         if (!manyProp.isExcludedFromHistory()) {
           intersectionAsOfTableAlias = true;
         }
-
         return nodeBeanProp.addJoin(joinType, alias2, alias, ctx);
       }
     }
-
     return nodeBeanProp.addJoin(joinType, prefix, ctx);
   }
 
@@ -735,14 +708,12 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (queryMode.isLoadContextBean()) {
       return true;
     }
-
     // reload if contextBean is partial object
     return !contextBean._ebean_getIntercept().isFullyLoadedBean();
   }
 
   @Override
   public boolean hasMany() {
-
     for (SqlTreeNode child : children) {
       if (child.hasMany()) {
         return true;
