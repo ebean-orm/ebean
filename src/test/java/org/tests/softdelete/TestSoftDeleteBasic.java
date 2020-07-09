@@ -227,6 +227,26 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
+  public void testFindSoftDeletedList() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelFetch");
+    DB.save(bean);
+
+    EBasicSDChild bean2 = new EBasicSDChild(bean, "softDelFetchus", 1L);
+    DB.save(bean2);
+    DB.delete(bean2);
+
+    EBasicSDChild child = DB
+      .find(EBasicSDChild.class)
+      .setIncludeSoftDeletes()
+      .where()
+      .idEq(bean.getId())
+      .findOne();
+    assertThat(child).isNotNull();
+    assertThat(child.getOwner().getChildren().size()).isEqualTo(1);
+  }
+
+  @Test
   public void testDeleteById_and_findCount() {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
