@@ -9,11 +9,13 @@ import io.ebean.SqlRow;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.tests.model.softdelete.EBasicNoSDChild;
 import org.tests.model.softdelete.EBasicSDChild;
 import org.tests.model.softdelete.EBasicSoftDelete;
 
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -134,6 +136,64 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     // Cleanup created entity
     query.delete();
+  }
+
+  @Test
+  public void testNotFindSoftDeleted() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("Shouldn't be found with child expression when child is deleted");
+    DB.save(bean);
+    final EBasicSDChild child = new EBasicSDChild(bean, "Delete me, don't find me", 1L);
+    DB.save(child);
+    DB.delete(child);
+
+    Query<EBasicSoftDelete> query = DB.find(EBasicSoftDelete.class)
+                                         .where()
+                                         .eq("id", bean.getId())
+                                         .eq("children.amount", 1L)
+                                         .query();
+
+    List<EBasicSoftDelete> list = query.findList();
+    assertSql(query).contains("t0.deleted = false");
+    // Make sure that query includes that the child mustn't've been deleted
+    assertSql(query).contains("t1.deleted = false");
+    assertThat(list).hasSize(0);
+
+    // Cleanup created entity
+    query.delete();
+    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(singletonList(bean));
+  }
+
+  @Test
+  public void testNotFindSoftDeletedMultilevel() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("Shouldn't be found with child expression when child is deleted");
+    DB.save(bean);
+    final EBasicSDChild child = new EBasicSDChild(bean, "Delete me, don't find me", 1L);
+    DB.save(child);
+    DB.delete(child);
+
+    EBasicNoSDChild secondChild = new EBasicNoSDChild(bean, "Never deleted", 2L);
+    DB.save(secondChild);
+
+
+    Query<EBasicNoSDChild> query = DB.find(EBasicNoSDChild.class)
+                                      .where()
+                                      .eq("id", bean.getId())
+                                      .eq("owner.children.amount", 1L)
+                                      .query();
+
+    List<EBasicNoSDChild> list = query.findList();
+    // Make sure that query includes that the child mustn't've been deleted
+    assertSql(query).contains("t1.deleted = false");
+    assertSql(query).contains("t2.deleted = false");
+    assertThat(list).hasSize(0);
+
+    // Cleanup created entity
+    query.delete();
+    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(singletonList(bean));
   }
 
   @Test
