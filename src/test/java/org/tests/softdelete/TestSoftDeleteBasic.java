@@ -2,7 +2,6 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 public class TestSoftDeleteBasic extends BaseTestCase {
 
@@ -32,14 +30,14 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.addNoSoftDeleteChild("nsd1", 101);
     bean.addNoSoftDeleteChild("nsd2", 102);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    assertEquals(new Long(1), bean.getVersion());
-    assertEquals(new Long(1), bean.getChildren().get(0).getVersion());
+    assertThat(bean.getVersion()).isEqualTo(1);
+    assertThat(bean.getChildren().get(0).getVersion()).isEqualTo(1);
 
     LoggedSqlCollector.start();
 
-    Ebean.delete(bean);
+    DB.delete(bean);
 
 //    List<String> loggedSql = LoggedSqlCollector.stop();
 //
@@ -68,15 +66,15 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.addChild("child2", 20);
     bean.addChild("child3", 30);
 
-    Ebean.save(bean);
-    Ebean.delete(bean.getChildren().get(0));
+    DB.save(bean);
+    DB.delete(bean.getChildren().get(0));
 
     LoggedSqlCollector.start();
 
-    List<Object> ids = Ebean.find(EBasicSDChild.class).where().eq("owner", bean).findIds();
+    List<Object> ids = DB.find(EBasicSDChild.class).where().eq("owner", bean).findIds();
     assertThat(ids).hasSize(2);
 
-    List<EBasicSDChild> beans = Ebean.find(EBasicSDChild.class).where().eq("owner", bean).findList();
+    List<EBasicSDChild> beans = DB.find(EBasicSDChild.class).where().eq("owner", bean).findList();
     assertThat(beans).hasSize(2);
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -91,22 +89,22 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("one");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    Ebean.delete(bean);
+    DB.delete(bean);
 
     SqlQuery sqlQuery = DB.sqlQuery("select * from ebasic_soft_delete where id=?");
     sqlQuery.setParameter(bean.getId());
     SqlRow sqlRow = sqlQuery.findOne();
     assertThat(sqlRow).isNotNull();
 
-    EBasicSoftDelete findNormal = Ebean.find(EBasicSoftDelete.class)
+    EBasicSoftDelete findNormal = DB.find(EBasicSoftDelete.class)
       .setId(bean.getId())
       .findOne();
 
     assertThat(findNormal).isNull();
 
-    EBasicSoftDelete findInclude = Ebean.find(EBasicSoftDelete.class)
+    EBasicSoftDelete findInclude = DB.find(EBasicSoftDelete.class)
       .setId(bean.getId())
       .setIncludeSoftDeletes()
       .findOne();
@@ -119,11 +117,11 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("softDelFetch");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    Ebean.delete(bean);
+    DB.delete(bean);
 
-    Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+    Query<EBasicSoftDelete> query = DB.find(EBasicSoftDelete.class)
       .setIncludeSoftDeletes()
       .where()
       .eq("deleted", true)
@@ -233,17 +231,17 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("two");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    int rowCountBefore = Ebean.find(EBasicSoftDelete.class).findCount();
+    int rowCountBefore = DB.find(EBasicSoftDelete.class).findCount();
 
-    Ebean.delete(EBasicSoftDelete.class, bean.getId());
+    DB.delete(EBasicSoftDelete.class, bean.getId());
 
 
     // -- test .findCount()
 
     LoggedSqlCollector.start();
-    int rowCountAfter = Ebean.find(EBasicSoftDelete.class).findCount();
+    int rowCountAfter = DB.find(EBasicSoftDelete.class).findCount();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -254,7 +252,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     // -- test includeSoftDeletes().findCount()
 
     LoggedSqlCollector.start();
-    int rowCountFull = Ebean.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findCount();
+    int rowCountFull = DB.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findCount();
     assertThat(rowCountFull).isGreaterThan(rowCountAfter);
 
     loggedSql = LoggedSqlCollector.stop();
@@ -267,16 +265,16 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("partial");
-    Ebean.save(bean);
+    DB.save(bean);
 
     // partially loaded bean without deleted state loaded
-    EBasicSoftDelete partial = Ebean.find(EBasicSoftDelete.class)
+    EBasicSoftDelete partial = DB.find(EBasicSoftDelete.class)
       .select("id")
       .setId(bean.getId())
       .findOne();
 
     LoggedSqlCollector.start();
-    Ebean.delete(partial);
+    DB.delete(partial);
 
     // check lazy loading isn't invoked (deleted set to true without invoking lazy loading)
     List<String> loggedSql = LoggedSqlCollector.stop();
@@ -296,11 +294,11 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.addNoSoftDeleteChild("nsd1", 101);
     bean.addNoSoftDeleteChild("nsd2", 102);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     LoggedSqlCollector.start();
 
-    Ebean.delete(bean);
+    DB.delete(bean);
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
@@ -328,14 +326,14 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.addNoSoftDeleteChild("nsd1", 101);
     bean.addNoSoftDeleteChild("nsd2", 102);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    Ebean.delete(bean.getChildren().get(1));
+    DB.delete(bean.getChildren().get(1));
 
     LoggedSqlCollector.start();
 
     Query<EBasicSoftDelete> query1 =
-      Ebean.find(EBasicSoftDelete.class)
+      DB.find(EBasicSoftDelete.class)
         .fetch("children")
         .where().eq("id", bean.getId())
         .query();
@@ -352,12 +350,12 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
 
     // fetch again using lazy loading
-    EBasicSoftDelete fetchWithLazy = Ebean.find(EBasicSoftDelete.class, bean.getId());
+    EBasicSoftDelete fetchWithLazy = DB.find(EBasicSoftDelete.class, bean.getId());
     assertThat(fetchWithLazy.getChildren()).hasSize(2);
 
     // fetch includeSoftDeletes using lazy loading
     EBasicSoftDelete fetchAllWithLazy =
-      Ebean.find(EBasicSoftDelete.class)
+      DB.find(EBasicSoftDelete.class)
         .setId(bean.getId())
         .where()
         .setIncludeSoftDeletes()
@@ -374,10 +372,10 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.addChild("child1", 10);
     bean.addChild("child2", 20);
 
-    Ebean.save(bean);
-    Ebean.deleteAll(bean.getChildren());
+    DB.save(bean);
+    DB.deleteAll(bean.getChildren());
 
-    Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+    Query<EBasicSoftDelete> query = DB.find(EBasicSoftDelete.class)
       .setId(bean.getId())
       .fetch("children");
 
@@ -399,22 +397,22 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   @Test
   public void testFetchWithIncludeSoftDeletes() {
 
-    try (Transaction tyn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
       EBasicSoftDelete bean = new EBasicSoftDelete();
       bean.setName("fetchWithInclude");
       bean.addChild("child1", 91);
       bean.addChild("child2", 92);
 
-      Ebean.save(bean);
+      DB.save(bean);
 
       EBasicSDChild child0 = bean.getChildren().get(0);
 
       EBasicSDChild upd = new EBasicSDChild();
       upd.setId(child0.getId());
       upd.setDeleted(true);
-      Ebean.update(upd);
+      DB.update(upd);
 
-      Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+      Query<EBasicSoftDelete> query = DB.find(EBasicSoftDelete.class)
         .fetch("children")
         .setIncludeSoftDeletes()
         .where().eq("name", "fetchWithInclude")
