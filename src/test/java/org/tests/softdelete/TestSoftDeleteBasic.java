@@ -2,7 +2,6 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
@@ -17,7 +16,6 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 public class TestSoftDeleteBasic extends BaseTestCase {
 
@@ -152,7 +150,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       .find(EBasicSDChild.class)
       .setIncludeSoftDeletes()
       .where()
-      .idEq(bean.getId())
+      .idEq(bean2.getId())
       .findOne();
     assertThat(child).isNotNull();
     assertThat(child.getOwner().getChildren().size()).isEqualTo(1);

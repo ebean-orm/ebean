@@ -39,6 +39,7 @@ import io.ebean.util.SplitName;
 import io.ebeaninternal.api.BeanCacheResult;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.ConcurrencyMode;
+import io.ebeaninternal.api.LoadBeanContext;
 import io.ebeaninternal.api.LoadContext;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -2276,14 +2277,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * define a Reference for the collection and not invoke a query.
    */
   public boolean lazyLoadMany(EntityBeanIntercept ebi) {
+    return lazyLoadMany(ebi, null);
+  }
+
+  public boolean lazyLoadMany(EntityBeanIntercept ebi, LoadBeanContext parent) {
     int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
     if (lazyLoadProperty == -1) {
       return false;
     }
     if (inheritInfo != null) {
-      return descOf(ebi.getOwner().getClass()).lazyLoadMany(ebi, lazyLoadProperty);
+      return descOf(ebi.getOwner().getClass()).lazyLoadMany(ebi, lazyLoadProperty, parent);
     }
-    return lazyLoadMany(ebi, lazyLoadProperty);
+    return lazyLoadMany(ebi, lazyLoadProperty, parent);
   }
 
   /**
@@ -2296,12 +2301,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Check for lazy loading of many property.
    */
-  private boolean lazyLoadMany(EntityBeanIntercept ebi, int lazyLoadProperty) {
+  private boolean lazyLoadMany(EntityBeanIntercept ebi, int lazyLoadProperty, LoadBeanContext loadBeanContext) {
     BeanProperty lazyLoadBeanProp = propertiesIndex[lazyLoadProperty];
     if (lazyLoadBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) lazyLoadBeanProp;
-      manyProp.createReference(ebi.getOwner());
+      final BeanCollection<?> collection = manyProp.createReference(ebi.getOwner());
       ebi.setLoadedLazy();
+      if (loadBeanContext != null) {
+        loadBeanContext.register(manyProp.getName(), collection);
+      }
       return true;
     }
     return false;
