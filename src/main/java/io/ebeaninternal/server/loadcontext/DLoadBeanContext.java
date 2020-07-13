@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.loadcontext;
 
 import io.ebean.CacheMode;
+import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -32,7 +33,13 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(firstBatchSize);
-    this.cache = (queryProps == null) ? false : queryProps.isCache();
+    this.cache = (queryProps != null) && queryProps.isCache();
+  }
+
+  @Override
+  public void register(String manyProperty, BeanCollection<?> collection) {
+    String path = fullPath + "." + manyProperty;
+    parent.register(path, collection);
   }
 
   /**
@@ -175,7 +182,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
       // A synchronized (this) is effectively held by EntityBeanIntercept.loadBean()
-      if (context.desc.lazyLoadMany(ebi)) {
+      if (context.desc.lazyLoadMany(ebi, context)) {
         // lazy load property was a Many
         return;
       }
