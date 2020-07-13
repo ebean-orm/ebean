@@ -2,6 +2,7 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TestSoftDeleteBasic extends BaseTestCase {
 
@@ -135,6 +137,27 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     // Cleanup created entity
     query.delete();
   }
+
+  @Test
+  public void testFindSoftDeletedList() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelFetch");
+    DB.save(bean);
+
+    EBasicSDChild bean2 = new EBasicSDChild(bean, "softDelFetchus", 1L);
+    DB.save(bean2);
+    DB.delete(bean2);
+
+    EBasicSDChild child = DB
+      .find(EBasicSDChild.class)
+      .setIncludeSoftDeletes()
+      .where()
+      .idEq(bean.getId())
+      .findOne();
+    assertThat(child).isNotNull();
+    assertThat(child.getOwner().getChildren().size()).isEqualTo(1);
+  }
+
 
   @Test
   public void testNotFindSoftDeleted() {
