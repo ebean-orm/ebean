@@ -68,6 +68,8 @@ public class TestDbJson_List extends BaseTestCase {
     assertThat(found.getBeanList()).hasSize(2);
     assertThat(found.getBeanSet()).hasSize(2);
     assertThat(found.getBeanMap()).hasSize(2);
+    assertThat(found.getPlainBean().getName()).isEqualTo("plain");
+    assertThat(found.getPlainBean().getAlong()).isEqualTo(52);
 
     json_parse_format();
     update_when_notDirty();
