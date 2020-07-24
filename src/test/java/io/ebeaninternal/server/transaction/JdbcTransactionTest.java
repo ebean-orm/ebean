@@ -2,12 +2,15 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.TransactionCallbackAdapter;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
