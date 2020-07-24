@@ -351,52 +351,32 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (callbackList != null) {
       // using old style loop to cater for case when new callbacks are added recursively (as otherwise iterator fails fast)
       for (int i = 0; i < callbackList.size(); i++) {
-        consumer.accept(callbackList.get(i));
+        try {
+          consumer.accept(callbackList.get(i));
+        } catch (Exception e) {
+          logger.error("Error executing transaction callback", e);
+        }
       }
     }
   }
 
   private void firePreRollback() {
-    withEachCallback(callback -> {
-      try {
-        callback.preRollback();
-      } catch (Exception e) {
-        logger.error("Error executing preRollback callback", e);
-      }
-    });
+    withEachCallback(TransactionCallback::preRollback);
   }
 
   private void firePostRollback() {
-    withEachCallback(callback -> {
-      try {
-        callback.postRollback();
-      } catch (Exception e) {
-        logger.error("Error executing postRollback callback", e);
-      }
-    });
+    withEachCallback(TransactionCallback::postRollback);
     if (changeLogHolder != null) {
       changeLogHolder.postRollback();
     }
   }
 
   private void firePreCommit() {
-    withEachCallback(callback -> {
-      try {
-        callback.preCommit();
-      } catch (Exception e) {
-        logger.error("Error executing preCommit callback", e);
-      }
-    });
+    withEachCallback(TransactionCallback::preCommit);
   }
 
   private void firePostCommit() {
-    withEachCallback(callback -> {
-      try {
-        callback.postCommit();
-      } catch (Exception e) {
-        logger.error("Error executing postCommit callback", e);
-      }
-    });
+    withEachCallback(TransactionCallback::postCommit);
     if (changeLogHolder != null) {
       changeLogHolder.postCommit();
     }
