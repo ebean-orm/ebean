@@ -69,4 +69,40 @@ public class JdbcTransactionTest {
     }
   }
 
+  @Test
+  public void postNestedCallback() {
+    // test both pre-commit and post-commit to ensure callbacks don't disappear and new ones can be added
+    AtomicInteger preCommitCallCount = new AtomicInteger();
+    AtomicInteger postCommitCallCount = new AtomicInteger();
+
+    try (Transaction transaction = DB.beginTransaction()) {
+      DB.currentTransaction().register(
+        new TransactionCallbackAdapter() {
+          @Override
+          public void postCommit() {
+            postCommitCallCount.incrementAndGet();
+            DB.currentTransaction().register(
+              new TransactionCallbackAdapter() {
+                @Override
+                public void postCommit() {
+                  postCommitCallCount.incrementAndGet();
+                }
+              }
+            );
+          }
+
+          @Override
+          public void preCommit() {
+            preCommitCallCount.incrementAndGet();
+          }
+        }
+      );
+      EBasic basic = new EBasic("b1");
+      DB.save(basic);
+      transaction.commit();     // transaction will fail if recursive post-commit is failing
+
+      assertThat(preCommitCallCount.get()).isEqualTo(1);      // precommit executed once
+      assertThat(postCommitCallCount.get()).isEqualTo(2);     // postcommit executed twice
+    }
+  }
 }

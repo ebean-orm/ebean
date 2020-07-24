@@ -347,55 +347,56 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     callbackList.add(callback);
   }
 
-  private void firePreRollback() {
+  private void withEachCallback(Consumer<TransactionCallback> consumer) {
     if (callbackList != null) {
-      for (TransactionCallback callback : callbackList) {
-        try {
-          callback.preRollback();
-        } catch (Exception e) {
-          logger.error("Error executing preRollback callback", e);
-        }
+      // using old style loop to cater for case when new callbacks are added recursively (as otherwise iterator fails fast)
+      for (int i = 0; i < callbackList.size(); i++) {
+        consumer.accept(callbackList.get(i));
       }
     }
   }
 
-  private void firePostRollback() {
-    if (callbackList != null) {
-      for (TransactionCallback callback : callbackList) {
-        try {
-          callback.postRollback();
-        } catch (Exception e) {
-          logger.error("Error executing postRollback callback", e);
-        }
+  private void firePreRollback() {
+    withEachCallback(callback -> {
+      try {
+        callback.preRollback();
+      } catch (Exception e) {
+        logger.error("Error executing preRollback callback", e);
       }
-    }
+    });
+  }
+
+  private void firePostRollback() {
+    withEachCallback(callback -> {
+      try {
+        callback.postRollback();
+      } catch (Exception e) {
+        logger.error("Error executing postRollback callback", e);
+      }
+    });
     if (changeLogHolder != null) {
       changeLogHolder.postRollback();
     }
   }
 
   private void firePreCommit() {
-    if (callbackList != null) {
-      for (TransactionCallback callback : callbackList) {
-        try {
-          callback.preCommit();
-        } catch (Exception e) {
-          logger.error("Error executing preCommit callback", e);
-        }
+    withEachCallback(callback -> {
+      try {
+        callback.preCommit();
+      } catch (Exception e) {
+        logger.error("Error executing preCommit callback", e);
       }
-    }
+    });
   }
 
   private void firePostCommit() {
-    if (callbackList != null) {
-      for (TransactionCallback callback : callbackList) {
-        try {
-          callback.postCommit();
-        } catch (Exception e) {
-          logger.error("Error executing postCommit callback", e);
-        }
+    withEachCallback(callback -> {
+      try {
+        callback.postCommit();
+      } catch (Exception e) {
+        logger.error("Error executing postCommit callback", e);
       }
-    }
+    });
     if (changeLogHolder != null) {
       changeLogHolder.postCommit();
     }
