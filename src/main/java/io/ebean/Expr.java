@@ -53,7 +53,7 @@ public class Expr {
   }
 
   /**
-   * In Range - property >= value1 and property < value2.
+   * In Range - {@code property >= value1 and property < value2}.
    * <p>
    * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
    * </p>

@@ -15,7 +15,7 @@ package io.ebean.config;
  *
  * public class EbeanConfigProvider implements ServerConfigProvider {
  *
- *   @Override
+ *   ＠Override
  *   public void apply(ServerConfig config) {
  *
  *     // register the entity bean classes explicitly

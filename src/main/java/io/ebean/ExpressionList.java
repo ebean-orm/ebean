@@ -859,7 +859,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value);
 
   /**
-   * In Range - property >= value1 and property < value2.
+   * In Range - {@code property >= value1 and property < value2}.
    * <p>
    * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
    * </p>
@@ -1254,12 +1254,10 @@ public interface ExpressionList<T> {
    * The raw expression should contain a single ? or ?1
    * at the location of the parameter.  We use ?1 when binding a
    * collection for an IN expression.
-   * </p>
-   * <p>>
+   * <p>
    * When properties in the clause are fully qualified as table-column names
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
-   * </p>
    * <p>
    * <h4>Examples:</h4>
    * <pre>{@code

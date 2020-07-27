@@ -12,26 +12,27 @@ package io.ebean;
  * The following is an example of named updates on an entity bean.
  * </p>
  * <pre>{@code
- *  ...
- * @NamedUpdates(value = {
- *   @NamedUpdate(
- *      name = "setTitle",
- *      notifyCache = false,
- *      update = "update topic set title = :title, postCount = :count where id = :id"),
- *  @NamedUpdate(
- *      name = "setPostCount",
- *      notifyCache = false,
- *      update = "update f_topic set post_count = :postCount where id = :id"),
- *  @NamedUpdate(
- *      name = "incrementPostCount",
- *      notifyCache = false,
- *      update = "update Topic set postCount = postCount + 1 where id = :id")
- *      //update = "update f_topic set post_count = post_count + 1 where id = :id")
- *  })
- * @Entity
- * @Table(name = "f_topic")
- * public class Topic {
- *  ...
+ *    ...
+ *   ＠NamedUpdates(value = {
+ *     ＠NamedUpdate(
+ *       name = "setTitle",
+ *       notifyCache = false,
+ *       update = "update topic set title = :title, postCount = :count where id = :id"),
+ *    ＠NamedUpdate(
+ *       name = "setPostCount",
+ *       notifyCache = false,
+ *       update = "update f_topic set post_count = :postCount where id = :id"),
+ *    ＠NamedUpdate(
+ *       name = "incrementPostCount",
+ *       notifyCache = false,
+ *       update = "update Topic set postCount = postCount + 1 where id = :id")
+ *       //update = "update f_topic set post_count = post_count + 1 where id = :id")
+ *   })
+ *   ＠Entity
+ *   ＠Table(name = "f_topic")
+ *   public class Topic {
+ *     ...
+ *   }
  * }</pre>
  *
  * <p>

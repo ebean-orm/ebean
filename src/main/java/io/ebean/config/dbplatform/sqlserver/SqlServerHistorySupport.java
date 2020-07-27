@@ -5,7 +5,7 @@ import io.ebean.config.dbplatform.DbStandardHistorySupport;
 /**
  * History support only valid on SqlServer 2016 or later.
  *
- * @author Vilmos Nagy  <vilmos.nagy@outlook.com>
+ * @author Vilmos Nagy
  */
 public class SqlServerHistorySupport extends DbStandardHistorySupport {
 

@@ -149,7 +149,7 @@ public interface DocumentStore {
    *    .setUseDocStore(true)
    *    .where()... // perhaps add predicates
    *    .findEachWhile(new Predicate<Order>() {
-   *      @Override
+   *      ＠Override
    *      public void accept(Order bean) {
    *        // process the bean
    *

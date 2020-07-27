@@ -94,8 +94,8 @@ public interface PagedList<T> {
    * Return the Future row count. You might get this if you wish to cancel the total row count query
    * or specify a timeout for the row count query.
    * <p>
-   * The loadRowCount() & getTotalRowCount() methods internally make use of this getFutureRowCount() method.
-   * Generally I expect people to prefer loadRowCount() & getTotalRowCount() over getFutureRowCount().
+   * The loadRowCount() and getTotalRowCount() methods internally make use of this getFutureRowCount() method.
+   * Generally I expect people to prefer loadRowCount() and getTotalRowCount() over getFutureRowCount().
    * </p>
    * <pre>{@code
    *

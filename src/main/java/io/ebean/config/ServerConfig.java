@@ -702,7 +702,7 @@ public class ServerConfig {
   /**
    * Set the JSON include mode used when writing JSON.
    * <p>
-   * Set to NON_NULL or NON_EMPTY to suppress nulls or null & empty collections respectively.
+   * Set to NON_NULL or NON_EMPTY to suppress nulls or null and empty collections respectively.
    */
   public void setJsonInclude(JsonConfig.Include jsonInclude) {
     this.jsonInclude = jsonInclude;

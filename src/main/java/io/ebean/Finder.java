@@ -37,12 +37,13 @@ import java.util.List;
  *   }
  * }
  *
- * @Entity
+ * ＠Entity
  * public class Customer extends BaseModel {
  *
  *   public static final CustomerFinder find = new CustomerFinder();
  *   ...
  *
+ * }
  * }</pre>
  * <p>
  *  When the Finder is registered as a field on Customer it can then be used like:
@@ -79,12 +80,13 @@ public class Finder<I, T> {
    *   // ... add extra customer specific finder methods
    * }
    *
-   * @Entity
+   * ＠Entity
    * public class Customer extends BaseModel {
    *
    *   public static final CustomerFinder find = new CustomerFinder();
    *   ...
    *
+   * }
    * }</pre>
    */
   public Finder(Class<T> type) {

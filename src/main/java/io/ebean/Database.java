@@ -881,7 +881,7 @@ public interface Database {
    * <pre>{@code
    *   public class Order { ...
    *
-   *     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
+   *     ＠OneToMany(cascade=CascadeType.ALL, mappedBy="order")
    * 	   List<OrderDetail> details;
    * 	   ...
    *   }
