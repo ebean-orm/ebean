@@ -6,17 +6,13 @@ package io.ebean;
  * <p>
  * If you don't want to build object graphs you can use {@link SqlQuery} instead
  * which returns {@link SqlRow} objects rather than entity beans.
- * </p>
  * <p>
  * <b>Unparsed RawSql:</b>
- * </p>
  * <p>
  * When RawSql is created via {@link RawSqlBuilder#unparsed(String)} then Ebean can not
  * modify the SQL at all. It can't add any extra expressions into the SQL.
- * </p>
  * <p>
  * <b>Parsed RawSql:</b>
- * </p>
  * <p>
  * When RawSql is created via {@link RawSqlBuilder#parse(String)} then Ebean will parse the
  * SQL and find places in the SQL where it can add extra where expressions, add
@@ -24,16 +20,13 @@ package io.ebean;
  * explicitly tell Ebean where these insertion points are you can place special
  * strings into your SQL ({@code ${where}} or {@code ${andWhere}} and {@code ${having}} or
  * {@code ${andHaving})}.
- * </p>
  * <p>
  * If the SQL already includes a WHERE clause put in {@code ${andWhere}} in the location
  * you want Ebean to add any extra where expressions. If the SQL doesn't have a
  * WHERE clause put {@code ${where}} in instead. Similarly you can put in {@code ${having}} or
  * {@code ${andHaving}} where you want Ebean put add extra having expressions.
- * </p>
  * <p>
  * <b>Aggregates:</b>
- * </p>
  * <p>
  * Often RawSql will be used with Aggregate functions (sum, avg, max etc). The
  * follow example shows an example based on Total Order Amount -
@@ -44,7 +37,6 @@ package io.ebean;
  * on RawSql and not based on a real DB Table or DB View. It has some properties
  * to hold the values for the aggregate functions (sum etc) and a &#064;OneToOne
  * to Order.
- * </p>
  * <p>
  * <h3>Example OrderAggregate</h3>
  * <pre>{@code
@@ -67,15 +59,15 @@ package io.ebean;
  *    ...
  *   }
  * }</pre>
- * <p>
+ *
  * <h3>Example 1:</h3>
- * <p>
+ *
  * <pre>{@code
  *
- *   String sql = " select order_id, o.status, c.id, c.name, sum(d.order_qty*d.unit_price) as totalAmount"
- *     + " from o_order o"
- *     + " join o_customer c on c.id = o.kcustomer_id "
- *     + " join o_order_detail d on d.order_id = o.id " + " group by order_id, o.status ";
+ *   String sql = " select order_id, o.status, c.id, c.name, sum(l.order_qty*l.unit_price) as totalAmount"
+ *     + " from order o"
+ *     + " join customer c on c.id = o.customer_id "
+ *     + " join order_line l on l.order_id = o.id " + " group by order_id, o.status ";
  *
  *   RawSql rawSql = RawSqlBuilder.parse(sql)
  *     // map the sql result columns to bean properties
@@ -95,18 +87,17 @@ package io.ebean;
  *
  *
  * }</pre>
- * <p>
+ *
  * <h3>Example 2:</h3>
  * <p>
  * The following example uses a FetchConfig().query() so that after the initial
  * RawSql query is executed Ebean executes a secondary query to fetch the
  * associated order status, orderDate along with the customer name.
- * </p>
- * <p>
+ *
  * <pre>{@code
  *
- *  String sql = " select order_id, 'ignoreMe', sum(d.order_qty*d.unit_price) as totalAmount "
- *     + " from o_order_detail d"
+ *  String sql = " select order_id, 'ignoreMe', sum(l.order_qty*l.unit_price) as totalAmount "
+ *     + " from order_line l"
  *     + " group by order_id ";
  *
  *   RawSql rawSql = RawSqlBuilder.parse(sql)
@@ -125,25 +116,23 @@ package io.ebean;
  *     .findList();
  *
  * }</pre>
- * <p>
  * <h3>Example 3: tableAliasMapping</h3>
  * <p>
  * Instead of mapping each column you can map each table alias to a path using tableAliasMapping().
- * </p>
  * <pre>{@code
  *
  *   String rs = "select o.id, o.status, c.id, c.name, "+
- *               " d.id, d.order_qty, p.id, p.name " +
- *               "from o_order o join o_customer c on c.id = o.kcustomer_id " +
- *               "join o_order_detail d on d.order_id = o.id  " +
- *               "join o_product p on p.id = d.product_id  " +
+ *               " l.id, l.order_qty, p.id, p.name " +
+ *               "from orders o join o_customer c on c.id = o.customer_id " +
+ *               "join order_line l on l.order_id = o.id  " +
+ *               "join product p on p.id = l.product_id  " +
  *               "where o.id <= :maxOrderId  and p.id = :productId "+
- *               "order by o.id, d.id asc";
+ *               "order by o.id, l.id asc";
  *
  *  RawSql rawSql = RawSqlBuilder.parse(rs)
  *       .tableAliasMapping("c", "customer")
- *       .tableAliasMapping("d", "details")
- *       .tableAliasMapping("p", "details.product")
+ *       .tableAliasMapping("l", "lines")
+ *       .tableAliasMapping("p", "lines.product")
  *       .create();
  *
  *  List<Order> ordersFromRaw = DB.find(Order.class)
@@ -154,9 +143,7 @@ package io.ebean;
  *
  * }</pre>
  * <p>
- * <p>
  * Note that lazy loading also works with object graphs built with RawSql.
- * </p>
  */
 public interface RawSql {
 
