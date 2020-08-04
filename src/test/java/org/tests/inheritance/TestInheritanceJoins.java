@@ -1,8 +1,6 @@
 package org.tests.inheritance;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.*;
 import org.tests.inheritance.model.CalculationResult;
 import org.tests.inheritance.model.Configurations;
 import org.tests.inheritance.model.GroupConfiguration;
@@ -10,6 +8,7 @@ import org.tests.inheritance.model.ProductConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TestInheritanceJoins extends BaseTestCase {
@@ -86,7 +85,7 @@ public class TestInheritanceJoins extends BaseTestCase {
 
 
     final GroupConfiguration gc = new GroupConfiguration("GC1");
-    configurations.add(gc);
+    configurations.addGroupConfiguration(gc);
 
 
     server.save(gc);
@@ -110,6 +109,27 @@ public class TestInheritanceJoins extends BaseTestCase {
     Configurations configurationsQueried = server.find(Configurations.class).fetch("groupConfigurations").where().idEq(configurations.getId()).findOne();
 
     Assert.assertNotNull(configurationsQueried);
+  }
+
+  @Test
+  public void testMultipleAssocManyWithSameInheritanceBase() {
+    Database database = DB.getDefault();
+
+    Configurations configurations = new Configurations();
+    database.save(configurations);
+
+    GroupConfiguration gc = new GroupConfiguration();
+    gc.setConfigurations(configurations);
+    database.save(gc);
+
+    ProductConfiguration pc = new ProductConfiguration();
+    pc.setConfigurations(configurations);
+    database.save(pc);
+
+    Configurations configurationsQueried = database.find(Configurations.class).fetch("groupConfigurations").fetch("productConfigurations").where().idEq(configurations.getId()).findOne();
+
+    Assert.assertEquals(Collections.singletonList(gc), configurationsQueried.getGroupConfigurations());
+    Assert.assertEquals(Collections.singletonList(pc), configurationsQueried.getProductConfigurations());
   }
 
 }
