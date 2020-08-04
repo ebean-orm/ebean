@@ -17,11 +17,12 @@ public class Configurations {
   @OneToMany
   private List<GroupConfiguration> groupConfigurations;
 
+  @OneToMany
+  private List<ProductConfiguration> productConfigurations;
 
   public Integer getId() {
     return id;
   }
-
 
   public void setId(Integer id) {
     this.id = id;
@@ -39,13 +40,25 @@ public class Configurations {
     return groupConfigurations;
   }
 
-
   public void setGroupConfigurations(List<GroupConfiguration> groupConfigurations) {
     this.groupConfigurations = groupConfigurations;
   }
 
-  public void add(GroupConfiguration groupConfiguration) {
+  public void addGroupConfiguration(GroupConfiguration groupConfiguration) {
     groupConfiguration.setConfigurations(this);
     groupConfigurations.add(groupConfiguration);
+  }
+
+  public List<ProductConfiguration> getProductConfigurations() {
+    return productConfigurations;
+  }
+
+  public void setProductConfigurations(List<ProductConfiguration> productConfigurations) {
+    this.productConfigurations = productConfigurations;
+  }
+
+  public void addProductConfiguration(ProductConfiguration productConfiguration) {
+    productConfiguration.setConfigurations(this);
+    productConfigurations.add(productConfiguration);
   }
 }
