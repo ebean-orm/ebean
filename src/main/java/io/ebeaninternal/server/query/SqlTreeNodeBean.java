@@ -667,6 +667,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
     SqlJoinType sqlJoinType = appendFromAsJoin(ctx, joinType);
+    if (inheritInfo != null) {
+       appendJoinDiscriminator(ctx);
+    }
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
       ctx.append("and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix))).append(" ");
     }
@@ -693,6 +696,12 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
     return nodeBeanProp.addJoin(joinType, prefix, ctx);
+  }
+
+  void appendJoinDiscriminator(DbSqlContext ctx) {
+    if (inheritInfo.getWhere() == null) return;
+    String alias = ctx.getTableAlias(prefix);
+    ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere());
   }
 
   /**
