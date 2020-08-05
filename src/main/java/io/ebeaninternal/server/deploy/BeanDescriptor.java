@@ -1962,6 +1962,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         return other._findBeanProperty(split[0]);
       }
       BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) other._findBeanProperty(split[0]);
+      if (assocProp == null) {
+        throw new IllegalStateException("Unknown property path [" + split[0] + "] from[" + path + "]");
+      }
       BeanDescriptor<?> targetDesc = assocProp.getTargetDescriptor();
       path = split[1];
       other = targetDesc;
