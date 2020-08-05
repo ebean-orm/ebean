@@ -1,12 +1,16 @@
 package org.tests.inheritance;
 
-import io.ebean.*;
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.Database;
+import io.ebean.Ebean;
+import io.ebean.EbeanServer;
+import org.junit.Assert;
+import org.junit.Test;
 import org.tests.inheritance.model.CalculationResult;
 import org.tests.inheritance.model.Configurations;
 import org.tests.inheritance.model.GroupConfiguration;
 import org.tests.inheritance.model.ProductConfiguration;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
