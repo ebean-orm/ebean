@@ -214,6 +214,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
+  public BeanPropertyAssocMany<?> asMany() {
+    return this;
+  }
+
+  @Override
   public boolean isManyToManyWithHistory() {
     return manyToMany && !excludedFromHistory && descriptor.isHistorySupport();
   }

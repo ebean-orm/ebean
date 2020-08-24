@@ -283,8 +283,8 @@ public class DLoadContext implements LoadContext {
   }
 
   @Override
-  public void register(String path, BeanCollection<?> bc) {
-    getManyContext(path).register(bc);
+  public void register(String path, BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
+    getManyContext(path, many).register(bc);
   }
 
   DLoadBeanContext getBeanContext(String path) {
@@ -315,11 +315,12 @@ public class DLoadContext implements LoadContext {
     }
   }
 
-  DLoadManyContext getManyContext(String path) {
-    if (path == null) {
-      throw new RuntimeException("path is null?");
-    }
-    return manyMap.computeIfAbsent(path, p -> createManyContext(p, defaultBatchSize, null));
+  DLoadManyContext getManyContext(String path, BeanPropertyAssocMany<?> many) {
+    return manyMap.computeIfAbsent(path, p -> createManyContext(p, many, defaultBatchSize));
+  }
+
+  private DLoadManyContext createManyContext(String path, BeanPropertyAssocMany<?> many, int batchSize) {
+    return new DLoadManyContext(this, many, path, batchSize, null);
   }
 
   private DLoadManyContext createManyContext(String path, int batchSize, OrmQueryProperties queryProps) {
