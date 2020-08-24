@@ -419,7 +419,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
               ref.setDisableLazyLoad(true);
             }
             if (!ref.isRegisteredWithLoadContext()) {
-              ctx.register(many.getName(), ref);
+              ctx.register(many.asMany(), ref);
             }
           }
         }

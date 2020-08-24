@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 /**
@@ -56,6 +57,5 @@ public interface LoadContext {
   /**
    * Register a collection for lazy loading.
    */
-  void register(String path, BeanCollection<?> bc);
-
+  void register(String path, BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 }

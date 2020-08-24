@@ -2,10 +2,16 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 
 public interface STreePropertyAssocMany extends STreePropertyAssoc {
+
+  /**
+   * Return as BeanPropertyAssocMany.
+   */
+  BeanPropertyAssocMany<?> asMany();
 
   /**
    * Append exported columns to the select.
