@@ -636,9 +636,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   @Override
-  public void register(STreePropertyAssocMany many, BeanCollection<?> bc) {
+  public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     String path = getPath(many.getName());
-    request.getGraphContext().register(path, many.asMany(), bc);
+    request.getGraphContext().register(path, many, bc);
   }
 
   /**

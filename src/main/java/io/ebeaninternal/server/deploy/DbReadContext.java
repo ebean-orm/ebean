@@ -68,7 +68,7 @@ public interface DbReadContext {
   /**
    * Register a collection for lazy loading.
    */
-  void register(STreePropertyAssocMany path, BeanCollection<?> bc);
+  void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
   /**
    * Return the property that is associated with the many. There can only be
