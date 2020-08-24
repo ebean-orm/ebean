@@ -11,6 +11,7 @@ import io.ebeaninternal.api.LoadBeanRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.util.ArrayList;
@@ -37,9 +38,9 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
   }
 
   @Override
-  public void register(String manyProperty, BeanCollection<?> collection) {
-    String path = fullPath + "." + manyProperty;
-    parent.register(path, collection);
+  public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> collection) {
+    String path = fullPath + "." + many.getName();
+    parent.register(path, many, collection);
   }
 
   /**

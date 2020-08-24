@@ -2269,7 +2269,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         BeanCollection<?> ref = many.createReferenceIfNull(bean);
         if (ref != null && !ref.isRegisteredWithLoadContext()) {
           String path = SplitName.add(prefix, many.getName());
-          loadContext.register(path, ref);
+          loadContext.register(path, many, ref);
         }
       }
     }
@@ -2311,7 +2311,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       final BeanCollection<?> collection = manyProp.createReference(ebi.getOwner());
       ebi.setLoadedLazy();
       if (loadBeanContext != null) {
-        loadBeanContext.register(manyProp.getName(), collection);
+        loadBeanContext.register(manyProp, collection);
       }
       return true;
     }
