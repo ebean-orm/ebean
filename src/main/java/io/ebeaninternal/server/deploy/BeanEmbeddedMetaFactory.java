@@ -38,7 +38,10 @@ class BeanEmbeddedMetaFactory {
       Column column = propColMap.get(propertyName);
       String dbColumn = dbColumn(columnPrefix, column, sourceProperties[i]);
       boolean dbNullable = dbNullable(column, sourceProperties[i]);
-      BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn, dbNullable);
+      int dbLength = dbLength(column, sourceProperties[i]);
+      int dbScale = dbScale(column, sourceProperties[i]);
+      String colDefn = getDbColumnDefn(column, sourceProperties[i]);
+      BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn, dbNullable, dbLength, dbScale, colDefn);
       if (sourceProperties[i] instanceof BeanPropertyAssocOne) {
         embeddedProperties[i] = new BeanPropertyAssocOne((BeanPropertyAssocOne)sourceProperties[i], overrides);
       } else {
@@ -57,4 +60,17 @@ class BeanEmbeddedMetaFactory {
   private static boolean dbNullable(Column override, BeanProperty source) {
     return (override != null && !override.nullable()) ? override.nullable() : source.isNullable();
   }
+
+  private static int dbLength(Column override, BeanProperty source) {
+    return (override != null && (override.length() != 255)) ? override.length() : source.getDbLength();
+  }
+
+  private static int dbScale(Column override, BeanProperty source) {
+    return (override != null && (override.scale() != 0)) ? override.scale() : source.getDbScale();
+  }
+
+  private static String getDbColumnDefn(Column override, BeanProperty source) {
+    return (override != null && !override.columnDefinition().isEmpty()) ? override.columnDefinition() : source.getDbColumnDefn();
+  }
+
 }

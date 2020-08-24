@@ -7,22 +7,18 @@ import java.util.HashMap;
  * <p>
  * Using this for now instead of String.intern() to avoid any unexpected
  * increase in PermGen space.
- * </p>
  */
 public final class InternString {
 
   private static final HashMap<String, String> map = new HashMap<>();
 
-
   /**
    * Return the shared instance of this string.
    */
   public static String intern(String s) {
-
     if (s == null) {
       return null;
     }
-
     //noinspection SynchronizationOnStaticField
     synchronized (map) {
       String v = map.get(s);
@@ -32,7 +28,6 @@ public final class InternString {
         map.put(s, s);
         return s;
       }
-
     }
   }
 }

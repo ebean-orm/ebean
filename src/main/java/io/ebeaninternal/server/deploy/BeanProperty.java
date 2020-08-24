@@ -313,36 +313,30 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
     this.dbColumnDefault = deploy.getDbColumnDefaultSqlLiteral();
     this.dbMigrationInfos = deploy.getDbMigrationInfos();
-
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
     this.local = deploy.isLocal();
-
     this.version = deploy.isVersionColumn();
     this.embedded = deploy.isEmbedded();
     this.id = deploy.isId();
     this.generatedProperty = deploy.getGeneratedProperty();
     this.getter = deploy.getGetter();
     this.setter = deploy.getSetter();
-
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
     this.dbComment = deploy.getDbComment();
     this.aggregation = deploy.parseAggregation();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
-
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
     this.lob = isLobType(dbType);
     this.propertyType = deploy.getPropertyType();
     this.field = deploy.getField();
     this.docOptions = deploy.getDocPropertyOptions();
-
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
     this.elPrefix = deploy.getElPrefix();
-
     this.softDelete = deploy.isSoftDelete();
     if (softDelete) {
       ScalarTypeBoolean.BooleanBase boolType = (ScalarTypeBoolean.BooleanBase) scalarType;
@@ -352,7 +346,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       this.softDeleteDbSet = null;
       this.softDeleteDbPredicate = null;
     }
-
     this.jsonSerialize = deploy.isJsonSerialize();
     this.jsonDeserialize = deploy.isJsonDeserialize();
   }
@@ -361,7 +354,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     if (descriptor != null) {
       s = StringHelper.replaceString(s, "${ta}.", "${}");
       s = StringHelper.replaceString(s, "${ta}", "${}");
-
       if (dbEncrypted) {
         s = dbEncryptFunction.getDecryptSql(s);
         String namedParam = ":encryptkey_" + descriptor.getBaseTable() + "___" + dbColumn;
@@ -376,21 +368,21 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * <p>
    * Primarily for supporting Embedded beans with overridden dbColumn
    * mappings.
-   * </p>
    */
   public BeanProperty(BeanProperty source, BeanPropertyOverride override) {
-
     this.descriptor = source.descriptor;
     this.propertyIndex = source.propertyIndex;
     this.name = source.getName();
-    this.dbColumn = InternString.intern(override.getDbColumn());
+    this.dbColumn = override.getDbColumn();
     this.nullable = override.isDbNullable();
+    this.dbLength = override.getDbLength();
+    this.dbScale = override.getDbScale();
+    this.dbColumnDefn = InternString.intern(override.getDbColumnDefn());
     // override with sqlFormula not currently supported
     this.sqlFormulaJoin = null;
     this.sqlFormulaSelect = null;
     this.formula = false;
     this.aggregation = null;
-
     this.excludedFromHistory = source.excludedFromHistory;
     this.tenantId = source.tenantId;
     this.draft = source.draft;
@@ -409,7 +401,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.secondaryTable = source.isSecondaryTable();
     this.secondaryTableJoin = source.secondaryTableJoin;
     this.secondaryTableJoinPrefix = source.secondaryTableJoinPrefix;
-
     this.dbComment = source.dbComment;
     this.dbBind = source.getDbBind();
     this.dbEncrypted = source.isDbEncrypted();
@@ -420,16 +411,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.dbUpdatable = source.isDbUpdatable();
     this.unique = source.isUnique();
     this.naturalKey = source.isNaturalKey();
-    this.dbLength = source.getDbLength();
-    this.dbScale = source.getDbScale();
-    this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbColumnDefault = source.dbColumnDefault;
     this.dbMigrationInfos = source.dbMigrationInfos;
-
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
     this.local = owningType.equals(descriptor.getBeanType());
-
     this.version = source.isVersion();
     this.embedded = source.isEmbedded();
     this.id = source.isId();
@@ -443,11 +429,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.field = source.getField();
     this.docOptions = source.docOptions;
     this.unmappedJson = source.unmappedJson;
-
     this.elPrefix = override.replace(source.elPrefix, source.dbColumn);
     this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
-
     this.jsonSerialize = source.jsonSerialize;
     this.jsonDeserialize = source.jsonDeserialize;
   }
@@ -562,9 +546,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (formula && sqlFormulaJoin != null) {
       ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
-
     } else if (secondaryTableJoin != null) {
-
       String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
       secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);
     }
@@ -585,7 +567,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
     if (aggregation != null) {
       ctx.appendFormulaSelect(aggregation);
     } else if (formula) {
@@ -596,15 +577,12 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       if (secondaryTableJoin != null) {
         ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
       }
-
       if (dbEncrypted) {
         ctx.appendRawColumn(getDecryptSqlWithColumnAlias(ctx.peekTableAlias()));
         ctx.addEncryptedProp(this);
-
       } else {
         ctx.appendColumn(dbColumn);
       }
-
       if (secondaryTableJoin != null) {
         ctx.popTableAlias();
       }
@@ -661,7 +639,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-
     try {
       Object value = scalarType.read(ctx.getDataReader());
       if (bean != null) {
@@ -715,7 +692,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Copy/set the property value from the draft bean to the live bean.
    */
   public void publish(EntityBean draftBean, EntityBean liveBean) {
-
     if (!version && !draftOnly) {
       // set property value from draft to live
       Object value = getValueIntercept(draftBean);
@@ -898,7 +874,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public void pathSet(Object bean, Object value) {
-
     if (bean != null) {
       Object logicalVal = convertToLogicalType(value);
       setValueIntercept((EntityBean) bean, logicalVal);
@@ -1073,14 +1048,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the DB scale for numeric columns.
    */
-  private int getDbScale() {
+  public int getDbScale() {
     return dbScale;
   }
 
   /**
    * Return a specific column DDL definition if specified (otherwise null).
    */
-  private String getDbColumnDefn() {
+  public String getDbColumnDefn() {
     return dbColumnDefn;
   }
 
@@ -1278,7 +1253,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       case Types.LONGVARCHAR:
       case Types.LONGVARBINARY:
         return true;
-
       default:
         return false;
     }
@@ -1499,7 +1473,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public void jsonRead(SpiJsonReader ctx, EntityBean bean) throws IOException {
-
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       if (jsonDeserialize) {
@@ -1550,7 +1523,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Add to the document mapping if this property is included for this index.
    */
   public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
-
     if (mapping.includesProperty(prefix, name)) {
       DocPropertyType type = scalarType.getDocType();
       DocPropertyOptions options = docOptions.copy();
@@ -1570,7 +1542,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public void registerColumn(BeanDescriptor<?> desc, String prefix) {
-
     String path = SplitName.add(prefix, name);
     if (formula && dbColumn != null) {
       // trim off table alias placeholder if found
