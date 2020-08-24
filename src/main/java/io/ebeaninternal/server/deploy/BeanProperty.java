@@ -274,7 +274,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public BeanProperty(BeanDescriptor<?> descriptor, DeployBeanProperty deploy) {
-
     this.descriptor = descriptor;
     this.name = InternString.intern(deploy.getName());
     this.propertyIndex = deploy.getPropertyIndex();
@@ -382,9 +381,10 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public BeanProperty(BeanProperty source, BeanPropertyOverride override) {
 
     this.descriptor = source.descriptor;
-    this.name = InternString.intern(source.getName());
     this.propertyIndex = source.propertyIndex;
+    this.name = source.getName();
     this.dbColumn = InternString.intern(override.getDbColumn());
+    this.nullable = override.isDbNullable();
     // override with sqlFormula not currently supported
     this.sqlFormulaJoin = null;
     this.sqlFormulaSelect = null;
@@ -418,7 +418,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.dbRead = source.isDbRead();
     this.dbInsertable = source.isDbInsertable();
     this.dbUpdatable = source.isDbUpdatable();
-    this.nullable = source.isNullable();
     this.unique = source.isUnique();
     this.naturalKey = source.isNaturalKey();
     this.dbLength = source.getDbLength();

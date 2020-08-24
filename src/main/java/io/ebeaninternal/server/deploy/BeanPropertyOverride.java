@@ -12,16 +12,22 @@ import io.ebeaninternal.server.core.InternString;
 class BeanPropertyOverride {
 
   private final String dbColumn;
+  private final boolean dbNullable;
 
-  BeanPropertyOverride(String dbColumn) {
+  BeanPropertyOverride(String dbColumn, boolean dbNullable) {
     this.dbColumn = InternString.intern(dbColumn);
+    this.dbNullable = dbNullable;
   }
 
-  public String getDbColumn() {
+  String getDbColumn() {
     return dbColumn;
   }
 
-  public String replace(String src, String srcDbColumn) {
+  boolean isDbNullable() {
+    return dbNullable;
+  }
+
+  String replace(String src, String srcDbColumn) {
     return StringHelper.replaceString(src, srcDbColumn, dbColumn);
   }
 }

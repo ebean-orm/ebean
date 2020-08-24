@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.config.BeanNotRegisteredException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
+import javax.persistence.Column;
 import java.util.Map;
 
 /**
@@ -15,7 +16,6 @@ class BeanEmbeddedMetaFactory {
    * Create BeanProperties for embedded beans using the deployment specific DB column name and table alias.
    */
   public static BeanEmbeddedMeta create(BeanDescriptorMap owner, DeployBeanPropertyAssocOne<?> prop) {
-
     // we can get a BeanDescriptor for an Embedded bean
     // and know that it is NOT recursive, as Embedded beans are
     // only allow to hold simple scalar types...
@@ -28,23 +28,17 @@ class BeanEmbeddedMetaFactory {
 
     // deployment override information (column names)
     String columnPrefix = prop.getColumnPrefix();
-    Map<String, String> propColMap = prop.getDeployEmbedded().getPropertyColumnMap();
+    Map<String, Column> propColMap = prop.getDeployEmbedded().getPropertyColumnMap();
 
     BeanProperty[] sourceProperties = targetDesc.propertiesNonTransient();
     BeanProperty[] embeddedProperties = new BeanProperty[sourceProperties.length];
 
     for (int i = 0; i < sourceProperties.length; i++) {
       String propertyName = sourceProperties[i].getName();
-      String dbColumn = propColMap.get(propertyName);
-      if (dbColumn == null) {
-        // dbColumn not overridden so take original
-        dbColumn = sourceProperties[i].getDbColumn();
-        if (columnPrefix != null) {
-          dbColumn = columnPrefix + dbColumn;
-        }
-      }
-
-      BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn);
+      Column column = propColMap.get(propertyName);
+      String dbColumn = dbColumn(columnPrefix, column, sourceProperties[i]);
+      boolean dbNullable = dbNullable(column, sourceProperties[i]);
+      BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn, dbNullable);
       if (sourceProperties[i] instanceof BeanPropertyAssocOne) {
         embeddedProperties[i] = new BeanPropertyAssocOne((BeanPropertyAssocOne)sourceProperties[i], overrides);
       } else {
@@ -53,5 +47,14 @@ class BeanEmbeddedMetaFactory {
     }
 
     return new BeanEmbeddedMeta(embeddedProperties);
+  }
+
+  private static String dbColumn(String prefix, Column override, BeanProperty source) {
+    String dbCol = (override != null && !override.name().isEmpty()) ? override.name() : source.getDbColumn();
+    return prefix == null ? dbCol : prefix + dbCol;
+  }
+
+  private static boolean dbNullable(Column override, BeanProperty source) {
+    return (override != null && !override.nullable()) ? override.nullable() : source.isNullable();
   }
 }

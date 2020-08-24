@@ -11,6 +11,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.validation.groups.Default;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -89,9 +90,9 @@ public abstract class AnnotationParser extends AnnotationBase {
 
     Set<AttributeOverride> attrOverrides = annotationAttributeOverrides(prop);
     if (!attrOverrides.isEmpty()) {
-      HashMap<String, String> propMap = new HashMap<>(attrOverrides.size());
+      Map<String, Column> propMap = new HashMap<>(attrOverrides.size());
       for (AttributeOverride attrOverride : attrOverrides) {
-        propMap.put(attrOverride.name(), attrOverride.column().name());
+        propMap.put(attrOverride.name(), attrOverride.column());
       }
       prop.getDeployEmbedded().putAll(propMap);
     }

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import javax.persistence.Column;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,28 +9,26 @@ import java.util.Map;
  * <p>
  * Typically collects the overridden column names mapped
  * to the Embedded bean.
- * </p>
  */
 public class DeployBeanEmbedded {
 
   /**
    * A map of property names to dbColumns.
    */
-  private final Map<String, String> propMap = new HashMap<>();
+  private final Map<String, Column> propMap = new HashMap<>();
 
   /**
    * Set a Map of property names to dbColumns.
    */
-  public void putAll(Map<String, String> propertyColumnMap) {
+  public void putAll(Map<String, Column> propertyColumnMap) {
     propMap.putAll(propertyColumnMap);
   }
 
   /**
    * Return a map of property names to dbColumns.
    */
-  public Map<String, String> getPropertyColumnMap() {
+  public Map<String, Column> getPropertyColumnMap() {
     return propMap;
   }
-
 
 }
