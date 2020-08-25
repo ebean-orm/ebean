@@ -249,6 +249,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final SlowQueryListener slowQueryListener;
 
+  private final boolean disableL2Cache;
+
   /**
    * Create the DefaultServer.
    */
@@ -256,6 +258,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
     this.serverConfig = config.getServerConfig();
+    this.disableL2Cache = serverConfig.isDisableL2Cache();
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
@@ -328,6 +331,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
+  }
+
+  @Override
+  public boolean isDisableL2Cache() {
+    return disableL2Cache;
   }
 
   @Override

@@ -698,8 +698,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   @Override
   @SuppressWarnings("unchecked")
   public Object getFromQueryCache() {
-
-    if (query.getUseQueryCache() == CacheMode.OFF || (transaction != null && transaction.isSkipCache())) {
+    if (query.getUseQueryCache() == CacheMode.OFF
+      || (transaction != null && transaction.isSkipCache())
+      || ebeanServer.isDisableL2Cache()) {
       return null;
     } else {
       cacheKey = query.queryHash();

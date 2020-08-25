@@ -34,6 +34,11 @@ import java.util.function.Predicate;
 public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollectionLoader {
 
   /**
+   * Return true if the L2 cache has been disabled.
+   */
+  boolean isDisableL2Cache();
+
+  /**
    * Return the log manager.
    */
   SpiLogManager log();

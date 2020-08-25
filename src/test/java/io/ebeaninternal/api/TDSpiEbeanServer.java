@@ -97,6 +97,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public boolean isDisableL2Cache() {
+    return false;
+  }
+
+  @Override
   public SpiLogManager log() {
     return null;
   }
