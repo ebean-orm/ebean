@@ -1,5 +1,6 @@
 package org.tests.model.embedded;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -7,6 +8,7 @@ import javax.persistence.Enumerated;
 @Embeddable
 public class EAddress {
 
+  @Column(nullable = false)
   String street;
 
   String suburb;

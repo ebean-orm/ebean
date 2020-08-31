@@ -58,7 +58,7 @@ class BeanEmbeddedMetaFactory {
   }
 
   private static boolean dbNullable(Column override, BeanProperty source) {
-    return (override != null && !override.nullable()) ? override.nullable() : source.isNullable();
+    return (override != null) ? override.nullable() : source.isNullable();
   }
 
   private static int dbLength(Column override, BeanProperty source) {
