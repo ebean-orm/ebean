@@ -4,7 +4,6 @@ import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 
-import java.beans.PropertyDescriptor;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -20,19 +19,12 @@ class DtoMetaProperty implements DtoReadSet {
   private final MethodHandle setter;
   private final ScalarType<?> scalarType;
 
-  DtoMetaProperty(TypeManager typeManager, PropertyDescriptor descriptor, Class<?> dtoType) throws IllegalAccessException, NoSuchMethodException {
-
+  DtoMetaProperty(TypeManager typeManager, Class<?> dtoType, Method writeMethod, String name, Class<?> propertyType) throws IllegalAccessException, NoSuchMethodException {
     this.dtoType = dtoType;
-    this.name = descriptor.getName();
-
-    Method writeMethod = descriptor.getWriteMethod();
+    this.name = name;
     if (writeMethod != null) {
-
-      Class<?> propertyType = descriptor.getPropertyType();
-
       this.setter = LOOKUP.findVirtual(dtoType, writeMethod.getName(), MethodType.methodType(void.class, propertyType));
       this.scalarType = typeManager.getScalarType(propertyType);
-
     } else {
       this.scalarType = null;
       this.setter = null;
@@ -58,11 +50,11 @@ class DtoMetaProperty implements DtoReadSet {
     try {
       setter.invoke(instance, arg);
     } catch (Throwable e) {
-      throw new RuntimeException("Error calling setter for property " + fullname() + " with arg: " + arg, e);
+      throw new RuntimeException("Error calling setter for property " + fullName() + " with arg: " + arg, e);
     }
   }
 
-  private String fullname() {
+  private String fullName() {
     return dtoType.getName() + "." + name;
   }
 
