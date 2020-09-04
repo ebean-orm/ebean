@@ -1,6 +1,5 @@
 package io.ebean.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -15,6 +14,13 @@ public class StringHelper {
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   /**
+   * Return true if the value is null or an empty string.
+   */
+  public static boolean isNull(String value) {
+    return value == null || value.trim().isEmpty();
+  }
+
+  /**
    * Parses out a list of Name Value pairs that are delimited together. Will
    * always return a StringMap. If allNameValuePairs is null, or no name values
    * can be parsed out an empty StringMap is returned.
@@ -23,16 +29,14 @@ public class StringHelper {
    * @param listDelimiter      (typically ';') the delimited between the list
    * @param nameValueSeparator (typically '=') the separator between the name and value
    */
-  public static Map<String, String> delimitedToMap(String allNameValuePairs,
-                                                   String listDelimiter, String nameValueSeparator) {
-
-    HashMap<String, String> params = new HashMap<>();
+  public static Map<String, String> delimitedToMap(String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+    Map<String, String> params = new HashMap<>();
     if ((allNameValuePairs == null) || (allNameValuePairs.isEmpty())) {
       return params;
     }
     // trim off any leading listDelimiter...
     allNameValuePairs = trimFront(allNameValuePairs, listDelimiter);
-    return getKeyValue(params, allNameValuePairs, listDelimiter, nameValueSeparator);
+    return delimitedToMap(params, allNameValuePairs, listDelimiter, nameValueSeparator);
   }
 
   /**
@@ -55,17 +59,9 @@ public class StringHelper {
   }
 
   /**
-   * Return true if the value is null or an empty string.
-   */
-  public static boolean isNull(String value) {
-    return value == null || value.trim().isEmpty();
-  }
-
-  /**
    * Recursively pulls out the key value pairs from a raw string.
    */
-  private static HashMap<String, String> getKeyValue(HashMap<String, String> map,
-                                                     String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+  private static Map<String, String> delimitedToMap(Map<String, String> map, String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
     int pos = 0;
     while (true) {
       if (pos >= allNameValuePairs.length()) {
@@ -94,22 +90,16 @@ public class StringHelper {
         }
         pos = delimPos + 1;
         continue;
-
       }
       String key = allNameValuePairs.substring(pos, equalsPos);
-
-      if (delimPos > -1) {
-        String value = allNameValuePairs.substring(equalsPos + 1, delimPos);
-        // dp("cont "+key+","+value+" pos:"+pos+"
-        // len:"+allNameValuePairs.length());
-        key = key.trim();
-
-        map.put(key, value);
-        pos = delimPos + 1;
-
-        // recurse the rest of the values...
-      } else {
+      if (delimPos <= -1) {
+        // we are done
         return map;
+
+      } else {
+        String value = allNameValuePairs.substring(equalsPos + 1, delimPos);
+        map.put(key.trim(), value);
+        pos = delimPos + 1;
       }
     }
   }
