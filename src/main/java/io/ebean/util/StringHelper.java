@@ -25,18 +25,18 @@ public class StringHelper {
    * always return a StringMap. If allNameValuePairs is null, or no name values
    * can be parsed out an empty StringMap is returned.
    *
-   * @param allNameValuePairs  the entire string to be parsed.
+   * @param source  the entire string to be parsed.
    * @param listDelimiter      (typically ';') the delimited between the list
    * @param nameValueSeparator (typically '=') the separator between the name and value
    */
-  public static Map<String, String> delimitedToMap(String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+  public static Map<String, String> delimitedToMap(String source, String listDelimiter, String nameValueSeparator) {
     Map<String, String> params = new HashMap<>();
-    if ((allNameValuePairs == null) || (allNameValuePairs.isEmpty())) {
+    if (source == null || source.isEmpty()) {
       return params;
     }
     // trim off any leading listDelimiter...
-    allNameValuePairs = trimFront(allNameValuePairs, listDelimiter);
-    return delimitedToMap(params, allNameValuePairs, listDelimiter, nameValueSeparator);
+    source = trimFront(source, listDelimiter);
+    return delimitedToMap(params, source, listDelimiter, nameValueSeparator);
   }
 
   /**
@@ -47,9 +47,6 @@ public class StringHelper {
    */
   private static String trimFront(String source, String trim) {
     while (true) {
-      if (source == null) {
-        return null;
-      }
       if (source.indexOf(trim) == 0) {
         source = source.substring(trim.length());
       } else {
@@ -61,18 +58,16 @@ public class StringHelper {
   /**
    * Recursively pulls out the key value pairs from a raw string.
    */
-  private static Map<String, String> delimitedToMap(Map<String, String> map, String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+  private static Map<String, String> delimitedToMap(Map<String, String> map, String source, String listDelimiter, String nameValueSeparator) {
     int pos = 0;
     while (true) {
-      if (pos >= allNameValuePairs.length()) {
+      if (pos >= source.length()) {
         return map;
       }
-
-      int equalsPos = allNameValuePairs.indexOf(nameValueSeparator, pos);
-      int delimPos = allNameValuePairs.indexOf(listDelimiter, pos);
-
+      int equalsPos = source.indexOf(nameValueSeparator, pos);
+      int delimPos = source.indexOf(listDelimiter, pos);
       if (delimPos == -1) {
-        delimPos = allNameValuePairs.length();
+        delimPos = source.length();
       }
       if (equalsPos == -1) {
         return map;
@@ -83,7 +78,7 @@ public class StringHelper {
       }
       if (equalsPos > delimPos) {
         // there is a key without a value?
-        String key = allNameValuePairs.substring(pos, delimPos);
+        String key = source.substring(pos, delimPos);
         key = key.trim();
         if (!key.isEmpty()) {
           map.put(key, null);
@@ -91,16 +86,10 @@ public class StringHelper {
         pos = delimPos + 1;
         continue;
       }
-      String key = allNameValuePairs.substring(pos, equalsPos);
-      if (delimPos <= -1) {
-        // we are done
-        return map;
-
-      } else {
-        String value = allNameValuePairs.substring(equalsPos + 1, delimPos);
-        map.put(key.trim(), value);
-        pos = delimPos + 1;
-      }
+      String key = source.substring(pos, equalsPos);
+      String value = source.substring(equalsPos + 1, delimPos);
+      map.put(key.trim(), value);
+      pos = delimPos + 1;
     }
   }
 

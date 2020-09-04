@@ -24,7 +24,6 @@ public class StringHelperTest {
   @Test
   public void removeNewLines() {
     String content = "This is\na\rmultiline\r\ntext\n\r";
-    String[] multi = {"\r\n", "\r", "\n"};
     content = StringHelper.removeNewLines(content);
     assertThat(content).isEqualTo("This is a multiline  text  ");
   }
@@ -39,4 +38,54 @@ public class StringHelperTest {
       .containsEntry("name3", "foo");
   }
 
+  @Test
+  public void testDelimitedToMap_expect_trimLeading() {
+    String content = ";name1=foo;name2=bar;";
+    Map<String, String> map = StringHelper.delimitedToMap(content, ";", "=");
+    assertThat(map).hasSize(2)
+      .containsEntry("name1", "foo")
+      .containsEntry("name2", "bar");
+  }
+
+  @Test
+  public void testDelimitedToMap_when_emptyEntry() {
+    String content = ";name1=foo;=;name2=bar;";
+    Map<String, String> map = StringHelper.delimitedToMap(content, ";", "=");
+    assertThat(map).hasSize(2)
+      .containsEntry("name1", "foo")
+      .containsEntry("name2", "bar");
+  }
+
+  @Test
+  public void testDelimitedToMap_when_missingValue() {
+    String content = ";name1=foo;nameX;name2=bar;";
+    Map<String, String> map = StringHelper.delimitedToMap(content, ";", "=");
+    assertThat(map).hasSize(3)
+      .containsEntry("nameX", null)
+      .containsEntry("name1", "foo")
+      .containsEntry("name2", "bar");
+  }
+
+  @Test
+  public void testDelimitedToMap_when_missingValueAtEnd() {
+    String content = ";name1=foo;nameX;name2=bar;nameX2";
+    Map<String, String> map = StringHelper.delimitedToMap(content, ";", "=");
+    assertThat(map).hasSize(3)
+      .containsEntry("nameX", null)
+      .containsEntry("nameX2", null)
+      .containsEntry("name1", "foo")
+      .containsEntry("name2", "bar");
+  }
+
+  @Test
+  public void testDelimitedToMap_when_null() {
+    Map<String, String> map = StringHelper.delimitedToMap(null, ";", "=");
+    assertThat(map).isEmpty();
+  }
+
+  @Test
+  public void testDelimitedToMap_when_empty() {
+    Map<String, String> map = StringHelper.delimitedToMap("", ";", "=");
+    assertThat(map).isEmpty();
+  }
 }
