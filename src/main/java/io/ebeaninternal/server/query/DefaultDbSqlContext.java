@@ -150,26 +150,21 @@ class DefaultDbSqlContext implements DbSqlContext {
       if (i > 0) {
         sb.append(" and ");
       }
-
       if (pair.getForeignSqlFormula() != null) {
         sb.append(StringHelper.replaceString(pair.getForeignSqlFormula(), tableAliasPlaceHolder, a2));
       } else {
         sb.append(a2).append(".").append(pair.getForeignDbColumn());
       }
-
       sb.append(" = ");
-
       if (pair.getLocalSqlFormula() != null) {
         sb.append(StringHelper.replaceString(pair.getLocalSqlFormula(), tableAliasPlaceHolder, a1));
       } else {
         sb.append(a1).append(".").append(pair.getLocalDbColumn());
       }
     }
-
     if (addAsOfOnClause) {
       sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
     }
-
     sb.append(" ");
   }
 
@@ -268,12 +263,9 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public void appendFormulaSelect(String sqlFormulaSelect) {
-
     String tableAlias = tableAliasStack.peek();
-    String converted = StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder, tableAlias);
     sb.append(COMMA);
-    sb.append(converted);
-
+    sb.append(StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder, tableAlias));
     appendColumnAlias();
   }
 
@@ -312,8 +304,7 @@ class DefaultDbSqlContext implements DbSqlContext {
     if (column.contains("${}")) {
       // support DB functions such as lower() etc
       // with the use of secondary columns
-      String x = StringHelper.replaceString(column, "${}", tableAlias);
-      sb.append(x);
+      sb.append(StringHelper.replaceString(column, "${}", tableAlias));
     } else {
       sb.append(tableAlias);
       sb.append(PERIOD);

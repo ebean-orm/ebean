@@ -125,8 +125,7 @@ public class LoadManyRequest extends LoadRequest {
     if (extraWhere != null) {
       // replace special ${ta} placeholder with the base table alias
       // which is always t0 and add the extra where clause
-      String ew = StringHelper.replaceString(extraWhere, "${ta}", "t0");
-      query.where().raw(ew);
+      query.where().raw(StringHelper.replaceString(extraWhere, "${ta}", "t0"));
     }
 
     query.setLazyLoadForParents(many);
