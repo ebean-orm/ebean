@@ -8,15 +8,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Special Map of the logical property joins to table alias.
  */
 class SqlTreeAlias {
-
-  private static final Pattern TABLE_ALIAS_REPLACE = Pattern.compile("${}", Pattern.LITERAL);
 
   private final SpiQuery.TemporalMode temporalMode;
 
@@ -87,15 +83,12 @@ class SqlTreeAlias {
    * Build a set of table alias for the given bean and fetch joined properties.
    */
   void buildAlias() {
-
     for (String joinProp : joinProps) {
       calcAlias(joinProp);
     }
-
     for (String joinProp : manyWhereJoinProps) {
       calcAliasManyWhere(joinProp);
     }
-
     mapEmbeddedPropertyAlias();
   }
 
@@ -111,14 +104,12 @@ class SqlTreeAlias {
   }
 
   private String calcAlias(String prefix) {
-
     String alias = nextTableAlias();
     aliasMap.put(prefix, alias);
     return alias;
   }
 
   private void calcAliasManyWhere(String prefix) {
-
     String alias = nextManyWhereTableAlias();
     manyWhereAliasMap.put(prefix, alias);
   }
@@ -176,12 +167,11 @@ class SqlTreeAlias {
   /**
    * Parse the clause replacing the table alias place holders.
    */
-  private String parseRootAlias(String clause) {
-
+  String parseRootAlias(String clause) {
     if (rootTableAlias == null) {
-      return TABLE_ALIAS_REPLACE.matcher(clause).replaceAll("");
+      return clause.replace("${}", "");
     } else {
-      return TABLE_ALIAS_REPLACE.matcher(clause).replaceAll(Matcher.quoteReplacement(rootTableAlias + "."));
+      return clause.replace("${}", rootTableAlias + ".");
     }
   }
 
@@ -189,12 +179,10 @@ class SqlTreeAlias {
    * Parse the clause replacing the table alias place holders.
    */
   private String parseAliasMap(String clause, HashMap<String, String> parseAliasMap) {
-
     for (Map.Entry<String, String> e : parseAliasMap.entrySet()) {
       String k = "${" + e.getKey() + "}";
       clause = clause.replace(k, e.getValue() + ".");
     }
-
     return clause;
   }
 

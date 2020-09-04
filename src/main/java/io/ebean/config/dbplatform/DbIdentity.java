@@ -1,16 +1,11 @@
 package io.ebean.config.dbplatform;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Defines the identity/sequence behaviour for the database.
  */
 public class DbIdentity {
 
   private static final String TABLE_PLACEHOLDER = "{table}";
-
-  private static final Pattern TABLE_REPLACE = Pattern.compile(TABLE_PLACEHOLDER, Pattern.LITERAL);
 
   /**
    * Set if this DB supports sequences. Note some DB's support both Sequences
@@ -55,10 +50,7 @@ public class DbIdentity {
     if (selectLastInsertedIdTemplate == null) {
       return null;
     }
-    if (!selectLastInsertedIdTemplate.contains(TABLE_PLACEHOLDER)) {
-      return selectLastInsertedIdTemplate;
-    }
-    return TABLE_REPLACE.matcher(selectLastInsertedIdTemplate).replaceAll(Matcher.quoteReplacement(table));
+    return selectLastInsertedIdTemplate.replace(TABLE_PLACEHOLDER, table);
   }
 
   /**

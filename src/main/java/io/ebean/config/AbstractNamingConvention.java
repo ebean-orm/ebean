@@ -3,8 +3,6 @@ package io.ebean.config;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
@@ -15,10 +13,6 @@ import javax.persistence.Table;
  * @author emcgreal
  */
 public abstract class AbstractNamingConvention implements NamingConvention {
-
-  private static final Pattern TABLE_REPLACE = Pattern.compile("{table}", Pattern.LITERAL);
-
-  private static final Pattern COLUMN_REPLACE = Pattern.compile("{column}", Pattern.LITERAL);
 
   /**
    * The Constant DEFAULT_SEQ_FORMAT.
@@ -85,13 +79,9 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   @Override
   public String getSequenceName(String rawTableName, String pkColumn) {
     final String tableNameUnquoted = databasePlatform.unQuote(rawTableName);
-    String s = TABLE_REPLACE.matcher(sequenceFormat).replaceAll(Matcher.quoteReplacement(tableNameUnquoted));
-    if (pkColumn == null) {
-      pkColumn = "";
-    } else {
-      pkColumn = databasePlatform.unQuote(pkColumn);
-    }
-    return COLUMN_REPLACE.matcher(s).replaceAll(Matcher.quoteReplacement(pkColumn));
+    String seqName = sequenceFormat.replace("{table}", tableNameUnquoted);
+    pkColumn = (pkColumn == null) ? "" : databasePlatform.unQuote(pkColumn);
+    return seqName.replace("{column}", pkColumn);
   }
 
   /**

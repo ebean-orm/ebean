@@ -54,9 +54,7 @@ public class MatchingNamingConventionTest {
   @Test
   public void getSequenceName() {
     MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
-
-    final String sequenceName = nc.getSequenceName("[Customer]", null);
-    assertEquals("Customer_seq", sequenceName);
+    assertEquals("Customer_seq", nc.getSequenceName("[Customer]", null));
   }
 
   @Test

@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Set properties for a UpdateQuery.
@@ -18,8 +17,6 @@ public class OrmUpdateProperties {
   private static final NullValue NULL_VALUE = new NullValue();
 
   private static final NoneValue NONE_VALUE = new NoneValue();
-
-  private static final Pattern TABLE_ALIAS_REPLACE = Pattern.compile("${}", Pattern.LITERAL);
 
   /**
    * Bind value used in the set clause for update query.
@@ -172,21 +169,22 @@ public class OrmUpdateProperties {
    * Build the actual set clause converting logical property names to db columns etc.
    */
   public String buildSetClause(DeployParser deployParser) {
-
     int setCount = 0;
     StringBuilder sb = new StringBuilder();
-
     for (Map.Entry<String, Value> entry : values.entrySet()) {
       String property = entry.getKey();
       if (setCount++ > 0) {
         sb.append(", ");
       }
-
       // translate to db columns and remove table alias placeholders
-      sb.append(TABLE_ALIAS_REPLACE.matcher(deployParser.parse(property)).replaceAll(""));
+      sb.append(trim(deployParser.parse(property)));
       sb.append(entry.getValue().bindClause());
     }
     return sb.toString();
+  }
+
+  static String trim(String dbColumn) {
+    return dbColumn.replace("${}", "");
   }
 
 }
