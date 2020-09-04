@@ -23,9 +23,9 @@ public class StringHelperTest {
 
   @Test
   public void replaceString() {
-    assertEquals("sJmethJng", StringHelper.replaceString("somethong", "o","J"));
-    assertEquals("somethong", StringHelper.replaceString("somethong", "o", null));
-    assertNull(StringHelper.replaceString(null, "o","J"));
+    assertEquals("sJmethJng", StringHelper.replace("somethong", "o","J"));
+    assertEquals("somethong", StringHelper.replace("somethong", "o", null));
+    assertNull(StringHelper.replace(null, "o","J"));
   }
 
   @Test

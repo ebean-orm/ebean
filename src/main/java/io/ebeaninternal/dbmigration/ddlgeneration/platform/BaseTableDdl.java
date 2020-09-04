@@ -33,13 +33,13 @@ import io.ebeaninternal.dbmigration.model.MTableIdentity;
 import io.ebeaninternal.server.deploy.IdentityMode;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.ebean.util.StringHelper.replace;
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
 
@@ -182,9 +182,9 @@ public class BaseTableDdl implements TableDdl {
      * Replaces Table name (${table}), Column name (${column}) and default value (${default}) in DDL.
      */
     private String translate(String ddl, String tableName, String columnName, String defaultValue) {
-      String ret = StringHelper.replaceString(ddl, "${table}", tableName);
-      ret = StringHelper.replaceString(ret, "${column}", columnName);
-      return StringHelper.replaceString(ret, "${default}", defaultValue);
+      String ret = replace(ddl, "${table}", tableName);
+      ret = replace(ret, "${column}", columnName);
+      return replace(ret, "${default}", defaultValue);
     }
 
     private void handleStrictError(String tableName, String columnName) {

@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
 
+import static io.ebean.util.StringHelper.replace;
+
 /**
  * Configuration for the DB migration processing.
  */
@@ -375,8 +377,8 @@ public class DbMigrationConfig {
    */
   public String getDdlHeader() {
     if (ddlHeader != null && !ddlHeader.isEmpty()) {
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${version}", EbeanVersion.getVersion());
-      ddlHeader = StringHelper.replaceString(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
+      ddlHeader = replace(ddlHeader, "${version}", EbeanVersion.getVersion());
+      ddlHeader = replace(ddlHeader, "${timestamp}", ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ));
     }
     return ddlHeader;
   }

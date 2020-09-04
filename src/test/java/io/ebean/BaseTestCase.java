@@ -158,10 +158,10 @@ public abstract class BaseTestCase {
    */
   protected String trimSql(String sql, int columns) {
     for (int i = 0; i <= columns; i++) {
-      sql = StringHelper.replaceString(sql, " c" + i + ",", ",");
+      sql = StringHelper.replace(sql, " c" + i + ",", ",");
     }
     for (int i = 0; i <= columns; i++) {
-      sql = StringHelper.replaceString(sql, " c" + i + " ", " ");
+      sql = StringHelper.replace(sql, " c" + i + " ", " ");
     }
     return sql;
   }

@@ -102,7 +102,7 @@ public class StringHelper {
    * @param replace the string used to replace match with
    * @return the source string after the search and replace
    */
-  public static String replaceString(String source, String match, String replace) {
+  public static String replace(String source, String match, String replace) {
     if (source == null) {
       return null;
     }

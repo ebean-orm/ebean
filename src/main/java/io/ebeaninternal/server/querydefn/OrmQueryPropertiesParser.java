@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.FetchConfig;
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.util.DSelectColumnsParser;
 
 import java.util.LinkedHashSet;
@@ -77,12 +76,12 @@ class OrmQueryPropertiesParser {
     }
     int pos = inputProperties.indexOf("+readonly");
     if (pos > -1) {
-      inputProperties = StringHelper.replaceString(inputProperties, "+readonly", "");
+      inputProperties = inputProperties.replace("+readonly", "");
       readOnly = true;
     }
     pos = inputProperties.indexOf("+cache");
     if (pos > -1) {
-      inputProperties = StringHelper.replaceString(inputProperties, "+cache", "");
+      inputProperties = inputProperties.replace("+cache", "");
       cache = true;
     }
     pos = inputProperties.indexOf("+query");
@@ -162,7 +161,7 @@ class OrmQueryPropertiesParser {
     int startPos = pos + option.length();
     int endPos = findEndPos(startPos, inputProperties);
     if (endPos == -1) {
-      inputProperties = StringHelper.replaceString(inputProperties, option, "");
+      inputProperties = inputProperties.replace(option, "");
       return 0;
 
     } else {

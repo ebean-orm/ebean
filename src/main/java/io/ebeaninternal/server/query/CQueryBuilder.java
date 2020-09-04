@@ -13,7 +13,6 @@ import io.ebean.config.dbplatform.SqlLimiter;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -176,16 +175,14 @@ class CQueryBuilder {
    * Strip the root table alias.
    */
   private String aliasStrip(String sql) {
-    sql = StringHelper.replaceString(sql, "${RTA}.", "");
-    return StringHelper.replaceString(sql, " ${RTA}", "");
+    return sql.replace("${RTA}.", "").replace(" ${RTA}", "");
   }
 
   /**
    * Replace the root table alias.
    */
   private String aliasReplace(String sql, String replaceWith) {
-    sql = StringHelper.replaceString(sql, "${RTA}.", replaceWith + ".");
-    return StringHelper.replaceString(sql, "${RTA}", replaceWith);
+    return sql.replace("${RTA}.", replaceWith + ".").replace("${RTA}", replaceWith);
   }
 
   CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
@@ -680,7 +677,7 @@ class CQueryBuilder {
         }
         if (updateStatement) {
           // strip the table alias for use in update statement
-          idSql = StringHelper.replaceString(idSql, "t0.", "");
+          idSql = idSql.replace("t0.", "");
         }
         sb.append(idSql).append(" ");
         hasWhere = true;

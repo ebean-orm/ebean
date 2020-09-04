@@ -27,7 +27,7 @@ public class TestTextJsonInsertUpdate extends BaseTestCase {
 
     // update with optimistic concurrency checking
     String j0 = jsonContext.toJson(c0);
-    String j1 = StringHelper.replaceString(j0, "InsJson", "Mod1");
+    String j1 = StringHelper.replace(j0, "InsJson", "Mod1");
     Customer c1 = jsonContext.toBean(Customer.class, j1);
     Ebean.update(c1);
 

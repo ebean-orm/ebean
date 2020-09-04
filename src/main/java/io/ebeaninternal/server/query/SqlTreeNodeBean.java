@@ -6,7 +6,6 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.util.SplitName;
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.DbReadContext;
@@ -593,8 +592,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
         ctx.append(" and");
       }
       String ta = ctx.getTableAlias(prefix);
-      String ew = StringHelper.replaceString(extraWhere, "${ta}", ta);
-      ctx.append(" ").append(ew).append(" ");
+      ctx.append(" ").append(extraWhere.replace("${ta}", ta)).append(" ");
     }
   }
 

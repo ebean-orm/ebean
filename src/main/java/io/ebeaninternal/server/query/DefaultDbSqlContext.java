@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
@@ -151,13 +150,13 @@ class DefaultDbSqlContext implements DbSqlContext {
         sb.append(" and ");
       }
       if (pair.getForeignSqlFormula() != null) {
-        sb.append(StringHelper.replaceString(pair.getForeignSqlFormula(), tableAliasPlaceHolder, a2));
+        sb.append(pair.getForeignSqlFormula().replace(tableAliasPlaceHolder, a2));
       } else {
         sb.append(a2).append(".").append(pair.getForeignDbColumn());
       }
       sb.append(" = ");
       if (pair.getLocalSqlFormula() != null) {
-        sb.append(StringHelper.replaceString(pair.getLocalSqlFormula(), tableAliasPlaceHolder, a1));
+        sb.append(pair.getLocalSqlFormula().replace(tableAliasPlaceHolder, a1));
       } else {
         sb.append(a1).append(".").append(pair.getLocalDbColumn());
       }
@@ -223,7 +222,7 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     // replace ${ta} place holder with the real table alias...
     String tableAlias = tableAliasStack.peek();
-    String converted = StringHelper.replaceString(sqlFormulaJoin, tableAliasPlaceHolder, tableAlias);
+    String converted = sqlFormulaJoin.replace(tableAliasPlaceHolder, tableAlias);
 
     if (formulaJoins == null) {
       formulaJoins = new HashSet<>();
@@ -265,7 +264,7 @@ class DefaultDbSqlContext implements DbSqlContext {
   public void appendFormulaSelect(String sqlFormulaSelect) {
     String tableAlias = tableAliasStack.peek();
     sb.append(COMMA);
-    sb.append(StringHelper.replaceString(sqlFormulaSelect, tableAliasPlaceHolder, tableAlias));
+    sb.append(sqlFormulaSelect.replace(tableAliasPlaceHolder, tableAlias));
     appendColumnAlias();
   }
 
@@ -300,11 +299,10 @@ class DefaultDbSqlContext implements DbSqlContext {
   @Override
   public void appendColumn(String tableAlias, String column) {
     sb.append(COMMA);
-
     if (column.contains("${}")) {
       // support DB functions such as lower() etc
       // with the use of secondary columns
-      sb.append(StringHelper.replaceString(column, "${}", tableAlias));
+      sb.append(column.replace("${}", tableAlias));
     } else {
       sb.append(tableAlias);
       sb.append(PERIOD);

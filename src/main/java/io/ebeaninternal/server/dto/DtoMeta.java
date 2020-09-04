@@ -5,8 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.ebean.util.StringHelper.replaceString;
-
 /**
  * Holds property and constructor meta data for a given DTO bean type.
  *
@@ -88,7 +86,7 @@ class DtoMeta {
       property = propMap.get(upperLabel.substring(3));
     }
     if (property == null) {
-      property = propMap.get(replaceString(upperLabel, "_", ""));
+      property = propMap.get(upperLabel.replace("_", ""));
     }
     return property;
   }

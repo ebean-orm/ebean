@@ -4,7 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebean.util.SplitName;
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.type.ScalarType;
@@ -99,14 +98,12 @@ public class ElPropertyChain implements ElPropertyValue {
     if (prefix == null) {
       return lastElPropertyValue.getElPlaceholder(encrypted);
     }
-
     String el = lastElPropertyValue.getElPlaceholder(encrypted);
-
     if (!el.contains("${}")) {
       // typically a secondary table property
-      return StringHelper.replaceString(el, "${", "${" + prefix + ".");
+      return el.replace("${", "${" + prefix + ".");
     } else {
-      return StringHelper.replaceString(el, ROOT_ELPREFIX, "${" + prefix + "}");
+      return el.replace(ROOT_ELPREFIX, "${" + prefix + "}");
     }
   }
 

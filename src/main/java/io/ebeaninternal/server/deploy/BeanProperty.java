@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.ebean.util.StringHelper.replace;
+
 /**
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
@@ -352,12 +354,12 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
     if (descriptor != null) {
-      s = StringHelper.replaceString(s, "${ta}.", "${}");
-      s = StringHelper.replaceString(s, "${ta}", "${}");
+      s = replace(s, "${ta}.", "${}");
+      s = replace(s, "${ta}", "${}");
       if (dbEncrypted) {
         s = dbEncryptFunction.getDecryptSql(s);
         String namedParam = ":encryptkey_" + descriptor.getBaseTable() + "___" + dbColumn;
-        s = StringHelper.replaceString(s, "?", namedParam);
+        s = replace(s, "?", namedParam);
       }
     }
     return InternString.intern(s);

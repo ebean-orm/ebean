@@ -1,7 +1,5 @@
 package io.ebean;
 
-import io.ebean.util.StringHelper;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -341,7 +339,7 @@ public final class OrderBy<T> implements Serializable {
         if (collation != null)  {
           if (collation.contains("${}")) {
             // this is a complex collation, e.g. DB2 - we must replace the property
-            sb.append(StringHelper.replaceString(collation, "${}", property));
+            sb.append(collation.replace("${}", property));
           } else {
             sb.append(property);
             sb.append(" collate ").append(collation);

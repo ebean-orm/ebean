@@ -46,6 +46,6 @@ class BeanPropertyOverride {
   }
 
   String replace(String src, String srcDbColumn) {
-    return StringHelper.replaceString(src, srcDbColumn, dbColumn);
+    return StringHelper.replace(src, srcDbColumn, dbColumn);
   }
 }
