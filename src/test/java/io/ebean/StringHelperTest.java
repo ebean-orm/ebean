@@ -6,8 +6,27 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class StringHelperTest {
+
+  @Test
+  public void isNull() {
+    assertTrue(StringHelper.isNull(null));
+    assertTrue(StringHelper.isNull(""));
+    assertTrue(StringHelper.isNull("   "));
+    assertFalse(StringHelper.isNull("a"));
+  }
+
+  @Test
+  public void replaceString() {
+    assertEquals("sJmethJng", StringHelper.replaceString("somethong", "o","J"));
+    assertEquals("somethong", StringHelper.replaceString("somethong", "o", null));
+    assertNull(StringHelper.replaceString(null, "o","J"));
+  }
 
   @Test
   public void testSplitNames() {
@@ -72,7 +91,6 @@ public class StringHelperTest {
     Map<String, String> map = StringHelper.delimitedToMap(content, ";", "=");
     assertThat(map).hasSize(3)
       .containsEntry("nameX", null)
-      .containsEntry("nameX2", null)
       .containsEntry("name1", "foo")
       .containsEntry("name2", "bar");
   }
