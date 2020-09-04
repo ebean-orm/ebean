@@ -10,110 +10,9 @@ import java.util.regex.Pattern;
  */
 public class StringHelper {
 
-  private static final char SINGLE_QUOTE = '\'';
-
-  private static final char DOUBLE_QUOTE = '"';
-
   private static final Pattern SPLIT_NAMES = Pattern.compile("[\\s,;]+");
 
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
-  /**
-   * parses a String of the form name1='value1' name2='value2'. Note that you
-   * can use either single or double quotes for any particular name value pair
-   * and the end quote must match the begin quote.
-   */
-  public static HashMap<String, String> parseNameQuotedValue(String tag) throws RuntimeException {
-
-    if (tag == null || tag.length() < 1) {
-      return null;
-    }
-
-    // make sure that the quotes are matched...
-    // int remainer = countOccurances(tag, ""+quote) % 2;
-    // if (remainer == 1) {
-    // dp("remainder = "+remainer);
-    // throw new StringParsingException("Unmatched quote in "+tag);
-    // }
-
-    // make sure that th last character is not an equals...
-    // (check now so I don't need to check this every time..)
-    if (tag.charAt(tag.length() - 1) == '=') {
-      throw new RuntimeException("missing quoted value at the end of " + tag);
-    }
-
-    HashMap<String, String> map = new HashMap<>();
-    // recursively parse out the name value pairs...
-    return parseNameQuotedValue(map, tag, 0);
-  }
-
-  /**
-   * recursively parse out name value pairs (where the value is quoted, with
-   * either single or double quotes).
-   */
-  private static HashMap<String, String> parseNameQuotedValue(HashMap<String, String> map,
-                                                              String tag, int pos) throws RuntimeException {
-    while (true) {
-
-      int equalsPos = tag.indexOf('=', pos);
-      if (equalsPos > -1) {
-        // check for begin quote...
-        char firstQuote = tag.charAt(equalsPos + 1);
-        if (firstQuote != SINGLE_QUOTE && firstQuote != DOUBLE_QUOTE) {
-          throw new RuntimeException("missing begin quote at " + (equalsPos) + "["
-            + tag.charAt(equalsPos + 1) + "] in [" + tag + "]");
-        }
-
-        // check for end quote...
-        int endQuotePos = tag.indexOf(firstQuote, equalsPos + 2);
-        if (endQuotePos == -1) {
-          throw new RuntimeException("missing end quote [" + firstQuote + "] after " + pos + " in [" + tag + "]");
-        }
-
-        // we have a valid name and value...
-        // dp("pos="+pos+" equalsPos="+equalsPos+"
-        // endQuotePos="+endQuotePos);
-        String name = tag.substring(pos, equalsPos);
-        // dp("name="+name+"; value="+value+";");
-
-        // trim off any whitespace from the front of name...
-        name = trimFront(name, " ");
-        if ((name.indexOf(SINGLE_QUOTE) > -1) || (name.indexOf(DOUBLE_QUOTE) > -1)) {
-          throw new RuntimeException("attribute name contains a quote [" + name + "]");
-        }
-
-        String value = tag.substring(equalsPos + 2, endQuotePos);
-        map.put(name, value);
-
-        pos = endQuotePos + 1;
-
-      } else {
-        // no more equals... stop parsing...
-        return map;
-      }
-    }
-  }
-
-  /**
-   * Returns the number of times a particular String occurs in another String.
-   * e.g. count the number of single quotes.
-   */
-  public static int countOccurances(String content, String occurs) {
-    return countOccurances(content, occurs, 0, 0);
-  }
-
-  private static int countOccurances(String content, String occurs, int pos, int countSoFar) {
-    while (true) {
-      int equalsPos = content.indexOf(occurs, pos);
-      if (equalsPos > -1) {
-        countSoFar += 1;
-        pos = equalsPos + occurs.length();
-        // dp("countSoFar="+countSoFar+" pos="+pos);
-      } else {
-        return countSoFar;
-      }
-    }
-  }
 
   /**
    * Parses out a list of Name Value pairs that are delimited together. Will
@@ -133,7 +32,7 @@ public class StringHelper {
     }
     // trim off any leading listDelimiter...
     allNameValuePairs = trimFront(allNameValuePairs, listDelimiter);
-    return getKeyValue(params, 0, allNameValuePairs, listDelimiter, nameValueSeparator);
+    return getKeyValue(params, allNameValuePairs, listDelimiter, nameValueSeparator);
   }
 
   /**
@@ -142,13 +41,12 @@ public class StringHelper {
    * @param source the source string
    * @param trim   the string to trim off the front
    */
-  public static String trimFront(String source, String trim) {
+  private static String trimFront(String source, String trim) {
     while (true) {
       if (source == null) {
         return null;
       }
       if (source.indexOf(trim) == 0) {
-        // dp("trim ...");
         source = source.substring(trim.length());
       } else {
         return source;
@@ -166,12 +64,11 @@ public class StringHelper {
   /**
    * Recursively pulls out the key value pairs from a raw string.
    */
-  private static HashMap<String, String> getKeyValue(HashMap<String, String> map, int pos,
+  private static HashMap<String, String> getKeyValue(HashMap<String, String> map,
                                                      String allNameValuePairs, String listDelimiter, String nameValueSeparator) {
+    int pos = 0;
     while (true) {
-
       if (pos >= allNameValuePairs.length()) {
-        // dp("end as "+pos+" >= "+allNameValuePairs.length() );
         return map;
       }
 
@@ -182,12 +79,9 @@ public class StringHelper {
         delimPos = allNameValuePairs.length();
       }
       if (equalsPos == -1) {
-        // dp("no more equals...");
         return map;
       }
       if (delimPos == (equalsPos + 1)) {
-        // dp("Ignoring as nothing between delim and equals...
-        // delim:"+delimPos+" eq:"+equalsPos);
         pos = delimPos + 1;
         continue;
       }
@@ -214,59 +108,9 @@ public class StringHelper {
         pos = delimPos + 1;
 
         // recurse the rest of the values...
-
       } else {
-        // dp("ERROR: delimPos < 0 ???");
         return map;
       }
-    }
-  }
-
-  /**
-   * Convert a string that has delimited values (say comma delimited) in a
-   * String[]. You must explicitly choose whether or not to include empty values
-   * (say two commas that a right beside each other.
-   * <p>
-   * e.g. "alpha,beta,,theta"<br>
-   * With keepEmpties true, this results in a String[] of size 4 with the third
-   * one having a String of 0 length. With keepEmpties false, this results in a
-   * String[] of size 3.
-   * <p>
-   * e.g. ",alpha,beta,,theta,"<br>
-   * With keepEmpties true, this results in a String[] of size 6 with the
-   * 1st,4th and 6th one having a String of 0 length. With keepEmpties false,
-   * this results in a String[] of size 3.
-   */
-  public static String[] delimitedToArray(String str, String delimiter, boolean keepEmpties) {
-
-    ArrayList<String> list = new ArrayList<>();
-    int startPos = 0;
-    delimiter(str, delimiter, keepEmpties, startPos, list);
-    String[] result = new String[list.size()];
-    return list.toArray(result);
-  }
-
-  private static void delimiter(String str, String delimiter, boolean keepEmpties, int startPos,
-                                ArrayList<String> list) {
-
-    int endPos = str.indexOf(delimiter, startPos);
-    if (endPos == -1) {
-      if (startPos <= str.length()) {
-        String lastValue = str.substring(startPos, str.length());
-        if (keepEmpties || !lastValue.isEmpty()) {
-          list.add(lastValue);
-        }
-      }
-      // we have finished parsing the string...
-
-    } else {
-      // get the delimited value... add it..
-      String value = str.substring(startPos, endPos);
-      if (keepEmpties || !value.isEmpty()) {
-        list.add(value);
-      }
-      // recursively search as we are not at the end yet...
-      delimiter(str, delimiter, keepEmpties, endPos + 1, list);
     }
   }
 
