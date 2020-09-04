@@ -136,8 +136,7 @@ public class CQueryEngine {
     SpiTransaction t = request.getTransaction();
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r", "\n"}, "\\n ");
-      String msg = "ERROR executing query, bindLog[" + bindLog + "] error[" + errMsg + "]";
+      String msg = "ERROR executing query, bindLog[" + bindLog + "] error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
       t.logSummary(msg);
     }
 

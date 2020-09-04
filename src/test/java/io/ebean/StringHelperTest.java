@@ -22,11 +22,11 @@ public class StringHelperTest {
   }
 
   @Test
-  public void testReplaceStringMulti() {
+  public void removeNewLines() {
     String content = "This is\na\rmultiline\r\ntext\n\r";
     String[] multi = {"\r\n", "\r", "\n"};
-    content = StringHelper.replaceStringMulti(content, multi, "<br/>");
-    assertThat(content).isEqualTo("This is<br/>a<br/>multiline<br/>text<br/><br/>");
+    content = StringHelper.removeNewLines(content);
+    assertThat(content).isEqualTo("This is a multiline  text  ");
   }
 
   @Test

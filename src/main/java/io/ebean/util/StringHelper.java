@@ -198,92 +198,11 @@ public class StringHelper {
   }
 
   /**
-   * A search and replace with multiple matching strings.
-   * <p>
-   * Useful when converting CRNL CR and NL all to a BR tag for example.
-   * <pre>{@code
-   *
-   * String[] multi = { "\r\n", "\r", "\n" };
-   * content = StringHelper.replaceStringMulti(content, multi, "<br/>");
-   *
-   * }</pre>
+   * Return new line and carriage return with space.
    */
-  public static String replaceStringMulti(String source, String[] match, String replace) {
-    if (source == null) {
-      return null;
-    }
-    return replaceStringMulti(source, match, replace, 30, 0, source.length());
-  }
-
-  /**
-   * Additionally specify an additional size estimate for the buffer plus start
-   * and end positions.
-   * <p>
-   * The start and end positions can limit the search and replace. Otherwise
-   * these default to startPos = 0 and endPos = source.length().
-   * </p>
-   */
-  public static String replaceStringMulti(String source, String[] match, String replace,
-                                          int additionalSize, int startPos, int endPos) {
-    if (source == null) {
-      return null;
-    }
-    int shortestMatch = match[0].length();
-
-    char[] match0 = new char[match.length];
-    for (int i = 0; i < match0.length; i++) {
-      match0[i] = match[i].charAt(0);
-      if (match[i].length() < shortestMatch) {
-        shortestMatch = match[i].length();
-      }
-    }
-
-    StringBuilder sb = new StringBuilder(source.length() + additionalSize);
-
-    char sourceChar;
-
-    int len = source.length();
-    int lastMatch = endPos - shortestMatch;
-
-    if (startPos > 0) {
-      sb.append(source.substring(0, startPos));
-    }
-
-    int matchCount;
-
-    for (int i = startPos; i < len; i++) {
-      sourceChar = source.charAt(i);
-      if (i > lastMatch) {
-        sb.append(sourceChar);
-      } else {
-        matchCount = 0;
-        for (int k = 0; k < match0.length; k++) {
-          if (matchCount == 0 && sourceChar == match0[k]) {
-            if (match[k].length() + i <= len) {
-
-              ++matchCount;
-              int j = 1;
-              for (; j < match[k].length(); j++) {
-                if (source.charAt(i + j) != match[k].charAt(j)) {
-                  --matchCount;
-                  break;
-                }
-              }
-              if (matchCount > 0) {
-                i = i + j - 1;
-                sb.append(replace);
-                break;
-              }
-            }
-          }
-        }
-        if (matchCount == 0) {
-          sb.append(sourceChar);
-        }
-      }
-    }
-
-    return sb.toString();
+  public static String removeNewLines(String source) {
+    source = source.replace('\n', ' ');
+    return source.replace('\r', ' ');
   }
 
   /**
@@ -296,13 +215,13 @@ public class StringHelper {
     }
     String[] result = SPLIT_NAMES.split(names);
     if (result.length == 0) {
-      return EMPTY_STRING_ARRAY; // don't know if this ever can happen
+      return EMPTY_STRING_ARRAY;
     }
-    if ("".equals(result[0])) { //  = input string starts with whitespace
-      if (result.length == 1) { //  = input string contains only whitespace
+    if ("".equals(result[0])) { //  input string starts with whitespace
+      if (result.length == 1) { // input string contains only whitespace
         return EMPTY_STRING_ARRAY;
       } else {
-        String ret[] = new String[result.length-1]; // remove first entry
+        String[] ret = new String[result.length-1]; // remove first entry
         System.arraycopy(result, 1, ret, 0, ret.length);
         return ret;
       }
