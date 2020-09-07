@@ -60,7 +60,9 @@ import java.util.concurrent.Callable;
  *
  * }</pre>
  */
-public class DB {
+public final class DB {
+
+  private static final DbContext context = DbContext.getInstance();
 
   /**
    * Hide constructor.
@@ -72,7 +74,7 @@ public class DB {
    * Return the default database.
    */
   public static Database getDefault() {
-    return Ebean.getDefaultServer();
+    return context.getDefault();
   }
 
   /**
@@ -81,25 +83,8 @@ public class DB {
    * @param name The name of the database
    */
   public static Database byName(String name) {
-    return Ebean.getServer(name);
+    return context.get(name);
   }
-
-//  /**
-//   * Register the server with this Ebean singleton. Specify if the registered
-//   * server is the primary/default database.
-//   */
-//  public static void register(EbeanServer server, boolean defaultServer) {
-//    serverMgr.register(server, defaultServer);
-//  }
-//
-//  /**
-//   * Backdoor for registering a mock implementation of EbeanServer as the default database.
-//   */
-//  protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
-//    EbeanServer originalPrimaryServer = serverMgr.defaultServer;
-//    serverMgr.registerWithName(name, server, defaultServer);
-//    return originalPrimaryServer;
-//  }
 
   /**
    * Return the ScriptRunner for the default database.

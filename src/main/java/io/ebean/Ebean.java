@@ -2,25 +2,19 @@ package io.ebean;
 
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.BeanNotEnhancedException;
-import io.ebean.datasource.DataSourceConfigurationException;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Deprecated - please migrate to use <code>io.ebean.DB</code>.
@@ -33,119 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Deprecated
 public final class Ebean {
-  private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
 
-  static {
-    EbeanVersion.getVersion(); // initialises the version class and logs the version.
-  }
-
-  /**
-   * Manages creation and cache of Databases.
-   */
-  private static final Ebean.ServerManager serverMgr = new Ebean.ServerManager();
-
-  /**
-   * Helper class for managing fast and safe access and creation of Databases.
-   */
-  private static final class ServerManager {
-
-    /**
-     * Cache for fast concurrent read access.
-     */
-    private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<>();
-
-    /**
-     * Cache for synchronized read, creation and put. Protected by the monitor object.
-     */
-    private final HashMap<String, EbeanServer> syncMap = new HashMap<>();
-
-    private final Object monitor = new Object();
-
-    /**
-     * The 'default' Database.
-     */
-    private EbeanServer defaultServer;
-
-    private ServerManager() {
-      try {
-        if (!PrimaryServer.isSkip()) {
-          // look to see if there is a default server defined
-          String defaultName = PrimaryServer.getDefaultServerName();
-          logger.debug("defaultName:{}", defaultName);
-          if (defaultName != null && !defaultName.trim().isEmpty()) {
-            defaultServer = getWithCreate(defaultName.trim());
-          }
-        }
-      } catch (BeanNotEnhancedException e) {
-        throw e;
-
-      } catch (DataSourceConfigurationException e) {
-        String msg = "Configuration error creating DataSource for the default Database." +
-          " This typically means a missing application-test.yaml or missing ebean-test dependency." +
-          " See https://ebean.io/docs/trouble-shooting#datasource";
-        throw new DataSourceConfigurationException(msg, e);
-
-      } catch (Throwable e) {
-        logger.error("Error trying to create the default Database", e);
-        throw new RuntimeException(e);
-      }
-    }
-
-    private EbeanServer getDefaultServer() {
-      if (defaultServer == null) {
-        String msg = "The default Database has not been defined?";
-        msg += " This is normally set via the ebean.datasource.default property.";
-        msg += " Otherwise it should be registered programmatically via registerServer()";
-        throw new PersistenceException(msg);
-      }
-      return defaultServer;
-    }
-
-    private EbeanServer get(String name) {
-      if (name == null || name.isEmpty()) {
-        return defaultServer;
-      }
-      // non-synchronized read
-      EbeanServer server = concMap.get(name);
-      if (server != null) {
-        return server;
-      }
-      // synchronized read, create and put
-      return getWithCreate(name);
-    }
-
-    /**
-     * Synchronized read, create and put of Databases.
-     */
-    private EbeanServer getWithCreate(String name) {
-      synchronized (monitor) {
-        EbeanServer server = syncMap.get(name);
-        if (server == null) {
-          // register when creating server this way
-          server = EbeanServerFactory.create(name);
-          register(server, false);
-        }
-        return server;
-      }
-    }
-
-    /**
-     * Register a server so we can get it by its name.
-     */
-    private void register(EbeanServer server, boolean isDefaultServer) {
-      registerWithName(server.getName(), server, isDefaultServer);
-    }
-
-    private void registerWithName(String name, EbeanServer server, boolean isDefaultServer) {
-      synchronized (monitor) {
-        concMap.put(name, server);
-        syncMap.put(name, server);
-        if (isDefaultServer) {
-          defaultServer = server;
-        }
-      }
-    }
-  }
+  private static final DbContext context = DbContext.getInstance();
 
   private Ebean() {
   }
@@ -169,7 +52,7 @@ public final class Ebean {
    * @param name the name of the server, can use null for the 'default server'
    */
   public static EbeanServer getServer(String name) {
-    return serverMgr.get(name);
+    return (EbeanServer)context.get(name);
   }
 
   /**
@@ -179,28 +62,27 @@ public final class Ebean {
    * </p>
    */
   public static EbeanServer getDefaultServer() {
-    return serverMgr.getDefaultServer();
+    return (EbeanServer)context.getDefault();
   }
 
   /**
    * Register the server with this Ebean singleton. Specify if the registered
    * server is the primary/default database.
    */
+  @Deprecated
   public static void register(EbeanServer server, boolean defaultServer) {
-    serverMgr.register(server, defaultServer);
+    context.register(server, defaultServer);
   }
 
   /**
    * Backdoor for registering a mock implementation of EbeanServer as the default database.
    */
   protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
-    EbeanServer originalPrimaryServer = serverMgr.defaultServer;
-    serverMgr.registerWithName(name, server, defaultServer);
-    return originalPrimaryServer;
+    return (EbeanServer)context.mock(name, server, defaultServer);
   }
 
   private static Database getDefault() {
-    return serverMgr.getDefaultServer();
+    return context.getDefault();
   }
 
   /**
