@@ -998,6 +998,9 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   public final void preCommit() {
     internalBatchFlush();
     firePreCommit();
+    // we must flush the batch queue again, because the callback can
+    // modify current transaction
+    internalBatchFlush();
   }
 
   /**
