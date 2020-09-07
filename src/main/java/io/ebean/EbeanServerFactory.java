@@ -73,7 +73,7 @@ public class EbeanServerFactory {
     EbeanServer server = createInternal(config);
 
     if (config.isRegister()) {
-      PrimaryServer.setSkip(true);
+      DbPrimary.setSkip(true);
       Ebean.register(server, config.isDefaultServer());
     }
 
@@ -126,7 +126,7 @@ public class EbeanServerFactory {
 
     if (containerConfig == null) {
       // effectively load configuration from ebean.properties
-      Properties properties = PrimaryServer.getProperties();
+      Properties properties = DbPrimary.getProperties();
       containerConfig = new ContainerConfig();
       containerConfig.loadFromProperties(properties);
     }

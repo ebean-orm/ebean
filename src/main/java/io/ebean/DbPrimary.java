@@ -9,7 +9,7 @@ import java.util.Properties;
  * <p/>
  * Intended for internal use as part of bootup, construction, registration of the default database.
  */
-class PrimaryServer {
+class DbPrimary {
 
   private static String defaultServerName;
 
@@ -19,7 +19,7 @@ class PrimaryServer {
    * Set whether to skip automatically creating the primary database.
    */
   static synchronized void setSkip(boolean skip) {
-    PrimaryServer.skip = skip;
+    DbPrimary.skip = skip;
   }
 
   /**

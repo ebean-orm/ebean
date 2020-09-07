@@ -6,18 +6,18 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 /**
- * Class to determine the ebean version. (
- * @author Roland Praml, FOCONIS AG
+ * Class to determine the ebean version.
  *
+ * @author Roland Praml, FOCONIS AG
  */
 public class EbeanVersion {
-  private EbeanVersion() {
 
-  }
   private static final Logger logger = LoggerFactory.getLogger(EbeanVersion.class);
 
   private static String version = "unknown";
+
   static {
     try {
       Properties prop = new Properties();
@@ -32,6 +32,10 @@ public class EbeanVersion {
     } catch (IOException e) {
       logger.warn("Could not determine ebean version: {}", e.getMessage());
     }
+  }
+
+  private EbeanVersion() {
+    // hide
   }
 
   /**

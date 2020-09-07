@@ -2,26 +2,19 @@ package io.ebean;
 
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.BeanNotEnhancedException;
-import io.ebean.config.ServerConfig;
-import io.ebean.datasource.DataSourceConfigurationException;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Deprecated - please migrate to use <code>io.ebean.DB</code>.
@@ -34,123 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Deprecated
 public final class Ebean {
-  private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
 
-  static {
-    EbeanVersion.getVersion(); // initialises the version class and logs the version.
-  }
-
-  /**
-   * Manages creation and cache of Databases.
-   */
-  private static final Ebean.ServerManager serverMgr = new Ebean.ServerManager();
-
-  /**
-   * Helper class for managing fast and safe access and creation of Databases.
-   */
-  private static final class ServerManager {
-
-    /**
-     * Cache for fast concurrent read access.
-     */
-    private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<>();
-
-    /**
-     * Cache for synchronized read, creation and put. Protected by the monitor object.
-     */
-    private final HashMap<String, EbeanServer> syncMap = new HashMap<>();
-
-    private final Object monitor = new Object();
-
-    /**
-     * The 'default' Database.
-     */
-    private EbeanServer defaultServer;
-
-    private ServerManager() {
-
-      try {
-        if (!PrimaryServer.isSkip()) {
-          // look to see if there is a default server defined
-          String defaultName = PrimaryServer.getDefaultServerName();
-          logger.debug("defaultName:{}", defaultName);
-          if (defaultName != null && !defaultName.trim().isEmpty()) {
-            defaultServer = getWithCreate(defaultName.trim());
-          }
-        }
-      } catch (BeanNotEnhancedException e) {
-        throw e;
-
-      } catch (DataSourceConfigurationException e) {
-        String msg = "Configuration error creating DataSource for the default Database." +
-          " This typically means a missing application-test.yaml or missing ebean-test dependency." +
-          " See https://ebean.io/docs/trouble-shooting#datasource";
-        throw new DataSourceConfigurationException(msg, e);
-
-      } catch (Throwable e) {
-        logger.error("Error trying to create the default Database", e);
-        throw new RuntimeException(e);
-      }
-    }
-
-    private EbeanServer getDefaultServer() {
-      if (defaultServer == null) {
-        String msg = "The default Database has not been defined?";
-        msg += " This is normally set via the ebean.datasource.default property.";
-        msg += " Otherwise it should be registered programmatically via registerServer()";
-        throw new PersistenceException(msg);
-      }
-      return defaultServer;
-    }
-
-    private EbeanServer get(String name) {
-      if (name == null || name.isEmpty()) {
-        return defaultServer;
-      }
-      // non-synchronized read
-      EbeanServer server = concMap.get(name);
-      if (server != null) {
-        return server;
-      }
-      // synchronized read, create and put
-      return getWithCreate(name);
-    }
-
-    /**
-     * Synchronized read, create and put of Databases.
-     */
-    private EbeanServer getWithCreate(String name) {
-
-      synchronized (monitor) {
-
-        EbeanServer server = syncMap.get(name);
-        if (server == null) {
-          // register when creating server this way
-          server = EbeanServerFactory.create(name);
-          register(server, false);
-        }
-        return server;
-      }
-    }
-
-    /**
-     * Register a server so we can get it by its name.
-     */
-    private void register(EbeanServer server, boolean isDefaultServer) {
-      registerWithName(server.getName(), server, isDefaultServer);
-    }
-
-    private void registerWithName(String name, EbeanServer server, boolean isDefaultServer) {
-      synchronized (monitor) {
-        concMap.put(name, server);
-        syncMap.put(name, server);
-        if (isDefaultServer) {
-          defaultServer = server;
-        }
-      }
-    }
-
-  }
+  private static final DbContext context = DbContext.getInstance();
 
   private Ebean() {
   }
@@ -174,7 +52,7 @@ public final class Ebean {
    * @param name the name of the server, can use null for the 'default server'
    */
   public static EbeanServer getServer(String name) {
-    return serverMgr.get(name);
+    return (EbeanServer)context.get(name);
   }
 
   /**
@@ -184,7 +62,27 @@ public final class Ebean {
    * </p>
    */
   public static EbeanServer getDefaultServer() {
-    return serverMgr.getDefaultServer();
+    return (EbeanServer)context.getDefault();
+  }
+
+  /**
+   * Register the server with this Ebean singleton. Specify if the registered
+   * server is the primary/default database.
+   */
+  @Deprecated
+  public static void register(EbeanServer server, boolean defaultServer) {
+    context.register(server, defaultServer);
+  }
+
+  /**
+   * Backdoor for registering a mock implementation of EbeanServer as the default database.
+   */
+  protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
+    return (EbeanServer)context.mock(name, server, defaultServer);
+  }
+
+  private static Database getDefault() {
+    return context.getDefault();
   }
 
   /**
@@ -205,24 +103,7 @@ public final class Ebean {
    * </p>
    */
   public static ExpressionFactory getExpressionFactory() {
-    return serverMgr.getDefaultServer().getExpressionFactory();
-  }
-
-  /**
-   * Register the server with this Ebean singleton. Specify if the registered
-   * server is the primary/default database.
-   */
-  public static void register(EbeanServer server, boolean defaultServer) {
-    serverMgr.register(server, defaultServer);
-  }
-
-  /**
-   * Backdoor for registering a mock implementation of EbeanServer as the default database.
-   */
-  protected static EbeanServer mock(String name, EbeanServer server, boolean defaultServer) {
-    EbeanServer originalPrimaryServer = serverMgr.defaultServer;
-    serverMgr.registerWithName(name, server, defaultServer);
-    return originalPrimaryServer;
+    return getDefault().getExpressionFactory();
   }
 
   /**
@@ -238,7 +119,7 @@ public final class Ebean {
    * </p>
    */
   public static Object nextId(Class<?> beanType) {
-    return serverMgr.getDefaultServer().nextId(beanType);
+    return getDefault().nextId(beanType);
   }
 
   /**
@@ -284,7 +165,7 @@ public final class Ebean {
    * </p>
    */
   public static Transaction beginTransaction() {
-    return serverMgr.getDefaultServer().beginTransaction();
+    return getDefault().beginTransaction();
   }
 
   /**
@@ -293,7 +174,7 @@ public final class Ebean {
    * @param isolation the Transaction isolation level
    */
   public static Transaction beginTransaction(TxIsolation isolation) {
-    return serverMgr.getDefaultServer().beginTransaction(isolation);
+    return getDefault().beginTransaction(isolation);
   }
 
   /**
@@ -346,7 +227,7 @@ public final class Ebean {
    * }</pre>
    */
   public static Transaction beginTransaction(TxScope scope) {
-    return serverMgr.getDefaultServer().beginTransaction(scope);
+    return getDefault().beginTransaction(scope);
   }
 
   /**
@@ -354,7 +235,7 @@ public final class Ebean {
    * in scope.
    */
   public static Transaction currentTransaction() {
-    return serverMgr.getDefaultServer().currentTransaction();
+    return getDefault().currentTransaction();
   }
 
   /**
@@ -384,21 +265,21 @@ public final class Ebean {
    * @throws PersistenceException if there is no currently active transaction
    */
   public static void register(TransactionCallback transactionCallback) throws PersistenceException {
-    serverMgr.getDefaultServer().register(transactionCallback);
+    getDefault().register(transactionCallback);
   }
 
   /**
    * Commit the current transaction.
    */
   public static void commitTransaction() {
-    serverMgr.getDefaultServer().commitTransaction();
+    getDefault().commitTransaction();
   }
 
   /**
    * Rollback the current transaction.
    */
   public static void rollbackTransaction() {
-    serverMgr.getDefaultServer().rollbackTransaction();
+    getDefault().rollbackTransaction();
   }
 
   /**
@@ -426,14 +307,14 @@ public final class Ebean {
    * }</pre>
    */
   public static void endTransaction() {
-    serverMgr.getDefaultServer().endTransaction();
+    getDefault().endTransaction();
   }
 
   /**
    * Mark the current transaction as rollback only.
    */
   public static void setRollbackOnly() {
-    serverMgr.getDefaultServer().currentTransaction().setRollbackOnly();
+    getDefault().currentTransaction().setRollbackOnly();
   }
 
   /**
@@ -444,7 +325,7 @@ public final class Ebean {
    * </p>
    */
   public static Map<String, ValuePair> diff(Object a, Object b) {
-    return serverMgr.getDefaultServer().diff(a, b);
+    return getDefault().diff(a, b);
   }
 
   /**
@@ -478,7 +359,7 @@ public final class Ebean {
    * </p>
    */
   public static void save(Object bean) throws OptimisticLockException {
-    serverMgr.getDefaultServer().save(bean);
+    getDefault().save(bean);
   }
 
   /**
@@ -486,14 +367,14 @@ public final class Ebean {
    * want to explicitly insert it.
    */
   public static void insert(Object bean) {
-    serverMgr.getDefaultServer().insert(bean);
+    getDefault().insert(bean);
   }
 
   /**
    * Insert a collection of beans.
    */
   public static void insertAll(Collection<?> beans) {
-    serverMgr.getDefaultServer().insertAll(beans);
+    getDefault().insertAll(beans);
   }
 
   /**
@@ -516,7 +397,7 @@ public final class Ebean {
    * }</pre>
    */
   public static void markAsDirty(Object bean) throws OptimisticLockException {
-    serverMgr.getDefaultServer().markAsDirty(bean);
+    getDefault().markAsDirty(bean);
   }
 
   /**
@@ -543,14 +424,14 @@ public final class Ebean {
    * }</pre>
    */
   public static void update(Object bean) throws OptimisticLockException {
-    serverMgr.getDefaultServer().update(bean);
+    getDefault().update(bean);
   }
 
   /**
    * Update the beans in the collection.
    */
   public static void updateAll(Collection<?> beans) throws OptimisticLockException {
-    serverMgr.getDefaultServer().updateAll(beans);
+    getDefault().updateAll(beans);
   }
 
   /**
@@ -559,7 +440,7 @@ public final class Ebean {
    * @param bean The bean to merge
    */
   public static void merge(Object bean) {
-    serverMgr.getDefaultServer().merge(bean);
+    getDefault().merge(bean);
   }
 
   /**
@@ -569,14 +450,14 @@ public final class Ebean {
    * @param options The options to control the merge
    */
   public static void merge(Object bean, MergeOptions options) {
-    serverMgr.getDefaultServer().merge(bean, options);
+    getDefault().merge(bean, options);
   }
 
   /**
    * Save all the beans from a Collection.
    */
   public static int saveAll(Collection<?> beans) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().saveAll(beans);
+    return getDefault().saveAll(beans);
   }
 
   /**
@@ -627,7 +508,7 @@ public final class Ebean {
    */
   @Nonnull
   public static Set<Property> checkUniqueness(Object bean) {
-    return serverMgr.getDefaultServer().checkUniqueness(bean);
+    return getDefault().checkUniqueness(bean);
   }
 
   /**
@@ -635,7 +516,7 @@ public final class Ebean {
    */
   @Nonnull
   public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
-    return serverMgr.getDefaultServer().checkUniqueness(bean, transaction);
+    return getDefault().checkUniqueness(bean, transaction);
   }
 
   /**
@@ -658,56 +539,56 @@ public final class Ebean {
    * </p>
    */
   public static boolean delete(Object bean) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().delete(bean);
+    return getDefault().delete(bean);
   }
 
   /**
    * Delete the bean in permanent fashion (will not use soft delete).
    */
   public static boolean deletePermanent(Object bean) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().deletePermanent(bean);
+    return getDefault().deletePermanent(bean);
   }
 
   /**
    * Delete the bean given its type and id.
    */
   public static int delete(Class<?> beanType, Object id) {
-    return serverMgr.getDefaultServer().delete(beanType, id);
+    return getDefault().delete(beanType, id);
   }
 
   /**
    * Delete permanent the bean given its type and id.
    */
   public static int deletePermanent(Class<?> beanType, Object id) {
-    return serverMgr.getDefaultServer().deletePermanent(beanType, id);
+    return getDefault().deletePermanent(beanType, id);
   }
 
   /**
    * Delete several beans given their type and id values.
    */
   public static int deleteAll(Class<?> beanType, Collection<?> ids) {
-    return serverMgr.getDefaultServer().deleteAll(beanType, ids);
+    return getDefault().deleteAll(beanType, ids);
   }
 
   /**
    * Delete permanent several beans given their type and id values.
    */
   public static int deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
-    return serverMgr.getDefaultServer().deleteAllPermanent(beanType, ids);
+    return getDefault().deleteAllPermanent(beanType, ids);
   }
 
   /**
    * Delete all the beans in the Collection.
    */
   public static int deleteAll(Collection<?> beans) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().deleteAll(beans);
+    return getDefault().deleteAll(beans);
   }
 
   /**
    * Delete permanent all the beans in the Collection (will not use soft delete).
    */
   public static int deleteAllPermanent(Collection<?> beans) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().deleteAllPermanent(beans);
+    return getDefault().deleteAllPermanent(beans);
   }
 
   /**
@@ -718,7 +599,7 @@ public final class Ebean {
    * </p>
    */
   public static void refresh(Object bean) {
-    serverMgr.getDefaultServer().refresh(bean);
+    getDefault().refresh(bean);
   }
 
   /**
@@ -736,7 +617,7 @@ public final class Ebean {
    * @param manyPropertyName the property name of the List Set or Map to refresh.
    */
   public static void refreshMany(Object bean, String manyPropertyName) {
-    serverMgr.getDefaultServer().refreshMany(bean, manyPropertyName);
+    getDefault().refreshMany(bean, manyPropertyName);
   }
 
   /**
@@ -761,7 +642,7 @@ public final class Ebean {
    * @param id       the id value
    */
   public static <T> T getReference(Class<T> beanType, Object id) {
-    return serverMgr.getDefaultServer().getReference(beanType, id);
+    return getDefault().getReference(beanType, id);
   }
 
   /**
@@ -804,7 +685,7 @@ public final class Ebean {
    * @param sortByClause the properties to sort the list by
    */
   public static <T> void sort(List<T> list, String sortByClause) {
-    serverMgr.getDefaultServer().sort(list, sortByClause);
+    getDefault().sort(list, sortByClause);
   }
 
   /**
@@ -854,7 +735,7 @@ public final class Ebean {
    */
   @Nullable
   public static <T> T find(Class<T> beanType, Object id) {
-    return serverMgr.getDefaultServer().find(beanType, id);
+    return getDefault().find(beanType, id);
   }
 
   /**
@@ -869,7 +750,7 @@ public final class Ebean {
    */
   @Deprecated
   public static SqlQuery createSqlQuery(String sql) {
-    return serverMgr.getDefaultServer().sqlQuery(sql);
+    return getDefault().sqlQuery(sql);
   }
 
   /**
@@ -884,7 +765,7 @@ public final class Ebean {
    */
   @Deprecated
   public static SqlUpdate createSqlUpdate(String sql) {
-    return serverMgr.getDefaultServer().sqlUpdate(sql);
+    return getDefault().sqlUpdate(sql);
   }
 
   /**
@@ -893,7 +774,7 @@ public final class Ebean {
    * @see CallableSql
    */
   public static CallableSql createCallableSql(String sql) {
-    return serverMgr.getDefaultServer().createCallableSql(sql);
+    return getDefault().createCallableSql(sql);
   }
 
   /**
@@ -925,16 +806,14 @@ public final class Ebean {
    * }</pre>
    */
   public static <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
-
-    return serverMgr.getDefaultServer().createUpdate(beanType, ormUpdate);
+    return getDefault().createUpdate(beanType, ormUpdate);
   }
 
   /**
    * Create a CsvReader for a given beanType.
    */
   public static <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-
-    return serverMgr.getDefaultServer().createCsvReader(beanType);
+    return getDefault().createCsvReader(beanType);
   }
 
   /**
@@ -949,7 +828,7 @@ public final class Ebean {
    * @return The query
    */
   public static <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {
-    return serverMgr.getDefaultServer().createNamedQuery(beanType, namedQuery);
+    return getDefault().createNamedQuery(beanType, namedQuery);
   }
 
   /**
@@ -972,8 +851,7 @@ public final class Ebean {
    * @return A ORM Query object for this beanType
    */
   public static <T> Query<T> createQuery(Class<T> beanType) {
-
-    return serverMgr.getDefaultServer().createQuery(beanType);
+    return getDefault().createQuery(beanType);
   }
 
   /**
@@ -1010,8 +888,7 @@ public final class Ebean {
    * @return The query with expressions defined as per the parsed query statement
    */
   public static <T> Query<T> createQuery(Class<T> beanType, String eql) {
-
-    return serverMgr.getDefaultServer().createQuery(beanType, eql);
+    return getDefault().createQuery(beanType, eql);
   }
 
   /**
@@ -1026,8 +903,7 @@ public final class Ebean {
    * @return A ORM Query object for this beanType
    */
   public static <T> Query<T> find(Class<T> beanType) {
-
-    return serverMgr.getDefaultServer().find(beanType);
+    return getDefault().find(beanType);
   }
 
   /**
@@ -1050,7 +926,7 @@ public final class Ebean {
    * @return The query to set parameters and execute
    */
   public static <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
-    return serverMgr.getDefaultServer().findNative(beanType, nativeSql);
+    return getDefault().findNative(beanType, nativeSql);
   }
 
   /**
@@ -1065,7 +941,7 @@ public final class Ebean {
    * @param <T>     The type of the DTO bean.
    */
   public static <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
-    return serverMgr.getDefaultServer().findDto(dtoType, sql);
+    return getDefault().findDto(dtoType, sql);
   }
 
   /**
@@ -1087,7 +963,7 @@ public final class Ebean {
    * @return The update query to use
    */
   public static <T> UpdateQuery<T> update(Class<T> beanType) {
-    return serverMgr.getDefaultServer().update(beanType);
+    return getDefault().update(beanType);
   }
 
   /**
@@ -1101,7 +977,7 @@ public final class Ebean {
    * </p>
    */
   public static <T> Filter<T> filter(Class<T> beanType) {
-    return serverMgr.getDefaultServer().filter(beanType);
+    return getDefault().filter(beanType);
   }
 
   /**
@@ -1144,7 +1020,7 @@ public final class Ebean {
    * @see Ebean#execute(CallableSql)
    */
   public static int execute(SqlUpdate sqlUpdate) {
-    return serverMgr.getDefaultServer().execute(sqlUpdate);
+    return getDefault().execute(sqlUpdate);
   }
 
   /**
@@ -1172,7 +1048,7 @@ public final class Ebean {
    * @see Ebean#execute(SqlUpdate)
    */
   public static int execute(CallableSql callableSql) {
-    return serverMgr.getDefaultServer().execute(callableSql);
+    return getDefault().execute(callableSql);
   }
 
   /**
@@ -1196,7 +1072,7 @@ public final class Ebean {
    * }</pre>
    */
   public static void execute(TxScope scope, Runnable r) {
-    serverMgr.getDefaultServer().execute(scope, r);
+    getDefault().execute(scope, r);
   }
 
   /**
@@ -1223,7 +1099,7 @@ public final class Ebean {
    * }</pre>
    */
   public static void execute(Runnable r) {
-    serverMgr.getDefaultServer().execute(r);
+    getDefault().execute(r);
   }
 
   /**
@@ -1248,7 +1124,7 @@ public final class Ebean {
    * }</pre>
    */
   public static <T> T executeCall(TxScope scope, Callable<T> c) {
-    return serverMgr.getDefaultServer().executeCall(scope, c);
+    return getDefault().executeCall(scope, c);
   }
 
   /**
@@ -1281,7 +1157,7 @@ public final class Ebean {
    * }</pre>
    */
   public static <T> T executeCall(Callable<T> c) {
-    return serverMgr.getDefaultServer().executeCall(c);
+    return getDefault().executeCall(c);
   }
 
   /**
@@ -1315,8 +1191,7 @@ public final class Ebean {
    * @param deletes   true if rows on the table where deleted
    */
   public static void externalModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-
-    serverMgr.getDefaultServer().externalModification(tableName, inserts, updates, deletes);
+    getDefault().externalModification(tableName, inserts, updates, deletes);
   }
 
   /**
@@ -1326,14 +1201,14 @@ public final class Ebean {
    * </p>
    */
   public static BeanState getBeanState(Object bean) {
-    return serverMgr.getDefaultServer().getBeanState(bean);
+    return getDefault().getBeanState(bean);
   }
 
   /**
    * Return the manager of the server cache ("L2" cache).
    */
   public static ServerCacheManager getServerCacheManager() {
-    return serverMgr.getDefaultServer().getServerCacheManager();
+    return getDefault().getServerCacheManager();
   }
 
   /**
@@ -1341,14 +1216,14 @@ public final class Ebean {
    * queries.
    */
   public static BackgroundExecutor getBackgroundExecutor() {
-    return serverMgr.getDefaultServer().getBackgroundExecutor();
+    return getDefault().getBackgroundExecutor();
   }
 
   /**
    * Return the JsonContext for reading/writing JSON.
    */
   public static JsonContext json() {
-    return serverMgr.getDefaultServer().json();
+    return getDefault().json();
   }
 
 }
