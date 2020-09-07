@@ -10,29 +10,29 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class PrimaryServerTest extends BaseTestCase {
+public class DbPrimaryTest extends BaseTestCase {
 
 
   @Test
   public void testIsSkipPrimaryServer() {
-    PrimaryServer.setSkip(true);
-    assertTrue(PrimaryServer.isSkip());
-    PrimaryServer.setSkip(false);
-    assertFalse(PrimaryServer.isSkip());
+    DbPrimary.setSkip(true);
+    assertTrue(DbPrimary.isSkip());
+    DbPrimary.setSkip(false);
+    assertFalse(DbPrimary.isSkip());
   }
 
   @Test
   @ForPlatform(Platform.H2)
   public void testGetPrimaryServerName() {
 
-    String primaryServerName = PrimaryServer.getDefaultServerName();
+    String primaryServerName = DbPrimary.getDefaultServerName();
     assertEquals("h2", primaryServerName);
   }
 
   @Test
   public void testLoadProperties() {
 
-    Properties properties = PrimaryServer.getProperties();
+    Properties properties = DbPrimary.getProperties();
     assertTrue(!properties.isEmpty());
   }
 }
