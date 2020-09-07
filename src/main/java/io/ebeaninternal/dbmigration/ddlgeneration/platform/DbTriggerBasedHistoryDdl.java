@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
-import io.ebean.config.ServerConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -37,12 +37,12 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void configure(ServerConfig serverConfig, PlatformDdl platformDdl) {
+  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
     this.platformDdl = platformDdl;
-    this.sysPeriod = serverConfig.getAsOfSysPeriod();
-    this.viewSuffix = serverConfig.getAsOfViewSuffix();
-    this.historySuffix = serverConfig.getHistoryTableSuffix();
-    this.constraintNaming = serverConfig.getConstraintNaming();
+    this.sysPeriod = config.getAsOfSysPeriod();
+    this.viewSuffix = config.getAsOfViewSuffix();
+    this.historySuffix = config.getHistoryTableSuffix();
+    this.constraintNaming = config.getConstraintNaming();
 
     this.sysPeriodStart = sysPeriod + "_start";
     this.sysPeriodEnd = sysPeriod + "_end";

@@ -1,12 +1,11 @@
 package io.ebean.config;
 
 /**
- * Deprecated - migrate to DatabaseConfigProvider.
- * <p>
  * Provides a ServiceLoader based mechanism to configure a ServerConfig.
  * <p>
  * Provide an implementation and register it via the standard Java ServiceLoader mechanism
  * via a file at <code>META-INF/services/io.ebean.config.ServerConfigProvider</code>.
+ * </p>
  * <p>
  * If you are using a DI container like Spring or Guice you are unlikely to use this but instead use a
  * spring specific configuration.  When we are not using a DI container we may use this mechanism to
@@ -14,10 +13,10 @@ package io.ebean.config;
  * </p>
  * <pre>{@code
  *
- * public class EbeanConfigProvider implements ServerConfigProvider {
+ * public class EbeanConfigProvider implements DatabaseConfigProvider {
  *
  *   ＠Override
- *   public void apply(ServerConfig config) {
+ *   public void apply(DatabaseConfig config) {
  *
  *     // register the entity bean classes explicitly
  *     config.addClass(Customer.class);
@@ -28,14 +27,13 @@ package io.ebean.config;
  *
  * }</pre>
  */
-@Deprecated
-public interface ServerConfigProvider {
+public interface DatabaseConfigProvider {
 
   /**
-   * Apply the configuration to the ServerConfig.
+   * Apply the configuration to the DatabaseConfig.
    * <p>
    * Typically we explicitly register entity bean classes and thus avoid classpath scanning.
    * </p>
    */
-  void apply(ServerConfig config);
+  void apply(DatabaseConfig config);
 }

@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 
 /**
  * Used to configure the server on startup.
@@ -11,8 +11,8 @@ import io.ebean.config.ServerConfig;
 public interface ServerConfigStartup {
 
   /**
-   * On starting configure the ServerConfig.
+   * On starting configure the DatabaseConfig.
    */
-  void onStart(ServerConfig serverConfig);
+  void onStart(DatabaseConfig config);
 
 }

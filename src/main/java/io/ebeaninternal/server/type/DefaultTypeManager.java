@@ -8,10 +8,10 @@ import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.ScalarTypeConverter;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.types.Cidr;
@@ -184,7 +184,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Create the DefaultTypeManager.
    */
-  public DefaultTypeManager(ServerConfig config, BootupClasses bootupClasses) {
+  public DefaultTypeManager(DatabaseConfig config, BootupClasses bootupClasses) {
 
     this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
@@ -248,7 +248,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
    */
-  private void loadTypesFromProviders(ServerConfig config, Object objectMapper) {
+  private void loadTypesFromProviders(DatabaseConfig config, Object objectMapper) {
 
     ServiceLoader<ExtraTypeFactory> factories = ServiceLoader.load(ExtraTypeFactory.class);
     Iterator<ExtraTypeFactory> iterator = factories.iterator();
@@ -785,12 +785,11 @@ public final class DefaultTypeManager implements TypeManager {
     add(scalarType);
   }
 
-  private Object initObjectMapper(ServerConfig serverConfig) {
-
-    Object objectMapper = serverConfig.getObjectMapper();
+  private Object initObjectMapper(DatabaseConfig config) {
+    Object objectMapper = config.getObjectMapper();
     if (objectMapper == null) {
       objectMapper = new ObjectMapper();
-      serverConfig.setObjectMapper(objectMapper);
+      config.setObjectMapper(objectMapper);
     }
     return objectMapper;
   }
@@ -862,12 +861,9 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
    */
-  private void initialiseJacksonTypes(ServerConfig config) {
-
+  private void initialiseJacksonTypes(DatabaseConfig config) {
     if (objectMapper != null) {
-
       logger.trace("Registering JsonNode type support");
-
       ObjectMapper mapper = (ObjectMapper) objectMapper;
       jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
       jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
@@ -885,12 +881,10 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private void initialiseJavaTimeTypes(ServerConfig config) {
-
+  private void initialiseJavaTimeTypes(DatabaseConfig config) {
     if (java7Present) {
       typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     }
-
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
       addType(java.time.Period.class, new ScalarTypePeriod());
@@ -926,8 +920,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Detect if Joda classes are in the classpath and if so register the Joda data types.
    */
   @SuppressWarnings("deprecation")
-  private void initialiseJodaTypes(ServerConfig config) {
-
+  private void initialiseJodaTypes(DatabaseConfig config) {
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
@@ -955,8 +948,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  private void initialiseStandard(ServerConfig config) {
-
+  private void initialiseStandard(DatabaseConfig config) {
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
     int platformBlobType = databasePlatform.getBlobDbType();

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
-import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.math.BigInteger;
@@ -14,9 +14,9 @@ import java.util.Calendar;
  */
 public class DefaultTypeFactory {
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
-  public DefaultTypeFactory(ServerConfig serverConfig) {
+  public DefaultTypeFactory(DatabaseConfig serverConfig) {
     this.serverConfig = serverConfig;
   }
 

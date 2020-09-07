@@ -8,11 +8,11 @@ public interface AutoConfigure {
   /**
    * Perform configuration for the ServerConfig prior to properties load.
    */
-  void preConfigure(ServerConfig serverConfig);
+  void preConfigure(DatabaseConfig serverConfig);
 
   /**
    * Provide some configuration the ServerConfig prior to server creation but after properties have been applied.
    */
-  void postConfigure(ServerConfig serverConfig);
+  void postConfigure(DatabaseConfig serverConfig);
 
 }

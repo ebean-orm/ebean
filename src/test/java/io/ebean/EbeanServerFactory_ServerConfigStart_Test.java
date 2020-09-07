@@ -1,11 +1,10 @@
 package io.ebean;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.event.ServerConfigStartup;
-import org.tests.model.basic.UTDetail;
 import org.junit.Test;
+import org.tests.model.basic.UTDetail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,10 +46,10 @@ public class EbeanServerFactory_ServerConfigStart_Test {
 
   public static class OnStartup implements ServerConfigStartup {
 
-    ServerConfig calledWithConfig;
+    DatabaseConfig calledWithConfig;
 
     @Override
-    public void onStart(ServerConfig serverConfig) {
+    public void onStart(DatabaseConfig serverConfig) {
       calledWithConfig = serverConfig;
     }
   }
@@ -58,10 +57,10 @@ public class EbeanServerFactory_ServerConfigStart_Test {
 
   public static class OnStartupViaClass implements ServerConfigStartup {
 
-    static ServerConfig calledWithConfig;
+    static DatabaseConfig calledWithConfig;
 
     @Override
-    public void onStart(ServerConfig serverConfig) {
+    public void onStart(DatabaseConfig serverConfig) {
       calledWithConfig = serverConfig;
     }
   }

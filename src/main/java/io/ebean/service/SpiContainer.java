@@ -1,7 +1,7 @@
 package io.ebean.service;
 
-import io.ebean.EbeanServer;
-import io.ebean.config.ServerConfig;
+import io.ebean.Database;
+import io.ebean.config.DatabaseConfig;
 
 /**
  * Creates the Database implementations. This is used internally by the EbeanServerFactory and is not currently
@@ -14,7 +14,7 @@ public interface SpiContainer {
    *
    * @param configuration The configuration information for this database.
    */
-  EbeanServer createServer(ServerConfig configuration);
+  Database createServer(DatabaseConfig configuration);
 
   /**
    * Create an EbeanServer just using the name.
@@ -23,7 +23,7 @@ public interface SpiContainer {
    * avaje.properties file.
    * </p>
    */
-  EbeanServer createServer(String name);
+  Database createServer(String name);
 
   /**
    * Shutdown any Ebean wide resources such as clustering.

@@ -9,6 +9,7 @@ import io.ebean.cache.ServerCacheNotify;
 import io.ebean.cache.ServerCacheNotifyPlugin;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCachePlugin;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.config.ServerConfig;
@@ -115,7 +116,7 @@ public class InternalConfiguration {
 
   private final boolean online;
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
   private final BootupClasses bootupClasses;
 
@@ -171,7 +172,7 @@ public class InternalConfiguration {
   private final ExtraMetrics extraMetrics = new ExtraMetrics();
 
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
-                        ServerConfig serverConfig, BootupClasses bootupClasses) {
+                        DatabaseConfig serverConfig, BootupClasses bootupClasses) {
 
     this.online = online;
     this.serverConfig = serverConfig;
@@ -227,7 +228,7 @@ public class InternalConfiguration {
   /**
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
-  private ExpressionFactory initExpressionFactory(ServerConfig serverConfig) {
+  private ExpressionFactory initExpressionFactory(DatabaseConfig serverConfig) {
 
     boolean nativeIlike = serverConfig.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
     return new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop(), nativeIlike);
@@ -385,7 +386,7 @@ public class InternalConfiguration {
     return serverConfig.getDatabasePlatform();
   }
 
-  public ServerConfig getServerConfig() {
+  public DatabaseConfig getServerConfig() {
     return serverConfig;
   }
 

@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.NamingConvention;
-import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -25,7 +25,7 @@ public interface BeanDescriptorMap {
   /**
    * Return the ServerConfig.
    */
-  ServerConfig getServerConfig();
+  DatabaseConfig getServerConfig();
 
   /**
    * Return the Cache Manager.

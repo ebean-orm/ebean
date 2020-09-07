@@ -44,6 +44,7 @@ import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryEvent;
@@ -158,7 +159,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
   private final String serverName;
 
@@ -306,12 +307,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Create the CallStackFactory depending if AutoTune is being used.
    */
-  private CallOriginFactory initCallStackFactory(ServerConfig serverConfig) {
-    if (!serverConfig.getAutoTuneConfig().isActive()) {
+  private CallOriginFactory initCallStackFactory(DatabaseConfig config) {
+    if (!config.getAutoTuneConfig().isActive()) {
       // use a common CallStack for performance as we don't care with no AutoTune
       return new NoopCallOriginFactory();
     }
-    return new DefaultCallOriginFactory(serverConfig.getMaxCallStack());
+    return new DefaultCallOriginFactory(config.getMaxCallStack());
   }
 
   private void configureServerPlugins() {
@@ -363,7 +364,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ServerConfig getServerConfig() {
+  public DatabaseConfig getServerConfig() {
     return serverConfig;
   }
 

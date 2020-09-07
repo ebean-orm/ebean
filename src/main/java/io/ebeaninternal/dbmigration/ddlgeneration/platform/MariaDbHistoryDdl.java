@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -15,7 +15,7 @@ import java.io.IOException;
 public class MariaDbHistoryDdl implements PlatformHistoryDdl {
 
   @Override
-  public void configure(ServerConfig serverConfig, PlatformDdl platformDdl) {
+  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
     // do nothing
   }
 

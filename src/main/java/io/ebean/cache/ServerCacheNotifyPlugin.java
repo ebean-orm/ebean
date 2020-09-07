@@ -1,6 +1,6 @@
 package io.ebean.cache;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 
 /**
  * Plugin that provides a ServerCacheNotify implementation.
@@ -13,5 +13,5 @@ public interface ServerCacheNotifyPlugin {
   /**
    * Create a ServerCacheNotify implementation given the server configuration.
    */
-  ServerCacheNotify create(ServerConfig serverConfig);
+  ServerCacheNotify create(DatabaseConfig serverConfig);
 }

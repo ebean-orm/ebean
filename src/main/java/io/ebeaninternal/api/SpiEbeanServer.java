@@ -10,9 +10,8 @@ import io.ebean.RowMapper;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebean.bean.BeanCollectionLoader;
-import io.ebean.bean.BeanLoader;
 import io.ebean.bean.CallOrigin;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
@@ -66,7 +65,7 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   /**
    * Return the server configuration.
    */
-  ServerConfig getServerConfig();
+  DatabaseConfig getServerConfig();
 
   /**
    * Return the DatabasePlatform for this server.

@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.BaseTableDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
@@ -27,11 +27,11 @@ public class BaseDdlHandler implements DdlHandler {
 
   protected final TableDdl tableDdl;
 
-  public BaseDdlHandler(ServerConfig serverConfig, PlatformDdl platformDdl) {
-    this(serverConfig, platformDdl, new BaseTableDdl(serverConfig, platformDdl));
+  public BaseDdlHandler(DatabaseConfig config, PlatformDdl platformDdl) {
+    this(config, platformDdl, new BaseTableDdl(config, platformDdl));
   }
-  
-  protected BaseDdlHandler(ServerConfig serverConfig, PlatformDdl platformDdl, TableDdl tableDdl) {
+
+  protected BaseDdlHandler(DatabaseConfig config, PlatformDdl platformDdl, TableDdl tableDdl) {
     this.tableDdl = tableDdl;
   }
 

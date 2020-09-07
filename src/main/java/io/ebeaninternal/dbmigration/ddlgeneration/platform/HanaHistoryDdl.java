@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -24,11 +24,11 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   private Map<String, String> createdHistoryTables = new ConcurrentHashMap<>();
 
   @Override
-  public void configure(ServerConfig serverConfig, PlatformDdl platformDdl) {
-    this.systemPeriodStart = serverConfig.getAsOfSysPeriod() + "_start";
-    this.systemPeriodEnd = serverConfig.getAsOfSysPeriod() + "_end";
+  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+    this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
+    this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";
     this.platformDdl = platformDdl;
-    this.historySuffix = serverConfig.getHistoryTableSuffix();
+    this.historySuffix = config.getHistoryTableSuffix();
   }
 
   @Override
