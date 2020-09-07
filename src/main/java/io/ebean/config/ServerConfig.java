@@ -94,7 +94,7 @@ public class ServerConfig {
    * Typically configuration type objects that are passed by this ServerConfig
    * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
    */
-  private Map<String, Object> serviceObject = new HashMap<>();
+  private final Map<String, Object> serviceObject = new HashMap<>();
 
   private ContainerConfig containerConfig;
 
