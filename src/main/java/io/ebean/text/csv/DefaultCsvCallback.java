@@ -1,6 +1,6 @@
 package io.ebean.text.csv;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
   /**
    * The EbeanServer used to save the beans.
    */
-  protected EbeanServer server;
+  protected Database server;
 
   /**
    * Used to log a message to indicate progress through large files.
@@ -69,7 +69,6 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
    * Construct with explicit batch size and logging info frequency.
    */
   public DefaultCsvCallback(int persistBatchSize, int logInfoFrequency) {
-
     this.persistBatchSize = persistBatchSize;
     this.logInfoFrequency = logInfoFrequency;
   }
@@ -78,10 +77,9 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
    * Create a transaction if required.
    */
   @Override
-  public void begin(EbeanServer server) {
+  public void begin(Database server) {
     this.server = server;
     this.startTime = System.currentTimeMillis();
-
     initTransactionIfRequired();
   }
 

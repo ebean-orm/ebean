@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.text.csv;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.text.StringParser;
@@ -31,7 +31,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   private static final TimeStringParser TIME_PARSER = new TimeStringParser();
 
-  private final EbeanServer server;
+  private final Database server;
 
   private final BeanDescriptor<T> descriptor;
 
@@ -55,7 +55,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   private boolean addPropertiesFromHeader;
 
-  public TCsvReader(EbeanServer server, BeanDescriptor<T> descriptor) {
+  public TCsvReader(Database server, BeanDescriptor<T> descriptor) {
     this.server = server;
     this.descriptor = descriptor;
   }
@@ -349,7 +349,6 @@ public class TCsvReader<T> implements CsvReader<T> {
       try {
         Date dt = dateFormat.parse(value);
         return path.parseDateTime(dt.getTime());
-
       } catch (ParseException e) {
         throw new TextException("Error parsing [{}] using format[" + format + "]", value, e);
       }
