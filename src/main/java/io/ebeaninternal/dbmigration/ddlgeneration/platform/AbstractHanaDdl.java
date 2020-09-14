@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
@@ -90,8 +90,8 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   }
 
   @Override
-  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
-    return new HanaDdlHandler(serverConfig, this);
+  public DdlHandler createDdlHandler(DatabaseConfig config) {
+    return new HanaDdlHandler(config, this);
   }
 
   @Override

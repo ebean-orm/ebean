@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbMigrationConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -27,7 +27,7 @@ public class PlatformDdlWriter {
 
   private static final Logger logger = LoggerFactory.getLogger(PlatformDdlWriter.class);
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
   private final DbMigrationConfig config;
 
@@ -35,9 +35,9 @@ public class PlatformDdlWriter {
 
   private final int lockTimeoutSeconds;
 
-  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, DbMigrationConfig config, int lockTimeoutSeconds) {
+  public PlatformDdlWriter(DatabasePlatform platform, DatabaseConfig dbConfig, DbMigrationConfig config, int lockTimeoutSeconds) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
-    this.serverConfig = serverConfig;
+    this.serverConfig = dbConfig;
     this.config = config;
     this.lockTimeoutSeconds = lockTimeoutSeconds;
   }

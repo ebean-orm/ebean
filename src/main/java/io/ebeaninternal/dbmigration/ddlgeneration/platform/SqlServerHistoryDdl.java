@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -19,9 +19,9 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   private PlatformDdl platformDdl;
 
   @Override
-  public void configure(ServerConfig serverConfig, PlatformDdl platformDdl) {
-    this.systemPeriodStart = serverConfig.getAsOfSysPeriod() + "From";
-    this.systemPeriodEnd = serverConfig.getAsOfSysPeriod() + "To";
+  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+    this.systemPeriodStart = config.getAsOfSysPeriod() + "From";
+    this.systemPeriodEnd = config.getAsOfSysPeriod() + "To";
     this.platformDdl = platformDdl;
   }
 

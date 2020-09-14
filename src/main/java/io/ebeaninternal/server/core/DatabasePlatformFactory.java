@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
@@ -47,26 +47,24 @@ public class DatabasePlatformFactory {
   /**
    * Create the appropriate database specific platform.
    */
-  public DatabasePlatform create(ServerConfig serverConfig) {
-
+  public DatabasePlatform create(DatabaseConfig config) {
     try {
-
       String offlinePlatform = DbOffline.getPlatform();
       if (offlinePlatform != null) {
         logger.info("offline platform [{}]", offlinePlatform);
         return byDatabaseName(offlinePlatform);
       }
 
-      if (serverConfig.getDatabasePlatformName() != null) {
+      if (config.getDatabasePlatformName() != null) {
         // choose based on dbName
-        return byDatabaseName(serverConfig.getDatabasePlatformName());
+        return byDatabaseName(config.getDatabasePlatformName());
       }
 
-      if (serverConfig.getDataSourceConfig().isOffline()) {
+      if (config.getDataSourceConfig().isOffline()) {
         throw new PersistenceException("You must specify a DatabasePlatformName when you are offline");
       }
       // guess using meta data from driver
-      return byDataSource(serverConfig.getDataSource());
+      return byDataSource(config.getDataSource());
 
     } catch (Exception ex) {
       throw new PersistenceException(ex);

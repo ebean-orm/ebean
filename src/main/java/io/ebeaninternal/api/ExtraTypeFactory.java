@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.List;
@@ -13,5 +13,5 @@ public interface ExtraTypeFactory {
   /**
    * Provide extra types to Ebean.
    */
-  List<? extends ScalarType<?>> createTypes(ServerConfig config, Object objectMapper);
+  List<? extends ScalarType<?>> createTypes(DatabaseConfig config, Object objectMapper);
 }

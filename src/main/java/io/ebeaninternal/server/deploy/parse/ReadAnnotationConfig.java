@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebean.annotation.Aggregation;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 
 import javax.persistence.Column;
@@ -26,15 +26,13 @@ class ReadAnnotationConfig {
 
   private final Set<Class<?>> metaAnnotations = new HashSet<>();
 
-  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, ServerConfig serverConfig) {
-
+  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;
-    this.disableL2Cache = serverConfig.isDisableL2Cache();
-    this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
-    this.idGeneratorAutomatic = serverConfig.isIdGeneratorAutomatic();
-
+    this.disableL2Cache = config.isDisableL2Cache();
+    this.eagerFetchLobs = config.isEagerFetchLobs();
+    this.idGeneratorAutomatic = config.isIdGeneratorAutomatic();
     this.javaxValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJavaxValidationAnnotationsPresent();
     this.jacksonAnnotations = generatedPropFactory.getClassLoadConfig().isJacksonAnnotationsPresent();
     this.metaAnnotations.add(Column.class);

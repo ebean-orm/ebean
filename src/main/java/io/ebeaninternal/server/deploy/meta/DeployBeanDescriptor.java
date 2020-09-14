@@ -4,7 +4,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.Identity;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
@@ -18,7 +18,6 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
-import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.ChainedBeanPersistController;
@@ -27,6 +26,7 @@ import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
 import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
+import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.PartitionMeta;
@@ -68,7 +68,7 @@ public class DeployBeanDescriptor<T> {
 
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
   private final BeanDescriptorManager manager;
 
@@ -199,7 +199,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Construct the BeanDescriptor.
    */
-  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, ServerConfig serverConfig) {
+  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseConfig serverConfig) {
     this.manager = manager;
     this.serverConfig = serverConfig;
     this.beanType = beanType;

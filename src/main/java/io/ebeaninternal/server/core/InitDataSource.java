@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceAlertFactory;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourceFactory;
@@ -16,16 +16,16 @@ class InitDataSource {
 
   private final JndiDataSourceLookup jndiDataSourceFactory = new JndiDataSourceLookup();
 
-  private final ServerConfig config;
+  private final DatabaseConfig config;
 
   /**
    * Create and set the main DataSource and read-only DataSource.
    */
-  static void init(ServerConfig config) {
+  static void init(DatabaseConfig config) {
     new InitDataSource(config).initialise();
   }
 
-  InitDataSource(ServerConfig config) {
+  InitDataSource(DatabaseConfig config) {
     this.config = config;
   }
 

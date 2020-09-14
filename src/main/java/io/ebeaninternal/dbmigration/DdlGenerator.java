@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration;
 
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbMigrationConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebean.migration.runner.ScriptTransform;
@@ -56,25 +56,25 @@ public class DdlGenerator {
   private String createAllContent;
   private File baseDir;
 
-  public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
+  public DdlGenerator(SpiEbeanServer server, DatabaseConfig config) {
     this.server = server;
-    this.jaxbPresent = serverConfig.getClassLoadConfig().isJavaxJAXBPresent();
-    this.generateDdl = serverConfig.isDdlGenerate();
-    this.extraDdl = serverConfig.isDdlExtra();
-    this.createOnly = serverConfig.isDdlCreateOnly();
-    this.dbSchema = serverConfig.getDbSchema();
+    this.jaxbPresent = config.getClassLoadConfig().isJavaxJAXBPresent();
+    this.generateDdl = config.isDdlGenerate();
+    this.extraDdl = config.isDdlExtra();
+    this.createOnly = config.isDdlCreateOnly();
+    this.dbSchema = config.getDbSchema();
     final DatabasePlatform databasePlatform = server.getDatabasePlatform();
     this.platform = databasePlatform.getPlatform();
     this.platformName = platform.base().name();
-    if (!serverConfig.getTenantMode().isDdlEnabled() && serverConfig.isDdlRun()) {
-      log.warn("DDL can't be run on startup with TenantMode " + serverConfig.getTenantMode());
+    if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
+      log.warn("DDL can't be run on startup with TenantMode " + config.getTenantMode());
       this.runDdl = false;
       this.ddlAutoCommit = false;
     } else {
-      this.runDdl = serverConfig.isDdlRun();
+      this.runDdl = config.isDdlRun();
       this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
     }
-    this.scriptTransform = createScriptTransform(serverConfig.getMigrationConfig());
+    this.scriptTransform = createScriptTransform(config.getMigrationConfig());
     this.baseDir = initBaseDir();
   }
 

@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.PropertiesWrapper;
-import io.ebean.config.ServerConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
@@ -17,11 +17,11 @@ public class HanaTableDdl extends BaseTableDdl {
   private final HanaHistoryDdl historyDdl;
   private final boolean generateUniqueDdl;
 
-  public HanaTableDdl(ServerConfig serverConfig, PlatformDdl platformDdl) {
-    super(serverConfig, platformDdl);
+  public HanaTableDdl(DatabaseConfig config, PlatformDdl platformDdl) {
+    super(config, platformDdl);
     this.historyDdl = (HanaHistoryDdl) platformDdl.historyDdl;
-    if (serverConfig.getProperties() != null) {
-      PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "hana", serverConfig.getProperties(), serverConfig.getClassLoadConfig());
+    if (config.getProperties() != null) {
+      PropertiesWrapper wrapper = new PropertiesWrapper("ebean", "hana", config.getProperties(), config.getClassLoadConfig());
       this.generateUniqueDdl = wrapper.getBoolean("generateUniqueDdl", false);
     } else {
       this.generateUniqueDdl = false;

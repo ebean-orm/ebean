@@ -2,9 +2,9 @@ package io.ebeaninternal.server.core.bootup;
 
 import io.avaje.classpath.scanner.ClassFilter;
 import io.ebean.annotation.DocStore;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
-import io.ebean.config.ServerConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -106,12 +106,11 @@ public class BootupClasses implements ClassFilter {
   /**
    * Run any ServerConfigStartup listeners.
    */
-  public void runServerConfigStartup(ServerConfig serverConfig) {
-
+  public void runServerConfigStartup(DatabaseConfig config) {
     for (Class<?> cls : serverConfigStartupCandidates) {
       try {
         ServerConfigStartup newInstance = (ServerConfigStartup) cls.newInstance();
-        newInstance.onStart(serverConfig);
+        newInstance.onStart(config);
       } catch (Exception e) {
         // assume that the desired behavior is to fail - add your own try catch if needed
         throw new IllegalStateException("Error running ServerConfigStartup " + cls, e);
@@ -119,7 +118,7 @@ public class BootupClasses implements ClassFilter {
     }
     for (ServerConfigStartup startup : serverConfigStartupInstances) {
       try {
-        startup.onStart(serverConfig);
+        startup.onStart(config);
       } catch (Exception e) {
         // assume that the desired behavior is to fail - add your own try catch if needed
         throw new IllegalStateException("Error running ServerConfigStartup " + startup.getClass(), e);
@@ -188,13 +187,13 @@ public class BootupClasses implements ClassFilter {
     add(startupInstances, serverConfigStartupInstances, serverConfigStartupCandidates);
   }
 
-  public void addChangeLogInstances(ServerConfig serverConfig) {
+  public void addChangeLogInstances(DatabaseConfig config) {
 
-    readAuditPrepare = serverConfig.getReadAuditPrepare();
-    readAuditLogger = serverConfig.getReadAuditLogger();
-    changeLogPrepare = serverConfig.getChangeLogPrepare();
-    changeLogListener = serverConfig.getChangeLogListener();
-    changeLogRegister = serverConfig.getChangeLogRegister();
+    readAuditPrepare = config.getReadAuditPrepare();
+    readAuditLogger = config.getReadAuditLogger();
+    changeLogPrepare = config.getChangeLogPrepare();
+    changeLogListener = config.getChangeLogListener();
+    changeLogRegister = config.getChangeLogRegister();
 
     // if not already set create the implementations found
     // via classpath scanning

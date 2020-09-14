@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.annotation.ConstraintMode;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -141,16 +142,16 @@ public class PlatformDdl {
   /**
    * Set configuration options.
    */
-  public void configure(ServerConfig serverConfig) {
-    historyDdl.configure(serverConfig, this);
-    naming = serverConfig.getConstraintNaming();
+  public void configure(DatabaseConfig config) {
+    historyDdl.configure(config, this);
+    naming = config.getConstraintNaming();
   }
 
   /**
    * Create a DdlHandler for the specific database platform.
    */
-  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
-    return new BaseDdlHandler(serverConfig, this);
+  public DdlHandler createDdlHandler(DatabaseConfig config) {
+    return new BaseDdlHandler(config, this);
   }
 
   /**

@@ -1,9 +1,9 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.NamingConvention;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
@@ -202,13 +202,13 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Construct with a naming convention and platform specific DDL.
    */
-  public BaseTableDdl(ServerConfig serverConfig, PlatformDdl platformDdl) {
-    this.namingConvention = serverConfig.getNamingConvention();
-    this.naming = serverConfig.getConstraintNaming();
-    this.historyTableSuffix = serverConfig.getHistoryTableSuffix();
+  public BaseTableDdl(DatabaseConfig config, PlatformDdl platformDdl) {
+    this.namingConvention = config.getNamingConvention();
+    this.naming = config.getConstraintNaming();
+    this.historyTableSuffix = config.getHistoryTableSuffix();
     this.platformDdl = platformDdl;
-    this.platformDdl.configure(serverConfig);
-    this.strictMode = serverConfig.getMigrationConfig().isStrictMode();
+    this.platformDdl.configure(config);
+    this.strictMode = config.getMigrationConfig().isStrictMode();
     DbHistorySupport hist = platformDdl.getPlatform().getHistorySupport();
     if (hist == null) {
       this.historySupport = HistorySupport.NONE;

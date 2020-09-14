@@ -7,6 +7,7 @@ import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.BeanNotEnhancedException;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.NamingConvention;
@@ -129,7 +130,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanManagerFactory beanManagerFactory;
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
   private final ChangeLogListener changeLogListener;
 
@@ -270,8 +271,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return the AsOfViewSuffix based on the DbHistorySupport.
    */
-  private String getAsOfViewSuffix(DatabasePlatform databasePlatform, ServerConfig serverConfig) {
-
+  private String getAsOfViewSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
     return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
@@ -280,7 +280,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return the versions between timestamp suffix based on the DbHistorySupport.
    */
-  private String getVersionsBetweenSuffix(DatabasePlatform databasePlatform, ServerConfig serverConfig) {
+  private String getVersionsBetweenSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
@@ -293,7 +293,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   @Override
-  public ServerConfig getServerConfig() {
+  public DatabaseConfig getServerConfig() {
     return serverConfig;
   }
 

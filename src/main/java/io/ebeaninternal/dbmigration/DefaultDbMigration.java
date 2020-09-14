@@ -4,10 +4,10 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.EbeanServer;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
@@ -104,7 +104,7 @@ public class DefaultDbMigration implements DbMigration {
 
   protected List<Pair> platforms = new ArrayList<>();
 
-  protected ServerConfig serverConfig;
+  protected DatabaseConfig serverConfig;
 
   protected DbConstraintNaming constraintNaming;
 
@@ -164,7 +164,7 @@ public class DefaultDbMigration implements DbMigration {
    * Set the serverConfig to use. Typically this is not called explicitly.
    */
   @Override
-  public void setServerConfig(ServerConfig config) {
+  public void setServerConfig(DatabaseConfig config) {
     if (this.serverConfig == null) {
       this.serverConfig = config;
     }

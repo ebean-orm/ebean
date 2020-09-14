@@ -5,12 +5,12 @@ import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonB;
 import io.ebean.annotation.DbJsonType;
 import io.ebean.annotation.DbMap;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptDeploy;
 import io.ebean.config.EncryptDeployManager;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.Encryptor;
 import io.ebean.config.NamingConvention;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
@@ -59,17 +59,15 @@ public class DeployUtil {
 
   private final boolean useJavaxValidationNotNull;
 
-  public DeployUtil(TypeManager typeMgr, ServerConfig serverConfig) {
-
+  public DeployUtil(TypeManager typeMgr, DatabaseConfig config) {
     this.typeManager = typeMgr;
-    this.namingConvention = serverConfig.getNamingConvention();
-    this.dbPlatform = serverConfig.getDatabasePlatform();
-    this.encryptDeployManager = serverConfig.getEncryptDeployManager();
-    this.encryptKeyManager = serverConfig.getEncryptKeyManager();
-
-    Encryptor be = serverConfig.getEncryptor();
+    this.namingConvention = config.getNamingConvention();
+    this.dbPlatform = config.getDatabasePlatform();
+    this.encryptDeployManager = config.getEncryptDeployManager();
+    this.encryptKeyManager = config.getEncryptKeyManager();
+    Encryptor be = config.getEncryptor();
     this.bytesEncryptor = be != null ? be : new SimpleAesEncryptor();
-    this.useJavaxValidationNotNull = serverConfig.isUseJavaxValidationNotNull();
+    this.useJavaxValidationNotNull = config.isUseJavaxValidationNotNull();
   }
 
   public TypeManager getTypeManager() {

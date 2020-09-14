@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 
@@ -12,7 +12,7 @@ public class ReadAnnotations {
 
   private final ReadAnnotationConfig readConfig;
 
-  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, ServerConfig serverConfig) {
+  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig serverConfig) {
     this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, serverConfig);
     if (readConfig.isJavaxValidationAnnotations()) {
       InitMetaValidationAnnotation.init(readConfig);

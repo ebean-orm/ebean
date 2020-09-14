@@ -12,8 +12,8 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.QueryCacheEntry;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKey;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.event.BeanFindController;
@@ -523,7 +523,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the ServerConfig.
    */
-  public ServerConfig getServerConfig() {
+  public DatabaseConfig getServerConfig() {
     return owner.getServerConfig();
   }
 

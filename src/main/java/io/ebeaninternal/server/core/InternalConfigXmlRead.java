@@ -2,7 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.avaje.classpath.scanner.ClassPathScanner;
 import io.avaje.classpath.scanner.Resource;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.server.dto.DtoNamedQueries;
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
 import io.ebeaninternal.xmlmapping.model.XmDto;
@@ -23,7 +23,7 @@ class InternalConfigXmlRead {
 
   private static final Logger log = LoggerFactory.getLogger(InternalConfigXmlRead.class);
 
-  private final ServerConfig serverConfig;
+  private final DatabaseConfig serverConfig;
 
   private final ClassLoader classLoader;
 
@@ -31,7 +31,7 @@ class InternalConfigXmlRead {
 
   private List<XmEbean> xmlEbeanList;
 
-  InternalConfigXmlRead(ServerConfig serverConfig) {
+  InternalConfigXmlRead(DatabaseConfig serverConfig) {
     this.serverConfig = serverConfig;
     this.classLoader = serverConfig.getClassLoadConfig().getClassLoader();
     if (serverConfig.getClassLoadConfig().isJavaxJAXBPresent()) {

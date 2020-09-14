@@ -33,13 +33,6 @@ import java.util.ServiceLoader;
 @Deprecated
 public class EbeanServerFactory {
 
-
-  private static SpiContainer container;
-
-  static {
-    EbeanVersion.getVersion(); // initalizes the version class and logs the version.
-  }
-
   /**
    * Initialise the container with clustering configuration.
    * <p>
@@ -47,53 +40,28 @@ public class EbeanServerFactory {
    * ContainerConfig on the ServerConfig when creating the first EbeanServer instance.
    */
   public static synchronized void initialiseContainer(ContainerConfig containerConfig) {
-    getContainer(containerConfig);
+    DatabaseFactory.initialiseContainer(containerConfig);
   }
 
   /**
    * Create using ebean.properties to configure the database.
    */
   public static synchronized EbeanServer create(String name) {
-
-    // construct based on loading properties files
-    // and if invoked by Ebean then it handles registration
-    SpiContainer serverFactory = getContainer(null);
-    return serverFactory.createServer(name);
+    return (EbeanServer)DatabaseFactory.create(name);
   }
 
   /**
    * Create using the ServerConfig object to configure the database.
    */
   public static synchronized EbeanServer create(ServerConfig config) {
-
-    if (config.getName() == null) {
-      throw new PersistenceException("The name is null (it is required)");
-    }
-
-    EbeanServer server = createInternal(config);
-
-    if (config.isRegister()) {
-      DbPrimary.setSkip(true);
-      Ebean.register(server, config.isDefaultServer());
-    }
-
-    return server;
+    return (EbeanServer)DatabaseFactory.create(config);
   }
 
   /**
    * Create using the ServerConfig additionally specifying a classLoader to use as the context class loader.
    */
   public static synchronized EbeanServer createWithContextClassLoader(ServerConfig config, ClassLoader classLoader) {
-
-    ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(classLoader);
-    try {
-      return EbeanServerFactory.create(config);
-
-    } finally {
-      // set the currentContextLoader back
-      Thread.currentThread().setContextClassLoader(currentContextLoader);
-    }
+    return (EbeanServer)DatabaseFactory.createWithContextClassLoader(config, classLoader);
   }
 
   /**
@@ -103,46 +71,7 @@ public class EbeanServerFactory {
    * </p>
    */
   public static synchronized void shutdown() {
-    container.shutdown();
+    DatabaseFactory.shutdown();
   }
 
-
-  private static EbeanServer createInternal(ServerConfig config) {
-
-    return getContainer(config.getContainerConfig()).createServer(config);
-  }
-
-  /**
-   * Get the EbeanContainer initialising it if necessary.
-   *
-   * @param containerConfig the configuration controlling clustering communication
-   */
-  private static SpiContainer getContainer(ContainerConfig containerConfig) {
-
-    // thread safe in that all calling methods are synchronized
-    if (container != null) {
-      return container;
-    }
-
-    if (containerConfig == null) {
-      // effectively load configuration from ebean.properties
-      Properties properties = DbPrimary.getProperties();
-      containerConfig = new ContainerConfig();
-      containerConfig.loadFromProperties(properties);
-    }
-    container = createContainer(containerConfig);
-    return container;
-  }
-
-  /**
-   * Create the container instance using the configuration.
-   */
-  protected static SpiContainer createContainer(ContainerConfig containerConfig) {
-
-    Iterator<SpiContainerFactory> factories = ServiceLoader.load(SpiContainerFactory.class).iterator();
-    if (factories.hasNext()) {
-      return factories.next().create(containerConfig);
-    }
-    throw new IllegalStateException("Service loader didn't find a SpiContainerFactory?");
-  }
 }

@@ -3,7 +3,7 @@ package io.ebean.plugin;
 import io.ebean.EbeanServer;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
 import javax.sql.DataSource;
@@ -17,7 +17,7 @@ public interface SpiServer extends EbeanServer, BeanLoader {
   /**
    * Return the serverConfig.
    */
-  ServerConfig getServerConfig();
+  DatabaseConfig getServerConfig();
 
   /**
    * Return the DatabasePlatform for this database.

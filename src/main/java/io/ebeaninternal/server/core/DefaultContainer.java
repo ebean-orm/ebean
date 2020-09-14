@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.ContainerConfig;
+import io.ebean.config.DatabaseConfig;
+import io.ebean.config.DatabaseConfigProvider;
 import io.ebean.config.ModuleInfoLoader;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.ServerConfigProvider;
@@ -52,20 +54,16 @@ public class DefaultContainer implements SpiContainer {
    */
   @Override
   public SpiEbeanServer createServer(String name) {
-
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName(name);
     config.loadFromProperties();
-
     return createServer(config);
   }
 
-  private SpiBackgroundExecutor createBackgroundExecutor(ServerConfig serverConfig) {
-
+  private SpiBackgroundExecutor createBackgroundExecutor(DatabaseConfig serverConfig) {
     String namePrefix = "ebean-" + serverConfig.getName();
     int schedulePoolSize = serverConfig.getBackgroundExecutorSchedulePoolSize();
     int shutdownSecs = serverConfig.getBackgroundExecutorShutdownSecs();
-
     return new DefaultBackgroundExecutor(schedulePoolSize, shutdownSecs, namePrefix);
   }
 
@@ -73,41 +71,39 @@ public class DefaultContainer implements SpiContainer {
    * Create the implementation from the configuration.
    */
   @Override
-  public SpiEbeanServer createServer(ServerConfig serverConfig) {
-
+  public SpiEbeanServer createServer(DatabaseConfig config) {
     synchronized (this) {
-      applyConfigServices(serverConfig);
-
-      setNamingConvention(serverConfig);
-      BootupClasses bootupClasses = getBootupClasses(serverConfig);
+      applyConfigServices(config);
+      setNamingConvention(config);
+      BootupClasses bootupClasses = getBootupClasses(config);
 
       boolean online = true;
-      if (serverConfig.isDocStoreOnly()) {
-        serverConfig.setDatabasePlatform(new H2Platform());
+      if (config.isDocStoreOnly()) {
+        config.setDatabasePlatform(new H2Platform());
       } else {
-        TenantMode tenantMode = serverConfig.getTenantMode();
+        TenantMode tenantMode = config.getTenantMode();
         if (TenantMode.DB != tenantMode) {
-          setDataSource(serverConfig);
+          setDataSource(config);
           if (!tenantMode.isDynamicDataSource()) {
             // check the autoCommit and Transaction Isolation
-            online = checkDataSource(serverConfig);
+            online = checkDataSource(config);
           }
         }
       }
 
       // determine database platform (Oracle etc)
-      setDatabasePlatform(serverConfig);
-      if (serverConfig.getDbEncrypt() != null) {
+      setDatabasePlatform(config);
+      if (config.getDbEncrypt() != null) {
         // use a configured DbEncrypt rather than the platform default
-        serverConfig.getDatabasePlatform().setDbEncrypt(serverConfig.getDbEncrypt());
+        config.getDatabasePlatform().setDbEncrypt(config.getDbEncrypt());
       }
 
       // inform the NamingConvention of the associated DatabasePlatform
-      serverConfig.getNamingConvention().setDatabasePlatform(serverConfig.getDatabasePlatform());
+      config.getNamingConvention().setDatabasePlatform(config.getDatabasePlatform());
 
       // executor and l2 caching service setup early (used during server construction)
-      SpiBackgroundExecutor executor = createBackgroundExecutor(serverConfig);
-      InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, serverConfig, bootupClasses);
+      SpiBackgroundExecutor executor = createBackgroundExecutor(config);
+      InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, config, bootupClasses);
 
       DefaultServer server = new DefaultServer(c, c.cacheManager());
 
@@ -121,10 +117,17 @@ public class DefaultContainer implements SpiContainer {
     }
   }
 
-  private void applyConfigServices(ServerConfig config) {
+  private void applyConfigServices(DatabaseConfig config) {
     if (config.isDefaultServer()) {
-      for (ServerConfigProvider configProvider : ServiceLoader.load(ServerConfigProvider.class)) {
+      boolean appliedConfig = false;
+      for (DatabaseConfigProvider configProvider : ServiceLoader.load(DatabaseConfigProvider.class)) {
         configProvider.apply(config);
+        appliedConfig = true;
+      }
+      if (!appliedConfig && config instanceof ServerConfig) {
+        for (ServerConfigProvider configProvider : ServiceLoader.load(ServerConfigProvider.class)) {
+          configProvider.apply((ServerConfig)config);
+        }
       }
       if (config.isAutoLoadModuleInfo()) {
         // auto register entity classes (default db)
@@ -157,42 +160,42 @@ public class DefaultContainer implements SpiContainer {
    * Get the entities, scalarTypes, Listeners etc combining the class registered
    * ones with the already created instances.
    */
-  private BootupClasses getBootupClasses(ServerConfig serverConfig) {
+  private BootupClasses getBootupClasses(DatabaseConfig config) {
 
-    BootupClasses bootup = getBootupClasses1(serverConfig);
-    bootup.addIdGenerators(serverConfig.getIdGenerators());
-    bootup.addPersistControllers(serverConfig.getPersistControllers());
-    bootup.addPostLoaders(serverConfig.getPostLoaders());
-    bootup.addPostConstructListeners(serverConfig.getPostConstructListeners());
-    bootup.addFindControllers(serverConfig.getFindControllers());
-    bootup.addPersistListeners(serverConfig.getPersistListeners());
-    bootup.addQueryAdapters(serverConfig.getQueryAdapters());
-    bootup.addServerConfigStartup(serverConfig.getServerConfigStartupListeners());
-    bootup.addChangeLogInstances(serverConfig);
+    BootupClasses bootup = getBootupClasses1(config);
+    bootup.addIdGenerators(config.getIdGenerators());
+    bootup.addPersistControllers(config.getPersistControllers());
+    bootup.addPostLoaders(config.getPostLoaders());
+    bootup.addPostConstructListeners(config.getPostConstructListeners());
+    bootup.addFindControllers(config.getFindControllers());
+    bootup.addPersistListeners(config.getPersistListeners());
+    bootup.addQueryAdapters(config.getQueryAdapters());
+    bootup.addServerConfigStartup(config.getServerConfigStartupListeners());
+    bootup.addChangeLogInstances(config);
 
     // run any ServerConfigStartup instances
-    bootup.runServerConfigStartup(serverConfig);
+    bootup.runServerConfigStartup(config);
     return bootup;
   }
 
   /**
    * Get the class based entities, scalarTypes, Listeners etc.
    */
-  private BootupClasses getBootupClasses1(ServerConfig serverConfig) {
+  private BootupClasses getBootupClasses1(DatabaseConfig config) {
 
-    List<Class<?>> entityClasses = serverConfig.getClasses();
-    if (serverConfig.isDisableClasspathSearch() || (entityClasses != null && !entityClasses.isEmpty())) {
+    List<Class<?>> entityClasses = config.getClasses();
+    if (config.isDisableClasspathSearch() || (entityClasses != null && !entityClasses.isEmpty())) {
       // use classes we explicitly added via configuration
       return new BootupClasses(entityClasses);
     }
 
-    return BootupClassPathSearch.search(serverConfig);
+    return BootupClassPathSearch.search(config);
   }
 
   /**
    * Set the naming convention to underscore if it has not already been set.
    */
-  private void setNamingConvention(ServerConfig config) {
+  private void setNamingConvention(DatabaseConfig config) {
     if (config.getNamingConvention() == null) {
       config.setNamingConvention(new UnderscoreNamingConvention());
     }
@@ -201,7 +204,7 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Set the DatabasePlatform if it has not already been set.
    */
-  private void setDatabasePlatform(ServerConfig config) {
+  private void setDatabasePlatform(DatabaseConfig config) {
 
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
@@ -219,7 +222,7 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Set the DataSource if it has not already been set.
    */
-  private void setDataSource(ServerConfig config) {
+  private void setDataSource(DatabaseConfig config) {
     if (isOfflineMode(config)) {
       logger.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
     } else {
@@ -227,8 +230,8 @@ public class DefaultContainer implements SpiContainer {
     }
   }
 
-  private boolean isOfflineMode(ServerConfig serverConfig) {
-    return serverConfig.isDbOffline() || DbOffline.isSet();
+  private boolean isOfflineMode(DatabaseConfig config) {
+    return config.isDbOffline() || DbOffline.isSet();
   }
 
   /**
@@ -241,26 +244,22 @@ public class DefaultContainer implements SpiContainer {
    * checking may not work as expected.
    * </p>
    */
-  private boolean checkDataSource(ServerConfig serverConfig) {
-
-    if (isOfflineMode(serverConfig)) {
+  private boolean checkDataSource(DatabaseConfig config) {
+    if (isOfflineMode(config)) {
       return false;
     }
-
-    if (serverConfig.getDataSource() == null) {
-      if (serverConfig.getDataSourceConfig().isOffline()) {
+    if (config.getDataSource() == null) {
+      if (config.getDataSourceConfig().isOffline()) {
         // this is ok - offline DDL generation etc
         return false;
       }
       throw new RuntimeException("DataSource not set?");
     }
-
-    try (Connection connection = serverConfig.getDataSource().getConnection()) {
+    try (Connection connection = config.getDataSource().getConnection()) {
       if (connection.getAutoCommit()) {
-        logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
+        logger.warn("DataSource [{}] has autoCommit defaulting to true!", config.getName());
       }
       return true;
-
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
     }
