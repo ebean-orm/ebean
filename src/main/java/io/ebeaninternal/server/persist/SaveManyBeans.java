@@ -36,7 +36,6 @@ public class SaveManyBeans extends SaveManyBase {
   private final boolean isMap;
   private final boolean saveRecurseSkippable;
   private final DeleteMode deleteMode;
-
   private Collection<?> collection;
   private int sortOrder;
 
@@ -52,7 +51,6 @@ public class SaveManyBeans extends SaveManyBase {
 
   @Override
   void save() {
-
     if (many.hasJoinTable()) {
       // check if we can save the m2m intersection in this direction
       // we only allow one direction based on first traversed basis
@@ -104,7 +102,6 @@ public class SaveManyBeans extends SaveManyBase {
   }
 
   private void processDetails() {
-
     BeanProperty orderColumn = null;
     boolean hasOrderColumn = many.hasOrderColumn();
     if (hasOrderColumn) {
@@ -135,7 +132,6 @@ public class SaveManyBeans extends SaveManyBase {
   }
 
   private void saveAllBeans(BeanProperty orderColumn) {
-
     // if a map, then we get the key value and
     // set it to the appropriate property on the
     // detail bean before we save it
@@ -150,7 +146,6 @@ public class SaveManyBeans extends SaveManyBase {
         mapKeyValue = entry.getKey();
         detailBean = entry.getValue();
       }
-
       if (detailBean instanceof EntityBean) {
         EntityBean detail = (EntityBean) detailBean;
         EntityBeanIntercept ebi = detail._ebean_getIntercept();
@@ -164,12 +159,10 @@ public class SaveManyBeans extends SaveManyBase {
           if (targetDescriptor.isReference(ebi)) {
             // we can skip this one
             skipSavingThisBean = true;
-
           } else if (ebi.isNewOrDirty()) {
             skipSavingThisBean = false;
             // set the parent bean to detailBean
             many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
-
           } else {
             // unmodified so skip depending on prop.isSaveRecurseSkippable();
             skipSavingThisBean = saveRecurseSkippable;
@@ -210,7 +203,6 @@ public class SaveManyBeans extends SaveManyBase {
    * Collect the Id values of the details to remove 'missing children' for stateless updates.
    */
   private List<Object> collectIds(Collection<?> collection, BeanDescriptor<?> targetDescriptor, boolean isMap) {
-
     List<Object> detailIds = new ArrayList<>();
     // stateless update with deleteMissingChildren so first
     // collect the Id values to remove the 'missing children'
@@ -237,7 +229,6 @@ public class SaveManyBeans extends SaveManyBase {
    * </p>
    */
   private void saveAssocManyIntersection() {
-
     if (value == null) {
       return;
     }
@@ -258,7 +249,6 @@ public class SaveManyBeans extends SaveManyBase {
   }
 
   private void saveAssocManyIntersection(boolean queue) {
-
     boolean forcedUpdate = request.isForcedUpdate();
     boolean vanillaCollection = !(value instanceof BeanCollection<?>);
     if (vanillaCollection || forcedUpdate) {
@@ -269,7 +259,6 @@ public class SaveManyBeans extends SaveManyBase {
 
     Collection<?> deletions = null;
     Collection<?> additions;
-
     if (insertedParent || vanillaCollection || forcedUpdate) {
       // treat everything in the list/set/map as an intersection addition
       if (value instanceof Map<?, ?>) {
@@ -309,12 +298,9 @@ public class SaveManyBeans extends SaveManyBase {
             transaction.logSummary(m);
           }
           log.warn(m);
-
         } else {
           if (!many.hasImportedId(otherBean)) {
-            String msg = "ManyToMany bean " + otherBean + " does not have an Id value.";
-            throw new PersistenceException(msg);
-
+            throw new PersistenceException("ManyToMany bean " + otherBean + " does not have an Id value.");
           } else {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
@@ -334,7 +320,6 @@ public class SaveManyBeans extends SaveManyBase {
         persister.executeOrQueue(sqlDelete, transaction, queue);
       }
     }
-
     // decrease the depth back to what it was
     transaction.depth(-1);
   }
