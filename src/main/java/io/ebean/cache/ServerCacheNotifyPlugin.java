@@ -13,5 +13,5 @@ public interface ServerCacheNotifyPlugin {
   /**
    * Create a ServerCacheNotify implementation given the server configuration.
    */
-  ServerCacheNotify create(DatabaseConfig serverConfig);
+  ServerCacheNotify create(DatabaseConfig config);
 }

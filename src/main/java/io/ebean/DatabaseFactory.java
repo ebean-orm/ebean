@@ -40,7 +40,7 @@ public class DatabaseFactory {
    * Initialise the container with clustering configuration.
    * <p>
    * Call this prior to creating any Database instances or alternatively set the
-   * ContainerConfig on the ServerConfig when creating the first Database instance.
+   * ContainerConfig on the DatabaseConfig when creating the first Database instance.
    */
   public static synchronized void initialiseContainer(ContainerConfig containerConfig) {
     getContainer(containerConfig);

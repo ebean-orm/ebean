@@ -11,7 +11,6 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.NamingConvention;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.config.dbplatform.DbIdentity;
@@ -88,7 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Creates BeanDescriptors.
@@ -130,7 +128,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanManagerFactory beanManagerFactory;
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig config;
 
   private final ChangeLogListener changeLogListener;
 
@@ -204,38 +202,35 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Create for a given database dbConfig.
    */
   public BeanDescriptorManager(InternalConfiguration config) {
-
-    this.serverConfig = config.getServerConfig();
-    this.serverName = InternString.intern(serverConfig.getName());
+    this.config = config.getConfig();
+    this.serverName = InternString.intern(this.config.getName());
     this.cacheManager = config.getCacheManager();
     this.docStoreFactory = config.getDocStoreFactory();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.dataSource = serverConfig.getDataSource();
-    this.encryptKeyManager = serverConfig.getEncryptKeyManager();
-    this.databasePlatform = serverConfig.getDatabasePlatform();
+    this.dataSource = this.config.getDataSource();
+    this.encryptKeyManager = this.config.getEncryptKeyManager();
+    this.databasePlatform = this.config.getDatabasePlatform();
     this.multiValueBind = config.getMultiValueBind();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), multiValueBind);
-    this.queryPlanTTLSeconds = serverConfig.getQueryPlanTTLSeconds();
-
-    this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
-    String versionsBetweenSuffix = getVersionsBetweenSuffix(databasePlatform, serverConfig);
-    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, serverConfig);
+    this.queryPlanTTLSeconds = this.config.getQueryPlanTTLSeconds();
+    this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, this.config);
+    String versionsBetweenSuffix = getVersionsBetweenSuffix(databasePlatform, this.config);
+    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, this.config);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
-    this.namingConvention = serverConfig.getNamingConvention();
+    this.namingConvention = this.config.getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
     this.typeManager = deployUtil.getTypeManager();
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
-    this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory(serverConfig);
+    this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory(this.config);
     this.persistControllerManager = new PersistControllerManager(bootupClasses);
     this.postLoadManager = new PostLoadManager(bootupClasses);
     this.postConstructManager = new PostConstructManager(bootupClasses);
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
     this.beanFinderManager = new BeanFinderManager(bootupClasses);
-
     this.transientProperties = new TransientProperties();
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
@@ -293,8 +288,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   @Override
-  public DatabaseConfig getServerConfig() {
-    return serverConfig;
+  public DatabaseConfig getConfig() {
+    return config;
   }
 
   @Override
@@ -394,7 +389,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private void readXmlMapping(List<XmEbean> mappings) {
     if (mappings != null) {
-      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
+      ClassLoader classLoader = config.getClassLoadConfig().getClassLoader();
       for (XmEbean mapping : mappings) {
         List<XmEntity> entityDeploy = mapping.getEntity();
         for (XmEntity deploy : entityDeploy) {
@@ -1288,7 +1283,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private <T> DeployBeanInfo<T> createDeployBeanInfo(Class<T> beanClass) {
 
-    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<>(this, beanClass, serverConfig);
+    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<>(this, beanClass, config);
     beanLifecycleAdapterFactory.addLifecycleMethods(desc);
 
     // set bean controller, finder and listener
@@ -1365,7 +1360,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         identityMode.setIdType(IdType.EXTERNAL);
         return;
       }
-      if (desc.isIdGeneratedValue() || serverConfig.isIdGeneratorAutomatic()) {
+      if (desc.isIdGeneratedValue() || config.isIdGeneratorAutomatic()) {
         // use IDENTITY or SEQUENCE based on platform
         identityMode.setPlatformType(dbIdentity.getIdType());
       } else {
@@ -1628,7 +1623,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Create a DeployBeanDescriptor for an ElementCollection target.
    */
   public <A> DeployBeanDescriptor<A> createDeployDescriptor(Class<A> targetType) {
-    return new DeployBeanDescriptor<>(this, targetType, serverConfig);
+    return new DeployBeanDescriptor<>(this, targetType, config);
   }
 
   /**

@@ -100,7 +100,7 @@ public interface SpiTransaction extends Transaction {
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.
-   * If null is returned the server default is used (set on ServerConfig).
+   * If null is returned the server default is used (set on DatabaseConfig).
    */
   Boolean isUpdateAllLoadedProperties();
 

@@ -242,7 +242,7 @@ public class DatabasePlatform {
   }
 
   /**
-   * Configure UUID Storage etc based on ServerConfig settings.
+   * Configure UUID Storage etc based on DatabaseConfig settings.
    */
   protected void configure(PlatformConfig config, boolean allQuotedIdentifiers) {
     this.allQuotedIdentifiers = allQuotedIdentifiers;

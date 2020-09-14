@@ -6,7 +6,7 @@ import io.ebean.annotation.Platform;
 /**
  * Custom mappings for DB types that override the default.
  *
- * @see ServerConfig#addCustomMapping(DbType, String)
+ * @see DatabaseConfig#addCustomMapping(DbType, String)
  */
 public class CustomDbTypeMapping {
 

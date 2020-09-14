@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 
 import java.util.Set;
 
@@ -29,10 +29,10 @@ import java.util.Set;
  * </p>
  * <p>
  * A BeanPersistListener is either found automatically via class path search or
- * can be added programmatically via {@link ServerConfig#add(BeanPersistListener)}}.
+ * can be added programmatically via {@link DatabaseConfig#add(BeanPersistListener)}}.
  * </p>
  *
- * @see ServerConfig#add(BeanPersistListener)
+ * @see DatabaseConfig#add(BeanPersistListener)
  */
 public interface BeanPersistListener {
 

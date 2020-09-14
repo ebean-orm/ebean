@@ -54,12 +54,12 @@ public class CQueryEngine {
 
   private final DatabasePlatform dbPlatform;
 
-  public CQueryEngine(DatabaseConfig serverConfig, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+  public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
     this.dbPlatform = dbPlatform;
-    this.defaultFetchSizeFindEach = serverConfig.getJdbcFetchSizeFindEach();
-    this.defaultFetchSizeFindList = serverConfig.getJdbcFetchSizeFindList();
+    this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
+    this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, serverConfig.getAsOfSysPeriod());
+    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, config.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
 

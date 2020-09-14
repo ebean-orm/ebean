@@ -86,7 +86,7 @@ public interface DbMigration {
   void setServer(Database database);
 
   /**
-   * Set the serverConfig to use. Typically this is not called explicitly.
+   * Set the DatabaseConfig to use. Typically this is not called explicitly.
    */
   void setServerConfig(DatabaseConfig config);
 

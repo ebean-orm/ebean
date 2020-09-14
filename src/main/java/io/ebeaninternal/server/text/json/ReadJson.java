@@ -163,7 +163,7 @@ public class ReadJson implements SpiJsonReader {
     if (objectMapper == null) {
       throw new IllegalStateException(
         "Jackson ObjectMapper required but has not set. The ObjectMapper can be set on"
-          + " either the ServerConfig or on JsonReadOptions.");
+          + " either the DatabaseConfig or on JsonReadOptions.");
     }
     return (ObjectMapper) objectMapper;
   }

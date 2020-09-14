@@ -4,7 +4,7 @@ import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.PersistenceContext;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -175,7 +175,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private Boolean skipCache;
 
   /**
-   * Default skip cache behavior from {@link ServerConfig#isSkipCacheAfterWrite()}.
+   * Default skip cache behavior from {@link DatabaseConfig#isSkipCacheAfterWrite()}.
    */
   private final boolean skipCacheAfterWrite;
 

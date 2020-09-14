@@ -14,7 +14,7 @@ import java.io.IOException;
 public interface PlatformHistoryDdl {
 
   /**
-   * Configure typically reading the necessary parameters from ServerConfig and Platform.
+   * Configure typically reading the necessary parameters from DatabaseConfig and Platform.
    */
   void configure(DatabaseConfig config, PlatformDdl platformDdl);
 

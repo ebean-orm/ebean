@@ -1,10 +1,10 @@
 package io.ebean.config;
 
 /**
- * Provides a ServiceLoader based mechanism to configure a ServerConfig.
+ * Provides a ServiceLoader based mechanism to configure a DatabaseConfig.
  * <p>
  * Provide an implementation and register it via the standard Java ServiceLoader mechanism
- * via a file at <code>META-INF/services/io.ebean.config.ServerConfigProvider</code>.
+ * via a file at <code>META-INF/services/io.ebean.config.DatabaseConfigProvider</code>.
  * </p>
  * <p>
  * If you are using a DI container like Spring or Guice you are unlikely to use this but instead use a

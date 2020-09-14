@@ -14,7 +14,7 @@ public class CacheManagerOptions {
 
   private final ClusterManager clusterManager;
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig databaseConfig;
 
   private final boolean localL2Caching;
 
@@ -29,7 +29,7 @@ public class CacheManagerOptions {
   CacheManagerOptions() {
     this.localL2Caching = true;
     this.clusterManager = null;
-    this.serverConfig = null;
+    this.databaseConfig = null;
     this.cacheFactory = new DefaultServerCacheFactory();
     this.beanDefault = new ServerCacheOptions();
     this.queryDefault = new ServerCacheOptions();
@@ -37,7 +37,7 @@ public class CacheManagerOptions {
 
   public CacheManagerOptions(ClusterManager clusterManager, DatabaseConfig config, boolean localL2Caching) {
     this.clusterManager = clusterManager;
-    this.serverConfig = config;
+    this.databaseConfig = config;
     this.localL2Caching = localL2Caching;
     this.currentTenantProvider = config.getCurrentTenantProvider();
   }
@@ -60,7 +60,7 @@ public class CacheManagerOptions {
   }
 
   public String getServerName() {
-    return (serverConfig == null) ? "db" : serverConfig.getName();
+    return (databaseConfig == null) ? "db" : databaseConfig.getName();
   }
 
   public boolean isLocalL2Caching() {

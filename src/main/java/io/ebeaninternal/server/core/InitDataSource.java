@@ -98,7 +98,7 @@ class InitDataSource {
     }
     if (dsConfig.isOffline()) {
       if (config.getDatabasePlatformName() == null) {
-        throw new PersistenceException("You MUST specify a DatabasePlatformName on ServerConfig when offline");
+        throw new PersistenceException("You MUST specify a DatabasePlatformName on DatabaseConfig when offline");
       }
       return null;
     }

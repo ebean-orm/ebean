@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 
 /**
  * Objects extending this modify queries prior their execution.
@@ -10,7 +10,7 @@ import io.ebean.config.ServerConfig;
  * </p>
  * <p>
  * A BeanQueryAdapter is either found automatically via class path search or can
- * be added programmatically via {@link ServerConfig#add(BeanQueryAdapter)}.
+ * be added programmatically via {@link DatabaseConfig#add(BeanQueryAdapter)}.
  * </p>
  * <p>
  * Note that a BeanQueryAdapter should be thread safe (stateless) and if

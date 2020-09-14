@@ -23,9 +23,9 @@ public interface BeanDescriptorMap {
   String getServerName();
 
   /**
-   * Return the ServerConfig.
+   * Return the DatabaseConfig.
    */
-  DatabaseConfig getServerConfig();
+  DatabaseConfig getConfig();
 
   /**
    * Return the Cache Manager.

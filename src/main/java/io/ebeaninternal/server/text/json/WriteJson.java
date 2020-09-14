@@ -476,7 +476,7 @@ public class WriteJson implements SpiJsonWriter {
 
   private ObjectMapper objectMapper() {
     if (objectMapper == null) {
-      throw new IllegalStateException("Jackson ObjectMapper required but not set. Expected to be set on either serverConfig");
+      throw new IllegalStateException("Jackson ObjectMapper required but not set. Expected to be set on DatabaseConfig");
     }
     return (ObjectMapper) objectMapper;
   }

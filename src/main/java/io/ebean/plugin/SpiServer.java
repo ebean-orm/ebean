@@ -15,7 +15,7 @@ import java.util.List;
 public interface SpiServer extends EbeanServer, BeanLoader {
 
   /**
-   * Return the serverConfig.
+   * Return the DatabaseConfig.
    */
   DatabaseConfig getServerConfig();
 

@@ -2,7 +2,6 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.Ebean;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;

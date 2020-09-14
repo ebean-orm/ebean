@@ -283,7 +283,7 @@ public interface Query<T> {
   /**
    * Specify the PersistenceContextScope to use for this query.
    * <p/>
-   * When this is not set the 'default' configured on {@link io.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)}
+   * When this is not set the 'default' configured on {@link io.ebean.config.DatabaseConfig#setPersistenceContextScope(PersistenceContextScope)}
    * is used - this value defaults to {@link PersistenceContextScope#TRANSACTION}.
    * <p/>
    * Note that the same persistence Context is used for subsequent lazy loading and query join queries.

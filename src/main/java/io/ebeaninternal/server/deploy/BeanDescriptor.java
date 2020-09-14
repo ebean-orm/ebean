@@ -521,10 +521,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * Return the ServerConfig.
+   * Return the DatabaseConfig.
    */
-  public DatabaseConfig getServerConfig() {
-    return owner.getServerConfig();
+  public DatabaseConfig getConfig() {
+    return owner.getConfig();
   }
 
   /**

@@ -27,7 +27,6 @@ import io.ebeaninternal.server.core.Persister;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanManager;
-import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.IntersectionRow;
@@ -42,8 +41,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 
 /**
  * Persister implementation using DML.
@@ -1276,7 +1273,6 @@ public final class DefaultPersister implements Persister {
   private String errNotRegistered(Class<?> beanClass) {
     String msg = "The type [" + beanClass + "] is not a registered entity?";
     msg += " If you don't explicitly list the entity classes to use Ebean will search for them in the classpath.";
-    msg += " If the entity is in a Jar check the ebean.search.jars property in ebean.properties file or check ServerConfig.addJar().";
     return msg;
   }
 

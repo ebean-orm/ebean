@@ -147,7 +147,7 @@ public class ClassLoadConfig {
 
     ClassLoaderContext(ClassLoader preferredLoader) {
       this.preferredLoader = preferredLoader;
-      this.callerLoader = ServerConfig.class.getClassLoader();
+      this.callerLoader = DatabaseConfig.class.getClassLoader();
       this.contextLoader = contextLoader();
     }
 

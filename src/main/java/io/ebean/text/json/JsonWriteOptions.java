@@ -101,7 +101,7 @@ public class JsonWriteOptions {
   /**
    * Return the jackson object mapper to use.
    * <p/>
-   * If null the ObjectMapper from serverConfig will be used.
+   * If null the ObjectMapper from DatabaseConfig will be used.
    */
   public Object getObjectMapper() {
     return objectMapper;
@@ -110,7 +110,7 @@ public class JsonWriteOptions {
   /**
    * Set the jackson object mapper to use.
    * <p/>
-   * If null the ObjectMapper from serverConfig will be used.
+   * If null the ObjectMapper from DatabaseConfig will be used.
    */
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;

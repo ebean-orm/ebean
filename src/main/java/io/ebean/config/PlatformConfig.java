@@ -249,10 +249,10 @@ public class PlatformConfig {
    * <pre>{@code
    *
    *   // set the default mapping for BigDecimal.class/decimal
-   *   serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
+   *   config.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
    *
    *   // set the default mapping for String.class/varchar but only for Postgres
-   *   serverConfig.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
+   *   config.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
    *
    * }</pre>
    *
@@ -270,10 +270,10 @@ public class PlatformConfig {
    * <pre>{@code
    *
    *   // set the default mapping for BigDecimal/decimal
-   *   serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
+   *   config.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
    *
    *   // set the default mapping for String/varchar
-   *   serverConfig.addCustomMapping(DbType.VARCHAR, "text");
+   *   config.addCustomMapping(DbType.VARCHAR, "text");
    *
    * }</pre>
    *

@@ -22,6 +22,7 @@ package io.ebean.event;
  * <p>
  * It is worth noting that BeanPersistListener is different in three main ways
  * from BeanPersistController postXXX methods.
+ * </p>
  * <ul>
  * <li>BeanPersistListener only sees successfully committed events.
  * BeanController pre and post methods occur before the commit or a rollback and
@@ -31,10 +32,9 @@ package io.ebean.event;
  * <li>BeanPersistListener can be notified of events from other servers in a
  * cluster.</li>
  * </ul>
- * </p>
  * <p>
  * A BeanPersistController is either found automatically via class path search
- * or can be added programmatically via ServerConfiguration.addEntity().
+ * or can be added programmatically via DatabaseConfig.add().
  * </p>
  */
 public interface BeanPersistController {

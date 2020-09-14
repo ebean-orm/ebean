@@ -12,7 +12,6 @@ import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryListener;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
@@ -105,8 +104,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
- * Used to extend the ServerConfig with additional objects used to configure and
- * construct an EbeanServer.
+ * Used to extend the DatabaseConfig with additional objects used to configure and
+ * construct an Database.
  */
 public class InternalConfiguration {
 
@@ -116,7 +115,7 @@ public class InternalConfiguration {
 
   private final boolean online;
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig config;
 
   private final BootupClasses bootupClasses;
 
@@ -172,49 +171,42 @@ public class InternalConfiguration {
   private final ExtraMetrics extraMetrics = new ExtraMetrics();
 
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
-                        DatabaseConfig serverConfig, BootupClasses bootupClasses) {
+                        DatabaseConfig config, BootupClasses bootupClasses) {
 
     this.online = online;
-    this.serverConfig = serverConfig;
-    this.clockService = new ClockService(serverConfig.getClock());
+    this.config = config;
+    this.clockService = new ClockService(config.getClock());
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
-    this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
-    this.jsonFactory = serverConfig.getJsonFactory();
+    this.docStoreFactory = initDocStoreFactory(config.service(DocStoreFactory.class));
+    this.jsonFactory = config.getJsonFactory();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.bootupClasses = bootupClasses;
-
-    this.databasePlatform = serverConfig.getDatabasePlatform();
-    this.expressionFactory = initExpressionFactory(serverConfig);
-    this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
-
+    this.databasePlatform = config.getDatabasePlatform();
+    this.expressionFactory = initExpressionFactory(config);
+    this.typeManager = new DefaultTypeManager(config, bootupClasses);
     this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
     this.deployInherit = new DeployInherit(bootupClasses);
-
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
-    this.deployUtil = new DeployUtil(typeManager, serverConfig);
-
+    this.deployUtil = new DeployUtil(typeManager, config);
     this.serverCachePlugin = initServerCachePlugin();
     this.cacheManager = initCacheManager();
-
-    InternalConfigXmlRead xmlRead = new InternalConfigXmlRead(serverConfig);
-
+    InternalConfigXmlRead xmlRead = new InternalConfigXmlRead(config);
     this.dtoBeanManager = new DtoBeanManager(typeManager, xmlRead.readDtoMapping());
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlRead.xmlDeployment());
     Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
-
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
-    this.cQueryEngine = new CQueryEngine(serverConfig, databasePlatform, binder, asOfTableMapping, draftTableMap);
+    this.cQueryEngine = new CQueryEngine(config, databasePlatform, binder, asOfTableMapping, draftTableMap);
   }
 
   private SpiLogManager initLogManager() {
 
     // allow plugin - i.e. capture executed SQL for testing/asserts
-    SpiLoggerFactory loggerFactory = serverConfig.service(SpiLoggerFactory.class);
+    SpiLoggerFactory loggerFactory = config.service(SpiLoggerFactory.class);
     if (loggerFactory == null) {
       loggerFactory = new DLoggerFactory();
     }
@@ -228,10 +220,9 @@ public class InternalConfiguration {
   /**
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
-  private ExpressionFactory initExpressionFactory(DatabaseConfig serverConfig) {
-
-    boolean nativeIlike = serverConfig.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
-    return new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop(), nativeIlike);
+  private ExpressionFactory initExpressionFactory(DatabaseConfig config) {
+    boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
+    return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
 
   private DocStoreFactory initDocStoreFactory(DocStoreFactory service) {
@@ -290,7 +281,7 @@ public class InternalConfiguration {
    * Return the ChangeLogRegister to use with a default implementation if none defined.
    */
   public ChangeLogRegister changeLogRegister(ChangeLogRegister register) {
-    boolean includeInserts = serverConfig.isChangeLogIncludeInserts();
+    boolean includeInserts = config.isChangeLogIncludeInserts();
     return plugin((register != null) ? register : new DefaultChangeLogRegister(includeInserts));
   }
 
@@ -351,7 +342,7 @@ public class InternalConfiguration {
   }
 
   AutoTuneService createAutoTuneService(SpiEbeanServer server) {
-    return AutoTuneServiceFactory.create(server, serverConfig);
+    return AutoTuneServiceFactory.create(server, config);
   }
 
   DtoQueryEngine createDtoQueryEngine() {
@@ -359,7 +350,7 @@ public class InternalConfiguration {
   }
 
   RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue(), serverConfig.getPlatformConfig().getDbUuid().useBinaryOptimized());
+    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized());
   }
 
   OrmQueryEngine createOrmQueryEngine() {
@@ -383,11 +374,11 @@ public class InternalConfiguration {
   }
 
   public DatabasePlatform getDatabasePlatform() {
-    return serverConfig.getDatabasePlatform();
+    return config.getDatabasePlatform();
   }
 
-  public DatabaseConfig getServerConfig() {
-    return serverConfig;
+  public DatabaseConfig getConfig() {
+    return config;
   }
 
   public ExpressionFactory getExpressionFactory() {
@@ -423,8 +414,8 @@ public class InternalConfiguration {
   }
 
   public GeneratedPropertyFactory getGeneratedPropertyFactory() {
-    boolean offlineMode = serverConfig.isDbOffline() || DbOffline.isSet();
-    return new GeneratedPropertyFactory(offlineMode, serverConfig, bootupClasses.getIdGenerators());
+    boolean offlineMode = config.isDbOffline() || DbOffline.isSet();
+    return new GeneratedPropertyFactory(offlineMode, config, bootupClasses.getIdGenerators());
   }
 
   /**
@@ -440,14 +431,14 @@ public class InternalConfiguration {
   TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
 
     TransactionScopeManager scopeManager = createTransactionScopeManager();
-    boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || serverConfig.isNotifyL2CacheInForeground();
+    boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || config.isNotifyL2CacheInForeground();
 
     TransactionManagerOptions options =
-      new TransactionManagerOptions(notifyL2CacheInForeground, serverConfig, scopeManager, clusterManager, backgroundExecutor,
+      new TransactionManagerOptions(notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
         indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
         tableModState, cacheNotify, clockService);
 
-    if (serverConfig.isDocStoreOnly()) {
+    if (config.isDocStoreOnly()) {
       return new DocStoreTransactionManager(options);
     }
     return new TransactionManager(options);
@@ -455,11 +446,11 @@ public class InternalConfiguration {
 
   private SpiProfileHandler profileHandler() {
 
-    ProfilingConfig profilingConfig = serverConfig.getProfilingConfig();
+    ProfilingConfig profilingConfig = config.getProfilingConfig();
     if (!profilingConfig.isEnabled()) {
       return new NoopProfileHandler();
     }
-    SpiProfileHandler handler = serverConfig.service(SpiProfileHandler.class);
+    SpiProfileHandler handler = config.service(SpiProfileHandler.class);
     if (handler == null) {
       handler = new DefaultProfileHandler(profilingConfig);
     }
@@ -470,16 +461,16 @@ public class InternalConfiguration {
    * Return the DataSource supplier based on the tenancy mode.
    */
   private DataSourceSupplier dataSource() {
-    switch (serverConfig.getTenantMode()) {
+    switch (config.getTenantMode()) {
       case DB:
       case DB_WITH_MASTER:
-        return new MultiTenantDbSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getTenantDataSourceProvider());
+        return new MultiTenantDbSupplier(config.getCurrentTenantProvider(), config.getTenantDataSourceProvider());
       case SCHEMA:
-        return new MultiTenantDbSchemaSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource(), serverConfig.getTenantSchemaProvider());
+        return new MultiTenantDbSchemaSupplier(config.getCurrentTenantProvider(), config.getDataSource(), config.getReadOnlyDataSource(), config.getTenantSchemaProvider());
       case CATALOG:
-        return new MultiTenantDbCatalogSupplier(serverConfig.getCurrentTenantProvider(), serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource(), serverConfig.getTenantCatalogProvider());
+        return new MultiTenantDbCatalogSupplier(config.getCurrentTenantProvider(), config.getDataSource(), config.getReadOnlyDataSource(), config.getTenantCatalogProvider());
       default:
-        return new SimpleDataSourceProvider(serverConfig.getDataSource(), serverConfig.getReadOnlyDataSource());
+        return new SimpleDataSourceProvider(config.getDataSource(), config.getReadOnlyDataSource());
     }
   }
 
@@ -487,9 +478,8 @@ public class InternalConfiguration {
    * Create the TransactionScopeManager taking into account JTA or external transaction manager.
    */
   private TransactionScopeManager createTransactionScopeManager() {
-
-    ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
-    if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
+    ExternalTransactionManager externalTransactionManager = config.getExternalTransactionManager();
+    if (externalTransactionManager == null && config.isUseJtaTransactionManager()) {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
@@ -504,7 +494,7 @@ public class InternalConfiguration {
    * Create the DataTimeZone implementation to use.
    */
   private DataTimeZone initDataTimeZone() {
-    String tz = serverConfig.getDataTimeZone();
+    String tz = config.getDataTimeZone();
     if (tz == null) {
       if (isMySql(getPlatform())) {
         return new MySqlDataTimeZone();
@@ -534,7 +524,7 @@ public class InternalConfiguration {
    * Return the slow query warning limit in micros.
    */
   long getSlowQueryMicros() {
-    long millis = serverConfig.getSlowQueryMillis();
+    long millis = config.getSlowQueryMillis();
     return (millis < 1) ? Long.MAX_VALUE : millis * 1000L;
   }
 
@@ -542,13 +532,13 @@ public class InternalConfiguration {
    * Return the SlowQueryListener with a default that logs a warning message.
    */
   SlowQueryListener getSlowQueryListener() {
-    long millis = serverConfig.getSlowQueryMillis();
+    long millis = config.getSlowQueryMillis();
     if (millis < 1) {
       return null;
     }
-    SlowQueryListener listener = serverConfig.getSlowQueryListener();
+    SlowQueryListener listener = config.getSlowQueryListener();
     if (listener == null) {
-      listener = serverConfig.service(SlowQueryListener.class);
+      listener = config.service(SlowQueryListener.class);
       if (listener == null) {
         listener = new DefaultSlowQueryListener();
       }
@@ -572,11 +562,11 @@ public class InternalConfiguration {
   }
 
   private ServerCachePlugin initServerCachePlugin() {
-    if (serverConfig.isLocalOnlyL2Cache()) {
+    if (config.isLocalOnlyL2Cache()) {
       localL2Caching = true;
       return new DefaultServerCachePlugin();
     }
-    ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
+    ServerCachePlugin plugin = config.getServerCachePlugin();
     if (plugin == null) {
       ServiceLoader<ServerCachePlugin> cacheFactories = ServiceLoader.load(ServerCachePlugin.class);
       Iterator<ServerCachePlugin> iterator = cacheFactories.iterator();
@@ -598,34 +588,33 @@ public class InternalConfiguration {
    */
   private SpiCacheManager initCacheManager() {
 
-    if (!online || serverConfig.isDisableL2Cache()) {
+    if (!online || config.isDisableL2Cache()) {
       // use local only L2 cache implementation as placeholder
       return new DefaultServerCacheManager();
     }
 
-    ServerCacheFactory factory = serverCachePlugin.create(serverConfig, backgroundExecutor);
-
-    ServerCacheNotifyPlugin notifyPlugin = serverConfig.service(ServerCacheNotifyPlugin.class);
+    ServerCacheFactory factory = serverCachePlugin.create(config, backgroundExecutor);
+    ServerCacheNotifyPlugin notifyPlugin = config.service(ServerCacheNotifyPlugin.class);
     if (notifyPlugin != null) {
       // plugin supplied so use that to send notifications
-      cacheNotify = notifyPlugin.create(serverConfig);
+      cacheNotify = notifyPlugin.create(config);
     } else {
       cacheNotify = factory.createCacheNotify(tableModState);
     }
 
     // reasonable default settings are for a cache per bean type
     ServerCacheOptions beanOptions = new ServerCacheOptions();
-    beanOptions.setMaxSize(serverConfig.getCacheMaxSize());
-    beanOptions.setMaxIdleSecs(serverConfig.getCacheMaxIdleTime());
-    beanOptions.setMaxSecsToLive(serverConfig.getCacheMaxTimeToLive());
+    beanOptions.setMaxSize(config.getCacheMaxSize());
+    beanOptions.setMaxIdleSecs(config.getCacheMaxIdleTime());
+    beanOptions.setMaxSecsToLive(config.getCacheMaxTimeToLive());
 
     // reasonable default settings for the query cache per bean type
     ServerCacheOptions queryOptions = new ServerCacheOptions();
-    queryOptions.setMaxSize(serverConfig.getQueryCacheMaxSize());
-    queryOptions.setMaxIdleSecs(serverConfig.getQueryCacheMaxIdleTime());
-    queryOptions.setMaxSecsToLive(serverConfig.getQueryCacheMaxTimeToLive());
+    queryOptions.setMaxSize(config.getQueryCacheMaxSize());
+    queryOptions.setMaxIdleSecs(config.getQueryCacheMaxIdleTime());
+    queryOptions.setMaxSecsToLive(config.getQueryCacheMaxTimeToLive());
 
-    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, serverConfig, localL2Caching)
+    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, config, localL2Caching)
       .with(beanOptions, queryOptions)
       .with(factory, tableModState);
 
@@ -633,10 +622,10 @@ public class InternalConfiguration {
   }
 
   public QueryPlanManager initQueryPlanManager(TransactionManager transactionManager) {
-    if (!serverConfig.isCollectQueryPlans()) {
+    if (!config.isCollectQueryPlans()) {
       return QueryPlanManager.NOOP;
     }
-    long threshold = serverConfig.getCollectQueryPlanThresholdMicros();
+    long threshold = config.getCollectQueryPlanThresholdMicros();
     return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.getPlatform()), extraMetrics);
   }
 

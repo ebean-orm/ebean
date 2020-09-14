@@ -14,10 +14,10 @@ import java.util.Calendar;
  */
 public class DefaultTypeFactory {
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig config;
 
-  public DefaultTypeFactory(DatabaseConfig serverConfig) {
-    this.serverConfig = serverConfig;
+  public DefaultTypeFactory(DatabaseConfig config) {
+    this.config = config;
   }
 
   protected ScalarTypeBool createBoolean(String trueValue, String falseValue) {
@@ -41,37 +41,31 @@ public class DefaultTypeFactory {
    * etc.
    */
   public ScalarTypeBool createBoolean() {
-
-    if (serverConfig == null) {
+    if (config == null) {
       return new ScalarTypeBoolean.Native();
     }
-    String trueValue = serverConfig.getDatabaseBooleanTrue();
-    String falseValue = serverConfig.getDatabaseBooleanFalse();
-
+    String trueValue = config.getDatabaseBooleanTrue();
+    String falseValue = config.getDatabaseBooleanFalse();
     if (falseValue != null && trueValue != null) {
       // explicit integer or string based booleans
       return createBoolean(trueValue, falseValue);
     }
 
     // determine based on database platform configuration
-    int booleanDbType = serverConfig.getDatabasePlatform().getBooleanDbType();
-
+    int booleanDbType = config.getDatabasePlatform().getBooleanDbType();
     // Some dbs use BIT e.g. MySQL
     if (booleanDbType == Types.BIT) {
       return new ScalarTypeBoolean.BitBoolean();
     }
-
     if (booleanDbType == Types.INTEGER) {
       return new ScalarTypeBoolean.IntBoolean(1, 0);
     }
     if (booleanDbType == Types.VARCHAR) {
       return new ScalarTypeBoolean.StringBoolean("T", "F");
     }
-
     if (booleanDbType == Types.BOOLEAN) {
       return new ScalarTypeBoolean.Native();
     }
-
     // assume the JDBC driver can convert the type
     return new ScalarTypeBoolean.Native();
   }

@@ -68,7 +68,7 @@ public class DeployBeanDescriptor<T> {
 
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig config;
 
   private final BeanDescriptorManager manager;
 
@@ -199,9 +199,9 @@ public class DeployBeanDescriptor<T> {
   /**
    * Construct the BeanDescriptor.
    */
-  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseConfig serverConfig) {
+  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseConfig config) {
     this.manager = manager;
-    this.serverConfig = serverConfig;
+    this.config = config;
     this.beanType = beanType;
   }
 
@@ -819,15 +819,13 @@ public class DeployBeanDescriptor<T> {
   public void setUuidGenerator() {
     if (idGenerator == null) {
       this.identityMode.setIdType(IdType.EXTERNAL);
-      switch (serverConfig.getUuidVersion()) {
+      switch (config.getUuidVersion()) {
         case VERSION1:
-          this.idGenerator = UuidV1IdGenerator.getInstance(serverConfig.getUuidStateFile());
+          this.idGenerator = UuidV1IdGenerator.getInstance(config.getUuidStateFile());
           break;
-
         case VERSION1RND:
           this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
           break;
-
         case VERSION4:
         default:
           this.idGenerator = UuidV4IdGenerator.INSTANCE;
@@ -1084,7 +1082,7 @@ public class DeployBeanDescriptor<T> {
     }
     if (mostSpecific != DocStoreMode.DEFAULT) return mostSpecific;
     if (docStorePersist != DocStoreMode.DEFAULT) return docStorePersist;
-    return serverConfig.getDocStoreConfig().getPersist();
+    return config.getDocStoreConfig().getPersist();
   }
 
   /**
@@ -1161,7 +1159,7 @@ public class DeployBeanDescriptor<T> {
   @SuppressWarnings("unchecked")
   Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
     if (jacksonAnnotatedClass == null) {
-      jacksonAnnotatedClass = new DeployBeanObtainJackson(serverConfig, beanType).obtain();
+      jacksonAnnotatedClass = new DeployBeanObtainJackson(config, beanType).obtain();
     }
     return jacksonAnnotatedClass;
   }

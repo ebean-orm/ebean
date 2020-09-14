@@ -6,7 +6,7 @@ package io.ebean;
  * Ebean has traditionally used Transaction scope for the PersistenceContext. This is used to change the scope to
  * use (by default) and explicitly set the scope to use for an individual query.
  *
- * @see io.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)
+ * @see io.ebean.config.DatabaseConfig#setPersistenceContextScope(PersistenceContextScope)
  * @see Query#setPersistenceContextScope(PersistenceContextScope)
  */
 public enum PersistenceContextScope {

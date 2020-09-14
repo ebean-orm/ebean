@@ -13,7 +13,7 @@ import java.util.List;
 public class ClassPathScanners {
 
   /**
-   * Return the list of ClassPathScanner services using serverConfig service loader.
+   * Return the list of ClassPathScanner services using DatabaseConfig service loader.
    */
   public static List<ClassPathScanner> find(DatabaseConfig config) {
     List<ClassPathScanner> scanners = new ArrayList<>();

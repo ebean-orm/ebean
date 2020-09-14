@@ -46,7 +46,6 @@ import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKeyManager;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.SlowQueryEvent;
 import io.ebean.config.SlowQueryListener;
 import io.ebean.config.TenantMode;
@@ -159,7 +158,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig config;
 
   private final String serverName;
 
@@ -258,26 +257,26 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
     this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
-    this.serverConfig = config.getServerConfig();
-    this.disableL2Cache = serverConfig.isDisableL2Cache();
+    this.config = config.getConfig();
+    this.disableL2Cache = this.config.isDisableL2Cache();
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.extraMetrics = config.getExtraMetrics();
-    this.serverName = serverConfig.getName();
-    this.lazyLoadBatchSize = serverConfig.getLazyLoadBatchSize();
-    this.queryBatchSize = serverConfig.getQueryBatchSize();
+    this.serverName = this.config.getName();
+    this.lazyLoadBatchSize = this.config.getLazyLoadBatchSize();
+    this.queryBatchSize = this.config.getQueryBatchSize();
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
-    this.encryptKeyManager = serverConfig.getEncryptKeyManager();
-    this.defaultPersistenceContextScope = serverConfig.getPersistenceContextScope();
-    this.currentTenantProvider = serverConfig.getCurrentTenantProvider();
+    this.encryptKeyManager = this.config.getEncryptKeyManager();
+    this.defaultPersistenceContextScope = this.config.getPersistenceContextScope();
+    this.currentTenantProvider = this.config.getCurrentTenantProvider();
     this.slowQueryMicros = config.getSlowQueryMicros();
     this.slowQueryListener = config.getSlowQueryListener();
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
-    this.updateAllPropertiesInBatch = serverConfig.isUpdateAllPropertiesInBatch();
-    this.callStackFactory = initCallStackFactory(serverConfig);
+    this.updateAllPropertiesInBatch = this.config.isUpdateAllPropertiesInBatch();
+    this.callStackFactory = initCallStackFactory(this.config);
     this.persister = config.createPersister(this);
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
@@ -296,7 +295,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverPlugins = config.getPlugins();
-    this.ddlGenerator = new DdlGenerator(this, serverConfig);
+    this.ddlGenerator = new DdlGenerator(this, this.config);
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
@@ -326,7 +325,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
-    if (!serverConfig.isDocStoreOnly()) {
+    if (!config.isDocStoreOnly()) {
       ddlGenerator.execute(online);
     }
     for (Plugin plugin : serverPlugins) {
@@ -365,7 +364,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public DatabaseConfig getServerConfig() {
-    return serverConfig;
+    return config;
   }
 
   @Override
@@ -380,7 +379,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public DdlHandler createDdlHandler() {
-    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(serverConfig);
+    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(config);
   }
 
   @Override
@@ -445,15 +444,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (encryptKeyManager != null) {
       encryptKeyManager.initialise();
     }
-    serverCacheManager.setEnabledRegions(serverConfig.getEnabledL2Regions());
+    serverCacheManager.setEnabledRegions(config.getEnabledL2Regions());
   }
 
   /**
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
-    if (TenantMode.DB != serverConfig.getTenantMode()) {
-      serverConfig.runDbMigration(serverConfig.getDataSource());
+    if (TenantMode.DB != config.getTenantMode()) {
+      config.runDbMigration(config.getDataSource());
     }
   }
 
@@ -496,14 +495,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     transactionManager.shutdown(shutdownDataSource, deregisterDriver);
     shutdown = true;
     if (shutdownDataSource) {
-      // deregister the DataSource in case ServerConfig is re-used
-      serverConfig.setDataSource(null);
+      config.setDataSource(null);
     }
   }
 
   private void shutdownPlugins() {
-    if (serverConfig.isDumpMetricsOnShutdown()) {
-      new DumpMetrics(this, serverConfig.getDumpMetricsOptions()).dump();
+    if (config.isDumpMetricsOnShutdown()) {
+      new DumpMetrics(this, config.getDumpMetricsOptions()).dump();
     }
     for (Plugin plugin : serverPlugins) {
       try {

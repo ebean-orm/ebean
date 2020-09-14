@@ -37,13 +37,11 @@ public class GeneratedPropertyFactory {
 
   private final Map<String, PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
-  public GeneratedPropertyFactory(boolean offlineMode, DatabaseConfig serverConfig, List<IdGenerator> idGenerators) {
-
-    this.classLoadConfig = serverConfig.getClassLoadConfig();
+  public GeneratedPropertyFactory(boolean offlineMode, DatabaseConfig config, List<IdGenerator> idGenerators) {
+    this.classLoadConfig = config.getClassLoadConfig();
     this.insertFactory = new InsertTimestampFactory(classLoadConfig);
     this.updateFactory = new UpdateTimestampFactory(classLoadConfig);
-
-    CurrentUserProvider currentUserProvider = serverConfig.getCurrentUserProvider();
+    CurrentUserProvider currentUserProvider = config.getCurrentUserProvider();
     if (currentUserProvider != null) {
       generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
       generatedWhoModified = new GeneratedWhoModified(currentUserProvider);

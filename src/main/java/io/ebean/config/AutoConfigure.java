@@ -6,13 +6,13 @@ package io.ebean.config;
 public interface AutoConfigure {
 
   /**
-   * Perform configuration for the ServerConfig prior to properties load.
+   * Perform configuration for the DatabaseConfig prior to properties load.
    */
-  void preConfigure(DatabaseConfig serverConfig);
+  void preConfigure(DatabaseConfig config);
 
   /**
-   * Provide some configuration the ServerConfig prior to server creation but after properties have been applied.
+   * Provide some configuration the DatabaseConfig prior to server creation but after properties have been applied.
    */
-  void postConfigure(DatabaseConfig serverConfig);
+  void postConfigure(DatabaseConfig config);
 
 }

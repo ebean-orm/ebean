@@ -23,7 +23,7 @@ class InternalConfigXmlRead {
 
   private static final Logger log = LoggerFactory.getLogger(InternalConfigXmlRead.class);
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig config;
 
   private final ClassLoader classLoader;
 
@@ -31,10 +31,10 @@ class InternalConfigXmlRead {
 
   private List<XmEbean> xmlEbeanList;
 
-  InternalConfigXmlRead(DatabaseConfig serverConfig) {
-    this.serverConfig = serverConfig;
-    this.classLoader = serverConfig.getClassLoadConfig().getClassLoader();
-    if (serverConfig.getClassLoadConfig().isJavaxJAXBPresent()) {
+  InternalConfigXmlRead(DatabaseConfig config) {
+    this.config = config;
+    this.classLoader = config.getClassLoadConfig().getClassLoader();
+    if (config.getClassLoadConfig().isJavaxJAXBPresent()) {
       init();
     }
   }
@@ -45,10 +45,9 @@ class InternalConfigXmlRead {
   }
 
   private List<Resource> xmlMappingResources() {
-    List<ClassPathScanner> scanners = ClassPathScanners.find(serverConfig);
-    List<String> mappingLocations = serverConfig.getMappingLocations();
+    List<ClassPathScanner> scanners = ClassPathScanners.find(config);
+    List<String> mappingLocations = config.getMappingLocations();
     List<Resource> resourceList = new ArrayList<>();
-
     long st = System.currentTimeMillis();
     if (mappingLocations != null && !mappingLocations.isEmpty()) {
       for (ClassPathScanner finder : scanners) {
@@ -57,7 +56,6 @@ class InternalConfigXmlRead {
         }
       }
     }
-
     long searchTime = System.currentTimeMillis() - st;
     log.debug("Classpath search mappings[{}] searchTime[{}]", resourceList.size(), searchTime);
     return resourceList;

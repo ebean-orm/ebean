@@ -3,7 +3,7 @@ package io.ebean;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.DocStoreConfig;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -226,7 +226,7 @@ public interface Transaction extends AutoCloseable {
   /**
    * Set if the L2 cache should be skipped for "find by id" and "find by natural key" queries.
    * <p>
-   * By default {@link ServerConfig#isSkipCacheAfterWrite()} is true and that means that for
+   * By default {@link DatabaseConfig#isSkipCacheAfterWrite()} is true and that means that for
    * "find by id" and "find by natural key" queries which normally hit L2 bean cache automatically
    * - will not do so after a persist/write on the transaction.
    * </p>
@@ -235,7 +235,7 @@ public interface Transaction extends AutoCloseable {
    * will skip the L2 bean cache or not (regardless of whether the transaction is considered "read only").
    * </p>
    * <p>
-   * Refer to {@link ServerConfig#setSkipCacheAfterWrite(boolean)} for configuring the default behavior
+   * Refer to {@link DatabaseConfig#setSkipCacheAfterWrite(boolean)} for configuring the default behavior
    * for using the L2 bean cache in transactions spanning multiple query/persist requests.
    * </p>
    *
@@ -276,7 +276,7 @@ public interface Transaction extends AutoCloseable {
    *
    * }</pre>
    *
-   * @see ServerConfig#isSkipCacheAfterWrite()
+   * @see DatabaseConfig#isSkipCacheAfterWrite()
    */
   void setSkipCache(boolean skipCache);
 
@@ -402,7 +402,7 @@ public interface Transaction extends AutoCloseable {
    * </p>
    *
    * @param batchMode the batch mode to use per save(), insert(), update() or delete()
-   * @see io.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
+   * @see io.ebean.config.DatabaseConfig#setPersistBatchOnCascade(PersistBatch)
    */
   void setBatchOnCascade(boolean batchMode);
 

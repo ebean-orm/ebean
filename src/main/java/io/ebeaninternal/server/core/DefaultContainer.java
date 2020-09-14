@@ -60,10 +60,10 @@ public class DefaultContainer implements SpiContainer {
     return createServer(config);
   }
 
-  private SpiBackgroundExecutor createBackgroundExecutor(DatabaseConfig serverConfig) {
-    String namePrefix = "ebean-" + serverConfig.getName();
-    int schedulePoolSize = serverConfig.getBackgroundExecutorSchedulePoolSize();
-    int shutdownSecs = serverConfig.getBackgroundExecutorShutdownSecs();
+  private SpiBackgroundExecutor createBackgroundExecutor(DatabaseConfig config) {
+    String namePrefix = "ebean-" + config.getName();
+    int schedulePoolSize = config.getBackgroundExecutorSchedulePoolSize();
+    int shutdownSecs = config.getBackgroundExecutorShutdownSecs();
     return new DefaultBackgroundExecutor(schedulePoolSize, shutdownSecs, namePrefix);
   }
 
@@ -173,7 +173,6 @@ public class DefaultContainer implements SpiContainer {
     bootup.addServerConfigStartup(config.getServerConfigStartupListeners());
     bootup.addChangeLogInstances(config);
 
-    // run any ServerConfigStartup instances
     bootup.runServerConfigStartup(config);
     return bootup;
   }
@@ -209,7 +208,7 @@ public class DefaultContainer implements SpiContainer {
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
       if (config.getTenantMode().isDynamicDataSource()) {
-        throw new IllegalStateException("DatabasePlatform must be explicitly set on ServerConfig for TenantMode "+config.getTenantMode());
+        throw new IllegalStateException("DatabasePlatform must be explicitly set on DatabaseConfig for TenantMode "+config.getTenantMode());
       }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);

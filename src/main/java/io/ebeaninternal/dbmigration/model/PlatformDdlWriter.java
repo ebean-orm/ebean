@@ -27,7 +27,7 @@ public class PlatformDdlWriter {
 
   private static final Logger logger = LoggerFactory.getLogger(PlatformDdlWriter.class);
 
-  private final DatabaseConfig serverConfig;
+  private final DatabaseConfig databaseConfig;
 
   private final DbMigrationConfig config;
 
@@ -37,7 +37,7 @@ public class PlatformDdlWriter {
 
   public PlatformDdlWriter(DatabasePlatform platform, DatabaseConfig dbConfig, DbMigrationConfig config, int lockTimeoutSeconds) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
-    this.serverConfig = dbConfig;
+    this.databaseConfig = dbConfig;
     this.config = config;
     this.lockTimeoutSeconds = lockTimeoutSeconds;
   }
@@ -123,7 +123,7 @@ public class PlatformDdlWriter {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   protected DdlHandler handler() {
-    return platformDdl.createDdlHandler(serverConfig);
+    return platformDdl.createDdlHandler(databaseConfig);
   }
 
   /**

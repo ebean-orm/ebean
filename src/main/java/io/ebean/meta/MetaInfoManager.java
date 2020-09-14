@@ -52,7 +52,7 @@ public interface MetaInfoManager {
   /**
    * Initiate query plan collection by turning on "bind capture" on matching query plans.
    * <p>
-   * Also refer to ServerConfig collectQueryPlans that needs to be set to true
+   * Also refer to DatabaseConfig collectQueryPlans that needs to be set to true
    * and collectQueryPlanThresholdMicros which is a global defaults that can also
    * initiate query plan capture.
    *

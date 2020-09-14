@@ -23,7 +23,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
   private final boolean defaultInsertsInclude;
 
   /**
-   * Create with the default insertsIncluded from ServerConfig.
+   * Create with the default insertsIncluded from DatabaseConfig.
    */
   public DefaultChangeLogRegister(boolean defaultInsertsInclude) {
     this.defaultInsertsInclude = defaultInsertsInclude;
@@ -60,7 +60,6 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
    */
   private boolean insertModeInclude(ChangeLogInsertMode inserts) {
     if (inserts == ChangeLogInsertMode.DEFAULT) {
-      // return the default as per the ServerConfig
       return defaultInsertsInclude;
     }
     return ChangeLogInsertMode.INCLUDE == inserts;

@@ -326,7 +326,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
-          "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
+          "ScalarType of Joda LocalTime not defined. You need to set DatabaseConfig.jodaLocalTimeMode to"
             + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
       found = checkInterfaceTypes(type);

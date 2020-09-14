@@ -34,8 +34,8 @@ class BeanLifecycleAdapterFactory {
 
   private final boolean postConstructPresent;
 
-  BeanLifecycleAdapterFactory(DatabaseConfig serverConfig) {
-    this.postConstructPresent = serverConfig.getClassLoadConfig().isJavaxPostConstructPresent();
+  BeanLifecycleAdapterFactory(DatabaseConfig config) {
+    this.postConstructPresent = config.getClassLoadConfig().isJavaxPostConstructPresent();
   }
 
   /**

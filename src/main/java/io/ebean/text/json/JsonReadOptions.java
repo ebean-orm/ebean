@@ -73,14 +73,14 @@ public class JsonReadOptions {
   }
 
   /**
-   * Return the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the ServerConfig).
+   * Return the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the DatabaseConfig).
    */
   public Object getObjectMapper() {
     return objectMapper;
   }
 
   /**
-   * Set the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the ServerConfig).
+   * Set the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the DatabaseConfig).
    */
   public JsonReadOptions setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;

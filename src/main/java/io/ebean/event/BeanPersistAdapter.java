@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 
 /**
  * A no operation implementation of BeanPersistController. Objects extending
@@ -8,8 +8,8 @@ import io.ebean.config.ServerConfig;
  * <p>
  * A BeanPersistAdapter is either found automatically via class path search or
  * can be added programmatically via
- * {@link ServerConfig#add(BeanPersistController)} or
- * {@link ServerConfig#setPersistControllers(java.util.List)}.
+ * {@link DatabaseConfig#add(BeanPersistController)} or
+ * {@link DatabaseConfig#setPersistControllers(java.util.List)}.
  * </p>
  */
 public abstract class BeanPersistAdapter implements BeanPersistController {

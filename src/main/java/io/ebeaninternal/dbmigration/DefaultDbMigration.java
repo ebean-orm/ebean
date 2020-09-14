@@ -104,7 +104,7 @@ public class DefaultDbMigration implements DbMigration {
 
   protected List<Pair> platforms = new ArrayList<>();
 
-  protected DatabaseConfig serverConfig;
+  protected DatabaseConfig databaseConfig;
 
   protected DbConstraintNaming constraintNaming;
 
@@ -161,18 +161,18 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   /**
-   * Set the serverConfig to use. Typically this is not called explicitly.
+   * Set the DatabaseConfig to use. Typically this is not called explicitly.
    */
   @Override
   public void setServerConfig(DatabaseConfig config) {
-    if (this.serverConfig == null) {
-      this.serverConfig = config;
+    if (this.databaseConfig == null) {
+      this.databaseConfig = config;
     }
     if (migrationConfig == null) {
-      this.migrationConfig = serverConfig.getMigrationConfig();
+      this.migrationConfig = databaseConfig.getMigrationConfig();
     }
     if (constraintNaming == null) {
-      this.constraintNaming = serverConfig.getConstraintNaming();
+      this.constraintNaming = databaseConfig.getConstraintNaming();
     }
   }
 
@@ -383,7 +383,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void configurePlatforms() {
     for (Pair pair : platforms) {
-      PlatformConfig config = serverConfig.newPlatformConfig("dbmigration.platform", pair.prefix);
+      PlatformConfig config = databaseConfig.newPlatformConfig("dbmigration.platform", pair.prefix);
       pair.platform.configure(config);
     }
   }
@@ -660,7 +660,7 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, serverConfig, migrationConfig, lockTimeoutSeconds);
+    return new PlatformDdlWriter(platform, databaseConfig, migrationConfig, lockTimeoutSeconds);
   }
 
   /**

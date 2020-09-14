@@ -60,7 +60,7 @@ import java.util.ServiceLoader;
  * DatabaseConfig config = new DatabaseConfig();
  *
  * // read the ebean.properties and load
- * // those settings into this serverConfig object
+ * // those settings into this DatabaseConfig object
  * config.loadFromProperties();
  *
  * // explicitly register the entity beans to avoid classpath scanning
@@ -72,7 +72,7 @@ import java.util.ServiceLoader;
  * }</pre>
  *
  * <p>
- * Note that ServerConfigProvider provides a standard Java ServiceLoader mechanism that can
+ * Note that DatabaseConfigProvider provides a standard Java ServiceLoader mechanism that can
  * be used to apply configuration to the DatabaseConfig.
  * </p>
  *
@@ -89,7 +89,7 @@ public class DatabaseConfig {
   private String name = "db";
 
   /**
-   * Typically configuration type objects that are passed by this ServerConfig
+   * Typically configuration type objects that are passed by this DatabaseConfig
    * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
    */
   private final Map<String, Object> serviceObject = new HashMap<>();
@@ -609,7 +609,7 @@ public class DatabaseConfig {
    *
    *   JedisPool jedisPool = ..
    *
-   *   serverConfig.putServiceObject(jedisPool);
+   *   config.putServiceObject(jedisPool);
    *
    * }</pre>
    */
@@ -632,7 +632,7 @@ public class DatabaseConfig {
    *
    * <pre>{@code
    *
-   *   JedisPool jedisPool = serverConfig.getServiceObject(JedisPool.class);
+   *   JedisPool jedisPool = config.getServiceObject(JedisPool.class);
    *
    * }</pre>
    *
@@ -2022,7 +2022,7 @@ public class DatabaseConfig {
   /**
    * Set to true to run DB migrations on server start.
    * <p>
-   * This is the same as serverConfig.getMigrationConfig().setRunMigration(). We have added this method here
+   * This is the same as config.getMigrationConfig().setRunMigration(). We have added this method here
    * as it is often the only thing we need to configure for migrations.
    */
   public void setRunMigration(boolean runMigration) {
@@ -2333,10 +2333,10 @@ public class DatabaseConfig {
    * <pre>{@code
    *
    *   // set the default mapping for BigDecimal.class/decimal
-   *   serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
+   *   config.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
    *
    *   // set the default mapping for String.class/varchar but only for Postgres
-   *   serverConfig.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
+   *   config.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
    *
    * }</pre>
    *
@@ -2354,10 +2354,10 @@ public class DatabaseConfig {
    * <pre>{@code
    *
    *   // set the default mapping for BigDecimal/decimal
-   *   serverConfig.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
+   *   config.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
    *
    *   // set the default mapping for String/varchar
-   *   serverConfig.addCustomMapping(DbType.VARCHAR, "text");
+   *   config.addCustomMapping(DbType.VARCHAR, "text");
    *
    * }</pre>
    *
