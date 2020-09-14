@@ -8,14 +8,11 @@ import java.util.Set;
  * Represents the type of a OneToMany or ManyToMany property.
  */
 public enum ManyType {
-
   LIST(false, List.class),
   SET(false, Set.class),
   MAP(true, null);
 
-
   private final boolean map;
-
   @SuppressWarnings("rawtypes")
   private final Class<? extends Collection> type;
 

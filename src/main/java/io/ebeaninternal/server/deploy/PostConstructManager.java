@@ -29,7 +29,6 @@ class PostConstructManager {
    * Register BeanPostLoad listeners for a given entity type.
    */
   void addPostConstructListeners(DeployBeanDescriptor<?> deployDesc) {
-
     for (BeanPostConstructListener c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanPostLoad on[{}] {}", deployDesc.getFullName(), c.getClass().getName());

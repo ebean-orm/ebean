@@ -30,7 +30,6 @@ class PersistListenerManager {
    * Return the BeanPersistController for a given entity type.
    */
   <T> void addPersistListeners(DeployBeanDescriptor<T> deployDesc) {
-
     for (BeanPersistListener listener : list) {
       if (listener.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanPersistListener on[{}] {}", deployDesc.getFullName(), listener.getClass().getName());

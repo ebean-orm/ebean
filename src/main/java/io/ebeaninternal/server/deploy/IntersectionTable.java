@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.SqlUpdate;
 
 public class IntersectionTable {
@@ -20,14 +20,14 @@ public class IntersectionTable {
   /**
    * Return a SqlUpdate for inserting into the intersection table.
    */
-  public SqlUpdate insert(EbeanServer server, boolean draft) {
+  public SqlUpdate insert(Database server, boolean draft) {
     return server.sqlUpdate(draft ? draftInsertSql : insertSql);
   }
 
   /**
    * Return a SqlUpdate for deleting from the intersection table.
    */
-  public SqlUpdate delete(EbeanServer server, boolean draft) {
+  public SqlUpdate delete(Database server, boolean draft) {
     return server.sqlUpdate(draft ? draftDeleteSql : deleteSql);
   }
 

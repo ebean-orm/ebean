@@ -26,7 +26,6 @@ public class TableJoinColumn {
 
   private final boolean updateable;
 
-
   /**
    * Hash for including in a query plan
    */
@@ -62,7 +61,6 @@ public class TableJoinColumn {
     result = 92821 * result + (foreignSqlFormula != null ? foreignSqlFormula.hashCode() : 0);
     result = 92821 * result + (insertable ? 1 : 0);
     result = 92821 * result + (updateable ? 1 : 0);
-
     return result;
   }
 
@@ -75,7 +73,6 @@ public class TableJoinColumn {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-
     TableJoinColumn that = (TableJoinColumn) o;
     if (insertable != that.insertable) return false;
     if (updateable != that.updateable) return false;

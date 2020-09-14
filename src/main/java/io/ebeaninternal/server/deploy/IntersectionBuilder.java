@@ -10,7 +10,6 @@ public class IntersectionBuilder {
 
   private final String publishTable;
   private final String draftTable;
-
   private final List<String> columns = new ArrayList<>();
 
   IntersectionBuilder(String publishTable, String draftTable) {
@@ -23,10 +22,8 @@ public class IntersectionBuilder {
   }
 
   public IntersectionTable build() {
-
     String insertSql = insertSql(publishTable);
     String deleteSql = deleteSql(publishTable);
-
     String draftInsertSql;
     String draftDeleteSql;
     if (publishTable.equals(draftTable)) {
@@ -36,15 +33,12 @@ public class IntersectionBuilder {
       draftInsertSql = insertSql(draftTable);
       draftDeleteSql = deleteSql(draftTable);
     }
-
     return new IntersectionTable(insertSql, deleteSql, draftInsertSql, draftDeleteSql);
   }
 
   private String insertSql(String tableName) {
-
     StringBuilder sb = new StringBuilder();
     sb.append("insert into ").append(tableName).append(" (");
-
     int count = 0;
     for (String column : columns) {
       if (count++ > 0) {
@@ -60,16 +54,13 @@ public class IntersectionBuilder {
       sb.append("?");
     }
     sb.append(")");
-
     return sb.toString();
   }
 
   private String deleteSql(String tableName) {
-
     StringBuilder sb = new StringBuilder();
     sb.append("delete from ").append(tableName);
     sb.append(" where ");
-
     int count = 0;
     for (String column : columns) {
       if (count++ > 0) {
@@ -78,8 +69,6 @@ public class IntersectionBuilder {
       sb.append(column);
       sb.append(" = ?");
     }
-
     return sb.toString();
   }
-
 }

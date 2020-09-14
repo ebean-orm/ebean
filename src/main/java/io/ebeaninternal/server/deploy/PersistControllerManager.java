@@ -18,7 +18,6 @@ class PersistControllerManager {
   private final List<BeanPersistController> list;
 
   PersistControllerManager(BootupClasses bootupClasses) {
-
     list = bootupClasses.getBeanPersistControllers();
   }
 
@@ -30,7 +29,6 @@ class PersistControllerManager {
    * Return the BeanPersistController for a given entity type.
    */
   void addPersistControllers(DeployBeanDescriptor<?> deployDesc) {
-
     for (BeanPersistController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanPersistController on[{}] {}", deployDesc.getFullName(), c.getClass().getName());

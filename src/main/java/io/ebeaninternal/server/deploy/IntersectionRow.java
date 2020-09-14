@@ -46,12 +46,9 @@ public class IntersectionRow {
   }
 
   public SpiSqlUpdate createInsert(SpiEbeanServer server) {
-
     BindParams bindParams = new BindParams();
-
     StringBuilder sb = new StringBuilder();
     sb.append("insert into ").append(tableName).append(" (");
-
     int count = 0;
     for (Map.Entry<String, Object> entry : values.entrySet()) {
       if (count++ > 0) {
@@ -60,7 +57,6 @@ public class IntersectionRow {
       sb.append(entry.getKey());
       bindParams.setParameter(count, entry.getValue());
     }
-
     sb.append(") values (");
     for (int i = 0; i < count; i++) {
       if (i > 0) {
@@ -69,14 +65,11 @@ public class IntersectionRow {
       sb.append("?");
     }
     sb.append(")");
-
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
   public SpiSqlUpdate createDelete(SpiEbeanServer server, DeleteMode deleteMode) {
-
     BindParams bindParams = new BindParams();
-
     StringBuilder sb = new StringBuilder();
     if (deleteMode.isHard()) {
       sb.append("delete from ").append(tableName);
@@ -85,55 +78,41 @@ public class IntersectionRow {
       sb.append(targetDescriptor.getSoftDeleteDbSet());
     }
     sb.append(" where ");
-
     int count = setBindParams(bindParams, sb);
-
     if (excludeIds != null) {
       IdInExpression idIn = new IdInExpression(excludeIds);
-
       DefaultExpressionRequest er = new DefaultExpressionRequest(excludeDescriptor);
       idIn.addSqlNoAlias(er);
       idIn.addBindValues(er);
-
       sb.append(" and not ( ");
       sb.append(er.getSql());
       sb.append(" ) ");
-
       List<Object> bindValues = er.getBindValues();
       for (Object bindValue : bindValues) {
         bindParams.setParameter(++count, bindValue);
       }
     }
-
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
   public SpiSqlUpdate createDeleteChildren(SpiEbeanServer server) {
-
     BindParams bindParams = new BindParams();
-
     StringBuilder sb = new StringBuilder();
     sb.append("delete from ").append(tableName).append(" where ");
-
     setBindParams(bindParams, sb);
-
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
   private int setBindParams(BindParams bindParams, StringBuilder sb) {
-
     int count = 0;
     for (Map.Entry<String, Object> entry : values.entrySet()) {
       if (count++ > 0) {
         sb.append(" and ");
       }
-
       sb.append(entry.getKey());
       sb.append(" = ?");
-
       bindParams.setParameter(count, entry.getValue());
     }
-
     return count;
   }
 }

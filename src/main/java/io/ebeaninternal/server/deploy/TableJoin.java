@@ -47,13 +47,11 @@ public final class TableJoin {
     this.table = InternString.intern(deploy.getTable());
     this.type = deploy.getType();
     this.inheritInfo = deploy.getInheritInfo();
-
     DeployTableJoinColumn[] deployCols = deploy.columns();
     this.columns = new TableJoinColumn[deployCols.length];
     for (int i = 0; i < deployCols.length; i++) {
       this.columns[i] = new TableJoinColumn(deployCols[i]);
     }
-
     this.queryHash = calcQueryHash();
   }
 
@@ -88,13 +86,10 @@ public final class TableJoin {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-
     TableJoin that = (TableJoin) o;
-
     if (!table.equals(that.table)) return false;
     if (type != that.type) return false;
     if (columns.length != that.columns.length) return false;
-
     for (int i = 0; i < columns.length; i++) {
       if (!columns[i].equals(that.columns[i])) {
         return false;
@@ -138,22 +133,18 @@ public final class TableJoin {
     String[] names = SplitName.split(prefix);
     String a1 = ctx.getTableAlias(names[0]);
     String a2 = ctx.getTableAlias(prefix);
-
     addJoin(joinType, a1, a2, ctx);
     ctx.append("and ").append(a2).append(predicate);
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
-
     String[] names = SplitName.split(prefix);
     String a1 = ctx.getTableAlias(names[0]);
     String a2 = ctx.getTableAlias(prefix);
-
     return addJoin(joinType, a1, a2, ctx);
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
-
     String joinLiteral = joinType.getLiteral(type);
     ctx.addJoin(joinLiteral, table, columns(), a1, a2);
     return joinType.autoToOuter(type);
