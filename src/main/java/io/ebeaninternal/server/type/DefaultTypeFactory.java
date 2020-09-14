@@ -21,14 +21,11 @@ public class DefaultTypeFactory {
   }
 
   protected ScalarTypeBool createBoolean(String trueValue, String falseValue) {
-
     try {
       // first try Integer based boolean
       Integer intTrue = BasicTypeConverter.toInteger(trueValue);
       Integer intFalse = BasicTypeConverter.toInteger(falseValue);
-
       return new ScalarTypeBoolean.IntBoolean(intTrue, intFalse);
-
     } catch (NumberFormatException e) {
       // treat as Varchar/String based boolean
       return new ScalarTypeBoolean.StringBoolean(trueValue, falseValue);
@@ -50,10 +47,8 @@ public class DefaultTypeFactory {
       // explicit integer or string based booleans
       return createBoolean(trueValue, falseValue);
     }
-
     // determine based on database platform configuration
     int booleanDbType = config.getDatabasePlatform().getBooleanDbType();
-    // Some dbs use BIT e.g. MySQL
     if (booleanDbType == Types.BIT) {
       return new ScalarTypeBoolean.BitBoolean();
     }
@@ -63,10 +58,6 @@ public class DefaultTypeFactory {
     if (booleanDbType == Types.VARCHAR) {
       return new ScalarTypeBoolean.StringBoolean("T", "F");
     }
-    if (booleanDbType == Types.BOOLEAN) {
-      return new ScalarTypeBoolean.Native();
-    }
-    // assume the JDBC driver can convert the type
     return new ScalarTypeBoolean.Native();
   }
 
@@ -75,8 +66,7 @@ public class DefaultTypeFactory {
    */
   public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode, JsonConfig.Date jsonDate) {
     // by default map anonymous java.util.Date to java.sql.Timestamp.
-    int utilDateType = getTemporalMapType("timestamp");
-    return createUtilDate(mode, jsonDate, utilDateType);
+    return createUtilDate(mode, jsonDate, java.sql.Types.TIMESTAMP);
   }
 
   /**
@@ -84,14 +74,11 @@ public class DefaultTypeFactory {
    * map to.
    */
   public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime jsonDateTime, JsonConfig.Date jsonDate, int utilDateType) {
-
     switch (utilDateType) {
       case Types.DATE:
         return new ScalarTypeUtilDate.DateType(jsonDate);
-
       case Types.TIMESTAMP:
         return new ScalarTypeUtilDate.TimestampType(jsonDateTime);
-
       default:
         throw new RuntimeException("Invalid type " + utilDateType);
     }
@@ -101,9 +88,7 @@ public class DefaultTypeFactory {
    * Create the default ScalarType for java.util.Calendar.
    */
   public ScalarType<Calendar> createCalendar(JsonConfig.DateTime mode) {
-
-    int jdbcType = getTemporalMapType("timestamp");
-    return createCalendar(mode, jdbcType);
+    return createCalendar(mode, java.sql.Types.TIMESTAMP);
   }
 
   /**
@@ -111,22 +96,13 @@ public class DefaultTypeFactory {
    * to map to.
    */
   public ScalarType<Calendar> createCalendar(JsonConfig.DateTime mode, int jdbcType) {
-
     return new ScalarTypeCalendar(mode, jdbcType);
-  }
-
-  private int getTemporalMapType(String mapType) {
-    if (mapType.equalsIgnoreCase("date")) {
-      return java.sql.Types.DATE;
-    }
-    return java.sql.Types.TIMESTAMP;
   }
 
   /**
    * Create a ScalarType for java.math.BigInteger.
    */
   public ScalarType<BigInteger> createMathBigInteger() {
-
     return new ScalarTypeMathBigInteger();
   }
 }
