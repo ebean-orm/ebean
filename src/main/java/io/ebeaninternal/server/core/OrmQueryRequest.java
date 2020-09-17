@@ -358,7 +358,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Will end a locally created transaction.
    * <p>
    * It ends the query only transaction.
-   * </p>
    */
   @Override
   public void endTransIfRequired() {
@@ -385,17 +384,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return query.getType() == Type.ITERATE;
   }
 
-  /**
-   * Execute the query as a delete.
-   */
   @Override
   public int delete() {
     return notifyCache(queryEngine.delete(this), false);
   }
 
-  /**
-   * Execute the query as a update.
-   */
   @Override
   public int update() {
     return notifyCache(queryEngine.update(this), true);
@@ -413,9 +406,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return queryEngine.findResultSet(this);
   }
 
-  /**
-   * Execute the query as findById.
-   */
   @Override
   public Object findId() {
     return queryEngine.findId(this);
@@ -456,9 +446,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return queryEngine.findIterate(this);
   }
 
-  /**
-   * Execute the query as findList.
-   */
   @Override
   @SuppressWarnings("unchecked")
   public List<T> findList() {
@@ -470,18 +457,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return queryEngine.findVersions(this);
   }
 
-  /**
-   * Execute the query as findSet.
-   */
   @Override
   @SuppressWarnings("unchecked")
   public Set<T> findSet() {
     return (Set<T>) queryEngine.findMany(this);
   }
 
-  /**
-   * Execute the query as findMap.
-   */
   @Override
   @SuppressWarnings("unchecked")
   public <K> Map<K, T> findMap() {
@@ -497,9 +478,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return (Map<K, T>) queryEngine.findMany(this);
   }
 
-  /**
-   * Execute the findSingleAttributeList query.
-   */
   @Override
   public <A> List<A> findSingleAttributeList() {
     return queryEngine.findSingleAttributeList(this);
@@ -512,9 +490,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return finder;
   }
 
-  /**
-   * Return the find that is to be performed.
-   */
   @Override
   public SpiQuery<T> getQuery() {
     return query;
@@ -652,11 +627,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   @Override
   public boolean getFromBeanCache() {
-
     if (!query.isBeanCacheGet()) {
       return false;
     }
-
     // check if the query can use the bean cache
     // 1. Find by Ids
     //    - hit beanCache with Ids
@@ -664,7 +637,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     //    - query and Load misses into bean cache
     //    - merge the 2 results and return
     //
-
     CacheIdLookup<T> idLookup = query.cacheIdLookup();
     if (idLookup != null) {
       BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
@@ -672,7 +644,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       this.cacheBeans = idLookup.removeHits(cacheResult);
       return idLookup.allHits();
     }
-
     if (!beanDescriptor.isNaturalKeyCaching()) {
       return false;
     }
@@ -688,7 +659,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         return data.allHits();
       }
     }
-
     return false;
   }
 
@@ -779,7 +749,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return the batch size for lazy loading on this bean query request.
    */
   public int getLazyLoadBatchSize() {
-
     int batchSize = query.getLazyLoadBatchSize();
     return (batchSize > 0) ? batchSize : ebeanServer.getLazyLoadBatchSize();
   }
@@ -798,7 +767,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return the base table alias for this query.
    */
   public String getBaseTableAlias() {
-    return query.getAlias() == null ? beanDescriptor.getBaseTableAlias() : query.getAlias();
+    return query.getAlias(beanDescriptor.getBaseTableAlias());
   }
 
   /**
