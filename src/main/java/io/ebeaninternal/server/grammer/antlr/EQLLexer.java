@@ -1,13 +1,16 @@
 // Generated from /home/rob/github/ebean-dir/ebean/src/test/resources/EQL.g4 by ANTLR 4.8
 package io.ebeaninternal.server.grammer.antlr;
-import org.antlr.v4.runtime.Lexer;
+
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.RuntimeMetaData;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLLexer extends Lexer {
@@ -17,17 +20,17 @@ public class EQLLexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
-		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
-		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
-		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
-		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
-		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52, 
-		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59, 
-		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, T__65=66, 
-		T__66=67, INPUT_VARIABLE=68, PATH_VARIABLE=69, QUOTED_PATH_VARIABLE=70, 
-		PROP_FORMULA=71, BOOLEAN_LITERAL=72, NUMBER_LITERAL=73, DOUBLE=74, INT=75, 
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9,
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17,
+		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24,
+		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31,
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38,
+		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45,
+		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52,
+		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59,
+		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, T__65=66,
+		T__66=67, INPUT_VARIABLE=68, PATH_VARIABLE=69, QUOTED_PATH_VARIABLE=70,
+		PROP_FORMULA=71, BOOLEAN_LITERAL=72, NUMBER_LITERAL=73, DOUBLE=74, INT=75,
 		ZERO=76, STRING_LITERAL=77, WS=78;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
@@ -39,16 +42,16 @@ public class EQLLexer extends Lexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8", 
-			"T__9", "T__10", "T__11", "T__12", "T__13", "T__14", "T__15", "T__16", 
-			"T__17", "T__18", "T__19", "T__20", "T__21", "T__22", "T__23", "T__24", 
-			"T__25", "T__26", "T__27", "T__28", "T__29", "T__30", "T__31", "T__32", 
-			"T__33", "T__34", "T__35", "T__36", "T__37", "T__38", "T__39", "T__40", 
-			"T__41", "T__42", "T__43", "T__44", "T__45", "T__46", "T__47", "T__48", 
-			"T__49", "T__50", "T__51", "T__52", "T__53", "T__54", "T__55", "T__56", 
-			"T__57", "T__58", "T__59", "T__60", "T__61", "T__62", "T__63", "T__64", 
-			"T__65", "T__66", "INPUT_VARIABLE", "PATH_VARIABLE", "QUOTED_PATH_VARIABLE", 
-			"PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL", "DOUBLE", "INT", 
+			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8",
+			"T__9", "T__10", "T__11", "T__12", "T__13", "T__14", "T__15", "T__16",
+			"T__17", "T__18", "T__19", "T__20", "T__21", "T__22", "T__23", "T__24",
+			"T__25", "T__26", "T__27", "T__28", "T__29", "T__30", "T__31", "T__32",
+			"T__33", "T__34", "T__35", "T__36", "T__37", "T__38", "T__39", "T__40",
+			"T__41", "T__42", "T__43", "T__44", "T__45", "T__46", "T__47", "T__48",
+			"T__49", "T__50", "T__51", "T__52", "T__53", "T__54", "T__55", "T__56",
+			"T__57", "T__58", "T__59", "T__60", "T__61", "T__62", "T__63", "T__64",
+			"T__65", "T__66", "INPUT_VARIABLE", "PATH_VARIABLE", "QUOTED_PATH_VARIABLE",
+			"PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL", "DOUBLE", "INT",
 			"ZERO", "STRING_LITERAL", "WS"
 		};
 	}
@@ -56,29 +59,29 @@ public class EQLLexer extends Lexer {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'('", "')'", "'select'", "'distinct'", "'where'", "'order'", "'by'", 
-			"','", "'nulls'", "'first'", "'last'", "'asc'", "'desc'", "'limit'", 
-			"'offset'", "'fetch'", "'+'", "'query'", "'lazy'", "'or'", "'and'", "'not'", 
-			"'inOrEmpty'", "'in'", "'between'", "'to'", "'inrange'", "'inRange'", 
-			"'is'", "'null'", "'isNull'", "'isNotNull'", "'notNull'", "'empty'", 
-			"'isEmpty'", "'isNotEmpty'", "'notEmpty'", "'like'", "'ilike'", "'contains'", 
-			"'icontains'", "'startsWith'", "'istartsWith'", "'endsWith'", "'iendsWith'", 
-			"'='", "'eq'", "'>'", "'gt'", "'>='", "'ge'", "'gte'", "'<'", "'lt'", 
-			"'<='", "'le'", "'lte'", "'<>'", "'!='", "'ne'", "'ieq'", "'ine'", "'eqOrNull'", 
-			"'gtOrNull'", "'ltOrNull'", "'geOrNull'", "'leOrNull'", null, null, null, 
+			null, "'('", "')'", "'select'", "'distinct'", "'where'", "'order'", "'by'",
+			"','", "'nulls'", "'first'", "'last'", "'asc'", "'desc'", "'limit'",
+			"'offset'", "'fetch'", "'+'", "'query'", "'lazy'", "'or'", "'and'", "'not'",
+			"'inOrEmpty'", "'in'", "'between'", "'to'", "'inrange'", "'inRange'",
+			"'is'", "'null'", "'isNull'", "'isNotNull'", "'notNull'", "'empty'",
+			"'isEmpty'", "'isNotEmpty'", "'notEmpty'", "'like'", "'ilike'", "'contains'",
+			"'icontains'", "'startsWith'", "'istartsWith'", "'endsWith'", "'iendsWith'",
+			"'='", "'eq'", "'>'", "'gt'", "'>='", "'ge'", "'gte'", "'<'", "'lt'",
+			"'<='", "'le'", "'lte'", "'<>'", "'!='", "'ne'", "'ieq'", "'ine'", "'eqOrNull'",
+			"'gtOrNull'", "'ltOrNull'", "'geOrNull'", "'leOrNull'", null, null, null,
 			null, null, null, null, null, "'0'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, "INPUT_VARIABLE", "PATH_VARIABLE", 
-			"QUOTED_PATH_VARIABLE", "PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL", 
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, "INPUT_VARIABLE", "PATH_VARIABLE",
+			"QUOTED_PATH_VARIABLE", "PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL",
 			"DOUBLE", "INT", "ZERO", "STRING_LITERAL", "WS"
 		};
 	}

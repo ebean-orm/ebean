@@ -1,13 +1,25 @@
 // Generated from /home/rob/github/ebean-dir/ebean/src/test/resources/EQL.g4 by ANTLR 4.8
 package io.ebeaninternal.server.grammer.antlr;
-import org.antlr.v4.runtime.atn.*;
+
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.RuntimeMetaData;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLParser extends Parser {
@@ -17,46 +29,46 @@ public class EQLParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
-		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
-		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
-		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
-		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
-		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52, 
-		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59, 
-		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, T__65=66, 
-		T__66=67, INPUT_VARIABLE=68, PATH_VARIABLE=69, QUOTED_PATH_VARIABLE=70, 
-		PROP_FORMULA=71, BOOLEAN_LITERAL=72, NUMBER_LITERAL=73, DOUBLE=74, INT=75, 
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9,
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17,
+		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24,
+		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31,
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38,
+		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45,
+		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52,
+		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59,
+		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, T__65=66,
+		T__66=67, INPUT_VARIABLE=68, PATH_VARIABLE=69, QUOTED_PATH_VARIABLE=70,
+		PROP_FORMULA=71, BOOLEAN_LITERAL=72, NUMBER_LITERAL=73, DOUBLE=74, INT=75,
 		ZERO=76, STRING_LITERAL=77, WS=78;
 	public static final int
-		RULE_select_statement = 0, RULE_select_properties = 1, RULE_select_clause = 2, 
-		RULE_distinct = 3, RULE_fetch_clause = 4, RULE_where_clause = 5, RULE_orderby_clause = 6, 
-		RULE_orderby_property = 7, RULE_nulls_firstlast = 8, RULE_asc_desc = 9, 
-		RULE_limit_clause = 10, RULE_offset_clause = 11, RULE_fetch_path = 12, 
-		RULE_fetch_property_set = 13, RULE_fetch_property_group = 14, RULE_fetch_path_path = 15, 
-		RULE_fetch_property = 16, RULE_fetch_query_hint = 17, RULE_fetch_lazy_hint = 18, 
-		RULE_fetch_option = 19, RULE_fetch_query_option = 20, RULE_fetch_lazy_option = 21, 
-		RULE_fetch_batch_size = 22, RULE_conditional_expression = 23, RULE_conditional_term = 24, 
-		RULE_conditional_factor = 25, RULE_conditional_primary = 26, RULE_any_expression = 27, 
-		RULE_inOrEmpty_expression = 28, RULE_in_expression = 29, RULE_in_value = 30, 
-		RULE_between_expression = 31, RULE_inrange_expression = 32, RULE_inrange_op = 33, 
-		RULE_propertyBetween_expression = 34, RULE_isNull_expression = 35, RULE_isNotNull_expression = 36, 
-		RULE_isEmpty_expression = 37, RULE_isNotEmpty_expression = 38, RULE_like_expression = 39, 
-		RULE_like_op = 40, RULE_comparison_expression = 41, RULE_comparison_operator = 42, 
+		RULE_select_statement = 0, RULE_select_properties = 1, RULE_select_clause = 2,
+		RULE_distinct = 3, RULE_fetch_clause = 4, RULE_where_clause = 5, RULE_orderby_clause = 6,
+		RULE_orderby_property = 7, RULE_nulls_firstlast = 8, RULE_asc_desc = 9,
+		RULE_limit_clause = 10, RULE_offset_clause = 11, RULE_fetch_path = 12,
+		RULE_fetch_property_set = 13, RULE_fetch_property_group = 14, RULE_fetch_path_path = 15,
+		RULE_fetch_property = 16, RULE_fetch_query_hint = 17, RULE_fetch_lazy_hint = 18,
+		RULE_fetch_option = 19, RULE_fetch_query_option = 20, RULE_fetch_lazy_option = 21,
+		RULE_fetch_batch_size = 22, RULE_conditional_expression = 23, RULE_conditional_term = 24,
+		RULE_conditional_factor = 25, RULE_conditional_primary = 26, RULE_any_expression = 27,
+		RULE_inOrEmpty_expression = 28, RULE_in_expression = 29, RULE_in_value = 30,
+		RULE_between_expression = 31, RULE_inrange_expression = 32, RULE_inrange_op = 33,
+		RULE_propertyBetween_expression = 34, RULE_isNull_expression = 35, RULE_isNotNull_expression = 36,
+		RULE_isEmpty_expression = 37, RULE_isNotEmpty_expression = 38, RULE_like_expression = 39,
+		RULE_like_op = 40, RULE_comparison_expression = 41, RULE_comparison_operator = 42,
 		RULE_value_expression = 43, RULE_literal = 44;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"select_statement", "select_properties", "select_clause", "distinct", 
-			"fetch_clause", "where_clause", "orderby_clause", "orderby_property", 
-			"nulls_firstlast", "asc_desc", "limit_clause", "offset_clause", "fetch_path", 
-			"fetch_property_set", "fetch_property_group", "fetch_path_path", "fetch_property", 
-			"fetch_query_hint", "fetch_lazy_hint", "fetch_option", "fetch_query_option", 
-			"fetch_lazy_option", "fetch_batch_size", "conditional_expression", "conditional_term", 
-			"conditional_factor", "conditional_primary", "any_expression", "inOrEmpty_expression", 
-			"in_expression", "in_value", "between_expression", "inrange_expression", 
-			"inrange_op", "propertyBetween_expression", "isNull_expression", "isNotNull_expression", 
-			"isEmpty_expression", "isNotEmpty_expression", "like_expression", "like_op", 
+			"select_statement", "select_properties", "select_clause", "distinct",
+			"fetch_clause", "where_clause", "orderby_clause", "orderby_property",
+			"nulls_firstlast", "asc_desc", "limit_clause", "offset_clause", "fetch_path",
+			"fetch_property_set", "fetch_property_group", "fetch_path_path", "fetch_property",
+			"fetch_query_hint", "fetch_lazy_hint", "fetch_option", "fetch_query_option",
+			"fetch_lazy_option", "fetch_batch_size", "conditional_expression", "conditional_term",
+			"conditional_factor", "conditional_primary", "any_expression", "inOrEmpty_expression",
+			"in_expression", "in_value", "between_expression", "inrange_expression",
+			"inrange_op", "propertyBetween_expression", "isNull_expression", "isNotNull_expression",
+			"isEmpty_expression", "isNotEmpty_expression", "like_expression", "like_op",
 			"comparison_expression", "comparison_operator", "value_expression", "literal"
 		};
 	}
@@ -64,29 +76,29 @@ public class EQLParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'('", "')'", "'select'", "'distinct'", "'where'", "'order'", "'by'", 
-			"','", "'nulls'", "'first'", "'last'", "'asc'", "'desc'", "'limit'", 
-			"'offset'", "'fetch'", "'+'", "'query'", "'lazy'", "'or'", "'and'", "'not'", 
-			"'inOrEmpty'", "'in'", "'between'", "'to'", "'inrange'", "'inRange'", 
-			"'is'", "'null'", "'isNull'", "'isNotNull'", "'notNull'", "'empty'", 
-			"'isEmpty'", "'isNotEmpty'", "'notEmpty'", "'like'", "'ilike'", "'contains'", 
-			"'icontains'", "'startsWith'", "'istartsWith'", "'endsWith'", "'iendsWith'", 
-			"'='", "'eq'", "'>'", "'gt'", "'>='", "'ge'", "'gte'", "'<'", "'lt'", 
-			"'<='", "'le'", "'lte'", "'<>'", "'!='", "'ne'", "'ieq'", "'ine'", "'eqOrNull'", 
-			"'gtOrNull'", "'ltOrNull'", "'geOrNull'", "'leOrNull'", null, null, null, 
+			null, "'('", "')'", "'select'", "'distinct'", "'where'", "'order'", "'by'",
+			"','", "'nulls'", "'first'", "'last'", "'asc'", "'desc'", "'limit'",
+			"'offset'", "'fetch'", "'+'", "'query'", "'lazy'", "'or'", "'and'", "'not'",
+			"'inOrEmpty'", "'in'", "'between'", "'to'", "'inrange'", "'inRange'",
+			"'is'", "'null'", "'isNull'", "'isNotNull'", "'notNull'", "'empty'",
+			"'isEmpty'", "'isNotEmpty'", "'notEmpty'", "'like'", "'ilike'", "'contains'",
+			"'icontains'", "'startsWith'", "'istartsWith'", "'endsWith'", "'iendsWith'",
+			"'='", "'eq'", "'>'", "'gt'", "'>='", "'ge'", "'gte'", "'<'", "'lt'",
+			"'<='", "'le'", "'lte'", "'<>'", "'!='", "'ne'", "'ieq'", "'ine'", "'eqOrNull'",
+			"'gtOrNull'", "'ltOrNull'", "'geOrNull'", "'leOrNull'", null, null, null,
 			null, null, null, null, null, "'0'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, "INPUT_VARIABLE", "PATH_VARIABLE", 
-			"QUOTED_PATH_VARIABLE", "PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL", 
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, "INPUT_VARIABLE", "PATH_VARIABLE",
+			"QUOTED_PATH_VARIABLE", "PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL",
 			"DOUBLE", "INT", "ZERO", "STRING_LITERAL", "WS"
 		};
 	}
