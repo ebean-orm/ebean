@@ -87,12 +87,32 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
+  public void where_geOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name geOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertSql(query).contains("where (t0.name >= ? or t0.name is null)");
+    }
+  }
+
+  @Test
   public void where_ltOrNull_bindPositioned() {
 
     final Query<Customer> query = where("name ltOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
       assertSql(query).contains("where (t0.name < ? or t0.name is null)");
+    }
+  }
+
+  @Test
+  public void where_leOrNull_bindPositioned() {
+
+    final Query<Customer> query = where("name leOrNull ?", "Rob");
+    query.findList();
+    if (isH2()) {
+      assertSql(query).contains("where (t0.name <= ? or t0.name is null)");
     }
   }
 

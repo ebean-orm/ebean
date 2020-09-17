@@ -208,7 +208,7 @@ comparison_operator
    | '<>' | '!=' | 'ne'
    | 'ieq'
    | 'ine'
-   | 'eqOrNull' | 'gtOrNull' | 'ltOrNull'
+   | 'eqOrNull' | 'gtOrNull' | 'ltOrNull' | 'geOrNull' | 'leOrNull'
    ;
 
 value_expression

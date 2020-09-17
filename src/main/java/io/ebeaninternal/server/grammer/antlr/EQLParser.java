@@ -1,72 +1,62 @@
-// Generated from /home/rob/github/ebean-dir/ebean/src/test/resources/EQL.g4 by ANTLR 4.7.2
+// Generated from /home/rob/github/ebean-dir/ebean/src/test/resources/EQL.g4 by ANTLR 4.8
 package io.ebeaninternal.server.grammer.antlr;
-
-import org.antlr.v4.runtime.NoViableAltException;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.RuntimeMetaData;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.Vocabulary;
-import org.antlr.v4.runtime.VocabularyImpl;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9,
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17,
-		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24,
-		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31,
-		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38,
-		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45,
-		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52,
-		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59,
-		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, INPUT_VARIABLE=66,
-		PATH_VARIABLE=67, QUOTED_PATH_VARIABLE=68, PROP_FORMULA=69, BOOLEAN_LITERAL=70,
-		NUMBER_LITERAL=71, DOUBLE=72, INT=73, ZERO=74, STRING_LITERAL=75, WS=76;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
+		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
+		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
+		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
+		T__45=46, T__46=47, T__47=48, T__48=49, T__49=50, T__50=51, T__51=52, 
+		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59, 
+		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, T__65=66, 
+		T__66=67, INPUT_VARIABLE=68, PATH_VARIABLE=69, QUOTED_PATH_VARIABLE=70, 
+		PROP_FORMULA=71, BOOLEAN_LITERAL=72, NUMBER_LITERAL=73, DOUBLE=74, INT=75, 
+		ZERO=76, STRING_LITERAL=77, WS=78;
 	public static final int
-		RULE_select_statement = 0, RULE_select_properties = 1, RULE_select_clause = 2,
-		RULE_distinct = 3, RULE_fetch_clause = 4, RULE_where_clause = 5, RULE_orderby_clause = 6,
-		RULE_orderby_property = 7, RULE_nulls_firstlast = 8, RULE_asc_desc = 9,
-		RULE_limit_clause = 10, RULE_offset_clause = 11, RULE_fetch_path = 12,
-		RULE_fetch_property_set = 13, RULE_fetch_property_group = 14, RULE_fetch_path_path = 15,
-		RULE_fetch_property = 16, RULE_fetch_query_hint = 17, RULE_fetch_lazy_hint = 18,
-		RULE_fetch_option = 19, RULE_fetch_query_option = 20, RULE_fetch_lazy_option = 21,
-		RULE_fetch_batch_size = 22, RULE_conditional_expression = 23, RULE_conditional_term = 24,
-		RULE_conditional_factor = 25, RULE_conditional_primary = 26, RULE_any_expression = 27,
-		RULE_inOrEmpty_expression = 28, RULE_in_expression = 29, RULE_in_value = 30,
-		RULE_between_expression = 31, RULE_inrange_expression = 32, RULE_inrange_op = 33,
-		RULE_propertyBetween_expression = 34, RULE_isNull_expression = 35, RULE_isNotNull_expression = 36,
-		RULE_isEmpty_expression = 37, RULE_isNotEmpty_expression = 38, RULE_like_expression = 39,
-		RULE_like_op = 40, RULE_comparison_expression = 41, RULE_comparison_operator = 42,
+		RULE_select_statement = 0, RULE_select_properties = 1, RULE_select_clause = 2, 
+		RULE_distinct = 3, RULE_fetch_clause = 4, RULE_where_clause = 5, RULE_orderby_clause = 6, 
+		RULE_orderby_property = 7, RULE_nulls_firstlast = 8, RULE_asc_desc = 9, 
+		RULE_limit_clause = 10, RULE_offset_clause = 11, RULE_fetch_path = 12, 
+		RULE_fetch_property_set = 13, RULE_fetch_property_group = 14, RULE_fetch_path_path = 15, 
+		RULE_fetch_property = 16, RULE_fetch_query_hint = 17, RULE_fetch_lazy_hint = 18, 
+		RULE_fetch_option = 19, RULE_fetch_query_option = 20, RULE_fetch_lazy_option = 21, 
+		RULE_fetch_batch_size = 22, RULE_conditional_expression = 23, RULE_conditional_term = 24, 
+		RULE_conditional_factor = 25, RULE_conditional_primary = 26, RULE_any_expression = 27, 
+		RULE_inOrEmpty_expression = 28, RULE_in_expression = 29, RULE_in_value = 30, 
+		RULE_between_expression = 31, RULE_inrange_expression = 32, RULE_inrange_op = 33, 
+		RULE_propertyBetween_expression = 34, RULE_isNull_expression = 35, RULE_isNotNull_expression = 36, 
+		RULE_isEmpty_expression = 37, RULE_isNotEmpty_expression = 38, RULE_like_expression = 39, 
+		RULE_like_op = 40, RULE_comparison_expression = 41, RULE_comparison_operator = 42, 
 		RULE_value_expression = 43, RULE_literal = 44;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"select_statement", "select_properties", "select_clause", "distinct",
-			"fetch_clause", "where_clause", "orderby_clause", "orderby_property",
-			"nulls_firstlast", "asc_desc", "limit_clause", "offset_clause", "fetch_path",
-			"fetch_property_set", "fetch_property_group", "fetch_path_path", "fetch_property",
-			"fetch_query_hint", "fetch_lazy_hint", "fetch_option", "fetch_query_option",
-			"fetch_lazy_option", "fetch_batch_size", "conditional_expression", "conditional_term",
-			"conditional_factor", "conditional_primary", "any_expression", "inOrEmpty_expression",
-			"in_expression", "in_value", "between_expression", "inrange_expression",
-			"inrange_op", "propertyBetween_expression", "isNull_expression", "isNotNull_expression",
-			"isEmpty_expression", "isNotEmpty_expression", "like_expression", "like_op",
+			"select_statement", "select_properties", "select_clause", "distinct", 
+			"fetch_clause", "where_clause", "orderby_clause", "orderby_property", 
+			"nulls_firstlast", "asc_desc", "limit_clause", "offset_clause", "fetch_path", 
+			"fetch_property_set", "fetch_property_group", "fetch_path_path", "fetch_property", 
+			"fetch_query_hint", "fetch_lazy_hint", "fetch_option", "fetch_query_option", 
+			"fetch_lazy_option", "fetch_batch_size", "conditional_expression", "conditional_term", 
+			"conditional_factor", "conditional_primary", "any_expression", "inOrEmpty_expression", 
+			"in_expression", "in_value", "between_expression", "inrange_expression", 
+			"inrange_op", "propertyBetween_expression", "isNull_expression", "isNotNull_expression", 
+			"isEmpty_expression", "isNotEmpty_expression", "like_expression", "like_op", 
 			"comparison_expression", "comparison_operator", "value_expression", "literal"
 		};
 	}
@@ -74,29 +64,29 @@ public class EQLParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'('", "')'", "'select'", "'distinct'", "'where'", "'order'", "'by'",
-			"','", "'nulls'", "'first'", "'last'", "'asc'", "'desc'", "'limit'",
-			"'offset'", "'fetch'", "'+'", "'query'", "'lazy'", "'or'", "'and'", "'not'",
-			"'inOrEmpty'", "'in'", "'between'", "'to'", "'inrange'", "'inRange'",
-			"'is'", "'null'", "'isNull'", "'isNotNull'", "'notNull'", "'empty'",
-			"'isEmpty'", "'isNotEmpty'", "'notEmpty'", "'like'", "'ilike'", "'contains'",
-			"'icontains'", "'startsWith'", "'istartsWith'", "'endsWith'", "'iendsWith'",
-			"'='", "'eq'", "'>'", "'gt'", "'>='", "'ge'", "'gte'", "'<'", "'lt'",
-			"'<='", "'le'", "'lte'", "'<>'", "'!='", "'ne'", "'ieq'", "'ine'", "'eqOrNull'",
-			"'gtOrNull'", "'ltOrNull'", null, null, null, null, null, null, null,
-			null, "'0'"
+			null, "'('", "')'", "'select'", "'distinct'", "'where'", "'order'", "'by'", 
+			"','", "'nulls'", "'first'", "'last'", "'asc'", "'desc'", "'limit'", 
+			"'offset'", "'fetch'", "'+'", "'query'", "'lazy'", "'or'", "'and'", "'not'", 
+			"'inOrEmpty'", "'in'", "'between'", "'to'", "'inrange'", "'inRange'", 
+			"'is'", "'null'", "'isNull'", "'isNotNull'", "'notNull'", "'empty'", 
+			"'isEmpty'", "'isNotEmpty'", "'notEmpty'", "'like'", "'ilike'", "'contains'", 
+			"'icontains'", "'startsWith'", "'istartsWith'", "'endsWith'", "'iendsWith'", 
+			"'='", "'eq'", "'>'", "'gt'", "'>='", "'ge'", "'gte'", "'<'", "'lt'", 
+			"'<='", "'le'", "'lte'", "'<>'", "'!='", "'ne'", "'ieq'", "'ine'", "'eqOrNull'", 
+			"'gtOrNull'", "'ltOrNull'", "'geOrNull'", "'leOrNull'", null, null, null, 
+			null, null, null, null, null, "'0'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, null, null, null, null, null, null,
-			null, null, null, null, null, null, "INPUT_VARIABLE", "PATH_VARIABLE",
-			"QUOTED_PATH_VARIABLE", "PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL",
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, "INPUT_VARIABLE", "PATH_VARIABLE", 
+			"QUOTED_PATH_VARIABLE", "PROP_FORMULA", "BOOLEAN_LITERAL", "NUMBER_LITERAL", 
 			"DOUBLE", "INT", "ZERO", "STRING_LITERAL", "WS"
 		};
 	}
@@ -182,6 +172,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitSelect_statement(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitSelect_statement(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -277,6 +272,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitSelect_properties(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitSelect_properties(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Select_propertiesContext select_properties() throws RecognitionException {
@@ -340,6 +340,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitSelect_clause(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitSelect_clause(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Select_clauseContext select_clause() throws RecognitionException {
@@ -389,6 +394,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitDistinct(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitDistinct(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final DistinctContext distinct() throws RecognitionException {
@@ -428,6 +438,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_clause(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_clause(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_clauseContext fetch_clause() throws RecognitionException {
@@ -466,6 +481,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitWhere_clause(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitWhere_clause(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -510,6 +530,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitOrderby_clause(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitOrderby_clause(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -575,6 +600,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitOrderby_property(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitOrderby_property(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Orderby_propertyContext orderby_property() throws RecognitionException {
@@ -632,6 +662,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitNulls_firstlast(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitNulls_firstlast(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Nulls_firstlastContext nulls_firstlast() throws RecognitionException {
@@ -685,6 +720,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitAsc_desc(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitAsc_desc(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Asc_descContext asc_desc() throws RecognitionException {
@@ -733,6 +773,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitLimit_clause(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitLimit_clause(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -784,6 +829,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitOffset_clause(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitOffset_clause(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Offset_clauseContext offset_clause() throws RecognitionException {
@@ -830,6 +880,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_path(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_path(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -893,6 +948,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_property_set(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_property_set(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_property_setContext fetch_property_set() throws RecognitionException {
@@ -938,6 +998,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_property_group(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_property_group(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -994,6 +1059,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_path_path(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_path_path(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_path_pathContext fetch_path_path() throws RecognitionException {
@@ -1046,6 +1116,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_property(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_property(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1113,6 +1188,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_query_hint(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_query_hint(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_query_hintContext fetch_query_hint() throws RecognitionException {
@@ -1153,6 +1233,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_lazy_hint(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_lazy_hint(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1197,6 +1282,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_option(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_option(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1252,6 +1342,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_query_option(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_query_option(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_query_optionContext fetch_query_option() throws RecognitionException {
@@ -1302,6 +1397,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_lazy_option(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_lazy_option(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_lazy_optionContext fetch_lazy_option() throws RecognitionException {
@@ -1350,6 +1450,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitFetch_batch_size(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitFetch_batch_size(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Fetch_batch_sizeContext fetch_batch_size() throws RecognitionException {
@@ -1395,6 +1500,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitConditional_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitConditional_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1455,6 +1565,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitConditional_term(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitConditional_term(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Conditional_termContext conditional_term() throws RecognitionException {
@@ -1511,6 +1626,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitConditional_factor(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitConditional_factor(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Conditional_factorContext conditional_factor() throws RecognitionException {
@@ -1563,6 +1683,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitConditional_primary(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitConditional_primary(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1652,6 +1777,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitAny_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitAny_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1780,6 +1910,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitInOrEmpty_expression(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitInOrEmpty_expression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final InOrEmpty_expressionContext inOrEmpty_expression() throws RecognitionException {
@@ -1823,6 +1958,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitIn_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitIn_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1870,6 +2010,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitIn_value(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitIn_value(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1950,6 +2095,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitBetween_expression(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitBetween_expression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Between_expressionContext between_expression() throws RecognitionException {
@@ -2004,6 +2154,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitInrange_expression(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitInrange_expression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Inrange_expressionContext inrange_expression() throws RecognitionException {
@@ -2047,6 +2202,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitInrange_op(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitInrange_op(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2100,6 +2260,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitPropertyBetween_expression(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitPropertyBetween_expression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final PropertyBetween_expressionContext propertyBetween_expression() throws RecognitionException {
@@ -2144,6 +2309,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitIsNull_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitIsNull_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2200,6 +2370,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitIsNotNull_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitIsNotNull_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2268,6 +2443,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitIsEmpty_expression(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitIsEmpty_expression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final IsEmpty_expressionContext isEmpty_expression() throws RecognitionException {
@@ -2323,6 +2503,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitIsNotEmpty_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitIsNotEmpty_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2397,6 +2582,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitLike_expression(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitLike_expression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Like_expressionContext like_expression() throws RecognitionException {
@@ -2436,6 +2626,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitLike_op(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitLike_op(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2488,6 +2683,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitComparison_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitComparison_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2551,6 +2751,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitComparison_operator(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitComparison_operator(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final Comparison_operatorContext comparison_operator() throws RecognitionException {
@@ -2562,7 +2767,7 @@ public class EQLParser extends Parser {
 			{
 			setState(350);
 			_la = _input.LA(1);
-			if ( !(((((_la - 46)) & ~0x3f) == 0 && ((1L << (_la - 46)) & ((1L << (T__45 - 46)) | (1L << (T__46 - 46)) | (1L << (T__47 - 46)) | (1L << (T__48 - 46)) | (1L << (T__49 - 46)) | (1L << (T__50 - 46)) | (1L << (T__51 - 46)) | (1L << (T__52 - 46)) | (1L << (T__53 - 46)) | (1L << (T__54 - 46)) | (1L << (T__55 - 46)) | (1L << (T__56 - 46)) | (1L << (T__57 - 46)) | (1L << (T__58 - 46)) | (1L << (T__59 - 46)) | (1L << (T__60 - 46)) | (1L << (T__61 - 46)) | (1L << (T__62 - 46)) | (1L << (T__63 - 46)) | (1L << (T__64 - 46)))) != 0)) ) {
+			if ( !(((((_la - 46)) & ~0x3f) == 0 && ((1L << (_la - 46)) & ((1L << (T__45 - 46)) | (1L << (T__46 - 46)) | (1L << (T__47 - 46)) | (1L << (T__48 - 46)) | (1L << (T__49 - 46)) | (1L << (T__50 - 46)) | (1L << (T__51 - 46)) | (1L << (T__52 - 46)) | (1L << (T__53 - 46)) | (1L << (T__54 - 46)) | (1L << (T__55 - 46)) | (1L << (T__56 - 46)) | (1L << (T__57 - 46)) | (1L << (T__58 - 46)) | (1L << (T__59 - 46)) | (1L << (T__60 - 46)) | (1L << (T__61 - 46)) | (1L << (T__62 - 46)) | (1L << (T__63 - 46)) | (1L << (T__64 - 46)) | (1L << (T__65 - 46)) | (1L << (T__66 - 46)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2599,6 +2804,11 @@ public class EQLParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitValue_expression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitValue_expression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2656,6 +2866,11 @@ public class EQLParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof EQLListener ) ((EQLListener)listener).exitLiteral(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof EQLVisitor ) return ((EQLVisitor<? extends T>)visitor).visitLiteral(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final LiteralContext literal() throws RecognitionException {
@@ -2667,7 +2882,7 @@ public class EQLParser extends Parser {
 			{
 			setState(356);
 			_la = _input.LA(1);
-			if ( !(((((_la - 70)) & ~0x3f) == 0 && ((1L << (_la - 70)) & ((1L << (BOOLEAN_LITERAL - 70)) | (1L << (NUMBER_LITERAL - 70)) | (1L << (STRING_LITERAL - 70)))) != 0)) ) {
+			if ( !(((((_la - 72)) & ~0x3f) == 0 && ((1L << (_la - 72)) & ((1L << (BOOLEAN_LITERAL - 72)) | (1L << (NUMBER_LITERAL - 72)) | (1L << (STRING_LITERAL - 72)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2689,7 +2904,7 @@ public class EQLParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3N\u0169\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3P\u0169\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -2715,7 +2930,7 @@ public class EQLParser extends Parser {
 		"\5\'\u0145\n\'\3(\3(\3(\3(\3(\3(\3(\3(\5(\u014f\n(\3)\3)\3)\3)\3*\3*\3"+
 		"+\3+\3+\3+\3+\3+\3+\3+\5+\u015f\n+\3,\3,\3-\3-\5-\u0165\n-\3.\3.\3.\2"+
 		"\2/\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@B"+
-		"DFHJLNPRTVXZ\2\b\3\2\16\17\3\2EF\3\2\35\36\3\2(/\3\2\60C\4\2HIMM\2\u0169"+
+		"DFHJLNPRTVXZ\2\b\3\2\16\17\3\2GH\3\2\35\36\3\2(/\3\2\60E\4\2JKOO\2\u0169"+
 		"\2]\3\2\2\2\4u\3\2\2\2\6w\3\2\2\2\b}\3\2\2\2\n\177\3\2\2\2\f\u0081\3\2"+
 		"\2\2\16\u0084\3\2\2\2\20\u008e\3\2\2\2\22\u0099\3\2\2\2\24\u009b\3\2\2"+
 		"\2\26\u009d\3\2\2\2\30\u00a2\3\2\2\2\32\u00a5\3\2\2\2\34\u00ad\3\2\2\2"+
@@ -2736,14 +2951,14 @@ public class EQLParser extends Parser {
 		"\31\2\u0083\r\3\2\2\2\u0084\u0085\7\b\2\2\u0085\u0086\7\t\2\2\u0086\u008b"+
 		"\5\20\t\2\u0087\u0088\7\n\2\2\u0088\u008a\5\20\t\2\u0089\u0087\3\2\2\2"+
 		"\u008a\u008d\3\2\2\2\u008b\u0089\3\2\2\2\u008b\u008c\3\2\2\2\u008c\17"+
-		"\3\2\2\2\u008d\u008b\3\2\2\2\u008e\u0090\7E\2\2\u008f\u0091\5\24\13\2"+
+		"\3\2\2\2\u008d\u008b\3\2\2\2\u008e\u0090\7G\2\2\u008f\u0091\5\24\13\2"+
 		"\u0090\u008f\3\2\2\2\u0090\u0091\3\2\2\2\u0091\u0093\3\2\2\2\u0092\u0094"+
 		"\5\22\n\2\u0093\u0092\3\2\2\2\u0093\u0094\3\2\2\2\u0094\21\3\2\2\2\u0095"+
 		"\u0096\7\13\2\2\u0096\u009a\7\f\2\2\u0097\u0098\7\13\2\2\u0098\u009a\7"+
 		"\r\2\2\u0099\u0095\3\2\2\2\u0099\u0097\3\2\2\2\u009a\23\3\2\2\2\u009b"+
-		"\u009c\t\2\2\2\u009c\25\3\2\2\2\u009d\u009e\7\20\2\2\u009e\u00a0\7I\2"+
+		"\u009c\t\2\2\2\u009c\25\3\2\2\2\u009d\u009e\7\20\2\2\u009e\u00a0\7K\2"+
 		"\2\u009f\u00a1\5\30\r\2\u00a0\u009f\3\2\2\2\u00a0\u00a1\3\2\2\2\u00a1"+
-		"\27\3\2\2\2\u00a2\u00a3\7\21\2\2\u00a3\u00a4\7I\2\2\u00a4\31\3\2\2\2\u00a5"+
+		"\27\3\2\2\2\u00a2\u00a3\7\21\2\2\u00a3\u00a4\7K\2\2\u00a4\31\3\2\2\2\u00a5"+
 		"\u00a7\7\22\2\2\u00a6\u00a8\5(\25\2\u00a7\u00a6\3\2\2\2\u00a7\u00a8\3"+
 		"\2\2\2\u00a8\u00a9\3\2\2\2\u00a9\u00ab\5 \21\2\u00aa\u00ac\5\34\17\2\u00ab"+
 		"\u00aa\3\2\2\2\u00ab\u00ac\3\2\2\2\u00ac\33\3\2\2\2\u00ad\u00ae\7\3\2"+
@@ -2751,7 +2966,7 @@ public class EQLParser extends Parser {
 		"\5\"\22\2\u00b2\u00b3\7\n\2\2\u00b3\u00b5\5\"\22\2\u00b4\u00b2\3\2\2\2"+
 		"\u00b5\u00b8\3\2\2\2\u00b6\u00b4\3\2\2\2\u00b6\u00b7\3\2\2\2\u00b7\37"+
 		"\3\2\2\2\u00b8\u00b6\3\2\2\2\u00b9\u00ba\t\3\2\2\u00ba!\3\2\2\2\u00bb"+
-		"\u00c0\7E\2\2\u00bc\u00c0\5$\23\2\u00bd\u00c0\5&\24\2\u00be\u00c0\7G\2"+
+		"\u00c0\7G\2\2\u00bc\u00c0\5$\23\2\u00bd\u00c0\5&\24\2\u00be\u00c0\7I\2"+
 		"\2\u00bf\u00bb\3\2\2\2\u00bf\u00bc\3\2\2\2\u00bf\u00bd\3\2\2\2\u00bf\u00be"+
 		"\3\2\2\2\u00c0#\3\2\2\2\u00c1\u00c2\7\23\2\2\u00c2\u00c3\5*\26\2\u00c3"+
 		"%\3\2\2\2\u00c4\u00c5\7\23\2\2\u00c5\u00c6\5,\27\2\u00c6\'\3\2\2\2\u00c7"+
@@ -2759,7 +2974,7 @@ public class EQLParser extends Parser {
 		"\2\2\u00ca)\3\2\2\2\u00cb\u00cd\7\24\2\2\u00cc\u00ce\5.\30\2\u00cd\u00cc"+
 		"\3\2\2\2\u00cd\u00ce\3\2\2\2\u00ce+\3\2\2\2\u00cf\u00d1\7\25\2\2\u00d0"+
 		"\u00d2\5.\30\2\u00d1\u00d0\3\2\2\2\u00d1\u00d2\3\2\2\2\u00d2-\3\2\2\2"+
-		"\u00d3\u00d4\7\3\2\2\u00d4\u00d5\7I\2\2\u00d5\u00d6\7\4\2\2\u00d6/\3\2"+
+		"\u00d3\u00d4\7\3\2\2\u00d4\u00d5\7K\2\2\u00d5\u00d6\7\4\2\2\u00d6/\3\2"+
 		"\2\2\u00d7\u00dc\5\62\32\2\u00d8\u00d9\7\26\2\2\u00d9\u00db\5\62\32\2"+
 		"\u00da\u00d8\3\2\2\2\u00db\u00de\3\2\2\2\u00dc\u00da\3\2\2\2\u00dc\u00dd"+
 		"\3\2\2\2\u00dd\61\3\2\2\2\u00de\u00dc\3\2\2\2\u00df\u00e4\5\64\33\2\u00e0"+
@@ -2777,34 +2992,34 @@ public class EQLParser extends Parser {
 		"\2\2\u0102\u00f6\3\2\2\2\u0102\u00f7\3\2\2\2\u0102\u00f8\3\2\2\2\u0102"+
 		"\u00f9\3\2\2\2\u0102\u00fa\3\2\2\2\u0102\u00fb\3\2\2\2\u0102\u00fc\3\2"+
 		"\2\2\u0102\u00fd\3\2\2\2\u0102\u00fe\3\2\2\2\u01039\3\2\2\2\u0104\u0105"+
-		"\7E\2\2\u0105\u0106\7\31\2\2\u0106\u0107\5> \2\u0107;\3\2\2\2\u0108\u0109"+
-		"\7E\2\2\u0109\u010a\7\32\2\2\u010a\u010b\5> \2\u010b=\3\2\2\2\u010c\u0119"+
-		"\7D\2\2\u010d\u010e\7\3\2\2\u010e\u0113\5X-\2\u010f\u0110\7\n\2\2\u0110"+
+		"\7G\2\2\u0105\u0106\7\31\2\2\u0106\u0107\5> \2\u0107;\3\2\2\2\u0108\u0109"+
+		"\7G\2\2\u0109\u010a\7\32\2\2\u010a\u010b\5> \2\u010b=\3\2\2\2\u010c\u0119"+
+		"\7F\2\2\u010d\u010e\7\3\2\2\u010e\u0113\5X-\2\u010f\u0110\7\n\2\2\u0110"+
 		"\u0112\5X-\2\u0111\u010f\3\2\2\2\u0112\u0115\3\2\2\2\u0113\u0111\3\2\2"+
 		"\2\u0113\u0114\3\2\2\2\u0114\u0116\3\2\2\2\u0115\u0113\3\2\2\2\u0116\u0117"+
 		"\7\4\2\2\u0117\u0119\3\2\2\2\u0118\u010c\3\2\2\2\u0118\u010d\3\2\2\2\u0119"+
-		"?\3\2\2\2\u011a\u011b\7E\2\2\u011b\u011c\7\33\2\2\u011c\u011d\5X-\2\u011d"+
-		"\u011e\7\27\2\2\u011e\u011f\5X-\2\u011fA\3\2\2\2\u0120\u0121\7E\2\2\u0121"+
+		"?\3\2\2\2\u011a\u011b\7G\2\2\u011b\u011c\7\33\2\2\u011c\u011d\5X-\2\u011d"+
+		"\u011e\7\27\2\2\u011e\u011f\5X-\2\u011fA\3\2\2\2\u0120\u0121\7G\2\2\u0121"+
 		"\u0122\5D#\2\u0122\u0123\5X-\2\u0123\u0124\7\34\2\2\u0124\u0125\5X-\2"+
 		"\u0125C\3\2\2\2\u0126\u0127\t\4\2\2\u0127E\3\2\2\2\u0128\u0129\5X-\2\u0129"+
-		"\u012a\7\33\2\2\u012a\u012b\7E\2\2\u012b\u012c\7\27\2\2\u012c\u012d\7"+
-		"E\2\2\u012dG\3\2\2\2\u012e\u012f\7E\2\2\u012f\u0130\7\37\2\2\u0130\u0134"+
-		"\7 \2\2\u0131\u0132\7E\2\2\u0132\u0134\7!\2\2\u0133\u012e\3\2\2\2\u0133"+
-		"\u0131\3\2\2\2\u0134I\3\2\2\2\u0135\u0136\7E\2\2\u0136\u0137\7\37\2\2"+
-		"\u0137\u0138\7\30\2\2\u0138\u013e\7 \2\2\u0139\u013a\7E\2\2\u013a\u013e"+
-		"\7\"\2\2\u013b\u013c\7E\2\2\u013c\u013e\7#\2\2\u013d\u0135\3\2\2\2\u013d"+
-		"\u0139\3\2\2\2\u013d\u013b\3\2\2\2\u013eK\3\2\2\2\u013f\u0140\7E\2\2\u0140"+
-		"\u0141\7\37\2\2\u0141\u0145\7$\2\2\u0142\u0143\7E\2\2\u0143\u0145\7%\2"+
+		"\u012a\7\33\2\2\u012a\u012b\7G\2\2\u012b\u012c\7\27\2\2\u012c\u012d\7"+
+		"G\2\2\u012dG\3\2\2\2\u012e\u012f\7G\2\2\u012f\u0130\7\37\2\2\u0130\u0134"+
+		"\7 \2\2\u0131\u0132\7G\2\2\u0132\u0134\7!\2\2\u0133\u012e\3\2\2\2\u0133"+
+		"\u0131\3\2\2\2\u0134I\3\2\2\2\u0135\u0136\7G\2\2\u0136\u0137\7\37\2\2"+
+		"\u0137\u0138\7\30\2\2\u0138\u013e\7 \2\2\u0139\u013a\7G\2\2\u013a\u013e"+
+		"\7\"\2\2\u013b\u013c\7G\2\2\u013c\u013e\7#\2\2\u013d\u0135\3\2\2\2\u013d"+
+		"\u0139\3\2\2\2\u013d\u013b\3\2\2\2\u013eK\3\2\2\2\u013f\u0140\7G\2\2\u0140"+
+		"\u0141\7\37\2\2\u0141\u0145\7$\2\2\u0142\u0143\7G\2\2\u0143\u0145\7%\2"+
 		"\2\u0144\u013f\3\2\2\2\u0144\u0142\3\2\2\2\u0145M\3\2\2\2\u0146\u0147"+
-		"\7E\2\2\u0147\u0148\7\37\2\2\u0148\u0149\7\30\2\2\u0149\u014f\7$\2\2\u014a"+
-		"\u014b\7E\2\2\u014b\u014f\7&\2\2\u014c\u014d\7E\2\2\u014d\u014f\7\'\2"+
+		"\7G\2\2\u0147\u0148\7\37\2\2\u0148\u0149\7\30\2\2\u0149\u014f\7$\2\2\u014a"+
+		"\u014b\7G\2\2\u014b\u014f\7&\2\2\u014c\u014d\7G\2\2\u014d\u014f\7\'\2"+
 		"\2\u014e\u0146\3\2\2\2\u014e\u014a\3\2\2\2\u014e\u014c\3\2\2\2\u014fO"+
-		"\3\2\2\2\u0150\u0151\7E\2\2\u0151\u0152\5R*\2\u0152\u0153\5X-\2\u0153"+
-		"Q\3\2\2\2\u0154\u0155\t\5\2\2\u0155S\3\2\2\2\u0156\u0157\7E\2\2\u0157"+
+		"\3\2\2\2\u0150\u0151\7G\2\2\u0151\u0152\5R*\2\u0152\u0153\5X-\2\u0153"+
+		"Q\3\2\2\2\u0154\u0155\t\5\2\2\u0155S\3\2\2\2\u0156\u0157\7G\2\2\u0157"+
 		"\u0158\5V,\2\u0158\u0159\5X-\2\u0159\u015f\3\2\2\2\u015a\u015b\5X-\2\u015b"+
-		"\u015c\5V,\2\u015c\u015d\7E\2\2\u015d\u015f\3\2\2\2\u015e\u0156\3\2\2"+
+		"\u015c\5V,\2\u015c\u015d\7G\2\2\u015d\u015f\3\2\2\2\u015e\u0156\3\2\2"+
 		"\2\u015e\u015a\3\2\2\2\u015fU\3\2\2\2\u0160\u0161\t\6\2\2\u0161W\3\2\2"+
-		"\2\u0162\u0165\5Z.\2\u0163\u0165\7D\2\2\u0164\u0162\3\2\2\2\u0164\u0163"+
+		"\2\u0162\u0165\5Z.\2\u0163\u0165\7F\2\2\u0164\u0162\3\2\2\2\u0164\u0163"+
 		"\3\2\2\2\u0165Y\3\2\2\2\u0166\u0167\t\7\2\2\u0167[\3\2\2\2\"]bfiluy\u008b"+
 		"\u0090\u0093\u0099\u00a0\u00a7\u00ab\u00b6\u00bf\u00c9\u00cd\u00d1\u00dc"+
 		"\u00e4\u00e8\u00f1\u0102\u0113\u0118\u0133\u013d\u0144\u014e\u015e\u0164";
