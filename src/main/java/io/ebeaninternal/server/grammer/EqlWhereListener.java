@@ -248,8 +248,12 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
       case EQORNULL:
         return EqlOperator.EQORNULL;
       case GTORNULL:
-        return EqlOperator.LTORNULL;
+        return EqlOperator.LEORNULL;
       case LTORNULL:
+        return EqlOperator.GEORNULL;
+      case GEORNULL:
+        return EqlOperator.LTORNULL;
+      case LEORNULL:
         return EqlOperator.GTORNULL;
       default:
         throw new IllegalStateException("Can not invert operator " + op);
@@ -421,6 +425,12 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
         break;
       case LTORNULL:
         peekExprList().ltOrNull(path, bind(value));
+        break;
+      case GEORNULL:
+        peekExprList().geOrNull(path, bind(value));
+        break;
+      case LEORNULL:
+        peekExprList().leOrNull(path, bind(value));
         break;
 
       default:

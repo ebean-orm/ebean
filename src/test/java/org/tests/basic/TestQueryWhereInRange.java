@@ -63,6 +63,21 @@ public class TestQueryWhereInRange extends BaseTestCase {
   }
 
   @Test
+  public void geOrNull() {
+
+    ResetBasicData.reset();
+    LocalDate today = LocalDate.now();
+
+    Query<Order> query = DB.find(Order.class)
+      .where().geOrNull("orderDate", today)
+      .query();
+
+    query.findList();
+
+    assertSql(query).contains("where (t0.order_date >= ? or t0.order_date is null)");
+  }
+
+  @Test
   public void ltOrNull() {
 
     ResetBasicData.reset();
@@ -74,8 +89,21 @@ public class TestQueryWhereInRange extends BaseTestCase {
       .query();
 
     query.findList();
-
     assertSql(query).contains(" where (t0.order_date < ? or t0.order_date is null)");
+  }
+
+  @Test
+  public void leOrNull() {
+
+    ResetBasicData.reset();
+    LocalDate today = LocalDate.now();
+
+    Query<Order> query = DB.find(Order.class)
+      .where().leOrNull("orderDate", today)
+      .query();
+
+    query.findList();
+    assertSql(query).contains(" where (t0.order_date <= ? or t0.order_date is null)");
   }
 
   @Test

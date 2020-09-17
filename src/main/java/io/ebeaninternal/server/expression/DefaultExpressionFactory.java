@@ -269,6 +269,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return or(gt(propertyName, value), isNull(propertyName));
   }
 
+  @Override
+  public Expression geOrNull(String propertyName, Object value) {
+    return or(ge(propertyName, value), isNull(propertyName));
+  }
+
   /**
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
@@ -284,6 +289,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression ltOrNull(String propertyName, Object value) {
     return or(lt(propertyName, value), isNull(propertyName));
+  }
+
+  @Override
+  public Expression leOrNull(String propertyName, Object value) {
+    return or(le(propertyName, value), isNull(propertyName));
   }
 
   /**

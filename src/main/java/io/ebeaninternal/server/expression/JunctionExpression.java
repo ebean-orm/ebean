@@ -634,6 +634,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> geOrNull(String propertyName, Object value) {
+    return exprList.geOrNull(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> having() {
     throw new IllegalStateException("having() not allowed on Junction expression list");
   }
@@ -776,6 +781,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> ltOrNull(String propertyName, Object value) {
     return exprList.ltOrNull(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> leOrNull(String propertyName, Object value) {
+    return exprList.leOrNull(propertyName, value);
   }
 
   @Override

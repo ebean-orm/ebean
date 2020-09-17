@@ -47,6 +47,8 @@ class OperatorMapping {
     map.put("eqOrNull", EqlOperator.EQORNULL);
     map.put("gtOrNull", EqlOperator.GTORNULL);
     map.put("ltOrNull", EqlOperator.LTORNULL);
+    map.put("geOrNull", EqlOperator.GEORNULL);
+    map.put("leOrNull", EqlOperator.LEORNULL);
   }
 
   public EqlOperator get(String key) {
