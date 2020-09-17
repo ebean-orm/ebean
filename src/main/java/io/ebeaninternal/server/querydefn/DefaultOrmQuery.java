@@ -1106,7 +1106,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   private String planDescription() {
-
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {
       sb.append("t:").append(type.ordinal());
@@ -1119,6 +1118,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append(",temp:").append(temporalMode.ordinal());
+      if (versionsStart != null) {
+        sb.append(",vb:");
+      }
     }
     if (forUpdate != null) {
       sb.append(",forUpd:").append(forUpdate.ordinal());
@@ -2015,6 +2017,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public String getAlias() {
     return rootTableAlias;
+  }
+
+  @Override
+  public String getAlias(String defaultAlias) {
+    return rootTableAlias != null ? rootTableAlias : defaultAlias;
   }
 
   @Override

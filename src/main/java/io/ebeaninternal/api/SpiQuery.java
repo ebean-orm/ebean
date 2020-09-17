@@ -857,6 +857,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   String getAlias();
 
   /**
+   * Return root table alias with default option.
+   */
+  String getAlias(String defaultAlias);
+
+  /**
    * Validate the query returning the set of properties with unknown paths.
    */
   Set<String> validate(BeanType<T> desc);

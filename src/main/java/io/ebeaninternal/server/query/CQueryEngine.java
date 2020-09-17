@@ -254,9 +254,8 @@ public class CQueryEngine {
 
     String sysPeriodLower = getSysPeriodLower(query);
     if (query.isVersionsBetween() && !historySupport.isStandardsBased()) {
-      // just add as normal predicates using the lower bound
-      query.where().gt(sysPeriodLower, query.getVersionStart());
       query.where().lt(sysPeriodLower, query.getVersionEnd());
+      query.where().geOrNull(getSysPeriodUpper(query), query.getVersionStart());
     }
 
     // order by lower sys period desc
@@ -313,20 +312,16 @@ public class CQueryEngine {
   }
 
   private <T> void deriveVersionDiff(Version<T> current, Version<T> prior, BeanDescriptor<T> descriptor) {
-
     Map<String, ValuePair> diff = DiffHelp.diff(current.getBean(), prior.getBean(), descriptor);
     current.setDiff(diff);
   }
 
-  /**
-   * Return the lower sys_period given the table alias of the query or default.
-   */
   private <T> String getSysPeriodLower(SpiQuery<T> query) {
-    String rootTableAlias = query.getAlias();
-    if (rootTableAlias == null) {
-      rootTableAlias = T0;
-    }
-    return historySupport.getSysPeriodLower(rootTableAlias);
+    return historySupport.getSysPeriodLower(query.getAlias(T0));
+  }
+
+  private <T> String getSysPeriodUpper(SpiQuery<T> query) {
+    return historySupport.getSysPeriodUpper(query.getAlias(T0));
   }
 
   /**

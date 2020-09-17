@@ -8,11 +8,11 @@ import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-
-import org.tests.model.converstation.User;
+import io.ebeantest.LoggedSql;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.converstation.User;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -82,16 +82,17 @@ public class TestHistoryInsert extends BaseTestCase {
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   public void test() throws InterruptedException {
 
+    Timestamp t0 = new Timestamp(System.currentTimeMillis());
+    Thread.sleep(DB_CLOCK_DELTA); // wait, so that our system clock can catch up
+
     User user = new User();
     user.setName("Jim");
     user.setEmail("one@email.com");
     user.setPasswordHash("someHash");
-
     DB.save(user);
-    logger.info("-- initial save");
-
     Thread.sleep(DB_CLOCK_DELTA); // wait, so that our system clock can catch up
-    Timestamp afterInsert = new Timestamp(System.currentTimeMillis());
+    Timestamp t1 = new Timestamp(System.currentTimeMillis());
+    logger.info("-- initial save");
 
     List<SqlRow> history = fetchHistory(user);
     assertThat(history).isEmpty();
@@ -101,9 +102,12 @@ public class TestHistoryInsert extends BaseTestCase {
 
     user.setName("Jim v2");
     user.setPasswordHash("anotherHash");
-    Thread.sleep(50); // wait, to ensure that whenModified differs
+    Thread.sleep(DB_CLOCK_DELTA);; // wait, to ensure that whenModified differs
     logger.info("-- update v2");
     DB.save(user);
+    Timestamp t2 = user.getWhenModified();
+    Thread.sleep(20);
+    Timestamp t2P = new Timestamp(System.currentTimeMillis());
 
     history = fetchHistory(user);
     assertThat(history).hasSize(1);
@@ -115,10 +119,11 @@ public class TestHistoryInsert extends BaseTestCase {
 
     user.setName("Jim v3");
     user.setEmail("three@email.com");
-    Thread.sleep(50); // otherwise the timestamp of "whenModified" may not change
-
+    Thread.sleep(DB_CLOCK_DELTA);; // otherwise the timestamp of "whenModified" may not change
     logger.info("-- update v3");
     DB.save(user);
+    Thread.sleep(20);
+    Timestamp t3 = new Timestamp(System.currentTimeMillis());
 
     history = fetchHistory(user);
     assertThat(history).hasSize(2);
@@ -129,14 +134,34 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(versions).hasSize(3);
     assertThat(versions.get(0).getDiff()).containsKeys("name", "email", "version", "whenModified");
 
+    final Version<User> v0 = versions.get(2);
+    final Version<User> v1 = versions.get(1);
+    final Version<User> v3 = versions.get(0);
+
+    LoggedSql.start();
+    assertThat(findVersions(user.getId(), t0, t1)).isEqualTo(1);
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      assertThat(sql.get(0)).contains("and t0.sys_period_start < ? and (t0.sys_period_end >= ? or t0.sys_period_end is null)");
+    } else if (isPostgres()) {
+      assertThat(sql.get(0)).contains("and lower(t0.sys_period) < ? and (upper(t0.sys_period) >= ? or upper(t0.sys_period) is null)");
+    }
+
+    assertThat(findVersions(user.getId(), t0, t2)).isEqualTo(1); // boundary
+    assertThat(findVersions(user.getId(), t0, t2P)).isEqualTo(2);
+    assertThat(findVersions(user.getId(), t0, t3)).isEqualTo(3);
+    assertThat(findVersions(user.getId(), v0.getStart(), t3)).isEqualTo(3); // inclusive lower boundary
+    assertThat(findVersions(user.getId(), v1.getStart(), v3.getStart())).isEqualTo(2);
+
     logger.info("-- delete");
     DB.delete(user);
 
-    User earlyVersion = DB.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
+    User earlyVersion = DB.find(User.class).setId(user.getId()).asOf(t1).findOne();
     assertThat(earlyVersion.getName()).isEqualTo("Jim");
     assertThat(earlyVersion.getEmail()).isEqualTo("one@email.com");
 
-    DB.find(User.class).setId(user.getId()).asOf(afterInsert).findOne();
+    DB.find(User.class).setId(user.getId()).asOf(t1).findOne();
 
     logger.info("-- last fetchHistory");
 
@@ -147,6 +172,13 @@ public class TestHistoryInsert extends BaseTestCase {
 
     versions = DB.find(User.class).setId(user.getId()).findVersions();
     assertThat(versions).hasSize(3);
+  }
+
+  private int findVersions(Long id, Timestamp t0, Timestamp t1) {
+    final List<Version<User>> vb2 = DB.find(User.class)
+      .setId(id)
+      .findVersionsBetween(t0, t1);
+    return vb2.size();
   }
 
   @Test
