@@ -1793,7 +1793,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private EntityBean checkEntityBean(Object bean) {
     if (bean == null) {
-      throw new IllegalArgumentException(Message.msg("bean.isnull"));
+      throw new IllegalArgumentException("The bean is null?");
     }
     if (!(bean instanceof EntityBean)) {
       throw new IllegalArgumentException("Was expecting an EntityBean but got a " + bean.getClass());

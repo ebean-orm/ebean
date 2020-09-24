@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.io.ByteArrayOutputStream;
@@ -213,7 +212,7 @@ public class RsetDataReader implements DataReader {
       }
       reader.close();
     } catch (IOException e) {
-      throw new SQLException(Message.msg("persist.clob.io", e.getMessage()));
+      throw new SQLException("IOException reading Clob " + e.getMessage());
     }
 
     return out.toString();

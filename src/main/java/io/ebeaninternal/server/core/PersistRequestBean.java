@@ -850,7 +850,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public final void checkRowCount(int rowCount) {
     if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
       if (ConcurrencyMode.VERSION == concurrencyMode) {
-        throw new OptimisticLockException(Message.msg("persist.conc2", String.valueOf(rowCount)), null, bean);
+        throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");
       }

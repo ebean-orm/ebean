@@ -16,7 +16,6 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiUpdate;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequest.Type;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -545,7 +544,7 @@ public final class DefaultPersister implements Persister {
         request.executeOrQueue();
 
       } else if (logger.isDebugEnabled()) {
-        logger.debug(Message.msg("persist.update.skipped", request.getBean()));
+        logger.debug("Update skipped as bean is unchanged: {}", request.getBean());
       }
 
       if (request.isPersistCascade()) {

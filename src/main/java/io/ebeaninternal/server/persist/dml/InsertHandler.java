@@ -3,7 +3,6 @@ package io.ebeaninternal.server.persist.dml;
 import io.ebean.bean.EntityBean;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -155,9 +154,8 @@ public class InsertHandler extends DmlHandler {
       if (idValue != null) {
         persistRequest.setGeneratedKey(idValue);
       }
-
     } else {
-      throw new PersistenceException(Message.msg("persist.autoinc.norows"));
+      throw new PersistenceException("Autoincrement getGeneratedKeys() returned no rows?");
     }
   }
 

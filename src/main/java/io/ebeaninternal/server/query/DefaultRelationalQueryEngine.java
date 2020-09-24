@@ -7,7 +7,6 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetricMap;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
@@ -55,6 +54,10 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     return new DefaultSqlRow(estimateCapacity, 0.75f, dbTrueValue, binaryOptimizedUUID);
   }
 
+  private String errMsg(String msg, String sql) {
+    return "Query threw SQLException:" + msg + " Query was:" + sql;
+  }
+
   @Override
   public void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer) {
 
@@ -68,7 +71,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       request.logSummary();
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -86,7 +89,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       request.logSummary();
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -102,7 +105,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       return value;
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -118,7 +121,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       return list;
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -133,7 +136,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       request.logSummary();
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -160,7 +163,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       return list;
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -189,7 +192,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       return value;
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -210,7 +213,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       return rows;
 
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();

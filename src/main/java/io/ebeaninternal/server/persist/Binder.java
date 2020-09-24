@@ -3,7 +3,6 @@ package io.ebeaninternal.server.persist;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiLogManager;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
@@ -183,7 +182,7 @@ public class Binder {
       }
 
     } catch (SQLException ex) {
-      logger.warn(Message.msg("fetch.bind.error", String.valueOf(dataBind.currentPos() - 1), value));
+      logger.warn("error binding parameter [{}][{}]", (dataBind.currentPos() - 1), value);
       throw ex;
     }
   }
@@ -376,8 +375,7 @@ public class Binder {
           break;
 
         default:
-          String msg = Message.msg("persist.bind.datatype", String.valueOf(dataType), String.valueOf(b.currentPos()));
-          throw new SQLException(msg);
+          throw new SQLException("Unhandled data type:" + dataType + " bind number:" + b.currentPos());
       }
 
     } catch (Exception e) {

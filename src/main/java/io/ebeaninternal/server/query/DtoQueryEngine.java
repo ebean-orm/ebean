@@ -2,7 +2,6 @@ package io.ebeaninternal.server.query;
 
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.persist.Binder;
 
 import javax.persistence.PersistenceException;
@@ -29,7 +28,7 @@ public class DtoQueryEngine {
       return rows;
 
     } catch (Throwable e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     } finally {
       request.close();
     }
@@ -42,7 +41,7 @@ public class DtoQueryEngine {
         consumer.accept(request.readNextBean());
       }
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
@@ -58,10 +57,14 @@ public class DtoQueryEngine {
         }
       }
     } catch (Exception e) {
-      throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
     } finally {
       request.close();
     }
+  }
+
+  private String errMsg(String msg, String sql) {
+    return "Query threw SQLException:" + msg + " Query was:" + sql;
   }
 }

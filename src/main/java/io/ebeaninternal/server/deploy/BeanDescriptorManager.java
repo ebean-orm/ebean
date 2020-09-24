@@ -32,7 +32,6 @@ import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.core.InternalConfiguration;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.id.IdBinder;
@@ -1335,11 +1334,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
     if (desc.idProperty() == null) {
-      // bean doesn't have an Id property
-      if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
-        // expecting an id property
-        logger.debug(Message.msg("deploy.nouid", desc.getFullName()));
-      }
       return;
     }
 

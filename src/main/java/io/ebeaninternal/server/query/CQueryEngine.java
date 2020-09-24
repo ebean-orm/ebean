@@ -13,7 +13,6 @@ import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.DiffHelp;
-import io.ebeaninternal.server.core.Message;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -144,7 +143,7 @@ public class CQueryEngine {
     t.getConnection();
 
     // build a decent error message for the exception
-    String m = Message.msg("fetch.sqlerror", e.getMessage(), bindLog, sql);
+    String m = "Query threw SQLException:" + e.getMessage() + " Bind values:[" + bindLog + "] Query was:" + sql;
     return dbPlatform.translate(m, e);
   }
 
