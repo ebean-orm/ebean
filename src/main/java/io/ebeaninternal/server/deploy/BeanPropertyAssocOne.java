@@ -5,6 +5,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -426,9 +427,19 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return getPropertyType();
   }
 
+  /**
+   * Return the bean cache value for this property using original values.
+   */
+  public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
+    return cacheDataConvert(ebi.getOrigValue(propertyIndex));
+  }
+
   @Override
   public Object getCacheDataValue(EntityBean bean) {
-    Object ap = getValue(bean);
+    return cacheDataConvert(getValue(bean));
+  }
+
+  private Object cacheDataConvert(Object ap) {
     if (ap == null) {
       return null;
     }

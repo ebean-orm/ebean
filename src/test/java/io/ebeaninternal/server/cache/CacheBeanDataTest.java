@@ -43,7 +43,7 @@ public class CacheBeanDataTest extends BaseTestCase {
     billingAddress.setLine1("92 Someplace Else");
     c.setBillingAddress(billingAddress);
 
-    ((EntityBean) c)._ebean_getIntercept().setNewBeanForUpdate();
+    ((EntityBean) c)._ebean_getIntercept().setLoaded();
 
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(desc, (EntityBean) c);
 

@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -10,7 +11,6 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebean.util.SplitName;
-import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -794,7 +794,17 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * </p>
    */
   public Object getCacheDataValue(EntityBean bean) {
-    Object value = getValue(bean);
+    return cacheDataConvert(getValue(bean));
+  }
+
+  /**
+   * Return the bean cache value for this property using original values.
+   */
+  public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
+    return cacheDataConvert(ebi.getOrigValue(propertyIndex));
+  }
+
+  private Object cacheDataConvert(Object value) {
     if (value == null || scalarType.isBinaryType()) {
       return value;
     } else {
