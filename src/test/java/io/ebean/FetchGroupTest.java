@@ -110,7 +110,7 @@ public class FetchGroupTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t1.id, t1.line_1, t1.line_2, t1.city, t2.code, t2.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_country t2 on t2.code = t1.country_code ");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t1.id, t1.line_1, t1.line_2, t1.city, t2.code, t2.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id left join o_country t2 on t2.code = t1.country_code ");
   }
 
   @Test

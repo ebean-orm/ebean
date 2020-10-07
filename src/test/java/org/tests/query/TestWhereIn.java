@@ -66,7 +66,7 @@ public class TestWhereIn extends BaseTestCase {
       .where().inOrEmpty("customer.billingAddress.id", Arrays.asList(1)).query();
 
     query.findList();
-    assertThat(sqlOf(query)).contains("select t0.id from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id  where t1.billing_address_id ");
+    assertThat(sqlOf(query)).contains("select t0.id from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t1.billing_address_id ");
   }
 
 

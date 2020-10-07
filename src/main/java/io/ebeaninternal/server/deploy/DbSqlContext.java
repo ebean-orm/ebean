@@ -45,7 +45,7 @@ public interface DbSqlContext {
   /**
    * Add a raw column to the sql.
    */
-  void appendRawColumn(String rawcolumnWithTableAlias);
+  void appendRawColumn(String rawColumnWithTableAlias);
 
   /**
    * Append a column with an explicit table alias.

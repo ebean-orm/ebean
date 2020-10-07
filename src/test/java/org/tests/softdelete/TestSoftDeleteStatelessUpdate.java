@@ -56,7 +56,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
 
     sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id  where t0.id = ?");
+    assertSql(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id where t0.id = ?");
 
     EsdMaster fetchedWithOutSoftDeletes = DB.find(EsdMaster.class)
       .setId(master.getId())
@@ -68,7 +68,7 @@ public class TestSoftDeleteStatelessUpdate extends BaseTestCase {
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
-      assertSql(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id and t1.deleted = false  where t0.id = ?");
+      assertSql(sql.get(0)).contains("left join esd_detail t1 on t1.master_id = t0.id and t1.deleted = false where t0.id = ?");
     }
   }
 }

@@ -122,7 +122,7 @@ public class TestAggregateFormula extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
-    assertSql(sql.get(1)).contains("select t0.id, t0.name, t0.status, t1.id, t1.city, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where");
+    assertSql(sql.get(1)).contains("select t0.id, t0.name, t0.status, t1.id, t1.city, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id where");
 
     assertThat(contacts).isNotEmpty();
 

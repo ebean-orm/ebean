@@ -507,7 +507,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch shippingAddress (line1) limit 10");
     query.findList();
 
-    assertSql(query, 12).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  left join o_address t2 on t2.id = t0.shipping_address_id");
+    assertSql(query, 12).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id left join o_address t2 on t2.id = t0.shipping_address_id");
   }
 
   @Test
@@ -702,7 +702,7 @@ public class EqlParserTest extends BaseTestCase {
     List<OrderDetail> details = query.findList();
 
     assertThat(details).isNotEmpty();
-    assertSql(query).contains("select sum(t0.order_qty), t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id  group by t1.id");
+    assertSql(query).contains("select sum(t0.order_qty), t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id group by t1.id");
   }
 
   @Test

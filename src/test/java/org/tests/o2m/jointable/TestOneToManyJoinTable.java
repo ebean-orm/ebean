@@ -64,7 +64,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains("from troop t0 left join troop_monkey t1z_ on t1z_.troop_pid = t0.pid  left join monkey t1 on t1.mid = t1z_.monkey_mid  where t0.pid = ?");
+    assertSql(sql.get(0)).contains("from troop t0 left join troop_monkey t1z_ on t1z_.troop_pid = t0.pid left join monkey t1 on t1.mid = t1z_.monkey_mid where t0.pid = ?");
     assertSql(sql.get(0)).contains("select t0.pid, t0.name, t0.version, t1.mid, t1.name, t1.food_preference, t1.version");
 
     DB.delete(troop);

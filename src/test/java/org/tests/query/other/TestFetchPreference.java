@@ -38,7 +38,7 @@ public class TestFetchPreference extends BaseTestCase {
     String sql = sqlOf(query, 1);
 
     // join to group (the ToOne part only) and participants (our preferred ToMany path)
-    assertThat(sql).contains(" from c_conversation t0 left join c_group t1 on t1.id = t0.group_id  left join c_participation t2");
+    assertThat(sql).contains(" from c_conversation t0 left join c_group t1 on t1.id = t0.group_id left join c_participation t2");
   }
 
   @Test

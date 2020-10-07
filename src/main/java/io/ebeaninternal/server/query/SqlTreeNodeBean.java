@@ -592,7 +592,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
         ctx.append(" and");
       }
       String ta = ctx.getTableAlias(prefix);
-      ctx.append(" ").append(extraWhere.replace("${ta}", ta)).append(" ");
+      ctx.append(" ").append(extraWhere.replace("${ta}", ta));
     }
   }
 
@@ -669,7 +669,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
        appendJoinDiscriminator(ctx);
     }
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
-      ctx.append("and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix))).append(" ");
+      ctx.append(" and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
     }
     return sqlJoinType;
   }
@@ -699,7 +699,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   void appendJoinDiscriminator(DbSqlContext ctx) {
     if (inheritInfo.getWhere() == null) return;
     String alias = ctx.getTableAlias(prefix);
-    ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere()).append(" ");
+    ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere());
   }
 
   /**
