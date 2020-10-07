@@ -1,5 +1,7 @@
 package org.tests.model.carwheeltruck;
 
+import io.ebean.annotation.SoftDelete;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -21,6 +23,9 @@ public class TCar {
   @Id
   @Size(max=32)
   String plateNo;
+
+  @SoftDelete
+  boolean deleted;
 
   @OneToMany(cascade = CascadeType.ALL)
   List<TWheel> wheels;

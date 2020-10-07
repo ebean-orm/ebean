@@ -699,7 +699,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   void appendJoinDiscriminator(DbSqlContext ctx) {
     if (inheritInfo.getWhere() == null) return;
     String alias = ctx.getTableAlias(prefix);
-    ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere());
+    ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere()).append(" ");
   }
 
   /**
