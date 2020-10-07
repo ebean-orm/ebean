@@ -79,7 +79,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(trimSql(loggedSql.get(0), 1)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 left join bbookmark_org t1 on t1.id = t0.org_id  where t1.name");
+    assertThat(trimSql(loggedSql.get(0), 1)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 left join bbookmark_org t1 on t1.id = t0.org_id where t1.name");
 
     Query<BBookmarkUser> query2 = server.find(BBookmarkUser.class)
       .where().eq("name", "NotARealFirstName").query();
@@ -119,7 +119,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(trimSql(loggedSql.get(0), 1)).contains("select t0.id from contact t0 left join contact_group t1 on t1.id = t0.group_id  where t1.name = ?");
+    assertThat(trimSql(loggedSql.get(0), 1)).contains("select t0.id from contact t0 left join contact_group t1 on t1.id = t0.group_id where t1.name = ?");
 
     Query<Contact> query2 = server.find(Contact.class).where().eq("firstName", "NotARealFirstName").query();
 

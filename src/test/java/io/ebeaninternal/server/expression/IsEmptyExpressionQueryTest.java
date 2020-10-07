@@ -125,7 +125,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
       assertThat(sqlOf(query)).contains("select distinct on (t0.id) t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note x where x.contact_id = u1.id)");
 
     } else {
-      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where not exists (select 1 from contact_note x where x.contact_id = u1.id)");
+      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id where not exists (select 1 from contact_note x where x.contact_id = u1.id)");
     }
   }
 
@@ -144,7 +144,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
       assertThat(sqlOf(query)).contains("select distinct on (t0.id) t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note x where x.contact_id = u1.id)");
 
     } else {
-      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id  where exists (select 1 from contact_note x where x.contact_id = u1.id)");
+      assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 join contact u1 on u1.customer_id = t0.id where exists (select 1 from contact_note x where x.contact_id = u1.id)");
     }
   }
 

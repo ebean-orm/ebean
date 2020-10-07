@@ -51,7 +51,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     assertThat(loggedSql).hasSize(1);
     if (isH2()) {
-      assertThat(loggedSql.get(0)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id  limit 10");
+      assertThat(loggedSql.get(0)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id limit 10");
     }
   }
 
@@ -112,7 +112,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     assertThat(loggedSql).hasSize(1);
     if (isH2()) {
-      assertThat(loggedSql.get(0)).contains("join o_customer t1 on t1.id = t0.kcustomer_id  limit 10");
+      assertThat(loggedSql.get(0)).contains("join o_customer t1 on t1.id = t0.kcustomer_id limit 10");
     }
   }
 

@@ -21,7 +21,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
     final Query<SourceBase> query = DB.find(SourceBase.class).order("pos");
     query.findList();
 
-    assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id  order by t0.pos");
+    assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id order by t0.pos");
   }
 
   @Test
@@ -30,7 +30,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
     final Query<SourceA> query = DB.find(SourceA.class).order("pos");
     query.findList();
 
-    assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id  where t0.dtype = 'SourceA' order by t0.pos");
+    assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id where t0.dtype = 'SourceA' order by t0.pos");
   }
 
   @Test
@@ -39,7 +39,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
     final Query<SourceA> query = DB.find(SourceA.class).fetch("target", "name").order("pos");
     query.findList();
 
-    assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t1.id, t1.name from source_base t0 left join target_base t1 on t1.id = t0.target_id  and t1.dtype = 'Target1'  where t0.dtype = 'SourceA' order by t0.pos");
+    assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t1.id, t1.name from source_base t0 left join target_base t1 on t1.id = t0.target_id and t1.dtype = 'Target1' where t0.dtype = 'SourceA' order by t0.pos");
   }
 
   @Test
@@ -89,7 +89,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t1.id, t1.name from source_base t0 left join target_base t1 on t1.id = t0.target_id  and t1.dtype = 'Target1'  where t0.dtype = 'SourceA' order by t0.pos");
+    assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t1.id, t1.name from source_base t0 left join target_base t1 on t1.id = t0.target_id and t1.dtype = 'Target1' where t0.dtype = 'SourceA' order by t0.pos");
   }
 
   /**
@@ -117,7 +117,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
     assertThat(sql).hasSize(3);
     //assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t0.target_id, t0.target_id from source_base t0 order by t0.pos");
-    assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id  order by t0.pos");
+    assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id order by t0.pos");
     assertSql(sql.get(1)).contains("select t0.dtype, t0.id, t0.name from target_base t0 where t0.dtype = 'Target1' and t0.id ");
     assertSql(sql.get(2)).contains("select t0.dtype, t0.id, t0.name from target_base t0 where t0.dtype = 'Target2' and t0.id = ?");
   }

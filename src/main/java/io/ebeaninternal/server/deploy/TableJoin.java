@@ -134,7 +134,7 @@ public final class TableJoin {
     String a1 = ctx.getTableAlias(names[0]);
     String a2 = ctx.getTableAlias(prefix);
     addJoin(joinType, a1, a2, ctx);
-    ctx.append("and ").append(a2).append(predicate);
+    ctx.append(" and ").append(a2).append(predicate);
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {

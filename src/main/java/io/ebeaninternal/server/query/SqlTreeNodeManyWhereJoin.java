@@ -100,18 +100,17 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     if (nodeBeanProp instanceof STreePropertyAssocOne) {
       nodeBeanProp.addJoin(joinType, parentAlias, alias, ctx);
       if (softDelete) {
-        ctx.append("and ").append(target.getSoftDeletePredicate(alias)).append(" ");
+        ctx.append(" and ").append(target.getSoftDeletePredicate(alias));
       }
     } else {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (!manyProp.hasJoinTable()) {
         manyProp.addJoin(joinType, parentAlias, alias, ctx);
         if (softDelete) {
-          ctx.append("and ").append(target.getSoftDeletePredicate(alias)).append(" ");
+          ctx.append(" and ").append(target.getSoftDeletePredicate(alias));
         }
       } else {
         String alias2 = alias + "z_";
-
         TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
         manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
         manyProp.addJoin(joinType, alias2, alias, ctx);

@@ -161,7 +161,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> names = query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id  where t0.status = ? and lower(t1.city) like ");
+    assertThat(sqlOf(query)).contains("select distinct t0.name from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id where t0.status = ? and lower(t1.city) like ");
     assertThat(names).isNotNull();
   }
 
@@ -224,7 +224,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<String> cities = query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t2.city from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id");
+    assertThat(sqlOf(query)).contains("select distinct t2.city from contact t0 join o_customer t1 on t1.id = t0.customer_id left join o_address t2 on t2.id = t1.billing_address_id");
     assertThat(cities).contains("Auckland").containsNull();
   }
 
@@ -404,7 +404,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     query.findSingleAttributeList();
 
-    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 join o_customer t1 on t1.id = t0.customer_id  order by t1.billing_address_id desc");
+    assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 join o_customer t1 on t1.id = t0.customer_id order by t1.billing_address_id desc");
   }
 
   @Test
@@ -422,8 +422,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-      + "join o_customer t1 on t1.id = t0.customer_id  "  // two spaces!
-      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.billing_address_id "
       + "where t2.city = ? "
       + "order by t1.billing_address_id desc");
   }
@@ -443,8 +443,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-      + "join o_customer t1 on t1.id = t0.customer_id  "
-      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.billing_address_id "
       + "where t2.city = ? "
       + "order by t1.billing_address_id desc");
   }
@@ -464,8 +464,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-      + "join o_customer t1 on t1.id = t0.customer_id  "
-      + "left join o_address t2 on t2.id = t1.billing_address_id  "
+      + "join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.billing_address_id "
       + "where t2.city = ? "
       + "order by t1.billing_address");
   }
@@ -485,8 +485,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(ids).isNotEmpty();
 
     assertThat(sqlOf(query)).contains("select distinct t1.billing_address_id from contact t0 "
-      + "join o_customer t1 on t1.id = t0.customer_id  "
-      + "left join o_address t2 on t2.id = t1.shipping_address_id  "
+      + "join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.shipping_address_id "
       + "where t2.city = ? "
       + "order by t1.billing_address_id desc");
 
@@ -536,8 +536,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
       + "select t2.line_1 as attribute_ "
-      + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
-      + "left join o_address t2 on t2.id = t1.shipping_address_id "
+      + "from contact t0 join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.shipping_address_id"
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list2.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
@@ -550,8 +550,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
       + "select t0.first_name as attribute_ from contact t0 "
-      + "join o_customer t1 on t1.id = t0.customer_id  "
-      + "left join o_address t2 on t2.id = t1.shipping_address_id  where t2.line_1 = ?"
+      + "join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.shipping_address_id where t2.line_1 = ?"
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list3.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
@@ -567,9 +567,9 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
       + "select t2.line_1 as attribute_ "
-      + "from contact t0 join o_customer t1 on t1.id = t0.customer_id  "
-      + "left join o_address t2 on t2.id = t1.billing_address_id  "
-      + "left join o_address t3 on t3.id = t1.shipping_address_id  "
+      + "from contact t0 join o_customer t1 on t1.id = t0.customer_id "
+      + "left join o_address t2 on t2.id = t1.billing_address_id "
+      + "left join o_address t3 on t3.id = t1.shipping_address_id "
       + "where (t3.line_1 <> ? or t3.line_1 is null)"
       + ") r1 group by r1.attribute_ order by r1.attribute_");
     assertThat(list4.get(0)).isInstanceOf(CountedValue.class);
@@ -584,12 +584,12 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
 
     if (isOracle()) {
-      assertSql(query).contains("select r1.attribute_, count(*) from (select t2.line_1 as attribute_ from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id  where t2.line_1 is not null) r1 group by r1.attribute_ order by r1.attribute_ desc offset 1 rows fetch next 2 rows only");
+      assertSql(query).contains("select r1.attribute_, count(*) from (select t2.line_1 as attribute_ from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id where t2.line_1 is not null) r1 group by r1.attribute_ order by r1.attribute_ desc offset 1 rows fetch next 2 rows only");
     } else {
       assertSql(query).contains("select r1.attribute_, count(*) from ("
         + "select t2.line_1 as attribute_ from contact t0 "
-        + "join o_customer t1 on t1.id = t0.customer_id  "
-        + "left join o_address t2 on t2.id = t1.billing_address_id  "
+        + "join o_customer t1 on t1.id = t0.customer_id "
+        + "left join o_address t2 on t2.id = t1.billing_address_id "
         + "where t2.line_1 is not null"
         + ") r1 group by r1.attribute_ order by r1.attribute_ desc ");
     }

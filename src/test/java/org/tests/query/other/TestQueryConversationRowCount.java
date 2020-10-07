@@ -66,7 +66,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     Assert.assertEquals(1, loggedSql.size());
 
     String countSql = trimSql(loggedSql.get(0), 0);
-    assertThat(countSql).contains("select count(*) from ( select distinct t0.id from c_conversation t0 left join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ? and ((t0.isopen = ? and u1.user_id = ?) or t0.isopen = ?))");
+    assertThat(countSql).contains("select count(*) from ( select distinct t0.id from c_conversation t0 left join c_participation u1 on u1.conversation_id = t0.id where t0.group_id = ? and ((t0.isopen = ? and u1.user_id = ?) or t0.isopen = ?))");
   }
 
 }

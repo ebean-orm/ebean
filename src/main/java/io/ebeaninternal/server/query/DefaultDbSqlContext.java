@@ -164,7 +164,6 @@ class DefaultDbSqlContext implements DbSqlContext {
     if (addAsOfOnClause) {
       sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
     }
-    sb.append(" ");
   }
 
   private void appendTable(String table, String draftTable) {
@@ -219,14 +218,11 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType) {
-
     // replace ${ta} place holder with the real table alias...
     String tableAlias = tableAliasStack.peek();
     String converted = sqlFormulaJoin.replace(tableAliasPlaceHolder, tableAlias);
-
     if (formulaJoins == null) {
       formulaJoins = new HashSet<>();
-
     } else if (formulaJoins.contains(converted)) {
       // skip adding a formula join because
       // the same join has already been added.
@@ -235,7 +231,6 @@ class DefaultDbSqlContext implements DbSqlContext {
 
     // we only want to add this join once
     formulaJoins.add(converted);
-
     sb.append(" ");
     if (joinType == SqlJoinType.OUTER) {
       if ("join".equals(sqlFormulaJoin.substring(0, 4).toLowerCase())) {
@@ -243,9 +238,7 @@ class DefaultDbSqlContext implements DbSqlContext {
         append(" left ");
       }
     }
-
     sb.append(converted);
-    sb.append(" ");
   }
 
   @Override
@@ -317,9 +310,9 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void appendRawColumn(String rawColumnWithAlias) {
+  public void appendRawColumn(String rawColumnWithTableAlias) {
     sb.append(COMMA);
-    sb.append(rawColumnWithAlias);
+    sb.append(rawColumnWithTableAlias);
   }
 
   @Override
