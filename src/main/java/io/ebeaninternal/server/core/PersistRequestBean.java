@@ -118,6 +118,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private Map<String, Object> collectionChanges;
 
   /**
+   * Set true when the request includes cascade save to a many.
+   */
+  private boolean updatedMany;
+
+  /**
    * Many properties that were cascade saved (and hence might need caches updated later).
    */
   private List<BeanPropertyAssocMany<?>> updatedManys;
@@ -1031,21 +1036,24 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return beanDescriptor.isReference(intercept);
   }
 
-  /**
-   * This many property has been cascade saved. Keep note of this and update the 'many property'
-   * cache on post commit.
-   */
-  public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
-    if (updatedManys == null) {
-      updatedManys = new ArrayList<>(5);
-    }
-    updatedManys.add(updatedAssocMany);
+  public void setUpdatedMany() {
+    this.updatedMany = true;
   }
 
   /**
-   * Return the list of cascade updated many properties (can be null).
+   * This many property has potential L2 cache update for many Ids.
    */
-  public List<BeanPropertyAssocMany<?>> getUpdatedManyCollections() {
+  public void addUpdatedManyForL2Cache(BeanPropertyAssocMany<?> many) {
+    if (updatedManys == null) {
+      updatedManys = new ArrayList<>(5);
+    }
+    updatedManys.add(many);
+  }
+
+  /**
+   * Return the list of updated many properties for L2 cache update (can be null).
+   */
+  public List<BeanPropertyAssocMany<?>> getUpdatedManyForL2Cache() {
     return updatedManys;
   }
 
@@ -1061,7 +1069,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * many properties were updated.
    */
   public void completeUpdate() {
-    if (!dirty && updatedManys != null) {
+    if (!dirty && updatedMany) {
       // set the flag and register for post commit processing if there
       // is caching or registered listeners
       if (idValue == null) {

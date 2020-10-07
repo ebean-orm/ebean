@@ -680,7 +680,7 @@ final class BeanDescriptorCacheHelp<T> {
     if (context == null) {
       context = new DefaultPersistenceContext();
     } else {
-      bean = (EntityBean)desc.contextGet(context, id);
+      bean = (EntityBean) desc.contextGet(context, id);
     }
 
     if (bean == null) {
@@ -886,15 +886,13 @@ final class BeanDescriptorCacheHelp<T> {
         // query caching only
         return;
       }
-      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
+      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyForL2Cache();
       if (manyCollections != null) {
         for (BeanPropertyAssocMany<?> many : manyCollections) {
-          if (!many.isElementCollection()) {
-            Object details = many.getValue(updateRequest.getEntityBean());
-            CachedManyIds entry = createManyIds(many, details);
-            if (entry != null) {
-              changeSet.addManyPut(desc, many.getName(), id, entry);
-            }
+          Object details = many.getValue(updateRequest.getEntityBean());
+          CachedManyIds entry = createManyIds(many, details);
+          if (entry != null) {
+            changeSet.addManyPut(desc, many.getName(), id, entry);
           }
         }
       }

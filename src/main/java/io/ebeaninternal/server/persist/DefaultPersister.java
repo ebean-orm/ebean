@@ -942,9 +942,6 @@ public final class DefaultPersister implements Persister {
       // check that property is loaded and collection should be cascaded to
       if (request.isLoadedProperty(many) && !many.isSkipSaveBeanCollection(parentBean, insertedParent)) {
         saveMany(insertedParent, many, parentBean, request);
-        if (!insertedParent) {
-          request.addUpdatedManyProperty(many);
-        }
       }
     }
   }
