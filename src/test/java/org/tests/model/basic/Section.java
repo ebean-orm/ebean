@@ -29,7 +29,7 @@ public class Section extends BasicDomain {
   @Lob
   String content;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   List<SubSection> subSections;
 
   public Section() {

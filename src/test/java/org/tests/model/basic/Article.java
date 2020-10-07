@@ -20,11 +20,8 @@ public class Article extends BasicDomain {
 
   String author;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   List<Section> sections;
-
-  public Article() {
-  }
 
   public Article(String name, String author) {
     this.name = name;
