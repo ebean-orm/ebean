@@ -1,7 +1,5 @@
 package io.ebeaninternal.server.autotune.service;
 
-import io.ebeaninternal.server.autotune.AutoTuneCollection;
-
 import java.io.Serializable;
 import java.util.concurrent.atomic.LongAdder;
 

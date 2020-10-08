@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.autotune;
+package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;

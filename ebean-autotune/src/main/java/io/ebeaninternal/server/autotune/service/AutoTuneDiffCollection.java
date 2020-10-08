@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.ObjectGraphOrigin;
-import io.ebeaninternal.server.autotune.AutoTuneCollection;
 import io.ebeaninternal.server.autotune.model.Autotune;
 import io.ebeaninternal.server.autotune.model.Origin;
 import io.ebeaninternal.server.autotune.model.ProfileDiff;

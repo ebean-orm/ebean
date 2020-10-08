@@ -6,7 +6,6 @@ import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.config.AutoTuneConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.autotune.AutoTuneCollection;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 

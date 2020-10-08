@@ -33,7 +33,8 @@ import io.ebeaninternal.api.SpiLoggerFactory;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
-import io.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
+import io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
+import io.ebeaninternal.server.autotune.NoAutoTuneService;
 import io.ebeaninternal.server.cache.CacheManagerOptions;
 import io.ebeaninternal.server.cache.DefaultCacheAdapter;
 import io.ebeaninternal.server.cache.DefaultServerCacheManager;
@@ -342,7 +343,8 @@ public class InternalConfiguration {
   }
 
   AutoTuneService createAutoTuneService(SpiEbeanServer server) {
-    return AutoTuneServiceFactory.create(server, config);
+    final AutoTuneServiceProvider provider = config.service(AutoTuneServiceProvider.class);
+    return provider == null ? new NoAutoTuneService() : provider.create(server, config);
   }
 
   DtoQueryEngine createDtoQueryEngine() {

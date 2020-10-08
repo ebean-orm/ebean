@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>12.4.3-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>ebean-autotune</artifactId>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean</artifactId>
+      <version>12.4.3-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Provided scope to compile with java 11 -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.avaje.composite</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.17</version>
+        <extensions>true</extensions>
+        <configuration>
+          <tiles>
+            <!-- other tiles ... -->
+            <tile>io.ebean.tile:enhancement:12.4.2</tile>
+          </tiles>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

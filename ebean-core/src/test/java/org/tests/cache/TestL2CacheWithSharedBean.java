@@ -4,23 +4,20 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.autotune.model.Origin;
-import io.ebeaninternal.server.autotune.service.TunedQueryInfo;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
-import org.tests.model.basic.FeatureDescription;
 import org.junit.Assert;
 import org.junit.Test;
+import org.tests.model.basic.FeatureDescription;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestL2CacheWithSharedBean extends BaseTestCase {
 
-  private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
-    Origin origin = new Origin();
-    origin.setDetail(tunedDetail.toString());
-    return new TunedQueryInfo(origin);
-  }
+//  private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
+//    Origin origin = new Origin();
+//    origin.setDetail(tunedDetail.toString());
+//    return new TunedQueryInfo(origin);
+//  }
 
   @Test
   public void test() {
@@ -36,11 +33,11 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("name");
-    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
+//    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
 
     Query<FeatureDescription> query = Ebean.find(FeatureDescription.class).setId(f1.getId());
 
-    tunedInfo.tuneQuery((SpiQuery<?>) query);
+//    tunedInfo.tuneQuery((SpiQuery<?>) query);
 
     query.findOne(); // PUT into cache
 

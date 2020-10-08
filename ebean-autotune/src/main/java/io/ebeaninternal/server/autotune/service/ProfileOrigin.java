@@ -5,7 +5,6 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.text.PathProperties;
 import io.ebean.text.PathProperties.Props;
-import io.ebeaninternal.server.autotune.AutoTuneCollection;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 

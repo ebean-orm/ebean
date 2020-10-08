@@ -3,10 +3,12 @@ package io.ebeaninternal.server.autotune.service;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.autotune.AutoTuneService;
+import io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
 
-public class AutoTuneServiceFactory {
+public class AutoTuneServiceFactory implements AutoTuneServiceProvider {
 
-  public static AutoTuneService create(SpiEbeanServer server, DatabaseConfig config) {
+  @Override
+  public AutoTuneService create(SpiEbeanServer server, DatabaseConfig config) {
     return new DefaultAutoTuneService(server, config);
   }
 

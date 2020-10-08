@@ -4,7 +4,6 @@ import io.ebean.config.AutoTuneConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.autotune.AutoTuneCollection;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.model.Autotune;
 import io.ebeaninternal.server.autotune.model.Origin;

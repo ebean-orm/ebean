@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AutoTuneXmlReaderTest {
 
   @Test
-  public void read_file() throws Exception {
+  public void read_file() {
 
     File testFile = new File("src/test/resources/autotune/test-autotune.xml");
 
@@ -20,7 +20,7 @@ public class AutoTuneXmlReaderTest {
   }
 
   @Test
-  public void read_inputStream() throws Exception {
+  public void read_inputStream() {
 
     InputStream is = getClass().getResourceAsStream("/autotune/test-autotune.xml");
 

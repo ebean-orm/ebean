@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.autotune.service;
 
-import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.NodeUsageCollector;
 import io.ebean.bean.ObjectGraphNode;
@@ -8,8 +7,9 @@ import io.ebean.bean.ObjectGraphOrigin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.junit.Test;
+import org.tests.autofetch.BaseTestCase;
 import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
+//import org.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,25 +102,24 @@ public class ProfileOriginTest extends BaseTestCase {
     //fetch details (id,orderQty,shipQty,unitPrice)
 
     NodeUsageCollector c = node(null);
-    c.addUsed("details");
+    c.addUsed("customer");
     po.collectUsageInfo(c);
 
-    c = node("details");
+    c = node("customer");
     c.addUsed("id");
-    c.addUsed("orderQty");
-    c.addUsed("shipQty");
-    c.addUsed("unitPrice");
-    c.addUsed("product");
+    c.addUsed("name");
+    c.addUsed("note");
+    c.addUsed("billingAddress");
     po.collectUsageInfo(c);
 
     //fetch details.product (id,name)
-    c = node("details.product");
+    c = node("customer.billingAddress");
     c.addUsed("id");
-    c.addUsed("name");
+    c.addUsed("line1");
     po.collectUsageInfo(c);
 
     OrmQueryDetail detail = po.buildDetail(desc);
-    assertThat(detail.asString()).isEqualTo("fetch details (orderQty,shipQty,unitPrice) fetch details.product (name)");
+    assertThat(detail.asString()).isEqualTo("fetch customer (name,note) fetch customer.billingAddress (line1)");
   }
 
   private NodeUsageCollector node(String path) {
@@ -128,16 +127,16 @@ public class ProfileOriginTest extends BaseTestCase {
     return new NodeUsageCollector(node, null);
   }
 
-  @Test
-  public void testQueries() {
-
-    ResetBasicData.reset();
-
-    //DB.createQuery(Order.class, "select (orderDate) fetch customer (billingAddress)").findList();
-
-    // we prefer this first query other the second one
-    DB.createQuery(Order.class, "select (orderDate,customer)").findList();
-    DB.createQuery(Order.class, "select (orderDate) fetch customer (id)").findList();
-
-  }
+//  @Test
+//  public void testQueries() {
+//
+//    ResetBasicData.reset();
+//
+//    //DB.createQuery(Order.class, "select (orderDate) fetch customer (billingAddress)").findList();
+//
+//    // we prefer this first query other the second one
+//    DB.createQuery(Order.class, "select (orderDate,customer)").findList();
+//    DB.createQuery(Order.class, "select (orderDate) fetch customer (id)").findList();
+//
+//  }
 }
