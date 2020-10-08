@@ -3,7 +3,11 @@ datasource:
     username: sa
     password:
     databaseUrl: jdbc:h2:mem:tests
-    databaseDriver: org.h2.Driver
+
+  pg:
+    username: sa
+    password:
+    databaseUrl: jdbc:h2:mem:tests
 
 ebean:
 #  migration:
