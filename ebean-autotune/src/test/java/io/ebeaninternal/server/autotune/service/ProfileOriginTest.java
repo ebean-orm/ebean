@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.autotune.service;
 
-import io.ebean.DB;
 import io.ebean.bean.NodeUsageCollector;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -9,9 +8,10 @@ import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.junit.Test;
 import org.tests.autofetch.BaseTestCase;
 import org.tests.model.basic.Order;
-//import org.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+//import org.tests.model.basic.ResetBasicData;
 
 public class ProfileOriginTest extends BaseTestCase {
 

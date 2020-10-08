@@ -8,3 +8,10 @@ do
     cat ${file}
     echo
 done
+
+for file in ebean-autotune/target/surefire-reports/*.txt
+do
+    echo ${file}
+    cat ${file}
+    echo
+done

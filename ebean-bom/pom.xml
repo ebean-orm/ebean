@@ -12,9 +12,30 @@
   <artifactId>ebean-bom</artifactId>
   <packaging>pom</packaging>
 
+  <properties>
+    <ebean-agent.version>12.4.3</ebean-agent.version>
+    <ebean-maven-plugin.version>12.4.3</ebean-maven-plugin.version>
+  </properties>
+
   <dependencyManagement>
 
     <dependencies>
+
+      <!-- dependencies external to this ebean.git build -->
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-agent</artifactId>
+        <version>${ebean-agent.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-maven-plugin</artifactId>
+        <version>${ebean-maven-plugin.version}</version>
+      </dependency>
+
+      <!-- modules -->
 
       <dependency>
         <groupId>io.ebean</groupId>
@@ -30,6 +51,12 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>ebean-autotune</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-querybean</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -37,6 +64,13 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>querybean-generator</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>kotlin-querybean-generator</artifactId>
         <version>${project.version}</version>
         <scope>provided</scope>
       </dependency>
