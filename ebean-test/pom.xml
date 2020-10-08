@@ -22,7 +22,7 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean</artifactId>
+      <artifactId>ebean-core</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

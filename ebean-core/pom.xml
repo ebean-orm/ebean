@@ -6,10 +6,10 @@
     <version>12.4.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean</artifactId>
+  <artifactId>ebean-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>ebean</name>
+  <name>ebean-core</name>
   <url>http://ebean-orm.github.io/</url>
 
   <properties>
