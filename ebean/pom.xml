@@ -20,6 +20,12 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-autotune</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
       <version>${project.version}</version>
     </dependency>

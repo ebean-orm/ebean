@@ -1,7 +1,8 @@
 package io.ebean.test.config.platform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -14,7 +15,7 @@ public class ConfigTest {
   @Test
   public void trimExtensions() {
 
-    Config config = new Config("db", "db", "db", new ServerConfig());
+    Config config = new Config("db", "db", "db", new DatabaseConfig());
 
     assertThat(config.trimExtensions("a,b")).isEqualTo("a,b");
     assertThat(config.trimExtensions(" a , b ")).isEqualTo("a,b");
@@ -27,7 +28,7 @@ public class ConfigTest {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb", "other");
 
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(p);
 
     Config config = new Config("other", "postgres", "other", serverConfig);
@@ -50,7 +51,7 @@ public class ConfigTest {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb.dbName", "other");
 
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(p);
 
     Config config = new Config("other", "postgres", "other", serverConfig);
@@ -77,7 +78,7 @@ public class ConfigTest {
     p.setProperty("ebean.test.extraDb.password", "other_pwd");
     p.setProperty("ebean.test.extraDb.url", "other_url");
 
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.setName("scOther");
     serverConfig.loadFromProperties(p);
 
@@ -104,7 +105,7 @@ public class ConfigTest {
     sourceProperties.setProperty("ebean.test.dbName", "main");
     sourceProperties.setProperty("ebean.test.extraDb.dbName", "central");
 
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.setName("main");
     serverConfig.loadFromProperties(sourceProperties);
 
@@ -117,7 +118,7 @@ public class ConfigTest {
     assertThat(mainProps.getProperty("datasource.main.username")).isEqualTo("main");
 
 
-    ServerConfig centralConfig = new ServerConfig();
+    DatabaseConfig centralConfig = new DatabaseConfig();
     centralConfig.setName("central");
     centralConfig.loadFromProperties(sourceProperties);
 
@@ -135,14 +136,24 @@ public class ConfigTest {
   public void ignoreDockerShutdown() {
 
     Properties sourceProperties = new Properties();
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(sourceProperties);
 
     Config config = new Config("main", "postgres", "main", serverConfig);
 
     assertThat(config.ignoreDockerShutdown("./src/test/resources/logback-test.xml")).isTrue();
     assertThat(config.ignoreDockerShutdown("./src/test/resources/file-does-not-exist")).isFalse();
+  }
 
+  @Ignore
+  @Test
+  public void run_local_only_ignoreDockerShutdown() {
+
+    Properties sourceProperties = new Properties();
+    DatabaseConfig serverConfig = new DatabaseConfig();
+    serverConfig.loadFromProperties(sourceProperties);
+
+    Config config = new Config("main", "postgres", "main", serverConfig);
     assertThat(config.ignoreDockerShutdown("~/.ebean/ignore-docker-shutdown")).isTrue();
     assertThat(config.ignoreDockerShutdown()).isTrue();
   }
@@ -153,7 +164,7 @@ public class ConfigTest {
     Properties sourceProperties = new Properties();
     sourceProperties.setProperty("ebean.test.localDevelopment", "./src/test/resources/logback-test.xml");
 
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(sourceProperties);
 
     Config config = new Config("main", "postgres", "main", serverConfig);
