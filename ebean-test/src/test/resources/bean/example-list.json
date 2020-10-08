@@ -1,0 +1,11 @@
+[ {
+  "id": "*",
+  "name": "something",
+  "whenModified": "*",
+  "version": 1
+}, {
+  "id": "*",
+  "name": "other",
+  "whenModified": "*",
+  "version": 1
+} ]

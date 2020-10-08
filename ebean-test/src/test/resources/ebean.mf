@@ -1,0 +1,2 @@
+entity-packages: org.test
+transactional-packages: org.test
