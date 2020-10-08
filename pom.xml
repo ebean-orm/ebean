@@ -38,6 +38,7 @@
 
   <modules>
     <module>ebean</module>
+    <module>ebean-bom</module>
     <module>ebean-core</module>
     <module>ebean-autotune</module>
     <module>ebean-test</module>
