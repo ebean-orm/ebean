@@ -40,6 +40,9 @@
     <module>ebean-core</module>
     <module>ebean-autotune</module>
     <module>ebean-test</module>
+    <module>querybean-generator</module>
+    <module>kotlin-querybean-generator</module>
+    <module>ebean-querybean</module>
   </modules>
 
 </project>
