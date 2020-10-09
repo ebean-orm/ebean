@@ -1,4 +1,4 @@
-package io.ebeaninternal.dbmigration.model.visitor;
+package io.ebeaninternal.server.deploy.visitor;
 
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;

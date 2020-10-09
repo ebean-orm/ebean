@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 import io.ebeaninternal.dbmigration.model.MTable;
-import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
+import io.ebeaninternal.server.deploy.visitor.VisitProperties;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanTable;
@@ -20,7 +20,7 @@ public class ModelBuildElementTable {
     BeanDescriptor<?> targetDescriptor = manyProp.getTargetDescriptor();
     MTable table = new MTable(beanTable.getBaseTable());
 
-    VisitAllUsing.visitOne(targetDescriptor, new ModelBuildPropertyVisitor(ctx, table, targetDescriptor));
+    VisitProperties.visit(targetDescriptor, new ModelBuildPropertyVisitor(ctx, table, targetDescriptor));
     ctx.addTableElementCollection(table);
   }
 

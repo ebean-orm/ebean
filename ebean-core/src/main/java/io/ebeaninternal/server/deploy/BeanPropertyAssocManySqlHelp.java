@@ -4,8 +4,8 @@ import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiSqlUpdate;
-import io.ebeaninternal.dbmigration.model.visitor.BaseTablePropertyVisitor;
-import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
+import io.ebeaninternal.server.deploy.visitor.BaseTablePropertyVisitor;
+import io.ebeaninternal.server.deploy.visitor.VisitProperties;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 
 import java.util.List;
@@ -50,7 +50,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     append(sb);
 
     Cols cols = new Cols(sb);
-    VisitAllUsing.visitOne(many.targetDescriptor, cols);
+    VisitProperties.visit(many.targetDescriptor, cols);
     sb.append(") values (");
     appendBind(sb, exportedProperties.length, true);
     appendBind(sb, cols.colCount, false);

@@ -7,7 +7,7 @@ import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MCompoundUniqueConstraint;
 import io.ebeaninternal.dbmigration.model.MIndex;
 import io.ebeaninternal.dbmigration.model.MTable;
-import io.ebeaninternal.dbmigration.model.visitor.BaseTablePropertyVisitor;
+import io.ebeaninternal.server.deploy.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;

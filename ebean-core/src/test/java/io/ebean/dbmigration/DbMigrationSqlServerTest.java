@@ -1,7 +1,7 @@
 package io.ebean.dbmigration;
 
 import io.ebean.annotation.Platform;
-import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebeaninternal.api.DbOffline;
 import org.junit.Test;
 
 public class DbMigrationSqlServerTest {

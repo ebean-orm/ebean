@@ -13,7 +13,7 @@ import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;

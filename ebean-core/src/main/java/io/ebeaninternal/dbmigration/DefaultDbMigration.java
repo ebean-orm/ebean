@@ -29,6 +29,7 @@ import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
 import io.ebean.migration.MigrationVersion;
+import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;

@@ -1,6 +1,6 @@
 package io.ebean.test.config;
 
-import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebeaninternal.api.DbOffline;
 
 class RunOnceMarker {
 

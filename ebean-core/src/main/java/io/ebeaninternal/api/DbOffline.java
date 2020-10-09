@@ -1,4 +1,4 @@
-package io.ebeaninternal.dbmigration;
+package io.ebeaninternal.api;
 
 import io.ebean.annotation.Platform;
 import org.slf4j.Logger;

@@ -18,7 +18,7 @@ import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
-import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;

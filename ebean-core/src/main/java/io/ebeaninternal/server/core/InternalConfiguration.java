@@ -31,7 +31,7 @@ import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
 import io.ebeaninternal.api.SpiProfileHandler;
-import io.ebeaninternal.dbmigration.DbOffline;
+import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
 import io.ebeaninternal.server.autotune.NoAutoTuneService;
