@@ -25,6 +25,8 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.ExtraMetrics;
 import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
+import io.ebeaninternal.api.SpiDdlGenerator;
+import io.ebeaninternal.api.SpiDdlGeneratorProvider;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.SpiLogManager;
@@ -644,6 +646,21 @@ public class InternalConfiguration {
         return new QueryPlanLoggerOracle();
       default:
         return new QueryPlanLoggerExplain();
+    }
+  }
+
+  /**
+   * Return the DDL generator.
+   */
+  public SpiDdlGenerator initDdlGenerator(SpiEbeanServer server) {
+    final SpiDdlGeneratorProvider service = config.service(SpiDdlGeneratorProvider.class);
+    return service == null ? new NoopDdl() : service.generator(server);
+  }
+
+  private static class NoopDdl implements SpiDdlGenerator {
+    @Override
+    public void execute(boolean online) {
+      // do nothing
     }
   }
 }

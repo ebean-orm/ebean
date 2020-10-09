@@ -7,6 +7,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.migration.ddl.DdlRunner;
 import io.ebean.migration.runner.ScriptTransform;
 import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.SpiDdlGenerator;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MTable;
@@ -33,7 +34,7 @@ import java.sql.SQLException;
  * Typically the "Create All" DDL is executed for running tests etc and has nothing to do
  * with DB Migration (diff based) DDL.
  */
-public class DdlGenerator {
+public class DdlGenerator implements SpiDdlGenerator {
 
   private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
   private static final String[] BUILD_DIRS = {"target", "build"};
@@ -54,10 +55,11 @@ public class DdlGenerator {
   private CurrentModel currentModel;
   private String dropAllContent;
   private String createAllContent;
-  private File baseDir;
+  private final File baseDir;
 
-  public DdlGenerator(SpiEbeanServer server, DatabaseConfig config) {
+  public DdlGenerator(SpiEbeanServer server) {
     this.server = server;
+    final DatabaseConfig config = server.getServerConfig();
     this.jaxbPresent = config.getClassLoadConfig().isJavaxJAXBPresent();
     this.generateDdl = config.isDdlGenerate();
     this.extraDdl = config.isDdlExtra();
@@ -88,10 +90,7 @@ public class DdlGenerator {
     return new File(".");
   }
 
-  /**
-   * Generate the DDL and then run the DDL based on property settings
-   * (ebean.ddl.generate and ebean.ddl.run etc).
-   */
+  @Override
   public void execute(boolean online) {
     generateDdl();
     if (online) {
@@ -162,7 +161,7 @@ public class DdlGenerator {
   /**
    * Execute all the DDL statements in the script.
    */
-  public void runScript(Connection connection, boolean expectErrors, String content, String scriptName) {
+  void runScript(Connection connection, boolean expectErrors, String content, String scriptName) {
 
     DdlRunner runner = createDdlRunner(expectErrors, scriptName);
     try {

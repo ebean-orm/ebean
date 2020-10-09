@@ -6,11 +6,11 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.ChangeSetType;
 import io.ebeaninternal.dbmigration.migration.Migration;
-import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

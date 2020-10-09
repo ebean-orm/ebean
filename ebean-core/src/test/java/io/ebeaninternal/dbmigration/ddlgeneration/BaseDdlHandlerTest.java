@@ -11,7 +11,6 @@ import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.server.core.PlatformDdlBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 

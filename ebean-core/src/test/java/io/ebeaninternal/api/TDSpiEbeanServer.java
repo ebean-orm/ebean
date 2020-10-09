@@ -168,11 +168,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public DdlHandler createDdlHandler() {
-    return null;
-  }
-
-  @Override
   public CallOrigin createCallOrigin() {
     return null;
   }

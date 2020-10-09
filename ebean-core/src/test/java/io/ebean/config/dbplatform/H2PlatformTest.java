@@ -2,7 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
-import io.ebeaninternal.server.core.PlatformDdlBuilder;
+import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

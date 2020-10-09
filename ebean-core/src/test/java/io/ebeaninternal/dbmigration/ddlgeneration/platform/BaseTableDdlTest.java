@@ -12,7 +12,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.server.core.PlatformDdlBuilder;
+import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import org.junit.Test;
 
 import java.io.IOException;

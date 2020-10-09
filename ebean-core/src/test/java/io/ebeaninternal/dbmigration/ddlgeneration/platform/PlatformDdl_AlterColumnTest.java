@@ -10,7 +10,7 @@ import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.server.core.PlatformDdlBuilder;
+import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.dbmigration.ddlgeneration;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.ClickHouseDdl;

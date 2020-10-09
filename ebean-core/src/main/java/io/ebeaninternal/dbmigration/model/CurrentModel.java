@@ -13,6 +13,7 @@ import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
 import io.ebeaninternal.extraddl.model.DdlScript;
 import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
+import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -195,7 +196,7 @@ public class CurrentModel {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   private DdlHandler handler() {
-    return server.createDdlHandler();
+    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(server.getServerConfig());
   }
 
   /**

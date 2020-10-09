@@ -51,6 +51,7 @@ import io.ebean.config.SlowQueryListener;
 import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
+import io.ebean.event.ShutdownManager;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
@@ -70,6 +71,7 @@ import io.ebeaninternal.api.LoadManyRequest;
 import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
+import io.ebeaninternal.api.SpiDdlGenerator;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
@@ -83,8 +85,6 @@ import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionManager;
 import io.ebeaninternal.api.TransactionEventTable;
-import io.ebeaninternal.dbmigration.DdlGenerator;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -96,7 +96,6 @@ import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.el.ElFilter;
 import io.ebeaninternal.server.grammer.EqlParser;
-import io.ebean.event.ShutdownManager;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.CallableQueryCount;
@@ -204,7 +203,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final List<Plugin> serverPlugins;
 
-  private final DdlGenerator ddlGenerator;
+  private final SpiDdlGenerator ddlGenerator;
 
   private final ScriptRunner scriptRunner;
 
@@ -295,7 +294,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverPlugins = config.getPlugins();
-    this.ddlGenerator = new DdlGenerator(this, this.config);
+    this.ddlGenerator = config.initDdlGenerator(this);
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
@@ -375,11 +374,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public ScriptRunner script() {
     return scriptRunner;
-  }
-
-  @Override
-  public DdlHandler createDdlHandler() {
-    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(config);
   }
 
   @Override
