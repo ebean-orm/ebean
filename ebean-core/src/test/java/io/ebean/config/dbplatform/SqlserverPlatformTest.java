@@ -2,8 +2,6 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,27 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SqlserverPlatformTest {
 
   SqlServer17Platform platform = new SqlServer17Platform();
-
-  @Test
-  public void testTypeConversion() {
-
-    PlatformDdl ddl = PlatformDdlBuilder.create(platform);
-
-    assertThat(ddl.convert("clob")).isEqualTo("nvarchar(max)");
-    assertThat(ddl.convert("blob")).isEqualTo("image");
-    assertThat(ddl.convert("json")).isEqualTo("nvarchar(max)");
-    assertThat(ddl.convert("jsonb")).isEqualTo("nvarchar(max)");
-
-    assertThat(ddl.convert("double")).isEqualTo("float(32)");
-    assertThat(ddl.convert("varchar(20)")).isEqualTo("nvarchar(20)");
-    assertThat(ddl.convert("decimal(10)")).isEqualTo("numeric(10)");
-    assertThat(ddl.convert("decimal(8,4)")).isEqualTo("numeric(8,4)");
-    assertThat(ddl.convert("decimal")).isEqualTo("numeric(16,3)");
-    assertThat(ddl.convert("boolean")).isEqualTo("bit");
-    assertThat(ddl.convert("bit")).isEqualTo("bit");
-    assertThat(ddl.convert("tinyint")).isEqualTo("smallint");
-    assertThat(ddl.convert("binary(16)")).isEqualTo("binary(16)");
-  }
 
   @Test
   public void uuid_default() {

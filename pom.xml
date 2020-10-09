@@ -41,6 +41,7 @@
     <module>ebean-api</module>
     <module>ebean-bom</module>
     <module>ebean-core</module>
+    <module>ebean-ddlgen</module>
     <module>ebean-autotune</module>
     <module>ebean-test</module>
     <module>querybean-generator</module>

@@ -31,6 +31,13 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-ddlgen</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>

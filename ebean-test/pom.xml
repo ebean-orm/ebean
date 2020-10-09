@@ -34,6 +34,12 @@
       <scope>provided</scope>
     </dependency>
 
+   <dependency>
+     <groupId>io.ebean</groupId>
+     <artifactId>ebean-ddlgen</artifactId>
+     <version>${project.version}</version>
+   </dependency>
+
     <dependency>
       <groupId>io.ebean.test</groupId>
       <artifactId>ebean-test-docker</artifactId>
