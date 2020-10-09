@@ -96,7 +96,7 @@ import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.el.ElFilter;
 import io.ebeaninternal.server.grammer.EqlParser;
-import io.ebeaninternal.server.lib.ShutdownManager;
+import io.ebean.event.ShutdownManager;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.query.CQueryEngine;
 import io.ebeaninternal.server.query.CallableQueryCount;
@@ -300,7 +300,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     configureServerPlugins();
     // Register with the JVM Shutdown hook
-    ShutdownManager.registerEbeanServer(this);
+    ShutdownManager.registerDatabase(this);
   }
 
   /**
@@ -456,11 +456,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  /**
-   * Shutting down via JVM Shutdown hook.
-   */
   @Override
-  public void shutdownManaged() {
+  public void shutdown() {
     synchronized (this) {
       shutdownInternal(true, false);
     }
@@ -473,7 +470,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
     synchronized (this) {
       // Unregister from JVM Shutdown hook
-      ShutdownManager.unregisterEbeanServer(this);
+      ShutdownManager.unregisterDatabase(this);
       shutdownInternal(shutdownDataSource, deregisterDriver);
     }
   }

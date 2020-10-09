@@ -17,7 +17,7 @@ import io.ebeaninternal.dbmigration.DbOffline;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.lib.ShutdownManager;
+import io.ebean.event.ShutdownManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

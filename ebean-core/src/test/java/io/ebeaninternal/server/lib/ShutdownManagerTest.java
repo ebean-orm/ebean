@@ -1,7 +1,8 @@
 package io.ebeaninternal.server.lib;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
+import io.ebean.event.ShutdownManager;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,8 +14,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   @Ignore
   @Test
   public void test_deregisterShutdownHook() {
-
-    Ebean.getDefaultServer();
+    DB.getDefault();
     ShutdownManager.deregisterShutdownHook();
   }
 
@@ -24,9 +24,8 @@ public class ShutdownManagerTest extends BaseTestCase {
   @Ignore
   @Test
   public void test_noShutdownHook() {
-
     System.setProperty("ebean.registerShutdownHook", "false");
-    Ebean.getDefaultServer();
+    DB.getDefault();
   }
 
 }

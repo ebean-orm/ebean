@@ -1,15 +1,15 @@
-package io.ebeaninternal.api;
+package io.ebean.event;
 
 
 /**
  * Helper to find classes taking into account the context class loader.
  */
-public class ClassUtil {
+class ClassUtil {
 
   /**
    * Return a new instance of the class using the default constructor.
    */
-  public static Object newInstance(String className) {
+  static Object newInstance(String className) {
 
     try {
       Class<?> cls = forName(className);
@@ -23,7 +23,7 @@ public class ClassUtil {
   /**
    * Load a class taking into account a context class loader (if present).
    */
-  public static Class<?> forName(String name) throws ClassNotFoundException {
+  static Class<?> forName(String name) throws ClassNotFoundException {
     return new ClassLoadContext().forName(name);
   }
 
@@ -31,7 +31,7 @@ public class ClassUtil {
   /**
    * Helper to wrap the context and caller classLoaders (to use/try both).
    */
-  static class ClassLoadContext {
+  private static class ClassLoadContext {
 
     private final ClassLoader contextLoader;
 

@@ -1,7 +1,5 @@
 package io.ebean.event;
 
-import io.ebeaninternal.server.lib.ShutdownManager;
-
 import javax.servlet.ServletContextEvent;
 
 /**

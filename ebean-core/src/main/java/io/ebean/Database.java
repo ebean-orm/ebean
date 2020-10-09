@@ -94,6 +94,11 @@ import java.util.concurrent.Callable;
 public interface Database {
 
   /**
+   * Shutdown the Database instance.
+   */
+  void shutdown();
+
+  /**
    * Shutdown the Database instance programmatically.
    * <p>
    * This method is not normally required. Ebean registers a shutdown hook and shuts down cleanly.

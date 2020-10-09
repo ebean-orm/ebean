@@ -48,11 +48,6 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   SpiJsonContext jsonExtended();
 
   /**
-   * For internal use, shutdown of the server invoked by JVM Shutdown.
-   */
-  void shutdownManaged();
-
-  /**
    * Return true if updates in JDBC batch should include all columns if unspecified on the transaction.
    */
   boolean isUpdateAllPropertiesInBatch();

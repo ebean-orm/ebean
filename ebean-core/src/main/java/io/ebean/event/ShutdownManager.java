@@ -1,8 +1,7 @@
-package io.ebeaninternal.server.lib;
+package io.ebean.event;
 
+import io.ebean.Database;
 import io.ebean.service.SpiContainer;
-import io.ebeaninternal.api.ClassUtil;
-import io.ebeaninternal.api.SpiEbeanServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +22,13 @@ public final class ShutdownManager {
 
   private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
 
-  static final List<SpiEbeanServer> servers = new ArrayList<>();
+  private static final List<Database> databases = new ArrayList<>();
 
-  static final ShutdownHook shutdownHook = new ShutdownHook();
+  private static final ShutdownHook shutdownHook = new ShutdownHook();
 
-  static boolean stopping;
+  private static boolean stopping;
 
-  static SpiContainer container;
+  private static SpiContainer container;
 
   static {
     // Register the Shutdown hook
@@ -58,7 +57,7 @@ public final class ShutdownManager {
    */
   public static boolean isStopping() {
     //noinspection SynchronizationOnStaticField
-    synchronized (servers) {
+    synchronized (databases) {
       return stopping;
     }
   }
@@ -76,7 +75,7 @@ public final class ShutdownManager {
    */
   public static void deregisterShutdownHook() {
     //noinspection SynchronizationOnStaticField
-    synchronized (servers) {
+    synchronized (databases) {
       try {
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
       } catch (IllegalStateException ex) {
@@ -92,7 +91,7 @@ public final class ShutdownManager {
    */
   protected static void registerShutdownHook() {
     //noinspection SynchronizationOnStaticField
-    synchronized (servers) {
+    synchronized (databases) {
       try {
         String value = System.getProperty("ebean.registerShutdownHook");
         if (value == null || !value.trim().equalsIgnoreCase("false")) {
@@ -114,7 +113,7 @@ public final class ShutdownManager {
    */
   public static void shutdown() {
     //noinspection SynchronizationOnStaticField
-    synchronized (servers) {
+    synchronized (databases) {
       if (stopping) {
         // Already run shutdown...
         return;
@@ -146,9 +145,9 @@ public final class ShutdownManager {
 
       // shutdown any registered servers that have not
       // already been shutdown manually
-      for (SpiEbeanServer server : servers) {
+      for (Database server : databases) {
         try {
-          server.shutdownManaged();
+          server.shutdown();
         } catch (Exception ex) {
           logger.error("Error executing shutdown runnable", ex);
           ex.printStackTrace();
@@ -178,10 +177,10 @@ public final class ShutdownManager {
   /**
    * Register an ebeanServer to be shutdown when the JVM is shutdown.
    */
-  public static void registerEbeanServer(SpiEbeanServer server) {
+  public static void registerDatabase(Database server) {
     //noinspection SynchronizationOnStaticField
-    synchronized (servers) {
-      servers.add(server);
+    synchronized (databases) {
+      databases.add(server);
     }
   }
 
@@ -191,10 +190,17 @@ public final class ShutdownManager {
    * This is done when the ebeanServer is shutdown manually.
    * </p>
    */
-  public static void unregisterEbeanServer(SpiEbeanServer server) {
+  public static void unregisterDatabase(Database server) {
     //noinspection SynchronizationOnStaticField
-    synchronized (servers) {
-      servers.remove(server);
+    synchronized (databases) {
+      databases.remove(server);
+    }
+  }
+
+  private static class ShutdownHook extends Thread {
+    @Override
+    public void run() {
+      ShutdownManager.shutdown();
     }
   }
 }

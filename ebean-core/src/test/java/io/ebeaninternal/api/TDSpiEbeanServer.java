@@ -107,7 +107,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void shutdownManaged() {
+  public void shutdown() {
   }
 
   @Override
