@@ -3,6 +3,7 @@ package io.ebeanservice.docstore.api.support;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Query;
+import io.ebean.docstore.DocUpdateContext;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -46,11 +47,11 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
     }
 
     @Override
-    public void deleteById(Object idValue, DocStoreUpdateContext txn) throws IOException {
+    public void deleteById(Object idValue, DocUpdateContext txn) throws IOException {
     }
 
     @Override
-    public void index(Object idValue, Object entityBean, DocStoreUpdateContext txn) throws IOException {
+    public void index(Object idValue, Object entityBean, DocUpdateContext txn) throws IOException {
     }
 
     @Override
@@ -62,7 +63,7 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
     }
 
     @Override
-    public void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException {
+    public void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocUpdateContext txn) throws IOException {
     }
   }
 }

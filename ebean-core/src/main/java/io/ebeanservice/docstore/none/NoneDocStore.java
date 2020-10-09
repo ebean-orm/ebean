@@ -4,8 +4,8 @@ import io.ebean.DocStoreQueueEntry;
 import io.ebean.DocumentStore;
 import io.ebean.PagedList;
 import io.ebean.Query;
-import io.ebeanservice.docstore.api.DocQueryRequest;
-import io.ebeanservice.docstore.api.RawDoc;
+import io.ebean.docstore.DocQueryContext;
+import io.ebean.docstore.RawDoc;
 
 import java.io.IOException;
 import java.util.List;
@@ -68,27 +68,27 @@ public class NoneDocStore implements DocumentStore {
   }
 
   @Override
-  public <T> T find(DocQueryRequest<T> request) {
+  public <T> T find(DocQueryContext<T> request) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> PagedList<T> findPagedList(DocQueryRequest<T> request) {
+  public <T> PagedList<T> findPagedList(DocQueryContext<T> request) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> List<T> findList(DocQueryRequest<T> request) {
+  public <T> List<T> findList(DocQueryContext<T> request) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> void findEach(DocQueryRequest<T> query, Consumer<T> consumer) {
+  public <T> void findEach(DocQueryContext<T> query, Consumer<T> consumer) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> void findEachWhile(DocQueryRequest<T> query, Predicate<T> consumer) {
+  public <T> void findEachWhile(DocQueryContext<T> query, Predicate<T> consumer) {
     throw implementationNotInClassPath();
   }
 

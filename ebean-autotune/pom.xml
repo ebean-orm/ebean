@@ -15,8 +15,14 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.4.3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Provided scope to compile with java 11 -->

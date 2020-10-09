@@ -1,11 +1,12 @@
 package io.ebeanservice.docstore.api.mapping;
 
 import io.ebean.FetchPath;
+import io.ebean.docstore.DocMapping;
 
 /**
  * Mapping for a document stored in a doc store (like ElasticSearch).
  */
-public class DocumentMapping {
+public class DocumentMapping implements DocMapping {
 
   protected final String queueId;
 

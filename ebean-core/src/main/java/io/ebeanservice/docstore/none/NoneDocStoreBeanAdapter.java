@@ -1,5 +1,6 @@
 package io.ebeanservice.docstore.none;
 
+import io.ebean.docstore.DocUpdateContext;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -23,12 +24,12 @@ public class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
   }
 
   @Override
-  public void deleteById(Object idValue, DocStoreUpdateContext txn) throws IOException {
+  public void deleteById(Object idValue, DocUpdateContext txn) throws IOException {
     throw NoneDocStore.implementationNotInClassPath();
   }
 
   @Override
-  public void index(Object idValue, T entityBean, DocStoreUpdateContext txn) throws IOException {
+  public void index(Object idValue, T entityBean, DocUpdateContext txn) throws IOException {
     throw NoneDocStore.implementationNotInClassPath();
   }
 
@@ -43,7 +44,7 @@ public class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
   }
 
   @Override
-  public void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException {
+  public void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocUpdateContext txn) throws IOException {
     throw NoneDocStore.implementationNotInClassPath();
   }
 }

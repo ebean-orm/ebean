@@ -2,6 +2,7 @@ package io.ebeanservice.docstore.api;
 
 import io.ebean.Query;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.docstore.DocUpdateContext;
 import io.ebean.plugin.BeanDocType;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -66,13 +67,13 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * Process a delete by id of a given document.
    */
   @Override
-  void deleteById(Object idValue, DocStoreUpdateContext txn) throws IOException;
+  void deleteById(Object idValue, DocUpdateContext txn) throws IOException;
 
   /**
    * Process an index event which is effectively an insert or update (or put).
    */
   @Override
-  void index(Object idValue, T entityBean, DocStoreUpdateContext txn) throws IOException;
+  void index(Object idValue, T entityBean, DocUpdateContext txn) throws IOException;
 
   /**
    * Process an insert persist request.
@@ -104,7 +105,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * @param txn                the doc store transaction to use to process the update
    */
   @Override
-  void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException;
+  void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocUpdateContext txn) throws IOException;
 
   /**
    * Create the document mapping.

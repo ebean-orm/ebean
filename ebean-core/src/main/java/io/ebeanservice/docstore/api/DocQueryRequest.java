@@ -1,5 +1,6 @@
 package io.ebeanservice.docstore.api;
 
+import io.ebean.docstore.DocQueryContext;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
@@ -7,7 +8,7 @@ import io.ebeaninternal.api.SpiTransaction;
 /**
  * A Query request for the document store.
  */
-public interface DocQueryRequest<T> {
+public interface DocQueryRequest<T> extends DocQueryContext<T> {
 
   /**
    * Return the transaction for this request (can be null for document store only queries).

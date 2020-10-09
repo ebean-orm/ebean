@@ -6,7 +6,7 @@ import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
-import io.ebeanservice.docstore.api.mapping.DocumentMapping;
+import io.ebean.docstore.DocMapping;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -167,7 +167,7 @@ public interface BeanType<T> {
    * for the document store.
    * </p>
    */
-  DocumentMapping getDocMapping();
+  DocMapping getDocMapping();
 
   /**
    * Return the doc store queueId for this bean type.

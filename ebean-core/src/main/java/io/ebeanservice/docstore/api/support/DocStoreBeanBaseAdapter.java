@@ -4,6 +4,7 @@ import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.docstore.DocUpdateContext;
 import io.ebean.plugin.BeanType;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -326,10 +327,10 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public abstract void deleteById(Object idValue, DocStoreUpdateContext txn) throws IOException;
+  public abstract void deleteById(Object idValue, DocUpdateContext txn) throws IOException;
 
   @Override
-  public abstract void index(Object idValue, T entityBean, DocStoreUpdateContext txn) throws IOException;
+  public abstract void index(Object idValue, T entityBean, DocUpdateContext txn) throws IOException;
 
   @Override
   public abstract void insert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
@@ -338,6 +339,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   public abstract void update(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext txn) throws IOException;
 
   @Override
-  public abstract void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException;
+  public abstract void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocUpdateContext txn) throws IOException;
 
 }

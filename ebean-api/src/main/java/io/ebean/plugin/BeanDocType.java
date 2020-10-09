@@ -2,7 +2,7 @@ package io.ebean.plugin;
 
 import io.ebean.FetchPath;
 import io.ebean.Query;
-import io.ebeanservice.docstore.api.DocStoreUpdateContext;
+import io.ebean.docstore.DocUpdateContext;
 
 import java.io.IOException;
 
@@ -52,12 +52,12 @@ public interface BeanDocType<T> {
    * This somewhat assumes the bean is fetched with appropriate path properties
    * to match the expected document structure.
    */
-  void index(Object idValue, T bean, DocStoreUpdateContext txn) throws IOException;
+  void index(Object idValue, T bean, DocUpdateContext txn) throws IOException;
 
   /**
    * Add a delete by Id to the doc store.
    */
-  void deleteById(Object idValue, DocStoreUpdateContext txn) throws IOException;
+  void deleteById(Object idValue, DocUpdateContext txn) throws IOException;
 
   /**
    * Add a embedded document update to the doc store.
@@ -67,6 +67,6 @@ public interface BeanDocType<T> {
    * @param embeddedRawContent the content of the embedded document in JSON form
    * @param txn                the doc store transaction to add the update to
    */
-  void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocStoreUpdateContext txn) throws IOException;
+  void updateEmbedded(Object idValue, String embeddedProperty, String embeddedRawContent, DocUpdateContext txn) throws IOException;
 
 }

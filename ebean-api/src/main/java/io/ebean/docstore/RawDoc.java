@@ -1,4 +1,4 @@
-package io.ebeanservice.docstore.api;
+package io.ebean.docstore;
 
 import java.util.Map;
 

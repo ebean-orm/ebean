@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.ebeanservice.docstore.api.DocQueryRequest;
-import io.ebeanservice.docstore.api.RawDoc;
+import io.ebean.docstore.DocQueryContext;
+import io.ebean.docstore.RawDoc;
 import javax.annotation.Nullable;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ public interface DocumentStore {
    * }</pre>
    */
   @Nullable
-  <T> T find(DocQueryRequest<T> request);
+  <T> T find(DocQueryContext<T> request);
 
   /**
    * Execute the find list query. This request is prepared to execute secondary queries.
@@ -86,7 +86,7 @@ public interface DocumentStore {
    *
    * }</pre>
    */
-  <T> List<T> findList(DocQueryRequest<T> request);
+  <T> List<T> findList(DocQueryContext<T> request);
 
   /**
    * Execute the query against the document store returning the paged list.
@@ -107,7 +107,7 @@ public interface DocumentStore {
    *
    * }</pre>
    */
-  <T> PagedList<T> findPagedList(DocQueryRequest<T> request);
+  <T> PagedList<T> findPagedList(DocQueryContext<T> request);
 
   /**
    * Execute the query against the document store with the expectation of a large set of results
@@ -129,7 +129,7 @@ public interface DocumentStore {
    *
    * }</pre>
    */
-  <T> void findEach(DocQueryRequest<T> query, Consumer<T> consumer);
+  <T> void findEach(DocQueryContext<T> query, Consumer<T> consumer);
 
   /**
    * Execute the query against the document store with the expectation of a large set of results
@@ -161,7 +161,7 @@ public interface DocumentStore {
    *
    * }</pre>
    */
-  <T> void findEachWhile(DocQueryRequest<T> query, Predicate<T> consumer);
+  <T> void findEachWhile(DocQueryContext<T> query, Predicate<T> consumer);
 
   /**
    * Find each processing raw documents.
