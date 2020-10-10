@@ -22,6 +22,7 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
+import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.ExtraMetrics;
 import io.ebeaninternal.api.QueryPlanManager;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
@@ -33,7 +34,6 @@ import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
 import io.ebeaninternal.api.SpiProfileHandler;
-import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
 import io.ebeaninternal.server.autotune.NoAutoTuneService;
@@ -93,6 +93,8 @@ import io.ebeaninternal.server.transaction.TransactionManagerOptions;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
+import io.ebeaninternal.xmapping.api.XmapEbean;
+import io.ebeaninternal.xmapping.api.XmapService;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
@@ -101,6 +103,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -195,10 +198,11 @@ public class InternalConfiguration {
     this.deployUtil = new DeployUtil(typeManager, config);
     this.serverCachePlugin = initServerCachePlugin();
     this.cacheManager = initCacheManager();
-    InternalConfigXmlRead xmlRead = new InternalConfigXmlRead(config);
-    this.dtoBeanManager = new DtoBeanManager(typeManager, xmlRead.readDtoMapping());
+
+    final InternalConfigXmlMap xmlMap = initExternalMapping();
+    this.dtoBeanManager = new DtoBeanManager(typeManager, xmlMap.readDtoMapping());
     this.beanDescriptorManager = new BeanDescriptorManager(this);
-    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlRead.xmlDeployment());
+    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlMap.xmlDeployment());
     Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
     this.dataTimeZone = initDataTimeZone();
@@ -206,14 +210,29 @@ public class InternalConfiguration {
     this.cQueryEngine = new CQueryEngine(config, databasePlatform, binder, asOfTableMapping, draftTableMap);
   }
 
-  private SpiLogManager initLogManager() {
+  private InternalConfigXmlMap initExternalMapping() {
+    final List<XmapEbean> xmEbeans = readExternalMapping();
+    return new InternalConfigXmlMap(xmEbeans, config.getClassLoadConfig().getClassLoader());
+  }
 
+  private List<XmapEbean> readExternalMapping() {
+    //TODO: Remove the isJavaxJAXBPresent() check once this is external module
+    if (!config.getClassLoadConfig().isJavaxJAXBPresent()) {
+      return Collections.emptyList();
+    }
+    final XmapService xmapService = config.service(XmapService.class);
+    if (xmapService == null) {
+      return Collections.emptyList();
+    }
+    return xmapService.read(config.getClassLoadConfig().getClassLoader(), config.getMappingLocations());
+  }
+
+  private SpiLogManager initLogManager() {
     // allow plugin - i.e. capture executed SQL for testing/asserts
     SpiLoggerFactory loggerFactory = config.service(SpiLoggerFactory.class);
     if (loggerFactory == null) {
       loggerFactory = new DLoggerFactory();
     }
-
     SpiLogger sql = loggerFactory.create("io.ebean.SQL");
     SpiLogger sum = loggerFactory.create("io.ebean.SUM");
     SpiLogger txn = loggerFactory.create("io.ebean.TXN");
