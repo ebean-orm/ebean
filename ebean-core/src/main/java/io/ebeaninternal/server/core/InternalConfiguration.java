@@ -216,10 +216,6 @@ public class InternalConfiguration {
   }
 
   private List<XmapEbean> readExternalMapping() {
-    //TODO: Remove the isJavaxJAXBPresent() check once this is external module
-    if (!config.getClassLoadConfig().isJavaxJAXBPresent()) {
-      return Collections.emptyList();
-    }
     final XmapService xmapService = config.service(XmapService.class);
     if (xmapService == null) {
       return Collections.emptyList();

@@ -63,14 +63,6 @@ public class ClassLoadConfig {
   }
 
   /**
-   * Return true if javax JAXB is present (maybe not in java9).
-   * If not we don't try to parse or support 'extra ddl'.
-   */
-  public boolean isJavaxJAXBPresent() {
-    return isPresent("javax.xml.bind.JAXBException");
-  }
-
-  /**
    * Return true if Jackson annotations like JsonIgnore are present.
    */
   public boolean isJacksonAnnotationsPresent() {

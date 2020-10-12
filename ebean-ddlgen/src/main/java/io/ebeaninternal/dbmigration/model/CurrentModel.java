@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration.model;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.dbmigration.Detect;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -66,7 +67,7 @@ public class CurrentModel {
     this.databasePlatform = server.getDatabasePlatform();
     this.constraintNaming = constraintNaming;
     this.platformTypes = platformTypes;
-    this.jaxbPresent = server.getServerConfig().getClassLoadConfig().isJavaxJAXBPresent();
+    this.jaxbPresent = Detect.isJAXBPresent(server.getServerConfig());
   }
 
   public DdlOptions getDdlOptions() {

@@ -54,6 +54,13 @@
       <version>12.4.1</version>
       <scope>test</scope>
     </dependency>
+    <!-- test scope for supporting ebean-ddlgen -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.2</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
@@ -110,14 +117,6 @@
       <artifactId>joda-time</artifactId>
       <version>2.9.7</version>
       <optional>true</optional>
-    </dependency>
-
-    <!-- Provided scope to compile with java 11 -->
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>2.3.2</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>

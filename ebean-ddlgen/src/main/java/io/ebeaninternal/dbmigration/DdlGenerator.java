@@ -60,7 +60,7 @@ public class DdlGenerator implements SpiDdlGenerator {
   public DdlGenerator(SpiEbeanServer server) {
     this.server = server;
     final DatabaseConfig config = server.getServerConfig();
-    this.jaxbPresent = config.getClassLoadConfig().isJavaxJAXBPresent();
+    this.jaxbPresent = Detect.isJAXBPresent(config);
     this.generateDdl = config.isDdlGenerate();
     this.extraDdl = config.isDdlExtra();
     this.createOnly = config.isDdlCreateOnly();
