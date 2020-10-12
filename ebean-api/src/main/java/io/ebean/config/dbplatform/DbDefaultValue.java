@@ -1,12 +1,10 @@
 package io.ebean.config.dbplatform;
 
+import io.ebean.annotation.DbDefault;
+
 import java.sql.Types;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.xml.bind.DatatypeConverter;
-
-import io.ebean.annotation.DbDefault;
 
 /**
  * DB Column default values mapping to database platform specific literals.
@@ -170,14 +168,12 @@ public class DbDefaultValue {
     }
     sb.append('\'');
     return sb.toString();
-
   }
 
   private static String toDateLiteral(String value) {
     if (NOW.equals(value)) {
       return value; // this will get translated later
     }
-    DatatypeConverter.parseDate(value); // verify
     return toTextLiteral(value);
   }
 
@@ -185,7 +181,6 @@ public class DbDefaultValue {
     if (NOW.equals(value)) {
       return value; // this will get translated later
     }
-    DatatypeConverter.parseTime(value); // verify
     return toTextLiteral(value);
   }
 
@@ -193,7 +188,6 @@ public class DbDefaultValue {
     if (NOW.equals(value)) {
       return value; // this will get translated later
     }
-    DatatypeConverter.parseDateTime(value); // verify
     return toTextLiteral(value);
   }
 }
