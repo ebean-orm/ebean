@@ -121,7 +121,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.4.2</tile>
+            <tile>io.ebean.tile:enhancement:12.5.0</tile>
           </tiles>
         </configuration>
       </plugin>

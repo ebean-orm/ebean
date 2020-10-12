@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
-      <version>12.4.1</version>
+      <version>12.5.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -56,7 +56,7 @@
         <configuration>
           <tiles>
             <!-- other tiles ... -->
-            <tile>io.ebean.tile:enhancement:12.4.2</tile>
+            <tile>io.ebean.tile:enhancement:12.5.0</tile>
           </tiles>
         </configuration>
       </plugin>
