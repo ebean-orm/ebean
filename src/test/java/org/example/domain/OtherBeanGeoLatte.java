@@ -1,6 +1,7 @@
 package org.example.domain;
 
 
+import org.geolatte.geom.G2D;
 import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiLineString;
 import org.geolatte.geom.MultiPoint;
@@ -8,6 +9,7 @@ import org.geolatte.geom.MultiPolygon;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Polygon;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -28,6 +30,9 @@ public class OtherBeanGeoLatte extends BaseEntity {
   MultiPoint multiPoint;
 
   MultiPolygon mpoly;
+
+  @Column(columnDefinition = "geometry(Point, 4326)")
+  Point<G2D> wgs84Point;
 
   public String getName() {
     return name;
@@ -83,5 +88,13 @@ public class OtherBeanGeoLatte extends BaseEntity {
 
   public void setMultiPoint(MultiPoint multiPoint) {
     this.multiPoint = multiPoint;
+  }
+
+  public Point<G2D> getWgs84Point() {
+    return wgs84Point;
+  }
+
+  public void setWgs84Point(final Point<G2D> wgs84Point) {
+    this.wgs84Point = wgs84Point;
   }
 }
