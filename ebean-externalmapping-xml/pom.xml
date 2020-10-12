@@ -1,24 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<!--  <parent>-->
-<!--    <artifactId>ebean-parent</artifactId>-->
-<!--    <groupId>io.ebean</groupId>-->
-<!--    <version>12.5.1-SNAPSHOT</version>-->
-<!--  </parent>-->
+  <parent>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>12.5.1-SNAPSHOT</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>ebean-externalmapping-xml</artifactId>
-  <version>12.5.1-SNAPSHOT</version>
-  <parent>
-    <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
-    <version>2.2</version>
-  </parent>
 
-  <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
   <dependencies>
 
     <dependency>
@@ -31,7 +21,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.5.0</version>
+      <version>12.5.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -50,7 +40,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.5.0</version>
+      <version>12.5.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
