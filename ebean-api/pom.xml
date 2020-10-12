@@ -5,7 +5,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.4.3-SNAPSHOT</version>
+    <version>12.5.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -97,7 +97,7 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.4.199</version>
-      <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>

@@ -4,7 +4,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.4.3-SNAPSHOT</version>
+  <version>12.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>
@@ -50,12 +50,12 @@
     <module>ebean-core</module>
     <module>ebean-ddlgen</module>
     <module>ebean-autotune</module>
+    <module>ebean-externalmapping-api</module>
+    <module>ebean-externalmapping-xml</module>
     <module>ebean-test</module>
     <module>querybean-generator</module>
     <module>kotlin-querybean-generator</module>
     <module>ebean-querybean</module>
-    <module>ebean-externalmapping-api</module>
-    <module>ebean-externalmapping-xml</module>
   </modules>
 
 </project>
