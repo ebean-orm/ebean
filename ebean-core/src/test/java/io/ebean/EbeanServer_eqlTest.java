@@ -6,10 +6,9 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import javax.persistence.PersistenceException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
 
 public class EbeanServer_eqlTest extends BaseTestCase {
 
@@ -90,7 +89,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     // check also select count(*)
     LoggedSqlCollector.start();
     query.findCount();
-    List<String>sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from o_customer t0;");
   }
 
@@ -116,7 +115,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     // check also select count(*)
     LoggedSqlCollector.start();
     query.findCount();
-    List<String>sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from o_customer t0;");
 
   }
@@ -233,33 +232,4 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 
-  @Test
-  public void namedQuery_fromXml() {
-
-    ResetBasicData.reset();
-
-    Query<Customer> query = server()
-      .createNamedQuery(Customer.class, "withContactsById")
-      .setParameter("id", 1);
-
-    query.setUseCache(false);
-    query.findOne();
-
-    assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
-  }
-
-  @Test
-  public void namedQuery_fromCustomXmlLocations() {
-
-    ResetBasicData.reset();
-
-    Query<Customer> query = server()
-      .createNamedQuery(Customer.class, "withContactsById2")
-      .setParameter("id", 1);
-
-    query.setUseCache(false);
-    query.findOne();
-
-    assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
-  }
 }

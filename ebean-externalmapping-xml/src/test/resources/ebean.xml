@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ebean xmlns="http://ebean-orm.github.io/xml/ns/ebean">
+
+  <entity class="org.tests.model.basic.OrderAggregate">
+    <raw-sql name="default">
+      <column-mapping column="order_id" property="order.id"/>
+      <query>
+        select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount
+        from o_order_detail
+        group by order_id
+      </query>
+    </raw-sql>
+
+    <raw-sql name="withMax">
+      <column-mapping column="order_id" property="order.id"/>
+      <query>
+        select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount, max(order_qty*unit_price) as maxAmount
+        from o_order_detail
+        group by order_id
+      </query>
+    </raw-sql>
+
+    <raw-sql name="withParam">
+      <column-mapping column="order_id" property="order.id"/>
+      <query>
+        select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount
+        from o_order_detail where id > :minId
+        group by order_id
+      </query>
+    </raw-sql>
+
+  </entity>
+
+  <entity class="org.tests.model.basic.Order">
+    <raw-sql name="myRawTest">
+      <alias-mapping alias="c" property="customer"/>
+      <alias-mapping alias="a" property="customer.billingAddress"/>
+      <query>
+        select o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line1, a.line2, a.city
+        from o_order o
+        join o_customer c on o.customer_id = c.id
+        join o_address a on c.billing_address_id = a.id
+        where o.status = :orderStatus
+        order by c.name, c.id
+      </query>
+    </raw-sql>
+  </entity>
+
+  <entity class="org.tests.model.basic.Customer">
+    <named-query name="withContactsById">
+      <query>
+        select (name, version)
+        fetch contacts (firstName, lastName, email)
+        where id = :id
+      </query>
+    </named-query>
+  </entity>
+
+</ebean>

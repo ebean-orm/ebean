@@ -47,18 +47,24 @@
   </profiles>
   <dependencies>
 
+    <!-- keep testing in core using ebean-ddlgen -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
       <version>12.4.1</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-externalmapping-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!--

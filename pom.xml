@@ -34,6 +34,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.avaje.composite</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <modules>
@@ -47,6 +54,8 @@
     <module>querybean-generator</module>
     <module>kotlin-querybean-generator</module>
     <module>ebean-querybean</module>
+    <module>ebean-externalmapping-api</module>
+    <module>ebean-externalmapping-xml</module>
   </modules>
 
 </project>
