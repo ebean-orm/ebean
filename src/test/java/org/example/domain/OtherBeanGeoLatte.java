@@ -31,7 +31,7 @@ public class OtherBeanGeoLatte extends BaseEntity {
 
   MultiPolygon mpoly;
 
-  @Column(columnDefinition = "geometry(Point, 4326)")
+  @Column(columnDefinition = "geometry(Point, 4326)", unique = true)
   Point<G2D> wgs84Point;
 
   public String getName() {

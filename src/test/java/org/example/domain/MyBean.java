@@ -29,7 +29,7 @@ public class MyBean extends BaseEntity {
 
   MultiPolygon mpoly;
 
-  @Column(columnDefinition = "geometry(Point, 4326)")
+  @Column(columnDefinition = "geometry(Point, 4326)", unique = true)
   Point wgs84Point;
 
   public String getName() {

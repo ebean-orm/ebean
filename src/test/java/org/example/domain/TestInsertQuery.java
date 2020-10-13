@@ -1,7 +1,6 @@
 package org.example.domain;
 
 import io.ebean.Ebean;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.postgis.LineString;
 import org.postgis.MultiLineString;
 import org.postgis.MultiPoint;
@@ -18,8 +17,7 @@ public class TestInsertQuery {
   /**
    * Not automated this test yet.
    */
-  @Ignore
-  @Test
+  @Test(enabled = false)
   public void insert() throws SQLException {
 
 
