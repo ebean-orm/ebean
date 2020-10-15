@@ -48,14 +48,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
-      <version>12.5.0</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>12.5.0</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
