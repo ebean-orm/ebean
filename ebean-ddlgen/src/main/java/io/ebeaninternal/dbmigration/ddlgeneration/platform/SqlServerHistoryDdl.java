@@ -10,7 +10,7 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import java.io.IOException;
 
 /**
- * @author Vilmos Nagy  <vilmos.nagy@outlook.com>
+ * @author Vilmos Nagy
  */
 public class SqlServerHistoryDdl implements PlatformHistoryDdl {
 

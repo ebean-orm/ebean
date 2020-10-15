@@ -562,7 +562,7 @@ public class PlatformDdl {
 
   /**
    * Return true if unique constraints for nullable columns can be inlined as normal.
-   * Returns false for MsSqlServer & DB2 due to it's not possible to to put a constraint
+   * Returns false for MsSqlServer and DB2 due to it's not possible to to put a constraint
    * on a nullable column
    */
   public boolean isInlineUniqueWhenNullable() {
