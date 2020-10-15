@@ -3,6 +3,7 @@ package io.ebean;
 import io.avaje.config.Config;
 
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Provides singleton state for the default database.
@@ -11,47 +12,66 @@ import java.util.Properties;
  */
 class DbPrimary {
 
+  private static final ReentrantLock lock = new ReentrantLock(false);
   private static String defaultServerName;
-
   private static boolean skip;
 
   /**
    * Set whether to skip automatically creating the primary database.
    */
-  static synchronized void setSkip(boolean skip) {
-    DbPrimary.skip = skip;
+  static void setSkip(boolean skip) {
+    lock.lock();
+    try {
+      DbPrimary.skip = skip;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Return true to skip automatically creating the primary database.
    */
-  static synchronized boolean isSkip() {
-    return skip;
+  static boolean isSkip() {
+    lock.lock();
+    try {
+      return skip;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Return the default database name.
    */
-  static synchronized String getDefaultServerName() {
-    getProperties();
-    return defaultServerName;
+  static String getDefaultServerName() {
+    lock.lock();
+    try {
+      getProperties();
+      return defaultServerName;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Return the default configuration Properties.
    */
-  static synchronized Properties getProperties() {
-    if (defaultServerName == null) {
-      defaultServerName = determineDefaultServerName();
+  static Properties getProperties() {
+    lock.lock();
+    try {
+      if (defaultServerName == null) {
+        defaultServerName = determineDefaultServerName();
+      }
+      return Config.asProperties();
+    } finally {
+      lock.unlock();
     }
-    return Config.asProperties();
   }
 
   /**
    * Determine and return the default server name checking system environment variables and then global properties.
    */
   private static String determineDefaultServerName() {
-
     String defaultServerName = System.getenv("EBEAN_DB");
     defaultServerName = System.getProperty("db", defaultServerName);
     defaultServerName = System.getProperty("ebean_db", defaultServerName);

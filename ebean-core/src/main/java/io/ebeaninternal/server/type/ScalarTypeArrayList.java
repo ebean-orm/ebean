@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Collections.EMPTY_LIST;
 
@@ -33,6 +34,7 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
 
   static class Factory implements PlatformArrayTypeFactory {
 
+    private final ReentrantLock lock = new ReentrantLock(false);
     private final Map<String, ScalarTypeArrayList> cache = new HashMap<>();
 
     /**
@@ -40,7 +42,8 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
      */
     @Override
     public ScalarTypeArrayList typeFor(Type valueType, boolean nullable) {
-      synchronized (this) {
+      lock.lock();
+      try {
         String key = valueType + ":" + nullable;
         if (valueType.equals(UUID.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
@@ -58,6 +61,8 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
         }
         throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
+      } finally {
+        lock.unlock();
       }
     }
 

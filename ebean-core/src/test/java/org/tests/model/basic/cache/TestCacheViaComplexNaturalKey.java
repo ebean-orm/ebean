@@ -30,7 +30,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     return server().getServerCacheManager();
   }
 
-  private static synchronized void insertSome() {
+  private static void insertSome() {
     if (!loadOnce) {
       Ebean.find(OCachedNatKeyBean.class).delete();
       for (String store : Arrays.asList("abc", "def")) {

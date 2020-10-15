@@ -9,6 +9,7 @@ import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Creates Database instances.
@@ -30,6 +31,7 @@ import java.util.ServiceLoader;
  */
 public class DatabaseFactory {
 
+  private static final ReentrantLock lock = new ReentrantLock(false);
   private static SpiContainer container;
 
   static {
@@ -42,44 +44,63 @@ public class DatabaseFactory {
    * Call this prior to creating any Database instances or alternatively set the
    * ContainerConfig on the DatabaseConfig when creating the first Database instance.
    */
-  public static synchronized void initialiseContainer(ContainerConfig containerConfig) {
-    getContainer(containerConfig);
+  public static void initialiseContainer(ContainerConfig containerConfig) {
+    lock.lock();
+    try {
+      getContainer(containerConfig);
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Create using properties to configure the database.
    */
-  public static synchronized Database create(String name) {
-    // construct based on loading properties files
-    return getContainer(null).createServer(name);
+  public static Database create(String name) {
+    lock.lock();
+    try {
+      return getContainer(null).createServer(name);
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
    * Create using the DatabaseConfig object to configure the database.
    */
-  public static synchronized Database create(DatabaseConfig config) {
-    if (config.getName() == null) {
-      throw new PersistenceException("The name is null (it is required)");
+  public static Database create(DatabaseConfig config) {
+    lock.lock();
+    try {
+      if (config.getName() == null) {
+        throw new PersistenceException("The name is null (it is required)");
+      }
+      Database server = createInternal(config);
+      if (config.isRegister()) {
+        DbPrimary.setSkip(true);
+        DbContext.getInstance().register(server, config.isDefaultServer());
+      }
+      return server;
+    } finally {
+      lock.unlock();
     }
-    Database server = createInternal(config);
-    if (config.isRegister()) {
-      DbPrimary.setSkip(true);
-      DbContext.getInstance().register(server, config.isDefaultServer());
-    }
-    return server;
   }
 
   /**
    * Create using the DatabaseConfig additionally specifying a classLoader to use as the context class loader.
    */
-  public static synchronized Database createWithContextClassLoader(DatabaseConfig config, ClassLoader classLoader) {
-    ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(classLoader);
+  public static Database createWithContextClassLoader(DatabaseConfig config, ClassLoader classLoader) {
+    lock.lock();
     try {
-      return DatabaseFactory.create(config);
+      ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();
+      Thread.currentThread().setContextClassLoader(classLoader);
+      try {
+        return DatabaseFactory.create(config);
+      } finally {
+        // set the currentContextLoader back
+        Thread.currentThread().setContextClassLoader(currentContextLoader);
+      }
     } finally {
-      // set the currentContextLoader back
-      Thread.currentThread().setContextClassLoader(currentContextLoader);
+      lock.unlock();
     }
   }
 
@@ -89,8 +110,13 @@ public class DatabaseFactory {
    * This is typically invoked via JVM shutdown hook and not explicitly called.
    * </p>
    */
-  public static synchronized void shutdown() {
-    container.shutdown();
+  public static void shutdown() {
+    lock.lock();
+    try {
+      container.shutdown();
+    } finally {
+      lock.unlock();
+    }
   }
 
   private static Database createInternal(DatabaseConfig config) {
@@ -103,8 +129,7 @@ public class DatabaseFactory {
    * @param containerConfig the configuration controlling clustering communication
    */
   private static SpiContainer getContainer(ContainerConfig containerConfig) {
-
-    // thread safe in that all calling methods are synchronized
+    // thread safe in that all calling methods hold lock
     if (container != null) {
       return container;
     }
@@ -123,7 +148,6 @@ public class DatabaseFactory {
    * Create the container instance using the configuration.
    */
   protected static SpiContainer createContainer(ContainerConfig containerConfig) {
-
     Iterator<SpiContainerFactory> factories = ServiceLoader.load(SpiContainerFactory.class).iterator();
     if (factories.hasNext()) {
       return factories.next().create(containerConfig);

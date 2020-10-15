@@ -28,7 +28,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     return server().getServerCacheManager();
   }
 
-  private static synchronized void insertSome() {
+  private static void insertSome() {
     if (!loadOnce) {
       Ebean.find(OCachedNatKeyBean3.class).delete();
 
