@@ -1,9 +1,12 @@
 package io.ebean.querybean.generator;
 
-import org.testng.annotations.Test;
-
+import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+
+import java.util.HashSet;
+
+import org.testng.annotations.Test;
 
 public class SplitTest {
 
@@ -32,4 +35,9 @@ public class SplitTest {
     assertEquals(split[1], "Customer");
   }
 
+  @Test
+  public void split_generics() throws Exception {
+    assertEquals("Foo<Bar, XFoo<XBar>>", Split.genericsSplit("com.Foo<com.Bar, org.XFoo<org.XBar>>").getKey());
+    assertEquals(new HashSet<>(asList("com.Foo", "com.Bar", "org.XFoo", "org.XBar")), Split.genericsSplit("com.Foo<com.Bar, org.XFoo<org.XBar>>").getValue());
+  }
 }
