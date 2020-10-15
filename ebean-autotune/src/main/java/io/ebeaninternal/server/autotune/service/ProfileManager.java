@@ -11,11 +11,14 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages the collection of object graph usage profiling.
  */
 public class ProfileManager implements ProfilingListener {
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final boolean queryTuningAddVersion;
 
@@ -31,8 +34,6 @@ public class ProfileManager implements ProfilingListener {
    * Map of the usage and query statistics gathered.
    */
   private final Map<String, ProfileOrigin> profileMap = new ConcurrentHashMap<>();
-
-  private final Object monitor = new Object();
 
   private final SpiEbeanServer server;
 
@@ -101,8 +102,11 @@ public class ProfileManager implements ProfilingListener {
   }
 
   private ProfileOrigin getProfileOrigin(ObjectGraphOrigin originQueryPoint) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       return profileMap.computeIfAbsent(originQueryPoint.getKey(), k -> new ProfileOrigin(originQueryPoint, queryTuningAddVersion, profilingBase, profilingRate));
+    } finally {
+      lock.unlock();
     }
   }
 

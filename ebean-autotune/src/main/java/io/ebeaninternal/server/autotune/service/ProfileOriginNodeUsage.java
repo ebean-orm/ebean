@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Collects usages statistics for a given node in the object graph.
@@ -20,7 +21,7 @@ public class ProfileOriginNodeUsage {
 
   private static final Logger logger = LoggerFactory.getLogger(ProfileOriginNodeUsage.class);
 
-  private final Object monitor = new Object();
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final String path;
 
@@ -38,9 +39,8 @@ public class ProfileOriginNodeUsage {
   }
 
   protected void buildTunedFetch(PathProperties pathProps, BeanDescriptor<?> rootDesc, boolean addVersionProperty) {
-
-    synchronized (monitor) {
-
+    lock.lock();
+    try {
       BeanDescriptor<?> desc = rootDesc;
       if (path != null) {
         ElPropertyValue elGetValue = rootDesc.getElGetValue(path);
@@ -95,6 +95,8 @@ public class ProfileOriginNodeUsage {
         ElPropertyValue assocOne = rootDesc.getElGetValue(path);
         pathProps.addToPath(SplitName.parent(path), assocOne.getName());
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -102,9 +104,8 @@ public class ProfileOriginNodeUsage {
    * Collect usage from a node.
    */
   protected void collectUsageInfo(NodeUsageCollector profile) {
-
-    synchronized (monitor) {
-
+    lock.lock();
+    try {
       Set<String> used = profile.getUsed();
 
       profileCount++;
@@ -115,6 +116,8 @@ public class ProfileOriginNodeUsage {
       if (profile.isModified()) {
         modified = true;
       }
+    } finally {
+      lock.unlock();
     }
   }
 

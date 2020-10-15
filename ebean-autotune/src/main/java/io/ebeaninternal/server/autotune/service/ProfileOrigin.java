@@ -12,8 +12,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ProfileOrigin {
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private static final long RESET_COUNT = -1000000000L;
 
@@ -28,8 +31,6 @@ public class ProfileOrigin {
   private final Map<String, ProfileOriginQuery> queryStatsMap = new ConcurrentHashMap<>();
 
   private final Map<String, ProfileOriginNodeUsage> nodeUsageMap = new ConcurrentHashMap<>();
-
-  private final Object monitor = new Object();
 
   private final AtomicLong requestCount = new AtomicLong();
 
@@ -74,8 +75,8 @@ public class ProfileOrigin {
    * Collect profiling information with the option to reset the underlying profiling detail.
    */
   public void profilingCollection(BeanDescriptor<?> rootDesc, AutoTuneCollection req, boolean reset) {
-
-    synchronized (monitor) {
+    lock.lock();
+    try {
       if (nodeUsageMap.isEmpty()) {
         return;
       }
@@ -94,6 +95,8 @@ public class ProfileOrigin {
           profileCount.set(0);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -155,8 +158,8 @@ public class ProfileOrigin {
   }
 
   private ProfileOriginNodeUsage getNodeStats(String path) {
-
-    synchronized (monitor) {
+    lock.lock();
+    try {
       // handle null paths as using ConcurrentHashMap
       path = (path == null) ? "" : path;
       ProfileOriginNodeUsage nodeStats = nodeUsageMap.get(path);
@@ -165,6 +168,8 @@ public class ProfileOrigin {
         nodeUsageMap.put(path, nodeStats);
       }
       return nodeStats;
+    } finally {
+      lock.unlock();
     }
   }
 

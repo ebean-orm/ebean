@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
@@ -21,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 public class DefaultAutoTuneService implements AutoTuneService {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAutoTuneService.class);
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final SpiEbeanServer server;
 
@@ -127,8 +130,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
    * Collect profiling, check for new/diff to existing tuning and apply changes.
    */
   private void runtimeTuningUpdate() {
-
-    synchronized (this) {
+    lock.lock();
+    try {
       try {
         long start = System.currentTimeMillis();
 
@@ -150,12 +153,14 @@ public class DefaultAutoTuneService implements AutoTuneService {
       } catch (Throwable e) {
         logger.error("Error collecting or applying automatic query tuning", e);
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   private void saveProfilingOnShutdown(boolean reset) {
-
-    synchronized (this) {
+    lock.lock();
+    try {
       if (isRuntimeTuningUpdates()) {
         runtimeTuningUpdate();
         outputAllTuning();
@@ -174,6 +179,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
           logger.info("writing new:{} diff:{} profiling entries for server:{}", event.getNewCount(), event.getDiffCount(), serverName);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
