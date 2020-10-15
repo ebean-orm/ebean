@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages the construction of caches.
@@ -26,17 +27,14 @@ class DefaultCacheHolder {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.ALL");
 
+  private final ReentrantLock lock = new ReentrantLock(false);
   private final ConcurrentHashMap<String, ServerCache> allCaches = new ConcurrentHashMap<>();
-
   private final ConcurrentHashMap<String, Set<String>> collectIdCaches = new ConcurrentHashMap<>();
 
   private final ServerCacheFactory cacheFactory;
-
   private final ServerCacheOptions beanDefault;
   private final ServerCacheOptions queryDefault;
-
   private final CurrentTenantProvider tenantProvider;
-
   private final QueryCacheEntryValidate queryCacheEntryValidate;
 
   DefaultCacheHolder(CacheManagerOptions builder) {
@@ -87,8 +85,11 @@ class DefaultCacheHolder {
   private ServerCache createCache(Class<?> beanType, ServerCacheType type, String key, String shortName) {
     ServerCacheOptions options = getCacheOptions(beanType, type);
     if (type == ServerCacheType.COLLECTION_IDS) {
-      synchronized (this) {
+      lock.lock();
+      try {
         collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
+      } finally {
+        lock.unlock();
       }
     }
     return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));

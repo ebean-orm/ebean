@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Used to reduce memory consumption of strings used in deployment processing.
@@ -12,6 +13,8 @@ public final class InternString {
 
   private static final HashMap<String, String> map = new HashMap<>();
 
+  private static final ReentrantLock lock = new ReentrantLock(false);
+
   /**
    * Return the shared instance of this string.
    */
@@ -19,8 +22,8 @@ public final class InternString {
     if (s == null) {
       return null;
     }
-    //noinspection SynchronizationOnStaticField
-    synchronized (map) {
+    lock.lock();
+    try {
       String v = map.get(s);
       if (v != null) {
         return v;
@@ -28,6 +31,8 @@ public final class InternString {
         map.put(s, s);
         return s;
       }
+    } finally {
+      lock.unlock();
     }
   }
 }

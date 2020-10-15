@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Database sequence based IdGenerator.
@@ -24,15 +25,9 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected static final Logger logger = LoggerFactory.getLogger("io.ebean.SEQ");
 
-  /**
-   * Used to synchronise the idList access.
-   */
-  protected final Object monitor = new Object();
+  private final ReentrantLock lock = new ReentrantLock(false);
 
-  /**
-   * Used to synchronise background loading (loadBatchInBackground).
-   */
-  protected final Object backgroundLoadMonitor = new Object();
+  private final ReentrantLock loadLock = new ReentrantLock(false);
 
   /**
    * The actual sequence name.
@@ -97,7 +92,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    */
   @Override
   public Object nextId(Transaction t) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       int size = idList.size();
       if (size > 0) {
         maybeLoadMoreInBackground(size);
@@ -105,6 +101,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
         loadMore(allocationSize);
       }
       return idList.pollFirst();
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -118,8 +116,11 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   private void loadMore(int requestSize) {
     List<Long> newIds = getMoreIds(requestSize);
-    synchronized (monitor) {
+    lock.lock();
+    try {
       idList.addAll(newIds);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -127,23 +128,26 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    * Load another batch of Id's using a background thread.
    */
   protected void loadInBackground(final int requestSize) {
-
     // single threaded processing...
-    synchronized (backgroundLoadMonitor) {
+    loadLock.lock();
+    try {
       if (currentlyBackgroundLoading) {
         // skip as already background loading
         logger.debug("... skip background sequence load (another load in progress)");
         return;
       }
-
       currentlyBackgroundLoading = true;
-
       backgroundExecutor.execute(() -> {
         loadMore(requestSize);
-        synchronized (backgroundLoadMonitor) {
+        loadLock.lock();
+        try {
           currentlyBackgroundLoading = false;
+        } finally {
+          loadLock.unlock();
         }
       });
+    } finally {
+      loadLock.lock();
     }
   }
 

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Daemon based ScheduleThreadPool.
@@ -15,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor {
 
   private static final Logger logger = LoggerFactory.getLogger(DaemonScheduleThreadPool.class);
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final String namePrefix;
 
@@ -38,7 +41,8 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
    */
   @Override
   public void shutdown() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (super.isShutdown()) {
         logger.debug("DaemonScheduleThreadPool {} already shut down", namePrefix);
         return;
@@ -55,6 +59,8 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
         logger.error("Error during shutdown of " + namePrefix, e);
         e.printStackTrace();
       }
+    } finally {
+      lock.unlock();
     }
   }
 }

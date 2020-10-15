@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages the shutdown of the JVM Runtime.
@@ -21,6 +22,8 @@ import java.util.List;
 public final class ShutdownManager {
 
   private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
+
+  private static final ReentrantLock lock = new ReentrantLock(false);
 
   private static final List<Database> databases = new ArrayList<>();
 
@@ -56,9 +59,11 @@ public final class ShutdownManager {
    * Return true if the system is in the process of stopping.
    */
   public static boolean isStopping() {
-    //noinspection SynchronizationOnStaticField
-    synchronized (databases) {
+    lock.lock();
+    try {
       return stopping;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -74,15 +79,15 @@ public final class ShutdownManager {
    * </p>
    */
   public static void deregisterShutdownHook() {
-    //noinspection SynchronizationOnStaticField
-    synchronized (databases) {
-      try {
-        Runtime.getRuntime().removeShutdownHook(shutdownHook);
-      } catch (IllegalStateException ex) {
-        if (!ex.getMessage().equals("Shutdown in progress")) {
-          throw ex;
-        }
+    lock.lock();
+    try {
+      Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    } catch (IllegalStateException ex) {
+      if (!ex.getMessage().equals("Shutdown in progress")) {
+        throw ex;
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -90,18 +95,18 @@ public final class ShutdownManager {
    * Register the shutdown hook with the Runtime.
    */
   protected static void registerShutdownHook() {
-    //noinspection SynchronizationOnStaticField
-    synchronized (databases) {
-      try {
-        String value = System.getProperty("ebean.registerShutdownHook");
-        if (value == null || !value.trim().equalsIgnoreCase("false")) {
-          Runtime.getRuntime().addShutdownHook(shutdownHook);
-        }
-      } catch (IllegalStateException ex) {
-        if (!ex.getMessage().equals("Shutdown in progress")) {
-          throw ex;
-        }
+    lock.lock();
+    try {
+      String value = System.getProperty("ebean.registerShutdownHook");
+      if (value == null || !value.trim().equalsIgnoreCase("false")) {
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
       }
+    } catch (IllegalStateException ex) {
+      if (!ex.getMessage().equals("Shutdown in progress")) {
+        throw ex;
+      }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -112,8 +117,8 @@ public final class ShutdownManager {
    * </p>
    */
   public static void shutdown() {
-    //noinspection SynchronizationOnStaticField
-    synchronized (databases) {
+    lock.lock();
+    try {
       if (stopping) {
         // Already run shutdown...
         return;
@@ -157,6 +162,8 @@ public final class ShutdownManager {
       if ("true".equalsIgnoreCase(System.getProperty("ebean.datasource.deregisterAllDrivers", "false"))) {
         deregisterAllJdbcDrivers();
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -178,9 +185,11 @@ public final class ShutdownManager {
    * Register an ebeanServer to be shutdown when the JVM is shutdown.
    */
   public static void registerDatabase(Database server) {
-    //noinspection SynchronizationOnStaticField
-    synchronized (databases) {
+    lock.lock();
+    try {
       databases.add(server);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -191,9 +200,11 @@ public final class ShutdownManager {
    * </p>
    */
   public static void unregisterDatabase(Database server) {
-    //noinspection SynchronizationOnStaticField
-    synchronized (databases) {
+    lock.lock();
+    try {
       databases.remove(server);
+    } finally {
+      lock.unlock();
     }
   }
 

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A "CachedThreadPool" based on Daemon threads.
@@ -15,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 public final class DaemonExecutorService {
 
   private static final Logger logger = LoggerFactory.getLogger(DaemonExecutorService.class);
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final String namePrefix;
 
@@ -49,7 +52,8 @@ public final class DaemonExecutorService {
    * </p>
    */
   public void shutdown() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (service.isShutdown()) {
         logger.debug("DaemonExecutorService[{}] already shut down", namePrefix);
         return;
@@ -66,6 +70,8 @@ public final class DaemonExecutorService {
         logger.error("Error during shutdown of DaemonThreadPool[" + namePrefix + "]", e);
         e.printStackTrace();
       }
+    } finally {
+      lock.unlock();
     }
   }
 

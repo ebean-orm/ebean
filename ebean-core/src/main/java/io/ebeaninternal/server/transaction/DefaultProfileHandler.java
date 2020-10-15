@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
@@ -64,6 +65,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   private final Queue<TransactionProfile> queue = new ConcurrentLinkedQueue<>();
 
   private final ExecutorService executor;
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final File dir;
 
@@ -117,7 +120,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   }
 
   private void flushCurrentFile() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (out != null) {
         try {
           out.close();
@@ -126,6 +130,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
           log.error("Failed to flush and close transaction profiling file ", e);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -133,7 +139,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
    * Move to the next file to write to.
    */
   private void incrementFile() {
-    synchronized (this) {
+    lock.lock();
+    try {
       flushCurrentFile();
       try {
         String now = DTF.format(LocalDateTime.now());
@@ -142,6 +149,8 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
       } catch (IOException e) {
         log.error("Not expected", e);
       }
+    } finally {
+      lock.unlock();
     }
   }
 

@@ -7,10 +7,14 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * Base class for Bean and BeanCollection loading (lazy loading and query join loading).
  */
 abstract class DLoadBaseContext {
+
+  protected final ReentrantLock lock = new ReentrantLock(false);
 
   protected final DLoadContext parent;
 

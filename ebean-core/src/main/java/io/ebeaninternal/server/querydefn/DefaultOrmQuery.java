@@ -71,6 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -87,6 +88,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
 
   private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final Class<T> beanType;
 
@@ -1992,8 +1995,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public void setCancelableQuery(CancelableQuery cancelableQuery) {
-    synchronized (this) {
+    lock.lock();
+    try {
       this.cancelableQuery = cancelableQuery;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -2026,18 +2032,24 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public void cancel() {
-    synchronized (this) {
+    lock.lock();
+    try {
       cancelled = true;
       if (cancelableQuery != null) {
         cancelableQuery.cancel();
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public boolean isCancelled() {
-    synchronized (this) {
+    lock.lock();
+    try {
       return cancelled;
+    } finally {
+      lock.unlock();
     }
   }
 

@@ -1,30 +1,28 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.PagedList;
-import io.ebeaninternal.api.Monitor;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 
 import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * PagedList implementation based on limit offset types of queries.
- *
- * @param <T> the entity bean type
  */
 public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final transient SpiEbeanServer server;
+
+  private final transient ReentrantLock lock = new ReentrantLock(false);
 
   private final SpiQuery<T> query;
 
   private final int firstRow;
 
   private final int maxRows;
-
-  private final Monitor monitor = new Monitor();
 
   private int foregroundTotalRowCount = -1;
 
@@ -49,21 +47,27 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   @Override
   public Future<Integer> getFutureCount() {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       if (futureRowCount == null) {
         futureRowCount = server.findFutureCount(query, null);
       }
       return futureRowCount;
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public List<T> getList() {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       if (list == null) {
         list = server.findList(query, null);
       }
       return list;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -77,7 +81,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   @Override
   public int getTotalPageCount() {
-
     int rowCount = getTotalCount();
     if (rowCount == 0) {
       return 0;
@@ -88,7 +91,8 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   @Override
   public int getTotalCount() {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       if (futureRowCount != null) {
         try {
           // background query already initiated so get it with a wait
@@ -103,6 +107,8 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
       // just using foreground thread
       foregroundTotalRowCount = server.findCount(query, null);
       return foregroundTotalRowCount;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -123,11 +129,9 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   @Override
   public String getDisplayXtoYofZ(String to, String of) {
-
     int first = firstRow + 1;
     int last = firstRow + getList().size();
     int total = getTotalCount();
-
     return first + to + last + of + total;
   }
 

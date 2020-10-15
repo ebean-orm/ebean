@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
   protected AtomicLong timeStamp = new AtomicLong(currentUuidTime());
 
   private AtomicLong nanoToMilliOffset = new AtomicLong(currentUuidTime());
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
 
   /**
@@ -106,7 +109,8 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
           logger.info("Clock skew of {} ms detected", delta / -10000);
           // The clock was adjusted back about 2 seconds, or we were generating a lot of ids too fast
           // if so, we try to set the current as last and also increment the clockSeq.
-          synchronized (this) {
+          lock.lock();
+          try {
             if (clockSeq.compareAndSet(seq, seq + 1)) {
               timeStamp.set(current);
               saveState();
@@ -114,6 +118,8 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
             } else {
               continue;
             }
+          } finally {
+            lock.unlock();
           }
         }
         // If current is in the future (most of the cases) try to set it.

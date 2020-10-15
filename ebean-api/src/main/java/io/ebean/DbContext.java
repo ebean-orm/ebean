@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Holds Database instances.
@@ -22,17 +23,11 @@ final class DbContext {
 
   private static final DbContext INSTANCE = new DbContext();
 
-  /**
-   * Cache for fast concurrent read access.
-   */
   private final ConcurrentHashMap<String, Database> concMap = new ConcurrentHashMap<>();
 
-  /**
-   * Cache for synchronized read, creation and put. Protected by the monitor object.
-   */
   private final HashMap<String, Database> syncMap = new HashMap<>();
 
-  private final Object monitor = new Object();
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   /**
    * The 'default' Database.
@@ -91,27 +86,28 @@ final class DbContext {
     if (name == null || name.isEmpty()) {
       return defaultDatabase;
     }
-    // non-synchronized read
     Database server = concMap.get(name);
     if (server != null) {
       return server;
     }
-    // synchronized read, create and put
     return getWithCreate(name);
   }
 
   /**
-   * Synchronized read, create and put of Databases.
+   * Read, create and put of Databases.
    */
   private Database getWithCreate(String name) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       Database server = syncMap.get(name);
       if (server == null) {
         // register when creating server this way
-        server = EbeanServerFactory.create(name);
+        server = DatabaseFactory.create(name);
         register(server, false);
       }
       return server;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -123,12 +119,15 @@ final class DbContext {
   }
 
   private void registerWithName(String name, Database server, boolean isDefault) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       concMap.put(name, server);
       syncMap.put(name, server);
       if (isDefault) {
         defaultDatabase = server;
       }
+    } finally {
+      lock.unlock();
     }
   }
 

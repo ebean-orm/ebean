@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages the cluster service.
@@ -16,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClusterManager implements ServerLookup {
 
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<>();
 
@@ -51,18 +54,24 @@ public class ClusterManager implements ServerLookup {
   }
 
   public void registerServer(EbeanServer server) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       serverMap.put(server.getName(), server);
       if (!started) {
         startup();
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public EbeanServer getServer(String name) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       return serverMap.get(name);
+    } finally {
+      lock.unlock();
     }
   }
 

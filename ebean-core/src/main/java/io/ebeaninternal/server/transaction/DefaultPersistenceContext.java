@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.PersistenceContext;
-import io.ebeaninternal.api.Monitor;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Default implementation of PersistenceContext.
@@ -32,7 +32,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<>();
 
-  private final Monitor monitor = new Monitor();
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   private int putCount;
 
@@ -68,7 +68,8 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   }
 
   public boolean resetLimit() {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       if (putCount < 100) {
         return false;
       }
@@ -80,6 +81,8 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       }
       // checking after another 100 puts
       return false;
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -88,17 +91,23 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   @Override
   public void put(Class<?> rootType, Object id, Object bean) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       putCount++;
       getClassContext(rootType).put(id, bean);
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public Object putIfAbsent(Class<?> rootType, Object id, Object bean) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       putCount++;
       return getClassContext(rootType).putIfAbsent(id, bean);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -107,15 +116,21 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   @Override
   public Object get(Class<?> rootType, Object id) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       return getClassContext(rootType).get(id);
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public WithOption getWithOption(Class<?> rootType, Object id) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       return getClassContext(rootType).getWithOption(id);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -124,9 +139,12 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   @Override
   public int size(Class<?> rootType) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       ClassContext classMap = typeCache.get(rootType);
       return classMap == null ? 0 : classMap.size();
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -135,45 +153,60 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   @Override
   public void clear() {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       typeCache.clear();
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public void clear(Class<?> rootType) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       ClassContext classMap = typeCache.get(rootType);
       if (classMap != null) {
         classMap.clear();
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public void deleted(Class<?> rootType, Object id) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       ClassContext classMap = typeCache.get(rootType);
       if (classMap != null && id != null) {
         classMap.deleted(id);
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public void clear(Class<?> rootType, Object id) {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       ClassContext classMap = typeCache.get(rootType);
       if (classMap != null && id != null) {
         classMap.remove(id);
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
   public String toString() {
-    synchronized (monitor) {
+    lock.lock();
+    try {
       return typeCache.toString();
+    } finally {
+      lock.unlock();
     }
   }
 

@@ -115,7 +115,8 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   private void initClear() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (list == null) {
         if (!disableLazyLoad && modifyListening) {
           lazyLoadCollection(true);
@@ -123,11 +124,14 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
           list = new ArrayList<>();
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   private void init() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (list == null) {
         if (disableLazyLoad) {
           list = new ArrayList<>();
@@ -135,6 +139,8 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
           lazyLoadCollection(false);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 

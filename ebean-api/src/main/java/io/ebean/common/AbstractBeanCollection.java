@@ -7,6 +7,7 @@ import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Base class for List Set and Map implementations of BeanCollection.
@@ -14,6 +15,8 @@ import java.util.Set;
 abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   private static final long serialVersionUID = 3365725236140187588L;
+
+  protected final ReentrantLock lock = new ReentrantLock(false);
 
   protected boolean readOnly;
 

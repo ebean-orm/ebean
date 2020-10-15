@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This is the object added to every entity bean using byte code enhancement.
@@ -29,6 +31,8 @@ public final class EntityBeanIntercept implements Serializable {
   private static final int STATE_NEW = 0;
   private static final int STATE_REFERENCE = 1;
   private static final int STATE_LOADED = 2;
+
+  private transient final ReentrantLock lock = new ReentrantLock(false);
 
   private transient NodeUsageCollector nodeUsageCollector;
 
@@ -803,7 +807,8 @@ public final class EntityBeanIntercept implements Serializable {
    * Load the bean when it is a reference.
    */
   protected void loadBean(int loadProperty) {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (beanLoader == null) {
         final Database database = DB.byName(ebeanServerName);
         if (database == null) {
@@ -811,14 +816,19 @@ public final class EntityBeanIntercept implements Serializable {
         }
         // For stand alone reference bean or after deserialisation lazy load
         // using the ebeanServer. Synchronise only on the bean.
-        loadBeanInternal(loadProperty, database.getPluginApi());
+        loadBeanInternal(loadProperty, database.getPluginApi().beanLoader());
         return;
       }
+    } finally {
+      lock.unlock();
     }
-    synchronized (beanLoader) {
+    final Lock lock = beanLoader.lock();
+    try {
       // Lazy loading using LoadBeanContext which supports batch loading
       // Synchronise on the beanLoader (a 'node' of the LoadBeanContext 'tree')
       loadBeanInternal(loadProperty, beanLoader);
+    } finally {
+      lock.unlock();
     }
   }
 
