@@ -432,7 +432,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
-    this.jsonHelp = new BeanDescriptorJsonHelp<>(this);
+    this.jsonHelp = initJsonHelp();
     this.draftHelp = new BeanDescriptorDraftHelp<>(this);
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
     this.docStoreQueueId = docStoreAdapter.getQueueId();
@@ -467,6 +467,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
         propertiesIndex[i] = propMap.get(ebi.getProperty(i));
       }
     }
+  }
+
+  public boolean isJacksonCorePresent() {
+    return owner.isJacksonCorePresent();
+  }
+
+  private BeanDescriptorJsonHelp<T> initJsonHelp() {
+    return isJacksonCorePresent() ? new BeanDescriptorJsonHelp<>(this) : null;
   }
 
   /**

@@ -71,4 +71,9 @@ public interface BeanDescriptorMap {
    * Return the scalarType for the given logical type.
    */
   ScalarType<?> getScalarType(String cast);
+
+  /**
+   * Return true if Jackson core is present on the classpath.
+   */
+  boolean isJacksonCorePresent();
 }

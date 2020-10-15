@@ -69,6 +69,10 @@ public class ClassLoadConfig {
     return isPresent("com.fasterxml.jackson.annotation.JsonIgnore");
   }
 
+  public boolean isJacksonCorePresent() {
+    return isPresent("com.fasterxml.jackson.core.JsonParser");
+  }
+
   /**
    * Return true if Jackson ObjectMapper is present.
    */

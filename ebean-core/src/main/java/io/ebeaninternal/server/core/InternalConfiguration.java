@@ -118,69 +118,41 @@ public class InternalConfiguration {
   private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
 
   private final TableModState tableModState;
-
   private final boolean online;
-
   private final DatabaseConfig config;
-
   private final BootupClasses bootupClasses;
-
   private final DatabasePlatform databasePlatform;
-
   private final DeployInherit deployInherit;
-
   private final TypeManager typeManager;
-
   private final DtoBeanManager dtoBeanManager;
-
   private final ClockService clockService;
-
   private final DataTimeZone dataTimeZone;
-
   private final Binder binder;
-
   private final DeployCreateProperties deployCreateProperties;
-
   private final DeployUtil deployUtil;
-
   private final BeanDescriptorManager beanDescriptorManager;
-
   private final CQueryEngine cQueryEngine;
-
   private final ClusterManager clusterManager;
-
   private final SpiCacheManager cacheManager;
-
   private final ServerCachePlugin serverCachePlugin;
-
-  private ServerCacheNotify cacheNotify;
-
-  private boolean localL2Caching;
-
+  private final boolean jacksonCorePresent;
   private final ExpressionFactory expressionFactory;
-
   private final SpiBackgroundExecutor backgroundExecutor;
-
   private final JsonFactory jsonFactory;
-
   private final DocStoreFactory docStoreFactory;
-
-  /**
-   * List of plugins (that ultimately the DefaultServer configures late in construction).
-   */
   private final List<Plugin> plugins = new ArrayList<>();
-
   private final MultiValueBind multiValueBind;
-
   private final SpiLogManager logManager;
-
   private final ExtraMetrics extraMetrics = new ExtraMetrics();
+  private ServerCacheNotify cacheNotify;
+  private boolean localL2Caching;
 
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
                         DatabaseConfig config, BootupClasses bootupClasses) {
 
     this.online = online;
     this.config = config;
+    this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
     this.clockService = new ClockService(config.getClock());
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
@@ -208,6 +180,10 @@ public class InternalConfiguration {
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(config, databasePlatform, binder, asOfTableMapping, draftTableMap);
+  }
+
+  public boolean isJacksonCorePresent() {
+    return jacksonCorePresent;
   }
 
   private InternalConfigXmlMap initExternalMapping() {
@@ -307,7 +283,7 @@ public class InternalConfiguration {
    * Return the ChangeLogListener to use with a default implementation if none defined.
    */
   public ChangeLogListener changeLogListener(ChangeLogListener listener) {
-    return plugin((listener != null) ? listener : new DefaultChangeLogListener());
+    return plugin((listener != null) ? listener : jacksonCorePresent ? new DefaultChangeLogListener() : null);
   }
 
   /**
@@ -315,7 +291,7 @@ public class InternalConfiguration {
    */
   ReadAuditLogger getReadAuditLogger() {
     ReadAuditLogger found = bootupClasses.getReadAuditLogger();
-    return plugin(found != null ? found : new DefaultReadAuditLogger());
+    return plugin(found != null ? found : jacksonCorePresent? new DefaultReadAuditLogger(): null);
   }
 
   /**
@@ -356,7 +332,7 @@ public class InternalConfiguration {
   }
 
   SpiJsonContext createJsonContext(SpiEbeanServer server) {
-    return new DJsonContext(server, jsonFactory, typeManager);
+    return jacksonCorePresent ? new DJsonContext(server, jsonFactory, typeManager) : null;
   }
 
   AutoTuneService createAutoTuneService(SpiEbeanServer server) {

@@ -144,7 +144,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     }
     this.inverseJoin = deploy.createInverseTableJoin();
     this.modifyListenMode = deploy.getModifyListenMode();
-    this.jsonHelp = new BeanPropertyAssocManyJsonHelp(this);
+    this.jsonHelp = descriptor.isJacksonCorePresent() ? new BeanPropertyAssocManyJsonHelp(this) : null;
   }
 
   @Override

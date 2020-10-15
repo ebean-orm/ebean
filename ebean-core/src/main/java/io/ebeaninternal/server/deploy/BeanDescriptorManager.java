@@ -95,87 +95,47 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private static final BeanDescComparator beanDescComparator = new BeanDescComparator();
 
   private final ReadAnnotations readAnnotations;
-
   private final TransientProperties transientProperties;
-
-  /**
-   * Helper to derive inheritance information.
-   */
   private final DeployInherit deplyInherit;
-
   private final BeanPropertyAccess beanPropertyAccess = new EnhanceBeanPropertyAccess();
-
   private final DeployUtil deployUtil;
-
   private final PersistControllerManager persistControllerManager;
-
   private final PostLoadManager postLoadManager;
-
   private final PostConstructManager postConstructManager;
-
   private final BeanFinderManager beanFinderManager;
-
   private final PersistListenerManager persistListenerManager;
-
   private final BeanQueryAdapterManager beanQueryAdapterManager;
-
   private final NamingConvention namingConvention;
-
   private final DeployCreateProperties createProperties;
-
   private final BeanManagerFactory beanManagerFactory;
-
   private final DatabaseConfig config;
-
   private final ChangeLogListener changeLogListener;
-
   private final ChangeLogRegister changeLogRegister;
-
   private final ChangeLogPrepare changeLogPrepare;
-
   private final DocStoreFactory docStoreFactory;
-
   private final MultiValueBind multiValueBind;
-
   private final TypeManager typeManager;
-
-  private int entityBeanCount;
-
   private final BootupClasses bootupClasses;
-
   private final String serverName;
-
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<>();
-
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
-
   private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<>();
-
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<>();
-
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
-
   private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
-
-  private List<BeanDescriptor<?>> immutableDescriptorList;
-
   private final DbIdentity dbIdentity;
-
   private final DataSource dataSource;
-
   private final DatabasePlatform databasePlatform;
-
   private final SpiCacheManager cacheManager;
-
   private final BackgroundExecutor backgroundExecutor;
-
   private final EncryptKeyManager encryptKeyManager;
-
   private final IdBinderFactory idBinderFactory;
-
   private final BeanLifecycleAdapterFactory beanLifecycleAdapterFactory;
-
   private final String asOfViewSuffix;
+  private final boolean jacksonCorePresent;
+  private final int queryPlanTTLSeconds;
+  private int entityBeanCount;
+  private List<BeanDescriptor<?>> immutableDescriptorList;
 
   /**
    * Map of base tables to 'with history views' used to support 'as of' queries.
@@ -186,8 +146,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Map of base tables to 'draft' tables.
    */
   private final Map<String, String> draftTableMap = new HashMap<>();
-
-  private final int queryPlanTTLSeconds;
 
   // temporary collections used during startup and then cleared
 
@@ -232,6 +190,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
     this.changeLogRegister = config.changeLogRegister(bootupClasses.getChangeLogRegister());
+    this.jacksonCorePresent = config.isJacksonCorePresent();
+  }
+
+  @Override
+  public boolean isJacksonCorePresent() {
+    return jacksonCorePresent;
   }
 
   /**
