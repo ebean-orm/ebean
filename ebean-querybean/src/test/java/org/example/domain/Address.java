@@ -5,6 +5,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.example.domain.otherpackage.GenericType;
+import org.example.domain.otherpackage.GenericTypeArgument;
+
 /**
  * Address entity bean.
  */
@@ -24,8 +27,10 @@ public class Address extends BaseModel {
   @ManyToOne
   Country country;
 
+  GenericType<GenericTypeArgument> metadata;
+
   /**
-   * Create a copy of the address. Used to provide a 'snapshot' of 
+   * Create a copy of the address. Used to provide a 'snapshot' of
    * the shippingAddress for a give order.
    */
   public Address createCopy() {
@@ -36,7 +41,7 @@ public class Address extends BaseModel {
     copy.setCountry(country);
     return copy;
   }
-  
+
   public String toString() {
     return id + " " + line1 + " " + line2 + " " + city + " " + country;
   }

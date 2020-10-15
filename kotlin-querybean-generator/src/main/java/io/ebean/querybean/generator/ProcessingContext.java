@@ -333,9 +333,9 @@ class ProcessingContext implements Constants {
       return result;
     } else {
       if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-        return new PropertyTypeScalarComparable(typeDef(typeMirror));
+        return new PropertyTypeScalarComparable(typeMirror.toString());
       } else {
-        return new PropertyTypeScalar(typeDef(typeMirror));
+        return new PropertyTypeScalar(typeMirror.toString());
       }
     }
   }
