@@ -1,5 +1,7 @@
 package io.ebean.bean;
 
+import java.util.concurrent.locks.Lock;
+
 /**
  * Loads a entity bean.
  * <p>
@@ -17,5 +19,10 @@ public interface BeanLoader {
    * Invoke the lazy loading for this bean.
    */
   void loadBean(EntityBeanIntercept ebi);
+
+  /**
+   * Obtain a lock on the loader.
+   */
+  Lock lock();
 
 }

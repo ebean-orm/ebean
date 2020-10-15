@@ -17,6 +17,8 @@ import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * ToOne bean load context.
@@ -86,11 +88,11 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
   @Override
   public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach) {
-
     if (!queryFetch) {
       throw new IllegalStateException("Not expecting loadSecondaryQuery() to be called?");
     }
-    synchronized (this) {
+    lock.lock();
+    try {
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
@@ -108,6 +110,8 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
           }
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -116,6 +120,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
    */
   static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
 
+    private final ReentrantLock bufferLock = new ReentrantLock(false);
     private final DLoadBeanContext context;
     private final int batchSize;
     private final List<EntityBeanIntercept> list;
@@ -125,6 +130,12 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
       this.context = context;
       this.batchSize = batchSize;
       this.list = new ArrayList<>(batchSize);
+    }
+
+    @Override
+    public Lock lock() {
+      bufferLock.lock();
+      return bufferLock;
     }
 
     @Override
@@ -182,7 +193,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
-      // A synchronized (this) is effectively held by EntityBeanIntercept.loadBean()
+      // A lock is effectively held by EntityBeanIntercept.loadBean()
       if (context.desc.lazyLoadMany(ebi, context)) {
         // lazy load property was a Many
         return;

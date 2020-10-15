@@ -5,10 +5,13 @@ import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 class CQueryBindCapture implements SpiQueryBindCapture {
 
   private static final double multiplier = 1.3d;
 
+  private final ReentrantLock lock = new ReentrantLock(false);
   private final CQueryPlanManager manager;
   private final SpiQueryPlan queryPlan;
 
@@ -35,13 +38,16 @@ class CQueryBindCapture implements SpiQueryBindCapture {
 
   @Override
   public void setBind(BindCapture bindCapture, long queryTimeMicros, long startNanos) {
-    synchronized (this) {
+    lock.lock();
+    try {
       this.thresholdMicros = Math.round(queryTimeMicros * multiplier);
       this.captureCount++;
       this.bindCapture = bindCapture;
       this.queryTimeMicros = queryTimeMicros;
       lastBindCapture = System.currentTimeMillis();
       manager.notifyBindCapture(this, startNanos);
+    } finally {
+      lock.unlock();
     }
   }
 

@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -57,6 +58,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
   private static final CQueryCollectionAddNoop NOOP_ADD = new CQueryCollectionAddNoop();
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   /**
    * The resultSet rows read.
@@ -288,7 +291,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   @Override
   public void cancel() {
-    synchronized (this) {
+    lock.lock();
+    try {
       this.cancelled = true;
       if (pstmt != null) {
         try {
@@ -298,6 +302,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
           throw new PersistenceException(msg, e);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -326,8 +332,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   ResultSet prepareResultSet(boolean forwardOnlyHint) throws SQLException {
-
-    synchronized (this) {
+    lock.lock();
+    try {
       if (cancelled || query.isCancelled()) {
         // cancelled before we started
         cancelled = true;
@@ -370,6 +376,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
       // executeQuery
       return pstmt.executeQuery();
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -524,8 +532,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   boolean hasNext() throws SQLException {
-
-    synchronized (this) {
+    lock.lock();
+    try {
       if (noMoreRows || cancelled) {
         return false;
       }
@@ -534,6 +542,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       }
       hasNextCache = readNextBean();
       return hasNextCache;
+    } finally {
+      lock.unlock();
     }
   }
 

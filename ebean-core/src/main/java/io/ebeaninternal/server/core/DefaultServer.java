@@ -36,11 +36,13 @@ import io.ebean.Version;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.BeanLoader;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.bean.PersistenceContext.WithOption;
+import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.CurrentTenantProvider;
@@ -142,6 +144,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -157,98 +160,47 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
+  private final ReentrantLock lock = new ReentrantLock(false);
   private final DatabaseConfig config;
-
   private final String serverName;
-
   private final DatabasePlatform databasePlatform;
-
   private final TransactionManager transactionManager;
-
   private final QueryPlanManager queryPlanManager;
-
   private final ExtraMetrics extraMetrics;
-
   private final DataTimeZone dataTimeZone;
-
-  /**
-   * Clock to use for WhenModified and WhenCreated.
-   */
   private final ClockService clockService;
-
   private final CallOriginFactory callStackFactory;
-
-  /**
-   * Handles the save, delete, updateSql CallableSql.
-   */
   private final Persister persister;
-
   private final OrmQueryEngine queryEngine;
-
   private final RelationalQueryEngine relationalQueryEngine;
   private final DtoQueryEngine dtoQueryEngine;
-
   private final ServerCacheManager serverCacheManager;
-
   private final DtoBeanManager dtoBeanManager;
   private final BeanDescriptorManager beanDescriptorManager;
-
   private final AutoTuneService autoTuneService;
-
   private final ReadAuditPrepare readAuditPrepare;
-
   private final ReadAuditLogger readAuditLogger;
-
   private final CQueryEngine cqueryEngine;
-
   private final List<Plugin> serverPlugins;
-
   private final SpiDdlGenerator ddlGenerator;
-
   private final ScriptRunner scriptRunner;
-
   private final ExpressionFactory expressionFactory;
-
   private final SpiBackgroundExecutor backgroundExecutor;
-
   private final DefaultBeanLoader beanLoader;
-
   private final EncryptKeyManager encryptKeyManager;
-
   private final SpiJsonContext jsonContext;
-
   private final DocumentStore documentStore;
-
   private final MetaInfoManager metaInfoManager;
-
   private final CurrentTenantProvider currentTenantProvider;
-
   private final SpiLogManager logManager;
-
-  /**
-   * The default PersistenceContextScope used if it is not explicitly set on a query.
-   */
   private final PersistenceContextScope defaultPersistenceContextScope;
-
-  /**
-   * Flag set when the server has shutdown.
-   */
-  private boolean shutdown;
-
-  /**
-   * The default batch size for lazy loading beans or collections.
-   */
   private final int lazyLoadBatchSize;
-
   private final int queryBatchSize;
-
   private final boolean updateAllPropertiesInBatch;
-
   private final long slowQueryMicros;
-
   private final SlowQueryListener slowQueryListener;
-
   private final boolean disableL2Cache;
+  private boolean shutdown;
 
   /**
    * Create the DefaultServer.
@@ -452,8 +404,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void shutdown() {
-    synchronized (this) {
+    lock.lock();
+    try {
       shutdownInternal(true, false);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -462,10 +417,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
-    synchronized (this) {
-      // Unregister from JVM Shutdown hook
+    lock.lock();
+    try {
       ShutdownManager.unregisterDatabase(this);
       shutdownInternal(shutdownDataSource, deregisterDriver);
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -573,6 +530,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void loadBean(LoadBeanRequest loadRequest) {
     beanLoader.loadBean(loadRequest);
+  }
+
+  @Override
+  public BeanLoader beanLoader() {
+    return new SingleBeanLoader.Dflt(this);
   }
 
   @Override

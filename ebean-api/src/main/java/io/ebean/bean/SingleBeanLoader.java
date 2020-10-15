@@ -2,10 +2,15 @@ package io.ebean.bean;
 
 import io.ebean.Database;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * BeanLoader used when single beans are loaded (which is usually not ideal / N+1).
  */
 public abstract class SingleBeanLoader implements BeanLoader {
+
+  private final ReentrantLock lock = new ReentrantLock(false);
 
   protected final Database database;
 
@@ -16,6 +21,12 @@ public abstract class SingleBeanLoader implements BeanLoader {
   @Override
   public String getName() {
     return database.getName();
+  }
+
+  @Override
+  public Lock lock() {
+    lock.lock();
+    return lock;
   }
 
   /**
@@ -43,6 +54,20 @@ public abstract class SingleBeanLoader implements BeanLoader {
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
       database.getPluginApi().loadBeanRef(ebi);
+    }
+  }
+
+  /**
+   * Single bean lazy loaded when a reference bean.
+   */
+  public static class Dflt extends SingleBeanLoader {
+    public Dflt(Database database) {
+      super(database);
+    }
+
+    @Override
+    public void loadBean(EntityBeanIntercept ebi) {
+      database.getPluginApi().loadBean(ebi);
     }
   }
 }

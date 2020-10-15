@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Extensions to Database API made available to plugins.
  */
-public interface SpiServer extends EbeanServer, BeanLoader {
+public interface SpiServer extends EbeanServer {
 
   /**
    * Return the DatabaseConfig.
@@ -53,6 +53,11 @@ public interface SpiServer extends EbeanServer, BeanLoader {
    * Return the associated read only DataSource for this Database instance (can be null).
    */
   DataSource getReadOnlyDataSource();
+
+  /**
+   * Return a BeanLoader.
+   */
+  BeanLoader beanLoader();
 
   /**
    * Invoke lazy loading on this single bean (reference bean).

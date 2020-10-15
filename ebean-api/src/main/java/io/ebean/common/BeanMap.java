@@ -121,7 +121,8 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   private void initClear() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (map == null) {
         if (!disableLazyLoad && modifyListening) {
           lazyLoadCollection(true);
@@ -129,11 +130,14 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
           map = new LinkedHashMap<>();
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   private void init() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (map == null) {
         if (disableLazyLoad) {
           map = new LinkedHashMap<>();
@@ -141,6 +145,8 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
           lazyLoadCollection(false);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 

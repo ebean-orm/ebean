@@ -114,7 +114,8 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   private void initClear() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (set == null) {
         if (!disableLazyLoad && modifyListening) {
           lazyLoadCollection(true);
@@ -122,11 +123,14 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
           set = new LinkedHashSet<>();
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
   private void init() {
-    synchronized (this) {
+    lock.lock();
+    try {
       if (set == null) {
         if (disableLazyLoad) {
           set = new LinkedHashSet<>();
@@ -134,6 +138,8 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
           lazyLoadCollection(true);
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 

@@ -39,28 +39,28 @@ public class EbeanServerFactory {
    * Call this prior to creating any EbeanServer instances or alternatively set the
    * ContainerConfig on the ServerConfig when creating the first EbeanServer instance.
    */
-  public static synchronized void initialiseContainer(ContainerConfig containerConfig) {
+  public static void initialiseContainer(ContainerConfig containerConfig) {
     DatabaseFactory.initialiseContainer(containerConfig);
   }
 
   /**
    * Create using ebean.properties to configure the database.
    */
-  public static synchronized EbeanServer create(String name) {
+  public static EbeanServer create(String name) {
     return (EbeanServer)DatabaseFactory.create(name);
   }
 
   /**
    * Create using the ServerConfig object to configure the database.
    */
-  public static synchronized EbeanServer create(ServerConfig config) {
+  public static EbeanServer create(ServerConfig config) {
     return (EbeanServer)DatabaseFactory.create(config);
   }
 
   /**
    * Create using the ServerConfig additionally specifying a classLoader to use as the context class loader.
    */
-  public static synchronized EbeanServer createWithContextClassLoader(ServerConfig config, ClassLoader classLoader) {
+  public static EbeanServer createWithContextClassLoader(ServerConfig config, ClassLoader classLoader) {
     return (EbeanServer)DatabaseFactory.createWithContextClassLoader(config, classLoader);
   }
 
@@ -70,7 +70,7 @@ public class EbeanServerFactory {
    * This is typically invoked via JVM shutdown hook and not explicitly called.
    * </p>
    */
-  public static synchronized void shutdown() {
+  public static void shutdown() {
     DatabaseFactory.shutdown();
   }
 

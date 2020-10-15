@@ -6,25 +6,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
  * List that copies itself on first write access. Needed to keep memory footprint low and the ability
  * to modify lists from cache.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  */
 public final class CopyOnFirstWriteList<E> extends AbstractList<E> implements List<E>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private final ReentrantLock lock = new ReentrantLock(false);
+
   /**
    * The underlying List implementation.
    */
   private List<E> list;
-  
-  
+
   public CopyOnFirstWriteList(List<E> list) {
     super();
     this.list = list;
@@ -166,14 +168,17 @@ public final class CopyOnFirstWriteList<E> extends AbstractList<E> implements Li
   public int lastIndexOf(Object o) {
     return list.lastIndexOf(o);
   }
-  
+
   private void checkCopyOnWrite() {
     if (!copied) {
-      synchronized (this) {
+      lock.lock();
+      try {
         if (!copied) {
           list = new ArrayList<>(list);
           copied = true;
         }
+      } finally {
+        lock.unlock();
       }
     }
   }

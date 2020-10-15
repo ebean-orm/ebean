@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -34,6 +35,7 @@ public class DefaultContainer implements SpiContainer {
 
   private static final Logger logger = LoggerFactory.getLogger("io.ebean.internal.DefaultContainer");
 
+  private final ReentrantLock lock = new ReentrantLock(false);
   private final ClusterManager clusterManager;
 
   public DefaultContainer(ContainerConfig containerConfig) {
@@ -72,7 +74,8 @@ public class DefaultContainer implements SpiContainer {
    */
   @Override
   public SpiEbeanServer createServer(DatabaseConfig config) {
-    synchronized (this) {
+    lock.lock();
+    try {
       applyConfigServices(config);
       setNamingConvention(config);
       BootupClasses bootupClasses = getBootupClasses(config);
@@ -114,6 +117,8 @@ public class DefaultContainer implements SpiContainer {
       }
       DbOffline.reset();
       return server;
+    } finally {
+      lock.unlock();
     }
   }
 

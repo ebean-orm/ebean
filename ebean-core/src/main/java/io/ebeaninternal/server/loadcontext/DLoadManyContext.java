@@ -16,6 +16,7 @@ import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * ToMany bean load context.
@@ -94,11 +95,11 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
   @Override
   public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach) {
-
     if (!queryFetch) {
       throw new IllegalStateException("Not expecting loadSecondaryQuery() to be called?");
     }
-    synchronized (this) {
+    lock.lock();
+    try {
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
@@ -118,6 +119,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
           this.bufferList = null;
         }
       }
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -127,6 +130,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
    */
   static class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
 
+    private final ReentrantLock lock = new ReentrantLock(false);
     private final PersistenceContext persistenceContext;
     private final DLoadManyContext context;
     private final int batchSize;
@@ -208,7 +212,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
     @Override
     public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
-      synchronized (this) {
+      lock.lock();
+      try {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
           EntityBean ownerBean = bc.getOwnerBean();
@@ -231,6 +236,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
         LoadManyRequest req = new LoadManyRequest(this, onlyIds, useCache);
         context.parent.getEbeanServer().loadMany(req);
+      } finally {
+        lock.unlock();
       }
     }
 
