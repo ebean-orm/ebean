@@ -26,6 +26,7 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
