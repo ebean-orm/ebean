@@ -4,7 +4,6 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -25,7 +24,7 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @ForPlatform({Platform.H2})
   @Test
   public void get() {
-    Ebean.execute(() -> {
+    DB.execute(() -> {
       SpiTransaction txn = getInScopeTransaction();
       assertNotNull(txn);
     });
@@ -38,12 +37,12 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @Test
   public void tryWithResources_expect_scopeCleanup() {
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
       assertNotNull(transaction);
       SpiTransaction txn = getInScopeTransaction();
       assertSame(txn, transaction);
 
-      try (Transaction nested = Ebean.beginTransaction()) {
+      try (Transaction nested = DB.beginTransaction()) {
         assertNotNull(nested);
         SpiTransaction txnNested = getInScopeTransaction();
         assertSame(txnNested, nested);
@@ -59,7 +58,7 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @Test
   public void afterCommit_expect_scopeCleanup() {
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
       transaction.commit();
       assertNull(getInScopeTransaction());
     }
@@ -70,7 +69,7 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @Test
   public void afterRollback_expect_scopeCleanup() {
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
       transaction.rollback();
       assertNull(getInScopeTransaction());
@@ -82,8 +81,8 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @Test
   public void end_withoutActiveTransaction_isFine() {
 
-    assertNull(Ebean.currentTransaction());
-    Ebean.endTransaction();
+    assertNull(DB.currentTransaction());
+    DB.endTransaction();
   }
 
   @ForPlatform({Platform.H2})
@@ -128,6 +127,7 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
     assertNull(foundDefaultDb);
 
     otherDb.delete(bean);
+    otherDb.shutdown();
   }
 
 

@@ -3,10 +3,10 @@ package io.ebean.event;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Ebean;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
 
@@ -22,15 +22,15 @@ public class BeanPostLoadTest extends BaseTestCase {
   @Test
   public void testPostLoad() {
 
-    EbeanServer ebeanServer = getEbeanServer();
+    Database db = createDatabase();
 
     EBasicVer bean = new EBasicVer("testPostLoad");
     bean.setDescription("someDescription");
     bean.setOther("other");
 
-    ebeanServer.save(bean);
+    db.save(bean);
 
-    EBasicVer found = ebeanServer.find(EBasicVer.class)
+    EBasicVer found = db.find(EBasicVer.class)
       .select("name, other")
       .setId(bean.getId())
       .findOne();
@@ -40,13 +40,14 @@ public class BeanPostLoadTest extends BaseTestCase {
     assertThat(postLoad.beanState.getLoadedProps()).containsExactly("id", "name", "other");
     assertThat(postLoad.bean).isSameAs(found);
 
-    ebeanServer.delete(bean);
+    db.delete(bean);
+    db.shutdown();
   }
 
 
-  private EbeanServer getEbeanServer() {
+  private Database createDatabase() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2ebasicver");
     config.loadFromProperties();
@@ -60,7 +61,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     config.add(postLoad);
 
-    return EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 
   static class PostLoad implements BeanPostLoad {

@@ -1,10 +1,10 @@
 package io.ebean.event;
 
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import org.junit.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
@@ -25,15 +25,15 @@ public class BeanPersistControllerTest {
   @Test
   public void issue_1341() {
 
-    EbeanServer ebeanServer = getEbeanServer(continuePersistingAdapter);
+    Database db = getDatabase(continuePersistingAdapter);
 
     UTMaster bean0 = new UTMaster("one0");
     UTDetail detail0 = new UTDetail("detail0", 12, 23D);
     bean0.getDetails().add(detail0);
 
-    ebeanServer.save(bean0);
+    db.save(bean0);
 
-    UTMaster master = ebeanServer.find(UTMaster.class)
+    UTMaster master = db.find(UTMaster.class)
       .setId(bean0.getId())
       .fetch("details", "name, version")
       .findOne();
@@ -41,79 +41,82 @@ public class BeanPersistControllerTest {
     UTDetail utDetail = master.getDetails().get(0);
     utDetail.setName("detail0 mod");
 
-    Transaction txn = ebeanServer.beginTransaction();
+    Transaction txn = db.beginTransaction();
     try {
       txn.setBatchMode(true);
-      ebeanServer.save(master);
+      db.save(master);
       txn.commit();
     } finally {
       txn.end();
     }
 
+    db.shutdown();
   }
 
   @Test
   public void testInsertUpdateDelete_given_continuePersistingAdapter() {
 
-    EbeanServer ebeanServer = getEbeanServer(continuePersistingAdapter);
-
+    Database db = getDatabase(continuePersistingAdapter);
 
     EBasicVer bean = new EBasicVer("testController");
 
-    ebeanServer.save(bean);
+    db.save(bean);
     assertThat(continuePersistingAdapter.methodsCalled).hasSize(2);
     assertThat(continuePersistingAdapter.methodsCalled).containsExactly("preInsert", "postInsert");
     continuePersistingAdapter.methodsCalled.clear();
 
     bean.setName("modified");
-    ebeanServer.save(bean);
+    db.save(bean);
     assertThat(continuePersistingAdapter.methodsCalled).hasSize(2);
     assertThat(continuePersistingAdapter.methodsCalled).containsExactly("preUpdate", "postUpdate");
     continuePersistingAdapter.methodsCalled.clear();
 
-    ebeanServer.delete(bean);
+    db.delete(bean);
     assertThat(continuePersistingAdapter.methodsCalled).hasSize(2);
     assertThat(continuePersistingAdapter.methodsCalled).containsExactly("preDelete", "postDelete");
 
+    db.shutdown();
   }
 
   @Test
   public void testInsertUpdateDelete_given_stopPersistingAdapter() {
 
-    EbeanServer ebeanServer = getEbeanServer(stopPersistingAdapter);
+    Database db = getDatabase(stopPersistingAdapter);
 
     EBasicVer bean = new EBasicVer("testController");
 
-    ebeanServer.save(bean);
+    db.save(bean);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preInsert");
     stopPersistingAdapter.methodsCalled.clear();
 
     bean.setName("modified");
-    ebeanServer.update(bean);
+    db.update(bean);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preUpdate");
     stopPersistingAdapter.methodsCalled.clear();
 
-    ebeanServer.delete(bean);
+    db.delete(bean);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDelete");
     stopPersistingAdapter.methodsCalled.clear();
 
-    ebeanServer.delete(EBasicVer.class, 22);
+    db.delete(EBasicVer.class, 22);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDeleteById");
     stopPersistingAdapter.methodsCalled.clear();
 
-    ebeanServer.deleteAll(EBasicVer.class, Arrays.asList(22,23,24));
+    db.deleteAll(EBasicVer.class, Arrays.asList(22,23,24));
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(3);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDeleteById", "preDeleteById", "preDeleteById");
     stopPersistingAdapter.methodsCalled.clear();
+
+    db.shutdown();
   }
 
-  private EbeanServer getEbeanServer(PersistAdapter persistAdapter) {
+  private Database getDatabase(PersistAdapter persistAdapter) {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2ebasicver");
     config.loadFromProperties();
     config.setDdlGenerate(true);
@@ -128,7 +131,7 @@ public class BeanPersistControllerTest {
 
     config.add(persistAdapter);
 
-    return EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 
   static class PersistAdapter extends BeanPersistAdapter {

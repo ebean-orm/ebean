@@ -2,6 +2,7 @@ package org.tests.basic;
 
 import io.ebean.DB;
 import io.ebean.Database;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.tests.model.basic.ESimple;
@@ -20,6 +21,11 @@ public class TestQueryUsingDatabase {
   public void setupNonDefaultDatabase() {
     DB.byName(SOME_OTHER_DB_NAME).insert(RECORD1);
     DB.byName(SOME_OTHER_DB_NAME).insert(RECORD2);
+  }
+
+  @After
+  public void shutdown() {
+    DB.byName(SOME_OTHER_DB_NAME).shutdown();
   }
 
   @Test

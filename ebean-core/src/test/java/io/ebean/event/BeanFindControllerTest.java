@@ -1,11 +1,11 @@
 package io.ebean.event;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanList;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import org.junit.Test;
 import org.tests.example.ModUuidGenerator;
 import org.tests.model.basic.EBasic;
@@ -23,7 +23,7 @@ public class BeanFindControllerTest extends BaseTestCase {
   @Test
   public void test() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2otherfind");
     config.loadFromProperties();
@@ -40,27 +40,27 @@ public class BeanFindControllerTest extends BaseTestCase {
     EBasicFindController findController = new EBasicFindController();
     config.getFindControllers().add(findController);
 
-    EbeanServer ebeanServer = EbeanServerFactory.create(config);
+    Database db = DatabaseFactory.create(config);
 
     assertFalse(findController.calledInterceptFind);
-    ebeanServer.find(EBasic.class, 42);
+    db.find(EBasic.class, 42);
     assertTrue(findController.calledInterceptFind);
 
     findController.findIntercept = true;
-    EBasic eBasic = ebeanServer.find(EBasic.class, 42);
+    EBasic eBasic = db.find(EBasic.class, 42);
 
     assertEquals(Integer.valueOf(47), eBasic.getId());
     assertEquals("47", eBasic.getName());
 
     assertFalse(findController.calledInterceptFindMany);
 
-    List<EBasic> list = ebeanServer.find(EBasic.class).where().eq("name", "AnInvalidNameSoEmpty").findList();
+    List<EBasic> list = db.find(EBasic.class).where().eq("name", "AnInvalidNameSoEmpty").findList();
     assertEquals(0, list.size());
     assertTrue(findController.calledInterceptFindMany);
 
     findController.findManyIntercept = true;
 
-    list = ebeanServer.find(EBasic.class).where().eq("name", "AnInvalidNameSoEmpty").findList();
+    list = db.find(EBasic.class).where().eq("name", "AnInvalidNameSoEmpty").findList();
     assertEquals(1, list.size());
 
     eBasic = list.get(0);
@@ -68,8 +68,9 @@ public class BeanFindControllerTest extends BaseTestCase {
     assertEquals("47", eBasic.getName());
 
     ECustomId bean = new ECustomId("check");
-    ebeanServer.save(bean);
+    db.save(bean);
     assertNotNull(bean.getId());
+    db.shutdown();
   }
 
   static class EBasicFindController implements BeanFindController {

@@ -1,12 +1,13 @@
 package io.ebean.config;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.draftable.BasicDraftableBean;
@@ -15,7 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PlatformNoGeneratedKeysTest {
 
-  static EbeanServer server = testH2Server();
+  static Database server = testH2Server();
+
+  @AfterClass
+  public static void shutdown() {
+    server.shutdown();
+  }
 
   @Test
   public void global_serverConfig_setDisableLazyLoading() {
@@ -79,9 +85,9 @@ public class PlatformNoGeneratedKeysTest {
     assertThat(one.isDraft()).isFalse();
   }
 
-  private static EbeanServer testH2Server() {
+  private static Database testH2Server() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2_noGeneratedKeys");
 
     OtherH2Platform platform = new OtherH2Platform();
@@ -108,7 +114,7 @@ public class PlatformNoGeneratedKeysTest {
     config.getClasses().add(BasicDraftableBean.class);
 
 
-    return EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 
   public static class OtherH2Platform extends H2Platform {
