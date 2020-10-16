@@ -1,8 +1,8 @@
 package io.ebean.querybean.generator
 
-import org.testng.Assert.assertEquals
-import org.testng.Assert.assertNull
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
 import java.lang.Exception
 import java.util.Arrays
 import java.util.HashSet
