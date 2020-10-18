@@ -7,6 +7,8 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
+  <name>Ebean DDL Generation</name>
+  <description>DDL and DB Migration generation</description>
   <artifactId>ebean-ddlgen</artifactId>
 
   <dependencies>
@@ -14,7 +16,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <!-- needed for java 11+ -->

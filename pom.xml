@@ -1,22 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <groupId>io.ebean</groupId>
-  <artifactId>ebean-parent</artifactId>
-  <version>12.5.2-SNAPSHOT</version>
-  <packaging>pom</packaging>
-
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
     <version>2.2</version>
   </parent>
 
+  <groupId>io.ebean</groupId>
+  <artifactId>ebean-parent</artifactId>
+  <version>12.5.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Ebean parent</name>
+  <description>Parent for ebean modules</description>
+  <url>https://ebean.io/</url>
+
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>rbygrave</id>
+      <name>Rob Bygrave</name>
+      <email>robin.bygrave@gmail.com</email>
+    </developer>
+  </developers>
 
   <dependencies>
 

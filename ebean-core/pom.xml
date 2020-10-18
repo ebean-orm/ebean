@@ -9,8 +9,9 @@
   <artifactId>ebean-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>ebean-core</name>
-  <url>http://ebean-orm.github.io/</url>
+  <name>Ebean core</name>
+  <description>Ebean core module</description>
+  <url>https://ebean.io/</url>
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
@@ -65,13 +66,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>

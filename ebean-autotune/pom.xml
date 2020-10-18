@@ -17,9 +17,9 @@
     <tag>HEAD</tag>
   </scm>
 
+  <name>Ebean Autotune</name>
+  <description>Ebean Automatic query tuning module</description>
   <artifactId>ebean-autotune</artifactId>
-  <groupId>io.ebean</groupId>
-  <version>12.5.2-SNAPSHOT</version>
 
   <dependencies>
 

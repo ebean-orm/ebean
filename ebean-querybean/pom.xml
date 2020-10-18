@@ -17,9 +17,9 @@
     <tag>HEAD</tag>
   </scm>
 
+  <name>Ebean querybean</name>
+  <description>Ebean Querybean support</description>
   <artifactId>ebean-querybean</artifactId>
-  <groupId>io.ebean</groupId>
-  <version>12.5.2-SNAPSHOT</version>
 
   <dependencies>
 

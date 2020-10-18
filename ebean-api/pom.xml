@@ -7,6 +7,8 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
+  <name>Ebean API</name>
+  <description>Ebean API</description>
   <artifactId>ebean-api</artifactId>
 
   <properties>

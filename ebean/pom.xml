@@ -7,40 +7,42 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
+  <name>Ebean composite</name>
+  <description>Composite of common runtime dependencies</description>
   <artifactId>ebean</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <!-- Technically optional but most expected to use query beans -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <!-- In future ebean-ddlgen would only be dependency of ebean-test -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
     <!-- In future this is optional and not included by default -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-autotune</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.2-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

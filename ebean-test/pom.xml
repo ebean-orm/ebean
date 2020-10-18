@@ -17,9 +17,9 @@
     <tag>HEAD</tag>
   </scm>
 
+  <name>Ebean test</name>
+  <description>Testing support for Ebean</description>
   <artifactId>ebean-test</artifactId>
-  <groupId>io.ebean</groupId>
-  <version>12.5.2-SNAPSHOT</version>
 
   <properties>
     <jackson-databind.version>2.11.3</jackson-databind.version>
