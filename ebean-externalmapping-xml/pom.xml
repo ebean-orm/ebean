@@ -14,12 +14,12 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>ebean-externalmapping-xml-12.5.1</tag>
   </scm>
 
   <artifactId>ebean-externalmapping-xml</artifactId>
   <groupId>io.ebean</groupId>
-  <version>12.5.1-SNAPSHOT</version>
+  <version>12.5.1</version>
 
   <dependencies>
 
