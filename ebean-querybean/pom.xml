@@ -27,7 +27,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.5.2-SNAPSHOT</version>
+      <version>12.5.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -60,14 +60,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>${project.version}</version>
+      <version>12.5.1</version>
       <scope>test</scope>
     </dependency>
 
