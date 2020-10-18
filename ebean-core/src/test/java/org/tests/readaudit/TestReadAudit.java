@@ -1,22 +1,22 @@
 package org.tests.readaudit;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.FutureList;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.event.readaudit.ReadEvent;
-import io.ebeaninternal.api.SpiEbeanServer;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.EBasicChangeLog;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.tests.model.basic.Country;
+import org.tests.model.basic.EBasicChangeLog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,18 +30,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestReadAudit extends BaseTestCase {
 
-  TDReadAuditPrepare readAuditPrepare = new TDReadAuditPrepare(true);
+  TDReadAuditPrepare readAuditPrepare = new TDReadAuditPrepare();
 
-  TDReadAuditLogger readAuditLogger = new TDReadAuditLogger(true);
+  TDReadAuditLogger readAuditLogger = new TDReadAuditLogger();
 
-  SpiEbeanServer server;
+  Database server;
 
   Long id1;
   Long id2;
 
   @Before
   public void setup() {
-    server = getServer();
+    server = createServer();
 
     EBasicChangeLog bean = new EBasicChangeLog();
     bean.setName("readAudito1");
@@ -63,7 +63,7 @@ public class TestReadAudit extends BaseTestCase {
 
   @After
   public void shutdown() {
-    server.shutdown(true, false);
+    server.shutdown();
   }
 
   @Test
@@ -304,9 +304,9 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many).hasSize(2);
   }
 
-  private SpiEbeanServer getServer() {
+  private Database createServer() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2other");
     config.loadFromProperties();
 
@@ -323,7 +323,7 @@ public class TestReadAudit extends BaseTestCase {
     config.setReadAuditLogger(readAuditLogger);
     config.setReadAuditPrepare(readAuditPrepare);
 
-    return (SpiEbeanServer) EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 
   private void resetCounters() {
@@ -331,12 +331,9 @@ public class TestReadAudit extends BaseTestCase {
     readAuditPrepare.resetCounters();
   }
 
-  class TDReadAuditPrepare implements ReadAuditPrepare {
+  static class TDReadAuditPrepare implements ReadAuditPrepare {
 
     int count;
-
-    TDReadAuditPrepare(boolean dummy) {
-    }
 
     void resetCounters() {
       count = 0;
@@ -351,14 +348,11 @@ public class TestReadAudit extends BaseTestCase {
     }
   }
 
-  class TDReadAuditLogger implements ReadAuditLogger {
+  static class TDReadAuditLogger implements ReadAuditLogger {
 
     Set<ReadAuditQueryPlan> plans = new HashSet<>();
     List<ReadEvent> beans = new ArrayList<>();
     List<ReadEvent> many = new ArrayList<>();
-
-    TDReadAuditLogger(boolean dummy) {
-    }
 
     void resetCounters() {
       plans.clear();

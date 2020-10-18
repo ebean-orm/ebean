@@ -1,7 +1,7 @@
 package io.ebean;
 
 import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantCatalogProvider;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.TenantMode;
@@ -29,7 +29,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantDataSourceProvider dataSourceProvider = Mockito.mock(TenantDataSourceProvider.class);
     Mockito.doReturn(mockedDataSource).when(dataSourceProvider).dataSource(tenant);
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("multiTenantDb");
     config.loadFromProperties();
     config.setRegister(false);
@@ -45,7 +45,8 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     //config.setDdlRun(false);
     config.setDatabasePlatform(new PostgresPlatform());
 
-    EbeanServerFactory.create(config);
+    final Database database = DatabaseFactory.create(config);
+    database.shutdown();
   }
 
 
@@ -63,9 +64,10 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantSchemaProvider schemaProvider = Mockito.mock(TenantSchemaProvider.class);
     Mockito.doReturn("tenant_schema").when(schemaProvider).schema(tenant);
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
+    config.setName("multi-tenancy");
     config.setRegister(false);
     config.setDefaultServer(false);
 
@@ -76,7 +78,8 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());
 
-    EbeanServerFactory.create(config);
+    final Database database = DatabaseFactory.create(config);
+    database.shutdown();
   }
 
   /**
@@ -92,9 +95,10 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantCatalogProvider catalogProvider = Mockito.mock(TenantCatalogProvider.class);
     Mockito.doReturn("tenant_catalog").when(catalogProvider).catalog(tenant);
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
+    config.setName("multi-tenancy");
     config.setRegister(false);
     config.setDefaultServer(false);
 
@@ -105,6 +109,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     config.setDdlRun(false);
     config.setDatabasePlatform(new MySqlPlatform());
 
-    EbeanServerFactory.create(config);
+    final Database database = DatabaseFactory.create(config);
+    database.shutdown();
   }
 }

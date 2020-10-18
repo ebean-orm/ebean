@@ -105,29 +105,31 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void usingDatabase() {
-
     // setup
     Database otherDb = createOtherDatabase();
-    EBasicVer bean = new EBasicVer("TestUsingDatabase");
-    otherDb.save(bean);
+    try {
+      EBasicVer bean = new EBasicVer("TestUsingDatabase");
+      otherDb.save(bean);
 
-    // act
-    final EBasicVer foundOtherDb = DB.find(EBasicVer.class)
-      .usingDatabase(otherDb)
-      .where().eq("name", "TestUsingDatabase")
-      .findOne();
+      // act
+      final EBasicVer foundOtherDb = DB.find(EBasicVer.class)
+        .usingDatabase(otherDb)
+        .where().eq("name", "TestUsingDatabase")
+        .findOne();
 
-    assertNotNull(foundOtherDb);
-    assertThat(foundOtherDb.getId()).isEqualTo(bean.getId());
+      assertNotNull(foundOtherDb);
+      assertThat(foundOtherDb.getId()).isEqualTo(bean.getId());
 
-    final EBasicVer foundDefaultDb = DB.find(EBasicVer.class)
-      .where().eq("name", "TestUsingDatabase")
-      .findOne();
+      final EBasicVer foundDefaultDb = DB.find(EBasicVer.class)
+        .where().eq("name", "TestUsingDatabase")
+        .findOne();
 
-    assertNull(foundDefaultDb);
+      assertNull(foundDefaultDb);
 
-    otherDb.delete(bean);
-    otherDb.shutdown();
+      otherDb.delete(bean);
+    } finally {
+      otherDb.shutdown();
+    }
   }
 
 

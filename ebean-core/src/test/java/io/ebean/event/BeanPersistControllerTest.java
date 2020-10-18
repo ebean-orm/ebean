@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanPersistControllerTest {
 
-  private PersistAdapter continuePersistingAdapter = new PersistAdapter(true);
+  private final PersistAdapter continuePersistingAdapter = new PersistAdapter(true);
 
-  private PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
+  private final PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
 
   @Test
   public void issue_1341() {

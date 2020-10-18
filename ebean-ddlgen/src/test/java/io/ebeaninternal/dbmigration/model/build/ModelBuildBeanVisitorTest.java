@@ -73,27 +73,28 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     config.setDatabasePlatform(new SqlServer17Platform());
 
     final SpiEbeanServer database = (SpiEbeanServer)DatabaseFactory.create(config);
+    try {
+      ModelBuildContext ctx = new ModelBuildContext(model, config.getDatabasePlatform(), config.getConstraintNaming(), true);
 
+      ModelBuildBeanVisitor addTable = new ModelBuildBeanVisitor(ctx);
 
-    ModelBuildContext ctx = new ModelBuildContext(model, config.getDatabasePlatform(), config.getConstraintNaming(), true);
+      new VisitAllUsing(addTable, database).visitAllBeans();
 
-    ModelBuildBeanVisitor addTable = new ModelBuildBeanVisitor(ctx);
+      MTable parent = model.getTable("[CKeyParent]");
+      assertThat(parent.getPkName()).isEqualTo("[pk_CKeyParent]");
 
-    new VisitAllUsing(addTable, database).visitAllBeans();
+      MTable detail = model.getTable("[CKeyDetail]");
+      assertThat(detail.getPkName()).isEqualTo("[pk_CKeyDetail]");
 
-    MTable parent = model.getTable("[CKeyParent]");
-    assertThat(parent.getPkName()).isEqualTo("[pk_CKeyParent]");
+      final List<MCompoundForeignKey> compoundKeys = detail.getCompoundKeys();
+      assertThat(compoundKeys).hasSize(1);
+      final MCompoundForeignKey fkey = compoundKeys.get(0);
+      assertThat(fkey.getName()).isEqualTo("[fk_CKeyDetail_parent]");
+      assertThat(fkey.getIndexName()).isEqualTo("[ix_CKeyDetail_parent]");
 
-    MTable detail = model.getTable("[CKeyDetail]");
-    assertThat(detail.getPkName()).isEqualTo("[pk_CKeyDetail]");
-
-    final List<MCompoundForeignKey> compoundKeys = detail.getCompoundKeys();
-    assertThat(compoundKeys).hasSize(1);
-    final MCompoundForeignKey fkey = compoundKeys.get(0);
-    assertThat(fkey.getName()).isEqualTo("[fk_CKeyDetail_parent]");
-    assertThat(fkey.getIndexName()).isEqualTo("[ix_CKeyDetail_parent]");
-
-    database.shutdown(true, false);
+    } finally {
+      database.shutdown();
+    }
   }
 
   private void assert_compound_pk(ModelContainer model) {

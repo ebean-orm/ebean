@@ -1,8 +1,8 @@
 package io.ebean.config;
 
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.junit.Ignore;
@@ -26,7 +26,7 @@ public class ServerConfigSqlServerTest {
     // no explicit databasePlatformName set ..
     //props.setProperty("ebean.some_sqlserver.databasePlatformName", "sqlserver17");
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("some_sqlserver");
     config.loadFromProperties(props);
 
@@ -38,9 +38,10 @@ public class ServerConfigSqlServerTest {
     config.setRegister(false);
     config.getClasses().add(EBasicVer.class);
 
-    EbeanServer sqlServer = EbeanServerFactory.create(config);
+    Database sqlServer = DatabaseFactory.create(config);
 
     assertThat(sqlServer).isNotNull();
+    sqlServer.shutdown();
 
 //    javax.persistence.PersistenceException: java.lang.IllegalArgumentException: For SqlServer please choose the more specific sqlserver16 or sqlserver17 platform via ServerConfig.setDatabasePlatformName. Refer to issue #1340 for details
 //
@@ -61,7 +62,7 @@ public class ServerConfigSqlServerTest {
 
     String name = "testsqlserver17";
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName(name);
 
     Properties props = props(name);
@@ -79,9 +80,10 @@ public class ServerConfigSqlServerTest {
     config.loadFromProperties(props);
     config.getClasses().add(EBasicVer.class);
 
-    EbeanServer sqlServer = EbeanServerFactory.create(config);
+    Database sqlServer = DatabaseFactory.create(config);
 
     assertThat(sqlServer).isNotNull();
+    sqlServer.shutdown();
   }
 
   @Ignore
@@ -93,7 +95,7 @@ public class ServerConfigSqlServerTest {
     Properties props = props(name);
     //props.setProperty("ebean.testsqlserver16.databasePlatformName", "sqlserver16");
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setDefaultServer(false);
     config.setRegister(false);
     config.setDdlGenerate(true);
@@ -104,9 +106,10 @@ public class ServerConfigSqlServerTest {
     config.loadFromProperties(props);
     config.getClasses().add(EBasicVer.class);
 
-    EbeanServer sqlServer = EbeanServerFactory.create(config);
+    Database sqlServer = DatabaseFactory.create(config);
 
     assertThat(sqlServer).isNotNull();
+    sqlServer.shutdown();
   }
 
   private Properties props(String dbName) {

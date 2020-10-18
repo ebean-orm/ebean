@@ -1,11 +1,12 @@
 package org.multitenant.partition;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
 import org.ebeantest.LoggedSqlCollector;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MultiTenantPartitionTest extends BaseTestCase {
 
-  private static String[] names = {"Ace", "Base", "Case", "Dae", "Eva"};
+  private static final String[] names = {"Ace", "Base", "Case", "Dae", "Eva"};
 
   static List<MtTenant> tenants() {
     List<MtTenant> tenants = new ArrayList<>();
@@ -26,10 +27,14 @@ public class MultiTenantPartitionTest extends BaseTestCase {
     return tenants;
   }
 
-  private static EbeanServer server = init();
-
+  private static final Database server = init();
   static {
     server.saveAll(tenants());
+  }
+
+  @AfterClass
+  public static void shutdown() {
+    server.shutdown();
   }
 
   @Test
@@ -103,9 +108,9 @@ public class MultiTenantPartitionTest extends BaseTestCase {
   }
 
 
-  private static EbeanServer init() {
+  private static Database init() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2multitenant");
     config.loadFromProperties();
@@ -120,6 +125,6 @@ public class MultiTenantPartitionTest extends BaseTestCase {
     config.getClasses().add(MtTenant.class);
     config.getClasses().add(MtContent.class);
 
-    return EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 }

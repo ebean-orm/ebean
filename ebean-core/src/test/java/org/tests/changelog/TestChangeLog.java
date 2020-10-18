@@ -3,9 +3,10 @@ package org.tests.changelog;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.annotation.ChangeLog;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
@@ -14,7 +15,6 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
-import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,16 +31,16 @@ public class TestChangeLog extends BaseTestCase {
 
   TDChangeLogRegister changeLogRegister = new TDChangeLogRegister();
 
-  SpiEbeanServer server;
+  Database server;
 
   @Before
   public void setup() {
-    server = getServer();
+    server = createServer();
   }
 
   @After
   public void shutdown() {
-    server.shutdown(true, false);
+    server.shutdown();
   }
 
   @Test
@@ -65,7 +65,7 @@ public class TestChangeLog extends BaseTestCase {
 
     assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
     assertThat(change.getOldData()).contains("\"name\":\"logBean\"");
-    assertThat(change.getData())   .contains("\"name\":\"ChangedName\"");
+    assertThat(change.getData()).contains("\"name\":\"ChangedName\"");
 
 
     server.delete(bean);
@@ -120,31 +120,27 @@ public class TestChangeLog extends BaseTestCase {
 
   }
 
+  private Database createServer() {
 
-  private SpiEbeanServer getServer() {
-
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2other");
     config.loadFromProperties();
-
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
-
     config.setDefaultServer(false);
     config.setRegister(false);
     config.setChangeLogAsync(false);
 
     config.addClass(EBasicChangeLog.class);
-
     config.setChangeLogPrepare(changeLogPrepare);
     config.setChangeLogListener(changeLogListener);
     config.setChangeLogRegister(changeLogRegister);
 
-    return (SpiEbeanServer) EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 
-  class TDChangeLogPrepare implements ChangeLogPrepare {
+  public static class TDChangeLogPrepare implements ChangeLogPrepare {
     @Override
     public boolean prepare(ChangeSet changes) {
       changes.setUserId("appUser1");
@@ -153,14 +149,12 @@ public class TestChangeLog extends BaseTestCase {
     }
   }
 
-  class TDChangeLogListener implements ChangeLogListener {
+  public static class TDChangeLogListener implements ChangeLogListener {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
     ChangeSet changes;
 
-    /**
-     */
     public TDChangeLogListener() {
       objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -184,7 +178,7 @@ public class TestChangeLog extends BaseTestCase {
 
   }
 
-  class TDChangeLogRegister implements ChangeLogRegister {
+  public static class TDChangeLogRegister implements ChangeLogRegister {
 
     @Override
     public ChangeLogFilter getChangeFilter(Class<?> beanType) {
@@ -198,11 +192,10 @@ public class TestChangeLog extends BaseTestCase {
     }
   }
 
-
   /**
    * Change log filter that includes all the inserts, updates and deletes.
    */
-  class TDFilter implements ChangeLogFilter {
+  public static class TDFilter implements ChangeLogFilter {
 
     /**
      * Returns true including all the inserts.

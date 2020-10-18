@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class DbMigrationDropHistoryTest {
 
     migration.setPathToResources("src/test/resources");
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("migrationtest-history");
     config.loadFromProperties();
     config.setRegister(false);
@@ -50,7 +50,7 @@ public class DbMigrationDropHistoryTest {
 
 
     config.setPackages(Arrays.asList("misc.migration.history.v1_0"));
-    EbeanServer server = EbeanServerFactory.create(config);
+    Database server = DatabaseFactory.create(config);
     migration.setServer(server);
 
     // First, we clean up the output-directory
@@ -65,7 +65,8 @@ public class DbMigrationDropHistoryTest {
 
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.history.v1_1"));
-    server = EbeanServerFactory.create(config);
+    server.shutdown();
+    server = DatabaseFactory.create(config);
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.1");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
@@ -82,6 +83,7 @@ public class DbMigrationDropHistoryTest {
       .hasMessageContaining("No 'pendingDrops'"); // subsequent call
     System.clearProperty("ddl.migration.pendingDropsFor");
 
+    server.shutdown();
     logger.info("end");
   }
 

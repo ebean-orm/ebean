@@ -1,9 +1,9 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.SQLSERVER17, "sqlserver17");
     migration.addPlatform(Platform.HANA, "hana");
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("migrationtest");
     config.loadFromProperties();
     config.setRegister(false);
@@ -66,7 +66,7 @@ public class DbMigrationGenerateTest {
 
 
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
-    EbeanServer server = EbeanServerFactory.create(config);
+    Database server = DatabaseFactory.create(config);
     migration.setServer(server);
 
     // First, we clean up the output-directory
@@ -81,7 +81,8 @@ public class DbMigrationGenerateTest {
 
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.v1_1"));
-    server = EbeanServerFactory.create(config);
+    server.shutdown();
+    server = DatabaseFactory.create(config);
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.1");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
@@ -100,7 +101,8 @@ public class DbMigrationGenerateTest {
 
     // and now for v1_2 with
     config.setPackages(Arrays.asList("misc.migration.v1_2"));
-    server = EbeanServerFactory.create(config);
+    server.shutdown();
+    server = DatabaseFactory.create(config);
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.3");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
@@ -108,13 +110,14 @@ public class DbMigrationGenerateTest {
 
     System.setProperty("ddl.migration.pendingDropsFor", "1.3");
     assertThat(migration.generateMigration()).isEqualTo("1.4__dropsFor_1.3");
-    assertThatThrownBy(()->migration.generateMigration())
+    assertThatThrownBy(migration::generateMigration)
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("No 'pendingDrops'"); // subsequent call
 
     System.clearProperty("ddl.migration.pendingDropsFor");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
+    server.shutdown();
     logger.info("end");
   }
 

@@ -3,12 +3,12 @@ package io.ebean.event;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
+import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.Ebean;
 import io.ebean.config.DatabaseConfig;
-import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +91,7 @@ public class BeanPostLoadTest extends BaseTestCase {
     public void postLoad(Object bean) {
       this.methodsCalled.add("postLoad");
       this.bean = bean;
-      this.beanState = Ebean.getBeanState(bean);
+      this.beanState = DB.getBeanState(bean);
     }
 
   }

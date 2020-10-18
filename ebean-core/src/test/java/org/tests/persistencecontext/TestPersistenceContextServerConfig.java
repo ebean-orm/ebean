@@ -1,16 +1,16 @@
 package org.tests.persistencecontext;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.config.ContainerConfig;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import org.tests.model.basic.EBasicVer;
 import org.junit.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.Properties;
 
@@ -20,20 +20,20 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
 
   @Test
   public void test_config() {
-
     SpiEbeanServer ebeanServer = (SpiEbeanServer) create();
+    try {
+      Query<EBasicVer> query = ebeanServer.find(EBasicVer.class);
+      PersistenceContextScope scope = ebeanServer.getPersistenceContextScope((SpiQuery<?>) query);
 
-    Query<EBasicVer> query = ebeanServer.find(EBasicVer.class);
-
-    PersistenceContextScope scope = ebeanServer.getPersistenceContextScope((SpiQuery<?>) query);
-
-    assertEquals(PersistenceContextScope.QUERY, scope);
+      assertEquals(PersistenceContextScope.QUERY, scope);
+    } finally {
+      ebeanServer.shutdown();
+    }
   }
 
-  static EbeanServer create() {
+  static Database create() {
 
-
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("withPCQuery");
     config.setDdlExtra(false);
 
@@ -49,15 +49,7 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
     config.setDefaultServer(false);
     config.setRegister(false);
 
-//    DataSourceConfig dataSourceConfig = new DataSourceConfig();
-//    dataSourceConfig.setUsername("sa");
-//    dataSourceConfig.setPassword("");
-//    dataSourceConfig.setUrl("jdbc:h2:mem:withPCQuery;");
-//    dataSourceConfig.setDriver("org.h2.Driver");
-//    config.setDataSourceConfig(dataSourceConfig);
-
     config.addClass(EBasicVer.class);
-
-    return EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 }

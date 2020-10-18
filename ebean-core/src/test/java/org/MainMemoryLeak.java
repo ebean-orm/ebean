@@ -1,11 +1,11 @@
 package org;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.annotation.Cache;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.PlatformNoGeneratedKeysTest;
-import io.ebean.config.ServerConfig;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -40,13 +40,13 @@ public class MainMemoryLeak {
 
     PlatformNoGeneratedKeysTest.OtherH2Platform platform = new PlatformNoGeneratedKeysTest.OtherH2Platform();
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setDatabasePlatform(platform);
     config.addClass(ECachedBean.class);
     config.loadFromProperties();
 
-    EbeanServer server = EbeanServerFactory.create(config);
+    Database server = DatabaseFactory.create(config);
 
     // create a string with 10k chars
     char[] c = new char[10_000];
@@ -70,6 +70,6 @@ public class MainMemoryLeak {
       System.out.println("Success, no mem limit detected");
       txn.commit();
     }
-
+    server.shutdown();
   }
 }
