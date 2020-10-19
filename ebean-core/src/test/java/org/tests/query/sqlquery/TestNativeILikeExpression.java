@@ -5,9 +5,9 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.plugin.SpiServer;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class TestNativeILikeExpression extends BaseTestCase {
 
     SpiServer pluginApi = server().getPluginApi();
     boolean expressionNativeIlike = pluginApi.getServerConfig().isExpressionNativeIlike();
-    Platform platform = pluginApi.getDatabasePlatform().getPlatform();
+    Platform platform = pluginApi.getPlatform().base();
 
     return expressionNativeIlike && platform == Platform.POSTGRES;
   }

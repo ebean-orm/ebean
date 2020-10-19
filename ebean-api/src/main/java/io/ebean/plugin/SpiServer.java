@@ -1,6 +1,6 @@
 package io.ebean.plugin;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.config.DatabaseConfig;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Extensions to Database API made available to plugins.
  */
-public interface SpiServer extends EbeanServer {
+public interface SpiServer extends Database {
 
   /**
    * Return the DatabaseConfig.

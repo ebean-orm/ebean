@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DbMigrationTest extends BaseTestCase {
 
   private void runScript(boolean expectErrors, String scriptName) throws IOException {
-    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPluginApi().getDatabasePlatform().getName()+"/" + scriptName);
+    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPlatform().name().toLowerCase() + "/" + scriptName);
     runScript(expectErrors, ddl, scriptName);
   }
 
