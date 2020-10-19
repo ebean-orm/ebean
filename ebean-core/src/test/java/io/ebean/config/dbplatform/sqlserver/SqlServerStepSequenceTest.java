@@ -27,7 +27,7 @@ public class SqlServerStepSequenceTest extends BaseTestCase {
     server().sqlUpdate("create sequence sqls_testseq_9876 start with 1 increment by 50").execute();
 
     BackgroundExecutor be = server().getBackgroundExecutor();
-    DataSource ds = server().getPluginApi().getDataSource();
+    DataSource ds = server().getDataSource();
 
     SqlServerStepSequence s = new SqlServerStepSequence(be, ds, "sqls_testseq_9876", 50);
 

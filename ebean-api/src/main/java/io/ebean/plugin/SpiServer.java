@@ -45,16 +45,6 @@ public interface SpiServer extends Database {
   BeanType<?> getBeanTypeForQueueId(String queueId);
 
   /**
-   * Return the associated DataSource for this Database instance.
-   */
-  DataSource getDataSource();
-
-  /**
-   * Return the associated read only DataSource for this Database instance (can be null).
-   */
-  DataSource getReadOnlyDataSource();
-
-  /**
    * Return a BeanLoader.
    */
   BeanLoader beanLoader();

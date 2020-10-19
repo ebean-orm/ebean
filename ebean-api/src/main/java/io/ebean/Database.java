@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +121,16 @@ public interface Database {
    * Return AutoTune which is used to control the AutoTune service at runtime.
    */
   AutoTune getAutoTune();
+
+  /**
+   * Return the associated DataSource for this Database instance.
+   */
+  DataSource getDataSource();
+
+  /**
+   * Return the associated read only DataSource for this Database instance (can be null).
+   */
+  DataSource getReadOnlyDataSource();
 
   /**
    * Return the name. This is used with {@link DB#byName(String)} to get a

@@ -53,6 +53,7 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.lang.reflect.Type;
 import java.time.Clock;
 import java.util.Collection;
@@ -333,6 +334,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public AutoTune getAutoTune() {
+    return null;
+  }
+
+  @Override
+  public DataSource getDataSource() {
+    return null;
+  }
+
+  @Override
+  public DataSource getReadOnlyDataSource() {
     return null;
   }
 

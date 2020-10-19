@@ -258,7 +258,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
       "join o_customer c on o.kcustomer_id = c.id " +
       "where c.id = ? and o.id > ?";
 
-    final DataSource dataSource = DB.getDefault().getPluginApi().getDataSource();
+    final DataSource dataSource = DB.getDefault().getDataSource();
 
     try (Connection connection = dataSource.getConnection()) {
       try (PreparedStatement stmt = connection.prepareStatement(sql)) {

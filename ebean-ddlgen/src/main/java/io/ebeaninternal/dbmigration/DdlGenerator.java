@@ -142,7 +142,7 @@ public class DdlGenerator implements SpiDdlGenerator {
 
   private Connection obtainConnection() {
     try {
-      return server.getPluginApi().getDataSource().getConnection();
+      return server.getDataSource().getConnection();
     } catch (SQLException e) {
       throw new PersistenceException("Failed to obtain connection to run DDL", e);
     }

@@ -15,7 +15,7 @@ public class Main {
 
 
     EbeanServer ms = Ebean.getServer("ms");
-    DataSource dataSource = ms.getPluginApi().getDataSource();
+    DataSource dataSource = ms.getDataSource();
 
     Connection connection = dataSource.getConnection();
     PreparedStatement statement = connection.prepareStatement("select next VALUE for j2_seq");

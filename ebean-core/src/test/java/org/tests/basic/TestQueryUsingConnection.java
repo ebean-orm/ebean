@@ -24,7 +24,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    DataSource dataSource = DB.getDefault().getPluginApi().getDataSource();
+    DataSource dataSource = DB.getDefault().getDataSource();
 
     try (Connection connection = dataSource.getConnection()) {
 
