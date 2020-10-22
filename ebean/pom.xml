@@ -7,7 +7,7 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
-  <name>Ebean composite</name>
+  <name>ebean composite</name>
   <description>Composite of common runtime dependencies</description>
   <artifactId>ebean</artifactId>
 

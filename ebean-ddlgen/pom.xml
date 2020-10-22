@@ -7,7 +7,7 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
-  <name>Ebean DDL Generation</name>
+  <name>ebean ddl generation</name>
   <description>DDL and DB Migration generation</description>
   <artifactId>ebean-ddlgen</artifactId>
 

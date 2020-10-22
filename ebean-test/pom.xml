@@ -17,7 +17,7 @@
     <tag>HEAD</tag>
   </scm>
 
-  <name>Ebean test</name>
+  <name>ebean test</name>
   <description>Testing support for Ebean</description>
   <artifactId>ebean-test</artifactId>
 

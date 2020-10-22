@@ -17,8 +17,8 @@
     <tag>HEAD</tag>
   </scm>
 
-  <name>Ebean querybean</name>
-  <description>Ebean Querybean support</description>
+  <name>ebean querybean</name>
+  <description>Ebean querybean support</description>
   <artifactId>ebean-querybean</artifactId>
 
   <dependencies>

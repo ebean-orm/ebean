@@ -9,8 +9,8 @@
   <artifactId>ebean-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>Ebean core</name>
-  <description>Ebean core module</description>
+  <name>ebean core</name>
+  <description>ebean core module</description>
   <url>https://ebean.io/</url>
 
   <scm>

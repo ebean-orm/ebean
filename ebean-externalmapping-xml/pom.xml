@@ -17,7 +17,7 @@
     <tag>HEAD</tag>
   </scm>
 
-  <name>Ebean external mapping XML</name>
+  <name>ebean external mapping xml</name>
   <description>XML implementation for mapping external named queries</description>
   <artifactId>ebean-externalmapping-xml</artifactId>
 

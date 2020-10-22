@@ -7,8 +7,8 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
-  <name>Ebean BOM</name>
-  <description>Ebean bill of materials pom</description>
+  <name>ebean bom</name>
+  <description>ebean bill of materials pom</description>
   <artifactId>ebean-bom</artifactId>
   <packaging>pom</packaging>
 

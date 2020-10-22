@@ -12,7 +12,7 @@
   <version>12.5.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Ebean parent</name>
+  <name>ebean parent</name>
   <description>Parent for ebean modules</description>
   <url>https://ebean.io/</url>
 

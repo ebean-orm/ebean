@@ -7,7 +7,7 @@
     <version>12.5.2-SNAPSHOT</version>
   </parent>
 
-  <name>Kotlin querybean generator</name>
+  <name>kotlin querybean generator</name>
   <description>Generates Kotlin querybeans</description>
   <artifactId>kotlin-querybean-generator</artifactId>
 
