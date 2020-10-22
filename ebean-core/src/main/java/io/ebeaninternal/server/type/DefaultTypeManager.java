@@ -146,8 +146,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final Object objectMapper;
 
-  private final boolean java7Present;
-
   private final boolean objectMapperPresent;
 
   private final boolean postgres;
@@ -187,8 +185,6 @@ public final class DefaultTypeManager implements TypeManager {
    * Create the DefaultTypeManager.
    */
   public DefaultTypeManager(DatabaseConfig config, BootupClasses bootupClasses) {
-
-    this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
     this.jsonDate = config.getJsonDate();
     this.typeMap = new ConcurrentHashMap<>();
@@ -345,13 +341,6 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private ScalarType<?> checkInterfaceTypes(Class<?> type) {
-    if (java7Present) {
-      return checkJava7InterfaceTypes(type);
-    }
-    return null;
-  }
-
-  private ScalarType<?> checkJava7InterfaceTypes(Class<?> type) {
     if (java.nio.file.Path.class.isAssignableFrom(type)) {
       return typeMap.get(java.nio.file.Path.class);
     }
@@ -897,9 +886,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
-    if (java7Present) {
-      typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
-    }
+    typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
       addType(java.time.Period.class, new ScalarTypePeriod());
