@@ -116,11 +116,11 @@ public class PostgresPlatform extends DatabasePlatform {
   protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
     switch (forUpdateMode) {
       case SKIPLOCKED:
-        return sql + " for update skip locked";
+        return sql + " for no key update skip locked";
       case NOWAIT:
-        return sql + " for update nowait";
+        return sql + " for no key update nowait";
       default:
-        return sql + " for update";
+        return sql + " for no key update";
     }
   }
 

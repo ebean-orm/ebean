@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
-
   @Test
   @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate() {
@@ -35,6 +34,8 @@ public class TestQueryForUpdate extends BaseTestCase {
     query.findList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isPostgres()) {
+      assertThat(sqlOf(query)).contains("for no key update");
     } else {
       assertThat(sqlOf(query)).contains("for update");
     }
@@ -67,7 +68,11 @@ public class TestQueryForUpdate extends BaseTestCase {
       if (isH2() || isPostgres()) {
         assertSql(sql.get(0)).contains("from e_basic t0 where t0.id =");
         assertSql(sql.get(1)).contains("from e_basic t0 where t0.id =");
-        assertSql(sql.get(1)).contains("for update");
+        if (isPostgres()) {
+          assertSql(sql.get(1)).contains("for no key update");
+        } else {
+          assertSql(sql.get(1)).contains("for update");
+        }
       }
 
       transaction.end();
@@ -91,6 +96,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sqlOf(query)).contains("for update");
     } else if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock,nowait)");
+    } else if (isPostgres()) {
+      assertThat(sqlOf(query)).contains("for no key update nowait");
     } else {
       assertThat(sqlOf(query)).contains("for update nowait");
     }
@@ -116,6 +123,8 @@ public class TestQueryForUpdate extends BaseTestCase {
         assertThat(sqlOf(query)).contains("with (updlock,nowait)");
       } else if (isH2()) {
         assertThat(sqlOf(query)).contains("for update");
+      } else if (isPostgres()) {
+        assertThat(sqlOf(query)).contains("for no key update nowait");
       } else {
         assertThat(sqlOf(query)).contains("for update nowait");
       }
