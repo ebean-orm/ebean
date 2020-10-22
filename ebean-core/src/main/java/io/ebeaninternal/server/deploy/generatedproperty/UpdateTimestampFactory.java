@@ -26,12 +26,11 @@ class UpdateTimestampFactory {
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 
-    if (classLoadConfig.isJavaTimePresent()) {
-      map.put(Instant.class, new GeneratedUpdateJavaTime.InstantDT());
-      map.put(LocalDateTime.class, new GeneratedUpdateJavaTime.LocalDT());
-      map.put(OffsetDateTime.class, new GeneratedUpdateJavaTime.OffsetDT());
-      map.put(ZonedDateTime.class, new GeneratedUpdateJavaTime.ZonedDT());
-    }
+    map.put(Instant.class, new GeneratedUpdateJavaTime.InstantDT());
+    map.put(LocalDateTime.class, new GeneratedUpdateJavaTime.LocalDT());
+    map.put(OffsetDateTime.class, new GeneratedUpdateJavaTime.OffsetDT());
+    map.put(ZonedDateTime.class, new GeneratedUpdateJavaTime.ZonedDT());
+
     if (classLoadConfig.isJodaTimePresent()) {
       map.put(org.joda.time.LocalDateTime.class, new GeneratedUpdateJodaTime.LocalDT());
       map.put(org.joda.time.DateTime.class, new GeneratedUpdateJodaTime.DateTimeDT());

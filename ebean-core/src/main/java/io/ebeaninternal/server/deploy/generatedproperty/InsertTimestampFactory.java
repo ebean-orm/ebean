@@ -26,12 +26,10 @@ class InsertTimestampFactory {
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 
-    if (classLoadConfig.isJavaTimePresent()) {
-      map.put(Instant.class, new GeneratedInsertJavaTime.InstantDT());
-      map.put(LocalDateTime.class, new GeneratedInsertJavaTime.LocalDT());
-      map.put(OffsetDateTime.class, new GeneratedInsertJavaTime.OffsetDT());
-      map.put(ZonedDateTime.class, new GeneratedInsertJavaTime.ZonedDT());
-    }
+    map.put(Instant.class, new GeneratedInsertJavaTime.InstantDT());
+    map.put(LocalDateTime.class, new GeneratedInsertJavaTime.LocalDT());
+    map.put(OffsetDateTime.class, new GeneratedInsertJavaTime.OffsetDT());
+    map.put(ZonedDateTime.class, new GeneratedInsertJavaTime.ZonedDT());
     if (classLoadConfig.isJodaTimePresent()) {
       map.put(org.joda.time.LocalDateTime.class, new GeneratedInsertJodaTime.LocalDT());
       map.put(org.joda.time.DateTime.class, new GeneratedInsertJodaTime.DateTimeDT());

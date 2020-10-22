@@ -27,13 +27,6 @@ public class ClassLoadConfig {
   }
 
   /**
-   * Return true if the Java.time types are available and should be supported.
-   */
-  public boolean isJavaTimePresent() {
-    return isPresent("java.time.LocalDate");
-  }
-
-  /**
    * Return true if the Joda types are available and should be supported.
    */
   public boolean isJodaTimePresent() {

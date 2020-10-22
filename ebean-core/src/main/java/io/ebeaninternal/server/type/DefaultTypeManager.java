@@ -887,30 +887,24 @@ public final class DefaultTypeManager implements TypeManager {
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
-    if (config.getClassLoadConfig().isJavaTimePresent()) {
-      logger.debug("Registering java.time data types");
-      addType(java.time.Period.class, new ScalarTypePeriod());
-      addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
-      addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
-      addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
-      addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
-      addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
-
-      addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
-      addType(Month.class, new ScalarTypeMonth());
-      addType(Year.class, new ScalarTypeYear());
-      addType(YearMonth.class, new ScalarTypeYearMonthDate(jsonDate));
-      addType(MonthDay.class, new ScalarTypeMonthDay());
-      addType(OffsetTime.class, new ScalarTypeOffsetTime());
-      addType(ZoneId.class, new ScalarTypeZoneId());
-      addType(ZoneOffset.class, new ScalarTypeZoneOffset());
-
-      boolean localTimeNanos = config.isLocalTimeWithNanos();
-      addType(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
-
-      boolean durationNanos = config.isDurationWithNanos();
-      addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
-    }
+    addType(java.time.Period.class, new ScalarTypePeriod());
+    addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
+    addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
+    addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
+    addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
+    addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
+    addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
+    addType(Month.class, new ScalarTypeMonth());
+    addType(Year.class, new ScalarTypeYear());
+    addType(YearMonth.class, new ScalarTypeYearMonthDate(jsonDate));
+    addType(MonthDay.class, new ScalarTypeMonthDay());
+    addType(OffsetTime.class, new ScalarTypeOffsetTime());
+    addType(ZoneId.class, new ScalarTypeZoneId());
+    addType(ZoneOffset.class, new ScalarTypeZoneOffset());
+    boolean localTimeNanos = config.isLocalTimeWithNanos();
+    addType(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
+    boolean durationNanos = config.isDurationWithNanos();
+    addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
   }
 
   private void addType(Class<?> clazz, ScalarType<?> scalarType) {
