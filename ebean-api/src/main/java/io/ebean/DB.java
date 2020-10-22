@@ -71,6 +71,13 @@ public final class DB {
   }
 
   /**
+   * Backdoor for registering a mock implementation of Database as the default database.
+   */
+  protected static Database mock(String name, Database server, boolean defaultServer) {
+    return context.mock(name, server, defaultServer);
+  }
+
+  /**
    * Return the default database.
    */
   public static Database getDefault() {
