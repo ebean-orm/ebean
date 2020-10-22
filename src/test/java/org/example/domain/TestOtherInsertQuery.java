@@ -1,7 +1,6 @@
 package org.example.domain;
 
 import io.ebean.Ebean;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Polygon;
 import org.geolatte.geom.codec.Wkt;
@@ -19,8 +18,7 @@ public class TestOtherInsertQuery {
   /**
    * Not automated this test yet.
    */
-  @Ignore
-  @Test
+  @Test(enabled = false)
   public void insert() throws SQLException {
 
 

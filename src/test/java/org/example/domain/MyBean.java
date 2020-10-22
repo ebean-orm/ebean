@@ -7,6 +7,7 @@ import org.postgis.MultiPolygon;
 import org.postgis.Point;
 import org.postgis.Polygon;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -27,6 +28,9 @@ public class MyBean extends BaseEntity {
   MultiPoint multiPoint;
 
   MultiPolygon mpoly;
+
+  @Column(columnDefinition = "geometry(Point, 4326)", unique = true)
+  Point wgs84Point;
 
   public String getName() {
     return name;
@@ -82,5 +86,13 @@ public class MyBean extends BaseEntity {
 
   public void setMpoly(MultiPolygon mpoly) {
     this.mpoly = mpoly;
+  }
+
+  public Point getWgs84Point() {
+    return wgs84Point;
+  }
+
+  public void setWgs84Point(final Point wgs84Point) {
+    this.wgs84Point = wgs84Point;
   }
 }
