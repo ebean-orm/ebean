@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <groupId>io.ebean</groupId>
-  <artifactId>ebean-postgis</artifactId>
-  <version>12.4.2-SNAPSHOT</version>
-
   <parent>
-    <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
-    <version>2.2</version>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>12.5.2-SNAPSHOT</version>
   </parent>
+
+  <name>ebean postgis</name>
+  <description>ebean postgis module</description>
+  <url>https://ebean.io/</url>
+
+  <artifactId>ebean-postgis</artifactId>
 
   <properties>
     <postgis.jdbc.version>2.2.1</postgis.jdbc.version>
+    <jackson-core.version>2.11.3</jackson-core.version>
   </properties>
-
-  <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean-postgis.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
 
   <dependencies>
 
-    <!-- Needs Ebean 8.6.1 or later -->
+    <!-- provided scope -->
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean</artifactId>
-      <version>12.4.1</version>
+      <artifactId>ebean-core</artifactId>
+      <version>12.5.2-SNAPSHOT</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson-core.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -64,7 +68,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.4.1</version>
+      <version>12.5.1</version>
       <scope>test</scope>
     </dependency>
 

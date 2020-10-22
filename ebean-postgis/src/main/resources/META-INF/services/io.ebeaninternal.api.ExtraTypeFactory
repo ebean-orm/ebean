@@ -1,1 +1,1 @@
-io.ebean.postgis.RegisterFactory
+io.ebean.postgis.PostgisExtraTypeFactory

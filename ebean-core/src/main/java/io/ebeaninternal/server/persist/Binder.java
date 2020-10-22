@@ -8,6 +8,7 @@ import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
+import io.ebeaninternal.server.type.GeoTypeBinder;
 import io.ebeaninternal.server.type.PostgresHelper;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.type.ScalarType;
@@ -35,26 +36,18 @@ public class Binder {
   private static final Logger logger = LoggerFactory.getLogger(Binder.class);
 
   private final TypeManager typeManager;
-
   private final int asOfBindCount;
-
   private final boolean asOfStandardsBased;
-
   private final DbExpressionHandler dbExpressionHandler;
-
   private final DataTimeZone dataTimeZone;
-
   private final MultiValueBind multiValueBind;
-
   private final boolean enableBindLog;
+  private final GeoTypeBinder geoTypeBinder;
 
-  /**
-   * Set the PreparedStatement with which to bind variables to.
-   */
   public Binder(TypeManager typeManager, SpiLogManager logManager, int asOfBindCount, boolean asOfStandardsBased,
                 DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueBind multiValueBind) {
-
     this.typeManager = typeManager;
+    this.geoTypeBinder = typeManager.getGeoTypeBinder();
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
@@ -88,9 +81,7 @@ public class Binder {
    * Bind the values to the Prepared Statement.
    */
   public void bind(BindValues bindValues, DataBind dataBind, StringBuilder bindBuf) throws SQLException {
-
     String logPrefix = "";
-
     ArrayList<BindValues.Value> list = bindValues.values();
     for (BindValues.Value bindValue : list) {
       Object val = bindValue.getValue();
@@ -124,7 +115,6 @@ public class Binder {
    * Bind the list of positionedParameters in BindParams.
    */
   private String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
-
     StringBuilder bindLog = new StringBuilder();
     bind(bindParams, dataBind, bindLog);
     return bindLog.toString();
@@ -134,7 +124,6 @@ public class Binder {
    * Bind the list of positionedParameters in BindParams.
    */
   public void bind(BindParams bindParams, DataBind dataBind, StringBuilder bindLog) throws SQLException {
-
     bind(bindParams.positionedParameters(), dataBind, bindLog);
   }
 
@@ -142,13 +131,10 @@ public class Binder {
    * Bind the list of parameters..
    */
   private void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog) throws SQLException {
-
     CallableStatement cstmt = null;
-
     if (dataBind.getPstmt() instanceof CallableStatement) {
       cstmt = (CallableStatement) dataBind.getPstmt();
     }
-
     // the iterator is assumed to be in the correct order
     Object value = null;
     try {
@@ -211,7 +197,6 @@ public class Binder {
    * Bind an Object with unknown data type.
    */
   public Object bindObject(DataBind dataBind, Object value) throws SQLException {
-
     if (value == null) {
       // null of unknown type
       bindObject(dataBind, null, Types.OTHER);
@@ -233,9 +218,7 @@ public class Binder {
         // convert to a JDBC native type
         value = type.toJdbcType(value);
       }
-
-      int dbType = type.getJdbcType();
-      bindObject(dataBind, value, dbType);
+      bindObject(dataBind, value, type.getJdbcType());
       return value;
     }
   }
@@ -261,12 +244,10 @@ public class Binder {
    * </p>
    */
   private void bindObject(DataBind dataBind, Object data, int dbType) throws SQLException {
-
     if (data == null) {
       dataBind.setNull(dbType);
       return;
     }
-
     switch (dbType) {
       case java.sql.Types.LONGVARCHAR:
         bindLongVarChar(dataBind, data);
@@ -293,7 +274,6 @@ public class Binder {
    * Binds the value to the statement according to the data type.
    */
   private void bindSimpleData(DataBind b, int dataType, Object data) {
-
     try {
       switch (dataType) {
         case java.sql.Types.BOOLEAN:
@@ -370,6 +350,15 @@ public class Binder {
           b.setObject(PostgresHelper.asInet(data.toString()));
           break;
 
+        case DbPlatformType.POINT:
+        case DbPlatformType.POLYGON:
+        case DbPlatformType.MULTIPOINT:
+        case DbPlatformType.LINESTRING:
+        case DbPlatformType.MULTILINESTRING:
+        case DbPlatformType.MULTIPOLYGON:
+          geoTypeBinder.bind(b, dataType, data);
+          break;
+
         case java.sql.Types.OTHER:
           b.setObject(data, dataType);
           break;
@@ -393,7 +382,6 @@ public class Binder {
    * Bind String data to a LONGVARCHAR column.
    */
   private void bindLongVarChar(DataBind dataBind, Object data) throws SQLException {
-
     dataBind.setClob((String) data);
   }
 
@@ -401,7 +389,6 @@ public class Binder {
    * Bind byte[] data to a LONGVARBINARY column.
    */
   private void bindLongVarBinary(DataBind dataBind, Object data) throws SQLException {
-
     dataBind.setBlob((byte[]) data);
   }
 
@@ -409,7 +396,6 @@ public class Binder {
    * Bind String data to a CLOB column.
    */
   private void bindClob(DataBind dataBind, Object data) throws SQLException {
-
     dataBind.setClob((String) data);
   }
 
@@ -417,7 +403,6 @@ public class Binder {
    * Bind byte[] data to a BLOB column.
    */
   private void bindBlob(DataBind dataBind, Object data) throws SQLException {
-
     dataBind.setBlob((byte[]) data);
   }
 

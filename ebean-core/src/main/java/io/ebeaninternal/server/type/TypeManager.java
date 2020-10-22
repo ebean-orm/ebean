@@ -69,4 +69,9 @@ public interface TypeManager {
    * Return the ScalarType used to handle HSTORE (Map<String,String>).
    */
   ScalarType<?> getDbMapScalarType();
+
+  /**
+   * Return the Geometry type binder if provided.
+   */
+  GeoTypeBinder getGeoTypeBinder();
 }

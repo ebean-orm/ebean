@@ -13,12 +13,12 @@ import io.ebeaninternal.server.type.ScalarType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegisterFactory implements ExtraTypeFactory {
+public class PostgisExtraTypeFactory implements ExtraTypeFactory {
 
   @Override
   public List<ScalarType<?>> createTypes(DatabaseConfig config, Object objectMapper) {
 
-    List<ScalarType<?>> list = new ArrayList<ScalarType<?>>();
+    List<ScalarType<?>> list = new ArrayList<>();
     list.add(new ScalarTypePgisPoint());
     list.add(new ScalarTypePgisPolygon());
     list.add(new ScalarTypePgisLineString());

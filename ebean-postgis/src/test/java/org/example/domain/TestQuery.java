@@ -1,9 +1,6 @@
 package org.example.domain;
 
-import static org.geolatte.geom.codec.Wkt.toWkt;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.AssertJUnit.assertNull;
-
+import io.ebean.DB;
 import org.geolatte.geom.G2D;
 import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiLineString;
@@ -17,7 +14,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import io.ebean.DB;
+import static org.geolatte.geom.codec.Wkt.toWkt;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
 
 public class TestQuery {
 
@@ -110,18 +109,19 @@ public class TestQuery {
     // Approx 1100 meters away
     // 0.009999999999990905 degrees away
 
-//    System.err.println(
-//      DB
-//        .sqlQuery("SELECT st_distance(wgs84_point, ?), * FROM mybean").setParameter(toWkt(geolatteClosePoint))
-//        .findOne()
-//    );
+    System.err.println(
+      DB
+        .sqlQuery("SELECT st_distance(wgs84_point, ?), * FROM mybean")
+        .setParameter(toWkt(geolatteClosePoint))
+        .findOne()
+    );
 
     assertNotNull(
       DB
         .find(OtherBeanGeoLatte.class)
         .where()
         .raw("st_distance(wgs84Point, ?) < 0.011", toWkt(geolatteClosePoint))
-//        .raw("st_distance(wgs84Point, ?) < 0.011 ", geolatteClosePoint)
+        .raw("st_distance(wgs84Point, ?) < 0.011 ", geolatteClosePoint)
         .findOne()
     );
 
@@ -130,7 +130,7 @@ public class TestQuery {
         .find(OtherBeanGeoLatte.class)
         .where()
         .raw("st_distance(wgs84Point, ?) < 0.009", toWkt(geolatteClosePoint))
-//        .raw("st_distance(wgs84Point, ?) < 0.009", geolatteClosePoint)
+        .raw("st_distance(wgs84Point, ?) < 0.009", geolatteClosePoint)
         .findOne()
     );
 
@@ -139,7 +139,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("ST_Within(wgs84Point, ST_GeomFromText(?))", toWkt(enclosingPolygon))
-//        .raw("ST_Within(wgs84Point, ?)", enclosingPolygon)
+        .raw("ST_Within(wgs84Point, ?)", enclosingPolygon)
         .findOne()
     );
 
@@ -147,7 +147,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("wgs84Point = ST_PointN(ST_GeomFromText(?), 2)", toWkt(lineString))
-//      .raw("wgs84Point = ST_PointN(?, 2)", lineString)
+        .raw("wgs84Point = ST_PointN(?, 2)", lineString)
         .findOne()
     );
 
@@ -155,7 +155,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(ST_GeomFromText(?)), 2)", toWkt(multiPoint))
-//      .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(?), 2)", multiPoint)
+        .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(?), 2)", multiPoint)
         .findOne()
     );
 
@@ -163,7 +163,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("ST_Within(wgs84Point, ST_GeomFromText(?))", toWkt(multiPolygon))
-//        .raw("ST_Within(wgs84Point, ?)", multiPolygon)
+        .raw("ST_Within(wgs84Point, ?)", multiPolygon)
         .findOne()
     );
 
@@ -171,7 +171,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("ST_Intersects(wgs84Point, ST_GeomFromText(?))", toWkt(multiLineString))
-//        .raw("ST_Intersects(wgs84Point, ?)", multiLineString)
+        .raw("ST_Intersects(wgs84Point, ?)", multiLineString)
         .findOne()
     );
   }
@@ -184,7 +184,7 @@ public class TestQuery {
         .find(MyBean.class)
         .where()
         .raw("st_distance(wgs84Point, ?) < 0.011", toWkt(geolatteClosePoint))
-//        .raw("st_distance(wgs84Point, ?) < 0.011", new org.postgis.Point(toWkt(geolatteClosePoint)))
+        .raw("st_distance(wgs84Point, ?) < 0.011", new org.postgis.Point(toWkt(geolatteClosePoint)))
         .findOne()
     );
 
@@ -193,7 +193,7 @@ public class TestQuery {
         .find(MyBean.class)
         .where()
         .raw("st_distance(wgs84Point, ?) < 0.009", toWkt(geolatteClosePoint))
-//        .raw("st_distance(wgs84Point, ?) < 0.009", postgisClosePoint)
+        .raw("st_distance(wgs84Point, ?) < 0.009", new org.postgis.Point(toWkt(geolatteClosePoint)))
         .findOne()
     );
 
@@ -202,7 +202,7 @@ public class TestQuery {
         .find(MyBean.class)
         .where()
         .raw("ST_Within(wgs84Point, ST_GeomFromText(?))", toWkt(enclosingPolygon))
-//        .raw("ST_Within(wgs84Point, ?)", new org.postgis.Polygon(toWkt(enclosingPolygon)))
+        .raw("ST_Within(wgs84Point, ?)", new org.postgis.Polygon(toWkt(enclosingPolygon)))
         .findOne()
     );
 
@@ -210,7 +210,7 @@ public class TestQuery {
       DB.find(MyBean.class)
         .where()
         .raw("wgs84Point = ST_PointN(ST_GeomFromText(?), 2)", toWkt(lineString))
-//        .raw("wgs84Point = ST_PointN(?, 2)", new org.postgis.LineString(toWkt(lineString)))
+        .raw("wgs84Point = ST_PointN(?, 2)", new org.postgis.LineString(toWkt(lineString)))
         .findOne()
     );
 
@@ -218,7 +218,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(ST_GeomFromText(?)), 2)", toWkt(multiPoint))
-//      .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(?), 2)", new org.postgis.MultiPoint(toWkt(multiPoint)))
+        .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(?), 2)", new org.postgis.MultiPoint(toWkt(multiPoint)))
         .findOne()
     );
 
@@ -226,7 +226,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(ST_GeomFromText(?)), 2)", toWkt(multiPoint))
-//      .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(?), 2)", new org.postgis.MultiPoint(toWkt(multiPoint)))
+        .raw("wgs84Point = ST_PointN(ST_LineFromMultiPoint(?), 2)", new org.postgis.MultiPoint(toWkt(multiPoint)))
         .findOne()
     );
 
@@ -235,7 +235,7 @@ public class TestQuery {
         .find(MyBean.class)
         .where()
         .raw("ST_Within(wgs84Point, ST_GeomFromText(?))", toWkt(multiPolygon))
-//        .raw("ST_Within(wgs84Point, ?)", new org.postgis.Polygon(toWkt(multiPolygon)))
+        .raw("ST_Within(wgs84Point, ?)", new org.postgis.MultiPolygon(toWkt(multiPolygon)))
         .findOne()
     );
 
@@ -243,7 +243,7 @@ public class TestQuery {
       DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("ST_Intersects(wgs84Point, ST_GeomFromText(?))", toWkt(multiLineString))
-//        .raw("ST_Intersects(wgs84Point, ?)", new org.postgis.MultiLineString(toWkt(multiLineString)))
+        .raw("ST_Intersects(wgs84Point, ?)", new org.postgis.MultiLineString(toWkt(multiLineString)))
         .findOne()
     );
   }

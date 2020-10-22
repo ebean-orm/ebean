@@ -19,6 +19,7 @@ import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.ExtraTypeFactory;
 import io.ebeaninternal.api.DbOffline;
+import io.ebeaninternal.api.GeoTypeProvider;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -180,6 +181,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final PlatformArrayTypeFactory arrayTypeListFactory;
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
+  private GeoTypeBinder geoTypeBinder;
 
   /**
    * Create the DefaultTypeManager.
@@ -211,11 +213,19 @@ public final class DefaultTypeManager implements TypeManager {
     initialiseJacksonTypes(config);
 
     loadTypesFromProviders(config, objectMapper);
+    loadGeoTypeBinder(config);
 
     if (bootupClasses != null) {
       initialiseCustomScalarTypes(bootupClasses);
       initialiseScalarConverters(bootupClasses);
       initialiseAttributeConverters(bootupClasses);
+    }
+  }
+
+  private void loadGeoTypeBinder(DatabaseConfig config) {
+    final GeoTypeProvider provider = config.service(GeoTypeProvider.class);
+    if (provider != null) {
+      geoTypeBinder = provider.createBinder(config);
     }
   }
 
@@ -346,6 +356,11 @@ public final class DefaultTypeManager implements TypeManager {
       return typeMap.get(java.nio.file.Path.class);
     }
     return null;
+  }
+
+  @Override
+  public GeoTypeBinder getGeoTypeBinder() {
+    return geoTypeBinder;
   }
 
   @Override

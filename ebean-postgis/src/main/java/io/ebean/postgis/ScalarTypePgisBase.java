@@ -1,11 +1,11 @@
 package io.ebean.postgis;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import org.postgis.Geometry;
 import org.postgis.PGgeometry;
 import org.postgis.PGgeometryLW;
@@ -13,7 +13,6 @@ import org.postgresql.util.PGobject;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -77,12 +76,12 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   }
 
   @Override
-  public T readData(DataInput dataInput) throws IOException {
+  public T readData(DataInput dataInput) {
     return null;
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, T v) throws IOException {
+  public void writeData(DataOutput dataOutput, T v) {
 
   }
 
@@ -158,12 +157,12 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
 
   @Override
-  public T jsonRead(JsonParser parser) throws IOException {
+  public T jsonRead(JsonParser parser) {
     return null;
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, T value) {
 
   }
 }
