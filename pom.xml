@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>2.2</version>
+    <version>2.3</version>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -36,6 +36,10 @@
       <email>robin.bygrave@gmail.com</email>
     </developer>
   </developers>
+
+  <properties>
+    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+  </properties>
 
   <dependencies>
 
