@@ -67,6 +67,13 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>${ebean-datasource.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
       <version>12.5.1</version>
       <scope>test</scope>

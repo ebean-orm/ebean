@@ -59,6 +59,13 @@
     <!-- test dependencies -->
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>${ebean-datasource.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
       <version>12.5.3-SNAPSHOT</version>
       <scope>test</scope>

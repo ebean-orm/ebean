@@ -39,6 +39,13 @@
     </dependency>
 
     <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>${ebean-datasource.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.avaje.composite</groupId>
       <artifactId>junit</artifactId>
       <version>1.1</version>

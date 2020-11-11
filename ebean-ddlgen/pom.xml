@@ -36,6 +36,13 @@
     </dependency>
 
     <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>${ebean-datasource.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
       <version>1.1.0.Final</version>

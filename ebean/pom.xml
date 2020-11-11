@@ -12,6 +12,13 @@
   <artifactId>ebean</artifactId>
 
   <dependencies>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>${ebean-datasource.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>

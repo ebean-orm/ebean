@@ -66,8 +66,8 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-datasource</artifactId>
-      <version>6.1</version>
+      <artifactId>ebean-datasource-api</artifactId>
+      <version>${ebean-datasource.version}</version>
     </dependency>
 
     <dependency>
