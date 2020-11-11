@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>ebean-parent</artifactId>
-    <groupId>io.ebean</groupId>
-    <version>12.5.3-SNAPSHOT</version>
-  </parent>
 <!--  <parent>-->
-<!--    <groupId>org.avaje</groupId>-->
-<!--    <artifactId>java8-oss</artifactId>-->
-<!--    <version>2.2</version>-->
+<!--    <artifactId>ebean-parent</artifactId>-->
+<!--    <groupId>io.ebean</groupId>-->
+<!--    <version>12.5.3-SNAPSHOT</version>-->
 <!--  </parent>-->
+  <parent>
+    <groupId>org.avaje</groupId>
+    <artifactId>java8-oss</artifactId>
+    <version>2.3</version>
+  </parent>
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
@@ -20,6 +20,11 @@
   <name>ebean querybean</name>
   <description>Ebean querybean support</description>
   <artifactId>ebean-querybean</artifactId>
+  <version>12.5.2</version>
+
+  <properties>
+    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+  </properties>
 
   <dependencies>
 
@@ -27,7 +32,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.5.3-SNAPSHOT</version>
+      <version>12.5.2</version>
       <scope>provided</scope>
     </dependency>
 
@@ -60,14 +65,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
-      <version>12.5.3-SNAPSHOT</version>
+      <version>12.5.2</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>12.5.3-SNAPSHOT</version>
+      <version>12.5.2</version>
       <scope>test</scope>
     </dependency>
 
