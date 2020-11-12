@@ -32,46 +32,49 @@ public class TransactionManagerTest extends BaseTestCase {
 
     DataSource dataSource = transactionManager.getDataSource();
     Connection connection = dataSource.getConnection();
-
-    SpiTransaction externalTxn = new ExternalJdbcTransaction("external0", true, connection, null);
-
-    // push an externally managed transaction onto scope
-    ScopedTransaction scopedTransaction = transactionManager.externalBeginTransaction(externalTxn, TxScope.required());
-
-    Transaction current = Transaction.current();
-    assertThat(current).as("external transaction is in scope").isSameAs(scopedTransaction);
-
-    Customer.find.byName("In external");
-
-    log.info("inner begin");
-    Transaction inner = Ebean.beginTransaction();
     try {
+      SpiTransaction externalTxn = new ExternalJdbcTransaction("external0", true, connection, null);
+
+      // push an externally managed transaction onto scope
+      ScopedTransaction scopedTransaction = transactionManager.externalBeginTransaction(externalTxn, TxScope.required());
+
+      Transaction current = Transaction.current();
+      assertThat(current).as("external transaction is in scope").isSameAs(scopedTransaction);
+
+      Customer.find.byName("In external");
+
+      log.info("inner begin");
+      Transaction inner = Ebean.beginTransaction();
+      try {
+
+        current = Transaction.current();
+        assertThat(current).as("still using external transaction, nested transaction pushed").isSameAs(scopedTransaction);
+
+        Customer.find.byName("In inner");
+        log.info("inner commit");
+        inner.commit();
+      } finally {
+        log.info("inner end");
+        inner.end();
+      }
 
       current = Transaction.current();
-      assertThat(current).as("still using external transaction, nested transaction pushed").isSameAs(scopedTransaction);
+      assertThat(current).as("external transaction still in scope").isSameAs(scopedTransaction);
 
-      Customer.find.byName("In inner");
-      log.info("inner commit");
-      inner.commit();
+      Customer.find.byName("external still active");
+
+
+      log.info("external transaction ends with commit and remove");
+      connection.commit();
+      // remove externally managed transaction out of scope
+      transactionManager.externalRemoveTransaction();
+
+
+      current = Transaction.current();
+      assertThat(current).as("external transaction out of scope").isNull();
     } finally {
-      log.info("inner end");
-      inner.end();
+      connection.close();
     }
-
-    current = Transaction.current();
-    assertThat(current).as("external transaction still in scope").isSameAs(scopedTransaction);
-
-    Customer.find.byName("external still active");
-
-
-    log.info("external transaction ends with commit and remove");
-    connection.commit();
-    // remove externally managed transaction out of scope
-    transactionManager.externalRemoveTransaction();
-
-
-    current = Transaction.current();
-    assertThat(current).as("external transaction out of scope").isNull();
 
     Customer.find.byNameStatus("New implicit transaction", Customer.Status.ACTIVE);
   }
