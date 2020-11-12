@@ -48,6 +48,12 @@
   </profiles>
   <dependencies>
 
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-ddl-runner</artifactId>
+      <version>1.0</version>
+    </dependency>
+
     <!-- keep testing in core using ebean-ddlgen -->
     <dependency>
       <groupId>io.ebean</groupId>
@@ -55,6 +61,7 @@
       <version>12.5.0</version>
       <scope>test</scope>
     </dependency>
+
     <!-- test scope for supporting ebean-ddlgen -->
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>

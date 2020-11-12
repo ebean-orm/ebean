@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.ScriptRunner;
-import io.ebean.migration.ddl.DdlRunner;
-import io.ebean.migration.runner.ScriptTransform;
+import io.ebean.ddlrunner.DdlRunner;
+import io.ebean.ddlrunner.ScriptTransform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.util.UrlHelper;
 

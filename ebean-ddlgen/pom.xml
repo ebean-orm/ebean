@@ -15,8 +15,15 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-ddl-runner</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
       <version>12.5.3-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- needed for java 11+ -->
