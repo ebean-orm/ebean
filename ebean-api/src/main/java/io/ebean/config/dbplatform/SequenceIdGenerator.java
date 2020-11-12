@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -42,7 +43,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected final int allocationSize;
 
-  protected boolean currentlyBackgroundLoading;
+  protected AtomicBoolean currentlyBackgroundLoading = new AtomicBoolean(false);
 
   /**
    * Construct given a dataSource and sql to return the next sequence value.
@@ -128,27 +129,16 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    * Load another batch of Id's using a background thread.
    */
   protected void loadInBackground(final int requestSize) {
-    // single threaded processing...
-    loadLock.lock();
-    try {
-      if (currentlyBackgroundLoading) {
-        // skip as already background loading
-        logger.debug("... skip background sequence load (another load in progress)");
-        return;
-      }
-      currentlyBackgroundLoading = true;
-      backgroundExecutor.execute(() -> {
-        loadMore(requestSize);
-        loadLock.lock();
-        try {
-          currentlyBackgroundLoading = false;
-        } finally {
-          loadLock.unlock();
-        }
-      });
-    } finally {
-      loadLock.lock();
+    if (currentlyBackgroundLoading.get()) {
+      // skip as already background loading
+      logger.debug("... skip background sequence load (another load in progress)");
+      return;
     }
+    currentlyBackgroundLoading.set(true);
+    backgroundExecutor.execute(() -> {
+      loadMore(requestSize);
+      currentlyBackgroundLoading.set(false);
+    });
   }
 
   /**
