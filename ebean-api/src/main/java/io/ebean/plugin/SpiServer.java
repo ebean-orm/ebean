@@ -6,7 +6,6 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 /**

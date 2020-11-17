@@ -2,8 +2,8 @@ package io.ebean;
 
 import io.ebean.docstore.DocQueryContext;
 import io.ebean.docstore.RawDoc;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

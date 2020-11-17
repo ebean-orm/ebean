@@ -2,11 +2,11 @@ package io.ebean.plugin;
 
 import io.ebean.Query;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.docstore.DocMapping;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
-import io.ebean.docstore.DocMapping;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;

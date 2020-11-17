@@ -1,7 +1,7 @@
 package io.ebean.text.json;
 
-import io.ebean.bean.PersistenceContext;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.bean.PersistenceContext;
 
 /**
  * Provides a JSON reader that can hold a persistence context and load context while reading JSON.

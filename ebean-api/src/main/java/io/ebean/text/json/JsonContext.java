@@ -1,9 +1,9 @@
 package io.ebean.text.json;
 
-import io.ebean.FetchPath;
-import io.ebean.plugin.BeanType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.FetchPath;
+import io.ebean.plugin.BeanType;
 
 import java.io.IOException;
 import java.io.Reader;
