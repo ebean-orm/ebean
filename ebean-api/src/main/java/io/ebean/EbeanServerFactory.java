@@ -2,13 +2,6 @@ package io.ebean;
 
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.ServerConfig;
-import io.ebean.service.SpiContainer;
-import io.ebean.service.SpiContainerFactory;
-
-import javax.persistence.PersistenceException;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.ServiceLoader;
 
 /**
  * Deprecated - please migrate to DatabaseFactory.

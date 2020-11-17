@@ -1,47 +1,6 @@
 package io.ebean.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import io.avaje.config.Config;
 import io.ebean.DatabaseFactory;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.Transaction;
-import io.ebean.annotation.Encrypted;
-import io.ebean.annotation.PersistBatch;
-import io.ebean.annotation.Platform;
-import io.ebean.cache.ServerCachePlugin;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbEncrypt;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.datasource.DataSourceConfig;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.BulkTableEventListener;
-import io.ebean.event.ServerConfigStartup;
-import io.ebean.event.changelog.ChangeLogListener;
-import io.ebean.event.changelog.ChangeLogPrepare;
-import io.ebean.event.changelog.ChangeLogRegister;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.migration.MigrationRunner;
-import io.ebean.util.StringHelper;
-
-import javax.persistence.EnumType;
-import javax.sql.DataSource;
-import java.time.Clock;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
 
 /**
  * Deprecated - please migrate to <code>io.ebean.DatabaseConfig</code>.
