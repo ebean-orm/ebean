@@ -13,6 +13,11 @@
   <packaging>pom</packaging>
 
   <properties>
+    <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
+    <ebean-migration-auto.version>1.0</ebean-migration-auto.version>
+    <ebean-migration.version>12.2.0</ebean-migration.version>
+    <ebean-test-docker.version>3.1.5</ebean-test-docker.version>
+    <ebean-datasource.version>7.0</ebean-datasource.version>
     <ebean-agent.version>12.5.0</ebean-agent.version>
     <ebean-maven-plugin.version>12.5.0</ebean-maven-plugin.version>
   </properties>
@@ -25,6 +30,36 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>ebean-ddl-runner</artifactId>
+        <version>${ebean-ddl-runner.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-migration-auto</artifactId>
+        <version>${ebean-migration-auto.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-migration</artifactId>
+        <version>${ebean-migration.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-datasource-api</artifactId>
+        <version>${ebean-datasource.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-datasource</artifactId>
+        <version>${ebean-datasource.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-agent</artifactId>
         <version>${ebean-agent.version}</version>
       </dependency>
@@ -33,6 +68,12 @@
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
         <version>${ebean-maven-plugin.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean.test</groupId>
+        <artifactId>ebean-test-docker</artifactId>
+        <version>${ebean-test-docker.version}</version>
       </dependency>
 
       <!-- modules -->
