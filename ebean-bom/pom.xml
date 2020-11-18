@@ -16,7 +16,7 @@
     <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.0</ebean-migration-auto.version>
     <ebean-migration.version>12.2.0</ebean-migration.version>
-    <ebean-test-docker.version>3.1.5</ebean-test-docker.version>
+    <ebean-test-docker.version>4.0</ebean-test-docker.version>
     <ebean-datasource.version>7.0</ebean-datasource.version>
     <ebean-agent.version>12.5.0</ebean-agent.version>
     <ebean-maven-plugin.version>12.5.0</ebean-maven-plugin.version>
@@ -71,7 +71,7 @@
       </dependency>
 
       <dependency>
-        <groupId>io.ebean.test</groupId>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-test-docker</artifactId>
         <version>${ebean-test-docker.version}</version>
       </dependency>
