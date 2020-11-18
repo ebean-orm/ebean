@@ -10,7 +10,6 @@
   <name>ebean ddl generation</name>
   <description>DDL and DB Migration generation</description>
   <artifactId>ebean-ddl-generator</artifactId>
-<!--  <version>12.5.2A</version>-->
 
   <dependencies>
 
