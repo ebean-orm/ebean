@@ -3,6 +3,7 @@ package io.ebean.config;
 import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
 import io.ebean.DatabaseFactory;
+import io.ebean.EbeanVersion;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.Transaction;
@@ -28,12 +29,13 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.migration.MigrationRunner;
 import io.ebean.util.StringHelper;
 
 import javax.persistence.EnumType;
 import javax.sql.DataSource;
 import java.time.Clock;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -277,6 +279,25 @@ public class DatabaseConfig {
 
   private String ddlSeedSql;
 
+  private String ddlHeader;
+
+  /**
+   * Mode used to check non-null columns added via migration have a default value specified etc.
+   */
+  private boolean ddlStrictMode = true;
+
+  /**
+   * Comma and equals delimited key/value placeholders to replace in DDL scripts.
+   */
+  private String ddlPlaceholders;
+
+  /**
+   * Map of key/value placeholders to replace in DDL scripts.
+   */
+  private Map<String, String> ddlPlaceholderMap;
+
+  private boolean runMigration;
+
   /**
    * When true L2 bean cache use is skipped after a write has occurred on a transaction.
    */
@@ -321,11 +342,6 @@ public class DatabaseConfig {
    * Optional - the database schema that should be used to own the tables etc.
    */
   private String dbSchema;
-
-  /**
-   * The db migration config (migration resource path etc).
-   */
-  private DbMigrationConfig migrationConfig = new DbMigrationConfig();
 
   /**
    * The ClassLoadConfig used to detect Joda, Java8, Jackson etc and create plugin instances given a className.
@@ -1213,20 +1229,6 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return the DB migration configuration.
-   */
-  public DbMigrationConfig getMigrationConfig() {
-    return migrationConfig;
-  }
-
-  /**
-   * Set the DB migration configuration.
-   */
-  public void setMigrationConfig(DbMigrationConfig migrationConfig) {
-    this.migrationConfig = migrationConfig;
-  }
-
-  /**
    * Return the Geometry SRID.
    */
   public int getGeometrySRID() {
@@ -2026,7 +2028,15 @@ public class DatabaseConfig {
    * as it is often the only thing we need to configure for migrations.
    */
   public void setRunMigration(boolean runMigration) {
-    migrationConfig.setRunMigration(runMigration);
+    this.runMigration = runMigration;
+  }
+
+  /**
+   * Return true if the DB migration should run on server start.
+   */
+  public boolean isRunMigration() {
+    final String run = System.getProperty("ebean.migration.run");
+    return (run != null) ? Boolean.parseBoolean(run) : runMigration;
   }
 
   /**
@@ -2132,6 +2142,67 @@ public class DatabaseConfig {
    */
   public boolean isDdlExtra() {
     return ddlExtra;
+  }
+
+  /**
+   * Set the header to use with DDL generation.
+   */
+  public void setDdlHeader(String ddlHeader) {
+    this.ddlHeader = ddlHeader;
+  }
+
+  /**
+   * Return the header to use with DDL generation.
+   */
+  public String getDdlHeader() {
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      String header = ddlHeader.replace("${version}", EbeanVersion.getVersion());
+      header = header.replace("${timestamp}", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+      return header;
+    }
+    return ddlHeader;
+  }
+
+  /**
+   * Return true if strict mode is used which includes a check that non-null columns have a default value.
+   */
+  public boolean isDdlStrictMode() {
+    return ddlStrictMode;
+  }
+
+  /**
+   * Set to false to turn off strict mode allowing non-null columns to not have a default value.
+   */
+  public void setDdlStrictMode(boolean ddlStrictMode) {
+    this.ddlStrictMode = ddlStrictMode;
+  }
+
+  /**
+   * Return a comma and equals delimited placeholders that are substituted in DDL scripts.
+   */
+  public String getDdlPlaceholders() {
+    return ddlPlaceholders;
+  }
+
+  /**
+   * Set a comma and equals delimited placeholders that are substituted in DDL scripts.
+   */
+  public void setDdlPlaceholders(String ddlPlaceholders) {
+    this.ddlPlaceholders = ddlPlaceholders;
+  }
+
+  /**
+   * Return a map of placeholder values that are substituted in DDL scripts.
+   */
+  public Map<String, String> getDdlPlaceholderMap() {
+    return ddlPlaceholderMap;
+  }
+
+  /**
+   * Set a map of placeholder values that are substituted in DDL scripts.
+   */
+  public void setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap) {
+    this.ddlPlaceholderMap = ddlPlaceholderMap;
   }
 
   /**
@@ -2699,13 +2770,8 @@ public class DatabaseConfig {
    * Load the configuration settings from the properties file.
    */
   protected void loadSettings(PropertiesWrapper p) {
-
     dbSchema = p.get("dbSchema", dbSchema);
-    if (dbSchema != null) {
-      migrationConfig.setDefaultDbSchema(dbSchema);
-    }
     profilingConfig.loadSettings(p, name);
-    migrationConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
     if (platformConfig.isAllQuotedIdentifiers()) {
       adjustNamingConventionForAllQuoted();
@@ -2807,12 +2873,16 @@ public class DatabaseConfig {
     jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
     jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
 
+    runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
     ddlExtra = p.getBoolean("ddl.extra", ddlExtra);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
     ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
+    ddlStrictMode = p.getBoolean("ddl.strictMode", ddlStrictMode);
+    ddlPlaceholders = p.get("ddl.placeholders", ddlPlaceholders);
+    ddlHeader = p.get("ddl.header", ddlHeader);
 
     // read tenant-configuration from config:
     // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
@@ -3032,17 +3102,6 @@ public class DatabaseConfig {
    */
   public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
-  }
-
-  /**
-   * Run the DB migration against the DataSource.
-   */
-  public DataSource runDbMigration(DataSource dataSource) {
-    if (migrationConfig.isRunMigration()) {
-      MigrationRunner runner = migrationConfig.createRunner(getClassLoadConfig().getClassLoader(), properties);
-      runner.run(dataSource);
-    }
-    return dataSource;
   }
 
   /**

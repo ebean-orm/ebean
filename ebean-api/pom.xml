@@ -70,12 +70,6 @@
       <version>${ebean-datasource.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-migration</artifactId>
-      <version>12.1.4</version>
-    </dependency>
-
     <!-- Jackson core used internally by Ebean -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

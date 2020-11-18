@@ -10,6 +10,7 @@
   <name>ebean ddl generation</name>
   <description>DDL and DB Migration generation</description>
   <artifactId>ebean-ddlgen</artifactId>
+<!--  <version>12.5.2A</version>-->
 
   <dependencies>
 
@@ -17,6 +18,12 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-runner</artifactId>
       <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration</artifactId>
+      <version>12.2.0</version>
     </dependency>
 
     <dependency>

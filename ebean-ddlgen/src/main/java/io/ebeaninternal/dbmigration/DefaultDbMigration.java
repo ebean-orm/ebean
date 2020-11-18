@@ -6,8 +6,8 @@ import io.ebean.EbeanServer;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
-import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.PlatformConfig;
+import io.ebean.config.PropertiesWrapper;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
@@ -28,7 +28,6 @@ import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
-import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
@@ -52,6 +51,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
@@ -93,11 +93,12 @@ public class DefaultDbMigration implements DbMigration {
 
   protected SpiEbeanServer server;
 
-  protected DbMigrationConfig migrationConfig;
-
   protected String pathToResources = "src/main/resources";
 
-  protected String migrationPath;
+  protected String migrationPath = "dbmigration";
+  protected String migrationInitPath = "dbinit";
+  protected String modelPath = "model";
+  protected String modelSuffix = ".model.xml";
 
   protected DatabasePlatform databasePlatform;
 
@@ -112,7 +113,7 @@ public class DefaultDbMigration implements DbMigration {
   protected Boolean strictMode;
   protected Boolean includeGeneratedFileComment;
   protected String header;
-  protected String applyPrefix;
+  protected String applyPrefix = "";
   protected String version;
   protected String name;
   protected String generatePendingDrop;
@@ -169,11 +170,16 @@ public class DefaultDbMigration implements DbMigration {
     if (this.databaseConfig == null) {
       this.databaseConfig = config;
     }
-    if (migrationConfig == null) {
-      this.migrationConfig = databaseConfig.getMigrationConfig();
-    }
     if (constraintNaming == null) {
       this.constraintNaming = databaseConfig.getConstraintNaming();
+    }
+
+    Properties properties = config.getProperties();
+    if (properties != null) {
+      PropertiesWrapper props = new PropertiesWrapper("ebean", config.getName(), properties, null);
+      migrationPath = props.get("migration.migrationPath", migrationPath);
+      migrationInitPath = props.get("migration.migrationInitPath", migrationInitPath);
+      pathToResources = props.get("migration.pathToResources", pathToResources);
     }
   }
 
@@ -466,7 +472,7 @@ public class DefaultDbMigration implements DbMigration {
       sb.append("R__");
     }
     sb.append(scriptName.replace(' ', '_'));
-    sb.append(migrationConfig.getApplySuffix());
+    sb.append(".sql");
     return sb.toString();
   }
 
@@ -529,7 +535,7 @@ public class DefaultDbMigration implements DbMigration {
         this.migrated = new ModelContainer();
       } else {
         this.modelDir = getModelDirectory(migrationDir);
-        MigrationModel migrationModel = new MigrationModel(modelDir, migrationConfig.getModelSuffix());
+        MigrationModel migrationModel = new MigrationModel(modelDir, modelSuffix);
         this.migrated = migrationModel.read(dbinitMigration);
       }
     }
@@ -605,7 +611,6 @@ public class DefaultDbMigration implements DbMigration {
    * Return true if the next pending drop changeSet should be generated as the next migration.
    */
   private String generatePendingDrop() {
-
     String nextDrop = System.getProperty("ddl.migration.pendingDropsFor");
     if (nextDrop != null) {
       return nextDrop;
@@ -625,18 +630,30 @@ public class DefaultDbMigration implements DbMigration {
       version = (nextVersion != null) ? nextVersion : initialVersion;
     }
 
-    String fullVersion = migrationConfig.getApplyPrefix() + version;
+    String fullVersion = applyPrefix + version;
     String name = getName();
     if (name != null) {
       fullVersion += "__" + toUnderScore(name);
 
     } else if (dropsFor != null) {
-      fullVersion += "__" + toUnderScore("dropsFor_" + MigrationVersion.trim(dropsFor));
+      fullVersion += "__" + toUnderScore("dropsFor_" + trimDropsFor(dropsFor));
 
     } else if (version.equals(initialVersion)) {
       fullVersion += "__initial";
     }
     return fullVersion;
+  }
+
+  String trimDropsFor(String dropsFor) {
+    if (dropsFor.startsWith("V") || dropsFor.startsWith("v")) {
+      dropsFor = dropsFor.substring(1);
+    }
+    int commentStart = dropsFor.indexOf("__");
+    if (commentStart > -1) {
+      // trim off the trailing comment
+      dropsFor = dropsFor.substring(0, commentStart);
+    }
+    return dropsFor;
   }
 
   /**
@@ -650,7 +667,6 @@ public class DefaultDbMigration implements DbMigration {
    * Write any extra platform ddl.
    */
   private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
-
     DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
       DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
@@ -661,15 +677,14 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, databaseConfig, migrationConfig, lockTimeoutSeconds);
+    return new PlatformDdlWriter(platform, databaseConfig, lockTimeoutSeconds);
   }
 
   /**
    * Write the migration xml.
    */
   private boolean writeMigrationXml(Migration dbMigration, File resourcePath, String fullVersion) {
-
-    String modelFile = fullVersion + migrationConfig.getModelSuffix();
+    String modelFile = fullVersion + modelSuffix;
     File file = new File(resourcePath, modelFile);
     if (file.exists()) {
       return false;
@@ -691,18 +706,12 @@ public class DefaultDbMigration implements DbMigration {
       // not explicitly set so use the platform of the server
       databasePlatform = server.getDatabasePlatform();
     }
-    if (migrationConfig != null) {
+    if (databaseConfig != null) {
       if (strictMode != null) {
-        migrationConfig.setStrictMode(strictMode);
-      }
-      if (applyPrefix != null) {
-        migrationConfig.setApplyPrefix(applyPrefix);
-      }
-      if (migrationPath != null) {
-        migrationConfig.setMigrationPath(migrationPath);
+        databaseConfig.setDdlStrictMode(strictMode);
       }
       if (header != null) {
-        migrationConfig.setDdlHeader(header);
+        databaseConfig.setDdlHeader(header);
       }
     }
   }
@@ -756,7 +765,6 @@ public class DefaultDbMigration implements DbMigration {
    * Return the system or environment property.
    */
   private String readEnvironment(String key) {
-
     String val = System.getProperty(key);
     if (val == null) {
       val = System.getenv(key);
@@ -782,7 +790,7 @@ public class DefaultDbMigration implements DbMigration {
       String msg = String.format("Error - path to resources %s does not exist. Absolute path is %s", pathToResources, resourceRootDir.getAbsolutePath());
       throw new UnknownResourcePathException(msg);
     }
-    String resourcePath = migrationConfig.getMigrationPath(dbinitMigration);
+    String resourcePath = getMigrationPath(dbinitMigration);
 
     // expect to be a path to something like - src/main/resources/dbmigration/model
     File path = new File(resourceRootDir, resourcePath);
@@ -794,15 +802,18 @@ public class DefaultDbMigration implements DbMigration {
     return path;
   }
 
+  private String getMigrationPath(boolean dbinitMigration) {
+    return dbinitMigration ? migrationInitPath : migrationPath;
+  }
+
   /**
    * Return the model directory (relative to the migration directory).
    */
   private File getModelDirectory(File migrationDirectory) {
-    String modelPath = migrationConfig.getModelPath();
     if (modelPath == null || modelPath.isEmpty()) {
       return migrationDirectory;
     }
-    File modelDir = new File(migrationDirectory, migrationConfig.getModelPath());
+    File modelDir = new File(migrationDirectory, modelPath);
     if (!modelDir.exists() && !modelDir.mkdirs()) {
       logInfo("Warning - Unable to ensure migration model directory exists at %s", modelDir.getAbsolutePath());
     }

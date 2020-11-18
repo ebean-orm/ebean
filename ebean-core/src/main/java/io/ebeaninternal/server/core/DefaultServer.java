@@ -61,6 +61,7 @@ import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
+import io.ebean.migration.auto.AutoMigrationRunner;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.Property;
@@ -397,8 +398,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
-    if (TenantMode.DB != config.getTenantMode()) {
-      config.runDbMigration(config.getDataSource());
+    if (config.isRunMigration() && TenantMode.DB != config.getTenantMode()) {
+      final AutoMigrationRunner migrationRunner = config.service(AutoMigrationRunner.class);
+      if (migrationRunner == null) {
+        throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
+      }
+      final String dbSchema = config.getDbSchema();
+      if (dbSchema != null) {
+        migrationRunner.setDefaultDbSchema(dbSchema);
+      }
+      migrationRunner.loadProperties(config.getProperties());
+      migrationRunner.run(config.getDataSource());
     }
   }
 

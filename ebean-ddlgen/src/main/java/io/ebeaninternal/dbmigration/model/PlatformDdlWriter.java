@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -29,16 +28,13 @@ public class PlatformDdlWriter {
 
   private final DatabaseConfig databaseConfig;
 
-  private final DbMigrationConfig config;
-
   private final PlatformDdl platformDdl;
 
   private final int lockTimeoutSeconds;
 
-  public PlatformDdlWriter(DatabasePlatform platform, DatabaseConfig dbConfig, DbMigrationConfig config, int lockTimeoutSeconds) {
+  public PlatformDdlWriter(DatabasePlatform platform, DatabaseConfig dbConfig, int lockTimeoutSeconds) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
     this.databaseConfig = dbConfig;
-    this.config = config;
     this.lockTimeoutSeconds = lockTimeoutSeconds;
   }
 
@@ -78,9 +74,8 @@ public class PlatformDdlWriter {
    * Write the ddl files.
    */
   protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
-
     if (!write.isApplyEmpty()) {
-      try (FileWriter applyWriter = createWriter(resourcePath, fullVersion, config.getApplySuffix())) {
+      try (FileWriter applyWriter = createWriter(resourcePath, fullVersion, ".sql")) {
         writeApplyDdl(applyWriter, write);
         applyWriter.flush();
       }
@@ -88,7 +83,6 @@ public class PlatformDdlWriter {
   }
 
   protected FileWriter createWriter(File path, String fullVersion, String suffix) throws IOException {
-
     File applyFile = new File(path, fullVersion + suffix);
     return new FileWriter(applyFile);
   }
@@ -97,9 +91,8 @@ public class PlatformDdlWriter {
    * Write the 'Apply' DDL buffers to the writer.
    */
   protected void writeApplyDdl(Writer writer, DdlWrite write) throws IOException {
-
-    String header = config.getDdlHeader();
-    if (header != null) {
+    String header = databaseConfig.getDdlHeader();
+    if (header != null && !header.isEmpty()) {
       writer.append(header).append('\n');
     }
     // merge the apply buffers in the appropriate order

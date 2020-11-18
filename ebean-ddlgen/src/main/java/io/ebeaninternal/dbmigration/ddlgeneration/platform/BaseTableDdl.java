@@ -208,7 +208,7 @@ public class BaseTableDdl implements TableDdl {
     this.historyTableSuffix = config.getHistoryTableSuffix();
     this.platformDdl = platformDdl;
     this.platformDdl.configure(config);
-    this.strictMode = config.getMigrationConfig().isStrictMode();
+    this.strictMode = config.isDdlStrictMode();
     DbHistorySupport hist = platformDdl.getPlatform().getHistorySupport();
     if (hist == null) {
       this.historySupport = HistorySupport.NONE;

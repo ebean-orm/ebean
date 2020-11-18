@@ -36,6 +36,8 @@ public class CurrentModel {
 
   private final boolean jaxbPresent;
 
+  private final String ddlHeader;
+
   private ModelContainer model;
 
   private ChangeSet changeSet;
@@ -67,6 +69,7 @@ public class CurrentModel {
     this.databasePlatform = server.getDatabasePlatform();
     this.constraintNaming = constraintNaming;
     this.platformTypes = platformTypes;
+    this.ddlHeader = server.getServerConfig().getDdlHeader();
     this.jaxbPresent = Detect.isJAXBPresent(server.getServerConfig());
   }
 
@@ -94,12 +97,10 @@ public class CurrentModel {
   public ModelContainer read() {
     if (model == null) {
       model = new ModelContainer();
-
       ModelBuildContext context = new ModelBuildContext(model, databasePlatform, constraintNaming, platformTypes);
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
       visit.visitAllBeans();
-
       // adjust the foreign keys on the 'draft' tables
       context.adjustDraftReferences();
     }
@@ -129,20 +130,16 @@ public class CurrentModel {
     createDdl();
 
     StringBuilder ddl = new StringBuilder(2000);
-    String header = server.getServerConfig().getMigrationConfig().getDdlHeader();
-    if (header != null && !header.isEmpty()) {
-      ddl.append(header).append('\n');
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddl.append(ddlHeader).append('\n');
     }
-
     if (jaxbPresent) {
       addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
     }
-
     ddl.append(write.apply().getBuffer());
     ddl.append(write.applyForeignKeys().getBuffer());
     ddl.append(write.applyHistoryView().getBuffer());
     ddl.append(write.applyHistoryTrigger().getBuffer());
-
     return ddl.toString();
   }
 
@@ -166,13 +163,11 @@ public class CurrentModel {
     createDdl();
 
     StringBuilder ddl = new StringBuilder(2000);
-    String header = server.getServerConfig().getMigrationConfig().getDdlHeader();
-    if (header != null && !header.isEmpty()) {
-      ddl.append(header).append('\n');
+    if (ddlHeader != null && !ddlHeader.isEmpty()) {
+      ddl.append(ddlHeader).append('\n');
     }
     ddl.append(write.dropAllForeignKeys().getBuffer());
     ddl.append(write.dropAll().getBuffer());
-
     return ddl.toString();
   }
 
@@ -180,12 +175,9 @@ public class CurrentModel {
    * Create all the DDL based on the changeSet.
    */
   private void createDdl() throws IOException {
-
     if (write == null) {
       ChangeSet createChangeSet = getChangeSet();
-
       write = new DdlWrite(new MConfiguration(), model, ddlOptions);
-
       DdlHandler handler = handler();
       handler.generateProlog(write);
       handler.generate(write, createChangeSet);
@@ -204,11 +196,9 @@ public class CurrentModel {
    * Convert the model into a ChangeSet.
    */
   private ChangeSet asChangeSet() {
-
     // empty diff so changes will effectively all be create
     ModelDiff diff = new ModelDiff();
     diff.compareTo(model);
-
     return diff.getApplyChangeSet();
   }
 

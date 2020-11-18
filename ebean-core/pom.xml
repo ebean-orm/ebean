@@ -54,11 +54,30 @@
       <version>1.0</version>
     </dependency>
 
-    <!-- keep testing in core using ebean-ddlgen -->
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>classpath-scanner</artifactId>
+      <version>4.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration-auto</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <!-- keep testing in core using ebean-ddlgen & ebean-migration -->
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration</artifactId>
+      <version>12.2.0</version>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddlgen</artifactId>
-      <version>12.5.0</version>
+      <version>12.5.2A</version>
       <scope>test</scope>
     </dependency>
 

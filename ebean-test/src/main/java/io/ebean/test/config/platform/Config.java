@@ -156,12 +156,12 @@ class Config {
   }
 
   private void setMigrationRun() {
-    config.getMigrationConfig().setRunMigration(true);
+    config.setRunMigration(true);
     setProperty("ebean." + db + ".migration.run", "true");
   }
 
   private void disableMigrationRun() {
-    System.setProperty("ddl.migration.run", "false");
+    System.setProperty("ebean.migration.run", "false");
   }
 
   /**

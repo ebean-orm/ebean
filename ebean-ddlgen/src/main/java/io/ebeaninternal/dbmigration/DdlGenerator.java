@@ -2,7 +2,6 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbMigrationConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.ddlrunner.DdlRunner;
 import io.ebean.ddlrunner.ScriptTransform;
@@ -76,7 +75,7 @@ public class DdlGenerator implements SpiDdlGenerator {
       this.runDdl = config.isDdlRun();
       this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
     }
-    this.scriptTransform = createScriptTransform(config.getMigrationConfig());
+    this.scriptTransform = createScriptTransform(config);
     this.baseDir = initBaseDir();
   }
 
@@ -366,8 +365,8 @@ public class DdlGenerator implements SpiDdlGenerator {
   /**
    * Create the ScriptTransform for placeholder key/value replacement.
    */
-  private ScriptTransform createScriptTransform(DbMigrationConfig config) {
-    return ScriptTransform.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
+  private ScriptTransform createScriptTransform(DatabaseConfig config) {
+    return ScriptTransform.build(config.getDdlPlaceholders(), config.getDdlPlaceholderMap());
   }
 
 }
