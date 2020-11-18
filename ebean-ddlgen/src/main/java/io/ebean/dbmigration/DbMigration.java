@@ -22,16 +22,41 @@ import java.util.ServiceLoader;
  *
  * <pre>{@code
  *
- *    // optionally specify the version and name
- *    //System.setProperty("ddl.migration.version", "1.1");
- *    //System.setProperty("ddl.migration.name", "add bars");
+ *    DbMigration migration = DbMigration.create();
  *
- *    // generate a migration using drops from a prior version
- *    //System.setProperty("ddl.migration.pendingDropsFor", "1.2");
+ *    migration.setPlatform(Platform.POSTGRES);
+ *
+ *    // optionally specify the version and name
+ *    migration.setName("add indexes to customer");
+ *
+ *    migration.generateMigration();
+ *
+ * }</pre>
+ *
+ * <p>
+ * Drop column migrations are effectively breaking changes and should
+ * be held back and run in a later migration after the columns deleted
+ * are no longer being used by the application. These changes are called
+ * "pending drops" and we must explicitly specify to include these in
+ * a generated migration.
+ * </p>
+ * <p>
+ * Use <code>setGeneratePendingDrop()</code> to specify a prior migration
+ * that has drop column changes that we want to generate a migration for.
+ * </p>
+ *
+ * <h3>Example: Generate for pending drops</h3>
+ *
+ * <pre>{@code
  *
  *    DbMigration migration = DbMigration.create();
  *
  *    migration.setPlatform(Platform.POSTGRES);
+ *
+ *    // set the migration version that has pending drops
+ *    migration.setGeneratePendingDrop("1.3");
+ *
+ *    // generates the migration with drop column changes
  *    migration.generateMigration();
  *
  * }</pre>
@@ -207,6 +232,23 @@ public interface DbMigration {
    *
    * }</pre>
    * <p>
+   *
+   * <h3>Example: Generate for "pending drops" (drop column changes)</h3>
+   *
+   * <pre>{@code
+   *
+   *    DbMigration migration = DbMigration.create();
+   *
+   *    migration.setPlatform(Platform.POSTGRES);
+   *
+   *    // set the migration version that has pending drops
+   *    migration.setGeneratePendingDrop("1.3");
+   *
+   *    // generates the migration with drop column changes
+   *    migration.generateMigration();
+   *
+   * }</pre>
+   *
    * <h3>Example: Run migration generating DDL for multiple platforms</h3>
    * <pre>{@code
    *
