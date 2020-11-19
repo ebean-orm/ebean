@@ -51,9 +51,7 @@ public class ScalarTypeEnumStandard {
      */
     @Override
     public Set<String> getDbCheckConstraintValues() {
-
       LinkedHashSet<String> values = new LinkedHashSet<>();
-
       Object[] ea = enumType.getEnumConstants();
       for (Object anEa : ea) {
         Enum<?> e = (Enum<?>) anEa;
@@ -81,18 +79,17 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public void bind(DataBind b, Object value) throws SQLException {
+    public void bind(DataBinder binder, Object value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.VARCHAR);
+        binder.setNull(Types.VARCHAR);
       } else {
-        b.setString(format(value));
+        binder.setString(format(value));
       }
     }
 
     @Override
-    public Object read(DataReader dataReader) throws SQLException {
-
-      String string = dataReader.getString();
+    public Object read(DataReader reader) throws SQLException {
+      String string = reader.getString();
       if (string == null) {
         return null;
       } else {
@@ -118,7 +115,6 @@ public class ScalarTypeEnumStandard {
       }
       return Enum.valueOf(enumType, (String) dbValue);
     }
-
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
@@ -144,7 +140,6 @@ public class ScalarTypeEnumStandard {
      */
     @Override
     public Set<String> getDbCheckConstraintValues() {
-
       LinkedHashSet<String> values = new LinkedHashSet<>();
       for (Object anEnumArray : enumArray) {
         Enum<?> e = (Enum<?>) anEnumArray;
@@ -154,18 +149,17 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public void bind(DataBind b, Object value) throws SQLException {
+    public void bind(DataBinder binder, Object value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.INTEGER);
+        binder.setNull(Types.INTEGER);
       } else {
-        b.setInt(((Enum<?>) value).ordinal());
+        binder.setInt(((Enum<?>) value).ordinal());
       }
     }
 
     @Override
-    public Object read(DataReader dataReader) throws SQLException {
-
-      Integer ordinal = dataReader.getInt();
+    public Object read(DataReader reader) throws SQLException {
+      Integer ordinal = reader.getInt();
       if (ordinal == null) {
         return null;
       } else {
@@ -196,7 +190,6 @@ public class ScalarTypeEnumStandard {
       if (dbValue == null || dbValue instanceof Enum<?>) {
         return dbValue;
       }
-
       int ordinal = (Integer) dbValue;
       if (ordinal < 0 || ordinal >= enumArray.length) {
         String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";

@@ -13,8 +13,8 @@ public class ScalarTypeBytesVarbinary extends ScalarTypeBytesBase {
   }
 
   @Override
-  public byte[] read(DataReader dataReader) throws SQLException {
-    return dataReader.getBytes();
+  public byte[] read(DataReader reader) throws SQLException {
+    return reader.getBytes();
   }
 
 }

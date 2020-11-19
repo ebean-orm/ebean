@@ -10,6 +10,6 @@ public interface ScalarDataReader<T> {
   /**
    * Read and return the appropriate value from the dataReader.
    */
-  T read(DataReader dataReader) throws SQLException;
+  T read(DataReader reader) throws SQLException;
 
 }

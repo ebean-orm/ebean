@@ -23,11 +23,11 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
   /**
    * Bind null or empty list (when not nullable).
    */
-  protected void bindNull(DataBind bind) throws SQLException {
+  protected void bindNull(DataBinder binder) throws SQLException {
     if (nullable) {
-      bind.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
-      bind.setString("[]");
+      binder.setString("[]");
     }
   }
 

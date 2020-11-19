@@ -10,7 +10,6 @@ public class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
 
   private final boolean optimized;
 
-
   protected ScalarTypeUUIDBinary(boolean optimized) {
     super(false, Types.BINARY);
     this.optimized = optimized;
@@ -36,17 +35,17 @@ public class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
   }
 
   @Override
-  public void bind(DataBind b, UUID value) throws SQLException {
+  public void bind(DataBinder binder, UUID value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.BINARY);
+      binder.setNull(Types.BINARY);
     } else {
-      b.setBytes(convertToBytes(value, optimized));
+      binder.setBytes(convertToBytes(value, optimized));
     }
   }
 
   @Override
-  public UUID read(DataReader dataReader) throws SQLException {
-    byte[] bytes = dataReader.getBytes();
+  public UUID read(DataReader reader) throws SQLException {
+    byte[] bytes = reader.getBytes();
     if (bytes == null) {
       return null;
     } else {
@@ -105,7 +104,6 @@ public class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
    * Convert from UUID to byte[].
    */
   public static byte[] convertToBytes(Object value, boolean optimized) {
-
 
     UUID uuid = (UUID) value;
     byte[] ret = new byte[16];

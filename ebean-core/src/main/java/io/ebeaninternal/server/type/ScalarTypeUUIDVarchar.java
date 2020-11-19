@@ -19,17 +19,17 @@ public class ScalarTypeUUIDVarchar extends ScalarTypeUUIDBase {
   }
 
   @Override
-  public void bind(DataBind b, UUID value) throws SQLException {
+  public void bind(DataBinder binder, UUID value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
-      b.setString(formatValue(value));
+      binder.setString(formatValue(value));
     }
   }
 
   @Override
-  public UUID read(DataReader dataReader) throws SQLException {
-    String value = dataReader.getString();
+  public UUID read(DataReader reader) throws SQLException {
+    String value = reader.getString();
     if (value == null) {
       return null;
     } else {

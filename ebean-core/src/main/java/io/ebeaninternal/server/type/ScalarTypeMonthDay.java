@@ -49,17 +49,17 @@ public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public MonthDay read(DataReader dataReader) throws SQLException {
-    Date ts = dataReader.getDate();
+  public MonthDay read(DataReader reader) throws SQLException {
+    Date ts = reader.getDate();
     return ts == null ? null : convertFromDate(ts);
   }
 
   @Override
-  public void bind(DataBind b, MonthDay value) throws SQLException {
+  public void bind(DataBinder binder, MonthDay value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.DATE);
+      binder.setNull(Types.DATE);
     } else {
-      b.setDate(convertToDate(value));
+      binder.setDate(convertToDate(value));
     }
   }
 

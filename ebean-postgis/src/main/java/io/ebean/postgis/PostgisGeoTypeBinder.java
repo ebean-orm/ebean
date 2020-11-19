@@ -1,6 +1,6 @@
 package io.ebean.postgis;
 
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataBinder;
 import io.ebeaninternal.server.type.GeoTypeBinder;
 import org.geolatte.geom.codec.Wkt;
 import org.postgis.Geometry;
@@ -17,11 +17,11 @@ class PostgisGeoTypeBinder implements GeoTypeBinder {
   }
 
   @Override
-  public void bind(DataBind b, int dataType, Object data) throws SQLException {
+  public void bind(DataBinder binder, int dataType, Object data) throws SQLException {
       if (data instanceof Geometry) {
-        b.setObject(new PGgeometryLW((Geometry) data));
+        binder.setObject(new PGgeometryLW((Geometry) data));
       } else if (withGeolatte) {
-        b.setObject(new PGgeometryLW(toWktString(data)));
+        binder.setObject(new PGgeometryLW(toWktString(data)));
       }
   }
 

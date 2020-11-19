@@ -69,9 +69,8 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public File read(DataReader dataReader) throws SQLException {
-
-    InputStream is = dataReader.getBinaryStream();
+  public File read(DataReader reader) throws SQLException {
+    InputStream is = reader.getBinaryStream();
     if (is == null) {
       return null;
     }
@@ -91,14 +90,14 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
 
 
   @Override
-  public void bind(DataBind b, File value) throws SQLException {
+  public void bind(DataBinder binder, File value) throws SQLException {
     if (value == null) {
-      b.setNull(jdbcType);
+      binder.setNull(jdbcType);
     } else {
       try {
         // stream from our file to the db
         InputStream fi = getInputStream(value);
-        b.setBinaryStream(fi, value.length());
+        binder.setBinaryStream(fi, value.length());
       } catch (IOException e) {
         throw new SQLException("Error trying to set file inputStream", e);
       }

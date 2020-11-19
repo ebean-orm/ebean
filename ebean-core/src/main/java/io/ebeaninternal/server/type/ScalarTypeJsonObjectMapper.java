@@ -214,17 +214,17 @@ public class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public void bind(DataBind bind, T value) throws SQLException {
+    public void bind(DataBinder binder, T value) throws SQLException {
       if (pgType != null) {
         String rawJson = (value == null) ? null : formatValue(value);
-        bind.setObject(PostgresHelper.asObject(pgType, rawJson));
+        binder.setObject(PostgresHelper.asObject(pgType, rawJson));
       } else {
         if (value == null) {
-          bind.setNull(Types.VARCHAR); // use varchar, otherwise SqlServer/db2 will fail with 'Invalid JDBC data type 5.001.'
+          binder.setNull(Types.VARCHAR); // use varchar, otherwise SqlServer/db2 will fail with 'Invalid JDBC data type 5.001.'
         } else {
           try {
             String json = objectWriter.writeValueAsString(value);
-            bind.setString(json);
+            binder.setString(json);
           } catch (JsonProcessingException e) {
             throw new SQLException("Unable to create JSON", e);
           }

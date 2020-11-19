@@ -38,8 +38,8 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public java.util.Date read(DataReader dataReader) throws SQLException {
-      Timestamp timestamp = dataReader.getTimestamp();
+    public java.util.Date read(DataReader reader) throws SQLException {
+      Timestamp timestamp = reader.getTimestamp();
       if (timestamp == null) {
         return null;
       } else {
@@ -48,11 +48,11 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public void bind(DataBind dataBind, java.util.Date value) throws SQLException {
+    public void bind(DataBinder binder, java.util.Date value) throws SQLException {
       if (value == null) {
-        dataBind.setNull(Types.TIMESTAMP);
+        binder.setNull(Types.TIMESTAMP);
       } else {
-        dataBind.setTimestamp(new Timestamp(value.getTime()));
+        binder.setTimestamp(new Timestamp(value.getTime()));
       }
     }
 
@@ -65,7 +65,6 @@ public class ScalarTypeUtilDate {
     public java.util.Date toBeanType(Object value) {
       return BasicTypeConverter.toUtilDate(value);
     }
-
 
     @Override
     public Date convertFromTimestamp(Timestamp ts) {

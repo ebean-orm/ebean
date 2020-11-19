@@ -13,7 +13,7 @@ public class ScalarTypeBytesLongVarbinary extends ScalarTypeBytesBase {
   }
 
   @Override
-  public byte[] read(DataReader dataReader) throws SQLException {
-    return dataReader.getBinaryBytes();
+  public byte[] read(DataReader reader) throws SQLException {
+    return reader.getBinaryBytes();
   }
 }

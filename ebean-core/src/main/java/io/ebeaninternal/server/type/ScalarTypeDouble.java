@@ -21,11 +21,11 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public void bind(DataBind b, Double value) throws SQLException {
+  public void bind(DataBinder binder, Double value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.DOUBLE);
+      binder.setNull(Types.DOUBLE);
     } else {
-      b.setDouble(value);
+      binder.setDouble(value);
     }
   }
 
@@ -75,7 +75,6 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
 
   @Override
   public void writeData(DataOutput dataOutput, Double value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

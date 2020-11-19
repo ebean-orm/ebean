@@ -28,17 +28,17 @@ public class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public void bind(DataBind bind, LocalTime value) throws SQLException {
+  public void bind(DataBinder binder, LocalTime value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.TIME);
+      binder.setNull(Types.TIME);
     } else {
-      bind.setTime(Time.valueOf(value));
+      binder.setTime(Time.valueOf(value));
     }
   }
 
   @Override
-  public LocalTime read(DataReader dataReader) throws SQLException {
-    Time time = dataReader.getTime();
+  public LocalTime read(DataReader reader) throws SQLException {
+    Time time = reader.getTime();
     return (time == null) ? null : time.toLocalTime();
   }
 

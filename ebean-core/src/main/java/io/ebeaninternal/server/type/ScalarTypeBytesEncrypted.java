@@ -45,9 +45,9 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public void bind(DataBind b, byte[] value) throws SQLException {
+  public void bind(DataBinder binder, byte[] value) throws SQLException {
     value = dataEncryptSupport.encrypt(value);
-    baseType.bind(b, value);
+    baseType.bind(binder, value);
   }
 
   @Override
@@ -76,8 +76,8 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public void loadIgnore(DataReader dataReader) {
-    baseType.loadIgnore(dataReader);
+  public void loadIgnore(DataReader reader) {
+    baseType.loadIgnore(reader);
   }
 
   @Override
@@ -118,9 +118,8 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public byte[] read(DataReader dataReader) throws SQLException {
-
-    byte[] data = baseType.read(dataReader);
+  public byte[] read(DataReader reader) throws SQLException {
+    byte[] data = baseType.read(reader);
     data = dataEncryptSupport.decrypt(data);
     return data;
   }
@@ -149,7 +148,6 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
   @Override
   public void writeData(DataOutput dataOutput, byte[] value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

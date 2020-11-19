@@ -54,19 +54,18 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
     return t;
   }
 
-
   @Override
-  public void bind(DataBind b, Timestamp value) throws SQLException {
+  public void bind(DataBinder binder, Timestamp value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TIMESTAMP);
+      binder.setNull(Types.TIMESTAMP);
     } else {
-      b.setTimestamp(value);
+      binder.setTimestamp(value);
     }
   }
 
   @Override
-  public Timestamp read(DataReader dataReader) throws SQLException {
-    return dataReader.getTimestamp();
+  public Timestamp read(DataReader reader) throws SQLException {
+    return reader.getTimestamp();
   }
 
   @Override

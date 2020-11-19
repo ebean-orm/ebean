@@ -22,17 +22,17 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public void bind(DataBind b, Short value) throws SQLException {
+  public void bind(DataBinder binder, Short value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.SMALLINT);
+      binder.setNull(Types.SMALLINT);
     } else {
-      b.setShort(value);
+      binder.setShort(value);
     }
   }
 
   @Override
-  public Short read(DataReader dataReader) throws SQLException {
-    return dataReader.getShort();
+  public Short read(DataReader reader) throws SQLException {
+    return reader.getShort();
   }
 
   @Override
@@ -76,7 +76,6 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
 
   @Override
   public void writeData(DataOutput dataOutput, Short value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

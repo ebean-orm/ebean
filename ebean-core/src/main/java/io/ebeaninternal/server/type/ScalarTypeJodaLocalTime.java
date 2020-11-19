@@ -25,18 +25,17 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public void bind(DataBind b, LocalTime value) throws SQLException {
+  public void bind(DataBinder binder, LocalTime value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TIME);
+      binder.setNull(Types.TIME);
     } else {
-      b.setTime(new Time(value.toDateTimeToday().getMillis()));
+      binder.setTime(new Time(value.toDateTimeToday().getMillis()));
     }
   }
 
   @Override
-  public LocalTime read(DataReader dataReader) throws SQLException {
-
-    Time sqlTime = dataReader.getTime();
+  public LocalTime read(DataReader reader) throws SQLException {
+    Time sqlTime = reader.getTime();
     if (sqlTime == null) {
       return null;
     } else {
@@ -71,7 +70,6 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     return new LocalTime(value);
   }
 
-
   @Override
   public LocalTime convertFromMillis(long systemTimeMillis) {
     return new LocalTime(systemTimeMillis, DateTimeZone.getDefault());
@@ -94,7 +92,6 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 
   @Override
   public void writeData(DataOutput dataOutput, LocalTime value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

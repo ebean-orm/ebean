@@ -19,10 +19,9 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public void bind(DataBind bind, Map value) throws SQLException {
-
+  public void bind(DataBinder binder, Map value) throws SQLException {
     String rawJson = (value == null) ? null : formatValue(value);
-    bind.setObject(PostgresHelper.asObject(postgresType, rawJson));
+    binder.setObject(PostgresHelper.asObject(postgresType, rawJson));
   }
 
   /**

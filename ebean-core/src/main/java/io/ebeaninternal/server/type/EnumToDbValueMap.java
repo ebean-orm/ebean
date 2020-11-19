@@ -69,12 +69,12 @@ public abstract class EnumToDbValueMap<T> {
   /**
    * Bind using the correct database type.
    */
-  public abstract void bind(DataBind b, Object value) throws SQLException;
+  public abstract void bind(DataBinder binder, Object value) throws SQLException;
 
   /**
    * Read using the correct database type.
    */
-  public abstract Object read(DataReader dataReader) throws SQLException;
+  public abstract Object read(DataReader reader) throws SQLException;
 
   /**
    * Return the database type.
@@ -94,7 +94,6 @@ public abstract class EnumToDbValueMap<T> {
    * </p>
    */
   protected void addInternal(Object beanValue, T dbValue, String name) {
-
     keyMap.put(beanValue, dbValue);
     valueMap.put(dbValue, beanValue);
     nameMap.put(name, beanValue);

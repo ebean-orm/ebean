@@ -112,7 +112,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * JDBC type.
    * </p>
    */
-  void bind(DataBind bind, T value) throws SQLException;
+  void bind(DataBinder binder, T value) throws SQLException;
 
   /**
    * Convert the value as necessary to the JDBC type.

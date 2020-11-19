@@ -22,17 +22,17 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
   }
 
   @Override
-  public void bind(DataBind b, Time value) throws SQLException {
+  public void bind(DataBinder binder, Time value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TIME);
+      binder.setNull(Types.TIME);
     } else {
-      b.setTime(value);
+      binder.setTime(value);
     }
   }
 
   @Override
-  public Time read(DataReader dataReader) throws SQLException {
-    return dataReader.getTime();
+  public Time read(DataReader reader) throws SQLException {
+    return reader.getTime();
   }
 
   @Override
@@ -77,7 +77,6 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
 
   @Override
   public void writeData(DataOutput dataOutput, Time value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

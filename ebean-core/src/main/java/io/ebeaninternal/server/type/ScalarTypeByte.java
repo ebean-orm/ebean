@@ -28,17 +28,17 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public void bind(DataBind b, Byte value) throws SQLException {
+  public void bind(DataBinder binder, Byte value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TINYINT);
+      binder.setNull(Types.TINYINT);
     } else {
-      b.setByte(value);
+      binder.setByte(value);
     }
   }
 
   @Override
-  public Byte read(DataReader dataReader) throws SQLException {
-    return dataReader.getByte();
+  public Byte read(DataReader reader) throws SQLException {
+    return reader.getByte();
   }
 
   @Override
@@ -104,7 +104,6 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
 
   @Override
   public void writeData(DataOutput dataOutput, Byte val) throws IOException {
-
     if (val == null) {
       dataOutput.writeBoolean(false);
     } else {

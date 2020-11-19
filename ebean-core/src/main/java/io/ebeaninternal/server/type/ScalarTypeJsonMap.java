@@ -35,7 +35,6 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
    * Return the ScalarType for the requested dbType and postgres.
    */
   public static ScalarTypeJsonMap typeFor(boolean postgres, int dbType) {
-
     switch (dbType) {
       case Types.VARCHAR:
         return VARCHAR;
@@ -59,9 +58,8 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
     }
 
     @Override
-    public Map read(DataReader dataReader) throws SQLException {
-
-      String content = dataReader.getStringFromStream();
+    public Map read(DataReader reader) throws SQLException {
+      String content = reader.getStringFromStream();
       if (content == null) {
         return null;
       }
@@ -82,15 +80,14 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
     }
 
     @Override
-    public Map read(DataReader dataReader) throws SQLException {
-
-      InputStream is = dataReader.getBinaryStream();
+    public Map read(DataReader reader) throws SQLException {
+      InputStream is = reader.getBinaryStream();
       if (is == null) {
         return null;
       }
       try {
-        try (InputStreamReader reader = new InputStreamReader(is)) {
-          return parse(reader);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(is)) {
+          return parse(inputStreamReader);
         }
       } catch (IOException e) {
         throw new SQLException("Error reading Blob stream from DB", e);
@@ -98,13 +95,12 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
     }
 
     @Override
-    public void bind(DataBind b, Map value) throws SQLException {
-
+    public void bind(DataBinder binder, Map value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.BLOB);
+        binder.setNull(Types.BLOB);
       } else {
         String rawJson = formatValue(value);
-        b.setBytes(rawJson.getBytes(StandardCharsets.UTF_8));
+        binder.setBytes(rawJson.getBytes(StandardCharsets.UTF_8));
       }
     }
   }
@@ -130,9 +126,8 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map read(DataReader dataReader) throws SQLException {
-
-    String rawJson = dataReader.getString();
+  public Map read(DataReader reader) throws SQLException {
+    String rawJson = reader.getString();
     if (rawJson == null) {
       return null;
     }
@@ -140,13 +135,12 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public void bind(DataBind b, Map value) throws SQLException {
-
+  public void bind(DataBinder binder, Map value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
       String rawJson = formatValue(value);
-      b.setString(rawJson);
+      binder.setString(rawJson);
     }
   }
 

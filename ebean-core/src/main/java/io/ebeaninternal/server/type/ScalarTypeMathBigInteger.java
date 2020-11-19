@@ -22,18 +22,17 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public void bind(DataBind b, BigInteger value) throws SQLException {
+  public void bind(DataBinder binder, BigInteger value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.BIGINT);
+      binder.setNull(Types.BIGINT);
     } else {
-      b.setLong(value.longValue());
+      binder.setLong(value.longValue());
     }
   }
 
   @Override
-  public BigInteger read(DataReader dataReader) throws SQLException {
-
-    Long value = dataReader.getLong();
+  public BigInteger read(DataReader reader) throws SQLException {
+    Long value = reader.getLong();
     if (value == null) {
       return null;
     }
@@ -81,7 +80,6 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
 
   @Override
   public void writeData(DataOutput dataOutput, BigInteger value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

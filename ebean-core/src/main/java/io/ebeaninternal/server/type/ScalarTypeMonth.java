@@ -35,12 +35,12 @@ public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
    * Bind Month enum value.
    */
   @Override
-  public void bind(DataBind b, Object value) throws SQLException {
+  public void bind(DataBinder binder, Object value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.INTEGER);
+      binder.setNull(Types.INTEGER);
     } else {
       // avoiding the map lookup
-      b.setInt(((Month) value).getValue());
+      binder.setInt(((Month) value).getValue());
     }
   }
 
@@ -48,8 +48,8 @@ public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
    * Read Month enum from integer.
    */
   @Override
-  public Object read(DataReader dataReader) throws SQLException {
-    Integer i = dataReader.getInt();
+  public Object read(DataReader reader) throws SQLException {
+    Integer i = reader.getInt();
     if (i == null) {
       return null;
     } else {

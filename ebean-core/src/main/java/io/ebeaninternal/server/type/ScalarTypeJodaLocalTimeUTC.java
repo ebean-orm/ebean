@@ -18,19 +18,18 @@ public class ScalarTypeJodaLocalTimeUTC extends ScalarTypeJodaLocalTime {
   }
 
   @Override
-  public void bind(DataBind b, LocalTime value) throws SQLException {
+  public void bind(DataBinder binder, LocalTime value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TIME);
+      binder.setNull(Types.TIME);
     } else {
       Time sqlTime = new Time(value.getMillisOfDay());
-      b.setTime(sqlTime);
+      binder.setTime(sqlTime);
     }
   }
 
   @Override
-  public LocalTime read(DataReader dataReader) throws SQLException {
-
-    Time sqlTime = dataReader.getTime();
+  public LocalTime read(DataReader reader) throws SQLException {
+    Time sqlTime = reader.getTime();
     if (sqlTime == null) {
       return null;
     } else {

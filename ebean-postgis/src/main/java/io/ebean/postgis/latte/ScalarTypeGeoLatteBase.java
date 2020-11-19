@@ -2,7 +2,7 @@ package io.ebean.postgis.latte;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataBinder;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -43,13 +43,12 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public void bind(DataBind bind, T value) throws SQLException {
-
+  public void bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.OTHER);
+      binder.setNull(Types.OTHER);
     } else {
       String wkt = Wkt.newEncoder(Wkt.Dialect.POSTGIS_EWKT_1).encode(value);
-      bind.setObject(new PGgeometryLW(wkt));
+      binder.setObject(new PGgeometryLW(wkt));
     }
   }
 
@@ -57,7 +56,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   @Override
   @SuppressWarnings("unchecked")
   public T read(DataReader reader) throws SQLException {
-
     Object object = reader.getObject();
     if (object == null) {
       return null;

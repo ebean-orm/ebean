@@ -2,7 +2,7 @@ package io.ebean.postgis;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.type.DataBinder;
 import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.ScalarType;
 import io.ebeanservice.docstore.api.mapping.DocPropertyType;
@@ -28,11 +28,11 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   }
 
   @Override
-  public void bind(DataBind bind, T value) throws SQLException {
+  public void bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.NULL);
+      binder.setNull(Types.NULL);
     } else {
-      bind.setObject(new PGgeometryLW(value));
+      binder.setObject(new PGgeometryLW(value));
     }
   }
 
@@ -40,7 +40,6 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T read(DataReader reader) throws SQLException {
-
     Object object = reader.getObject();
     if (object == null) {
       return null;

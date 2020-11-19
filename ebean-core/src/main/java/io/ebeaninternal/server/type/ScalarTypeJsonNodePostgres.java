@@ -22,9 +22,9 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   }
 
   @Override
-  public void bind(DataBind bind, JsonNode value) throws SQLException {
+  public void bind(DataBinder binder, JsonNode value) throws SQLException {
     String rawJson = (value == null) ? null : formatValue(value);
-    bind.setObject(PostgresHelper.asObject(postgresType, rawJson));
+    binder.setObject(PostgresHelper.asObject(postgresType, rawJson));
   }
 
   /**

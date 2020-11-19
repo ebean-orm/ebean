@@ -24,17 +24,17 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public void bind(DataBind b, Integer value) throws SQLException {
+  public void bind(DataBinder binder, Integer value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.INTEGER);
+      binder.setNull(Types.INTEGER);
     } else {
-      b.setInt(value);
+      binder.setInt(value);
     }
   }
 
   @Override
-  public Integer read(DataReader dataReader) throws SQLException {
-    return dataReader.getInt();
+  public Integer read(DataReader reader) throws SQLException {
+    return reader.getInt();
   }
 
   @Override

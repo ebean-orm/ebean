@@ -109,20 +109,20 @@ public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements Scal
   }
 
   @Override
-  public void bind(DataBind bind, Set value) throws SQLException {
+  public void bind(DataBinder binder, Set value) throws SQLException {
     if (value == null) {
-      bindNull(bind);
+      bindNull(binder);
     } else {
-      bind.setArray(arrayType, toArray(value));
+      binder.setArray(arrayType, toArray(value));
     }
   }
 
   @Override
-  protected void bindNull(DataBind bind) throws SQLException {
+  protected void bindNull(DataBinder binder) throws SQLException {
     if (nullable) {
-      bind.setNull(Types.ARRAY);
+      binder.setNull(Types.ARRAY);
     } else {
-      bind.setArray(arrayType, toArray(EMPTY_SET));
+      binder.setArray(arrayType, toArray(EMPTY_SET));
     }
   }
 

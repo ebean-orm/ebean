@@ -20,17 +20,17 @@ public class ScalarTypeDurationWithNanos extends ScalarTypeDuration {
   }
 
   @Override
-  public void bind(DataBind bind, Duration value) throws SQLException {
+  public void bind(DataBinder binder, Duration value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.DECIMAL);
+      binder.setNull(Types.DECIMAL);
     } else {
-      bind.setBigDecimal(convertToBigDecimal(value));
+      binder.setBigDecimal(convertToBigDecimal(value));
     }
   }
 
   @Override
-  public Duration read(DataReader dataReader) throws SQLException {
-    return convertFromBigDecimal(dataReader.getBigDecimal());
+  public Duration read(DataReader reader) throws SQLException {
+    return convertFromBigDecimal(reader.getBigDecimal());
   }
 
   @Override

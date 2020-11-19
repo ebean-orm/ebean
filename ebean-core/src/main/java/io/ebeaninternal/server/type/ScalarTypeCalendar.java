@@ -22,17 +22,16 @@ public class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
   }
 
   @Override
-  public void bind(DataBind b, Calendar value) throws SQLException {
+  public void bind(DataBinder binder, Calendar value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TIMESTAMP);
+      binder.setNull(Types.TIMESTAMP);
     } else {
-
       if (jdbcType == Types.TIMESTAMP) {
         Timestamp timestamp = new Timestamp(value.getTimeInMillis());
-        b.setTimestamp(timestamp);
+        binder.setTimestamp(timestamp);
       } else {
         Date d = new Date(value.getTimeInMillis());
-        b.setDate(d);
+        binder.setDate(d);
       }
     }
   }

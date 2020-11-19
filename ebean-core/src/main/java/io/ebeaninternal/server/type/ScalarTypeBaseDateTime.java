@@ -77,18 +77,17 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public void bind(DataBind b, T value) throws SQLException {
+  public void bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.TIMESTAMP);
+      binder.setNull(Types.TIMESTAMP);
     } else {
-      b.setTimestamp(convertToTimestamp(value));
+      binder.setTimestamp(convertToTimestamp(value));
     }
   }
 
   @Override
-  public T read(DataReader dataReader) throws SQLException {
-
-    Timestamp ts = dataReader.getTimestamp();
+  public T read(DataReader reader) throws SQLException {
+    Timestamp ts = reader.getTimestamp();
     if (ts == null) {
       return null;
     } else {
@@ -105,7 +104,6 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
   @Override
   public T jsonRead(JsonParser parser) throws IOException {
-
     switch (parser.getCurrentToken()) {
       case VALUE_NUMBER_INT: {
         return convertFromMillis(parser.getLongValue());
@@ -123,7 +121,6 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
   @Override
   public void jsonWrite(JsonGenerator writer, T value) throws IOException {
-
     switch (mode) {
       case ISO8601: {
         writer.writeString(toJsonISO8601(value));
@@ -179,7 +176,6 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
   @Override
   public void writeData(DataOutput dataOutput, T value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

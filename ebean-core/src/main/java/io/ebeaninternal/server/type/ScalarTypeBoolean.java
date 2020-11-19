@@ -51,18 +51,17 @@ public class ScalarTypeBoolean {
     }
 
     @Override
-    public void bind(DataBind b, Boolean value) throws SQLException {
+    public void bind(DataBinder binder, Boolean value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.BOOLEAN);
+        binder.setNull(Types.BOOLEAN);
       } else {
-        b.setBoolean(value);
+        binder.setBoolean(value);
       }
-
     }
 
     @Override
-    public Boolean read(DataReader dataReader) throws SQLException {
-      return dataReader.getBoolean();
+    public Boolean read(DataReader reader) throws SQLException {
+      return reader.getBoolean();
     }
   }
 
@@ -105,20 +104,19 @@ public class ScalarTypeBoolean {
     }
 
     @Override
-    public void bind(DataBind b, Boolean value) throws SQLException {
+    public void bind(DataBinder binder, Boolean value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.BIT);
+        binder.setNull(Types.BIT);
       } else {
         // use JDBC driver to convert boolean to bit
-        b.setBoolean(value);
+        binder.setBoolean(value);
       }
     }
 
     @Override
-    public Boolean read(DataReader dataReader) throws SQLException {
-      return dataReader.getBoolean();
+    public Boolean read(DataReader reader) throws SQLException {
+      return reader.getBoolean();
     }
-
   }
 
   /**
@@ -151,17 +149,17 @@ public class ScalarTypeBoolean {
     }
 
     @Override
-    public void bind(DataBind b, Boolean value) throws SQLException {
+    public void bind(DataBinder binder, Boolean value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.INTEGER);
+        binder.setNull(Types.INTEGER);
       } else {
-        b.setInt(toInteger(value));
+        binder.setInt(toInteger(value));
       }
     }
 
     @Override
-    public Boolean read(DataReader dataReader) throws SQLException {
-      Integer i = dataReader.getInt();
+    public Boolean read(DataReader reader) throws SQLException {
+      Integer i = reader.getInt();
       if (i == null) {
         return null;
       }
@@ -239,17 +237,17 @@ public class ScalarTypeBoolean {
     }
 
     @Override
-    public void bind(DataBind b, Boolean value) throws SQLException {
+    public void bind(DataBinder binder, Boolean value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.VARCHAR);
+        binder.setNull(Types.VARCHAR);
       } else {
-        b.setString(toString(value));
+        binder.setString(toString(value));
       }
     }
 
     @Override
-    public Boolean read(DataReader dataReader) throws SQLException {
-      String string = dataReader.getString();
+    public Boolean read(DataReader reader) throws SQLException {
+      String string = reader.getString();
       if (string == null) {
         return null;
       }
@@ -350,7 +348,6 @@ public class ScalarTypeBoolean {
 
     @Override
     public void writeData(DataOutput dataOutput, Boolean val) throws IOException {
-
       if (val == null) {
         dataOutput.writeBoolean(false);
       } else {

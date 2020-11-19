@@ -32,9 +32,8 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     }
 
     @Override
-    public JsonNode read(DataReader dataReader) throws SQLException {
-
-      String content = dataReader.getStringFromStream();
+    public JsonNode read(DataReader reader) throws SQLException {
+      String content = reader.getStringFromStream();
       if (content == null) {
         return null;
       }
@@ -63,7 +62,6 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
 
     @Override
     public JsonNode read(DataReader dataReader) throws SQLException {
-
       InputStream is = dataReader.getBinaryStream();
       if (is == null) {
         return null;
@@ -76,13 +74,12 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     }
 
     @Override
-    public void bind(DataBind dataBind, JsonNode value) throws SQLException {
-
+    public void bind(DataBinder binder, JsonNode value) throws SQLException {
       if (value == null) {
-        dataBind.setNull(Types.BLOB);
+        binder.setNull(Types.BLOB);
       } else {
         String rawJson = formatValue(value);
-        dataBind.setBlob(rawJson.getBytes(StandardCharsets.UTF_8));
+        binder.setBlob(rawJson.getBytes(StandardCharsets.UTF_8));
       }
     }
   }
@@ -114,9 +111,8 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public JsonNode read(DataReader dataReader) throws SQLException {
-
-    String rawJson = dataReader.getString();
+  public JsonNode read(DataReader reader) throws SQLException {
+    String rawJson = reader.getString();
     if (rawJson == null) {
       return null;
     }
@@ -124,13 +120,12 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public void bind(DataBind dataBind, JsonNode value) throws SQLException {
-
+  public void bind(DataBinder binder, JsonNode value) throws SQLException {
     if (value == null) {
-      dataBind.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
       String rawJson = formatValue(value);
-      dataBind.setString(rawJson);
+      binder.setString(rawJson);
     }
   }
 

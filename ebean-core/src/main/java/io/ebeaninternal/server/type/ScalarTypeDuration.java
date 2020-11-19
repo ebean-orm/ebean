@@ -36,17 +36,17 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   @Override
-  public void bind(DataBind bind, Duration value) throws SQLException {
+  public void bind(DataBinder binder, Duration value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.BIGINT);
+      binder.setNull(Types.BIGINT);
     } else {
-      bind.setLong(value.getSeconds());
+      binder.setLong(value.getSeconds());
     }
   }
 
   @Override
-  public Duration read(DataReader dataReader) throws SQLException {
-    Long value = dataReader.getLong();
+  public Duration read(DataReader reader) throws SQLException {
+    Long value = reader.getLong();
     return (value == null) ? null : Duration.ofSeconds(value);
   }
 

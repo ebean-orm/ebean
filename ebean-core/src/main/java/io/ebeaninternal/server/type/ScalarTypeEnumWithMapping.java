@@ -45,9 +45,7 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
    */
   @Override
   public Set<String> getDbCheckConstraintValues() {
-
     LinkedHashSet values = new LinkedHashSet();
-
     Iterator<?> it = beanDbMap.dbValues();
     while (it.hasNext()) {
       Object dbValue = it.next();
@@ -72,13 +70,13 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
   }
 
   @Override
-  public void bind(DataBind b, Object value) throws SQLException {
-    beanDbMap.bind(b, value);
+  public void bind(DataBinder binder, Object value) throws SQLException {
+    beanDbMap.bind(binder, value);
   }
 
   @Override
-  public Object read(DataReader dataReader) throws SQLException {
-    return beanDbMap.read(dataReader);
+  public Object read(DataReader reader) throws SQLException {
+    return beanDbMap.read(reader);
   }
 
   @Override

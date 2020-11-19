@@ -26,14 +26,13 @@ public class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
   public EnumToDbIntegerMap(boolean allowNulls) {
     super(allowNulls, true);
   }
-  
+
   public void add(Object beanValue, Integer dbValue, String name) {
     addInternal(beanValue, dbValue, name);
   }
 
   @Override
   public EnumToDbIntegerMap add(Object beanValue, String stringDbValue, String name) {
-
     try {
       Integer value = Integer.valueOf(stringDbValue);
       addInternal(beanValue, value, name);
@@ -49,19 +48,19 @@ public class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
   }
 
   @Override
-  public void bind(DataBind b, Object value) throws SQLException {
+  public void bind(DataBinder binder, Object value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.INTEGER);
+      binder.setNull(Types.INTEGER);
     } else {
       Integer s = getDbValue(value);
-      b.setInt(s);
+      binder.setInt(s);
     }
 
   }
 
   @Override
-  public Object read(DataReader dataReader) throws SQLException {
-    Integer i = dataReader.getInt();
+  public Object read(DataReader reader) throws SQLException {
+    Integer i = reader.getInt();
     if (i == null) {
       return null;
     } else {

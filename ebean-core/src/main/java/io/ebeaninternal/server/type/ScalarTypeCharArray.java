@@ -28,18 +28,18 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
   }
 
   @Override
-  public void bind(DataBind b, char[] value) throws SQLException {
+  public void bind(DataBinder binder, char[] value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
       String s = BasicTypeConverter.toString(value);
-      b.setString(s);
+      binder.setString(s);
     }
   }
 
   @Override
-  public char[] read(DataReader dataReader) throws SQLException {
-    String string = dataReader.getString();
+  public char[] read(DataReader reader) throws SQLException {
+    String string = reader.getString();
     if (string == null) {
       return null;
     } else {

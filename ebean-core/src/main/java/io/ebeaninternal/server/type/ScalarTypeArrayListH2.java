@@ -68,20 +68,20 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
   }
 
   @Override
-  public void bind(DataBind bind, List value) throws SQLException {
+  public void bind(DataBinder binder, List value) throws SQLException {
     if (value == null) {
-      bindNull(bind);
+      bindNull(binder);
     } else {
-      bind.setObject(toArray(value));
+      binder.setObject(toArray(value));
     }
   }
 
   @Override
-  protected void bindNull(DataBind bind) throws SQLException {
+  protected void bindNull(DataBinder binder) throws SQLException {
     if (nullable) {
-      bind.setNull(Types.ARRAY);
+      binder.setNull(Types.ARRAY);
     } else {
-      bind.setObject(toArray(EMPTY_LIST));
+      binder.setObject(toArray(EMPTY_LIST));
     }
   }
 }

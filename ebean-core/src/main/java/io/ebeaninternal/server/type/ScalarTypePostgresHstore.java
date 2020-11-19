@@ -37,9 +37,8 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Map read(DataReader dataReader) throws SQLException {
-
-    Object value = dataReader.getObject();
+  public Map read(DataReader reader) throws SQLException {
+    Object value = reader.getObject();
     if (value == null) {
       return null;
     }
@@ -50,8 +49,8 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public void bind(DataBind b, Map value) throws SQLException {
-    b.setObject(value);
+  public void bind(DataBinder binder, Map value) throws SQLException {
+    binder.setObject(value);
   }
 
   @Override

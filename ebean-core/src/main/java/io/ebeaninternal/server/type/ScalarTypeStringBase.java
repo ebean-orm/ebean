@@ -21,17 +21,17 @@ public abstract class ScalarTypeStringBase extends ScalarTypeBase<String> {
   }
 
   @Override
-  public void bind(DataBind b, String value) throws SQLException {
+  public void bind(DataBinder binder, String value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
-      b.setString(value);
+      binder.setString(value);
     }
   }
 
   @Override
-  public String read(DataReader dataReader) throws SQLException {
-    return dataReader.getString();
+  public String read(DataReader reader) throws SQLException {
+    return reader.getString();
   }
 
   @Override
@@ -75,7 +75,6 @@ public abstract class ScalarTypeStringBase extends ScalarTypeBase<String> {
 
   @Override
   public void writeData(DataOutput dataOutput, String value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

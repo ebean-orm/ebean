@@ -10,5 +10,5 @@ public interface GeoTypeBinder {
   /**
    * Bind the geometry type.
    */
-  void bind(DataBind b, int dataType, Object data) throws SQLException;
+  void bind(DataBinder binder, int dataType, Object data) throws SQLException;
 }

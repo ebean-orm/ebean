@@ -35,12 +35,12 @@ public class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
    * Bind DayOfWeek enum using getValue().
    */
   @Override
-  public void bind(DataBind b, Object value) throws SQLException {
+  public void bind(DataBinder binder, Object value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.INTEGER);
+      binder.setNull(Types.INTEGER);
     } else {
       // avoiding the map lookup
-      b.setInt(((DayOfWeek) value).getValue());
+      binder.setInt(((DayOfWeek) value).getValue());
     }
   }
 
@@ -48,8 +48,8 @@ public class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
    * Read DayOfWeek using int value.
    */
   @Override
-  public Object read(DataReader dataReader) throws SQLException {
-    Integer i = dataReader.getInt();
+  public Object read(DataReader reader) throws SQLException {
+    Integer i = reader.getInt();
     if (i == null) {
       return null;
     } else {

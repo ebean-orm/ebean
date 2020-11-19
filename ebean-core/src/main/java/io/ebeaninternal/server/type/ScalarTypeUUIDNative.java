@@ -15,8 +15,8 @@ public class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
   }
 
   @Override
-  public UUID read(DataReader dataReader) throws SQLException {
-    Object value = dataReader.getObject();
+  public UUID read(DataReader reader) throws SQLException {
+    Object value = reader.getObject();
     if (value == null) {
       return null;
     }
@@ -27,8 +27,8 @@ public class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
   }
 
   @Override
-  public void bind(DataBind b, UUID value) throws SQLException {
-    b.setObject(value);
+  public void bind(DataBinder binder, UUID value) throws SQLException {
+    binder.setObject(value);
   }
 
   @Override

@@ -21,17 +21,17 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public void bind(DataBind b, Long value) throws SQLException {
+  public void bind(DataBinder binder, Long value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.BIGINT);
+      binder.setNull(Types.BIGINT);
     } else {
-      b.setLong(value);
+      binder.setLong(value);
     }
   }
 
   @Override
-  public Long read(DataReader dataReader) throws SQLException {
-    return dataReader.getLong();
+  public Long read(DataReader reader) throws SQLException {
+    return reader.getLong();
   }
 
   @Override
@@ -80,7 +80,6 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
 
   @Override
   public void writeData(DataOutput dataOutput, Long value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

@@ -60,9 +60,8 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, LocalEncryp
   }
 
   @Override
-  public T read(DataReader dataReader) throws SQLException {
-
-    byte[] data = dataReader.getBytes();
+  public T read(DataReader reader) throws SQLException {
+    byte[] data = reader.getBytes();
     String formattedValue = dataEncryptSupport.decryptObject(data);
     if (formattedValue == null) {
       return null;
@@ -79,10 +78,9 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, LocalEncryp
   }
 
   @Override
-  public void bind(DataBind b, T value) throws SQLException {
-
+  public void bind(DataBinder binder, T value) throws SQLException {
     byte[] encryptedValue = encrypt(value);
-    byteArrayType.bind(b, encryptedValue);
+    byteArrayType.bind(binder, encryptedValue);
   }
 
   @Override

@@ -17,8 +17,8 @@ public class ScalarTypeClob extends ScalarTypeStringBase {
   }
 
   @Override
-  public String read(DataReader dataReader) throws SQLException {
-    return dataReader.getStringFromStream();
+  public String read(DataReader reader) throws SQLException {
+    return reader.getStringFromStream();
   }
 
 }

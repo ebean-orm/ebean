@@ -8,7 +8,6 @@ import java.sql.Types;
  */
 public class EnumToDbStringMap extends EnumToDbValueMap<String> {
 
-
   @Override
   public int getDbType() {
     return Types.VARCHAR;
@@ -21,19 +20,18 @@ public class EnumToDbStringMap extends EnumToDbValueMap<String> {
   }
 
   @Override
-  public void bind(DataBind b, Object value) throws SQLException {
+  public void bind(DataBinder binder, Object value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.VARCHAR);
+      binder.setNull(Types.VARCHAR);
     } else {
       String s = getDbValue(value);
-      b.setString(s);
+      binder.setString(s);
     }
-
   }
 
   @Override
-  public Object read(DataReader dataReader) throws SQLException {
-    String s = dataReader.getString();
+  public Object read(DataReader reader) throws SQLException {
+    String s = reader.getString();
     if (s == null) {
       return null;
     } else {

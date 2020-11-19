@@ -16,17 +16,17 @@ public class ScalarTypeLocalTimeWithNanos extends ScalarTypeLocalTime {
   }
 
   @Override
-  public void bind(DataBind bind, LocalTime value) throws SQLException {
+  public void bind(DataBinder binder, LocalTime value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.BIGINT);
+      binder.setNull(Types.BIGINT);
     } else {
-      bind.setLong(value.toNanoOfDay());
+      binder.setLong(value.toNanoOfDay());
     }
   }
 
   @Override
-  public LocalTime read(DataReader dataReader) throws SQLException {
-    Long value = dataReader.getLong();
+  public LocalTime read(DataReader reader) throws SQLException {
+    Long value = reader.getLong();
     return (value == null) ? null : LocalTime.ofNanoOfDay(value);
   }
 

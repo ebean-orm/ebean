@@ -73,8 +73,8 @@ public class ScalarTypeJsonSet {
     }
 
     @Override
-    public Set read(DataReader dataReader) throws SQLException {
-      String json = dataReader.getString();
+    public Set read(DataReader reader) throws SQLException {
+      String json = reader.getString();
       try {
         // parse JSON into modifyAware list
         return EJson.parseSet(json, true);
@@ -84,14 +84,14 @@ public class ScalarTypeJsonSet {
     }
 
     @Override
-    public void bind(DataBind bind, Set value) throws SQLException {
+    public void bind(DataBinder binder, Set value) throws SQLException {
       if (value == null) {
-        bindNull(bind);
+        bindNull(binder);
       } else if (value.isEmpty()) {
-        bind.setString("[]");
+        binder.setString("[]");
       } else {
         try {
-          bind.setString(EJson.write(value));
+          binder.setString(EJson.write(value));
         } catch (IOException e) {
           throw new SQLException("Failed to format Set into JSON content", e);
         }
@@ -99,11 +99,11 @@ public class ScalarTypeJsonSet {
     }
 
     @Override
-    protected void bindNull(DataBind bind) throws SQLException {
+    protected void bindNull(DataBinder binder) throws SQLException {
       if (nullable) {
-        bind.setNull(Types.VARCHAR);
+        binder.setNull(Types.VARCHAR);
       } else {
-        bind.setString("[]");
+        binder.setString("[]");
       }
     }
 
@@ -155,17 +155,17 @@ public class ScalarTypeJsonSet {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void bind(DataBind bind, Set value) throws SQLException {
+    public void bind(DataBinder binder, Set value) throws SQLException {
       if (value == null) {
-        bindNull(bind);
+        bindNull(binder);
       } else {
-        bind.setObject(PostgresHelper.asObject(pgType, formatValue(value)));
+        binder.setObject(PostgresHelper.asObject(pgType, formatValue(value)));
       }
     }
 
     @Override
-    protected void bindNull(DataBind bind) throws SQLException {
-      bind.setObject(PostgresHelper.asObject(pgType, nullable ? null : "[]"));
+    protected void bindNull(DataBinder binder) throws SQLException {
+      binder.setObject(PostgresHelper.asObject(pgType, nullable ? null : "[]"));
     }
   }
 

@@ -23,17 +23,17 @@ public class ScalarTypeYear extends ScalarTypeBase<Year> {
   }
 
   @Override
-  public void bind(DataBind bind, Year value) throws SQLException {
+  public void bind(DataBinder binder, Year value) throws SQLException {
     if (value == null) {
-      bind.setNull(Types.INTEGER);
+      binder.setNull(Types.INTEGER);
     } else {
-      bind.setInt(value.getValue());
+      binder.setInt(value.getValue());
     }
   }
 
   @Override
-  public Year read(DataReader dataReader) throws SQLException {
-    Integer value = dataReader.getInt();
+  public Year read(DataReader reader) throws SQLException {
+    Integer value = reader.getInt();
     return (value == null) ? null : Year.of(value);
   }
 

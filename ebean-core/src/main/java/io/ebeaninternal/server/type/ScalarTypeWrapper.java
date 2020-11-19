@@ -76,12 +76,12 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public void bind(DataBind b, B value) throws SQLException {
+  public void bind(DataBinder binder, B value) throws SQLException {
     if (value == null) {
-      scalarType.bind(b, null);
+      scalarType.bind(binder, null);
     } else {
       S sv = converter.unwrapValue(value);
-      scalarType.bind(b, sv);
+      scalarType.bind(binder, sv);
     }
   }
 
@@ -141,14 +141,13 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public void loadIgnore(DataReader dataReader) {
-    dataReader.incrementPos(1);
+  public void loadIgnore(DataReader reader) {
+    reader.incrementPos(1);
   }
 
   @Override
-  public B read(DataReader dataReader) throws SQLException {
-
-    S sv = scalarType.read(dataReader);
+  public B read(DataReader reader) throws SQLException {
+    S sv = scalarType.read(reader);
     if (sv == null) {
       return nullValue;
     }
@@ -174,7 +173,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   @Override
   @SuppressWarnings("unchecked")
   public Object toJdbcType(Object value) {
-
     Object sv = converter.unwrapValue((B) value);
     if (sv == null) {
       return nullValue;

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DataBind {
+public class DataBind implements DataBinder {
 
   private static final Logger log = LoggerFactory.getLogger(DataBind.class);
 
@@ -42,51 +42,52 @@ public class DataBind {
     this.connection = connection;
   }
 
-  /**
-   * Append an entry to the bind log.
-   */
+  @Override
   public StringBuilder append(Object entry) {
     return bindLog.append(entry);
   }
 
-  /**
-   * Return the bind log.
-   */
+  @Override
   public StringBuilder log() {
     return bindLog;
   }
 
-  /**
-   * Close the underlying prepared statement.
-   */
+  @Override
   public void close() throws SQLException {
     pstmt.close();
   }
 
+  @Override
   public int currentPos() {
     return pos;
   }
 
+  @Override
   public void setObject(Object value) throws SQLException {
     pstmt.setObject(++pos, value);
   }
 
+  @Override
   public void setObject(Object value, int sqlType) throws SQLException {
     pstmt.setObject(++pos, value, sqlType);
   }
 
+  @Override
   public void setNull(int jdbcType) throws SQLException {
     pstmt.setNull(++pos, jdbcType);
   }
 
+  @Override
   public int nextPos() {
     return ++pos;
   }
 
+  @Override
   public void decrementPos() {
     --pos;
   }
 
+  @Override
   public int executeUpdate() throws SQLException {
     try {
       return pstmt.executeUpdate();
@@ -108,38 +109,47 @@ public class DataBind {
     }
   }
 
+  @Override
   public PreparedStatement getPstmt() {
     return pstmt;
   }
 
+  @Override
   public void setString(String s) throws SQLException {
     pstmt.setString(++pos, s);
   }
 
+  @Override
   public void setInt(int i) throws SQLException {
     pstmt.setInt(++pos, i);
   }
 
+  @Override
   public void setLong(long i) throws SQLException {
     pstmt.setLong(++pos, i);
   }
 
+  @Override
   public void setShort(short i) throws SQLException {
     pstmt.setShort(++pos, i);
   }
 
+  @Override
   public void setFloat(float i) throws SQLException {
     pstmt.setFloat(++pos, i);
   }
 
+  @Override
   public void setDouble(double i) throws SQLException {
     pstmt.setDouble(++pos, i);
   }
 
+  @Override
   public void setBigDecimal(BigDecimal v) throws SQLException {
     pstmt.setBigDecimal(++pos, v);
   }
 
+  @Override
   public void setDate(java.sql.Date v) throws SQLException {
     Calendar timeZone = dataTimeZone.getDateTimeZone();
     if (timeZone != null) {
@@ -149,6 +159,7 @@ public class DataBind {
     }
   }
 
+  @Override
   public void setTimestamp(Timestamp v) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeZone();
     if (timeZone != null) {
@@ -158,6 +169,7 @@ public class DataBind {
     }
   }
 
+  @Override
   public void setTime(Time v) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeZone();
     if (timeZone != null) {
@@ -167,30 +179,32 @@ public class DataBind {
     }
   }
 
+  @Override
   public void setBoolean(boolean v) throws SQLException {
     pstmt.setBoolean(++pos, v);
   }
 
+  @Override
   public void setBytes(byte[] v) throws SQLException {
     pstmt.setBytes(++pos, v);
   }
 
+  @Override
   public void setByte(byte v) throws SQLException {
     pstmt.setByte(++pos, v);
   }
 
+  @Override
   public void setChar(char v) throws SQLException {
     pstmt.setString(++pos, String.valueOf(v));
   }
 
-  /**
-   * Return any inputStreams that have been bound (and should be closed).
-   * This is used for batched statement execution only.
-   */
+  @Override
   public List<InputStream> getInputStreams() {
     return inputStreams;
   }
 
+  @Override
   public void setBinaryStream(InputStream inputStream, long length) throws SQLException {
     if (inputStreams == null) {
       inputStreams = new ArrayList<>();
@@ -199,16 +213,19 @@ public class DataBind {
     pstmt.setBinaryStream(++pos, inputStream, length);
   }
 
+  @Override
   public void setBlob(byte[] bytes) throws SQLException {
     ByteArrayInputStream is = new ByteArrayInputStream(bytes);
     pstmt.setBinaryStream(++pos, is, bytes.length);
   }
 
+  @Override
   public void setClob(String content) throws SQLException {
     Reader reader = new StringReader(content);
     pstmt.setCharacterStream(++pos, reader, content.length());
   }
 
+  @Override
   public void setArray(String arrayType, Object[] elements) throws SQLException {
     Array array = connection.createArrayOf(arrayType, elements);
     pstmt.setArray(++pos, array);

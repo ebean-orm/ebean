@@ -17,12 +17,12 @@ public class ScalarTypeInetAddressPostgres extends ScalarTypeBaseVarchar<InetAdd
   }
 
   @Override
-  public void bind(DataBind b, InetAddress value) throws SQLException {
+  public void bind(DataBinder binder, InetAddress value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.OTHER);
+      binder.setNull(Types.OTHER);
     } else {
       String strValue = convertToDbString(value);
-      b.setObject(PostgresHelper.asInet(strValue));
+      binder.setObject(PostgresHelper.asInet(strValue));
     }
   }
 

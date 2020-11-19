@@ -21,17 +21,17 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public void bind(DataBind b, Float value) throws SQLException {
+  public void bind(DataBinder binder, Float value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.REAL);
+      binder.setNull(Types.REAL);
     } else {
-      b.setFloat(value);
+      binder.setFloat(value);
     }
   }
 
   @Override
-  public Float read(DataReader dataReader) throws SQLException {
-    return dataReader.getFloat();
+  public Float read(DataReader reader) throws SQLException {
+    return reader.getFloat();
   }
 
   @Override
@@ -75,7 +75,6 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
 
   @Override
   public void writeData(DataOutput dataOutput, Float value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

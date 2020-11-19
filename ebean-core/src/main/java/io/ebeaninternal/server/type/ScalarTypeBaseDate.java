@@ -41,18 +41,17 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   public abstract T convertFromDate(java.sql.Date ts);
 
   @Override
-  public void bind(DataBind b, T value) throws SQLException {
+  public void bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.DATE);
+      binder.setNull(Types.DATE);
     } else {
-      b.setDate(convertToDate(value));
+      binder.setDate(convertToDate(value));
     }
   }
 
   @Override
-  public T read(DataReader dataReader) throws SQLException {
-
-    Date ts = dataReader.getDate();
+  public T read(DataReader reader) throws SQLException {
+    Date ts = reader.getDate();
     return ts == null ? null : convertFromDate(ts);
   }
 
@@ -127,7 +126,6 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   @Override
   public void writeData(DataOutput dataOutput, T value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

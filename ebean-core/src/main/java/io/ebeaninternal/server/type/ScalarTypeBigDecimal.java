@@ -22,17 +22,17 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public void bind(DataBind b, BigDecimal value) throws SQLException {
+  public void bind(DataBinder binder, BigDecimal value) throws SQLException {
     if (value == null) {
-      b.setNull(Types.DECIMAL);
+      binder.setNull(Types.DECIMAL);
     } else {
-      b.setBigDecimal(value);
+      binder.setBigDecimal(value);
     }
   }
 
   @Override
-  public BigDecimal read(DataReader dataReader) throws SQLException {
-    return dataReader.getBigDecimal();
+  public BigDecimal read(DataReader reader) throws SQLException {
+    return reader.getBigDecimal();
   }
 
   @Override
@@ -76,7 +76,6 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 
   @Override
   public void writeData(DataOutput dataOutput, BigDecimal b) throws IOException {
-
     if (b == null) {
       dataOutput.writeBoolean(false);
     } else {
