@@ -3,10 +3,12 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareSet;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;

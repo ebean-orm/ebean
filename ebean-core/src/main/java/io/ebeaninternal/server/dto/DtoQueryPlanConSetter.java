@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebeaninternal.server.type.DataReader;
+import io.ebean.core.type.DataReader;
 
 import java.sql.SQLException;
 

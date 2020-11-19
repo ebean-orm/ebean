@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
+import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -22,7 +23,6 @@ import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import io.ebeanservice.docstore.api.support.DocStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

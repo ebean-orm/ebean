@@ -2,8 +2,8 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.core.type.DataReader;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.type.DataReader;
 
 import java.sql.SQLException;
 

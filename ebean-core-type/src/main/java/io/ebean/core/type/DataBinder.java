@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 import java.io.InputStream;
 import java.math.BigDecimal;

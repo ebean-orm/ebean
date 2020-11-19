@@ -1,17 +1,17 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.GeoTypeBinder;
 import io.ebeaninternal.server.type.PostgresHelper;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

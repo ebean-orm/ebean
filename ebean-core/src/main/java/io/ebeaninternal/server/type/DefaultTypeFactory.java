@@ -2,11 +2,13 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.math.BigInteger;
 import java.sql.Types;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Helper to create some default ScalarType objects for Booleans,
@@ -64,7 +66,7 @@ public class DefaultTypeFactory {
   /**
    * Create the default ScalarType for java.util.Date.
    */
-  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode, JsonConfig.Date jsonDate) {
+  public ScalarType<Date> createUtilDate(JsonConfig.DateTime mode, JsonConfig.Date jsonDate) {
     // by default map anonymous java.util.Date to java.sql.Timestamp.
     return createUtilDate(mode, jsonDate, java.sql.Types.TIMESTAMP);
   }

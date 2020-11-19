@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarType;
+
 import java.lang.reflect.Type;
 
 /**

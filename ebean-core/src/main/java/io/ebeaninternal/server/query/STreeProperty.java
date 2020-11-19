@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.core.type.ScalarDataReader;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.type.ScalarDataReader;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.List;
 

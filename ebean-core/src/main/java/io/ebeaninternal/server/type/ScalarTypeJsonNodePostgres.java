@@ -1,8 +1,9 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.config.dbplatform.DbPlatformType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.core.type.DataBinder;
 
 import java.sql.SQLException;
 

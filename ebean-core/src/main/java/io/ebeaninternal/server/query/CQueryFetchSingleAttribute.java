@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.CountedValue;
+import io.ebean.core.type.ScalarDataReader;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
@@ -8,7 +9,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarDataReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

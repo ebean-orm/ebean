@@ -8,6 +8,7 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
+import io.ebean.core.type.ScalarType;
 import io.ebean.util.CamelCaseHelper;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -21,7 +22,6 @@ import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;

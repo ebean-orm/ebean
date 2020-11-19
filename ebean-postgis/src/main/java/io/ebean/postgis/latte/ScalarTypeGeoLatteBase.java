@@ -2,10 +2,10 @@ package io.ebean.postgis.latte;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import io.ebeaninternal.server.type.DataBinder;
-import io.ebeaninternal.server.type.DataReader;
-import io.ebeaninternal.server.type.ScalarType;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarType;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.codec.Wkt;
 import org.postgis.PGgeometry;

@@ -71,6 +71,7 @@
     <module>ebean</module>
     <module>ebean-api</module>
     <module>ebean-bom</module>
+    <module>ebean-core-type</module>
     <module>ebean-core</module>
     <module>ebean-ddl-generator</module>
     <module>ebean-autotune</module>

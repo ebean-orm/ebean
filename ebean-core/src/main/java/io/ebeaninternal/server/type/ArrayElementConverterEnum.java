@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarType;
+
 public class ArrayElementConverterEnum implements ArrayElementConverter<String> {
 
   final ScalarType<?> scalarType;

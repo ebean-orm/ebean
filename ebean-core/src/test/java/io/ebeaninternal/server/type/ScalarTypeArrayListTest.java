@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.type;
 
 
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
 import org.junit.Test;
 import org.mockito.Mockito;
 

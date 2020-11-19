@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
+import io.ebean.core.type.DocPropertyType;
 import org.junit.Test;
 
 import java.sql.SQLException;

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.DataReader;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.io.ByteArrayOutputStream;

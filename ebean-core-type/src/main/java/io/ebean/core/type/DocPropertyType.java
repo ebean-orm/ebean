@@ -1,4 +1,4 @@
-package io.ebeanservice.docstore.api.mapping;
+package io.ebean.core.type;
 
 /**
  * Types as defined for document store property types.
