@@ -1,10 +1,9 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.dto;
 
+import io.ebean.core.type.DataReader;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.server.type.DataReader;
 
 import java.sql.SQLException;
 

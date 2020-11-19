@@ -2,10 +2,10 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.bean.EntityBean;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.io.IOException;
 import java.util.Arrays;

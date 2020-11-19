@@ -3,6 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
 import io.ebean.SqlRow;
+import io.ebean.core.type.ScalarType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetricMap;
@@ -10,7 +11,6 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;

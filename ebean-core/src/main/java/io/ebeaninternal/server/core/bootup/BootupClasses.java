@@ -5,6 +5,7 @@ import io.ebean.annotation.DocStore;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
+import io.ebean.core.type.ScalarType;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -18,7 +19,6 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.util.AnnotationUtil;
-import io.ebeaninternal.server.type.ScalarType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

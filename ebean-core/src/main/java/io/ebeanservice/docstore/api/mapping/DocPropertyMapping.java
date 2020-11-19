@@ -1,6 +1,7 @@
 package io.ebeanservice.docstore.api.mapping;
 
 import io.ebean.annotation.DocMapping;
+import io.ebean.core.type.DocPropertyType;
 
 import java.util.ArrayList;
 import java.util.List;

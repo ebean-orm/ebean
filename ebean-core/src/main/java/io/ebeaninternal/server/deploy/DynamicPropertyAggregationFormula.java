@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.query.SqlBeanLoad;
-import io.ebeaninternal.server.type.DataReader;
-import io.ebeaninternal.server.type.ScalarType;
 
 import javax.persistence.PersistenceException;
 

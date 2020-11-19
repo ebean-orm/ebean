@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebeaninternal.server.type.DataReader;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 
 import java.lang.invoke.MethodHandle;

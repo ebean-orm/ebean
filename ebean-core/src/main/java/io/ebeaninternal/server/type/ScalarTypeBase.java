@@ -1,5 +1,8 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
+
 /**
  * Base ScalarType object.
  */

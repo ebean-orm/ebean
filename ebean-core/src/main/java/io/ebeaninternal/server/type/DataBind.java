@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.DataBinder;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package io.ebean.postgis;
 
-import io.ebeaninternal.server.type.DataBinder;
+import io.ebean.core.type.DataBinder;
 import io.ebeaninternal.server.type.GeoTypeBinder;
 import org.geolatte.geom.codec.Wkt;
 import org.postgis.Geometry;

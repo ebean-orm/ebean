@@ -1,5 +1,9 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
+
 import javax.persistence.EnumType;
 import java.sql.SQLException;
 import java.util.Iterator;

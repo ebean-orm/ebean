@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.core.type.DataBinder;
 import io.ebean.types.Inet;
 
 import java.sql.SQLException;

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.core.type.DataBinder;
 import io.ebean.text.TextException;
 
 import java.net.InetAddress;

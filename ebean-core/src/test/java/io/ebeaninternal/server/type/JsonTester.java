@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.text.json.WriteJson;
 
 import java.io.IOException;

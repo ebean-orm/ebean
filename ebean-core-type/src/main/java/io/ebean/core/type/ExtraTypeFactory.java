@@ -1,7 +1,6 @@
-package io.ebeaninternal.api;
+package io.ebean.core.type;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.List;
 

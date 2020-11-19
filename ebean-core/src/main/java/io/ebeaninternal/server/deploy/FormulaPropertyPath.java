@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.query.STreeProperty;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.sql.Types;
 

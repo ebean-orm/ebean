@@ -1,11 +1,13 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
-import io.ebeaninternal.server.core.BasicTypeConverter;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.DocPropertyType;
+import io.ebean.text.TextException;
+import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;

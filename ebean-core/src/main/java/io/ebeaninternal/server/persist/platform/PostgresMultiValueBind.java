@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist.platform;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import io.ebeaninternal.server.type.ScalarType;
+import io.ebean.core.type.ScalarType;
 
 /**
  * Multi value binder that uses Postgres Array.

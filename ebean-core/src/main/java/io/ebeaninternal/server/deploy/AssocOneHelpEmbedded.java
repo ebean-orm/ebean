@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.type.DataReader;
+import io.ebean.core.type.DataReader;
 
 import java.sql.SQLException;
 

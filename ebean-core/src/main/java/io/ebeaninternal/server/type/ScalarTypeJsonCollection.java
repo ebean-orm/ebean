@@ -1,7 +1,8 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DocPropertyType;
 import io.ebeaninternal.json.ModifyAwareOwner;
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
 
 import java.io.DataInput;
 import java.io.DataOutput;

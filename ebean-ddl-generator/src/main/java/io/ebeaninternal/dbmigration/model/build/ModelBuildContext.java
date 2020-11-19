@@ -4,6 +4,7 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
@@ -14,7 +15,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.Collection;
 import java.util.List;

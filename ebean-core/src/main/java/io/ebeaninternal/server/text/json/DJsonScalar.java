@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.text.json;
 
-import io.ebeaninternal.server.type.ScalarType;
-import io.ebeaninternal.server.type.TypeManager;
 import com.fasterxml.jackson.core.JsonGenerator;
+import io.ebean.core.type.ScalarType;
+import io.ebeaninternal.server.type.TypeManager;
 
 import java.io.IOException;
 import java.util.List;

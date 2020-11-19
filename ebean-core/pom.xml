@@ -77,7 +77,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.0</version>
+      <version>12.6.1.PreRelease.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -92,6 +92,12 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
+      <version>12.6.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-core-type</artifactId>
       <version>12.6.1-SNAPSHOT</version>
     </dependency>
 

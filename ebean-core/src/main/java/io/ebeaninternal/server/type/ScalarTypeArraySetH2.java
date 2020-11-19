@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeanservice.docstore.api.mapping.DocPropertyType;
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarType;
 
 import java.lang.reflect.Type;
 import java.sql.SQLException;

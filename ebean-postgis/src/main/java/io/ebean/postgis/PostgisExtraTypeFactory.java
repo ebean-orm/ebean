@@ -1,14 +1,14 @@
 package io.ebean.postgis;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebean.core.type.ExtraTypeFactory;
+import io.ebean.core.type.ScalarType;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteLineString;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiLineString;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiPoint;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteMultiPolygon;
 import io.ebean.postgis.latte.ScalarTypeGeoLattePoint;
 import io.ebean.postgis.latte.ScalarTypeGeoLattePolygon;
-import io.ebeaninternal.api.ExtraTypeFactory;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.ArrayList;
 import java.util.List;

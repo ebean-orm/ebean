@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.type.ScalarType;
 
 import java.util.Arrays;
 

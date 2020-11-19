@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.core.type.DataReader;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -8,7 +9,6 @@ import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.query.DtoQueryEngine;
-import io.ebeaninternal.server.type.DataReader;
 import io.ebeaninternal.server.type.RsetDataReader;
 
 import java.sql.ResultSet;

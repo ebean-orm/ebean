@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.type.ScalarDataReader;
+import io.ebean.core.type.ScalarDataReader;
 
 public interface STreePropertyAssocOne extends STreePropertyAssoc {
 
