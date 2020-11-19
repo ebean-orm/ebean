@@ -3,6 +3,7 @@ package io.ebeaninternal.json;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.ModifyAwareType;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -145,7 +146,7 @@ class EJsonReader {
       currentContext = stack.pop(currentContext);
     }
     if (modifyAwareOwner != null) {
-      modifyAwareOwner.resetMarkedDirty();
+      modifyAwareOwner.setMarkedDirty(false);
     }
   }
 
@@ -296,7 +297,7 @@ class EJsonReader {
       map = new LinkedHashMap<>();
     }
 
-    ObjectContext(ModifyAwareOwner owner) {
+    ObjectContext(ModifyAwareType owner) {
       map = new ModifyAwareMap<>(owner, new LinkedHashMap<>());
     }
 
@@ -334,7 +335,7 @@ class EJsonReader {
       values = new ArrayList<>();
     }
 
-    ArrayContext(ModifyAwareOwner owner) {
+    ArrayContext(ModifyAwareType owner) {
       values = new ModifyAwareList<>(owner, new ArrayList<>());
     }
 

@@ -19,7 +19,6 @@ import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
 import io.ebeaninternal.json.ModifyAwareSet;
 
 import javax.persistence.PersistenceException;
@@ -200,7 +199,7 @@ public class ScalarTypeJsonObjectMapper {
      */
     @Override
     public boolean isDirty(Object value) {
-      return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
+      return CheckMarkedDirty.isDirty(value);
     }
 
     @Override

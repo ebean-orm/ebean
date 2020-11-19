@@ -1,11 +1,9 @@
-package io.ebeaninternal.json;
-
-import java.io.Serializable;
+package io.ebean;
 
 /**
  * Owner object notified when a modification is detected.
  */
-public interface ModifyAwareOwner extends Serializable {
+public interface ModifyAwareType {
 
   /**
    * Return true if the value is considered dirty.
@@ -16,11 +14,6 @@ public interface ModifyAwareOwner extends Serializable {
   /**
    * Marks the object as modified.
    */
-  void markAsModified();
-
-  /**
-   * Reset the dirty state to clean.
-   */
-  void resetMarkedDirty();
+  void setMarkedDirty(boolean markedDirty);
 
 }

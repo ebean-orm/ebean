@@ -1,5 +1,8 @@
 package io.ebeaninternal.json;
 
+import io.ebean.ModifyAwareType;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -10,20 +13,20 @@ import java.util.Objects;
 /**
  * Modify aware wrapper of a list.
  */
-public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
+public class ModifyAwareList<E> implements List<E>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
 
   final List<E> list;
 
-  final ModifyAwareOwner owner;
+  final ModifyAwareType owner;
 
   public ModifyAwareList(List<E> list) {
     this.list = list;
     this.owner = new ModifyAwareFlag();
   }
 
-  public ModifyAwareList(ModifyAwareOwner owner, List<E> list) {
+  public ModifyAwareList(ModifyAwareType owner, List<E> list) {
     this.list = list;
     this.owner = owner;
   }
@@ -56,13 +59,12 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
   }
 
   @Override
-  public void markAsModified() {
-    owner.markAsModified();
+  public void setMarkedDirty(boolean markedDirty) {
+    owner.setMarkedDirty(markedDirty);
   }
 
-  @Override
-  public void resetMarkedDirty() {
-    owner.resetMarkedDirty();
+  private void markAsDirty() {
+    owner.setMarkedDirty(true);
   }
 
   @Override
@@ -98,13 +100,13 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public boolean add(E e) {
-    owner.markAsModified();
+    markAsDirty();
     return list.add(e);
   }
 
   @Override
   public boolean remove(Object o) {
-    owner.markAsModified();
+    markAsDirty();
     return list.remove(o);
   }
 
@@ -115,31 +117,31 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public boolean addAll(Collection<? extends E> c) {
-    owner.markAsModified();
+    markAsDirty();
     return list.addAll(c);
   }
 
   @Override
   public boolean addAll(int index, Collection<? extends E> c) {
-    owner.markAsModified();
+    markAsDirty();
     return list.addAll(index, c);
   }
 
   @Override
   public boolean removeAll(Collection<?> c) {
-    owner.markAsModified();
+    markAsDirty();
     return list.removeAll(c);
   }
 
   @Override
   public boolean retainAll(Collection<?> c) {
-    owner.markAsModified();
+    markAsDirty();
     return list.retainAll(c);
   }
 
   @Override
   public void clear() {
-    owner.markAsModified();
+    markAsDirty();
     list.clear();
   }
 
@@ -150,19 +152,19 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public E set(int index, E element) {
-    owner.markAsModified();
+    markAsDirty();
     return list.set(index, element);
   }
 
   @Override
   public void add(int index, E element) {
-    owner.markAsModified();
+    markAsDirty();
     list.add(index, element);
   }
 
   @Override
   public E remove(int index) {
-    owner.markAsModified();
+    markAsDirty();
     return list.remove(index);
   }
 
@@ -195,7 +197,6 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
    * Create an return a modify aware Set.
    */
   public ModifyAwareSet<E> asSet() {
-
     return new ModifyAwareSet<>(owner, new LinkedHashSet<>(list));
   }
 }

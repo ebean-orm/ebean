@@ -2,7 +2,7 @@ package io.ebean.json;
 
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
+import io.ebean.ModifyAwareType;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;
@@ -293,7 +293,7 @@ public class EJsonTests {
 
     Set set = EJson.parseSet(jsonInput, true);
 
-    ModifyAwareOwner modAware = (ModifyAwareOwner) set;
+    ModifyAwareType modAware = (ModifyAwareType) set;
     assertFalse(modAware.isMarkedDirty());
 
     Iterator iterator = set.iterator();

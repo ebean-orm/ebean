@@ -1,5 +1,8 @@
 package io.ebeaninternal.json;
 
+import io.ebean.ModifyAwareType;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
@@ -8,11 +11,11 @@ import java.util.Set;
 /**
  * Wraps a Set for the purposes of detecting modifications.
  */
-public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
+public class ModifyAwareSet<E> implements Set<E>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
 
-  protected final ModifyAwareOwner owner;
+  protected final ModifyAwareType owner;
 
   protected final Set<E> set;
 
@@ -26,7 +29,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   /**
    * Create with an Owner that is notified of modifications.
    */
-  public ModifyAwareSet(ModifyAwareOwner owner, Set<E> underlying) {
+  public ModifyAwareSet(ModifyAwareType owner, Set<E> underlying) {
     this.owner = owner;
     this.set = underlying;
   }
@@ -37,15 +40,13 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   }
 
   @Override
-  public void markAsModified() {
-    owner.markAsModified();
+  public void setMarkedDirty(boolean markedDirty) {
+    owner.setMarkedDirty(markedDirty);
   }
 
-  @Override
-  public void resetMarkedDirty() {
-    owner.resetMarkedDirty();
+  private void markAsDirty() {
+    owner.setMarkedDirty(true);
   }
-
 
   @Override
   public String toString() {
@@ -72,7 +73,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   @Override
   public boolean add(E o) {
     if (set.add(o)) {
-      owner.markAsModified();
+      markAsDirty();
       return true;
     }
     return false;
@@ -83,7 +84,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     boolean changed = false;
     for (E o : collection) {
       if (set.add(o)) {
-        owner.markAsModified();
+        markAsDirty();
         changed = true;
       }
     }
@@ -93,7 +94,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   @Override
   public void clear() {
     if (!set.isEmpty()) {
-      owner.markAsModified();
+      markAsDirty();
     }
     set.clear();
   }
@@ -121,7 +122,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
   @Override
   public boolean remove(Object o) {
     if (set.remove(o)) {
-      owner.markAsModified();
+      markAsDirty();
       return true;
     }
     return false;
@@ -132,7 +133,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
     boolean changed = false;
     for (Object element : collection) {
       if (set.remove(element)) {
-        owner.markAsModified();
+        markAsDirty();
         changed = true;
       }
     }
@@ -147,7 +148,7 @@ public class ModifyAwareSet<E> implements Set<E>, ModifyAwareOwner {
       Object o = it.next();
       if (!collection.contains(o)) {
         it.remove();
-        owner.markAsModified();
+        markAsDirty();
         changed = true;
       }
     }
