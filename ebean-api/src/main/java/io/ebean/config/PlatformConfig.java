@@ -17,6 +17,11 @@ public class PlatformConfig {
 
   private boolean allQuotedIdentifiers;
 
+  /**
+   * Set this to true for Postgres FOR UPDATE to include the primary key (not use NO KEY).
+   */
+  private boolean lockWithKey;
+
   private DbConstraintNaming constraintNaming;
 
   /**
@@ -77,6 +82,7 @@ public class PlatformConfig {
    * Construct based on given config - typically for DbMigration generation with many platforms.
    */
   public PlatformConfig(PlatformConfig platformConfig) {
+    this.lockWithKey = platformConfig.lockWithKey;
     this.databaseBooleanFalse = platformConfig.databaseBooleanFalse;
     this.databaseBooleanTrue = platformConfig.databaseBooleanTrue;
     this.databaseSequenceBatchSize = platformConfig.databaseSequenceBatchSize;
@@ -134,13 +140,25 @@ public class PlatformConfig {
   }
 
   /**
+   * Return true if Postgres FOR UPDATE should include the primary key (or use NO KEY).
+   */
+  public boolean isLockWithKey() {
+    return lockWithKey;
+  }
+
+  /**
+   * Set to true such that Postgres FOR UPDATE should include the primary key (not use NO KEY option).
+   */
+  public void setLockWithKey(boolean lockWithKey) {
+    this.lockWithKey = lockWithKey;
+  }
+
+  /**
    * Return a value used to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
-   * </p>
    * <p>
    * The value returned is either a Integer or a String (e.g. "1", or "T").
-   * </p>
    */
   public String getDatabaseBooleanTrue() {
     return databaseBooleanTrue;
@@ -150,10 +168,8 @@ public class PlatformConfig {
    * Set the value to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
-   * </p>
    * <p>
    * The value set is either a Integer or a String (e.g. "1", or "T").
-   * </p>
    */
   public void setDatabaseBooleanTrue(String databaseBooleanTrue) {
     this.databaseBooleanTrue = databaseBooleanTrue;
@@ -245,7 +261,6 @@ public class PlatformConfig {
 
   /**
    * Add a custom type mapping.
-   * <p>
    * <pre>{@code
    *
    *   // set the default mapping for BigDecimal.class/decimal
@@ -266,7 +281,6 @@ public class PlatformConfig {
 
   /**
    * Add a custom type mapping that applies to all platforms.
-   * <p>
    * <pre>{@code
    *
    *   // set the default mapping for BigDecimal/decimal
@@ -294,6 +308,7 @@ public class PlatformConfig {
   public void loadSettings(PropertiesWrapper p) {
 
     idType = p.getEnum(IdType.class, "idType", idType);
+    lockWithKey = p.getBoolean("lockWithKey", lockWithKey);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
@@ -333,7 +348,6 @@ public class PlatformConfig {
    * Specify how UUID is stored.
    */
   public enum DbUuid {
-
 
     /**
      * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
