@@ -18,9 +18,9 @@ public class PlatformConfig {
   private boolean allQuotedIdentifiers;
 
   /**
-   * Set this to true for Postgres FOR UPDATE to include the primary key (not use NO KEY).
+   * Set this to true for Postgres FOR UPDATE to use NO KEY option.
    */
-  private boolean lockWithKey = true;
+  private boolean forUpdateNoKey;
 
   private DbConstraintNaming constraintNaming;
 
@@ -82,7 +82,7 @@ public class PlatformConfig {
    * Construct based on given config - typically for DbMigration generation with many platforms.
    */
   public PlatformConfig(PlatformConfig platformConfig) {
-    this.lockWithKey = platformConfig.lockWithKey;
+    this.forUpdateNoKey = platformConfig.forUpdateNoKey;
     this.databaseBooleanFalse = platformConfig.databaseBooleanFalse;
     this.databaseBooleanTrue = platformConfig.databaseBooleanTrue;
     this.databaseSequenceBatchSize = platformConfig.databaseSequenceBatchSize;
@@ -140,17 +140,17 @@ public class PlatformConfig {
   }
 
   /**
-   * Return true if Postgres FOR UPDATE should include the primary key (or use NO KEY).
+   * Return true if Postgres FOR UPDATE should use the NO KEY option.
    */
-  public boolean isLockWithKey() {
-    return lockWithKey;
+  public boolean isForUpdateNoKey() {
+    return forUpdateNoKey;
   }
 
   /**
-   * Set to true such that Postgres FOR UPDATE should include the primary key (not use NO KEY option).
+   * Set to true such that Postgres FOR UPDATE should use the NO KEY option.
    */
-  public void setLockWithKey(boolean lockWithKey) {
-    this.lockWithKey = lockWithKey;
+  public void setForUpdateNoKey(boolean forUpdateNoKey) {
+    this.forUpdateNoKey = forUpdateNoKey;
   }
 
   /**
@@ -308,7 +308,7 @@ public class PlatformConfig {
   public void loadSettings(PropertiesWrapper p) {
 
     idType = p.getEnum(IdType.class, "idType", idType);
-    lockWithKey = p.getBoolean("lockWithKey", lockWithKey);
+    forUpdateNoKey = p.getBoolean("forUpdateNoKey", forUpdateNoKey);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);

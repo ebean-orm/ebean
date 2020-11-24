@@ -29,7 +29,7 @@ public class PostgresPlatformTest {
     PlatformConfig config = new PlatformConfig();
     platform.configure(config);
 
-    assertThat(config.isLockWithKey()).isTrue();
+    assertThat(config.isForUpdateNoKey()).isFalse();
     assertThat(platform.withForUpdate("X", Query.ForUpdate.SKIPLOCKED, Query.LockType.Default)).isEqualTo("X for update skip locked");
     assertThat(platform.withForUpdate("X", Query.ForUpdate.NOWAIT, Query.LockType.Default)).isEqualTo("X for update nowait");
     assertThat(platform.withForUpdate("X", Query.ForUpdate.BASE, Query.LockType.Default)).isEqualTo("X for update");
@@ -56,10 +56,10 @@ public class PostgresPlatformTest {
     DatabasePlatform platform = new PostgresPlatform();
 
     PlatformConfig config = new PlatformConfig();
-    config.setLockWithKey(false);
+    config.setForUpdateNoKey(true);
     platform.configure(config);
 
-    assertThat(config.isLockWithKey()).isFalse();
+    assertThat(config.isForUpdateNoKey()).isTrue();
     assertThat(platform.withForUpdate("X", Query.ForUpdate.SKIPLOCKED, Query.LockType.Default)).isEqualTo("X for no key update skip locked");
     assertThat(platform.withForUpdate("X", Query.ForUpdate.NOWAIT, Query.LockType.Default)).isEqualTo("X for no key update nowait");
     assertThat(platform.withForUpdate("X", Query.ForUpdate.BASE, Query.LockType.Default)).isEqualTo("X for no key update");

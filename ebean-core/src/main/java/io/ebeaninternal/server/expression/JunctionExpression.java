@@ -497,13 +497,28 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public Query<T> forUpdate(Query.LockType lockType) {
+    return exprList.forUpdate(lockType);
+  }
+
+  @Override
   public Query<T> forUpdateNoWait() {
     return exprList.forUpdateNoWait();
   }
 
   @Override
+  public Query<T> forUpdateNoWait(Query.LockType lockType) {
+    return exprList.forUpdateNoWait(lockType);
+  }
+
+  @Override
   public Query<T> forUpdateSkipLocked() {
     return exprList.forUpdateSkipLocked();
+  }
+
+  @Override
+  public Query<T> forUpdateSkipLocked(Query.LockType lockType) {
+    return exprList.forUpdateSkipLocked(lockType);
   }
 
   /**

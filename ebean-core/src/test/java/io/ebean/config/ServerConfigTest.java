@@ -73,7 +73,7 @@ public class ServerConfigTest {
     props.setProperty("caseSensitiveCollation", "false");
     props.setProperty("loadModuleInfo", "true");
     props.setProperty("collectQueryPlanThresholdMicros", "10000");
-    props.setProperty("lockWithKey", "false");
+    props.setProperty("forUpdateNoKey", "true");
 
     serverConfig.loadFromProperties(props);
 
@@ -85,7 +85,7 @@ public class ServerConfigTest {
 
     assertTrue(serverConfig.isIdGeneratorAutomatic());
     assertFalse(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
-    assertFalse(serverConfig.getPlatformConfig().isLockWithKey());
+    assertTrue(serverConfig.getPlatformConfig().isForUpdateNoKey());
 
     assertThat(serverConfig.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 

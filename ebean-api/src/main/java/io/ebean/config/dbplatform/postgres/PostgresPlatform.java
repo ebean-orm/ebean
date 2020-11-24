@@ -33,7 +33,7 @@ public class PostgresPlatform extends DatabasePlatform {
   private static final String FOR_SHARE = " for share";
   private static final String FOR_KEY_SHARE = " for key share";
 
-  private boolean defaultLockWithKey = true;
+  private boolean forUpdateNoKey;
 
   public PostgresPlatform() {
     super();
@@ -94,7 +94,7 @@ public class PostgresPlatform extends DatabasePlatform {
   @Override
   public void configure(PlatformConfig config) {
     super.configure(config);
-    defaultLockWithKey = config.isLockWithKey();
+    forUpdateNoKey = config.isForUpdateNoKey();
   }
 
   @Override
@@ -145,7 +145,7 @@ public class PostgresPlatform extends DatabasePlatform {
       case NoKeyUpdate: return FOR_NO_KEY_UPDATE;
       case Share: return FOR_SHARE;
       case KeyShare: return FOR_KEY_SHARE;
-      case Default: return defaultLockWithKey ? FOR_UPDATE : FOR_NO_KEY_UPDATE;
+      case Default: return forUpdateNoKey ? FOR_NO_KEY_UPDATE : FOR_UPDATE;
     }
     return FOR_UPDATE;
   }
