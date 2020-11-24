@@ -180,6 +180,36 @@ import java.util.stream.Stream;
 public interface Query<T> {
 
   /**
+   * The lock type (strength) to use with query FOR UPDATE row locking.
+   */
+  enum LockType {
+    /**
+     * The default lock type - See PlatformConfig.lockWithKey option.
+     */
+    Default,
+
+    /**
+     * FOR UPDATE.
+     */
+    Update,
+
+    /**
+     * FOR NO KEY UPDATE.
+     */
+    NoKeyUpdate,
+
+    /**
+     * FOR SHARE.
+     */
+    Share,
+
+    /**
+     * FOR KEY SHARE.
+     */
+    KeyShare
+  }
+
+  /**
    * For update mode.
    */
   enum ForUpdate {
@@ -1619,12 +1649,22 @@ public interface Query<T> {
   Query<T> forUpdate();
 
   /**
+   * Execute using "for update" with given lock type (currently Postgres only).
+   */
+  Query<T> forUpdate(LockType lockType);
+
+  /**
    * Execute using "for update" clause with "no wait" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
    * </p>
    */
   Query<T> forUpdateNoWait();
+
+  /**
+   * Execute using "for update nowait" with given lock type (currently Postgres only).
+   */
+  Query<T> forUpdateNoWait(LockType lockType);
 
   /**
    * Execute using "for update" clause with "skip locked" option.
@@ -1635,6 +1675,11 @@ public interface Query<T> {
   Query<T> forUpdateSkipLocked();
 
   /**
+   * Execute using "for update skip locked" with given lock type (currently Postgres only).
+   */
+  Query<T> forUpdateSkipLocked(LockType lockType);
+
+  /**
    * Return true if this query has forUpdate set.
    */
   boolean isForUpdate();
@@ -1643,6 +1688,11 @@ public interface Query<T> {
    * Return the "for update" mode to use.
    */
   ForUpdate getForUpdateMode();
+
+  /**
+   * Return the lock type (strength) to use with "for update".
+   */
+  LockType getForUpdateLockType();
 
   /**
    * Set root table alias.

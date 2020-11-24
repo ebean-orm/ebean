@@ -236,10 +236,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private Boolean autoTune;
 
-  /**
-   * For update mode.
-   */
   private ForUpdate forUpdate;
+  private LockType lockType;
 
   private boolean singleAttribute;
 
@@ -967,21 +965,37 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> forUpdate() {
-    return setForUpdateWithMode(ForUpdate.BASE);
+    return setForUpdateWithMode(ForUpdate.BASE, LockType.Default);
+  }
+
+  @Override
+  public Query<T> forUpdate(LockType lockType) {
+    return setForUpdateWithMode(ForUpdate.BASE, lockType);
+  }
+
+  @Override
+  public Query<T> forUpdateNoWait(LockType lockType) {
+    return setForUpdateWithMode(ForUpdate.NOWAIT, lockType);
+  }
+
+  @Override
+  public Query<T> forUpdateSkipLocked(LockType lockType) {
+    return setForUpdateWithMode(ForUpdate.SKIPLOCKED, lockType);
   }
 
   @Override
   public DefaultOrmQuery<T> forUpdateNoWait() {
-    return setForUpdateWithMode(ForUpdate.NOWAIT);
+    return setForUpdateWithMode(ForUpdate.NOWAIT, LockType.Default);
   }
 
   @Override
   public DefaultOrmQuery<T> forUpdateSkipLocked() {
-    return setForUpdateWithMode(ForUpdate.SKIPLOCKED);
+    return setForUpdateWithMode(ForUpdate.SKIPLOCKED, LockType.Default);
   }
 
-  private DefaultOrmQuery<T> setForUpdateWithMode(ForUpdate mode) {
+  private DefaultOrmQuery<T> setForUpdateWithMode(ForUpdate mode, LockType lockType) {
     this.forUpdate = mode;
+    this.lockType = lockType;
     this.useBeanCache = CacheMode.OFF;
     return this;
   }
@@ -994,6 +1008,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public ForUpdate getForUpdateMode() {
     return forUpdate;
+  }
+
+  @Override
+  public LockType getForUpdateLockType() {
+    return lockType;
   }
 
   @Override

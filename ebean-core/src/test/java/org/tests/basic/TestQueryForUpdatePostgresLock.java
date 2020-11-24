@@ -5,7 +5,6 @@ import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static io.ebean.Query.LockType.NoKeyUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryForUpdatePostgresLock extends BaseTestCase {
@@ -27,7 +27,6 @@ public class TestQueryForUpdatePostgresLock extends BaseTestCase {
   private long timePreLock;
   private long timePostLock;
 
-  @Ignore // restore this test with explicit use of NO KEY lock strength
   @Test
   @ForPlatform(Platform.POSTGRES)
   public void testForUpdatePostgresLock() throws InterruptedException {
@@ -56,7 +55,7 @@ public class TestQueryForUpdatePostgresLock extends BaseTestCase {
   private void lockArticle(Integer id) {
     timePreLock = System.currentTimeMillis();
     log.info("lock start");
-    DB.find(Article.class).setId(id).forUpdate().findOne();
+    DB.find(Article.class).setId(id).forUpdate(NoKeyUpdate).findOne();
     sleep(1000);
     timePostLock = System.currentTimeMillis();
     log.info("lock done");

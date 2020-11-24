@@ -117,7 +117,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
     // for update are hints on from clause of base table
     return sql;
   }

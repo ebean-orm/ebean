@@ -686,7 +686,7 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * executed the select with "for update" which should lock the record "on read"
+   * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {
     query.forUpdate();
@@ -694,13 +694,28 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Execute using "for update" with given lock type (currently Postgres only).
+   */
+  public R forUpdate(Query.LockType lockType) {
+    query.forUpdate(lockType);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause with "no wait" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
-   * </p>
    */
   public R forUpdateNoWait() {
     query.forUpdateNoWait();
+    return root;
+  }
+
+  /**
+   * Execute using "for update nowait" with given lock type (currently Postgres only).
+   */
+  public R forUpdateNoWait(Query.LockType lockType) {
+    query.forUpdateNoWait(lockType);
     return root;
   }
 
@@ -712,6 +727,14 @@ public abstract class TQRootBean<T, R> {
    */
   public R forUpdateSkipLocked() {
     query.forUpdateSkipLocked();
+    return root;
+  }
+
+  /**
+   * Execute using "for update skip locked" with given lock type (currently Postgres only).
+   */
+  public R forUpdateSkipLocked(Query.LockType lockType) {
+    query.forUpdateSkipLocked(lockType);
     return root;
   }
 

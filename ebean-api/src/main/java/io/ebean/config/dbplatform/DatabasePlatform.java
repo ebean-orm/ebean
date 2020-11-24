@@ -679,9 +679,8 @@ public class DatabasePlatform {
 
   public String completeSql(String sql, Query<?> query) {
     if (query.isForUpdate()) {
-      sql = withForUpdate(sql, query.getForUpdateMode());
+      sql = withForUpdate(sql, query.getForUpdateMode(), query.getForUpdateLockType());
     }
-
     return sql;
   }
 
@@ -693,7 +692,7 @@ public class DatabasePlatform {
     return null;
   }
 
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
     // silently assume the database does not support the "for update" clause.
     logger.info("it seems your database does not support the 'for update' clause");
     return sql;
