@@ -27,6 +27,7 @@ public class TestSqlUpdateBatch extends BaseTestCase {
       // Dummy updates, that effectively do nothing, but ebean doesn't need to know this.
       final SqlUpdate update = DB.sqlUpdate("update uuone set name = ? where 0=1");
       final SqlUpdate delete = DB.sqlUpdate("delete from uuone where ?=-1");
+      // txn.setBatchSize(40);
 
       for (int i = 0; i <= 20; i++) {
         update
@@ -39,6 +40,7 @@ public class TestSqlUpdateBatch extends BaseTestCase {
 
       delete.executeBatch();
       update.executeBatch();
+      txn.commit();
     }
   }
 
@@ -50,10 +52,10 @@ public class TestSqlUpdateBatch extends BaseTestCase {
   @Test
   public void testBatchReturnArrayLength() {
     try (Transaction txn = DB.beginTransaction()) {
+      txn.setBatchSize(100); // something bigger than 40
       // Dummy update, that effectively does nothing, but ebean doesn't need to know this.
       final SqlUpdate update = DB.sqlUpdate("update uuone set name = ? where 0=1");
-
-      for (int i = 0; i <= 40; i++) {
+      for (int i = 0; i < 40; i++) {
         update
           .setParameter(1, String.valueOf(i))
           .addBatch();

@@ -149,7 +149,6 @@ public final class BatchControl {
       // execute the request immediately without batching
       return request.executeNow();
     }
-
     if (pstmtHolder.getMaxSize() >= batchSize) {
       flush();
     }
@@ -166,7 +165,6 @@ public final class BatchControl {
    * according to the depth (object graph depth).
    */
   public int executeOrQueue(PersistRequestBean<?> request, boolean batch) throws BatchedSqlException {
-
     if (!batch || (batchFlushOnMixed && !pstmtHolder.isEmpty())) {
       // flush when mixing beans and updateSql
       flush();
@@ -185,7 +183,6 @@ public final class BatchControl {
    * Add the request to the batch and return true if we should flush.
    */
   private boolean addToBatch(PersistRequestBean<?> request) {
-
     Object alreadyInBatch = persistedBeans.put(request.getEntityBean(), DUMMY);
     if (alreadyInBatch != null) {
       // special case where the same bean instance has already been
@@ -220,7 +217,11 @@ public final class BatchControl {
    * Flush any batched PreparedStatements.
    */
   private void flushPstmtHolder() throws BatchedSqlException {
-    pstmtHolder.flush(getGeneratedKeys);
+    pstmtHolder.flush(getGeneratedKeys, false);
+  }
+
+  private void flushPstmtHolder(boolean reset) throws BatchedSqlException {
+    pstmtHolder.flush(getGeneratedKeys, reset);
   }
 
   /**
@@ -235,6 +236,15 @@ public final class BatchControl {
       list.get(i).executeNow();
     }
     flushPstmtHolder();
+  }
+
+  public void flushOnCommit() throws BatchedSqlException {
+    try {
+      flushBuffer(false);
+    } finally {
+      // ensure PreparedStatements are closed
+      pstmtHolder.clear();
+    }
   }
 
   /**
@@ -261,8 +271,8 @@ public final class BatchControl {
     persistedBeans.clear();
   }
 
-  private void flushBuffer(boolean resetTop) throws BatchedSqlException {
-    flushInternal(resetTop);
+  private void flushBuffer(boolean reset) throws BatchedSqlException {
+    flushInternal(reset);
     flushQueue(earlyQueue);
     flushQueue(lateQueue);
   }
@@ -275,14 +285,15 @@ public final class BatchControl {
 
   /**
    * execute all the requests currently queued or batched.
+   *
+   * @param reset When true close all batched statements (completely empty)
    */
-  private void flushInternal(boolean resetTop) throws BatchedSqlException {
-
+  private void flushInternal(boolean reset) throws BatchedSqlException {
     try {
       bufferMax = 0;
       if (!pstmtHolder.isEmpty()) {
         // Flush existing pstmts (updateSql or callableSql)
-        flushPstmtHolder();
+        flushPstmtHolder(reset);
       }
       if (isEmpty()) {
         // Nothing in queue to flush
@@ -301,7 +312,7 @@ public final class BatchControl {
         beanHolder.executeNow();
       }
       persistedBeans.clear();
-      if (resetTop) {
+      if (reset) {
         beanHoldMap.clear();
         depthOrder.clear();
       }

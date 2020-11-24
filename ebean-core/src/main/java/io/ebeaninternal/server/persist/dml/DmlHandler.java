@@ -24,8 +24,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 
   private static final int[] GENERATED_KEY_COLUMNS = new int[]{1};
-  private static final int BATCHED_FIRST = 1;
-  private static final int BATCHED = 2;
+  private static final short BATCHED_FIRST = 1;
+  private static final short BATCHED = 2;
 
   /**
    * The originating request.
@@ -261,17 +261,15 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Return a prepared statement taking into account batch requirements.
    */
   PreparedStatement getPstmtBatch(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
-
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
     batchedPstmt = batch.getBatchedPstmt(sql);
     if (batchedPstmt != null) {
-      batchedStatus = BATCHED;
+      batchedStatus = batchedPstmt.isEmpty() ? BATCHED_FIRST : BATCHED;
       return batchedPstmt.getStatement(request);
     }
 
     batchedStatus = BATCHED_FIRST;
     PreparedStatement stmt = getPstmt(t, sql, genKeys);
-
     batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);
     batch.addStmt(batchedPstmt, request);
     return stmt;
