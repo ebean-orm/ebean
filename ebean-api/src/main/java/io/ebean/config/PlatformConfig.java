@@ -20,7 +20,7 @@ public class PlatformConfig {
   /**
    * Set this to true for Postgres FOR UPDATE to include the primary key (not use NO KEY).
    */
-  private boolean lockWithKey;
+  private boolean lockWithKey = true;
 
   private DbConstraintNaming constraintNaming;
 

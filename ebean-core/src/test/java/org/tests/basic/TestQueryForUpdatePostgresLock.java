@@ -5,6 +5,7 @@ import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class TestQueryForUpdatePostgresLock extends BaseTestCase {
   private long timePreLock;
   private long timePostLock;
 
+  @Ignore // restore this test with explicit use of NO KEY lock strength
   @Test
   @ForPlatform(Platform.POSTGRES)
   public void testForUpdatePostgresLock() throws InterruptedException {
