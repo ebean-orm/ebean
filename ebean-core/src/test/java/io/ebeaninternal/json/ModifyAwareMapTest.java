@@ -59,7 +59,7 @@ public class ModifyAwareMapTest {
     ModifyAwareMap<String, String> map = createMap();
     assertFalse(map.isMarkedDirty());
 
-    map.markAsModified();
+    map.setMarkedDirty(true);
     Assert.assertTrue(map.isMarkedDirty());
   }
 

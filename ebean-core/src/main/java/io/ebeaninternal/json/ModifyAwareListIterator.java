@@ -1,5 +1,7 @@
 package io.ebeaninternal.json;
 
+import io.ebean.ModifyAwareType;
+
 import java.util.ListIterator;
 
 /**
@@ -7,11 +9,11 @@ import java.util.ListIterator;
  */
 public class ModifyAwareListIterator<E> implements ListIterator<E> {
 
-  final ModifyAwareOwner owner;
+  final ModifyAwareType owner;
 
   final ListIterator<E> iterator;
 
-  public ModifyAwareListIterator(ModifyAwareOwner owner, ListIterator<E> iterator) {
+  public ModifyAwareListIterator(ModifyAwareType owner, ListIterator<E> iterator) {
     this.owner = owner;
     this.iterator = iterator;
   }
@@ -48,19 +50,19 @@ public class ModifyAwareListIterator<E> implements ListIterator<E> {
 
   @Override
   public void remove() {
-    owner.markAsModified();
+    owner.setMarkedDirty(true);
     iterator.remove();
   }
 
   @Override
   public void set(E e) {
-    owner.markAsModified();
+    owner.setMarkedDirty(true);
     iterator.set(e);
   }
 
   @Override
   public void add(E e) {
-    owner.markAsModified();
+    owner.setMarkedDirty(true);
     iterator.add(e);
   }
 }

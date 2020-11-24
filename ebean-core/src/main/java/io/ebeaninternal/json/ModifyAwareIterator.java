@@ -1,5 +1,7 @@
 package io.ebeaninternal.json;
 
+import io.ebean.ModifyAwareType;
+
 import java.util.Iterator;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Iterator;
  */
 public class ModifyAwareIterator<E> implements Iterator<E> {
 
-  private final ModifyAwareOwner owner;
+  private final ModifyAwareType owner;
 
   private final Iterator<E> it;
 
@@ -17,7 +19,7 @@ public class ModifyAwareIterator<E> implements Iterator<E> {
    * The owner is notified of the removals.
    * </p>
    */
-  public ModifyAwareIterator(ModifyAwareOwner owner, Iterator<E> it) {
+  public ModifyAwareIterator(ModifyAwareType owner, Iterator<E> it) {
     this.owner = owner;
     this.it = it;
   }
@@ -34,7 +36,7 @@ public class ModifyAwareIterator<E> implements Iterator<E> {
 
   @Override
   public void remove() {
-    owner.markAsModified();
+    owner.setMarkedDirty(true);
     it.remove();
   }
 

@@ -2,7 +2,6 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DocPropertyType;
-import io.ebeaninternal.json.ModifyAwareOwner;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -62,7 +61,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
    */
   @Override
   public boolean isDirty(Object value) {
-    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
+    return CheckMarkedDirty.isDirty(value);
   }
 
   @Override

@@ -1,5 +1,8 @@
 package io.ebeaninternal.json;
 
+import io.ebean.ModifyAwareType;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -9,11 +12,11 @@ import java.util.Set;
 /**
  * Map that is wraps an underlying map for the purpose of detecting changes.
  */
-public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
+public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
 
-  final ModifyAwareOwner owner;
+  final ModifyAwareType owner;
 
   /**
    * The underlying map.
@@ -25,7 +28,7 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
     this.owner = new ModifyAwareFlag();
   }
 
-  public ModifyAwareMap(ModifyAwareOwner owner, Map<K, V> underlying) {
+  public ModifyAwareMap(ModifyAwareType owner, Map<K, V> underlying) {
     this.owner = owner;
     this.map = underlying;
   }
@@ -58,13 +61,12 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
   }
 
   @Override
-  public void markAsModified() {
-    owner.markAsModified();
+  public void setMarkedDirty(boolean markedDirty) {
+    owner.setMarkedDirty(markedDirty);
   }
 
-  @Override
-  public void resetMarkedDirty() {
-    owner.resetMarkedDirty();
+  private void markAsDirty() {
+    owner.setMarkedDirty(true);
   }
 
   @Override
@@ -94,7 +96,7 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
 
   @Override
   public V put(K key, V value) {
-    markAsModified();
+    markAsDirty();
     return map.put(key, value);
   }
 
@@ -102,14 +104,14 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
   public V remove(Object key) {
     V value = map.remove(key);
     if (value != null) {
-      markAsModified();
+      markAsDirty();
     }
     return value;
   }
 
   @Override
   public void putAll(Map<? extends K, ? extends V> m) {
-    markAsModified();
+    markAsDirty();
     map.putAll(m);
   }
 
@@ -117,7 +119,7 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
   @Override
   public void clear() {
     if (!map.isEmpty()) {
-      markAsModified();
+      markAsDirty();
     }
     map.clear();
   }

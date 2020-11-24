@@ -9,7 +9,6 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareOwner;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,7 +33,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   @Override
   public boolean isDirty(Object value) {
-    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
+    return CheckMarkedDirty.isDirty(value);
   }
 
   @SuppressWarnings("unchecked")

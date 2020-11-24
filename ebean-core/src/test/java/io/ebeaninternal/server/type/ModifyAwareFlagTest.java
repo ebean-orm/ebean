@@ -20,7 +20,7 @@ public class ModifyAwareFlagTest {
     ObjectOutputStream oos = new ObjectOutputStream(os);
 
     ModifyAwareFlag flag = new ModifyAwareFlag();
-    flag.markAsModified();
+    flag.setMarkedDirty(true);
     oos.writeObject(flag);
     oos.flush();
     oos.close();
