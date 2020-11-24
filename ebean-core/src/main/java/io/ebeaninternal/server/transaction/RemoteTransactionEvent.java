@@ -152,7 +152,9 @@ public class RemoteTransactionEvent implements Runnable, BinaryWritable {
   public boolean isEmpty() {
     return beanPersistList.isEmpty()
       && (tableList == null || tableList.isEmpty())
-      && (deleteByIdMap == null || deleteByIdMap.isEmpty());
+      && (deleteByIdMap == null || deleteByIdMap.isEmpty())
+      && remoteTableMod == null
+      && remoteCacheEvent == null;
   }
 
   public void addBeanPersistIds(BeanPersistIds beanPersist) {
