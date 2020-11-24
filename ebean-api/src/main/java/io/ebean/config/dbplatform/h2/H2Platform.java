@@ -51,7 +51,7 @@ public class H2Platform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
     // NOWAIT and SKIP LOCKED currently not supported with H2
     return sql + " for update";
   }

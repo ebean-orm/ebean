@@ -79,7 +79,7 @@ public class OraclePlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
     switch (forUpdateMode) {
       case SKIPLOCKED:
         return sql + " for update skip locked";

@@ -26,10 +26,14 @@ import java.sql.Types;
  */
 public class PostgresPlatform extends DatabasePlatform {
 
-  // by default using NO KEY option with FOR UPDATE clauses
-  private String forUpdateSkipLocked = " for no key update skip locked";
-  private String forUpdateNowait = " for no key update nowait";
-  private String forUpdate = " for no key update";
+  private static final String SKIP_LOCKED = " skip locked";
+  private static final String NO_WAIT = " nowait";
+  private static final String FOR_UPDATE = " for update";
+  private static final String FOR_NO_KEY_UPDATE = " for no key update";
+  private static final String FOR_SHARE = " for share";
+  private static final String FOR_KEY_SHARE = " for key share";
+
+  private boolean defaultLockWithKey = true;
 
   public PostgresPlatform() {
     super();
@@ -90,11 +94,7 @@ public class PostgresPlatform extends DatabasePlatform {
   @Override
   public void configure(PlatformConfig config) {
     super.configure(config);
-    if (config.isLockWithKey()) {
-      this.forUpdateSkipLocked = " for update skip locked";
-      this.forUpdateNowait = " for update nowait";
-      this.forUpdate = " for update";
-    }
+    defaultLockWithKey = config.isLockWithKey();
   }
 
   @Override
@@ -124,20 +124,30 @@ public class PostgresPlatform extends DatabasePlatform {
    */
   @Override
   public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
-
     return new PostgresSequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode) {
+  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
     switch (forUpdateMode) {
       case SKIPLOCKED:
-        return sql + forUpdateSkipLocked;
+        return sql + lock(lockType) + SKIP_LOCKED;
       case NOWAIT:
-        return sql + forUpdateNowait;
+        return sql + lock(lockType) + NO_WAIT;
       default:
-        return sql + forUpdate;
+        return sql + lock(lockType);
     }
+  }
+
+  private String lock(Query.LockType lockType) {
+    switch (lockType) {
+      case Update: return FOR_UPDATE;
+      case NoKeyUpdate: return FOR_NO_KEY_UPDATE;
+      case Share: return FOR_SHARE;
+      case KeyShare: return FOR_KEY_SHARE;
+      case Default: return defaultLockWithKey ? FOR_UPDATE : FOR_NO_KEY_UPDATE;
+    }
+    return FOR_UPDATE;
   }
 
   @Override

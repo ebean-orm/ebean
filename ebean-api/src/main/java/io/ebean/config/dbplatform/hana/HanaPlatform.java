@@ -1,5 +1,6 @@
 package io.ebean.config.dbplatform.hana;
 
+import io.ebean.Query;
 import io.ebean.Query.ForUpdate;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
@@ -68,7 +69,7 @@ public class HanaPlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, ForUpdate forUpdateMode) {
+  protected String withForUpdate(String sql, ForUpdate forUpdateMode, Query.LockType lockType) {
     switch (forUpdateMode) {
       case BASE:
         return sql + " for update";

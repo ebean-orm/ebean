@@ -175,6 +175,11 @@ public interface ExpressionList<T> {
   Query<T> forUpdate();
 
   /**
+   * Execute using "for update" with given lock type (currently Postgres only).
+   */
+  Query<T> forUpdate(Query.LockType lockType);
+
+  /**
    * Execute using "for update" clause with No Wait option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
@@ -183,12 +188,22 @@ public interface ExpressionList<T> {
   Query<T> forUpdateNoWait();
 
   /**
+   * Execute using "for update nowait" with given lock type (currently Postgres only).
+   */
+  Query<T> forUpdateNoWait(Query.LockType lockType);
+
+  /**
    * Execute using "for update" clause with Skip Locked option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
    * </p>
    */
   Query<T> forUpdateSkipLocked();
+
+  /**
+   * Execute using "for update skip locked" with given lock type (currently Postgres only).
+   */
+  Query<T> forUpdateSkipLocked(Query.LockType lockType);
 
   /**
    * Execute the query including soft deleted rows.

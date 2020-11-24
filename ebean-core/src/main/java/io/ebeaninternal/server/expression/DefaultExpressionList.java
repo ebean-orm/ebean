@@ -492,13 +492,28 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> forUpdate(Query.LockType lockType) {
+    return query.forUpdate(lockType);
+  }
+
+  @Override
   public Query<T> forUpdateNoWait() {
     return query.forUpdateNoWait();
   }
 
   @Override
+  public Query<T> forUpdateNoWait(Query.LockType lockType) {
+    return query.forUpdateNoWait(lockType);
+  }
+
+  @Override
   public Query<T> forUpdateSkipLocked() {
     return query.forUpdateSkipLocked();
+  }
+
+  @Override
+  public Query<T> forUpdateSkipLocked(Query.LockType lockType) {
+    return query.forUpdateSkipLocked(lockType);
   }
 
   @Override
