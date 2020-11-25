@@ -138,9 +138,8 @@ public final class BatchControl {
    * These all go straight to jdbc and use addBatch(). Entity beans goto a queue
    * and wait there so that the jdbc is executed in the correct order according
    * to the depth.
-   * </p>
    */
-  public int executeStatementOrBatch(PersistRequest request, boolean batch) throws BatchedSqlException {
+  public int executeStatementOrBatch(PersistRequest request, boolean batch, boolean addBatch) throws BatchedSqlException {
     if (!batch || (batchFlushOnMixed && !isBeansEmpty())) {
       // flush when mixing beans and updateSql
       flush();
@@ -149,7 +148,7 @@ public final class BatchControl {
       // execute the request immediately without batching
       return request.executeNow();
     }
-    if (pstmtHolder.getMaxSize() >= batchSize) {
+    if (!addBatch && pstmtHolder.getMaxSize() >= batchSize) {
       flush();
     }
     // for OrmUpdate, SqlUpdate, CallableSql there is no queue...
