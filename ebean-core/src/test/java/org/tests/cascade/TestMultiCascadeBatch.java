@@ -1,6 +1,7 @@
 package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
@@ -48,6 +49,12 @@ public class TestMultiCascadeBatch extends BaseTestCase {
     grandparent.save();
 
     final List<String> sql = LoggedSqlCollector.stop();
+
+    final List<Site> list = DB.find(Site.class).where()
+      .idIn(grandparent.getId(), parent.getId(), child.getId())
+      .findList();
+
+    assertThat(list).hasSize(3);
 
     assertThat(sql).hasSize(5);
     assertSql(sql.get(0)).contains("insert into site (id, name");

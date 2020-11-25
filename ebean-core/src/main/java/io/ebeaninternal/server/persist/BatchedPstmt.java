@@ -37,7 +37,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * The list of BatchPostExecute used to perform post processing.
    */
-  private final ArrayList<BatchPostExecute> list = new ArrayList<>();
+  private final List<BatchPostExecute> list = new ArrayList<>();
 
   private final String sql;
 
@@ -68,6 +68,10 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
     return list.size();
   }
 
+  public boolean isEmpty() {
+    return list.isEmpty();
+  }
+
   /**
    * Return the sql
    */
@@ -95,9 +99,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
     if (rows.length != list.size()) {
       throw new IllegalStateException("Invalid state on executeBatch, rows:" + rows.length + " != " + list.size());
     }
-    for (BatchPostExecute item : list) {
-      item.postExecute();
-    }
+    postExecute();
     list.clear();
   }
 
@@ -113,7 +115,9 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
    * Run any post processing including getGeneratedKeys.
    */
   public void executeBatch(boolean getGeneratedKeys) throws SQLException {
-
+    if (list.isEmpty()) {
+      return;
+    }
     timedStart = System.nanoTime();
     profileStart = transaction.profileOffset();
     executeAndCheckRowCounts();
@@ -121,8 +125,8 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
       getGeneratedKeys();
     }
     postExecute();
-    close();
     addTimingMetrics();
+    list.clear();
     transaction.profileEvent(this);
   }
 
@@ -140,10 +144,15 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Close the underlying statement.
    */
-  public void close() throws SQLException {
+  public void close() {
     if (pstmt != null) {
-      pstmt.close();
-      pstmt = null;
+      try {
+        pstmt.close();
+      } catch (SQLException e) {
+        log.warn("Error closing statement", e);
+      } finally {
+        pstmt = null;
+      }
     }
   }
 
@@ -169,7 +178,6 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   }
 
   private void getGeneratedKeys() throws SQLException {
-
     int index = 0;
     try (ResultSet rset = pstmt.getGeneratedKeys()) {
       while (rset.next()) {
@@ -190,8 +198,13 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Register any inputStreams that should be closed after execution.
    */
-  public void registerInputStreams(List<InputStream> inputStreams) {
-    this.inputStreams = inputStreams;
+  public void registerInputStreams(List<InputStream> streams) {
+    if (streams != null) {
+      if (this.inputStreams == null) {
+        this.inputStreams = new ArrayList<>();
+      }
+      this.inputStreams.addAll(streams);
+    }
   }
 
   private void closeInputStreams() {
@@ -203,6 +216,7 @@ public class BatchedPstmt implements SpiProfileTransactionEvent {
           log.warn("Error closing inputStream ", e);
         }
       }
+      inputStreams = null;
     }
   }
 }
