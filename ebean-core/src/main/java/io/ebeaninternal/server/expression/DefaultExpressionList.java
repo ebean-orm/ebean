@@ -487,6 +487,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> withLock(Query.LockType lockType) {
+    return query.withLock(lockType);
+  }
+
+  @Override
+  public Query<T> withLock(Query.LockType lockType, Query.LockWait lockWait) {
+    return query.withLock(lockType, lockWait);
+  }
+
+  @Override
   public Query<T> forUpdate() {
     return query.forUpdate();
   }

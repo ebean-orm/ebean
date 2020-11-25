@@ -184,7 +184,8 @@ public interface Query<T> {
    */
   enum LockType {
     /**
-     * The default lock type - See PlatformConfig.forUpdateNoKey option.
+     * The default lock type being either UPDATE or NO_KEY_UPDATE based on
+     * PlatformConfig.forUpdateNoKey configuration (Postgres option).
      */
     DEFAULT,
 
@@ -194,17 +195,17 @@ public interface Query<T> {
     UPDATE,
 
     /**
-     * FOR NO KEY UPDATE.
+     * FOR NO KEY UPDATE (Postgres only).
      */
     NO_KEY_UPDATE,
 
     /**
-     * FOR SHARE UPDATE.
+     * FOR SHARE (Postgres only).
      */
     SHARE,
 
     /**
-     * FOR KEY SHARE UPDATE.
+     * FOR KEY SHARE (Postgres only).
      */
     KEY_SHARE
   }
@@ -1644,6 +1645,16 @@ public interface Query<T> {
   String getGeneratedSql();
 
   /**
+   * Execute the query with the given lock type and WAIT.
+   */
+  Query<T> withLock(LockType lockType);
+
+  /**
+   * Execute the query with the given lock type and lock wait.
+   */
+  Query<T> withLock(LockType lockType, LockWait lockWait);
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
@@ -1651,6 +1662,7 @@ public interface Query<T> {
   /**
    * Execute using "for update" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdate(LockType lockType);
 
   /**
@@ -1664,6 +1676,7 @@ public interface Query<T> {
   /**
    * Execute using "for update nowait" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdateNoWait(LockType lockType);
 
   /**
@@ -1677,6 +1690,7 @@ public interface Query<T> {
   /**
    * Execute using "for update skip locked" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdateSkipLocked(LockType lockType);
 
   /**

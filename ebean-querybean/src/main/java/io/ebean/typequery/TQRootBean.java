@@ -686,6 +686,22 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Execute the query with the given lock type and WAIT.
+   */
+  R withLock(Query.LockType lockType) {
+    query.withLock(lockType);
+    return root;
+  }
+
+  /**
+   * Execute the query with the given lock type and lock wait.
+   */
+  R withLock(Query.LockType lockType, Query.LockWait lockWait) {
+    query.withLock(lockType, lockWait);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {
@@ -694,8 +710,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Deprecated - migrate to withLock().
    * Execute using "for update" with given lock type (currently Postgres only).
    */
+  @Deprecated
   public R forUpdate(Query.LockType lockType) {
     query.forUpdate(lockType);
     return root;
@@ -712,8 +730,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Deprecated - migrate to withLock().
    * Execute using "for update nowait" with given lock type (currently Postgres only).
    */
+  @Deprecated
   public R forUpdateNoWait(Query.LockType lockType) {
     query.forUpdateNoWait(lockType);
     return root;
@@ -731,8 +751,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Deprecated - migrate to withLock().
    * Execute using "for update skip locked" with given lock type (currently Postgres only).
    */
+  @Deprecated
   public R forUpdateSkipLocked(Query.LockType lockType) {
     query.forUpdateSkipLocked(lockType);
     return root;
