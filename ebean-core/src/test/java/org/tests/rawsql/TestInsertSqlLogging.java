@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiTransaction;
@@ -17,12 +17,12 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.find(AuditLog.class).where().ge("id", 10000).delete();
+    DB.find(AuditLog.class).where().ge("id", 10000).delete();
 
     String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
-    SqlUpdate insert = Ebean.createSqlUpdate(sql);
+    SqlUpdate insert = DB.sqlUpdate(sql);
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
       txn.setBatchSize(2);
 
@@ -48,12 +48,12 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void addBatch_executeBatch() {
 
-    Ebean.find(AuditLog.class).where().ge("id", 10000).delete();
+    DB.find(AuditLog.class).where().ge("id", 10000).delete();
 
     String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
-    SqlUpdate insert = Ebean.createSqlUpdate(sql);
+    SqlUpdate insert = DB.sqlUpdate(sql);
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
 
       insert.setParameter(10000);
       insert.setParameter("hello");
@@ -80,12 +80,12 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void addBatch_namedParams() {
 
-    Ebean.find(AuditLog.class).where().ge("id", 10000).delete();
+    DB.find(AuditLog.class).where().ge("id", 10000).delete();
 
     String sql = "insert into audit_log (id, description, modified_description) values (:id, :desc, :modDesc)";
-    SqlUpdate insert = Ebean.createSqlUpdate(sql);
+    SqlUpdate insert = DB.sqlUpdate(sql);
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
 
       insert.setParameter("id", 20000);
       insert.setParameter("desc", "hello");
@@ -112,10 +112,10 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void test_trim_leadingSpaces_eventFound() {
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       String upd = "   update audit_log set description='junk' where id = 10001";
-      SqlUpdate update = Ebean.createSqlUpdate(upd);
+      SqlUpdate update = DB.sqlUpdate(upd);
       update.execute();
       transaction.commit();
 

@@ -3,7 +3,6 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DuplicateKeyException;
-import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
 
     UUID id = UUID.randomUUID();
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
     sqlUpdate.setParameter(1, id);
     sqlUpdate.setParameter(2, "hi");
     sqlUpdate.setParameter(3, 1);
@@ -53,10 +52,9 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
   @Test(expected = DuplicateKeyException.class)
   public void duplicateKey_executeNow() {
 
-
     UUID id = UUID.randomUUID();
 
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+    SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
     sqlUpdate.setParameter(1, id);
     sqlUpdate.setParameter(2, "hi");
     sqlUpdate.setParameter(3, 1);
@@ -73,9 +71,9 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
 
     UUID id = UUID.randomUUID();
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
-      SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+      SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
       sqlUpdate.setParameter(1, id);
       sqlUpdate.setParameter(2, "hi in batch");
       sqlUpdate.setParameter(3, 1);
@@ -95,9 +93,9 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
 
     UUID id = UUID.randomUUID();
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
-      SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);
+      SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
       sqlUpdate.setParameter(1, id);
       sqlUpdate.setParameter(2, "hi in batch");
       sqlUpdate.setParameter(3, 1);
@@ -107,8 +105,8 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
       sqlUpdate.setParameter(2, "fail in batch");
       sqlUpdate.setParameter(3, 1);
       sqlUpdate.addBatch();
-      int[] ints = sqlUpdate.executeBatch();
 
+      sqlUpdate.executeBatch();
       transaction.commit();
     }
   }
