@@ -965,7 +965,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> forUpdate() {
-    return setForUpdateWithMode(LockWait.WAIT, LockType.Default);
+    return setForUpdateWithMode(LockWait.WAIT, LockType.DEFAULT);
   }
 
   @Override
@@ -985,12 +985,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> forUpdateNoWait() {
-    return setForUpdateWithMode(LockWait.NOWAIT, LockType.Default);
+    return setForUpdateWithMode(LockWait.NOWAIT, LockType.DEFAULT);
   }
 
   @Override
   public DefaultOrmQuery<T> forUpdateSkipLocked() {
-    return setForUpdateWithMode(LockWait.SKIPLOCKED, LockType.Default);
+    return setForUpdateWithMode(LockWait.SKIPLOCKED, LockType.DEFAULT);
   }
 
   private DefaultOrmQuery<T> setForUpdateWithMode(LockWait mode, LockType lockType) {

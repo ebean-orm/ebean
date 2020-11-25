@@ -141,11 +141,11 @@ public class PostgresPlatform extends DatabasePlatform {
 
   private String lock(Query.LockType lockType) {
     switch (lockType) {
-      case Update: return FOR_UPDATE;
-      case NoKeyUpdate: return FOR_NO_KEY_UPDATE;
-      case Share: return FOR_SHARE;
-      case KeyShare: return FOR_KEY_SHARE;
-      case Default: return forUpdateNoKey ? FOR_NO_KEY_UPDATE : FOR_UPDATE;
+      case UPDATE: return FOR_UPDATE;
+      case NO_KEY_UPDATE: return FOR_NO_KEY_UPDATE;
+      case SHARE: return FOR_SHARE;
+      case KEY_SHARE: return FOR_KEY_SHARE;
+      case DEFAULT: return forUpdateNoKey ? FOR_NO_KEY_UPDATE : FOR_UPDATE;
     }
     return FOR_UPDATE;
   }

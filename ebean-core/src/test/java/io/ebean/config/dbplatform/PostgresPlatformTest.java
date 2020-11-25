@@ -30,24 +30,24 @@ public class PostgresPlatformTest {
     platform.configure(config);
 
     assertThat(config.isForUpdateNoKey()).isFalse();
-    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.Default)).isEqualTo("X for update skip locked");
-    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.Default)).isEqualTo("X for update nowait");
-    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.Default)).isEqualTo("X for update");
+    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.DEFAULT)).isEqualTo("X for update skip locked");
+    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.DEFAULT)).isEqualTo("X for update nowait");
+    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.DEFAULT)).isEqualTo("X for update");
 
-    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.Update)).isEqualTo("X for update skip locked");
-    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.NoKeyUpdate)).isEqualTo("X for no key update skip locked");
-    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.Share)).isEqualTo("X for share skip locked");
-    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.KeyShare)).isEqualTo("X for key share skip locked");
+    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.UPDATE)).isEqualTo("X for update skip locked");
+    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.NO_KEY_UPDATE)).isEqualTo("X for no key update skip locked");
+    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.SHARE)).isEqualTo("X for share skip locked");
+    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.KEY_SHARE)).isEqualTo("X for key share skip locked");
 
-    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.Update)).isEqualTo("X for update nowait");
-    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.NoKeyUpdate)).isEqualTo("X for no key update nowait");
-    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.Share)).isEqualTo("X for share nowait");
-    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.KeyShare)).isEqualTo("X for key share nowait");
+    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.UPDATE)).isEqualTo("X for update nowait");
+    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.NO_KEY_UPDATE)).isEqualTo("X for no key update nowait");
+    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.SHARE)).isEqualTo("X for share nowait");
+    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.KEY_SHARE)).isEqualTo("X for key share nowait");
 
-    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.Update)).isEqualTo("X for update");
-    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.NoKeyUpdate)).isEqualTo("X for no key update");
-    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.Share)).isEqualTo("X for share");
-    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.KeyShare)).isEqualTo("X for key share");
+    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.UPDATE)).isEqualTo("X for update");
+    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.NO_KEY_UPDATE)).isEqualTo("X for no key update");
+    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.SHARE)).isEqualTo("X for share");
+    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.KEY_SHARE)).isEqualTo("X for key share");
   }
 
   @Test
@@ -60,9 +60,9 @@ public class PostgresPlatformTest {
     platform.configure(config);
 
     assertThat(config.isForUpdateNoKey()).isTrue();
-    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.Default)).isEqualTo("X for no key update skip locked");
-    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.Default)).isEqualTo("X for no key update nowait");
-    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.Default)).isEqualTo("X for no key update");
+    assertThat(platform.withForUpdate("X", Query.LockWait.SKIPLOCKED, Query.LockType.DEFAULT)).isEqualTo("X for no key update skip locked");
+    assertThat(platform.withForUpdate("X", Query.LockWait.NOWAIT, Query.LockType.DEFAULT)).isEqualTo("X for no key update nowait");
+    assertThat(platform.withForUpdate("X", Query.LockWait.WAIT, Query.LockType.DEFAULT)).isEqualTo("X for no key update");
   }
 
 }

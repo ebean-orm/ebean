@@ -184,29 +184,29 @@ public interface Query<T> {
    */
   enum LockType {
     /**
-     * The default lock type - See PlatformConfig.lockWithKey option.
+     * The default lock type - See PlatformConfig.forUpdateNoKey option.
      */
-    Default,
+    DEFAULT,
 
     /**
      * FOR UPDATE.
      */
-    Update,
+    UPDATE,
 
     /**
      * FOR NO KEY UPDATE.
      */
-    NoKeyUpdate,
+    NO_KEY_UPDATE,
 
     /**
-     * FOR SHARE.
+     * FOR SHARE UPDATE.
      */
-    Share,
+    SHARE,
 
     /**
-     * FOR KEY SHARE.
+     * FOR KEY SHARE UPDATE.
      */
-    KeyShare
+    KEY_SHARE
   }
 
   /**
