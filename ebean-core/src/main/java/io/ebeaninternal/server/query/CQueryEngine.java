@@ -237,6 +237,7 @@ public class CQueryEngine {
 
     } catch (SQLException e) {
       try {
+        cquery.close();
         throw cquery.createPersistenceException(e);
       } finally {
         request.rollbackTransIfRequired();
