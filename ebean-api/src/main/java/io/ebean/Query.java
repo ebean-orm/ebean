@@ -210,13 +210,13 @@ public interface Query<T> {
   }
 
   /**
-   * For update mode.
+   * FOR UPDATE wait mode.
    */
-  enum ForUpdate {
+  enum LockWait {
     /**
      * Standard For update clause.
      */
-    BASE,
+    WAIT,
 
     /**
      * For update with No Wait option.
@@ -1685,9 +1685,9 @@ public interface Query<T> {
   boolean isForUpdate();
 
   /**
-   * Return the "for update" mode to use.
+   * Return the "for update" wait mode to use.
    */
-  ForUpdate getForUpdateMode();
+  LockWait getForUpdateLockWait();
 
   /**
    * Return the lock type (strength) to use with "for update".

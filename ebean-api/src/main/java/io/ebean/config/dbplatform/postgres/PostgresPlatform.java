@@ -128,8 +128,8 @@ public class PostgresPlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
-    switch (forUpdateMode) {
+  protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
+    switch (lockWait) {
       case SKIPLOCKED:
         return sql + lock(lockType) + SKIP_LOCKED;
       case NOWAIT:

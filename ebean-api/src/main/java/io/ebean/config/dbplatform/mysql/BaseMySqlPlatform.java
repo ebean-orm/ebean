@@ -60,7 +60,7 @@ public abstract class BaseMySqlPlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
+  protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // NOWAIT and SKIP LOCKED currently not supported with MySQL
     return sql + " for update";
   }

@@ -1,7 +1,7 @@
 package io.ebean.config.dbplatform.hana;
 
 import io.ebean.Query;
-import io.ebean.Query.ForUpdate;
+import io.ebean.Query.LockWait;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
@@ -69,16 +69,16 @@ public class HanaPlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, ForUpdate forUpdateMode, Query.LockType lockType) {
-    switch (forUpdateMode) {
-      case BASE:
+  protected String withForUpdate(String sql, LockWait lockWait, Query.LockType lockType) {
+    switch (lockWait) {
+      case WAIT:
         return sql + " for update";
       case NOWAIT:
         return sql + " for update nowait";
       case SKIPLOCKED:
         return sql + " for update ignore locked";
       default:
-        throw new IllegalArgumentException("Unknown update mode: " + forUpdateMode.name());
+        throw new IllegalArgumentException("Unknown update mode: " + lockWait);
     }
   }
 

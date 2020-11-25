@@ -237,7 +237,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Return the ForUpdate mode.
    */
   @Override
-  ForUpdate getForUpdateMode();
+  LockWait getForUpdateLockWait();
 
   /**
    * Return the bean descriptor for this query.

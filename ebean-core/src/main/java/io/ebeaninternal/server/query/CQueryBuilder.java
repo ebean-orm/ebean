@@ -783,7 +783,7 @@ class CQueryBuilder {
    * Return the 'for update' FROM hint (sql server).
    */
   String fromForUpdate(SpiQuery<?> query) {
-    Query.ForUpdate mode = query.getForUpdateMode();
+    Query.LockWait mode = query.getForUpdateLockWait();
     if (mode == null) {
       return null;
     } else {

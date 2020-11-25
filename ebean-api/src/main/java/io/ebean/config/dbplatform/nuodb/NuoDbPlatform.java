@@ -48,8 +48,8 @@ public class NuoDbPlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
-    switch (forUpdateMode) {
+  protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
+    switch (lockWait) {
       case NOWAIT:
         return sql + " for update nowait";
       case SKIPLOCKED:

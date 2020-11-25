@@ -236,7 +236,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private Boolean autoTune;
 
-  private ForUpdate forUpdate;
+  private LockWait forUpdate;
   private LockType lockType;
 
   private boolean singleAttribute;
@@ -965,35 +965,35 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> forUpdate() {
-    return setForUpdateWithMode(ForUpdate.BASE, LockType.Default);
+    return setForUpdateWithMode(LockWait.WAIT, LockType.Default);
   }
 
   @Override
   public Query<T> forUpdate(LockType lockType) {
-    return setForUpdateWithMode(ForUpdate.BASE, lockType);
+    return setForUpdateWithMode(LockWait.WAIT, lockType);
   }
 
   @Override
   public Query<T> forUpdateNoWait(LockType lockType) {
-    return setForUpdateWithMode(ForUpdate.NOWAIT, lockType);
+    return setForUpdateWithMode(LockWait.NOWAIT, lockType);
   }
 
   @Override
   public Query<T> forUpdateSkipLocked(LockType lockType) {
-    return setForUpdateWithMode(ForUpdate.SKIPLOCKED, lockType);
+    return setForUpdateWithMode(LockWait.SKIPLOCKED, lockType);
   }
 
   @Override
   public DefaultOrmQuery<T> forUpdateNoWait() {
-    return setForUpdateWithMode(ForUpdate.NOWAIT, LockType.Default);
+    return setForUpdateWithMode(LockWait.NOWAIT, LockType.Default);
   }
 
   @Override
   public DefaultOrmQuery<T> forUpdateSkipLocked() {
-    return setForUpdateWithMode(ForUpdate.SKIPLOCKED, LockType.Default);
+    return setForUpdateWithMode(LockWait.SKIPLOCKED, LockType.Default);
   }
 
-  private DefaultOrmQuery<T> setForUpdateWithMode(ForUpdate mode, LockType lockType) {
+  private DefaultOrmQuery<T> setForUpdateWithMode(LockWait mode, LockType lockType) {
     this.forUpdate = mode;
     this.lockType = lockType;
     this.useBeanCache = CacheMode.OFF;
@@ -1006,7 +1006,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public ForUpdate getForUpdateMode() {
+  public LockWait getForUpdateLockWait() {
     return forUpdate;
   }
 
@@ -1146,6 +1146,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     if (forUpdate != null) {
       sb.append(",forUpd:").append(forUpdate.ordinal());
+      if (lockType != null) {
+        sb.append(",lt:").append(lockType.ordinal());
+      }
     }
     if (id != null) {
       sb.append(",id:");

@@ -105,8 +105,8 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
    * For update is part of the FROM clause on the base table for sql server.
    */
   @Override
-  public String fromForUpdate(Query.ForUpdate forUpdateMode) {
-    switch (forUpdateMode) {
+  public String fromForUpdate(Query.LockWait lockWait) {
+    switch (lockWait) {
       case SKIPLOCKED:
         return "with (updlock,readpast)";
       case NOWAIT:
@@ -117,7 +117,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
   }
 
   @Override
-  protected String withForUpdate(String sql, Query.ForUpdate forUpdateMode, Query.LockType lockType) {
+  protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // for update are hints on from clause of base table
     return sql;
   }
