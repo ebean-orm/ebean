@@ -59,7 +59,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   public int addBatch() {
     this.addBatch = true;
-    return executeOrQueue();
+    return executeStatement(true);
   }
 
   /**
