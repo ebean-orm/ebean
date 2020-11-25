@@ -687,6 +687,12 @@ public abstract class TQRootBean<T, R> {
 
   /**
    * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
   R withLock(Query.LockType lockType) {
     query.withLock(lockType);
@@ -695,6 +701,12 @@ public abstract class TQRootBean<T, R> {
 
   /**
    * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
   R withLock(Query.LockType lockType, Query.LockWait lockWait) {
     query.withLock(lockType, lockWait);

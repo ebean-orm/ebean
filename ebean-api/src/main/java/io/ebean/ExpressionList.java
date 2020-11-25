@@ -171,11 +171,23 @@ public interface ExpressionList<T> {
 
   /**
    * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
   Query<T> withLock(Query.LockType lockType);
 
   /**
    * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
   Query<T> withLock(Query.LockType lockType, Query.LockWait lockWait);
 
