@@ -1,15 +1,14 @@
-dist: trusty
+dist: xenial
 sudo: required
 language: java
 jdk:
-  - oraclejdk8
   - openjdk11
 
 git:
   depth: 3
 
 addons:
-  postgresql: "9.6"
+  postgresql: 10
 #  apt:
 #    packages:
 #    - mysql-server-5.7

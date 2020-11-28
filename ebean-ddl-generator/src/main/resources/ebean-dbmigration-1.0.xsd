@@ -1,0 +1,374 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://ebean-orm.github.io/xml/ns/dbmigration"
+            targetNamespace="http://ebean-orm.github.io/xml/ns/dbmigration" elementFormDefault="qualified">
+
+  <!-- =========================================================== -->
+  <!-- CHANGE LOG                                                  -->
+  <!-- =========================================================== -->
+
+  <!-- Root level type : migration -->
+
+  <xsd:element name="migration">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="changeSet" minOccurs="1" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="changeSet">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:choice>
+          <xsd:group ref="changeSetChildren" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+      </xsd:sequence>
+      <xsd:attribute name="type" type="changeSetType" use="required"/>
+      <xsd:attribute name="dropsFor" type="xsd:string"/>
+      <xsd:attribute name="suppressDropsForever" type="xsd:boolean"/>
+      <xsd:attribute name="generated" type="xsd:boolean"/>
+      <xsd:attribute name="author" type="xsd:string"/>
+      <xsd:attribute name="comment" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:simpleType name="changeSetType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="apply"/>
+      <xsd:enumeration value="pendingDrops"/>
+      <xsd:enumeration value="baseline"/>
+      <xsd:enumeration value="drop"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="ddl-script">
+      <xsd:sequence>
+        <xsd:element name="ddl" type="xsd:string" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="platforms" type="xsd:string"/>
+  </xsd:complexType>
+
+  <!-- =========================================================== -->
+  <!-- CHANGE SET CHILDREN                                         -->
+  <!-- =========================================================== -->
+
+  <xsd:element name="sql">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="apply" minOccurs="1" maxOccurs="1"/>
+        <xsd:element ref="rollback" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="apply">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="rollback">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- CONFIGURATION -->
+
+  <xsd:element name="configuration">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="defaultTablespace"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="defaultTablespace">
+    <xsd:complexType>
+      <xsd:attribute name="tables" type="xsd:string"/>
+      <xsd:attribute name="indexes" type="xsd:string"/>
+      <xsd:attribute name="history" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- TABLE  -->
+
+  <xsd:element name="createTable">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="column" minOccurs="1" maxOccurs="unbounded"/>
+        <xsd:element ref="uniqueConstraint" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="foreignKey" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="partitionMode" type="xsd:string"/>
+      <xsd:attribute name="partitionColumn" type="xsd:string"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
+      <xsd:attribute name="draft" type="xsd:boolean"/>
+      <xsd:attribute name="identityType" type="identityType"/>
+      <xsd:attribute name="identityStart" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityIncrement" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityCache" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityGenerated" type="xsd:string"/>
+      <xsd:attribute name="sequenceName" type="xsd:string"/>
+      <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>
+      <xsd:attribute name="sequenceAllocate" type="xsd:positiveInteger"/>
+      <xsd:attribute name="pkName" type="xsd:string"/>
+      <xsd:attribute name="storageEngine" type="xsd:string"/>
+      <xsd:attributeGroup ref="tablespaceAttributes"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:simpleType name="identityType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="identity"/>
+      <xsd:enumeration value="sequence"/>
+      <xsd:enumeration value="generator"/>
+      <xsd:enumeration value="external"/>
+      <xsd:enumeration value="default"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- Only expected to be used for compound unique constraint -->
+  <xsd:element name="uniqueConstraint">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
+      <xsd:attribute name="oneToOne" type="xsd:boolean"/>
+      <xsd:attribute name="nullableColumns" type="xsd:string"/>
+      <xsd:attribute name="platforms" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="addUniqueConstraint">
+    <xsd:complexType>
+      <xsd:attribute name="constraintName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
+      <xsd:attribute name="oneToOne" type="xsd:boolean"/>
+      <xsd:attribute name="nullableColumns" type="xsd:string"/>
+      <xsd:attribute name="platforms" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- Only expected to be used for compound foreign keys -->
+  <xsd:element name="foreignKey">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
+      <xsd:attribute name="refColumnNames" type="xsd:string" use="required"/>
+      <xsd:attribute name="refTableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="indexName" type="xsd:string"/>
+      <xsd:attribute name="onDelete" type="xsd:string"/>
+      <xsd:attribute name="onUpdate" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="alterForeignKey">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="columnNames" type="xsd:string"/>
+      <xsd:attribute name="refColumnNames" type="xsd:string"/>
+      <xsd:attribute name="refTableName" type="xsd:string"/>
+      <xsd:attribute name="indexName" type="xsd:string"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="onDelete" type="xsd:string"/>
+      <xsd:attribute name="onUpdate" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="dropTable">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="sequenceCol" type="xsd:string"/>
+      <xsd:attribute name="sequenceName" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="renameTable">
+    <xsd:complexType>
+      <xsd:attribute name="oldName" type="xsd:string" use="required"/>
+      <xsd:attribute name="newName" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="addTableComment">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="comment" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- HISTORY -->
+
+  <xsd:element name="addHistoryTable">
+    <xsd:complexType>
+      <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="alterHistoryTable">
+    <xsd:complexType>
+      <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="dropHistoryTable">
+    <xsd:complexType>
+      <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- COLUMN -->
+
+  <xsd:element name="addColumn">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="column" minOccurs="1" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="dropColumn">
+    <xsd:complexType>
+      <xsd:attribute name="columnName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="alterColumn">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="before" minOccurs="0" maxOccurs="unbounded" type="ddl-script"/>
+        <xsd:element name="after" minOccurs="0" maxOccurs="unbounded" type="ddl-script"/>
+      </xsd:sequence>
+      <xsd:attribute name="columnName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
+      <xsd:attribute name="type" type="xsd:string"/>
+      <xsd:attribute name="currentType" type="xsd:string"/>
+      <xsd:attribute name="defaultValue" type="xsd:string"/>
+      <xsd:attribute name="currentDefaultValue" type="xsd:string"/>
+      <xsd:attribute name="notnull" type="xsd:boolean"/>
+      <xsd:attribute name="currentNotnull" type="xsd:boolean"/>
+      <xsd:attribute name="comment" type="xsd:string"/>
+      <xsd:attribute name="historyExclude" type="xsd:boolean"/>
+      <xsd:attribute name="checkConstraint" type="xsd:string"/>
+      <xsd:attribute name="checkConstraintName" type="xsd:string"/>
+      <xsd:attribute name="dropCheckConstraint" type="xsd:string"/>
+      <xsd:attribute name="unique" type="xsd:string"/>
+      <xsd:attribute name="uniqueOneToOne" type="xsd:string"/>
+      <xsd:attribute name="dropUnique" type="xsd:string"/>
+      <xsd:attribute name="references" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyName" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyIndex" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyOnDelete" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyOnUpdate" type="xsd:string"/>
+      <xsd:attribute name="dropForeignKey" type="xsd:string"/>
+      <xsd:attribute name="dropForeignKeyIndex" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="renameColumn">
+    <xsd:complexType>
+      <xsd:attribute name="oldName" type="xsd:string" use="required"/>
+      <xsd:attribute name="newName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="dataType" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- INDEXES -->
+
+  <xsd:element name="createIndex">
+    <xsd:complexType>
+      <xsd:attribute name="indexName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="columns" type="xsd:string" use="required"/>
+      <xsd:attribute name="unique" type="xsd:boolean"/>
+      <xsd:attribute name="concurrent" type="xsd:boolean"/>
+      <xsd:attribute name="definition" type="xsd:string"/>
+      <xsd:attribute name="platforms" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="dropIndex">
+    <xsd:complexType>
+      <xsd:attribute name="indexName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="concurrent" type="xsd:boolean"/>
+      <xsd:attribute name="platforms" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- ============================================ -->
+
+  <xsd:element name="column">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="before" minOccurs="0" maxOccurs="unbounded" type="ddl-script"/>
+        <xsd:element name="after" minOccurs="0" maxOccurs="unbounded" type="ddl-script"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="type" type="xsd:string" use="required"/>
+      <xsd:attribute name="defaultValue" type="xsd:string"/>
+      <xsd:attribute name="notnull" type="xsd:boolean"/>
+      <xsd:attribute name="historyExclude" type="xsd:boolean"/>
+      <xsd:attribute name="primaryKey" type="xsd:boolean"/>
+      <xsd:attribute name="identity" type="xsd:boolean"/>
+      <xsd:attribute name="checkConstraint" type="xsd:string"/>
+      <xsd:attribute name="checkConstraintName" type="xsd:string"/>
+      <xsd:attribute name="unique" type="xsd:string"/>
+      <xsd:attribute name="uniqueOneToOne" type="xsd:string"/>
+      <xsd:attribute name="references" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyName" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyIndex" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyOnDelete" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyOnUpdate" type="xsd:string"/>
+      <xsd:attribute name="comment" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:attributeGroup name="tablespaceAttributes">
+    <xsd:attribute name="tablespace" type="xsd:string"/>
+    <xsd:attribute name="indexTablespace" type="xsd:string"/>
+    <xsd:attribute name="comment" type="xsd:string"/>
+  </xsd:attributeGroup>
+
+  <!--  Children for changeSet  -->
+  <xsd:group name="changeSetChildren">
+    <xsd:choice>
+      <xsd:element ref="configuration" maxOccurs="1"/>
+      <xsd:element ref="sql" maxOccurs="unbounded"/>
+
+      <xsd:element ref="createTable" maxOccurs="unbounded"/>
+      <xsd:element ref="dropTable" maxOccurs="unbounded"/>
+      <xsd:element ref="renameTable" maxOccurs="unbounded"/>
+      <xsd:element ref="addTableComment" maxOccurs="unbounded"/>
+      <xsd:element ref="addUniqueConstraint" maxOccurs="unbounded"/>
+
+      <xsd:element ref="addHistoryTable" maxOccurs="unbounded"/>
+      <xsd:element ref="dropHistoryTable" maxOccurs="unbounded"/>
+      <xsd:element ref="alterForeignKey" maxOccurs="unbounded"/>
+
+      <xsd:element ref="addColumn" maxOccurs="unbounded"/>
+      <xsd:element ref="dropColumn" maxOccurs="unbounded"/>
+      <xsd:element ref="alterColumn" maxOccurs="unbounded"/>
+      <xsd:element ref="renameColumn" maxOccurs="unbounded"/>
+
+      <xsd:element ref="createIndex" maxOccurs="unbounded"/>
+      <xsd:element ref="dropIndex" maxOccurs="unbounded"/>
+
+    </xsd:choice>
+  </xsd:group>
+
+</xsd:schema>

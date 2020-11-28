@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<extra-ddl xmlns="http://ebean-orm.github.io/xml/ns/extraddl">
+
+  <ddl-script name="order views" platforms="h2" drop="true">
+      drop view order_agg_vw if exists;
+  </ddl-script>
+
+  <ddl-script name="order views" platforms="db2,h2,postgres,oracle,mysql,mariadb,nuodb">
+    create or replace view order_agg_vw as
+    select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
+           sum(d.ship_qty * d.unit_price) as ship_total
+    from o_order_detail d
+    group by d.order_id
+  </ddl-script>
+
+  <ddl-script name="order views hsqldb" platforms="hsqldb">
+    drop view order_agg_vw if exists ;
+    create view order_agg_vw as
+    select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
+           sum(d.ship_qty * d.unit_price) as ship_total
+    from o_order_detail d
+    group by d.order_id;
+  </ddl-script>
+
+  <ddl-script name="order views hana" platforms="hana">
+    create view order_agg_vw as
+    select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
+           sum(d.ship_qty * d.unit_price) as ship_total
+    from o_order_detail d
+    group by d.order_id;
+  </ddl-script>
+
+  <ddl-script name="order views sqlite" platforms="sqlite">
+    drop view if exists order_agg_vw;
+    create view order_agg_vw as
+    select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
+           sum(d.ship_qty * d.unit_price) as ship_total
+    from o_order_detail d
+    group by d.order_id;
+  </ddl-script>
+
+  <ddl-script name="order views mssql" platforms="sqlserver">
+    IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_NAME = 'order_agg_vw')
+      DROP VIEW order_agg_vw;
+
+    create view order_agg_vw as
+      select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
+             sum(d.ship_qty * d.unit_price) as ship_total
+      from o_order_detail d
+      group by d.order_id;
+  </ddl-script>
+
+  <ddl-script name="multi comments" platforms="h2,postgres">
+    -- h2 and postgres script
+  </ddl-script>
+
+  <ddl-script name="oracle only views" platforms="oracle">
+    -- oracle only script
+    select * from dual;
+  </ddl-script>
+
+  <ddl-script name="pg indexes" platforms="postgres">
+    -- postgres specific indexes
+    create index ix_ebasic_jmjb_gin2 on ebasic_json_map_json_b using gin(content jsonb_path_ops);
+  </ddl-script>
+
+</extra-ddl>

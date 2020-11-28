@@ -1,0 +1,21 @@
+<configuration scan="true" scanPeriod="10 seconds">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>TRACE</level>
+    </filter>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+  <logger name="io.ebean.docker" level="TRACE"/>
+  <!--  <logger name="io.ebean.DDL" level="DEBUG"/>-->
+  <!--  <logger name="io.ebean.SQL" level="TRACE"/>-->
+  <!--  <logger name="io.ebean.TXN" level="TRACE"/>-->
+  <!--  <logger name="io.ebean.SUM" level="TRACE"/>-->
+
+</configuration>

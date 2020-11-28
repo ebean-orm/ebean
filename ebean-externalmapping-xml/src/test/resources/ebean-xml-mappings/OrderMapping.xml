@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ebean xmlns="http://ebean-orm.github.io/xml/ns/ebean">
+
+  <entity class="org.tests.model.basic.Order">
+    <raw-sql name="myRawTest2">
+      <alias-mapping alias="c" property="customer"/>
+      <alias-mapping alias="a" property="customer.billingAddress"/>
+      <query>
+        select o.id, o.status, o.ship_date, c.id, c.name, a.id, a.line1, a.line2, a.city
+        from o_order o
+        join o_customer c on o.customer_id = c.id
+        join o_address a on c.billing_address_id = a.id
+        where o.status = :orderStatus
+        order by c.name, c.id
+      </query>
+    </raw-sql>
+
+    <raw-sql name="myRawTest3">
+      <column-mapping column="o.id" property="id"/>
+      <column-mapping column="o.status" property="status"/>
+      <query>
+        -- must be unparsed raw sql
+        select o.id, o.status
+        from o_order o
+      </query>
+    </raw-sql>
+
+  </entity>
+
+</ebean>

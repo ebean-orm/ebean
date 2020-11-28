@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ebean xmlns="http://ebean-orm.github.io/xml/ns/ebean">
+
+  <entity class="org.tests.model.basic.Customer">
+    <named-query name="withContactsById2">
+      <query>
+        select (name, version)
+        fetch contacts (firstName, lastName, email)
+        where id = :id
+      </query>
+    </named-query>
+  </entity>
+
+  <dto class="org.tests.model.basic.CustDto">
+    <raw-sql name="findByName">
+      <query>
+        select id, name from o_customer where name like ?
+      </query>
+    </raw-sql>
+  </dto>
+
+</ebean>

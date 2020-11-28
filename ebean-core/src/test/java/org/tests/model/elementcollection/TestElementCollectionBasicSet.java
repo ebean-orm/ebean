@@ -1,0 +1,190 @@
+package org.tests.model.elementcollection;
+
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class TestElementCollectionBasicSet extends BaseTestCase {
+
+  @Test
+  public void test() {
+
+    LoggedSqlCollector.start();
+
+    EcsPerson person = new EcsPerson("Fiona021");
+    person.getPhoneNumbers().add("021 1234");
+    person.getPhoneNumbers().add("021 4321");
+    DB.save(person);
+
+    List<String> sql = LoggedSqlCollector.current();
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(4);
+      assertSql(sql.get(0)).contains("insert into ecs_person");
+      assertSql(sql.get(1)).contains("insert into ecs_person_phone");
+      assertSqlBind(sql, 2, 3);
+    } else {
+      assertThat(sql).hasSize(3);
+      assertSql(sql.get(0)).contains("insert into ecs_person");
+      assertSql(sql.get(1)).contains("insert into ecs_person_phone");
+      assertSql(sql.get(2)).contains("insert into ecs_person_phone");
+    }
+
+    EcsPerson person1 = new EcsPerson("Fiona09");
+    person1.getPhoneNumbers().add("09 1234");
+    person1.getPhoneNumbers().add("09 4321");
+    person1.getPhoneNumbers().add("09 9876");
+    DB.save(person1);
+
+    LoggedSqlCollector.current();
+
+    List<EcsPerson> found =
+      DB.find(EcsPerson.class).where()
+        .startsWith("name", "Fiona0")
+        .order().asc("id")
+        .findList();
+
+    Set<String> phoneNumbers0 = found.get(0).getPhoneNumbers();
+    Set<String> phoneNumbers1 = found.get(1).getPhoneNumbers();
+    phoneNumbers0.size();
+
+    assertThat(phoneNumbers0).containsExactly("021 1234", "021 4321");
+    assertThat(phoneNumbers1).containsExactly("09 1234", "09 4321", "09 9876");
+
+    sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version from ecs_person t0 where");
+    assertSql(sql.get(1)).contains("select t0.ecs_person_id, t0.phone from ecs_person_phone t0 where");
+
+    List<EcsPerson> found2 =
+      DB.find(EcsPerson.class)
+        .fetch("phoneNumbers")
+        .where()
+        .startsWith("name", "Fiona0")
+        .order().asc("id")
+        .findList();
+
+    assertThat(found2).hasSize(2);
+
+    sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(1);
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t1.phone from ecs_person t0 left join ecs_person_phone t1");
+
+    EcsPerson foundFirst = found2.get(0);
+    jsonToFrom(foundFirst);
+
+    updateBasic(foundFirst);
+
+    LoggedSqlCollector.stop();
+  }
+
+  private void updateBasic(EcsPerson bean) {
+
+    bean.setName("Fiona021-mod-0");
+    DB.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(1);
+    assertSql(sql.get(0)).contains("update ecs_person");
+
+    updateBoth(bean);
+  }
+
+  private void updateBoth(EcsPerson bean) {
+
+    bean.setName("Fiona021-mod-both");
+    bean.getPhoneNumbers().add("01-22123");
+    DB.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(7);
+      assertSql(sql.get(0)).contains("update ecs_person set name=?, version=? where id=? and version=?");
+      assertSql(sql.get(1)).contains("delete from ecs_person_phone where ecs_person_id=?");
+      assertSqlBind(sql.get(2));
+      assertThat(sql.get(3)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertSqlBind(sql, 4, 6);
+    } else {
+      assertThat(sql).hasSize(5);
+      assertSql(sql.get(0)).contains("update ecs_person set name=?, version=? where id=? and version=?");
+      assertSql(sql.get(1)).contains("delete from ecs_person_phone where ecs_person_id=?");
+      assertSql(sql.get(2)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertThat(sql.get(3)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertThat(sql.get(4)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+    }
+
+    updateNothing(bean);
+  }
+
+  private void updateNothing(EcsPerson bean) {
+
+    DB.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(0);
+
+    updateOnlyCollection(bean);
+  }
+
+  private void updateOnlyCollection(EcsPerson bean) {
+
+    bean.getPhoneNumbers().add("01-4321");
+    DB.save(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    if (isPersistBatchOnCascade()) {
+      assertThat(sql).hasSize(7);
+      assertSql(sql.get(0)).contains("delete from ecs_person_phone where ecs_person_id=?");
+      assertSqlBind(sql.get(1));
+      assertSql(sql.get(2)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertSqlBind(sql, 3, 6);
+    } else {
+      assertThat(sql).hasSize(5);
+      assertSql(sql.get(0)).contains("delete from ecs_person_phone where ecs_person_id=?");
+      assertSql(sql.get(1)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertSql(sql.get(2)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertThat(sql.get(3)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+      assertThat(sql.get(4)).contains("insert into ecs_person_phone (ecs_person_id,phone) values (?,?)");
+    }
+
+    delete(bean);
+  }
+
+  private void delete(EcsPerson bean) {
+
+    DB.delete(bean);
+
+    List<String> sql = LoggedSqlCollector.current();
+    assertThat(sql).hasSize(2);
+    assertSql(sql.get(0)).contains("delete from ecs_person_phone where ecs_person_id = ?");
+    assertSql(sql.get(1)).contains("delete from ecs_person where id=? and version=?");
+  }
+
+  private void jsonToFrom(EcsPerson foundFirst) {
+    String asJson = DB.json().toJson(foundFirst);
+    EcsPerson fromJson = DB.json().toBean(EcsPerson.class, asJson);
+    assertThat(fromJson.getPhoneNumbers()).containsAll(foundFirst.getPhoneNumbers());
+  }
+
+  @Test
+  public void json() {
+
+    EcsPerson person = new EcsPerson("Fiona021");
+    person.getPhoneNumbers().add("021 1234");
+    person.getPhoneNumbers().add("021 4321");
+
+    final String asJson = DB.json().toJson(person);
+
+    assertThat(asJson).isEqualTo("{\"name\":\"Fiona021\",\"phoneNumbers\":[\"021 1234\",\"021 4321\"]}");
+
+    final EcsPerson fromJson = DB.json().toBean(EcsPerson.class, asJson);
+    assertThat(fromJson.getName()).isEqualTo("Fiona021");
+    assertThat(fromJson.getPhoneNumbers()).hasSize(2);
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanSet size[2] set[021 1234, 021 4321]");
+  }
+}

@@ -1,0 +1,2 @@
+entity-packages: org.example.domain
+querybean-packages: org.example.domain,org.querytest
