@@ -9,8 +9,9 @@ import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -285,4 +286,34 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals(hanaDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
     assertEquals(hanaDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
   }
+
+  @Test
+  public void appendForeignKeySuffix_when_defaults() {
+    assertThat(alterFkey(null, null)).isEqualTo(" on delete restrict on update restrict");
+  }
+
+  @Test
+  public void appendForeignKeySuffix_when_RestrictSetNull() {
+    assertThat(alterFkey("RESTRICT", "SET_NULL")).isEqualTo(" on delete restrict on update set null");
+  }
+
+  @Test
+  public void appendForeignKeySuffix_when_SetNullRestrict() {
+    assertThat(alterFkey("SET_NULL", "RESTRICT")).isEqualTo(" on delete set null on update restrict");
+  }
+
+  @Test
+  public void appendForeignKeySuffix_when_SetDefaultCascade() {
+    assertThat(alterFkey("SET_DEFAULT", "CASCADE")).isEqualTo(" on delete set null on update restrict");
+  }
+
+  private String alterFkey(String onDelete, String onUpdate) {
+    AlterForeignKey afk = new AlterForeignKey();
+    afk.setOnDelete(onDelete);
+    afk.setOnUpdate(onUpdate);
+    StringBuilder buffer = new StringBuilder();
+    h2Ddl.appendForeignKeySuffix(new WriteForeignKey(afk), buffer);
+    return buffer.toString();
+  }
+
 }

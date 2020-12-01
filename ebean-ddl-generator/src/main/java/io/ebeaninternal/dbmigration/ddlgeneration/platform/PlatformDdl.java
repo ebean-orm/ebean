@@ -457,7 +457,7 @@ public class PlatformDdl {
 
   protected void appendForeignKeySuffix(WriteForeignKey request, StringBuilder buffer) {
     appendForeignKeyOnDelete(buffer, withDefault(request.onDelete()));
-    appendForeignKeyOnUpdate(buffer, withDefault(request.onDelete()));
+    appendForeignKeyOnUpdate(buffer, withDefault(request.onUpdate()));
   }
 
   protected ConstraintMode withDefault(ConstraintMode mode) {
