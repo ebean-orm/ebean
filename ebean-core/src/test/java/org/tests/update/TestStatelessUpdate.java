@@ -368,11 +368,8 @@ public class TestStatelessUpdate extends TransactionalTestCase {
       ids.add(contact.getId());
       names.add(contact.getLastName());
     }
-    assertTrue(ids.contains(contact1.getId()));
-    assertTrue(ids.contains(updateContact3.getId()));
-    assertTrue(ids.contains(contact2.getId()));
-    assertTrue(names.contains(updateContact1.getLastName()));
-    assertTrue(names.contains(updateContact3.getLastName()));
+    assertThat(ids).contains(contact1.getId(), updateContact3.getId(), contact2.getId());
+    assertThat(names).contains(updateContact1.getLastName(), updateContact3.getLastName());
   }
 
   @Test
@@ -391,12 +388,10 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     DB.save(customer);
 
-
     // act
     Contact updateContact1 = new Contact();
     updateContact1.setId(contact1.getId());
     updateContact1.setLastName("contact1-changed");
-
 
     Contact updateContact3 = new Contact();
     updateContact3.setLastName("contact3-added");
@@ -431,12 +426,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
       ids.add(contact.getId());
       names.add(contact.getLastName());
     }
-    assertTrue(ids.contains(contact1.getId()));
-    assertTrue(ids.contains(updateContact3.getId()));
-    assertTrue(ids.contains(contact2.getId()));
-
-    assertTrue(names.contains(updateContact1.getLastName()));
-    assertTrue(names.contains(contact2.getLastName()));
-    assertTrue(names.contains(updateContact3.getLastName()));
+    assertThat(ids).contains(contact1.getId(), updateContact3.getId(), contact2.getId());
+    assertThat(names).contains(updateContact1.getLastName(), contact2.getLastName(), updateContact3.getLastName());
   }
 }
