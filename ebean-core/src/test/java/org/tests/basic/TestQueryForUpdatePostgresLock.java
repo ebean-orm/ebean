@@ -55,7 +55,7 @@ public class TestQueryForUpdatePostgresLock extends BaseTestCase {
   private void lockArticle(Integer id) {
     timePreLock = System.currentTimeMillis();
     log.info("lock start");
-    DB.find(Article.class).setId(id).forUpdate(NO_KEY_UPDATE).findOne();
+    DB.find(Article.class).setId(id).withLock(NO_KEY_UPDATE).findOne();
     sleep(1000);
     timePostLock = System.currentTimeMillis();
     log.info("lock done");

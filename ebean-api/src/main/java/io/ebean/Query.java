@@ -184,7 +184,8 @@ public interface Query<T> {
    */
   enum LockType {
     /**
-     * The default lock type - See PlatformConfig.forUpdateNoKey option.
+     * The default lock type being either UPDATE or NO_KEY_UPDATE based on
+     * PlatformConfig.forUpdateNoKey configuration (Postgres option).
      */
     DEFAULT,
 
@@ -194,17 +195,17 @@ public interface Query<T> {
     UPDATE,
 
     /**
-     * FOR NO KEY UPDATE.
+     * FOR NO KEY UPDATE (Postgres only).
      */
     NO_KEY_UPDATE,
 
     /**
-     * FOR SHARE UPDATE.
+     * FOR SHARE (Postgres only).
      */
     SHARE,
 
     /**
-     * FOR KEY SHARE UPDATE.
+     * FOR KEY SHARE (Postgres only).
      */
     KEY_SHARE
   }
@@ -1644,39 +1645,68 @@ public interface Query<T> {
   String getGeneratedSql();
 
   /**
+   * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
+   */
+  Query<T> withLock(LockType lockType);
+
+  /**
+   * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
+   */
+  Query<T> withLock(LockType lockType, LockWait lockWait);
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
+   * <p>
+   * The same as <code>withLock(LockType.UPDATE, LockWait.WAIT)</code>.
    */
   Query<T> forUpdate();
 
   /**
    * Execute using "for update" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdate(LockType lockType);
 
   /**
    * Execute using "for update" clause with "no wait" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
-   * </p>
+   * <p>
+   * The same as <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
    */
   Query<T> forUpdateNoWait();
 
   /**
    * Execute using "for update nowait" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdateNoWait(LockType lockType);
 
   /**
    * Execute using "for update" clause with "skip locked" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
-   * </p>
+   * <p>
+   * The same as <code>withLock(LockType.UPDATE, LockWait.SKIPLOCKED)</code>.
    */
   Query<T> forUpdateSkipLocked();
 
   /**
    * Execute using "for update skip locked" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdateSkipLocked(LockType lockType);
 
   /**

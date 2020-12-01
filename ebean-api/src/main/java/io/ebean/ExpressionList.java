@@ -170,13 +170,37 @@ public interface ExpressionList<T> {
   UpdateQuery<T> asUpdate();
 
   /**
+   * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
+   */
+  Query<T> withLock(Query.LockType lockType);
+
+  /**
+   * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
+   */
+  Query<T> withLock(Query.LockType lockType, Query.LockWait lockWait);
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
 
   /**
+   * Deprecated - migrate to withLock().
    * Execute using "for update" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdate(Query.LockType lockType);
 
   /**
@@ -188,8 +212,10 @@ public interface ExpressionList<T> {
   Query<T> forUpdateNoWait();
 
   /**
+   * Deprecated - migrate to withLock().
    * Execute using "for update nowait" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdateNoWait(Query.LockType lockType);
 
   /**
@@ -201,8 +227,10 @@ public interface ExpressionList<T> {
   Query<T> forUpdateSkipLocked();
 
   /**
+   * Deprecated - migrate to withLock().
    * Execute using "for update skip locked" with given lock type (currently Postgres only).
    */
+  @Deprecated
   Query<T> forUpdateSkipLocked(Query.LockType lockType);
 
   /**
