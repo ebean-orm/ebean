@@ -1,9 +1,8 @@
 package org.tests.update;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
-import org.junit.Assert;
+import io.ebeantest.LoggedSql;
 import org.junit.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -20,12 +19,11 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TestStatelessUpdate extends TransactionalTestCase {
-
-  private EbeanServer server = server();
 
   @Test
   public void test() {
@@ -35,41 +33,50 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     e.setStatus(Status.NEW);
     e.setDescription("wow");
 
-    server.save(e);
+    DB.save(e);
 
     // confirm saved as expected
-    EBasic eBasic = server.find(EBasic.class, e.getId());
-    assertEquals(e.getId(), eBasic.getId());
-    assertEquals(e.getName(), eBasic.getName());
-    assertEquals(e.getStatus(), eBasic.getStatus());
-    assertEquals(e.getDescription(), eBasic.getDescription());
+    EBasic original = DB.find(EBasic.class, e.getId());
+    assertEquals(e.getId(), original.getId());
+    assertEquals(e.getName(), original.getName());
+    assertEquals(e.getStatus(), original.getStatus());
+    assertEquals(e.getDescription(), original.getDescription());
 
     // test updating just the name
-    EBasic updateAll = new EBasic();
-    updateAll.setId(e.getId());
-    updateAll.setName("updAllProps");
+    EBasic updateNameOnly = new EBasic();
+    updateNameOnly.setId(e.getId());
+    updateNameOnly.setName("updateNameOnly");
 
-    server.update(updateAll);
+    LoggedSql.start();
+    DB.update(updateNameOnly);
 
-    eBasic = server.find(EBasic.class, e.getId());
-    assertEquals(e.getStatus(), eBasic.getStatus());
-    assertEquals(e.getDescription(), eBasic.getDescription());
-    assertEquals(updateAll.getName(), eBasic.getName());
+    List<String> sql = LoggedSql.collect();
+    original = DB.find(EBasic.class, e.getId());
+    assertEquals(e.getStatus(), original.getStatus());
+    assertEquals(e.getDescription(), original.getDescription());
+    assertEquals(updateNameOnly.getName(), original.getName());
 
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update e_basic set name=? where id=?; -- bind(updateNameOnly");
 
+    LoggedSql.collect();
     // test setting null
-    EBasic updateDeflt = new EBasic();
-    updateDeflt.setId(e.getId());
-    updateDeflt.setName("updateDeflt");
-    updateDeflt.setDescription(null);
-    server.update(updateDeflt);
+    EBasic updateWithNull = new EBasic();
+    updateWithNull.setId(e.getId());
+    updateWithNull.setName("updateWithNull");
+    updateWithNull.setDescription(null);
+    DB.update(updateWithNull);
+
+    sql = LoggedSql.stop();
 
     // name and description changed (using null)
-    eBasic = server.find(EBasic.class, e.getId());
-    assertEquals(e.getStatus(), eBasic.getStatus());
-    assertEquals(updateDeflt.getName(), eBasic.getName());
-    assertNull(eBasic.getDescription());
+    original = DB.find(EBasic.class, e.getId());
+    assertEquals(e.getStatus(), original.getStatus());
+    assertEquals(updateWithNull.getName(), original.getName());
+    assertNull(original.getDescription());
 
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update e_basic set name=?, description=? where id=?; -- bind(updateWithNull,null,");
   }
 
   @Test(expected = EntityNotFoundException.class)
@@ -80,7 +87,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     basic.setName("something");
     basic.setStatus(Status.ACTIVE);
 
-    Ebean.update(basic);
+    DB.update(basic);
   }
 
   @Test
@@ -91,7 +98,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     basic.setName("something");
     basic.setStatus(Status.ACTIVE);
 
-    assertThat(Ebean.delete(basic)).isFalse();
+    assertThat(DB.delete(basic)).isFalse();
   }
 
   /**
@@ -106,16 +113,17 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     basic.setStatus(Status.NEW);
     basic.setDescription("wow");
 
-    server.save(basic);
+    DB.save(basic);
 
+    LoggedSql.start();
     // act
     EBasic basicWithoutChanges = new EBasic();
     basicWithoutChanges.setId(basic.getId());
-    server.update(basicWithoutChanges);
+    DB.update(basicWithoutChanges);
 
-    // assert
-    // Nothing to check, simply no exception should occur
-    // maybe ensure that no update has been executed
+    // assert no update executed
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).isEmpty();
   }
 
   /**
@@ -135,17 +143,18 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     Customer customer = new Customer();
     customer.setName("something");
 
-    server.save(customer);
+    DB.save(customer);
+    LoggedSql.start();
 
     // act
     Customer customerWithoutChanges = new Customer();
     customerWithoutChanges.setId(customer.getId());
-    server.update(customerWithoutChanges);
+    DB.update(customerWithoutChanges);
+    final List<String> sql = LoggedSql.stop();
 
-    Customer result = Ebean.find(Customer.class, customer.getId());
-
-    // assert
+    Customer result = DB.find(Customer.class, customer.getId());
     assertThat(result.getUpdtime()).isEqualToIgnoringMillis(customer.getUpdtime());
+    assertThat(sql).isEmpty();
   }
 
   /**
@@ -163,7 +172,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customer.setContacts(new ArrayList<>());
     customer.getContacts().add(contact);
 
-    server.save(customer);
+    DB.save(customer);
 
     // act
     Customer customerWithChange = new Customer();
@@ -172,13 +181,17 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     // contacts is not loaded
     assertFalse(containsContacts(customerWithChange));
-    server.update(customerWithChange);
+    LoggedSql.start();
+    DB.update(customerWithChange);
+    final List<String> sql = LoggedSql.stop();
 
-    Customer result = Ebean.find(Customer.class, customer.getId());
+    Customer result = DB.find(Customer.class, customer.getId());
 
     // assert null list was ignored (missing children not deleted)
-    Assert.assertNotNull(result.getContacts());
+    assertNotNull(result.getContacts());
     assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update o_customer set name=?, updtime=? where id=?;");
   }
 
   /**
@@ -198,7 +211,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customer.setContacts(new ArrayList<>());
     customer.getContacts().add(contact);
 
-    server.save(customer);
+    DB.save(customer);
 
     // act
     Customer customerWithChange = new Customer();
@@ -210,13 +223,17 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     // contacts has been initialised to empty BeanList
     assertTrue(containsContacts(customerWithChange));
-    server.update(customerWithChange);
+    LoggedSql.start();
+    DB.update(customerWithChange);
+    final List<String> sql = LoggedSql.stop();
 
-    Customer result = Ebean.find(Customer.class, customer.getId());
+    Customer result = DB.find(Customer.class, customer.getId());
 
     // assert empty bean list was ignore (missing children not deleted)
-    Assert.assertNotNull(result.getContacts());
+    assertNotNull(result.getContacts());
     assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update o_customer set name=?, updtime=? where id=?;");
   }
 
   @Test
@@ -231,7 +248,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customer.setContacts(new ArrayList<>());
     customer.getContacts().add(contact);
 
-    server.save(customer);
+    DB.save(customer);
 
     // act
     Customer customerWithChange = new Customer();
@@ -242,16 +259,20 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customerWithChange.setContacts(Collections.<Contact>emptyList());
 
     assertTrue(containsContacts(customerWithChange));
-    server.update(customerWithChange);
+    LoggedSql.start();
+    DB.update(customerWithChange);
+    final List<String> sql = LoggedSql.stop();
 
-    Customer result = Ebean.find(Customer.class, customer.getId());
+    Customer result = DB.find(Customer.class, customer.getId());
 
     // assert empty bean list was ignore (missing children not deleted)
     assertThat(result.getContacts()).hasSize(1);
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update o_customer set name=?, updtime=? where id=?;");
   }
 
   private boolean containsContacts(Customer cust) {
-    return server.getBeanState(cust).getLoadedProps().contains("contacts");
+    return DB.getBeanState(cust).getLoadedProps().contains("contacts");
   }
 
   /**
@@ -273,7 +294,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customer.getContacts().add(contact1);
     customer.getContacts().add(contact2);
 
-    server.save(customer);
+    DB.save(customer);
 
     // act
     Contact updateContact1 = new Contact();
@@ -287,11 +308,13 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateCustomer.getContacts().add(updateContact1);
     updateCustomer.getContacts().add(updateContact2);
 
-    server.update(updateCustomer);
+    LoggedSql.start();
+    DB.update(updateCustomer);
+    final List<String> sql = LoggedSql.stop();
 
     // assert
-    // maybe check if update instead of insert has been executed,
-    // currently "Unique index or primary key violation" PersistenceException is throwing
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?;");
   }
 
   @Test
@@ -308,7 +331,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customer.getContacts().add(contact1);
     customer.getContacts().add(contact2);
 
-    server.save(customer);
+    DB.save(customer);
 
 
     // act
@@ -324,10 +347,19 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateCustomer.getContacts().add(updateContact1);
     updateCustomer.getContacts().add(updateContact3);
 
-    server.update(updateCustomer);
+    LoggedSql.start();
+    DB.update(updateCustomer);
+    final List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(5);
+    assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?");
+    assertThat(sql.get(1)).contains("insert into contact");
+    assertThat(sql.get(2)).contains(" -- bind(");
+    assertThat(sql.get(3)).contains("update contact set last_name=?, customer_id=? where id=?");
+    assertThat(sql.get(4)).contains(" -- bind(");
 
     // assert
-    Customer assCustomer = server.find(Customer.class, customer.getId());
+    Customer assCustomer = DB.find(Customer.class, customer.getId());
     List<Contact> assContacts = assCustomer.getContacts();
     assertThat(assContacts).hasSize(3);
     Set<Integer> ids = new LinkedHashSet<>();
@@ -357,7 +389,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     customer.getContacts().add(contact1);
     customer.getContacts().add(contact2);
 
-    server.save(customer);
+    DB.save(customer);
 
 
     // act
@@ -375,10 +407,19 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     updateCustomer.getContacts().add(updateContact3);
 
     // not adding contact2 but it won't be deleted in this case
-    server.update(updateCustomer);
+    LoggedSql.start();
+    DB.update(updateCustomer);
+    final List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(5);
+    assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?");
+    assertThat(sql.get(1)).contains("insert into contact");
+    assertThat(sql.get(2)).contains(" -- bind(");
+    assertThat(sql.get(3)).contains("update contact set last_name=?, customer_id=? where id=?");
+    assertThat(sql.get(4)).contains(" -- bind(");
 
     // assert
-    Customer assCustomer = server.find(Customer.class, customer.getId());
+    Customer assCustomer = DB.find(Customer.class, customer.getId());
     List<Contact> assContacts = assCustomer.getContacts();
 
     // contact 2 was not deleted this time
