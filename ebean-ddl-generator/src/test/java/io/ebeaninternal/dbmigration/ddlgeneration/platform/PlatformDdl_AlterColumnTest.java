@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
@@ -29,7 +29,7 @@ public class PlatformDdl_AlterColumnTest {
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   {
-    DatabaseConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();
+    DatabaseConfig serverConfig = DB.getDefault().getPluginApi().getServerConfig();
     sqlServerDdl.configure(serverConfig);
   }
 
@@ -304,7 +304,7 @@ public class PlatformDdl_AlterColumnTest {
 
   @Test
   public void appendForeignKeySuffix_when_SetDefaultCascade() {
-    assertThat(alterFkey("SET_DEFAULT", "CASCADE")).isEqualTo(" on delete set null on update restrict");
+    assertThat(alterFkey("SET_DEFAULT", "CASCADE")).isEqualTo(" on delete set default on update cascade");
   }
 
   private String alterFkey(String onDelete, String onUpdate) {
