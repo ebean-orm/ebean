@@ -14,11 +14,11 @@ create table migtest_e_ref (
 
 alter table if exists migtest_ckey_detail drop constraint if exists fk_migtest_ckey_detail_parent;
 alter table if exists migtest_fk_cascade drop constraint if exists fk_migtest_fk_cascade_one_id;
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table if exists migtest_fk_none drop constraint if exists fk_migtest_fk_none_one_id;
 alter table if exists migtest_fk_none_via_join drop constraint if exists fk_migtest_fk_none_via_join_one_id;
 alter table if exists migtest_fk_set_null drop constraint if exists fk_migtest_fk_set_null_one_id;
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;

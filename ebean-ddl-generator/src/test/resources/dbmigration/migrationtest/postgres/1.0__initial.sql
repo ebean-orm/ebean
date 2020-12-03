@@ -167,10 +167,10 @@ create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where 
 create index concurrently ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);
 create index ix_migtest_oto_child_lowername on migtest_oto_child (lower(name));
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
