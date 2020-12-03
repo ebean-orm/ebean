@@ -451,16 +451,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     backgroundExecutor.shutdown();
     // shutdown DataSource (if its an Ebean one)
     transactionManager.shutdown(shutdownDataSource, deregisterDriver);
+    dumpMetrics();
     shutdown = true;
     if (shutdownDataSource) {
       config.setDataSource(null);
     }
   }
 
-  private void shutdownPlugins() {
+  private void dumpMetrics() {
     if (config.isDumpMetricsOnShutdown()) {
       new DumpMetrics(this, config.getDumpMetricsOptions()).dump();
     }
+  }
+
+  private void shutdownPlugins() {
     for (Plugin plugin : serverPlugins) {
       try {
         plugin.shutdown();

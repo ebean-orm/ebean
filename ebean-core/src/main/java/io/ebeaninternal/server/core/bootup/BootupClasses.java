@@ -223,12 +223,9 @@ public class BootupClasses implements ClassFilter {
    */
   private <T> T create(Class<T> cls, boolean logOnException) {
     try {
-      // instantiate via found class
-      Constructor<T> constructor = cls.getConstructor();
-      return constructor.newInstance();
-
+      return cls.getConstructor().newInstance();
     } catch (NoSuchMethodException e) {
-      logger.debug("Ignore/expected - no default constructor", e);
+      logger.debug("Ignore/expected - no default constructor: " +e.getMessage());
       return null;
 
     } catch (Exception e) {
