@@ -1,5 +1,6 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.executor;
 
+import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.MDC;

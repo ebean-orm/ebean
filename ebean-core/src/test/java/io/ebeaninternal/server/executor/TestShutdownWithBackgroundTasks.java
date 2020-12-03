@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.lib.sql;
+package io.ebeaninternal.server.executor;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.BaseTestCase;

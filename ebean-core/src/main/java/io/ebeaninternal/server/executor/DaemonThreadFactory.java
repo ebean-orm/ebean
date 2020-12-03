@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.lib;
+package io.ebeaninternal.server.executor;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -10,14 +10,15 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.event.ShutdownManager;
 import io.ebean.service.SpiContainer;
+import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebean.event.ShutdownManager;
+import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

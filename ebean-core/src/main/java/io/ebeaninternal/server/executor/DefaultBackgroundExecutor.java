@@ -1,7 +1,6 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.executor;
 
 import io.ebeaninternal.api.SpiBackgroundExecutor;
-import io.ebeaninternal.server.lib.DaemonScheduleThreadPool;
 import org.slf4j.MDC;
 
 import java.util.Map;

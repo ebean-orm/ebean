@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.lib;
+package io.ebeaninternal.server.executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
