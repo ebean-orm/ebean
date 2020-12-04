@@ -26,9 +26,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   protected static final Logger logger = LoggerFactory.getLogger("io.ebean.SEQ");
 
-  private final ReentrantLock lock = new ReentrantLock(false);
-
-  private final ReentrantLock loadLock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * The actual sequence name.

@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ProfileOrigin {
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private static final long RESET_COUNT = -1000000000L;
 

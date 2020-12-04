@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DatabaseFactory {
 
-  private static final ReentrantLock lock = new ReentrantLock(false);
+  private static final ReentrantLock lock = new ReentrantLock();
   private static SpiContainer container;
 
   static {

@@ -36,7 +36,7 @@ public class DefaultContainer implements SpiContainer {
 
   private static final Logger logger = LoggerFactory.getLogger("io.ebean.internal.DefaultContainer");
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
   private final ClusterManager clusterManager;
 
   public DefaultContainer(ContainerConfig containerConfig) {

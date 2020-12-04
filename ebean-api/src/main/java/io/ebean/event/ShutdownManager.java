@@ -23,7 +23,7 @@ public final class ShutdownManager {
 
   private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
 
-  private static final ReentrantLock lock = new ReentrantLock(false);
+  private static final ReentrantLock lock = new ReentrantLock();
 
   private static final List<Database> databases = new ArrayList<>();
 

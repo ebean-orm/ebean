@@ -21,7 +21,7 @@ public class ProfileOriginNodeUsage {
 
   private static final Logger logger = LoggerFactory.getLogger(ProfileOriginNodeUsage.class);
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final String path;
 

@@ -89,7 +89,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final Class<T> beanType;
 

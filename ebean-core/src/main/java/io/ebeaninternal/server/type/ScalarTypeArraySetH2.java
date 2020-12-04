@@ -27,7 +27,7 @@ class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
 
   static class Factory implements PlatformArrayTypeFactory {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final Map<String, ScalarTypeArraySetH2> cache = new HashMap<>();
 
     /**

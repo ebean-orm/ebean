@@ -130,7 +130,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
    */
   static class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final PersistenceContext persistenceContext;
     private final DLoadManyContext context;
     private final int batchSize;

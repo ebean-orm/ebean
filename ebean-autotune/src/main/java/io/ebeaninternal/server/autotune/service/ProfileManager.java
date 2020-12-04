@@ -18,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ProfileManager implements ProfilingListener {
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final boolean queryTuningAddVersion;
 

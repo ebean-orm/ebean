@@ -161,7 +161,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
   private final DatabaseConfig config;
   private final String serverName;
   private final DatabasePlatform databasePlatform;

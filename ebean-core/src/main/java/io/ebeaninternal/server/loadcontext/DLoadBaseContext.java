@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 abstract class DLoadBaseContext {
 
-  protected final ReentrantLock lock = new ReentrantLock(false);
+  protected final ReentrantLock lock = new ReentrantLock();
 
   protected final DLoadContext parent;
 

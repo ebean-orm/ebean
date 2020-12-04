@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class SingleBeanLoader implements BeanLoader {
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   protected final Database database;
 

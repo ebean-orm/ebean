@@ -20,7 +20,7 @@ public final class CopyOnFirstWriteList<E> extends AbstractList<E> implements Li
 
   private static final long serialVersionUID = 1L;
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * The underlying List implementation.

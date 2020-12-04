@@ -27,7 +27,7 @@ class DefaultCacheHolder {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.ALL");
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
   private final ConcurrentHashMap<String, ServerCache> allCaches = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, Set<String>> collectIdCaches = new ConcurrentHashMap<>();
 

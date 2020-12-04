@@ -23,7 +23,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAutoTuneService.class);
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final SpiEbeanServer server;
 

@@ -59,7 +59,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   private static final CQueryCollectionAddNoop NOOP_ADD = new CQueryCollectionAddNoop();
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * The resultSet rows read.

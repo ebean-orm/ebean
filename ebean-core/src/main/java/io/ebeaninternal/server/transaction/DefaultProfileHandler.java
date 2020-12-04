@@ -66,7 +66,7 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
   private final ExecutorService executor;
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final File dir;
 

@@ -16,7 +16,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final transient SpiEbeanServer server;
 
-  private final transient ReentrantLock lock = new ReentrantLock(false);
+  private final transient ReentrantLock lock = new ReentrantLock();
 
   private final SpiQuery<T> query;
 

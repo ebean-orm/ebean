@@ -45,7 +45,7 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
   private AtomicLong nanoToMilliOffset = new AtomicLong(currentUuidTime());
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
 
   /**

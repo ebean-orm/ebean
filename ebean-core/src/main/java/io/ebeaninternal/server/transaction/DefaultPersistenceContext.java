@@ -32,7 +32,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<>();
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private int putCount;
 

@@ -120,7 +120,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
    */
   static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
 
-    private final ReentrantLock bufferLock = new ReentrantLock(false);
+    private final ReentrantLock bufferLock = new ReentrantLock();
     private final DLoadBeanContext context;
     private final int batchSize;
     private final List<EntityBeanIntercept> list;

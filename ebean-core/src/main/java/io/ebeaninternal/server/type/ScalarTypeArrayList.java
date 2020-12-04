@@ -36,7 +36,7 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
 
   static class Factory implements PlatformArrayTypeFactory {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final Map<String, ScalarTypeArrayList> cache = new HashMap<>();
 
     /**

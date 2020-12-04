@@ -36,7 +36,7 @@ public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements Scal
 
   static class Factory implements PlatformArrayTypeFactory {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final Map<String, ScalarTypeArraySet> cache = new HashMap<>();
 
     /**

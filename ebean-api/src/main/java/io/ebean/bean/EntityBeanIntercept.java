@@ -32,7 +32,7 @@ public final class EntityBeanIntercept implements Serializable {
   private static final int STATE_REFERENCE = 1;
   private static final int STATE_LOADED = 2;
 
-  private transient final ReentrantLock lock = new ReentrantLock(false);
+  private transient final ReentrantLock lock = new ReentrantLock();
 
   private transient NodeUsageCollector nodeUsageCollector;
 

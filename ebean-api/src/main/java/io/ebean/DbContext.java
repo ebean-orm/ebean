@@ -27,7 +27,7 @@ final class DbContext {
 
   private final HashMap<String, Database> syncMap = new HashMap<>();
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * The 'default' Database.
