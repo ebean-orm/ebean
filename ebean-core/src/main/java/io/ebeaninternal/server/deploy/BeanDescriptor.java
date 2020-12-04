@@ -522,7 +522,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       return null;
     }
     try {
-      return (EntityBean) beanType.newInstance();
+      return (EntityBean) beanType.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
@@ -814,7 +814,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     int propertyLength = toEbi.getPropertyLength();
     String[] names = getProperties();
     for (int i = 0; i < propertyLength; i++) {
-
       if (fromEbi.isLoadedProperty(i)) {
         BeanProperty property = getBeanProperty(names[i]);
         if (!toEbi.isLoadedProperty(i)) {
@@ -1865,17 +1864,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * We actually need to do a query because we don't know the type without the discriminator
-   * value, just select the id property and discriminator column (auto added)
+   * We actually need to do a query because we don't know the type without the discriminator value.
    */
   private T findReferenceBean(Object id, PersistenceContext pc) {
     DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
     query.setPersistenceContext(pc);
-    return query
-      // .select(getIdProperty().getName())
-      // we do not select the id because we
-      // probably have to load the entire bean
-      .setId(id).findOne();
+    return query.setId(id).findOne();
   }
 
   /**
@@ -2278,8 +2272,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public void lazyLoadRegister(String prefix, EntityBeanIntercept ebi, EntityBean bean, LoadContext loadContext) {
     // load the List/Set/Map proxy objects (deferred fetching of lists)
-    BeanPropertyAssocMany<?>[] manys = propertiesMany();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (BeanPropertyAssocMany<?> many : propertiesMany()) {
       if (!ebi.isLoadedProperty(many.getPropertyIndex())) {
         BeanCollection<?> ref = many.createReferenceIfNull(bean);
         if (ref != null && !ref.isRegisteredWithLoadContext()) {
