@@ -30,7 +30,11 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(eventLog()).containsOnly("preInsert", "postInsert");
     assertThat(sql).hasSize(4);
 
-    final EcPerson found = Ebean.find(EcPerson.class, person.getId());
+    final EcPerson found = Ebean.find(EcPerson.class)
+      .setId(person.getId())
+      //.setLabel("findById")
+      .findOne();
+
     found.getPhoneNumbers().size();
 
     sql = LoggedSqlCollector.current();

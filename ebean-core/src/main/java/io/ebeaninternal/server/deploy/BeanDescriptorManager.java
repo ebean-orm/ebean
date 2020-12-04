@@ -117,6 +117,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final TypeManager typeManager;
   private final BootupClasses bootupClasses;
   private final String serverName;
+  private final List<BeanDescriptor> elementDescriptors = new ArrayList<>();
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<>();
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
   private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<>();
@@ -643,6 +644,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     descMap.put(desc.getBeanType().getName(), desc);
     if (desc.isDocStoreMapped()) {
       descQueueMap.put(desc.getDocStoreQueueId(), desc);
+    }
+    for (BeanPropertyAssocMany many : desc.propertiesMany()) {
+      if (many.isElementCollection()) {
+        elementDescriptors.add(many.getElementDescriptor());
+      }
     }
   }
 
@@ -1617,6 +1623,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   public void visitMetrics(MetricVisitor visitor) {
     for (BeanDescriptor<?> desc : immutableDescriptorList) {
+      desc.visitMetrics(visitor);
+    }
+    for (BeanDescriptor desc : elementDescriptors) {
       desc.visitMetrics(visitor);
     }
   }

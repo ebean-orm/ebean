@@ -2088,6 +2088,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return the simple name of the entity bean.
+   */
+  public String getSimpleName() {
+    return beanType.getSimpleName();
+  }
+
+  /**
    * Summary description.
    */
   @Override

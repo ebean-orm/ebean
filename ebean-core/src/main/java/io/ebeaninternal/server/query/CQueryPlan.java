@@ -13,6 +13,7 @@ import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataBindCapture;
@@ -106,7 +107,7 @@ public class CQueryPlan implements SpiQueryPlan {
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType());
+    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
     this.location = location();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
@@ -130,7 +131,7 @@ public class CQueryPlan implements SpiQueryPlan {
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType());
+    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
     this.location = location();
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
@@ -145,14 +146,19 @@ public class CQueryPlan implements SpiQueryPlan {
     this.hash = md5Hash();
   }
 
-  private String deriveName(String label, SpiQuery.Type type) {
+  private String deriveName(String label, SpiQuery.Type type, String simpleName) {
     if (label == null) {
-      return "orm." + beanType.getSimpleName() + "." + type.label();
+      return Str.add("orm.", simpleName, ".", type.label());
     }
-    if (label.startsWith(beanType.getSimpleName())) {
-      return "orm." + label;
+    int pos = simpleName.indexOf('.');
+    if (pos > 1) {
+      // element collection and label
+      return Str.add("orm.", simpleName.substring(0, pos), "_", label);
     }
-    return "orm." + beanType.getSimpleName() + "_" + label;
+    if (label.startsWith(simpleName)) {
+      return Str.add("orm.", label);
+    }
+    return Str.add("orm.", simpleName, "_", label);
   }
 
   private SpiQueryBindCapture initBindCapture(SpiQuery<?> query) {

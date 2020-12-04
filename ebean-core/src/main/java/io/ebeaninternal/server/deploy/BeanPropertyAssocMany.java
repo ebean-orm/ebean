@@ -570,6 +570,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
+   * Return the element bean descriptor (for an element collection only).
+   */
+  public BeanDescriptor<T> getElementDescriptor() {
+    return elementDescriptor;
+  }
+
+  /**
    * ManyToMany only, join from local table to intersection table.
    */
   @Override

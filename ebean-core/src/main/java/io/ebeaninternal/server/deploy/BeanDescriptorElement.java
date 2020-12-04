@@ -14,11 +14,30 @@ import java.util.Arrays;
  */
 abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
 
+  private final String simpleName;
+
   final ElementHelp elementHelp;
 
   BeanDescriptorElement(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {
     super(owner, deploy);
+    this.simpleName = shortName(deploy.getName());
     this.elementHelp = elementHelp;
+  }
+
+  private String shortName(String name) {
+    int pos = name.lastIndexOf('.');
+    if (pos > 1) {
+      pos = name.lastIndexOf('.', pos - 1);
+      if (pos > 1) {
+        return name.substring(pos + 1);
+      }
+    }
+    return name;
+  }
+
+  @Override
+  public String getSimpleName() {
+    return simpleName;
   }
 
   @Override
