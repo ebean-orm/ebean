@@ -34,7 +34,7 @@ public class TestSqlUpdateBatch extends BaseTestCase {
           .setParameter(1, String.valueOf(i))
           .addBatch();
         delete
-          .setParameter(1, String.valueOf(i))
+          .setParameter(1, i)
           .addBatch();
       }
 
