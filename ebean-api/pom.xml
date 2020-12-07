@@ -55,7 +55,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>6.13</version>
+      <version>6.14-SNAPSHOT</version>
     </dependency>
 
     <dependency>
