@@ -154,7 +154,7 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertSql(sql.get(0)).contains("update ebasic_json_list set bean_set=?, bean_list=?, bean_map=?, plain_bean=?, version=? where id=? and version=?");
+    assertSql(sql.get(0)).contains("update ebasic_json_list set beans=?, bean_list=?, bean_map=?, plain_bean=?, version=? where id=? and version=?");
   }
 
   @Test

@@ -99,11 +99,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   }
 
   void readColumn(Column columnAnn, DeployBeanProperty prop) {
-
-    if (!isEmpty(columnAnn.name())) {
-      prop.setDbColumn(databasePlatform.convertQuotedIdentifiers(columnAnn.name()));
-    }
-
+    setColumnName(prop, columnAnn.name());
     prop.setDbInsertable(columnAnn.insertable());
     prop.setDbUpdateable(columnAnn.updatable());
     prop.setNullable(columnAnn.nullable());
@@ -122,6 +118,12 @@ public abstract class AnnotationParser extends AnnotationBase {
     if (!"".equals(tableName) && !tableName.equalsIgnoreCase(baseTable)) {
       // its on a secondary table...
       prop.setSecondaryTable(tableName);
+    }
+  }
+
+  protected void setColumnName(DeployBeanProperty prop, String name) {
+    if (!isEmpty(name)) {
+      prop.setDbColumn(databasePlatform.convertQuotedIdentifiers(name));
     }
   }
 

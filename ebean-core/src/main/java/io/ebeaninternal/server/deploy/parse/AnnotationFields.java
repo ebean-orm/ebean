@@ -311,19 +311,23 @@ public class AnnotationFields extends AnnotationParser {
     DbMap dbMap = get(prop, DbMap.class);
     if (dbMap != null) {
       util.setDbMap(prop, dbMap);
+      setColumnName(prop, dbMap.name());
     }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
       util.setDbJsonType(prop, dbJson);
+      setColumnName(prop, dbJson.name());
     } else {
       DbJsonB dbJsonB = get(prop, DbJsonB.class);
       if (dbJsonB != null) {
         util.setDbJsonBType(prop, dbJsonB);
+        setColumnName(prop, dbJsonB.name());
       }
     }
     DbArray dbArray = get(prop, DbArray.class);
     if (dbArray != null) {
       util.setDbArray(prop, dbArray);
+      setColumnName(prop, dbArray.name());
     }
   }
 

@@ -22,7 +22,7 @@ public class EBasicJsonList {
 
   String name;
 
-  @DbJson(length = 700)
+  @DbJson(length = 700, name = "beans")
   Set<PlainBean> beanSet;
 
   @DbJsonB

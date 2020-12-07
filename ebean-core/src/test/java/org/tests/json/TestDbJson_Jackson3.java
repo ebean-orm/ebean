@@ -71,6 +71,6 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, bean_set=?, bean_list=?, plain_bean=?, version=? where id=?");
+    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, beans=?, bean_list=?, plain_bean=?, version=? where id=?");
   }
 }
