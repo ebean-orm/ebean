@@ -77,7 +77,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
       loadTuningFile();
       if (isRuntimeTuningUpdates()) {
         // periodically gather and update query tuning
-        server.getBackgroundExecutor().executePeriodically(new ProfilingUpdate(), profilingUpdateFrequency, TimeUnit.SECONDS);
+        server.getBackgroundExecutor().scheduleWithFixedDelay(new ProfilingUpdate(), profilingUpdateFrequency, profilingUpdateFrequency, TimeUnit.SECONDS);
       }
     }
   }

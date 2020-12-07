@@ -86,7 +86,7 @@ public class DefaultServerCache implements ServerCache {
 
     // default to trimming the cache every 60 seconds
     long trimFreqSecs = (trimFrequency == 0) ? 60 : trimFrequency;
-    executor.executePeriodically(trim, trimFreqSecs, TimeUnit.SECONDS);
+    executor.scheduleWithFixedDelay(trim, trimFreqSecs, trimFreqSecs, TimeUnit.SECONDS);
   }
 
   @Override

@@ -82,12 +82,22 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public void executePeriodically(Runnable task, long delay, TimeUnit unit) {
-    executePeriodically(task, delay, delay, unit);
+    executor.scheduleWithFixedDelay(wrapMDC(task), delay, delay, unit);
   }
 
   @Override
   public void executePeriodically(Runnable task, long initialDelay, long delay, TimeUnit unit) {
     executor.scheduleWithFixedDelay(wrapMDC(task), initialDelay, delay, unit);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
+    return executor.scheduleWithFixedDelay(wrapMDC(task), initialDelay, delay, unit);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long delay, TimeUnit unit) {
+    return executor.scheduleAtFixedRate(wrapMDC(task), initialDelay, delay, unit);
   }
 
   @Override
