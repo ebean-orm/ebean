@@ -12,6 +12,7 @@ import org.tests.model.softdelete.EBasicNoSDChild;
 import org.tests.model.softdelete.EBasicSDChild;
 import org.tests.model.softdelete.EBasicSoftDelete;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -173,13 +174,17 @@ public class TestSoftDeleteBasic extends BaseTestCase {
                                          .query();
 
     List<EBasicSoftDelete> list = query.findList();
-    assertSql(query).contains("t0.deleted = false");
-    // Make sure that query includes that the child mustn't've been deleted
-    assertSql(query).contains("u1.deleted = false");
+    if (isMySql() || isMariaDB()) {
+      assertSql(query).contains("t0.deleted = 0");
+      assertSql(query).contains("u1.deleted = 0");
+    } else {
+      assertSql(query).contains("t0.deleted = false");
+      // Make sure that query includes that the child mustn't've been deleted
+      assertSql(query).contains("u1.deleted = false");
+    }
     assertThat(list).hasSize(0);
 
     // Cleanup created entity
-    query.delete();
     DB.deleteAllPermanent(singletonList(child));
     DB.deleteAllPermanent(singletonList(bean));
   }
@@ -205,13 +210,17 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     List<EBasicNoSDChild> list = query.findList();
     // Make sure that query includes that the child mustn't've been deleted
-    assertSql(query).contains("u1.deleted = false");
-    assertSql(query).contains("u2.deleted = false");
+    if (isMySql() || isMariaDB()) {
+      assertSql(query).contains("u1.deleted = 0");
+      assertSql(query).contains("u2.deleted = 0");
+    } else {
+      assertSql(query).contains("u1.deleted = false");
+      assertSql(query).contains("u2.deleted = false");
+    }
     assertThat(list).hasSize(0);
 
     // Cleanup created entity
-    query.delete();
-    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(Arrays.asList(child, secondChild));
     DB.deleteAllPermanent(singletonList(bean));
   }
 
@@ -242,8 +251,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     assertThat(list).hasSize(1);
 
     // Cleanup created entity
-    query.delete();
-    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(Arrays.asList(child, secondChild));
     DB.deleteAllPermanent(singletonList(bean));
   }
 

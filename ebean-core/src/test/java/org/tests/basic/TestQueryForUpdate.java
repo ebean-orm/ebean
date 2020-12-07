@@ -27,11 +27,15 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = DB.find(Customer.class)
-      .forUpdate()
-      .order().desc("id");
+    Query<Customer> query;
+    try (final Transaction transaction = DB.beginTransaction()) {
+      query = DB.find(Customer.class)
+        .forUpdate()
+        .order().desc("id");
 
-    query.findList();
+      query.findList();
+    }
+
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
     } else if (isPostgres()) {
