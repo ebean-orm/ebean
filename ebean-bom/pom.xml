@@ -15,7 +15,7 @@
   <properties>
     <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.0</ebean-migration-auto.version>
-    <ebean-migration.version>12.2.0</ebean-migration.version>
+    <ebean-migration.version>12.4.0</ebean-migration.version>
     <ebean-test-docker.version>4.1</ebean-test-docker.version>
     <ebean-datasource.version>7.0</ebean-datasource.version>
     <ebean-agent.version>12.6.2</ebean-agent.version>
