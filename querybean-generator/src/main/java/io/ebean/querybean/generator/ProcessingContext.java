@@ -171,7 +171,11 @@ class ProcessingContext implements Constants {
 
   private boolean isStaticOrTransient(VariableElement field) {
     Set<Modifier> modifiers = field.getModifiers();
-    return (modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.TRANSIENT));
+    return (
+      modifiers.contains(Modifier.STATIC) ||
+      modifiers.contains(Modifier.TRANSIENT) ||
+      hasAnnotations(field, "javax.persistence.Transient")
+    );
   }
 
   private static boolean hasAnnotations(Element element, String... annotations) {
