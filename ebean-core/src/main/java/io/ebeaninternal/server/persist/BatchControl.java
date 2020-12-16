@@ -81,8 +81,7 @@ public final class BatchControl {
    */
   private int bufferMax;
 
-  private Queue earlyQueue;
-  private Queue lateQueue;
+  private Queue[] queues = new Queue[3];
 
   /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
@@ -271,9 +270,10 @@ public final class BatchControl {
   }
 
   private void flushBuffer(boolean reset) throws BatchedSqlException {
+    flushQueue(queues[0]);
     flushInternal(reset);
-    flushQueue(earlyQueue);
-    flushQueue(lateQueue);
+    flushQueue(queues[1]);
+    flushQueue(queues[2]);
   }
 
   private void flushQueue(Queue queue) throws BatchedSqlException {
@@ -368,20 +368,11 @@ public final class BatchControl {
   /**
    * Add a SqlUpdate request to execute after flush.
    */
-  public void addToFlushQueue(PersistRequestUpdateSql request, boolean early) {
-    if (early) {
-      // add it to the early queue
-      if (earlyQueue == null) {
-        earlyQueue = new Queue();
-      }
-      earlyQueue.add(request);
-    } else {
-      // add it to the late queue
-      if (lateQueue == null) {
-        lateQueue = new Queue();
-      }
-      lateQueue.add(request);
+  public void addToFlushQueue(PersistRequestUpdateSql request, int pos) {
+    if (queues[pos] == null) {
+      queues[pos] = new Queue();
     }
+    queues[pos].add(request);
   }
 
   private static class Queue {

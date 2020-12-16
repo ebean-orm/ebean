@@ -104,18 +104,14 @@ public interface Persister {
   void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue);
 
   /**
-   * Queue the SqlUpdate for early execution (with JDBC batch).
+   * Queue the SqlUpdate for execution with position 0, 1 or 2 defining
+   * when it executes relative to the flush of beans .
    */
-  void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t);
+  void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, int pos);
 
   /**
-   * Queue the SqlUpdate for late execution (with JDBC batch).
+   * Add the statement to JDBC batch for later execution via executeBatch.
    */
-  void addToFlushQueueLast(SpiSqlUpdate update, SpiTransaction t);
-
-    /**
-     * Add the statement to JDBC batch for later execution via executeBatch.
-     */
   void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction);
 
   /**
