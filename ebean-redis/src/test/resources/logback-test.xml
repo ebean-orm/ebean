@@ -1,0 +1,29 @@
+<configuration scan="true" scanPeriod="10 seconds">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>TRACE</level>
+    </filter>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="WARN">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+  <!--<logger name="com.avaje.ebeaninternal.server.cluster" level="TRACE"/>-->
+
+<!--  <logger name="io.ebean" level="DEBUG"/>-->
+
+  <logger name="io.ebean.SQL" level="TRACE"/>
+  <logger name="io.ebean.TXN" level="TRACE"/>
+  <logger name="io.ebean.SUM" level="TRACE"/>
+
+  <logger name="io.ebean.cache" level="TRACE"/>
+  <logger name="io.ebean.cache.QUERY" level="TRACE"/>
+  <logger name="io.ebean.cache.BEAN" level="TRACE"/>
+  <logger name="io.ebean.cache.COLL" level="TRACE"/>
+  <logger name="io.ebean.cache.NATKEY" level="TRACE"/>
+
+</configuration>
