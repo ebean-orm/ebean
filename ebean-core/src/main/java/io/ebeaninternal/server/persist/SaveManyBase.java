@@ -49,7 +49,7 @@ abstract class SaveManyBase implements SaveMany {
   void preElementCollectionUpdate() {
     if (!insertedParent) {
       request.preElementCollectionUpdate();
-      persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction);
+      persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 1);
     }
   }
 

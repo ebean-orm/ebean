@@ -235,9 +235,6 @@ public class SaveManyBeans extends SaveManyBase {
   /**
    * Save the additions and removals from a ManyToMany collection as inserts
    * and deletes from the intersection table.
-   * <p>
-   * This is done via MapBeans.
-   * </p>
    */
   private void saveAssocManyIntersection() {
     if (value == null) {
@@ -336,9 +333,14 @@ public class SaveManyBeans extends SaveManyBase {
   }
 
   private void removeAssocManyOrphans() {
-    // check that the list is not null and if it is a BeanCollection
-    // check that is has been populated (don't trigger lazy loading)
-    if (value instanceof BeanCollection<?>) {
+    if (value == null) {
+      return;
+    }
+    if (!(value instanceof BeanCollection<?>)) {
+      if (!insertedParent) {
+        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
+      }
+    } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();
       if (insertedParent) {

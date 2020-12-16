@@ -141,24 +141,17 @@ public final class DefaultPersister implements Persister {
   @Override
   public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue) {
     if (queue) {
-      addToFlushQueue(update, t, false);
+      addToFlushQueue(update, t, 2);
     } else {
       executeSqlUpdate(update, t);
     }
   }
 
-  @Override
-  public void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t) {
-    addToFlushQueue(update, t, true);
-  }
-
-  @Override
-  public void addToFlushQueueLast(SpiSqlUpdate update, SpiTransaction t) {
-    addToFlushQueue(update, t, false);
-  }
-
-  private void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, boolean early) {
-    new PersistRequestUpdateSql(server, update, t, persistExecute).addToFlushQueue(early);
+  /**
+   * Add to the flush queue in position 0, 1 or 2.
+   */
+  public void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, int pos) {
+    new PersistRequestUpdateSql(server, update, t, persistExecute).addToFlushQueue(pos);
   }
 
   /**
@@ -963,7 +956,7 @@ public final class DefaultPersister implements Persister {
   void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
     SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
     if (queue) {
-      addToFlushQueue(sqlDelete, t, true);
+      addToFlushQueue(sqlDelete, t, 1);
     } else {
       executeSqlUpdate(sqlDelete, t);
     }
@@ -1237,7 +1230,6 @@ public final class DefaultPersister implements Persister {
   @SuppressWarnings({"unchecked"})
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
                                                   PersistRequest.Type type, int flags) {
-
     // no delete requests come here
     return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, flags);
   }
@@ -1252,7 +1244,6 @@ public final class DefaultPersister implements Persister {
 
   @SuppressWarnings({"unchecked"})
   private <T> PersistRequestBean<T> createDeleteRequest(Object bean, Transaction t, PersistRequest.Type type, int flags) {
-
     BeanManager<T> mgr = getBeanManager(bean);
     if (type == Type.DELETE_PERMANENT) {
       type = Type.DELETE;
@@ -1281,7 +1272,6 @@ public final class DefaultPersister implements Persister {
    */
   @SuppressWarnings("unchecked")
   private <T> BeanManager<T> getBeanManager(Object bean) {
-
     BeanManager<T> mgr = (BeanManager<T>) beanDescriptorManager.getBeanManager(bean.getClass());
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));

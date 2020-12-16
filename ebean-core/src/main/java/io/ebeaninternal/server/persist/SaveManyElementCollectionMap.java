@@ -51,7 +51,7 @@ class SaveManyElementCollectionMap extends SaveManyBase {
       sqlInsert.setParameter(parentId);
       sqlInsert.setParameter(entry.getKey());
       many.bindElementValue(sqlInsert, entry.getValue());
-      persister.addToFlushQueueLast(sqlInsert, transaction);
+      persister.addToFlushQueue(sqlInsert, transaction, 2);
     }
     resetModifyState();
     postElementCollectionUpdate();

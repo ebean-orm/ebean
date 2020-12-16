@@ -73,13 +73,13 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Add this request to BatchControl to flush later.
    */
-  public void addToFlushQueue(boolean early) {
+  public void addToFlushQueue(int pos) {
     BatchControl control = transaction.getBatchControl();
     if (control == null) {
       control = persistExecute.createBatchControl(transaction);
     }
     flushQueue = true;
-    control.addToFlushQueue(this, early);
+    control.addToFlushQueue(this, pos);
   }
 
   @Override
