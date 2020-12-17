@@ -10,9 +10,8 @@
   </parent>
 
   <artifactId>ebean-redis</artifactId>
-  <name>ebean test</name>
-  <description>Testing support for Ebean</description>
-
+  <name>ebean redis</name>
+  <description>Ebean Redis L2 Cache</description>
 
   <dependencies>
 
