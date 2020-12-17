@@ -1,5 +1,6 @@
 package org.example;
 
+import io.ebean.annotation.PersistBatch;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -31,6 +32,7 @@ public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Ebe
       throw new Exception("No ServerConig set. You must define a ServerConfig bean");
     }
 
+    serverConfig.setPersistBatch(PersistBatch.ALL);
     // Create the new EbeanServer using the configuration
     this.ebeanServer = EbeanServerFactory.create(serverConfig);
   }

@@ -1,5 +1,6 @@
 package org.example;
 
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -74,6 +76,10 @@ public class EbeanSpringModuleTest {
     user.setName("ebean");
     userService.save(user);
     logger.info("Saved new User");
+    assertThat(user.getOid()).isGreaterThan(0);
+
+    final User found = DB.find(User.class, user.getOid());
+    assertThat(found).isNotNull();
   }
 
   /**

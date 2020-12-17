@@ -49,7 +49,6 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
    */
   @Override
   public void setTransactionManager(Object txnMgr) {
-
     // RB: At this stage not exposing TransactionManager to
     // the public API and hence the Object type and casting here
     this.transactionManager = (TransactionManager) txnMgr;
@@ -64,10 +63,8 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
    */
   @Override
   public Object getCurrentTransaction() {
-
     // Get the current Spring ConnectionHolder associated to the current spring managed transaction
     ConnectionHolder holder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
-
     if (holder == null || !holder.isSynchronizedWithTransaction()) {
       // no current Spring transaction
       SpiTransaction currentEbeanTransaction = transactionManager.getInScope();
@@ -90,7 +87,6 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
       // Create and register a Spring TransactionSynchronization for this transaction
       springTxnLister = createSpringTxnListener(newTrans);
       TransactionSynchronizationManager.registerSynchronization(springTxnLister);
-
       return transactionManager.externalBeginTransaction(newTrans, TxScope.required());
     }
   }
@@ -102,7 +98,6 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
    * </p>
    */
   private SpringTxnListener getSpringTxnListener() {
-
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
       if (synchronizations != null) {
@@ -114,7 +109,6 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
         }
       }
     }
-
     return null;
   }
 
@@ -164,13 +158,13 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
 
     @Override
     public void beforeCommit(boolean readOnly) {
-      // Future note: for JPA2 locking we will
-      // have beforeCommit events to fire
+      if (!readOnly) {
+        transaction.flushBatch();
+      }
     }
 
     @Override
     public void afterCompletion(int status) {
-
       switch (status) {
         case STATUS_COMMITTED:
           log.debug("Spring Txn [{}] committed", transaction.getId());
