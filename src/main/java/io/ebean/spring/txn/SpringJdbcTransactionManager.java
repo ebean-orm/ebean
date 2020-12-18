@@ -159,7 +159,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
     @Override
     public void beforeCommit(boolean readOnly) {
       if (!readOnly) {
-        transaction.flushBatch();
+        transaction.preCommit();
       }
     }
 
@@ -168,12 +168,12 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
       switch (status) {
         case STATUS_COMMITTED:
           log.debug("Spring Txn [{}] committed", transaction.getId());
-          transactionManager.notifyOfCommit(transaction);
+          transaction.postCommit();
           break;
 
         case STATUS_ROLLED_BACK:
           log.debug("Spring Txn [{}] rollback", transaction.getId());
-          transactionManager.notifyOfRollback(transaction, null);
+          transaction.postRollback(null);
           break;
 
         default:
