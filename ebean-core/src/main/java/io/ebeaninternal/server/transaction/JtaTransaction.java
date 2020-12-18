@@ -13,9 +13,9 @@ public class JtaTransaction extends JdbcTransaction {
 
   private final UserTransaction userTransaction;
 
-  private boolean commmitted;
+  private final boolean newTransaction;
 
-  private boolean newTransaction;
+  private boolean committed;
 
   /**
    * Create the JtaTransaction.
@@ -41,7 +41,6 @@ public class JtaTransaction extends JdbcTransaction {
       if (connection.getAutoCommit()) {
         connection.setAutoCommit(false);
       }
-
     } catch (SQLException e) {
       throw new PersistenceException(e);
     }
@@ -52,7 +51,7 @@ public class JtaTransaction extends JdbcTransaction {
    */
   @Override
   public void commit() {
-    if (commmitted) {
+    if (committed) {
       throw new PersistenceException("This transaction has already been committed.");
     }
     try {
@@ -60,14 +59,14 @@ public class JtaTransaction extends JdbcTransaction {
         if (newTransaction) {
           userTransaction.commit();
         }
-        notifyCommit();
+        postCommit();
       } finally {
         close();
       }
     } catch (Exception e) {
       throw new PersistenceException(e);
     }
-    commmitted = true;
+    committed = true;
   }
 
   @Override
@@ -80,7 +79,7 @@ public class JtaTransaction extends JdbcTransaction {
    */
   @Override
   public void rollback(Throwable e) {
-    if (!commmitted) {
+    if (!committed) {
       try {
         try {
           if (userTransaction != null) {
@@ -90,7 +89,7 @@ public class JtaTransaction extends JdbcTransaction {
               userTransaction.setRollbackOnly();
             }
           }
-          notifyRollback(e);
+          postRollback(e);
         } finally {
           closeConnection();
         }
@@ -98,7 +97,6 @@ public class JtaTransaction extends JdbcTransaction {
         throw new PersistenceException(ex);
       }
     }
-
   }
 
   /**

@@ -318,4 +318,15 @@ public interface SpiTransaction extends Transaction {
    * Return true if explicitly set to skip cache (ignores skipOnWrite).
    */
   boolean isSkipCacheExplicit();
+
+  /**
+   * Fire post commit events and listeners.
+   */
+  void postCommit();
+
+  /**
+   * Fire post rollback events and listeners.
+   */
+  void postRollback(Throwable cause);
+
 }

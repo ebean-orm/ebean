@@ -985,6 +985,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     firePreCommit();
     // only performCommit can throw an exception
     performCommit();
+    postCommit();
+  }
+
+  @Override
+  public void postCommit() {
     firePostCommit();
     notifyCommit();
   }
@@ -1132,9 +1137,14 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
     } finally {
       // these will not throw an exception
-      firePostRollback();
-      notifyRollback(cause);
+      postRollback(cause);
     }
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    firePostRollback();
+    notifyRollback(cause);
   }
 
   /**
