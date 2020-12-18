@@ -586,6 +586,21 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     }
   }
 
+  @Override
+  public void preCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    // do nothing
+  }
+
   /**
    * Return true if the transaction is active.
    */

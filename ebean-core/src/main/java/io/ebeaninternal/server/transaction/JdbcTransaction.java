@@ -373,6 +373,9 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private void firePreCommit() {
     withEachCallback(TransactionCallback::preCommit);
+    if (changeLogHolder != null) {
+      changeLogHolder.preCommit();
+    }
   }
 
   private void firePostCommit() {
@@ -981,12 +984,21 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Batch flush, jdbc commit, trigger registered TransactionCallbacks, notify l2 cache etc.
    */
   private void flushCommitAndNotify() throws SQLException {
-    internalBatchFlush();
-    firePreCommit();
-    // only performCommit can throw an exception
+    preCommit();
     performCommit();
+    postCommit();
+  }
+
+  @Override
+  public void postCommit() {
     firePostCommit();
     notifyCommit();
+  }
+
+  @Override
+  public void preCommit() {
+    internalBatchFlush();
+    firePreCommit();
   }
 
   /**
@@ -1132,9 +1144,14 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
     } finally {
       // these will not throw an exception
-      firePostRollback();
-      notifyRollback(cause);
+      postRollback(cause);
     }
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    firePostRollback();
+    notifyRollback(cause);
   }
 
   /**

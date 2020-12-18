@@ -56,20 +56,31 @@ public class TChangeLogHolder {
    * Add a bean change to the change set.
    */
   public void addBeanChange(BeanChange change) {
-
     changes.addBeanChange(change);
     if (++count >= batchSize) {
       // we hit the batch size so send what we have knowing
       // that the transaction has not completed yet and
       // reset the changes and count
-      owner.sendChangeLog(changes);
-      changes = new ChangeSet(transactionId, ++batchId);
-      count = 0;
+      sendChanges();
     }
   }
 
+  private void sendChanges() {
+    owner.sendChangeLog(changes);
+    changes = new ChangeSet(transactionId, ++batchId);
+    count = 0;
+  }
+
   /**
-   * On post commit send the changes we have collected.
+   * Send the changes held prior to transaction commit.
+   */
+  public void preCommit() {
+    sendChanges();
+  }
+
+  /**
+   * On post commit send the changes we have collected. This should be
+   * only the COMMITTED state and with all changes sent prior to commit.
    */
   public void postCommit() {
     changes.setTxnState(TxnState.COMMITTED);

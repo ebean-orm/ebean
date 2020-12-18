@@ -15,10 +15,14 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
+import io.ebean.event.changelog.TxnState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.tests.model.basic.EBasicChangeLog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -43,6 +47,13 @@ public class TestChangeLog extends BaseTestCase {
     server.shutdown();
   }
 
+  private BeanChange firstChange() {
+    ChangeSet changeSet0 = changeLogListener.changes.get(0);
+    BeanChange change = changeSet0.getChanges().get(0);
+    changeLogListener.changes.clear();
+    return change;
+  }
+
   @Test
   public void test() {
 
@@ -50,8 +61,13 @@ public class TestChangeLog extends BaseTestCase {
     bean.setName("logBean");
     bean.setShortDescription("hello");
     server.save(bean);
-    BeanChange change = changeLogListener.changes.getChanges().get(0);
 
+    final List<ChangeSet> allChanges = changeLogListener.changes;
+    assertThat(allChanges).hasSize(2);
+    assertThat(allChanges.get(0).getTxnState()).isEqualTo(TxnState.IN_PROGRESS);
+    assertThat(allChanges.get(1).getTxnState()).isEqualTo(TxnState.COMMITTED);
+
+    BeanChange change = firstChange();
     assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
     assertThat(change.getData())
       .contains("\"name\":\"logBean\"")
@@ -61,8 +77,7 @@ public class TestChangeLog extends BaseTestCase {
     bean.setName("ChangedName");
     server.save(bean);
 
-    change = changeLogListener.changes.getChanges().get(0);
-
+    change = firstChange();
     assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
     assertThat(change.getOldData()).contains("\"name\":\"logBean\"");
     assertThat(change.getData()).contains("\"name\":\"ChangedName\"");
@@ -70,13 +85,10 @@ public class TestChangeLog extends BaseTestCase {
 
     server.delete(bean);
 
-    change = changeLogListener.changes.getChanges().get(0);
-
+    change = firstChange();
     assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
     assertThat(change.getData()).isNull();
-
   }
-
 
   @Test
   public void testWithNull() {
@@ -85,7 +97,7 @@ public class TestChangeLog extends BaseTestCase {
     bean.setName(null);
     bean.setShortDescription("hello");
     server.save(bean);
-    BeanChange change = changeLogListener.changes.getChanges().get(0);
+    BeanChange change = firstChange();
 
     assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
     assertThat(change.getData())
@@ -99,7 +111,7 @@ public class TestChangeLog extends BaseTestCase {
     bean.setShortDescription("hello");
     server.save(bean);
 
-    change = changeLogListener.changes.getChanges().get(0);
+    change = firstChange();
 
     assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
     assertThat(change.getOldData())
@@ -113,11 +125,10 @@ public class TestChangeLog extends BaseTestCase {
 
     server.delete(bean);
 
-    change = changeLogListener.changes.getChanges().get(0);
+    change = firstChange();
 
     assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
     assertThat(change.getData()).isNull();
-
   }
 
   private Database createServer() {
@@ -153,16 +164,15 @@ public class TestChangeLog extends BaseTestCase {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    ChangeSet changes;
+    List<ChangeSet> changes = new ArrayList<>();
 
     public TDChangeLogListener() {
       objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-
     @Override
     public void log(ChangeSet changes) {
-      this.changes = changes;
+      this.changes.add(changes);
       try {
         String json = objectMapper.writeValueAsString(changes);
         ChangeSet changes1 = objectMapper.readValue(json, ChangeSet.class);

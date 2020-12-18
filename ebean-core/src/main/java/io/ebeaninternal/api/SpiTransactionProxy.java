@@ -418,4 +418,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
     transaction.flushBatchOnCollection();
   }
 
+  @Override
+  public void preCommit() {
+    transaction.preCommit();
+  }
+
+  @Override
+  public void postCommit() {
+    transaction.postCommit();
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    transaction.postRollback(cause);
+  }
 }

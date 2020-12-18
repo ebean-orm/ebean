@@ -82,6 +82,7 @@
     <module>kotlin-querybean-generator</module>
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
+    <module>ebean-redis</module>
   </modules>
 
 </project>

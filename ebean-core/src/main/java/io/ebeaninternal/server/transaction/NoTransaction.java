@@ -89,6 +89,21 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void preCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    // do nothing
+  }
+
+  @Override
   public String getLogPrefix() {
     return null;
   }
