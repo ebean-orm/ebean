@@ -419,6 +419,11 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void preCommit() {
+    transaction.preCommit();
+  }
+
+  @Override
   public void postCommit() {
     transaction.postCommit();
   }

@@ -587,6 +587,11 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public void preCommit() {
+    // do nothing
+  }
+
+  @Override
   public void postCommit() {
     // do nothing
   }

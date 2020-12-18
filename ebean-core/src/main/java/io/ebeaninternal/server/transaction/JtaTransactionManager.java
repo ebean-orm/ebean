@@ -190,7 +190,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
     @Override
     public void beforeCompletion() {
-      transaction.flush();
+      transaction.preCommit();
     }
 
     @Override

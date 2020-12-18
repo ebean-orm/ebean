@@ -89,6 +89,11 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void preCommit() {
+    // do nothing
+  }
+
+  @Override
   public void postCommit() {
     // do nothing
   }

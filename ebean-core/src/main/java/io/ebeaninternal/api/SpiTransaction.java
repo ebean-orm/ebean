@@ -320,6 +320,11 @@ public interface SpiTransaction extends Transaction {
   boolean isSkipCacheExplicit();
 
   /**
+   * Fire pre commit processing/listeners.
+   */
+  void preCommit();
+
+  /**
    * Fire post commit events and listeners.
    */
   void postCommit();
