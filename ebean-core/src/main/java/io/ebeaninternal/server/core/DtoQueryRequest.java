@@ -50,7 +50,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       ormQuery.setManualId();
 
       // execute the underlying ORM query returning the ResultSet
-      SpiResultSet result = server.findResultSet(ormQuery, trans);
+      SpiResultSet result = server.findResultSet(ormQuery, transaction);
       this.pstmt = result.getStatement();
       this.sql = ormQuery.getGeneratedSql();
       setResultSet(result.getResultSet(), ormQuery.getQueryPlanKey());

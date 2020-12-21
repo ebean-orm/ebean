@@ -27,7 +27,7 @@ public abstract class AbstractSqlQueryRequest {
 
   protected final SpiEbeanServer server;
 
-  protected SpiTransaction trans;
+  protected SpiTransaction transaction;
 
   private boolean createdTransaction;
 
@@ -47,18 +47,18 @@ public abstract class AbstractSqlQueryRequest {
   AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query, Transaction t) {
     this.server = server;
     this.query = query;
-    this.trans = (SpiTransaction) t;
+    this.transaction = (SpiTransaction) t;
   }
 
   /**
    * Create a transaction if none currently exists.
    */
   public void initTransIfRequired() {
-    if (trans == null) {
-      trans = server.currentServerTransaction();
-      if (trans == null || !trans.isActive()) {
+    if (transaction == null) {
+      transaction = server.currentServerTransaction();
+      if (transaction == null || !transaction.isActive()) {
         // create a local readOnly transaction
-        trans = server.createReadOnlyTransaction(null);
+        transaction = server.createReadOnlyTransaction(null);
         createdTransaction = true;
       }
     }
@@ -69,26 +69,18 @@ public abstract class AbstractSqlQueryRequest {
    */
   public void endTransIfRequired() {
     if (createdTransaction) {
-      trans.commit();
+      transaction.commit();
     }
   }
 
   protected void flushJdbcBatchOnQuery() {
-    if (trans.isFlushOnQuery()) {
-      trans.flush();
+    if (transaction.isFlushOnQuery()) {
+      transaction.flush();
     }
   }
 
-  public EbeanServer getServer() {
-    return server;
-  }
-
-  public SpiTransaction getTransaction() {
-    return trans;
-  }
-
   public boolean isLogSql() {
-    return trans.isLogSql();
+    return transaction.isLogSql();
   }
 
   /**
@@ -126,7 +118,6 @@ public abstract class AbstractSqlQueryRequest {
    * Prepare the SQL taking into account named bind parameters.
    */
   private void prepareSql() {
-
     String sql = query.getQuery();
     BindParams bindParams = query.getBindParams();
     if (!bindParams.isEmpty()) {
@@ -137,7 +128,6 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   private String limitOffset(String sql) {
-
     int firstRow = query.getFirstRow();
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
@@ -155,10 +145,8 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
-
     prepareSql();
-    Connection conn = trans.getInternalConnection();
-
+    Connection conn = transaction.getInternalConnection();
     pstmt = conn.prepareStatement(sql);
     if (query.getTimeout() > 0) {
       pstmt.setQueryTimeout(query.getTimeout());
@@ -166,14 +154,12 @@ public abstract class AbstractSqlQueryRequest {
     if (query.getBufferFetchSizeHint() > 0) {
       pstmt.setFetchSize(query.getBufferFetchSizeHint());
     }
-
     BindParams bindParams = query.getBindParams();
     if (!bindParams.isEmpty()) {
       this.bindLog = binder.bind(bindParams, pstmt, conn);
     }
-
     if (isLogSql()) {
-      trans.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
+      transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
     }
 
     setResultSet(pstmt.executeQuery(), null);

@@ -100,9 +100,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
    * Build the list of property names.
    */
   private String[] getPropertyNames() throws SQLException {
-
     ResultSetMetaData metaData = resultSet.getMetaData();
-
     int columnsPlusOne = metaData.getColumnCount() + 1;
     ArrayList<String> propNames = new ArrayList<>(columnsPlusOne - 1);
     for (int i = 1; i < columnsPlusOne; i++) {
@@ -115,9 +113,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
    * Read and return the next SqlRow.
    */
   public SqlRow createNewRow() throws SQLException {
-
     rows++;
-
     SqlRow sqlRow = queryEngine.createSqlRow(estimateCapacity);
     int index = 0;
     for (String propertyName : propertyNames) {
@@ -129,9 +125,9 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   }
 
   public void logSummary() {
-    if (trans.isLogSummary()) {
+    if (transaction.isLogSummary()) {
       long micros = (System.nanoTime() - startNano) / 1000L;
-      trans.logSummary("SqlQuery  rows[" + rows + "] micros[" + micros + "] bind[" + bindLog + "]");
+      transaction.logSummary("SqlQuery  rows[" + rows + "] micros[" + micros + "] bind[" + bindLog + "]");
     }
   }
 
@@ -144,7 +140,6 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   }
 
   public <T> List<T> mapList(RowMapper<T> mapper) throws SQLException {
-
     List<T> list = new ArrayList<>();
     while (next()) {
       list.add(mapper.map(resultSet, rows++));
