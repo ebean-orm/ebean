@@ -73,6 +73,12 @@ public abstract class AbstractSqlQueryRequest {
     }
   }
 
+  protected void flushJdbcBatchOnQuery() {
+    if (trans.isFlushOnQuery()) {
+      trans.flush();
+    }
+  }
+
   public EbeanServer getServer() {
     return server;
   }

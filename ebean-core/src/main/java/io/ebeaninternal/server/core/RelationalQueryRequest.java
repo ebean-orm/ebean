@@ -56,35 +56,43 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   }
 
   boolean findEachRow(RowConsumer mapper) {
+    flushJdbcBatchOnQuery();
     queryEngine.findEachRow(this, mapper);
     return true;
   }
 
   <T> List<T> findListMapper(RowMapper<T> mapper) {
+    flushJdbcBatchOnQuery();
     return queryEngine.findListMapper(this, mapper);
   }
 
   <T> T findOneMapper(RowMapper<T> mapper) {
+    flushJdbcBatchOnQuery();
     return queryEngine.findOneMapper(this, mapper);
   }
 
   public <T> List<T> findSingleAttributeList(Class<T> cls) {
+    flushJdbcBatchOnQuery();
     return queryEngine.findSingleAttributeList(this, cls);
   }
 
   public <T> T findSingleAttribute(Class<T> cls) {
+    flushJdbcBatchOnQuery();
     return queryEngine.findSingleAttribute(this, cls);
   }
 
   public void findEach(Consumer<SqlRow> consumer) {
+    flushJdbcBatchOnQuery();
     queryEngine.findEach(this, consumer);
   }
 
   public void findEachWhile(Predicate<SqlRow> consumer) {
+    flushJdbcBatchOnQuery();
     queryEngine.findEach(this, consumer);
   }
 
   public List<SqlRow> findList() {
+    flushJdbcBatchOnQuery();
     return queryEngine.findList(this);
   }
 

@@ -1,6 +1,8 @@
 package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.DtoQuery2Test;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
@@ -103,6 +105,41 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertSql(sql.get(0)).contains("select count(*)");
+  }
+
+  @Test
+  @Transactional(batchSize = 20)
+  public void transactional_flushOnSqlQuery() {
+
+    LoggedSqlCollector.start();
+
+    DB.save(new EBasicVer("b1"));
+    DB.save(new EBasicVer("b2"));
+
+    // trigger JDBC batch by default
+    DB.sqlQuery("select count(*) from e_basicver")
+      .mapToScalar(Integer.class)
+      .findOne();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("insert into e_basicver");
+  }
+
+  @Test
+  @Transactional(batchSize = 20)
+  public void transactional_flushOnDtoQuery() {
+
+    LoggedSqlCollector.start();
+
+    DB.save(new EBasicVer("b1"));
+    DB.save(new EBasicVer("b2"));
+
+    // trigger JDBC batch by default
+    DB.findDto(DtoQuery2Test.DCust.class, "select id, name from o_customer")
+    .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("insert into e_basicver");
   }
 
   @Test
