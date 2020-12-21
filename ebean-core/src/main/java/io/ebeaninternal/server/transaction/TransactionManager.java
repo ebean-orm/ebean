@@ -634,7 +634,7 @@ public class TransactionManager implements SpiTransactionManager {
   public ScopedTransaction externalBeginTransaction(SpiTransaction transaction, TxScope txScope) {
     ScopedTransaction scopedTxn = new ScopedTransaction(scopeManager);
     scopedTxn.push(new ScopeTrans(rollbackOnChecked, false, transaction, txScope));
-    scopeManager.set(scopedTxn);
+    scopeManager.replace(scopedTxn);
     return scopedTxn;
   }
 
