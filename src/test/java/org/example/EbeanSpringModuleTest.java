@@ -62,8 +62,12 @@ public class EbeanSpringModuleTest {
 
   @Test
   public void testBatchInsert() {
-
     userService.batchInsert();
+  }
+
+  @Test
+  public void testRequiresNew() {
+    userService.requiresNew();
   }
 
   /**

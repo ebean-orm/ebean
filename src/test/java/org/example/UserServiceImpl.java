@@ -59,6 +59,13 @@ public class UserServiceImpl implements UserService {
     System.out.println("---------after batch-------");
   }
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void requiresNew() {
+		User user = new User();
+		user.setName("user_x0");
+		ebeanServer.save(user);
+	}
+
 
 	/**
 	 * Return the ebean server.

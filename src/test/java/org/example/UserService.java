@@ -14,4 +14,6 @@ public interface UserService {
 	void nonTransactional();
 
 	void batchInsert();
+
+	void requiresNew();
 }
