@@ -519,11 +519,11 @@ public interface Transaction extends AutoCloseable {
   void flush() throws PersistenceException;
 
   /**
-   * This is a synonym for flush() and will be deprecated.
+   * Deprecated - migrate to flush().
    * <p>
    * flush() is preferred as it matches the JPA flush() method.
-   * </p>
    */
+  @Deprecated
   void flushBatch() throws PersistenceException;
 
   /**

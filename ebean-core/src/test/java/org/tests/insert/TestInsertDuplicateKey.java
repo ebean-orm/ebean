@@ -24,7 +24,7 @@ public class TestInsertDuplicateKey extends BaseTestCase {
   public void clearDb() {
     server().find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
   }
-  
+
   @Test(expected = DuplicateKeyException.class)
   public void insert_duplicateKey() {
 
@@ -89,7 +89,7 @@ public class TestInsertDuplicateKey extends BaseTestCase {
       doc2.save();
 
       // flush at this point, fails
-      Ebean.getDefaultServer().currentTransaction().flushBatch();
+      Ebean.getDefaultServer().currentTransaction().flush();
     } catch (DuplicateKeyException e) {
       log.info("duplicate failed but just continue" + e.getMessage());
       try {

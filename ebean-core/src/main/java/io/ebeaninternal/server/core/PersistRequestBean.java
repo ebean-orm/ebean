@@ -388,7 +388,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public void preGetterTrigger(int propertyIndex) {
     if (flushBatchOnGetter(propertyIndex)) {
-      transaction.flushBatch();
+      transaction.flush();
     }
   }
 
