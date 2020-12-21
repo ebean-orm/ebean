@@ -63,7 +63,8 @@ public class UserServiceImpl implements UserService {
 	public void requiresNew() {
 		User user = new User();
 		user.setName("user_x0");
-		ebeanServer.save(user);
+		user.insert();
+		//ebeanServer.save(user);
 	}
 
 

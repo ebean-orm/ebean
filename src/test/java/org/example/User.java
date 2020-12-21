@@ -1,5 +1,7 @@
 package org.example;
 
+import io.ebean.Model;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -7,7 +9,7 @@ import javax.persistence.OneToOne;
 import java.util.Set;
 
 @Entity
-public class User {
+public class User extends Model {
 
 	@Id
 	long oid;
