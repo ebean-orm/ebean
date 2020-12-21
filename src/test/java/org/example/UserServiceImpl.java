@@ -1,7 +1,10 @@
 package org.example;
 
 import io.ebean.Transaction;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +19,9 @@ import java.util.List;
  * @since 18.05.2009
  * @author E Mc Greal
  */
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, ApplicationContextAware {
+
+	private ApplicationContext applicationContext;
 
 	/** The ebean server. */
 	@Autowired
@@ -57,6 +62,8 @@ public class UserServiceImpl implements UserService {
     ebeanServer.saveAll(users);
 
     System.out.println("---------after batch-------");
+
+    applicationContext.getBean(UserService.class).requiresNew();
   }
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -83,4 +90,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
 }
