@@ -37,7 +37,7 @@ public class SaveManyBeans extends SaveManyBase {
   private final boolean saveRecurseSkippable;
   private final DeleteMode deleteMode;
   private final boolean untouchedBeanCollection;
-  private Collection<?> collection;
+  private final Collection<?> collection;
   private int sortOrder;
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
@@ -49,6 +49,7 @@ public class SaveManyBeans extends SaveManyBase {
     this.saveRecurseSkippable = many.isSaveRecurseSkippable();
     this.deleteMode = targetDescriptor.isSoftDelete() ? DeleteMode.SOFT : DeleteMode.HARD;
     this.untouchedBeanCollection = untouchedBeanCollection();
+    this.collection = cascade ? BeanCollectionUtil.getActualEntries(value) : null;
   }
 
   /**
@@ -108,7 +109,6 @@ public class SaveManyBeans extends SaveManyBase {
   private void saveAssocManyDetails() {
     // check that the list is not null and if it is a BeanCollection
     // check that is has been populated (don't trigger lazy loading)
-    collection = BeanCollectionUtil.getActualEntries(value);
     if (collection != null) {
       processDetails();
     }
@@ -208,6 +208,18 @@ public class SaveManyBeans extends SaveManyBase {
       }
     }
     return true;
+  }
+
+  private boolean hasNewOrDirtyBeans() {
+    if (collection == null) {
+      return false;
+    }
+    for (Object bean : collection) {
+      if (bean instanceof EntityBean && ((EntityBean) bean)._ebean_getIntercept().isNewOrDirty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -337,7 +349,7 @@ public class SaveManyBeans extends SaveManyBase {
       return;
     }
     if (!(value instanceof BeanCollection<?>)) {
-      if (!insertedParent) {
+      if (!insertedParent && cascade && hasNewOrDirtyBeans()) {
         persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
       }
     } else {
