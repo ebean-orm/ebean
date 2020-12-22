@@ -8,6 +8,8 @@
   </parent>
 
   <artifactId>ebean-core-type</artifactId>
+  <name>ebean core type</name>
+  <description>ebean scalar types api</description>
 
   <properties>
     <jackson-core.version>2.11.3</jackson-core.version>
