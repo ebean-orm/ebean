@@ -1,7 +1,6 @@
 package io.ebean.test;
 
 import io.ebean.DB;
-import io.ebean.migration.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
