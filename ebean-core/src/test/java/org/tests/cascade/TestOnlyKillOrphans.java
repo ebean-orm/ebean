@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +25,23 @@ public class TestOnlyKillOrphans extends BaseTestCase {
     // assert
     CORoot check = DB.find(CORoot.class, root.getId());
     assertThat(check.getOne().getChildren()).hasSize(2);
+    DB.delete(check);
+  }
+
+  @Test
+  public void test2() {
+    final COOne one = setup();
+
+    assertThat(one.getChildren()).hasSize(2);
+
+    one.getChildren().add(new COOneMany("_M1"));
+
+    DB.save(one);
+
+    // assert
+    COOne check = DB.find(COOne.class, one.getId());
+    assertThat(check.getChildren().stream().map(it -> it.getName()).sorted().collect(Collectors.toList()))
+      .isEqualTo(Stream.of("M1", "M2", "_M1").sorted().collect(Collectors.toList()));
     DB.delete(check);
   }
 
