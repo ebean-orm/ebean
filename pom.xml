@@ -39,7 +39,15 @@
 
   <properties>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+    <ebean-agent.version>12.6.2</ebean-agent.version>
+    <ebean-annotation.version>6.15</ebean-annotation.version>
     <ebean-datasource.version>7.0</ebean-datasource.version>
+    <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
+    <ebean-maven-plugin.version>12.6.2</ebean-maven-plugin.version>
+    <ebean-migration-auto.version>1.0</ebean-migration-auto.version>
+    <ebean-migration.version>12.4.0</ebean-migration.version>
+    <ebean-persistence-api.version>2.2.4</ebean-persistence-api.version>
+    <ebean-test-docker.version>4.1</ebean-test-docker.version>
   </properties>
 
   <dependencies>

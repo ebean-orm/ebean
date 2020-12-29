@@ -49,13 +49,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>persistence-api</artifactId>
-      <version>2.2.4</version>
+      <version>${ebean-persistence-api.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>6.15</version>
+      <version>${ebean-annotation.version}</version>
     </dependency>
 
     <dependency>

@@ -12,21 +12,17 @@
   <artifactId>ebean-bom</artifactId>
   <packaging>pom</packaging>
 
-  <properties>
-    <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
-    <ebean-migration-auto.version>1.0</ebean-migration-auto.version>
-    <ebean-migration.version>12.4.0</ebean-migration.version>
-    <ebean-test-docker.version>4.1</ebean-test-docker.version>
-    <ebean-datasource.version>7.0</ebean-datasource.version>
-    <ebean-agent.version>12.6.2</ebean-agent.version>
-    <ebean-maven-plugin.version>12.6.2</ebean-maven-plugin.version>
-  </properties>
-
   <dependencyManagement>
 
     <dependencies>
 
       <!-- dependencies external to this ebean.git build -->
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-annotation</artifactId>
+        <version>${ebean-annotation.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>

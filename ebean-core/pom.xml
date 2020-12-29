@@ -51,7 +51,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-runner</artifactId>
-      <version>1.0</version>
+      <version>${ebean-ddl-runner.version}</version>
     </dependency>
 
     <dependency>
@@ -63,14 +63,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration-auto</artifactId>
-      <version>1.0</version>
+      <version>${ebean-migration-auto.version}</version>
     </dependency>
 
     <!-- keep testing in core using ebean-ddl-generator & ebean-migration -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>12.4.0</version>
+      <version>${ebean-migration.version}</version>
       <scope>test</scope>
     </dependency>
 
