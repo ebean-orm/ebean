@@ -349,9 +349,9 @@ public class SaveManyBeans extends SaveManyBase {
       return;
     }
     if (!(value instanceof BeanCollection<?>)) {
-      if (!insertedParent && cascade && hasNewOrDirtyBeans()) {
-        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
-      }
+//      if (!insertedParent && cascade && hasNewOrDirtyBeans()) {
+//        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
+//      }
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();
