@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.6.5</version>
+    <version>12.6.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core-type</artifactId>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.6.5</version>
+      <version>12.6.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
