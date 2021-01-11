@@ -215,7 +215,7 @@ class DefaultBeanLoader {
       desc.contextPut(pc, id, bean);
       ebi.setPersistenceContext(pc);
     }
-
+    // desc.contextPut(pc, id, bean); // this will fix one of the two tests
     boolean draft = desc.isDraftInstance(bean);
 
     if (embeddedOwnerIndex == -1) {

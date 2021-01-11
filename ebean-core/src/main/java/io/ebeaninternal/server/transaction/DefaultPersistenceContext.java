@@ -296,6 +296,10 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
 
     private void put(Object id, Object b) {
+      Object existing = map.get(id);
+      if (existing != null && existing != b) {
+        System.out.println("DEBUG: Overwriting object");
+      } // else // will fix both tests
       map.put(id, b);
     }
 
