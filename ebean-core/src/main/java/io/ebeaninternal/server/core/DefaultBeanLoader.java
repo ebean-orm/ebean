@@ -215,7 +215,6 @@ class DefaultBeanLoader {
       desc.contextPut(pc, id, bean);
       ebi.setPersistenceContext(pc);
     }
-    // desc.contextPut(pc, id, bean); // this will fix one of the two tests
     boolean draft = desc.isDraftInstance(bean);
 
     if (embeddedOwnerIndex == -1) {
@@ -245,7 +244,6 @@ class DefaultBeanLoader {
     // and put the data into the original bean
     query.setUsageProfiling(false);
     query.setPersistenceContext(pc);
-
     query.setMode(mode);
     query.setId(id);
 

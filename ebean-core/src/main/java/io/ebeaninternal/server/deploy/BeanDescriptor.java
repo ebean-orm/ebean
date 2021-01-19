@@ -1873,6 +1873,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Create a reference with a check for the bean in the persistence context.
+   */
+  public EntityBean createReference(Boolean readOnly, Object id, PersistenceContext pc) {
+    Object refBean = contextGet(pc, id);
+    if (refBean == null) {
+      refBean = createReference(readOnly, false, id, pc);
+    }
+    return (EntityBean)refBean;
+  }
+
+  /**
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
