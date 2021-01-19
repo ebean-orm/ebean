@@ -138,6 +138,27 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
+  public void testFindChild_joinParent() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelParent_withChild");
+    bean.addChild("child1", 10);
+
+    DB.save(bean);
+
+    Query<EBasicSDChild> query = DB.find(EBasicSDChild.class)
+      .where()
+      .eq("owner.name", "softDelParent_withChild")
+      .query();
+
+    List<EBasicSDChild> list = query.findList();
+    assertSql(query).contains("join ebasic_soft_delete t1 on t1.id = t0.owner_id and t1.deleted =");
+    assertThat(list).hasSize(1);
+
+    // Cleanup created entity
+    DB.deletePermanent(bean);
+  }
+
+  @Test
   public void testFindSoftDeletedList() {
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("softDelFetch");

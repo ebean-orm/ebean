@@ -24,19 +24,17 @@ import java.util.Set;
 class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private final STreePropertyAssoc assocBeanProperty;
-
+  private final SpiQuery.TemporalMode temporalMode;
   private final String prefix;
-
   private final boolean manyJoin;
-
   private final boolean pathContainsMany;
-
   private List<SqlTreeNodeExtraJoin> children;
 
-  SqlTreeNodeExtraJoin(String prefix, STreePropertyAssoc assocBeanProperty, boolean pathContainsMany) {
+  SqlTreeNodeExtraJoin(String prefix, STreePropertyAssoc assocBeanProperty, boolean pathContainsMany, SpiQuery.TemporalMode temporalMode) {
     this.prefix = prefix;
     this.assocBeanProperty = assocBeanProperty;
     this.pathContainsMany = pathContainsMany;
+    this.temporalMode = temporalMode;
     this.manyJoin = assocBeanProperty instanceof STreePropertyAssocMany;
   }
 
@@ -144,15 +142,16 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
         assocBeanProperty.appendFrom(ctx, joinType);
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
+      if (assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
+        ctx.append(" and ").append(assocBeanProperty.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
+      }
     }
 
     if (children != null) {
-
       if (manyJoin || pathContainsMany) {
         // if AUTO then make all descendants use OUTER JOIN
         joinType = joinType.autoToOuter();
       }
-
       for (SqlTreeNodeExtraJoin child : children) {
         child.appendFrom(ctx, joinType);
       }

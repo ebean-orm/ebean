@@ -262,8 +262,14 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Return true if the target side has soft delete.
    */
+  @Override
   public boolean isTargetSoftDelete() {
     return targetDescriptor.isSoftDelete();
+  }
+
+  @Override
+  public String getSoftDeletePredicate(String tableAlias) {
+    return targetDescriptor.getSoftDeletePredicate(tableAlias);
   }
 
   /**

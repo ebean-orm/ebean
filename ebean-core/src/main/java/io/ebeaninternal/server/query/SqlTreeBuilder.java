@@ -362,7 +362,7 @@ public final class SqlTreeBuilder {
 
     // look for predicateIncludes that are not in selectIncludes and add
     // them as extra joins to the query
-    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes);
+    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, temporalMode);
 
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
     if (!extraJoins.isEmpty()) {
@@ -592,26 +592,20 @@ public final class SqlTreeBuilder {
    */
   private static class IncludesDistiller {
 
+    private final STreeType desc;
     private final Set<String> selectIncludes;
     private final Set<String> predicateIncludes;
+    private final SpiQuery.TemporalMode temporalMode;
 
-    /**
-     * Contains the 'root' extra joins. We only return the roots back.
-     */
     private final Map<String, SqlTreeNodeExtraJoin> joinRegister = new HashMap<>();
-
-    /**
-     * Register of all the extra join nodes.
-     */
     private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<>();
 
-    private final STreeType desc;
-
     private IncludesDistiller(STreeType desc, Set<String> selectIncludes,
-                              Set<String> predicateIncludes) {
+                              Set<String> predicateIncludes, SpiQuery.TemporalMode temporalMode) {
       this.desc = desc;
       this.selectIncludes = selectIncludes;
       this.predicateIncludes = predicateIncludes;
+      this.temporalMode = temporalMode;
     }
 
     /**
@@ -666,7 +660,7 @@ public final class SqlTreeBuilder {
       if (extra == null) {
         return null;
       } else {
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.getProperty(), extra.isContainsMany());
+        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.getProperty(), extra.isContainsMany(), temporalMode);
         joinRegister.put(propertyName, extraJoin);
         return extraJoin;
       }
