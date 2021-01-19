@@ -111,9 +111,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
     boolean manyToMany = false;
-
     if (assocBeanProperty instanceof STreePropertyAssocMany) {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) assocBeanProperty;
       if (manyProp.hasJoinTable()) {
