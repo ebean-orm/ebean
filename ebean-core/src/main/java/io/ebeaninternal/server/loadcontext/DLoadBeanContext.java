@@ -56,7 +56,6 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
   }
 
   private void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
-
     if (cache) {
       query.setBeanCacheMode(CacheMode.ON);
     }
@@ -70,7 +69,6 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
   }
 
   protected void register(EntityBeanIntercept ebi) {
-
     if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(secondaryBatchSize);
     }
@@ -198,8 +196,10 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
         // lazy load property was a Many
         return;
       }
-
-      if (context.hitCache) {
+      if (list.isEmpty()) {
+        // re-add to the batch and lazy load from DB skipping l2 cache
+        list.add(ebi);
+      } else if (context.hitCache) {
         Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(list, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
         list.removeAll(hits);
         if (list.isEmpty() || hits.contains(ebi)) {
