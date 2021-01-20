@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
@@ -53,9 +54,11 @@ public class OrmUpdateProperties {
   private static class SimpleValue extends Value {
 
     final Object value;
+    final ScalarType<Object> scalarType;
 
-    SimpleValue(Object value) {
+    SimpleValue(Object value, ScalarType<Object> scalarType) {
       this.value = value;
+      this.scalarType = scalarType;
     }
 
     @Override
@@ -70,7 +73,11 @@ public class OrmUpdateProperties {
 
     @Override
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
-      binder.bindObject(dataBind, value);
+      if (scalarType != null) {
+        scalarType.bind(dataBind, value);
+      } else {
+        binder.bindObject(dataBind, value);
+      }
       dataBind.append(value).append(",");
     }
   }
@@ -115,16 +122,12 @@ public class OrmUpdateProperties {
    */
   private final LinkedHashMap<String, Value> values = new LinkedHashMap<>();
 
-  /**
-   * Normal set property.
-   */
-  public void set(String propertyName, Object value) {
-    if (value == null) {
-      values.put(propertyName, NULL_VALUE);
+  public void set(String propertyName, Object value, ScalarType<Object> scalarType) {
+    values.put(propertyName, new SimpleValue(value, scalarType));
+  }
 
-    } else {
-      values.put(propertyName, new SimpleValue(value));
-    }
+  public void setNull(String propertyName) {
+    values.put(propertyName, NULL_VALUE);
   }
 
   /**

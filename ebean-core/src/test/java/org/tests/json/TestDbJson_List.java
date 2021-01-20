@@ -1,7 +1,7 @@
 package org.tests.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.text.TextException;
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestDbJson_List extends BaseTestCase {
 
-  private EBasicJsonList bean = new EBasicJsonList();
+  private final EBasicJsonList bean = new EBasicJsonList();
 
   private EBasicJsonList found;
 
@@ -57,9 +57,9 @@ public class TestDbJson_List extends BaseTestCase {
     bean.getBeanMap().put("key0", new PlainBean("k0", 90));
     bean.getBeanMap().put("key1", new PlainBean("k1", 91));
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    found = Ebean.find(EBasicJsonList.class, bean.getId());
+    found = DB.find(EBasicJsonList.class, bean.getId());
 
     assertThat(found.getTags()).containsExactly("one", "two");
     assertTrue(found.getFlags().contains(42L));
@@ -81,7 +81,7 @@ public class TestDbJson_List extends BaseTestCase {
   //@Test//(dependsOnMethods = "insert")
   public void json_parse_format() {
 
-    String asJson = Ebean.json().toJson(found);
+    String asJson = DB.json().toJson(found);
     assertThat(asJson).contains("\"tags\":[\"one\",\"two\"]");
     assertThat(asJson).contains("\"flags\":[42,43,44]");
     assertThat(asJson).contains("\"plainBean\":{\"name\":\"plain\"");
@@ -90,7 +90,7 @@ public class TestDbJson_List extends BaseTestCase {
     assertThat(asJson).contains("\"beanMap\":{");
     assertThat(asJson).contains("\"id\":");
 
-    EBasicJsonList fromJson = Ebean.json().toBean(EBasicJsonList.class, asJson);
+    EBasicJsonList fromJson = DB.json().toBean(EBasicJsonList.class, asJson);
     assertEquals(found.getId(), fromJson.getId());
     assertEquals(found.getId(), fromJson.getId());
     assertEquals(found.getName(), fromJson.getName());
@@ -109,7 +109,7 @@ public class TestDbJson_List extends BaseTestCase {
 
     found.setName("mod");
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
@@ -122,7 +122,7 @@ public class TestDbJson_List extends BaseTestCase {
     found.getTags().add("three");
 
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
@@ -135,7 +135,7 @@ public class TestDbJson_List extends BaseTestCase {
     found.getFlags().remove(42L);
 
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
@@ -150,7 +150,7 @@ public class TestDbJson_List extends BaseTestCase {
     found.getBeanMap().remove("key0");
 
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
@@ -166,13 +166,13 @@ public class TestDbJson_List extends BaseTestCase {
     bean.setTags(null);
     bean.setBeanMap(null);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicJsonList found = Ebean.find(EBasicJsonList.class, bean.getId());
+    EBasicJsonList found = DB.find(EBasicJsonList.class, bean.getId());
 
     assertNull(found.getPlainBean());
 
-    String asJson = Ebean.json().toJson(found);
+    String asJson = DB.json().toJson(found);
     assertNotNull(asJson);
   }
 
@@ -186,17 +186,16 @@ public class TestDbJson_List extends BaseTestCase {
     plainBean.setName("Blubb");
     bean.getBeanMap().put("bla", plainBean);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     // set some invalid JSON content into DB
-    Ebean.update(EBasicJsonList.class)
-      .set("beanMap", "blabla")
-      .where().eq("id", bean.getId())
-      .update();
+    DB.sqlUpdate("update ebasic_json_list set bean_map=? where id=?")
+      .setParameters("blabla", bean.getId())
+      .execute();
 
     try {
       // a normal query fails due to invalid JSON content
-      Ebean.find(EBasicJsonList.class)
+      DB.find(EBasicJsonList.class)
         .setId(bean.getId())
         .findOne();
 
@@ -208,7 +207,7 @@ public class TestDbJson_List extends BaseTestCase {
       assertThat(e.getMessage()).contains("beanMap");
     }
 
-    bean = Ebean.find(EBasicJsonList.class)
+    bean = DB.find(EBasicJsonList.class)
       .setId(bean.getId())
       .setAllowLoadErrors() // allow invalid JSON content
       .findOne();
@@ -220,6 +219,6 @@ public class TestDbJson_List extends BaseTestCase {
       .isInstanceOf(TextException.class)
       .hasMessageContaining("blabla");
 
-    Ebean.delete(bean);
+    DB.delete(bean);
   }
 }
