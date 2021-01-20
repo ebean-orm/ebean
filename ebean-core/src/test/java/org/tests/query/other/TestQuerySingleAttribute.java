@@ -28,20 +28,33 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 	@Test
 	  public void findSingleAttributesTwoToMany() {
 	    ResetBasicData.reset();
+	    // Query without ors with equals causing joins, only one Customer with name Rob exists
+	    Query<Customer> query0 = DB.find(Customer.class)
+		        .select("name")
+		        .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+		        .where()
+		        .eq("name", "Rob")
+		        .query();
+
+		    CountedValue<String> robs0 = (CountedValue<String>) query0.findSingleAttributeList().get(0);
+		    assertThat(robs0.getValue()).isEqualTo("Rob");
+		    assertThat(robs0.getCount()).isEqualTo(1);
+	    
+		 // Query with or with equals causing joins
 	    Query<Customer> query = DB.find(Customer.class)
 	        .select("name")
-	        //.apply(toFetchPath("name"))
 	        .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
 	        .where()
 	        .eq("name", "Rob")
 	        .or()
 	         .eq("orders.status", Order.Status.NEW)
 	         .eq("contacts.firstName", "Fred1")
+	         .endOr()
 	        .query();
 
-	    List<Object> counted =  query.findSingleAttributeList();
-	    CountedValue<String> robs = (CountedValue<String>)counted.get(0);
+	    CountedValue<String> robs = (CountedValue<String>) query.findSingleAttributeList().get(0);
 	    assertThat(robs.getValue()).isEqualTo("Rob");
+	    // only one Customer named rob exists, but 7 is returned for the amount of Customers named Rob
 	    assertThat(robs.getCount()).isEqualTo(1);
 	    
 	    // TODO check correct future query
