@@ -6,16 +6,21 @@ import io.ebean.CountedValue;
 import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
+import org.tests.lazyforeignkeys.MainEntity;
+import org.tests.lazyforeignkeys.MainEntityRelation;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.VwCustomer;
+import org.tests.o2m.OmBasicParent;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -24,7 +29,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQuerySingleAttribute extends BaseTestCase {
-	
+
 	@Test
 	  public void findSingleAttributesTwoToMany() {
 	    ResetBasicData.reset();
@@ -39,7 +44,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 		    CountedValue<String> robs0 = (CountedValue<String>) query0.findSingleAttributeList().get(0);
 		    assertThat(robs0.getValue()).isEqualTo("Rob");
 		    assertThat(robs0.getCount()).isEqualTo(1);
-	    
+
 		 // Query with or with equals causing joins
 	    Query<Customer> query = DB.find(Customer.class)
 	        .select("name")
@@ -56,12 +61,13 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 	    assertThat(robs.getValue()).isEqualTo("Rob");
 	    // only one Customer named rob exists, but 7 is returned for the amount of Customers named Rob
 	    assertThat(robs.getCount()).isEqualTo(1);
-	    
-	    // TODO check correct future query
-	    assertThat(sqlOf(query)).contains("select r1.attribute_1, count(*) cnt"
-	        + " from (select t1.id attribute_1 from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1 ) r1"
-	        + " group by r1.attribute_1"
-	        + " order by count(*) desc, r1.attribute_1");
+
+	    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) " +
+        "from (select distinct t0.id, t0.name as attribute_ " +
+        "from o_customer t0 left join contact u1 on u1.customer_id = t0.id left join o_order u2 on u2.kcustomer_id = t0.id " +
+        "where t0.name = ? and (u2.status = ? or u1.first_name = ?)) r1 " +
+        "group by r1.attribute_ " +
+        "order by count(*) desc, r1.attribute_");
 	  }
 
   @Test
@@ -140,6 +146,93 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
     assertThat(name).isNotNull();
+  }
+
+  @Test
+  public void findSingleAttributeList_with_join_column() {
+    ResetBasicData.reset();
+    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+      .fetch("entity1", "attr1")
+      .setDistinct(true)
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where().query();
+
+    List<CountedValue<String>> attr1list = query.findSingleAttributeList();
+
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
+        + " from (select distinct t0.id, t0.id1, t1.attr1 as attribute_ from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1) r1"
+        + " group by r1.attribute_"
+        + " order by count(*) desc, r1.attribute_"); // sub-query select clause includes t0.id1
+    assertThat(attr1list).isNotNull();
+    assertThat(attr1list).hasSize(2);
+    assertThat(attr1list.get(0).getValue()).isEqualTo("a1");
+    assertThat(attr1list.get(0).getCount()).isEqualTo(2l);
+    assertThat(attr1list.get(1).getValue()).isEqualTo("a2");
+    assertThat(attr1list.get(1).getCount()).isEqualTo(1l);
+  }
+
+  @Test
+  public void findSingleAttributesVariousSelection1() {
+    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+      .fetch("entity1", "attr1")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where().query();
+    query.findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
+      + " from (select t0.id1, t1.attr1 as attribute_ from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1) r1"
+      + " group by r1.attribute_"
+      + " order by count(*) desc, r1.attribute_"); // sub-query select clause includes t0.id1
+  }
+
+  @Test
+  public void findSingleAttributesVariousSelection2() {
+    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+      .select("attr1")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where().query();
+    query.findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
+      + " from (select t0.attr1 as attribute_ from main_entity_relation t0) r1"
+      + " group by r1.attribute_"
+      + " order by count(*) desc, r1.attribute_");
+  }
+
+  @Test
+  public void findSingleAttributesVariousSelection3() {
+    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+      .select("id")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where().query();
+    query.findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
+      + " from (select t0.id as attribute_ from main_entity_relation t0) r1"
+      + " group by r1.attribute_"
+      + " order by count(*) desc, r1.attribute_");
+  }
+
+  @Test
+  public void findSingleAttributesVariousSelection4() {
+    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+      .fetch("entity1", "id")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where().query();
+    query.findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
+      + " from (select t0.id1, t1.id as attribute_ from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1) r1"
+      + " group by r1.attribute_"
+      + " order by count(*) desc, r1.attribute_"); // sub-query select clause includes t0.id1,
+  }
+
+  @Test
+  public void findSingleAttributesVariousSelection5() {
+    Query<OmBasicParent> query = Ebean.find(OmBasicParent.class)
+      .fetch("children", "name")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where().query();
+    query.findSingleAttributeList();
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
+      + " from (select t1.id, t1.name as attribute_ from om_basic_parent t0 left join om_basic_child t1 on t1.parent_id = t0.id) r1 "
+      + "group by r1.attribute_ order by count(*) desc, r1.attribute_"); // sub-query select clause includes t1.id,
   }
 
   @Test
@@ -663,5 +756,44 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     for (CountedValue<Order.Status> entry : orderStatusCount) {
       System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
     }
+  }
+
+  @Before
+  public void setup() {
+    MainEntity e1 = new MainEntity();
+    e1.setId("1");
+    e1.setAttr1("a1");
+    DB.save(e1);
+
+    MainEntity e2 = new MainEntity();
+    e2.setId("2");
+    e2.setAttr1("a2");
+    DB.save(e2);
+
+    MainEntity e3 = new MainEntity();
+    e3.setId("3");
+    e3.setAttr1("a1");
+    DB.save(e3);
+
+    MainEntityRelation rel = new MainEntityRelation();
+    rel.setEntity1(e1);
+    rel.setEntity2(e1);
+    DB.save(rel);
+
+    rel = new MainEntityRelation();
+    rel.setEntity1(e2);
+    rel.setEntity2(e2);
+    DB.save(rel);
+
+    rel = new MainEntityRelation();
+    rel.setEntity1(e3);
+    rel.setEntity2(e3);
+    DB.save(rel);
+  }
+
+  @After
+  public void cleanup() {
+    Ebean.find(MainEntityRelation.class).delete();
+    Ebean.find(MainEntity.class).delete();
   }
 }

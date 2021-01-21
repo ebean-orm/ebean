@@ -571,8 +571,8 @@ class CQueryBuilder {
     private final CQueryPredicates predicates;
     private final SqlTree select;
     private final boolean updateStatement;
-
     private final boolean distinct;
+    private final boolean countSingleAttribute;
     private final String dbOrderBy;
     private boolean useSqlLimiter;
     private boolean hasWhere;
@@ -590,6 +590,7 @@ class CQueryBuilder {
       this.updateStatement = updateStatement;
       this.distinct = query.isDistinct() || select.isSqlDistinct();
       this.dbOrderBy = predicates.getDbOrderBy();
+      this.countSingleAttribute = query.isCountDistinct() && query.isSingleAttribute();
     }
 
     private void appendSelect() {
@@ -601,8 +602,13 @@ class CQueryBuilder {
         if (!useSqlLimiter) {
           appendSelectDistinct();
         }
-        if (query.isCountDistinct() && query.isSingleAttribute()) {
-          sb.append("r1.attribute_, count(*) from (select ").append(select.getSelectSql()).append(" as attribute_");
+        if (countSingleAttribute) {
+          sb.append("r1.attribute_, count(*) from (select ");
+          if (distinct) {
+            sb.append("distinct t0.");
+            sb.append(request.getBeanDescriptor().getIdProperty().getDbColumn()).append(", ");
+          }
+          sb.append(select.getSelectSql()).append(" as attribute_");
         } else {
           sb.append(select.getSelectSql());
         }
@@ -621,7 +627,7 @@ class CQueryBuilder {
 
     private void appendSelectDistinct() {
       sb.append("select ");
-      if (distinct) {
+      if (distinct && !countSingleAttribute) {
         if (request.isInlineCountDistinct()) {
           sb.append("count(");
         }
@@ -730,7 +736,7 @@ class CQueryBuilder {
         sb.append(" order by ").append(dbOrderBy);
       }
 
-      if (query.isCountDistinct() && query.isSingleAttribute()) {
+      if (countSingleAttribute) {
         sb.append(") r1 group by r1.attribute_");
         sb.append(toSql(query.getCountDistinctOrder()));
       }
