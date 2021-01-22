@@ -11,7 +11,6 @@ import org.tests.model.basic.EBasicWithLog;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 
 public class TestLifecycleWithLog extends BaseTestCase {
 
@@ -31,22 +30,17 @@ public class TestLifecycleWithLog extends BaseTestCase {
     bean.setName("Test1");
 
     DB.save(bean);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "prePersist", "postPersist");
+    assertThat(getLogs()).contains("prePersist", "postPersist");
 
     bean.setName("Test2");
-
     DB.save(bean);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "preUpdate", "postUpdate");
+    assertThat(getLogs()).contains("preUpdate", "postUpdate");
 
     DB.delete(bean);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "preSoftDelete", "postSoftDelete");
+    assertThat(getLogs()).contains("preSoftDelete", "postSoftDelete");
 
     DB.deletePermanent(bean);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "preRemove", "postRemove");
+    assertThat(getLogs()).contains("preRemove", "postRemove");
   }
 
   @Test
@@ -59,22 +53,17 @@ public class TestLifecycleWithLog extends BaseTestCase {
     List<EBasicWithLog> beans = Arrays.asList(bean);
 
     DB.saveAll(beans);
+    assertThat(getLogs()).contains("prePersist", "postPersist");
 
-    assertThat(getLogs()).contains("onPersistTrigger", "prePersist", "postPersist");
-
-    bean.setName("Test2");
-
+    bean.setName("Test2Modified");
     DB.saveAll(beans);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "preUpdate", "postUpdate");
+    assertThat(getLogs()).contains("preUpdate", "postUpdate");
 
     DB.deleteAll(beans);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "preSoftDelete", "postSoftDelete");
+    assertThat(getLogs()).contains("preSoftDelete", "postSoftDelete");
 
     DB.deleteAllPermanent(beans);
-
-    assertThat(getLogs()).contains("onPersistTrigger", "preRemove", "postRemove");
+    assertThat(getLogs()).contains("preRemove", "postRemove");
   }
 
 }

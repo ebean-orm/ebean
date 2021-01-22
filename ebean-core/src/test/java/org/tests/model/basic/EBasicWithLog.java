@@ -115,13 +115,6 @@ public class EBasicWithLog {
     this.version = version;
   }
 
-  public void _ebean_onPersistTrigger() {
-    writeLog("onPersistTrigger");
-  }
-
-  /**
-   * @param string
-   */
   private void writeLog(String title) {
     EBasicLog log = new EBasicLog();
     log.setName(title);
