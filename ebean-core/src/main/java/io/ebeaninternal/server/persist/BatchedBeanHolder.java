@@ -48,6 +48,11 @@ class BatchedBeanHolder {
   private ArrayList<PersistRequest> deletes;
 
   /**
+   * The holder is empty
+   */
+  private boolean empty = true;
+
+  /**
    * Create a new entry with a given type and depth.
    */
   BatchedBeanHolder(BatchControl control, BeanDescriptor<?> beanDescriptor, int order) {
@@ -61,6 +66,13 @@ class BatchedBeanHolder {
    */
   public int getOrder() {
     return order;
+  }
+
+  /**
+   * Returns if the BeanHolder is empty.
+   */
+  public boolean isEmpty() {
+    return empty;
   }
 
   /**
@@ -90,6 +102,7 @@ class BatchedBeanHolder {
       updates = new ArrayList<>();
       control.executeNow(bufferedUpdates);
     }
+    empty = true;
   }
 
   @Override
@@ -112,9 +125,8 @@ class BatchedBeanHolder {
    * Add the request to the appropriate persist list.
    */
   public int append(PersistRequestBean<?> request) {
-
+    empty = false;
     request.setBatched();
-
     switch (request.getType()) {
       case INSERT:
         if (inserts == null) {
