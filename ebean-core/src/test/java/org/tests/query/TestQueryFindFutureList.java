@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FutureList;
 import io.ebean.Transaction;
 import org.tests.model.basic.Order;
@@ -22,16 +22,18 @@ public class TestQueryFindFutureList extends BaseTestCase {
     ResetBasicData.reset();
 
     // warm the connection pool
-    Transaction t0 = Ebean.getServer(null).createTransaction();
-    Transaction t1 = Ebean.getServer(null).createTransaction();
-    Transaction t2 = Ebean.getServer(null).createTransaction();
+    Transaction t0 = DB.createTransaction();
+    Transaction t1 = DB.createTransaction();
+    Transaction t2 = DB.createTransaction();
     t0.end();
     t1.end();
     t2.end();
 
-    FutureList<Order> futureList = Ebean.find(Order.class).findFutureList();
+    FutureList<Order> futureList = DB.find(Order.class).findFutureList();
 
     Thread.sleep(10);
+    futureList.cancel(true);
+    // calling again is ignored
     futureList.cancel(true);
 
     // don't shutdown immediately
@@ -43,12 +45,12 @@ public class TestQueryFindFutureList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    FutureList<Order> futureList = Ebean.find(Order.class).findFutureList();
+    FutureList<Order> futureList = DB.find(Order.class).findFutureList();
 
     // wait for it to complete
     List<Order> orders = futureList.getUnchecked();
 
-    assertEquals(Ebean.find(Order.class).findCount(), orders.size());
+    assertEquals(DB.find(Order.class).findCount(), orders.size());
   }
 
   @Test
@@ -56,12 +58,12 @@ public class TestQueryFindFutureList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    FutureList<Order> futureList = Ebean.find(Order.class).findFutureList();
+    FutureList<Order> futureList = DB.find(Order.class).findFutureList();
 
     // wait for it to complete
     List<Order> orders = futureList.getUnchecked(1, TimeUnit.SECONDS);
 
-    assertEquals(Ebean.find(Order.class).findCount(), orders.size());
+    assertEquals(DB.find(Order.class).findCount(), orders.size());
   }
 
 }
