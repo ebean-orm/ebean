@@ -401,12 +401,6 @@ public class CQueryEngine {
       if (cquery != null) {
         cquery.close();
       }
-      if (request.getQuery().isFutureFetch()) {
-        // end the transaction for futureFindIds
-        // as it had it's own transaction
-        logger.debug("Future fetch completed!");
-        request.getTransaction().end();
-      }
     }
   }
 
