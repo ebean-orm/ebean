@@ -296,10 +296,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       this.cancelled = true;
       if (pstmt != null) {
         try {
+          logger.debug("Cancelling query");
           pstmt.cancel();
         } catch (SQLException e) {
-          String msg = "Error cancelling query";
-          throw new PersistenceException(msg, e);
+          throw new PersistenceException("Error cancelling query", e);
         }
       }
     } finally {
@@ -322,7 +322,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   private boolean prepareBindExecuteQueryWithOption(boolean forwardOnlyHint) throws SQLException {
-
     ResultSet resultSet = prepareResultSet(forwardOnlyHint);
     if (resultSet == null) {
       return false;
@@ -334,19 +333,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   ResultSet prepareResultSet(boolean forwardOnlyHint) throws SQLException {
     lock.lock();
     try {
-      if (cancelled || query.isCancelled()) {
-        // cancelled before we started
-        cancelled = true;
-        return null;
+      if (cancelled) {
+        throw new SQLException("Query cancelled");
       }
-
       startNano = System.nanoTime();
-
-      // prepare
       SpiTransaction t = request.getTransaction();
       profileOffset = t.profileOffset();
-      Connection conn = t.getInternalConnection();
-
       if (query.isRawSql()) {
         ResultSet suppliedResultSet = query.getRawSql().getResultSet();
         if (suppliedResultSet != null) {
@@ -356,6 +348,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         }
       }
 
+      Connection conn = t.getInternalConnection();
       if (forwardOnlyHint) {
         // Use forward only hints for large resultSet processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -363,18 +356,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       } else {
         pstmt = conn.prepareStatement(sql);
       }
-
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());
       }
       if (query.getBufferFetchSizeHint() > 0) {
         pstmt.setFetchSize(query.getBufferFetchSizeHint());
       }
-
-      DataBind dataBind = queryPlan.bindEncryptedProperties(pstmt, conn);
-      bindLog = predicates.bind(dataBind);
-
-      // executeQuery
+      bindLog = predicates.bind(queryPlan.bindEncryptedProperties(pstmt, conn));
       return pstmt.executeQuery();
     } finally {
       lock.unlock();

@@ -751,7 +751,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public NaturalKeyQueryData<T> naturalKey() {
-
     if (whereExpressions == null) {
       return null;
     }
@@ -767,7 +766,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         return null;
       }
     }
-
     return data;
   }
 
@@ -815,7 +813,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
     copy.profileLocation = profileLocation;
-
     copy.baseTable = baseTable;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
@@ -1100,7 +1097,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public ObjectGraphNode setOrigin(CallOrigin callOrigin) {
-
     // create a 'origin' which links this query to the profiling information
     ObjectGraphOrigin o = new ObjectGraphOrigin(calculateOriginQueryHash(), callOrigin, beanType.getName());
     parentNode = new ObjectGraphNode(o, null);
@@ -1241,7 +1237,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public CQueryPlanKey prepare(SpiOrmQueryRequest<T> request) {
-
     prepareExpressions(request);
     prepareForPaging();
     queryPlanKey = createQueryPlanKey();
@@ -1252,7 +1247,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Prepare the expressions (compile sub-queries etc).
    */
   private void prepareExpressions(BeanQueryRequest<?> request) {
-
     if (whereExpressions != null) {
       whereExpressions.prepareExpression(request);
     }
@@ -1267,7 +1261,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * case, this is not a distinct query
    */
   private void prepareForPaging() {
-
     // add the rawSql statement - if any
     if (orderByIsEmpty()) {
       if (rawSql != null && rawSql.getSql() != null) {
@@ -1678,7 +1671,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         return this;
       }
     }
-
     if (bindParams == null) {
       bindParams = new BindParams();
     }
@@ -1972,7 +1964,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (namedParams == null) {
       namedParams = new HashMap<>();
     }
-
     return namedParams.computeIfAbsent(name, ONamedParam::new);
   }
 
@@ -2066,8 +2057,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public void cancel() {
     lock.lock();
     try {
-      cancelled = true;
-      if (cancelableQuery != null) {
+      if (!cancelled && cancelableQuery != null) {
+        cancelled = true;
         cancelableQuery.cancel();
       }
     } finally {
@@ -2095,7 +2086,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public Set<String> validate(BeanType<T> desc) {
-
     SpiExpressionValidation validation = new SpiExpressionValidation(desc);
     if (whereExpressions != null) {
       whereExpressions.validate(validation);
