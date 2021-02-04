@@ -19,8 +19,7 @@ public class TestDeleteO2MOrphans extends BaseTestCase {
 
     // assert
     COOne check = findById(id);
-    //FIXME #2127 #2141: assertThat(check.getChildren()).hasSize(2);
-    assertThat(check.getChildren()).hasSize(4);
+    assertThat(check.getChildren()).hasSize(2);
     DB.delete(check);
   }
 

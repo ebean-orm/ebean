@@ -210,18 +210,6 @@ public class SaveManyBeans extends SaveManyBase {
     return true;
   }
 
-  private boolean hasNewOrDirtyBeans() {
-    if (collection == null) {
-      return false;
-    }
-    for (Object bean : collection) {
-      if (bean instanceof EntityBean && ((EntityBean) bean)._ebean_getIntercept().isNewOrDirty()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   /**
    * Collect the Id values of the details to remove 'missing children' for stateless updates.
    */
@@ -344,14 +332,18 @@ public class SaveManyBeans extends SaveManyBase {
     transaction.depth(-1);
   }
 
+  private boolean isChangedProperty() {
+    return parentBean._ebean_getIntercept().isChangedProperty(many.getPropertyIndex());
+  }
+
   private void removeAssocManyOrphans() {
     if (value == null) {
       return;
     }
     if (!(value instanceof BeanCollection<?>)) {
-//      if (!insertedParent && cascade && hasNewOrDirtyBeans()) {
-//        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
-//      }
+      if (!insertedParent && cascade && isChangedProperty()) {
+        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
+      }
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();

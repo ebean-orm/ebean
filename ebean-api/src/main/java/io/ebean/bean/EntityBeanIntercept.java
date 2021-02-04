@@ -931,10 +931,14 @@ public final class EntityBeanIntercept implements Serializable {
    * OneToMany and ManyToMany only set loaded state.
    */
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-    if (readOnly) {
-      throw new IllegalStateException("This bean is readOnly");
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else {
+      if (readOnly) {
+        throw new IllegalStateException("This bean is readOnly");
+      }
+      setChangedProperty(propertyIndex);
     }
-    setLoadedProperty(propertyIndex);
   }
 
   private void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
