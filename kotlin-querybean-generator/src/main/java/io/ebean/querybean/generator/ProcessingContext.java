@@ -321,19 +321,13 @@ class ProcessingContext implements Constants {
       List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
       if (typeArguments.size() == 1) {
         TypeMirror argType = typeArguments.get(0);
-        if (argType.getKind() == TypeKind.WILDCARD) {
-          argType = ((WildcardType) argType).getExtendsBound();
-        }
-        Element argElement = typeUtils.asElement(argType);
+        Element argElement = asElement(argType);
         if (isEntityOrEmbedded(argElement)) {
           return createPropertyTypeAssoc(typeDef(argElement.asType()));
         }
       } else if (typeArguments.size() == 2) {
         TypeMirror argType = typeArguments.get(1);
-        if (argType.getKind() == TypeKind.WILDCARD) {
-          argType = ((WildcardType) argType).getExtendsBound();
-        }
-        Element argElement = typeUtils.asElement(argType);
+        Element argElement = asElement(argType);
         if (isEntityOrEmbedded(argElement)) {
           return createPropertyTypeAssoc(typeDef(argElement.asType()));
         }
@@ -345,6 +339,13 @@ class ProcessingContext implements Constants {
     } else {
       return new PropertyTypeScalar(typeMirror.toString());
     }
+  }
+
+  private Element asElement(TypeMirror argType) {
+    if (argType.getKind() == TypeKind.WILDCARD) {
+      argType = ((WildcardType) argType).getExtendsBound();
+    }
+    return typeUtils.asElement(argType);
   }
 
   private boolean typeInstanceOf(final TypeMirror typeMirror, final CharSequence desiredInterface) {
