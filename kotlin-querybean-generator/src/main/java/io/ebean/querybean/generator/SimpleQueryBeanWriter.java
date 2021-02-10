@@ -88,11 +88,7 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-
-    final String generated = processingContext.getGeneratedAnnotation();
-    if (generated != null) {
-      importTypes.add(generated);
-    }
+    importTypes.add(Constants.GENERATED);
     importTypes.add(beanFullName);
     importTypes.add(Constants.TQROOTBEAN);
     importTypes.add(Constants.TYPEQUERYBEAN);
@@ -282,9 +278,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       lang().beginAssocClass(writer, shortName, origShortName);
 
@@ -294,9 +288,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       lang().beginClass(writer, shortName);
     }

@@ -89,10 +89,7 @@ class SimpleModuleInfoWriter {
     writer.append("import java.util.ArrayList;").eol();
     writer.append("import java.util.Collections;").eol();
     writer.append("import java.util.List;").eol();
-    final String generated = processingContext.getGeneratedAnnotation();
-    if (generated != null) {
-      writer.append("import %s;", generated).eol();
-    }
+    writer.append("import %s;", Constants.GENERATED).eol();
     writer.eol();
     writer.append("import io.ebean.config.ModuleInfo;").eol();
     writer.append("import io.ebean.config.ModuleInfoLoader;").eol();
@@ -100,9 +97,7 @@ class SimpleModuleInfoWriter {
   }
 
   void buildAtContextModule(Append writer) {
-    if (processingContext.isGeneratedAvailable()) {
-      writer.append(Constants.AT_GENERATED).eol();
-    }
+    writer.append(Constants.AT_GENERATED).eol();
     writer.append("@ModuleInfo(");
     if (processingContext.hasOtherClasses()) {
       writer.append("other={%s}, ", otherClasses());

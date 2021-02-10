@@ -62,10 +62,7 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-    final String generated = processingContext.getGeneratedAnnotation();
-    if (generated != null) {
-      importTypes.add(generated);
-    }
+    importTypes.add(Constants.GENERATED);
     importTypes.add(beanFullName);
     importTypes.add(Constants.TQROOTBEAN);
     importTypes.add(Constants.TYPEQUERYBEAN);
@@ -301,9 +298,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       writer.append("public class Q%s<R> extends TQAssocBean<%s,R> {", shortName, origShortName).eol();
 
@@ -313,9 +308,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       writer.append("public class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
     }

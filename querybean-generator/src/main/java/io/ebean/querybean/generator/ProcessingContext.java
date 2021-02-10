@@ -46,7 +46,6 @@ class ProcessingContext implements Constants {
   private final Filer filer;
   private final Messager messager;
   private final Elements elementUtils;
-  private final String generatedAnnotation;
 
   private final PropertyTypeMap propertyTypeMap = new PropertyTypeMap();
 
@@ -95,9 +94,6 @@ class ProcessingContext implements Constants {
     this.filer = processingEnv.getFiler();
     this.messager = processingEnv.getMessager();
     this.elementUtils = processingEnv.getElementUtils();
-
-    boolean jdk8 = processingEnv.getSourceVersion().compareTo(SourceVersion.RELEASE_8) <= 0;
-    this.generatedAnnotation = generatedAnnotation(jdk8);
     this.readModuleInfo = new ReadModuleInfo(this);
   }
 
@@ -115,17 +111,6 @@ class ProcessingContext implements Constants {
 
   TypeElement componentAnnotation() {
     return elementUtils.getTypeElement(EBEAN_COMPONENT);
-  }
-
-  private String generatedAnnotation(boolean jdk8) {
-    if (jdk8) {
-      return isTypeAvailable(GENERATED_8) ? GENERATED_8 : null;
-    }
-    return isTypeAvailable(GENERATED_9) ? GENERATED_9 : null;
-  }
-
-  private boolean isTypeAvailable(String canonicalName) {
-    return null != elementUtils.getTypeElement(canonicalName);
   }
 
   /**
@@ -411,14 +396,6 @@ class ProcessingContext implements Constants {
 
   void logNote(String msg, Object... args) {
     messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
-  }
-
-  boolean isGeneratedAvailable() {
-    return generatedAnnotation != null;
-  }
-
-  String getGeneratedAnnotation() {
-    return generatedAnnotation;
   }
 
   void readModuleInfo() {
