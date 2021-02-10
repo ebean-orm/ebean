@@ -14,7 +14,7 @@ public class OrmQueryPropertiesTest {
     return sb.toString();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void construct_with_propertySet_when_null() {
     new OrmQueryProperties(null, (LinkedHashSet<String>) null);
   }

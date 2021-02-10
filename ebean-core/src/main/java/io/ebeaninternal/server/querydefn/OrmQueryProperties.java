@@ -30,12 +30,9 @@ public class OrmQueryProperties implements Serializable {
 
   private final String parentPath;
   private final String path;
-
   private final String rawProperties;
   private final String trimmedProperties;
-
-  private final LinkedHashSet<String> included;
-
+  private final Set<String> included;
   private final FetchConfig fetchConfig;
 
   /**
@@ -115,37 +112,16 @@ public class OrmQueryProperties implements Serializable {
     }
   }
 
-  public OrmQueryProperties(String path, LinkedHashSet<String> parsedProperties) {
-    if (parsedProperties == null) {
-      throw new IllegalArgumentException("parsedProperties is null");
-    }
-
+  public OrmQueryProperties(String path, Set<String> included) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
     // for rawSql parsedProperties can be empty (when only fetching Id property)
-    this.included = parsedProperties;
-    this.rawProperties = join(parsedProperties);
+    this.included = included;
+    this.rawProperties = String.join(",", included);
     this.trimmedProperties = rawProperties;
     this.cache = false;
     this.readOnly = false;
     this.fetchConfig = DEFAULT_FETCH;
-  }
-
-  /**
-   * Join the set of properties into a comma delimited string.
-   */
-  private String join(LinkedHashSet<String> parsedProperties) {
-    StringBuilder sb = new StringBuilder(50);
-    boolean first = true;
-    for (String property : parsedProperties) {
-      if (first) {
-        first = false;
-      } else {
-        sb.append(",");
-      }
-      sb.append(property);
-    }
-    return sb.toString();
   }
 
   /**
@@ -348,10 +324,6 @@ public class OrmQueryProperties implements Serializable {
       includedBeanJoin = new HashSet<>();
     }
     includedBeanJoin.add(propertyName);
-  }
-
-  public Set<String> getSelectInclude() {
-    return included;
   }
 
   public Set<String> getSelectQueryJoin() {

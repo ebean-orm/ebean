@@ -4,8 +4,7 @@ import io.ebean.FetchConfig;
 import io.ebeaninternal.server.util.DSelectColumnsParser;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Parses the path properties string.
@@ -23,9 +22,9 @@ class OrmQueryPropertiesParser {
     final boolean cache;
     final FetchConfig fetchConfig;
     final String properties;
-    final LinkedHashSet<String> included;
+    final Set<String> included;
 
-    Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, LinkedHashSet<String> included) {
+    Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, Set<String> included) {
       this.readOnly = readOnly;
       this.cache = cache;
       this.properties = properties;
@@ -77,24 +76,24 @@ class OrmQueryPropertiesParser {
       allProperties = true;
       return new Response(readOnly, cache, queryFetchBatch, lazyFetchBatch, "*", null);
     }
-    final List<String> strings = splitRawSelect(inputProperties);
-    final Iterator<String> iterator = strings.iterator();
+    boolean hints = false;
+    Set<String> fields = splitRawSelect(inputProperties);
+    final Iterator<String> iterator = fields.iterator();
     while (iterator.hasNext()) {
       String val = iterator.next();
       if (val.startsWith("+")) {
+        hints = true;
         iterator.remove();
         parseHint(val);
       } else if (val.equals("*")) {
         allProperties = true;
       }
     }
-
-    LinkedHashSet<String> included = null;
-    if (!strings.isEmpty()) {
-      included = new LinkedHashSet<>(strings);
+    String properties = allProperties ? "*" : hints ? String.join(",", fields) : inputProperties;
+    if (fields.isEmpty()) {
+      fields = null;
     }
-    String properties = (allProperties) ? "*" : String.join(",", strings);
-    return new Response(readOnly, cache, queryFetchBatch, lazyFetchBatch, properties, included);
+    return new Response(readOnly, cache, queryFetchBatch, lazyFetchBatch, properties, fields);
   }
 
   private void parseHint(String val) {
@@ -113,7 +112,7 @@ class OrmQueryPropertiesParser {
     if (val.endsWith(")")) {
       int start = val.lastIndexOf('(');
       if (start > 0) {
-        return Integer.parseInt(val.substring(start+1, val.length()-1));
+        return Integer.parseInt(val.substring(start + 1, val.length() - 1));
       }
     }
     return 0;
@@ -122,7 +121,7 @@ class OrmQueryPropertiesParser {
   /**
    * Split allowing 'dynamic function based properties'.
    */
-  private List<String> splitRawSelect(String inputProperties) {
+  private Set<String> splitRawSelect(String inputProperties) {
     return DSelectColumnsParser.parse(inputProperties);
   }
 
