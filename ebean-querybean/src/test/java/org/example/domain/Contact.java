@@ -2,13 +2,10 @@ package org.example.domain;
 
 import io.ebean.annotation.DbArray;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contact entity bean.
@@ -22,28 +19,32 @@ public class Contact extends BaseModel {
 
   @Column(length=50)
   String firstName;
-  
+
   @Column(length=50)
   String lastName;
-  
+
   @Column(length=200)
   String email;
 
   @Column(length=20)
   String phone;
-  
+
   @ManyToOne(optional=false)
   Customer customer;
 
   @OneToMany(mappedBy = "contact")
   List<ContactNote> notes;
 
+  @OneToMany(cascade = CascadeType.PERSIST)
+  @MapKey(name="key")
+  Map<String,ContactOther> others;
+
   /**
    * Default constructor.
    */
   public Contact() {
   }
-  
+
   /**
    * Construct with a firstName and lastName.
    */
@@ -51,7 +52,7 @@ public class Contact extends BaseModel {
     this.firstName = firstName;
     this.lastName = lastName;
   }
-  
+
   public String getFirstName() {
     return firstName;
   }

@@ -341,6 +341,11 @@ class ProcessingContext implements Constants {
           }
         }
       }
+    } else if (typeArguments.size() == 2) {
+      Element argElement = typeUtils.asElement(typeArguments.get(1));
+      if (isEntityOrEmbedded(argElement)) {
+        return createPropertyTypeAssoc(typeDef(argElement.asType()));
+      }
     }
     return null;
   }

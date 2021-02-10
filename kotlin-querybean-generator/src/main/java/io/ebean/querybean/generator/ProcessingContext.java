@@ -330,6 +330,15 @@ class ProcessingContext implements Constants {
             }
           }
         }
+      } else if (typeArguments.size() == 2) {
+        TypeMirror argType = typeArguments.get(1);
+        if (argType.getKind() == TypeKind.WILDCARD) {
+          argType = ((WildcardType) argType).getExtendsBound();
+        }
+        Element argElement = typeUtils.asElement(argType);
+        if (isEntityOrEmbedded(argElement)) {
+          return createPropertyTypeAssoc(typeDef(argElement.asType()));
+        }
       }
     }
 
