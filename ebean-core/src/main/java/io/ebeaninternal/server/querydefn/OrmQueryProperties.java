@@ -373,7 +373,6 @@ public class OrmQueryProperties implements Serializable {
   }
 
   boolean isIncluded(String propName) {
-
     if (includedBeanJoin != null && includedBeanJoin.contains(propName)) {
       return false;
     }
@@ -474,24 +473,21 @@ public class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-
-    builder.append("qpp[");
+    builder.append("p[");
     builder.append(path);
     if (included != null){
-      builder.append(" included:").append(included);
+      builder.append("/i").append(included);
     }
     if (secondaryQueryJoins != null) {
-      builder.append(" secondary:").append(secondaryQueryJoins);
+      builder.append("/s").append(secondaryQueryJoins);
     }
-
     if (filterMany != null) {
-      builder.append(" filterMany[");
+      builder.append("/f[");
       filterMany.queryPlanHash(builder);
       builder.append("]");
     }
-
     if (fetchConfig != null) {
-      builder.append(" config:").append(fetchConfig.hashCode());
+      builder.append("/c:").append(fetchConfig.hashCode());
     }
     builder.append("]");
   }

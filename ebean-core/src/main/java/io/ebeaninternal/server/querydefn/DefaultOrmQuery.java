@@ -1136,81 +1136,81 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private String planDescription() {
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {
-      sb.append("t:").append(type.ordinal());
+      sb.append(type.ordinal());
     }
     if (useDocStore) {
-      sb.append(",ds:");
+      sb.append("/ds");
     }
     if (beanDescriptor.getDiscValue() != null) {
-      sb.append(",disc:").append(beanDescriptor.getDiscValue());
+      sb.append("/dv").append(beanDescriptor.getDiscValue());
     }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
-      sb.append(",temp:").append(temporalMode.ordinal());
+      sb.append("/tm").append(temporalMode.ordinal());
       if (versionsStart != null) {
-        sb.append(",vb:");
+        sb.append("v");
       }
     }
     if (forUpdate != null) {
-      sb.append(",forUpd:").append(forUpdate.ordinal());
+      sb.append("/fu").append(forUpdate.ordinal());
       if (lockType != null) {
-        sb.append(",lt:").append(lockType.ordinal());
+        sb.append("t").append(lockType.ordinal());
       }
     }
     if (id != null) {
-      sb.append(",id:");
+      sb.append("/id");
     }
     if (manualId) {
-      sb.append(",manId:");
+      sb.append("/md");
     }
     if (distinct) {
-      sb.append(",dist:");
+      sb.append("/dt");
     }
     if (allowLoadErrors) {
-      sb.append(",allowLoadErrors:");
+      sb.append("/ae");
     }
     if (disableLazyLoading) {
-      sb.append(",disLazy:");
+      sb.append("/dl");
     }
     if (baseTable != null) {
-      sb.append(",baseTable:").append(baseTable);
+      sb.append("/bt").append(baseTable);
     }
     if (rootTableAlias != null) {
-      sb.append(",root:").append(rootTableAlias);
+      sb.append("/ra").append(rootTableAlias);
     }
     if (orderBy != null) {
-      sb.append(",orderBy:").append(orderBy.toStringFormat());
+      sb.append("/ob").append(orderBy.toStringFormat());
     }
     if (m2mIncludeJoin != null) {
-      sb.append(",m2m:").append(m2mIncludeJoin.getTable());
+      sb.append("/m2").append(m2mIncludeJoin.getTable());
     }
     if (mapKey != null) {
-      sb.append(",mapKey:").append(mapKey);
+      sb.append("/mk").append(mapKey);
     }
     if (countDistinctOrder != null) {
-      sb.append(",countDistOrd:").append(countDistinctOrder.name());
+      sb.append("/cd").append(countDistinctOrder.name());
     }
     if (detail != null) {
-      sb.append(" detail[");
+      sb.append("/d[");
       detail.queryPlanHash(sb);
       sb.append("]");
     }
     if (bindParams != null) {
-      sb.append(" bindParams[");
+      sb.append("/b[");
       bindParams.buildQueryPlanHash(sb);
       sb.append("]");
     }
     if (whereExpressions != null) {
-      sb.append(" where[");
+      sb.append("/w[");
       whereExpressions.queryPlanHash(sb);
       sb.append("]");
     }
     if (havingExpressions != null) {
-      sb.append(" having[");
+      sb.append("/h[");
       havingExpressions.queryPlanHash(sb);
       sb.append("]");
     }
     if (updateProperties != null) {
-      sb.append(" update[");
+      sb.append("/u[");
       updateProperties.buildQueryPlanHash(sb);
       sb.append("]");
     }
