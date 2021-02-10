@@ -1,6 +1,6 @@
 package org.example.domain;
 
-import org.example.domain.target.ACity;
+import org.example.domain.api.ACity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

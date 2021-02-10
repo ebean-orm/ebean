@@ -1,7 +1,7 @@
 package org.example.domain;
 
-import org.example.domain.target.ACity;
-import org.example.domain.target.ACountry;
+import org.example.domain.api.ACity;
+import org.example.domain.api.ACountry;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
