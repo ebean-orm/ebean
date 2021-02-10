@@ -286,6 +286,15 @@ class ProcessingContext implements Constants {
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
     }
 
+    // look for targetEntity annotation attribute
+    final String targetEntity = readTargetEntity(field);
+    if (targetEntity != null) {
+      final TypeElement element = elementUtils.getTypeElement(targetEntity);
+      if (isEntityOrEmbedded(element)) {
+        return createPropertyTypeAssoc(typeDef(element.asType()));
+      }
+    }
+
     if (isEntityOrEmbedded(fieldType)) {
       //  public QAssocContact<QCustomer> contacts;
       return createPropertyTypeAssoc(typeDef(typeMirror));
@@ -331,15 +340,6 @@ class ProcessingContext implements Constants {
       Element argElement = typeUtils.asElement(typeArguments.get(0));
       if (isEntityOrEmbedded(argElement)) {
         return createPropertyTypeAssoc(typeDef(argElement.asType()));
-      } else {
-        // look for targetEntity annotation attribute
-        final String targetEntity = readTargetEntity(field);
-        if (targetEntity != null) {
-          final TypeElement element = elementUtils.getTypeElement(targetEntity);
-          if (isEntityOrEmbedded(element)) {
-            return createPropertyTypeAssoc(typeDef(element.asType()));
-          }
-        }
       }
     } else if (typeArguments.size() == 2) {
       Element argElement = typeUtils.asElement(typeArguments.get(1));

@@ -303,12 +303,19 @@ class ProcessingContext implements Constants {
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
     }
 
+    // look for targetEntity annotation attribute
+    final String targetEntity = readTargetEntity(field);
+    if (targetEntity != null) {
+      final TypeElement element = elementUtils.getTypeElement(targetEntity);
+      if (isEntityOrEmbedded(element)) {
+        return createPropertyTypeAssoc(typeDef(element.asType()));
+      }
+    }
     if (isEntityOrEmbedded(fieldType)) {
       //  public QAssocContact<QCustomer> contacts;
       return createPropertyTypeAssoc(typeDef(typeMirror));
     }
 
-    PropertyType result = null;
     if (typeMirror.getKind() == TypeKind.DECLARED) {
       DeclaredType declaredType = (DeclaredType) typeMirror;
       List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
@@ -319,16 +326,7 @@ class ProcessingContext implements Constants {
         }
         Element argElement = typeUtils.asElement(argType);
         if (isEntityOrEmbedded(argElement)) {
-          result = createPropertyTypeAssoc(typeDef(argElement.asType()));
-        } else {
-          // look for targetEntity annotation attribute
-          final String targetEntity = readTargetEntity(field);
-          if (targetEntity != null) {
-            final TypeElement element = elementUtils.getTypeElement(targetEntity);
-            if (isEntityOrEmbedded(element)) {
-              result = createPropertyTypeAssoc(typeDef(element.asType()));
-            }
-          }
+          return createPropertyTypeAssoc(typeDef(argElement.asType()));
         }
       } else if (typeArguments.size() == 2) {
         TypeMirror argType = typeArguments.get(1);
@@ -342,14 +340,10 @@ class ProcessingContext implements Constants {
       }
     }
 
-    if (result != null) {
-      return result;
+    if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
+      return new PropertyTypeScalarComparable(typeMirror.toString());
     } else {
-      if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-        return new PropertyTypeScalarComparable(typeMirror.toString());
-      } else {
-        return new PropertyTypeScalar(typeMirror.toString());
-      }
+      return new PropertyTypeScalar(typeMirror.toString());
     }
   }
 
