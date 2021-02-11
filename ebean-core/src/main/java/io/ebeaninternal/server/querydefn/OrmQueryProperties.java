@@ -30,8 +30,7 @@ public class OrmQueryProperties implements Serializable {
 
   private final String parentPath;
   private final String path;
-  private final String rawProperties;
-  private final String trimmedProperties;
+  private final String properties;
   private final Set<String> included;
   private final FetchConfig fetchConfig;
 
@@ -81,8 +80,7 @@ public class OrmQueryProperties implements Serializable {
   public OrmQueryProperties(String path) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.rawProperties = null;
-    this.trimmedProperties = null;
+    this.properties = null;
     this.included = null;
     this.fetchConfig = DEFAULT_FETCH;
   }
@@ -97,8 +95,7 @@ public class OrmQueryProperties implements Serializable {
 
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.rawProperties = rawProperties;
-    this.trimmedProperties = response.properties;
+    this.properties = response.properties;
     this.included = response.included;
     this.cache = response.cache;
     this.readOnly = response.readOnly;
@@ -117,8 +114,7 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     // for rawSql parsedProperties can be empty (when only fetching Id property)
     this.included = included;
-    this.rawProperties = String.join(",", included);
-    this.trimmedProperties = rawProperties;
+    this.properties = String.join(",", included);
     this.cache = false;
     this.readOnly = false;
     this.fetchConfig = DEFAULT_FETCH;
@@ -131,8 +127,7 @@ public class OrmQueryProperties implements Serializable {
     this.fetchConfig = sourceFetchConfig;
     this.parentPath = source.parentPath;
     this.path = source.path;
-    this.rawProperties = source.rawProperties;
-    this.trimmedProperties = source.trimmedProperties;
+    this.properties = source.properties;
     this.cache = source.cache;
     this.readOnly = source.readOnly;
     this.filterMany = source.filterMany;
@@ -216,8 +211,8 @@ public class OrmQueryProperties implements Serializable {
   @SuppressWarnings("unchecked")
   public void configureBeanQuery(SpiQuery<?> query) {
 
-    if (trimmedProperties != null && !trimmedProperties.isEmpty()) {
-      query.select(trimmedProperties);
+    if (properties != null && !properties.isEmpty()) {
+      query.select(properties);
     }
 
     if (filterMany != null) {
@@ -244,7 +239,7 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public boolean hasSelectClause() {
-    if ("*".equals(trimmedProperties)) {
+    if ("*".equals(properties)) {
       // explicitly selected all properties
       return true;
     }
@@ -256,25 +251,17 @@ public class OrmQueryProperties implements Serializable {
    * Return true if the properties and configuration are empty.
    */
   public boolean isEmpty() {
-    return rawProperties == null || rawProperties.isEmpty();
+    return properties == null || properties.isEmpty();
   }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(40);
-    append("", sb);
-    return sb.toString();
-  }
-
-  public String append(String prefix, StringBuilder sb) {
+  public void asStringDebug(String prefix, StringBuilder sb) {
     sb.append(prefix);
     if (path != null) {
       sb.append(path).append(" ");
     }
     if (!isEmpty()) {
-      sb.append("(").append(rawProperties).append(")");
+      sb.append("(").append(properties).append(")");
     }
-    return sb.toString();
   }
 
   boolean isChild(OrmQueryProperties possibleChild) {
@@ -295,7 +282,7 @@ public class OrmQueryProperties implements Serializable {
    * Return the raw properties.
    */
   public String getProperties() {
-    return rawProperties;
+    return properties;
   }
 
   /**

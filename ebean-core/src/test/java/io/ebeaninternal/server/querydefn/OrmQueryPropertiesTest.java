@@ -10,7 +10,7 @@ public class OrmQueryPropertiesTest {
 
   String append(String prefix, OrmQueryProperties p1) {
     StringBuilder sb = new StringBuilder();
-    p1.append(prefix, sb);
+    p1.asStringDebug(prefix, sb);
     return sb.toString();
   }
 

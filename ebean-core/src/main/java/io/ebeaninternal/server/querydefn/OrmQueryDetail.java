@@ -106,25 +106,20 @@ public class OrmQueryDetail implements Serializable {
     return p1 == null ? p2 == null : p1.isSameByAutoTune(p2);
   }
 
-  @Override
-  public String toString() {
-    return asString();
-  }
-
   /**
    * Return the detail in string form.
    */
-  public String asString() {
+  public String asStringDebug() {
     StringBuilder sb = new StringBuilder();
     if (!baseProps.isEmpty()) {
-      baseProps.append("select ", sb);
+      baseProps.asStringDebug("select ", sb);
     }
     if (fetchPaths != null) {
       for (OrmQueryProperties join : fetchPaths.values()) {
         if (sb.length() > 0) {
           sb.append(" ");
         }
-        join.append("fetch ", sb);
+        join.asStringDebug("fetch ", sb);
       }
     }
     return sb.toString();
