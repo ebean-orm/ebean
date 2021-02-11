@@ -131,19 +131,10 @@ public class DatabasePlatformFactory {
    * Use JDBC DatabaseMetaData to determine the platform.
    */
   private DatabasePlatform byDataSource(DataSource dataSource) {
-
-    Connection connection = null;
-    try {
-      connection = dataSource.getConnection();
-      DatabaseMetaData metaData = connection.getMetaData();
-
-      return byDatabaseMeta(metaData, connection);
-
+    try (Connection connection = dataSource.getConnection()) {
+      return byDatabaseMeta(connection.getMetaData(), connection);
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      JdbcClose.close(connection);
     }
   }
 
