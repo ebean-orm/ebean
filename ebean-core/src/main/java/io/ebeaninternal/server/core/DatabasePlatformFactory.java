@@ -157,7 +157,7 @@ public class DatabasePlatformFactory {
     final int minorVersion = metaData.getDatabaseMinorVersion();
 
     if (dbProductName.contains("oracle")) {
-      return new OraclePlatform();
+      return oracleVersion(majorVersion);
     } else if (dbProductName.contains("microsoft")) {
       throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
     } else if (dbProductName.contains("h2")) {
@@ -186,6 +186,10 @@ public class DatabasePlatformFactory {
 
     // use the standard one
     return new DatabasePlatform();
+  }
+
+  private DatabasePlatform oracleVersion(int majorVersion) {
+    return majorVersion < 12 ? new Oracle11Platform() : new OraclePlatform();
   }
 
   private DatabasePlatform mysqlVersion(int majorVersion, int minorVersion) {
