@@ -16,7 +16,7 @@ public class TestManyOneInterface extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    IAddress a = new Address();
+    IAddress a = new Address("hello");
 
     IPerson p = new Person();
 

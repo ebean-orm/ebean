@@ -15,6 +15,10 @@ public class Address implements IAddress {
 
   private String street;
 
+  public Address(String street) {
+    this.street = street;
+  }
+
   public long getOid() {
     return oid;
   }

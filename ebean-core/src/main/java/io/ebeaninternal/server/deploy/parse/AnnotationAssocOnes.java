@@ -33,18 +33,15 @@ import javax.validation.constraints.NotNull;
 /**
  * Read the deployment annotations for Associated One beans.
  */
-public class AnnotationAssocOnes extends AnnotationParser {
+public class AnnotationAssocOnes extends AnnotationAssoc {
 
   private static final Logger log = LoggerFactory.getLogger(AnnotationAssocOnes.class);
-
-  private final BeanDescriptorManager factory;
 
   /**
    * Create with the deploy Info.
    */
   AnnotationAssocOnes(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
-    super(info, readConfig);
-    this.factory = factory;
+    super(info, readConfig, factory);
   }
 
   /**
@@ -191,25 +188,11 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
   }
 
-  private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? Does it have the @Entity annotation? See https://ebean.io/docs/trouble-shooting#not-registered";
-  }
-
-  private BeanTable beanTable(DeployBeanPropertyAssoc<?> prop) {
-    BeanTable assoc = factory.getBeanTable(prop.getPropertyType());
-    if (assoc == null) {
-      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(prop.getPropertyType(), prop.getFullBeanName()));
-    }
-    return assoc;
-  }
-
-  private void readManyToOne(ManyToOne propAnn, DeployBeanProperty prop) {
-
-    DeployBeanPropertyAssocOne<?> beanProp = (DeployBeanPropertyAssocOne<?>) prop;
+  private void readManyToOne(ManyToOne propAnn, DeployBeanPropertyAssocOne<?> beanProp) {
 
     setCascadeTypes(propAnn.cascade(), beanProp.getCascadeInfo());
-
-    beanProp.setBeanTable(beanTable(beanProp));
+    setTargetType(propAnn.targetEntity(), beanProp);
+    setBeanTable(beanProp);
     beanProp.setDbInsertable(true);
     beanProp.setDbUpdateable(true);
     beanProp.setNullable(propAnn.optional());
@@ -232,7 +215,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());
-    prop.setBeanTable(beanTable(prop));
+    setTargetType(propAnn.targetEntity(), prop);
+    setBeanTable(prop);
   }
 
   private boolean readOrphanRemoval(OneToOne property) {
@@ -261,7 +245,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     BeanTable baseBeanTable = factory.getBeanTable(info.getDescriptor().getBeanType());
 
     String localPrimaryKey = baseBeanTable.getIdColumn();
-    String foreignColumn = beanTable(prop).getIdColumn();
+    String foreignColumn = getBeanTable(prop).getIdColumn();
 
     prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localPrimaryKey, foreignColumn, false, false));
   }

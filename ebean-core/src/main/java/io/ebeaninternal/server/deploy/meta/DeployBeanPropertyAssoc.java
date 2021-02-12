@@ -176,4 +176,9 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   public void setFetchPreference(int fetchPreference) {
     this.fetchPreference = fetchPreference;
   }
+
+  @SuppressWarnings("unchecked")
+  public void setTargetType(Class<?> targetType) {
+    this.targetType = (Class<T>)targetType;
+  }
 }

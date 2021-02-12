@@ -66,19 +66,6 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
   }
 
   /**
-   * When generics is not used for manyType you can specify via annotations.
-   * <p>
-   * Really only expect this for Scala due to a Scala compiler bug at the moment.
-   * Otherwise I'd probably not bother support this.
-   * </p>
-   */
-  @SuppressWarnings("unchecked")
-  public void setTargetType(Class<?> cls) {
-    this.targetType = (Class<T>) cls;
-  }
-
-
-  /**
    * Return the many type.
    */
   public ManyType getManyType() {
