@@ -44,16 +44,10 @@ import static io.ebean.util.StringHelper.isNull;
 /**
  * Read the deployment annotation for Assoc Many beans.
  */
-class AnnotationAssocManys extends AnnotationParser {
+class AnnotationAssocManys extends AnnotationAssoc {
 
-  private final BeanDescriptorManager factory;
-
-  /**
-   * Create with the DeployInfo.
-   */
   AnnotationAssocManys(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
-    super(info, readConfig);
-    this.factory = factory;
+    super(info, readConfig, factory);
   }
 
   /**
@@ -435,11 +429,6 @@ class AnnotationAssocManys extends AnnotationParser {
     prop.setInverseJoin(inverseDest);
   }
 
-
-  private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? See https://ebean.io/docs/trouble-shooting#not-registered";
-  }
-
   private void readToMany(ManyToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
 
     manyProp.setMappedBy(propAnn.mappedBy());
@@ -460,20 +449,6 @@ class AnnotationAssocManys extends AnnotationParser {
     setTargetType(propAnn.targetEntity(), manyProp);
     setBeanTable(manyProp);
     manyProp.getTableJoin().setType(SqlJoinType.OUTER);
-  }
-
-  private void setTargetType(Class<?> targetType, DeployBeanPropertyAssocMany<?> prop) {
-    if (!targetType.equals(void.class)) {
-      prop.setTargetType(targetType);
-    }
-  }
-
-  private void setBeanTable(DeployBeanPropertyAssocMany<?> manyProp) {
-    BeanTable assoc = factory.getBeanTable(manyProp.getTargetType());
-    if (assoc == null) {
-      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(manyProp.getTargetType(), manyProp.getFullBeanName()));
-    }
-    manyProp.setBeanTable(assoc);
   }
 
   private String getM2MJoinTableName(BeanTable lhsTable, BeanTable rhsTable) {

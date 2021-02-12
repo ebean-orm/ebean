@@ -145,14 +145,6 @@ public class DeployCreateProperties {
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();
-
-    ManyToOne manyToOne = AnnotationUtil.get(field, ManyToOne.class);
-    if (manyToOne != null) {
-      Class<?> tt = manyToOne.targetEntity();
-      if (!tt.equals(void.class)) {
-        propertyType = tt;
-      }
-    }
     if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
