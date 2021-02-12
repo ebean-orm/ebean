@@ -106,15 +106,10 @@ public class OrmQueryDetail implements Serializable {
     return p1 == null ? p2 == null : p1.isSameByAutoTune(p2);
   }
 
-  @Override
-  public String toString() {
-    return asString();
-  }
-
   /**
    * Return the detail in string form.
    */
-  public String asString() {
+  public String asStringDebug() {
     StringBuilder sb = new StringBuilder();
     if (!baseProps.isEmpty()) {
       baseProps.asStringDebug("select ", sb);
@@ -150,7 +145,7 @@ public class OrmQueryDetail implements Serializable {
    * Set the base query properties to be empty.
    */
   public void setEmptyBase() {
-    this.baseProps = new OrmQueryProperties(null, new LinkedHashSet<>());
+    this.baseProps = new OrmQueryProperties(null, Collections.emptySet());
   }
 
   /**
@@ -316,7 +311,7 @@ public class OrmQueryDetail implements Serializable {
           if (addId) {
             parentProp = new OrmQueryProperties(parentPath, assocOne.getTargetIdProperty());
           } else {
-            parentProp = new OrmQueryProperties(parentPath, new LinkedHashSet<>());
+            parentProp = new OrmQueryProperties(parentPath, Collections.emptySet());
           }
         }
 

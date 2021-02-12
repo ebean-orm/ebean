@@ -3,8 +3,8 @@ package io.ebeaninternal.server.querydefn;
 import io.ebean.FetchConfig;
 import io.ebeaninternal.server.util.DSelectColumnsParser;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Parses the path properties string.
@@ -22,9 +22,9 @@ class OrmQueryPropertiesParser {
     final boolean cache;
     final FetchConfig fetchConfig;
     final String properties;
-    final LinkedHashSet<String> included;
+    final Set<String> included;
 
-    Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, LinkedHashSet<String> included) {
+    Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, Set<String> included) {
       this.readOnly = readOnly;
       this.cache = cache;
       this.properties = properties;
@@ -55,9 +55,7 @@ class OrmQueryPropertiesParser {
     return new OrmQueryPropertiesParser(rawProperties).parse();
   }
 
-  private String inputProperties;
-
-  private String outputProperties = "";
+  private final String inputProperties;
   private boolean allProperties;
   private boolean readOnly;
   private boolean cache;
@@ -72,124 +70,61 @@ class OrmQueryPropertiesParser {
    * Parse the raw string properties input.
    */
   private Response parse() {
-
     if (inputProperties == null || inputProperties.isEmpty()) {
       return EMPTY;
-    }
-    int pos = inputProperties.indexOf("+readonly");
-    if (pos > -1) {
-      inputProperties = inputProperties.replace("+readonly", "");
-      readOnly = true;
-    }
-    pos = inputProperties.indexOf("+cache");
-    if (pos > -1) {
-      inputProperties = inputProperties.replace("+cache", "");
-      cache = true;
-    }
-    pos = inputProperties.indexOf("+query");
-    if (pos > -1) {
-      queryFetchBatch = parseBatchHint(pos, "+query");
-    }
-    pos = inputProperties.indexOf("+lazy");
-    if (pos > -1) {
-      lazyFetchBatch = parseBatchHint(pos, "+lazy");
-    }
-
-    LinkedHashSet<String> included = parseIncluded();
-    String properties = (allProperties) ? "*" : outputProperties;
-    return new Response(readOnly, cache, queryFetchBatch, lazyFetchBatch, properties, included);
-  }
-
-  /**
-   * Parse the include separating by comma or semicolon.
-   */
-  private LinkedHashSet<String> parseIncluded() {
-
-    inputProperties = inputProperties.trim();
-    if (inputProperties.isEmpty()) {
-      // default properties
-      return null;
     }
     if (inputProperties.equals("*")) {
       // explicit all properties
       allProperties = true;
-      return null;
+      return new Response(readOnly, cache, queryFetchBatch, lazyFetchBatch, "*", null);
     }
-
-    List<String> res = splitRawSelect(inputProperties);
-
-    StringBuilder sb = new StringBuilder(70);
-    LinkedHashSet<String> propertySet = new LinkedHashSet<>(res.size() * 2);
-
-    int count = 0;
-    String temp;
-    for (String re : res) {
-      temp = re.trim();
-      if (!temp.isEmpty()) {
-        if (count > 0) {
-          sb.append(",");
-        }
-        sb.append(temp);
-        propertySet.add(temp);
-        count++;
+    boolean hints = false;
+    Set<String> fields = splitRawSelect(inputProperties);
+    final Iterator<String> iterator = fields.iterator();
+    while (iterator.hasNext()) {
+      String val = iterator.next();
+      if (val.startsWith("+")) {
+        hints = true;
+        iterator.remove();
+        parseHint(val);
+      } else if (val.equals("*")) {
+        allProperties = true;
       }
     }
-
-    if (propertySet.isEmpty()) {
-      // default properties
-      return null;
+    String properties = allProperties ? "*" : hints ? String.join(",", fields) : inputProperties;
+    if (fields.isEmpty()) {
+      fields = null;
     }
+    return new Response(readOnly, cache, queryFetchBatch, lazyFetchBatch, properties, fields);
+  }
 
-    if (propertySet.contains("*")) {
-      // explicit all properties
-      allProperties = true;
-      return null;
+  private void parseHint(String val) {
+    if (val.equals("+readonly")) {
+      readOnly = true;
+    } else if (val.equals("+cache")) {
+      cache = true;
+    } else if (val.startsWith("+query")) {
+      queryFetchBatch = parseBatch(val);
+    } else if (val.startsWith("+lazy")) {
+      lazyFetchBatch = parseBatch(val);
     }
+  }
 
-    // partial properties
-    outputProperties = sb.toString();
-    return propertySet;
+  private int parseBatch(String val) {
+    if (val.endsWith(")")) {
+      int start = val.lastIndexOf('(');
+      if (start > 0) {
+        return Integer.parseInt(val.substring(start + 1, val.length() - 1));
+      }
+    }
+    return 0;
   }
 
   /**
    * Split allowing 'dynamic function based properties'.
    */
-  private List<String> splitRawSelect(String inputProperties) {
+  private Set<String> splitRawSelect(String inputProperties) {
     return DSelectColumnsParser.parse(inputProperties);
   }
 
-  private int parseBatchHint(int pos, String option) {
-
-    int startPos = pos + option.length();
-    int endPos = findEndPos(startPos, inputProperties);
-    if (endPos == -1) {
-      inputProperties = inputProperties.replace(option, "");
-      return 0;
-
-    } else {
-
-      String batchParam = inputProperties.substring(startPos + 1, endPos);
-
-      if (endPos + 1 >= inputProperties.length()) {
-        inputProperties = inputProperties.substring(0, pos);
-      } else {
-        inputProperties = inputProperties.substring(0, pos) + inputProperties.substring(endPos + 1);
-      }
-      return Integer.parseInt(batchParam);
-    }
-  }
-
-  private int findEndPos(int pos, String props) {
-
-    if (pos < props.length()) {
-      if (props.charAt(pos) == '(') {
-        int endPara = props.indexOf(')', pos + 1);
-        if (endPara == -1) {
-          throw new RuntimeException("Error could not find ')' in " + props + " after position " + pos);
-        }
-        return endPara;
-      }
-    }
-    return -1;
-  }
 }
