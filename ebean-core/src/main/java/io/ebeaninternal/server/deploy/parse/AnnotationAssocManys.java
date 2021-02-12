@@ -5,7 +5,6 @@ import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.Where;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
-import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
 import io.ebean.core.type.ScalarType;
@@ -140,15 +139,15 @@ class AnnotationAssocManys extends AnnotationAssoc {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       if (prop.isManyToMany()) {
-        // expected this
         readJoinTable(joinTable, prop);
-
       } else {
         // OneToMany with @JoinTable
         prop.setO2mJoinTable();
         readJoinTable(joinTable, prop);
         manyToManyDefaultJoins(prop);
       }
+    } else if (prop.isManyToMany()) {
+      checkSelfManyToMany(prop);
     }
 
     if (prop.getMappedBy() != null) {
@@ -178,6 +177,12 @@ class AnnotationAssocManys extends AnnotationAssoc {
       // Use the owning bean table to define the join
       BeanTable owningBeanTable = factory.getBeanTable(descriptor.getBeanType());
       owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
+    }
+  }
+
+  private void checkSelfManyToMany(DeployBeanPropertyAssocMany<?> prop) {
+    if (prop.getTargetType().equals(descriptor.getBeanType())) {
+      throw new IllegalStateException("@ManyToMany mapping for " + prop.getFullBeanName() + " requires explicit @JoinTable with joinColumns & inverseJoinColumns. Refer issue #2157");
     }
   }
 
@@ -430,7 +435,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
   }
 
   private void readToMany(ManyToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
-
     manyProp.setMappedBy(propAnn.mappedBy());
     manyProp.setFetchType(propAnn.fetch());
     setCascadeTypes(propAnn.cascade(), manyProp.getCascadeInfo());
@@ -442,7 +446,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
   }
 
   private void readToOne(OneToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
-
     manyProp.setMappedBy(propAnn.mappedBy());
     manyProp.setFetchType(propAnn.fetch());
     setCascadeTypes(propAnn.cascade(), manyProp.getCascadeInfo());
