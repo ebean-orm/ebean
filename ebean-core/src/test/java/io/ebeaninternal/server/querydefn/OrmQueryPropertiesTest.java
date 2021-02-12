@@ -10,11 +10,11 @@ public class OrmQueryPropertiesTest {
 
   String append(String prefix, OrmQueryProperties p1) {
     StringBuilder sb = new StringBuilder();
-    p1.append(prefix, sb);
+    p1.asStringDebug(prefix, sb);
     return sb.toString();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void construct_with_propertySet_when_null() {
     new OrmQueryProperties(null, (LinkedHashSet<String>) null);
   }

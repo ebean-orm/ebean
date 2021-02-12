@@ -452,7 +452,7 @@ public final class SqlTreeBuilder {
     // Also note that this can include transient properties.
     // This makes sense for transient properties used to
     // hold sum() count() type values (with SqlSelect)
-    final Set<String> selectInclude = queryProps.getSelectInclude();
+    final Set<String> selectInclude = queryProps.getIncluded();
     for (String propName : selectInclude) {
       if (!propName.isEmpty()) {
         addProperty(selectProps, desc, queryProps, propName);

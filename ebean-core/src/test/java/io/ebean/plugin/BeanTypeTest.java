@@ -177,7 +177,7 @@ public class BeanTypeTest {
     beanType(Order.class).docStore().applyPath(orderQuery);
 
     OrmQueryDetail detail = orderQuery.getDetail();
-    assertThat(detail.getChunk("customer", false).getSelectInclude()).containsExactly("id", "name");
+    assertThat(detail.getChunk("customer", false).getIncluded()).containsExactly("id", "name");
   }
 
   @Test(expected = IllegalStateException.class)

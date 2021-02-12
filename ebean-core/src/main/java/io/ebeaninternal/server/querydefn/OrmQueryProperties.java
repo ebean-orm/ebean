@@ -30,12 +30,8 @@ public class OrmQueryProperties implements Serializable {
 
   private final String parentPath;
   private final String path;
-
-  private final String rawProperties;
-  private final String trimmedProperties;
-
-  private final LinkedHashSet<String> included;
-
+  private final String properties;
+  private final Set<String> included;
   private final FetchConfig fetchConfig;
 
   /**
@@ -84,8 +80,7 @@ public class OrmQueryProperties implements Serializable {
   public OrmQueryProperties(String path) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.rawProperties = null;
-    this.trimmedProperties = null;
+    this.properties = null;
     this.included = null;
     this.fetchConfig = DEFAULT_FETCH;
   }
@@ -100,8 +95,7 @@ public class OrmQueryProperties implements Serializable {
 
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.rawProperties = rawProperties;
-    this.trimmedProperties = response.properties;
+    this.properties = response.properties;
     this.included = response.included;
     this.cache = response.cache;
     this.readOnly = response.readOnly;
@@ -115,37 +109,15 @@ public class OrmQueryProperties implements Serializable {
     }
   }
 
-  public OrmQueryProperties(String path, LinkedHashSet<String> parsedProperties) {
-    if (parsedProperties == null) {
-      throw new IllegalArgumentException("parsedProperties is null");
-    }
-
+  public OrmQueryProperties(String path, Set<String> included) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
     // for rawSql parsedProperties can be empty (when only fetching Id property)
-    this.included = parsedProperties;
-    this.rawProperties = join(parsedProperties);
-    this.trimmedProperties = rawProperties;
+    this.included = included;
+    this.properties = String.join(",", included);
     this.cache = false;
     this.readOnly = false;
     this.fetchConfig = DEFAULT_FETCH;
-  }
-
-  /**
-   * Join the set of properties into a comma delimited string.
-   */
-  private String join(LinkedHashSet<String> parsedProperties) {
-    StringBuilder sb = new StringBuilder(50);
-    boolean first = true;
-    for (String property : parsedProperties) {
-      if (first) {
-        first = false;
-      } else {
-        sb.append(",");
-      }
-      sb.append(property);
-    }
-    return sb.toString();
   }
 
   /**
@@ -155,8 +127,7 @@ public class OrmQueryProperties implements Serializable {
     this.fetchConfig = sourceFetchConfig;
     this.parentPath = source.parentPath;
     this.path = source.path;
-    this.rawProperties = source.rawProperties;
-    this.trimmedProperties = source.trimmedProperties;
+    this.properties = source.properties;
     this.cache = source.cache;
     this.readOnly = source.readOnly;
     this.filterMany = source.filterMany;
@@ -240,8 +211,8 @@ public class OrmQueryProperties implements Serializable {
   @SuppressWarnings("unchecked")
   public void configureBeanQuery(SpiQuery<?> query) {
 
-    if (trimmedProperties != null && !trimmedProperties.isEmpty()) {
-      query.select(trimmedProperties);
+    if (properties != null && !properties.isEmpty()) {
+      query.select(properties);
     }
 
     if (filterMany != null) {
@@ -268,7 +239,7 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public boolean hasSelectClause() {
-    if ("*".equals(trimmedProperties)) {
+    if ("*".equals(properties)) {
       // explicitly selected all properties
       return true;
     }
@@ -280,25 +251,17 @@ public class OrmQueryProperties implements Serializable {
    * Return true if the properties and configuration are empty.
    */
   public boolean isEmpty() {
-    return rawProperties == null || rawProperties.isEmpty();
+    return properties == null || properties.isEmpty();
   }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(40);
-    append("", sb);
-    return sb.toString();
-  }
-
-  public String append(String prefix, StringBuilder sb) {
+  public void asStringDebug(String prefix, StringBuilder sb) {
     sb.append(prefix);
     if (path != null) {
       sb.append(path).append(" ");
     }
     if (!isEmpty()) {
-      sb.append("(").append(rawProperties).append(")");
+      sb.append("(").append(properties).append(")");
     }
-    return sb.toString();
   }
 
   boolean isChild(OrmQueryProperties possibleChild) {
@@ -319,7 +282,7 @@ public class OrmQueryProperties implements Serializable {
    * Return the raw properties.
    */
   public String getProperties() {
-    return rawProperties;
+    return properties;
   }
 
   /**
@@ -350,10 +313,6 @@ public class OrmQueryProperties implements Serializable {
     includedBeanJoin.add(propertyName);
   }
 
-  public Set<String> getSelectInclude() {
-    return included;
-  }
-
   public Set<String> getSelectQueryJoin() {
     return secondaryQueryJoins;
   }
@@ -373,7 +332,6 @@ public class OrmQueryProperties implements Serializable {
   }
 
   boolean isIncluded(String propName) {
-
     if (includedBeanJoin != null && includedBeanJoin.contains(propName)) {
       return false;
     }
@@ -474,24 +432,21 @@ public class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-
-    builder.append("qpp[");
+    builder.append("p[");
     builder.append(path);
     if (included != null){
-      builder.append(" included:").append(included);
+      builder.append("/i").append(included);
     }
     if (secondaryQueryJoins != null) {
-      builder.append(" secondary:").append(secondaryQueryJoins);
+      builder.append("/s").append(secondaryQueryJoins);
     }
-
     if (filterMany != null) {
-      builder.append(" filterMany[");
+      builder.append("/f[");
       filterMany.queryPlanHash(builder);
       builder.append("]");
     }
-
     if (fetchConfig != null) {
-      builder.append(" config:").append(fetchConfig.hashCode());
+      builder.append("/c:").append(fetchConfig.hashCode());
     }
     builder.append("]");
   }
