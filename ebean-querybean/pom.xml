@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.6.8-SNAPSHOT</version>
+    <version>12.7.1-SNAPSHOT</version>
   </parent>
 <!--  <parent>-->
 <!--    <groupId>org.avaje</groupId>-->
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.6.8-SNAPSHOT</version>
+      <version>12.7.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
@@ -67,14 +67,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.8-SNAPSHOT</version>
+      <version>12.7.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>12.6.8-SNAPSHOT</version>
+      <version>12.7.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
