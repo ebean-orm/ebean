@@ -33,8 +33,8 @@ public class TestRawSqlOrmWrapper3 extends BaseTestCase {
       .create();
 
     List<OrderAggregate> list2 = Ebean.find(OrderAggregate.class).setRawSql(rawSql)
-      .fetch("order", new FetchConfig().query())
-      .fetch("order.details", new FetchConfig().query())
+      .fetchQuery("order")
+      .fetchQuery("order.details")
       .where().gt("order.id", 2)
       .having().gt("totalAmount", 10)
       .filterMany("order.details").gt("unitPrice", 2d)

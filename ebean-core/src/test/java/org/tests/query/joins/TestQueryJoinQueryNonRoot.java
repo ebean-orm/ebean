@@ -29,7 +29,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
     List<Order> list = Ebean.find(Order.class)
       .fetch("customer")
-      .fetch("customer.contacts", "firstName", new FetchConfig().query().lazy(10))
+      .fetchQuery("customer.contacts", "firstName")
       .fetch("customer.contacts.group")
       .where().lt("id", 3).findList();
 

@@ -35,7 +35,7 @@ public class TestQueryFindEach extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
-      .fetch("contacts", new FetchConfig().query(2))
+      .fetchQuery("contacts")
       .where().gt("id", 0).order("id")
       .setMaxRows(2).query();
 
@@ -86,7 +86,7 @@ public class TestQueryFindEach extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
-      .fetch("contacts", new FetchConfig().query(2))
+      .fetchQuery("contacts")
       .where().gt("id", 0).order("id")
       .setMaxRows(2).query();
 

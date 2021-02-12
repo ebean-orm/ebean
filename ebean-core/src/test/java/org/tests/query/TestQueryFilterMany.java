@@ -29,7 +29,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     LoggedSqlCollector.start();
 
     Customer customer = Ebean.find(Customer.class)
-      .fetch("orders", new FetchConfig().lazy())
+      .fetchLazy("orders")
       .filterMany("orders").eq("status", Order.Status.NEW)
       .where().ieq("name", "Rob")
       .order().asc("id").setMaxRows(1)

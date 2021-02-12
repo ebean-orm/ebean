@@ -22,7 +22,7 @@ public class TestQueryFilterManyOnSecondary extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-      .fetch("orders", new FetchConfig().query())
+      .fetchQuery("orders")
       .where().ilike("name", "Rob%").gt("id", 0)
       .filterMany("orders").eq("status", Order.Status.NEW)
       .query();
@@ -44,7 +44,7 @@ public class TestQueryFilterManyOnSecondary extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
-      .fetch("details", new FetchConfig().query())
+      .fetchQuery("details")
       .fetch("details.product", "name")
       .filterMany("details").ilike("product.name", "c%")
       .query();

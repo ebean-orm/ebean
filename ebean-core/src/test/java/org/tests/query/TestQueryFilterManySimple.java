@@ -25,7 +25,7 @@ public class TestQueryFilterManySimple extends BaseTestCase {
       .find(Customer.class)
       // .join("orders", new JoinConfig().lazy())
       // .join("orders", new JoinConfig().query())
-      .fetch("orders").fetch("contacts", new FetchConfig().query()).where().ilike("name", "rob%")
+      .fetch("orders").fetchQuery("contacts").where().ilike("name", "rob%")
       .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
       .filterMany("contacts").isNotNull("firstName").findList();
 

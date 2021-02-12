@@ -18,7 +18,7 @@ public class TestQueryJoinBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> list = Ebean.find(Order.class)
-      .fetch("customer", new FetchConfig().queryFirst(3).lazy(2))
+      .fetch("customer")
       //.fetch("orders.details", new FetchConfig().query())
       //.fetch("orders.shipments", new FetchConfig().query())
       .findList();

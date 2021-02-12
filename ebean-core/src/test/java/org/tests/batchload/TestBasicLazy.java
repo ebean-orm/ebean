@@ -177,7 +177,7 @@ public class TestBasicLazy extends BaseTestCase {
     new FetchThread(tg, 2).start();
     new FetchThread(tg, 3).start();
 
-    orders = Ebean.find(Order.class).fetch("customer", new FetchConfig().lazy(100)).findList();
+    orders = Ebean.find(Order.class).fetchLazy("customer").findList();
     Assert.assertTrue(orders.size() >= 4);
 
     try {

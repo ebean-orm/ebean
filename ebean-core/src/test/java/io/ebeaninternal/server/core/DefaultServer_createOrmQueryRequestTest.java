@@ -99,7 +99,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
       .select("status, shipDate")
-      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name");
 
 
@@ -145,7 +145,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .fetch("details", new FetchConfig().query());
+      .fetchQuery("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -201,7 +201,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .fetch("details", new FetchConfig().lazy())
+      .fetchLazy("details")
       .fetch("details.product");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
@@ -230,7 +230,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
-      .fetch("details", new FetchConfig().query())
+      .fetchQuery("details")
       .fetch("details.product")
       .fetch("customer", "name");
 

@@ -14,11 +14,11 @@ public class TestThreeLevelQueryJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(Customer.class).fetch("orders", new FetchConfig().query())
-      .fetch("orders.details", new FetchConfig().query())
-      .fetch("orders.shipments", new FetchConfig().query())
-      .fetch("shippingAddress", new FetchConfig().query())
-      .fetch("billingAddress", new FetchConfig().query()).findList();
+    Ebean.find(Customer.class).fetchQuery("orders")
+      .fetchQuery("orders.details")
+      .fetchQuery("orders.shipments")
+      .fetchQuery("shippingAddress")
+      .fetchQuery("billingAddress").findList();
 
   }
 

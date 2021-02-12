@@ -24,7 +24,7 @@ public class TestQueryFindEachWhile extends BaseTestCase {
     Query<Customer> query
       = DB.find(Customer.class)
       .setAutoTune(false)
-      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).order("id")
+      .fetchQuery("contacts").where().gt("id", 0).order("id")
       .setMaxRows(2).query();
 
     final AtomicInteger counter = new AtomicInteger(0);
@@ -47,7 +47,7 @@ public class TestQueryFindEachWhile extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class).setAutoTune(false)
-      .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).order("id")
+      .fetchQuery("contacts").where().gt("id", 0).order("id")
       .setMaxRows(2).query();
 
     final AtomicInteger counter = new AtomicInteger(0);

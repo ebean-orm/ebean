@@ -129,9 +129,9 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     Query<Order> query = Ebean.find(Order.class)
       .select("status")
-      .fetch("customer", "name, status", new FetchConfig().query())
+      .fetchQuery("customer", "name, status")
       .fetch("customer.contacts")
-      .fetch("details", new FetchConfig().query())
+      .fetchQuery("details")
       .where().eq("status", Order.Status.NEW)
       .query();
 

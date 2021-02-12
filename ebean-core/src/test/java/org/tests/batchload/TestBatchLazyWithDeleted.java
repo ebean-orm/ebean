@@ -44,7 +44,7 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     Ebean.save(twoC);
 
     List<UUTwo> list = Ebean.find(UUTwo.class)
-      .fetch("master", new FetchConfig().lazy(5))
+      .fetchLazy("master")
       .where().startsWith("name", "two-bld-")
       .order("name")
       .findList();

@@ -131,7 +131,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .create();
 
     List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
-      .fetch("parent", new FetchConfig().query())
+      .fetchQuery("parent")
       .findList();
 
     assertNotNull(uncles.get(0));
@@ -150,7 +150,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .create();
 
     List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
-      .fetch("parent", new FetchConfig().query())
+      .fetchQuery("parent")
       .findList();
 
     assertNotNull(uncles.get(0));
@@ -185,7 +185,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .create();
 
     List<ParentAggregate> aggregates = Ebean.find(ParentAggregate.class).setRawSql(rawSql)
-      .fetch("parent", new FetchConfig().query())
+      .fetchQuery("parent")
       .findList();
 
     List<Parent> partial = new ArrayList<>();
@@ -209,7 +209,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .create();
 
     List<ParentAggregate> aggregates = Ebean.find(ParentAggregate.class).setRawSql(rawSql)
-      .fetch("parent", new FetchConfig().query())
+      .fetchQuery("parent")
       .findList();
 
     List<Parent> partial = new ArrayList<>();
@@ -235,7 +235,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .create();
 
     List<ParentAggregate> aggregates = Ebean.find(ParentAggregate.class).setRawSql(rawSql)
-      .fetch("parent", new FetchConfig().query())
+      .fetchQuery("parent")
       .findList();
 
     List<Parent> partial = new ArrayList<>();

@@ -39,7 +39,7 @@ public class TestRawSqlWithResultSet extends BaseTestCase {
       List<Customer> list = Ebean.find(Customer.class)
         .setRawSql(rawSql)
         // also test a secondary query join
-        .fetch("billingAddress", new FetchConfig().query())
+        .fetchQuery("billingAddress")
         .findList();
 
       for (Customer customer : list) {

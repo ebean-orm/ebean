@@ -96,7 +96,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     Query<Order> q = Ebean.find(Order.class)
       .fetch("customer")
       .fetch("customer.contacts")
-      .fetch("details", new FetchConfig().query(10))
+      .fetchQuery("details")
       .fetch("details.product")
       .where().gt("id", 0).query();
 
