@@ -3,30 +3,13 @@ package io.ebean;
 import java.io.Serializable;
 
 /**
- * Defines the configuration options for a "query fetch" or a
- * "lazy loading fetch". This gives you the ability to use multiple smaller
- * queries to populate an object graph as opposed to a single large query.
- * <p>
- * The primary goal is to provide efficient ways of loading complex object
- * graphs avoiding SQL Cartesian product and issues around populating object
- * graphs that have multiple *ToMany relationships.
- * </p>
- * <p>
- * It also provides the ability to control the lazy loading queries (batch size,
- * selected properties and fetches) to avoid N+1 queries etc.
- * <p>
- * There can also be cases loading across a single OneToMany where 2 SQL queries
- * using Ebean FetchConfig.query() can be more efficient than one SQL query.
- * When the "One" side is wide (lots of columns) and the cardinality difference
- * is high (a lot of "Many" beans per "One" bean) then this can be more
- * efficient loaded as 2 SQL queries.
- * </p>
+ * Defines how a relationship is fetched via either normal SQL join,
+ * a eager secondary query, via lazy loading or via eagerly hitting L2 cache.
  * <p>
  * <pre>{@code
  * // Normal fetch join results in a single SQL query
  * List<Order> list = DB.find(Order.class).fetch("details").findList();
  *
- * // Find Orders join details using a single SQL query
  * }</pre>
  * <p>
  * Example: Using a "query join" instead of a "fetch join" we instead use 2 SQL queries
@@ -37,101 +20,11 @@ import java.io.Serializable;
  * // This will use 2 SQL queries to build this object graph
  * List<Order> list =
  *     DB.find(Order.class)
- *         .fetch("details", new FetchConfig().query())
+ *         .fetch("details", FetchConfig.ofQuery())
  *         .findList();
  *
  * // query 1) find order
  * // query 2) find orderDetails where order.id in (?,?...) // first 100 order id's
- *
- * }</pre>
- * <p>
- * Example: Using 2 "query joins"
- * </p>
- * <p>
- * <pre>{@code
- *
- * // This will use 3 SQL queries to build this object graph
- * List<Order> list =
- *     DB.find(Order.class)
- *         .fetch("details", new FetchConfig().query())
- *         .fetch("customer", new FetchConfig().queryFirst(5))
- *         .findList();
- *
- * // query 1) find order
- * // query 2) find orderDetails where order.id in (?,?...) // first 100 order id's
- * // query 3) find customer where id in (?,?,?,?,?) // first 5 customers
- *
- * }</pre>
- * <p>
- * Example: Using "query joins" and partial objects
- * </p>
- * <p>
- *
- * <pre>{@code
- * // This will use 3 SQL queries to build this object graph
- * List<Order> list =
- *     DB.find(Order.class)
- *         .select("status, shipDate")
- *         .fetch("details", "quantity, price", new FetchConfig().query())
- *         .fetch("details.product", "sku, name")
- *         .fetch("customer", "name", new FetchConfig().queryFirst(5))
- *         .fetch("customer.contacts")
- *         .fetch("customer.shippingAddress")
- *         .findList();
- *
- * // query 1) find order (status, shipDate)
- * // query 2) find orderDetail (quantity, price) fetch product (sku, name) where
- * // order.id in (?,? ...)
- * // query 3) find customer (name) fetch contacts (*) fetch shippingAddress (*)
- * // where id in (?,?,?,?,?)
- *
- * // Note: the fetch of "details.product" is automatically included into the
- * // fetch of "details"
- * //
- * // Note: the fetch of "customer.contacts" and "customer.shippingAddress"
- * // are automatically included in the fetch of "customer"
- * }</pre>
- * <p>
- * You can use query() and lazy together on a single join. The query is executed
- * immediately and the lazy defines the batch size to use for further lazy
- * loading (if lazy loading is invoked).
- * </p>
- * <p>
- * <pre>{@code
- *
- * List<Order> list =
- *     DB.find(Order.class)
- *         .fetch("customer", new FetchConfig().query(10).lazy(5))
- *         .findList();
- *
- * // query 1) find order
- * // query 2) find customer where id in (?,?,?,?,?,?,?,?,?,?) // first 10 customers
- * // .. then if lazy loading of customers is invoked
- * // .. use a batch size of 5 to load the customers
- *
- * }</pre>
- * <p>
- * <p>
- * Example of controlling the lazy loading query:
- * </p>
- * <p>
- * This gives us the ability to optimise the lazy loading query for a given use
- * case.
- * </p>
- * <p>
- * <pre>{@code
- *
- * List<Order> list = DB.find(Order.class)
- *   .fetch("customer","name", new FetchConfig().lazy(5))
- *   .fetch("customer.contacts","contactName, phone, email")
- *   .fetch("customer.shippingAddress")
- *   .where().eq("status",Order.Status.NEW)
- *   .findList();
- *
- * // query 1) find order where status = Order.Status.NEW
- * //
- * // .. if lazy loading of customers is invoked
- * // .. use a batch size of 5 to load the customers
  *
  * }</pre>
  *
@@ -142,52 +35,105 @@ public class FetchConfig implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private int lazyBatchSize = -1;
+  private static final int JOIN_MODE = 0;
+  private static final int QUERY_MODE = 1;
+  private static final int LAZY_MODE = 2;
+  private static final int CACHE_MODE = 3;
 
-  private int queryBatchSize = -1;
-
-  private boolean queryAll;
-
-  private boolean cache;
+  private int mode;
+  private int batchSize;
+  private int hashCode;
 
   /**
-   * Construct the fetch configuration object.
+   * Construct using default JOIN mode.
    */
   public FetchConfig() {
+    //this.mode = JOIN_MODE;
+    this.batchSize = 100;
+    this.hashCode = 1000;
+  }
+
+  private FetchConfig(int mode, int batchSize) {
+    this.mode = mode;
+    this.batchSize = batchSize;
+    this.hashCode = mode + 10 * batchSize;
   }
 
   /**
-   * Specify that this path should be lazy loaded using the default batch load
-   * size.
+   * Return FetchConfig that will eagerly fetch the relationship using L2 cache.
+   * <p>
+   * Any cache misses will be loaded by secondary query to the database.
+   */
+  public static FetchConfig ofCache() {
+    return new FetchConfig(CACHE_MODE, 100);
+  }
+
+  /**
+   * Return FetchConfig that use a eager secondary query to fetch the relationship.
+   */
+  public static FetchConfig ofQuery() {
+    return new FetchConfig(QUERY_MODE, 100);
+  }
+
+  /**
+   * Return FetchConfig that use a eager secondary query to fetch the relationship specifying the batch size.
+   */
+  public static FetchConfig ofQuery(int batchSize) {
+    return new FetchConfig(QUERY_MODE, batchSize);
+  }
+
+  /**
+   * Return FetchConfig that use lazy loading to fetch the relationship.
+   */
+  public static FetchConfig ofLazy() {
+    return new FetchConfig(LAZY_MODE, 10);
+  }
+
+  /**
+   * Return FetchConfig that use lazy loading to fetch the relationship specifying the batch size.
+   */
+  public static FetchConfig ofLazy(int batchSize) {
+    return new FetchConfig(LAZY_MODE, batchSize);
+  }
+
+  /**
+   * We want to migrate away from mutating FetchConfig to a fully immutable FetchConfig.
+   */
+  private FetchConfig mutate(int mode, int batchSize) {
+    if (batchSize < 1) {
+      throw new IllegalArgumentException("batch size "+batchSize+" must be > 0");
+    }
+    this.mode = mode;
+    this.batchSize = batchSize;
+    this.hashCode = mode + 10 * batchSize;
+    return this;
+  }
+
+  /**
+   * Specify that this path should be lazy loaded using the default batch load size.
    */
   public FetchConfig lazy() {
-    this.lazyBatchSize = 0;
-    this.queryAll = false;
-    return this;
+    return mutate(LAZY_MODE, 10);
   }
 
   /**
    * Specify that this path should be lazy loaded with a specified batch size.
    *
-   * @param lazyBatchSize the batch size for lazy loading
+   * @param batchSize the batch size for lazy loading
    */
-  public FetchConfig lazy(int lazyBatchSize) {
-    this.lazyBatchSize = lazyBatchSize;
-    this.queryAll = false;
-    return this;
+  public FetchConfig lazy(int batchSize) {
+    return mutate(LAZY_MODE, batchSize);
   }
 
   /**
-   * Eagerly fetch the beans in this path as a separate query (rather than as
+   * Eagerly fetccd h the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
    * This will use the default batch size for separate query which is 100.
    * </p>
    */
   public FetchConfig query() {
-    this.queryBatchSize = 0;
-    this.queryAll = true;
-    return this;
+    return mutate(QUERY_MODE, 100);
   }
 
   /**
@@ -195,10 +141,7 @@ public class FetchConfig implements Serializable {
    * and using the DB for beans not in the cache.
    */
   public FetchConfig cache() {
-    this.cache = true;
-    this.queryBatchSize = 0;
-    this.queryAll = true;
-    return this;
+    return mutate(CACHE_MODE, 100);
   }
 
   /**
@@ -213,13 +156,10 @@ public class FetchConfig implements Serializable {
    * is also used.
    * </p>
    *
-   * @param queryBatchSize the batch size used to load beans on this path
+   * @param batchSize the batch size used to load beans on this path
    */
-  public FetchConfig query(int queryBatchSize) {
-    this.queryBatchSize = queryBatchSize;
-    // queryAll true as long as a lazy batch size has not already been set
-    this.queryAll = (lazyBatchSize == -1);
-    return this;
+  public FetchConfig query(int batchSize) {
+    return mutate(QUERY_MODE, batchSize);
   }
 
   /**
@@ -230,61 +170,57 @@ public class FetchConfig implements Serializable {
    * loaded eagerly but instead use lazy loading.
    * </p>
    *
-   * @param queryBatchSize the number of parent beans this path is populated for
+   * @param batchSize the number of parent beans this path is populated for
    */
-  public FetchConfig queryFirst(int queryBatchSize) {
-    this.queryBatchSize = queryBatchSize;
-    this.queryAll = false;
-    return this;
+  @Deprecated
+  public FetchConfig queryFirst(int batchSize) {
+    return query(batchSize);
   }
 
   /**
-   * Return the batch size for lazy loading.
+   * Return the batch size for fetching.
    */
-  public int getLazyBatchSize() {
-    return lazyBatchSize;
+  public int getBatchSize() {
+    return batchSize;
   }
 
   /**
-   * Return the batch size for separate query load.
-   */
-  public int getQueryBatchSize() {
-    return queryBatchSize;
-  }
-
-  /**
-   * Return true if the query fetch should fetch 'all' rather than just the
-   * 'first' batch.
-   */
-  public boolean isQueryAll() {
-    return queryAll;
-  }
-
-  /**
-   * Return true if this uses L2 bean cache.
+   * Return true if the fetch should use the L2 cache.
    */
   public boolean isCache() {
-    return cache;
+    return mode == CACHE_MODE;
+  }
+
+  /**
+   * Return true if the fetch should be a eager secondary query.
+   */
+  public boolean isQuery() {
+    return mode == QUERY_MODE;
+  }
+
+  /**
+   * Return true if the fetch should be a lazy query.
+   */
+  public boolean isLazy() {
+    return mode == LAZY_MODE;
+  }
+
+  /**
+   * Return true if the fetch should try to use SQL join.
+   */
+  public boolean isJoin() {
+    return mode == JOIN_MODE;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-
-    FetchConfig that = (FetchConfig) o;
-    if (lazyBatchSize != that.lazyBatchSize) return false;
-    if (queryBatchSize != that.queryBatchSize) return false;
-    if (cache != that.cache) return false;
-    return queryAll == that.queryAll;
+    return (hashCode == ((FetchConfig) o).hashCode);
   }
 
   @Override
   public int hashCode() {
-    int result = lazyBatchSize;
-    result = 92821 * result + queryBatchSize;
-    result = 92821 * result + (queryAll ? 1 : 0);
-    result = 92821 * result + (cache ? 1 : 0);
-    return result;
+    return hashCode;
   }
 }

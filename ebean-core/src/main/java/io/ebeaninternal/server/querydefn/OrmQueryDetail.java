@@ -117,14 +117,14 @@ public class OrmQueryDetail implements Serializable {
   public String asString() {
     StringBuilder sb = new StringBuilder();
     if (!baseProps.isEmpty()) {
-      baseProps.append("select ", sb);
+      baseProps.asStringDebug("select ", sb);
     }
     if (fetchPaths != null) {
       for (OrmQueryProperties join : fetchPaths.values()) {
         if (sb.length() > 0) {
           sb.append(" ");
         }
-        join.append("fetch ", sb);
+        join.asStringDebug("fetch ", sb);
       }
     }
     return sb.toString();

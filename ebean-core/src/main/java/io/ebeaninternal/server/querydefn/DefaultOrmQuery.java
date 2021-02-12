@@ -83,11 +83,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
 
-  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
+  private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
 
-  private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
+  private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
 
-  private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
+  private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private final ReentrantLock lock = new ReentrantLock();
 

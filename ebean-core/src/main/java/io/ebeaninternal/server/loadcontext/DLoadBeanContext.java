@@ -35,7 +35,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     super(parent, desc, path, defaultBatchSize, queryProps);
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
-    this.currentBuffer = createBuffer(firstBatchSize);
+    this.currentBuffer = createBuffer(batchSize);
     this.cache = (queryProps != null) && queryProps.isCache();
   }
 
@@ -52,7 +52,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     if (bufferList != null) {
       bufferList.clear();
     }
-    currentBuffer = createBuffer(secondaryBatchSize);
+    currentBuffer = createBuffer(batchSize);
   }
 
   private void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
@@ -70,7 +70,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
   protected void register(EntityBeanIntercept ebi) {
     if (currentBuffer.isFull()) {
-      currentBuffer = createBuffer(secondaryBatchSize);
+      currentBuffer = createBuffer(batchSize);
     }
     ebi.setBeanLoader(currentBuffer, getPersistenceContext());
     currentBuffer.add(ebi);
@@ -95,10 +95,6 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
             parent.getEbeanServer().loadBean(new LoadBeanRequest(loadBuffer, parentRequest));
-            if (!queryProps.isQueryFetchAll()) {
-              // Stop - only fetch the first batch ... the rest will be lazy loaded
-              break;
-            }
           }
           if (forEach) {
             clear();

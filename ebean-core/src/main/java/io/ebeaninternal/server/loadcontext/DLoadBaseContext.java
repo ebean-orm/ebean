@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.loadcontext;
 
-import io.ebean.FetchConfig;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiQuery;
@@ -28,9 +27,7 @@ abstract class DLoadBaseContext {
 
   final boolean hitCache;
 
-  final int firstBatchSize;
-
-  final int secondaryBatchSize;
+  final int batchSize;
 
   final ObjectGraphNode objectGraphNode;
 
@@ -45,38 +42,11 @@ abstract class DLoadBaseContext {
     this.hitCache = parent.isBeanCacheGet() && desc.isBeanCaching();
     this.objectGraphNode = parent.getObjectGraphNode(path);
     this.queryFetch = queryProps != null && queryProps.isQueryFetch();
-    this.firstBatchSize = initFirstBatchSize(defaultBatchSize, queryProps);
-    this.secondaryBatchSize = initSecondaryBatchSize(defaultBatchSize, firstBatchSize, queryProps);
+    this.batchSize = initBatchSize(defaultBatchSize, queryProps);
   }
 
-  private int initFirstBatchSize(int batchSize, OrmQueryProperties queryProps) {
-    if (queryProps == null) {
-      return batchSize;
-    }
-
-    int queryBatchSize = queryProps.getQueryFetchBatch();
-    if (queryBatchSize == -1) {
-      return batchSize;
-
-    } else if (queryBatchSize == 0) {
-      return 100;
-
-    } else {
-      return queryBatchSize;
-    }
-  }
-
-  private int initSecondaryBatchSize(int defaultBatchSize, int firstBatchSize, OrmQueryProperties queryProps) {
-    if (queryProps == null) {
-      return defaultBatchSize;
-    }
-    FetchConfig fetchConfig = queryProps.getFetchConfig();
-    if (fetchConfig.isQueryAll()) {
-      return firstBatchSize;
-    }
-
-    int lazyBatchSize = fetchConfig.getLazyBatchSize();
-    return (lazyBatchSize > 1) ? lazyBatchSize : defaultBatchSize;
+  private int initBatchSize(int batchSize, OrmQueryProperties queryProps) {
+    return queryProps == null ? batchSize : queryProps.getBatchSize();
   }
 
   /**
@@ -84,7 +54,6 @@ abstract class DLoadBaseContext {
    * set onto the secondary query.
    */
   void setLabel(SpiQuery<?> query) {
-
     String label = parent.getPlanLabel();
     if (label != null) {
       query.setProfilePath(label, fullPath, parent.getProfileLocation());

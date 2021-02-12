@@ -17,30 +17,26 @@ public class ParseFetchConfigTest {
   }
 
   @Test
-  public void parseLazy() throws Exception {
-
+  public void parseLazy() {
     FetchConfig lazy = ParseFetchConfig.parse("lazy");
-    assertThat(lazy.getLazyBatchSize()).isEqualTo(0);
+    assertThat(lazy.getBatchSize()).isEqualTo(10);
   }
 
   @Test
-  public void parseLazy100() throws Exception {
-
+  public void parseLazy100() {
     FetchConfig lazy = ParseFetchConfig.parse("lazy(100)");
-    assertThat(lazy.getLazyBatchSize()).isEqualTo(100);
+    assertThat(lazy.getBatchSize()).isEqualTo(100);
   }
 
   @Test
-  public void parseQuery() throws Exception {
-
+  public void parseQuery() {
     FetchConfig lazy = ParseFetchConfig.parse("query");
-    assertThat(lazy.getQueryBatchSize()).isEqualTo(0);
+    assertThat(lazy.getBatchSize()).isEqualTo(100);
   }
 
   @Test
-  public void parseQuery100() throws Exception {
-
+  public void parseQuery100() {
     FetchConfig lazy = ParseFetchConfig.parse("query(50)");
-    assertThat(lazy.getQueryBatchSize()).isEqualTo(50);
+    assertThat(lazy.getBatchSize()).isEqualTo(50);
   }
 }
