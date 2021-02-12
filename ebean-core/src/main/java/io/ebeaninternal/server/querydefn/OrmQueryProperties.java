@@ -90,11 +90,10 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public OrmQueryProperties(String path, String rawProperties, FetchConfig fetchConfig) {
-
-    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
-
     this.path = path;
     this.parentPath = SplitName.parent(path);
+
+    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.properties = response.properties;
     this.included = response.included;
     this.cache = response.cache;
@@ -350,42 +349,25 @@ public class OrmQueryProperties implements Serializable {
    * Return true if this path is a 'query join'.
    */
   public boolean isQueryFetch() {
-    return markForQueryJoin || getQueryFetchBatch() > -1;
+    return markForQueryJoin || cache || fetchConfig.isQuery();
   }
 
   /**
    * Return true if this path is a 'fetch join'.
    */
   boolean isFetchJoin() {
-    return !isQueryFetch() && !isLazyFetch();
+    return !markForQueryJoin && fetchConfig.isJoin();
   }
 
   /**
    * Return true if this path is a lazy fetch.
    */
   boolean isLazyFetch() {
-    return getLazyFetchBatch() > -1;
+    return fetchConfig.isLazy();
   }
 
-  /**
-   * Return the batch size to use for the query join.
-   */
-  public int getQueryFetchBatch() {
-    return fetchConfig.getQueryBatchSize();
-  }
-
-  /**
-   * Return true if a query join should eagerly fetch 'all' rather than the 'first'.
-   */
-  public boolean isQueryFetchAll() {
-    return fetchConfig.isQueryAll();
-  }
-
-  /**
-   * Return the batch size to use for lazy loading.
-   */
-  public int getLazyFetchBatch() {
-    return fetchConfig.getLazyBatchSize();
+  public int getBatchSize() {
+    return fetchConfig.getBatchSize();
   }
 
   /**
@@ -432,8 +414,10 @@ public class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("p[");
-    builder.append(path);
+    builder.append("{");
+    if (path != null) {
+      builder.append(path);
+    }
     if (included != null){
       builder.append("/i").append(included);
     }
@@ -441,14 +425,13 @@ public class OrmQueryProperties implements Serializable {
       builder.append("/s").append(secondaryQueryJoins);
     }
     if (filterMany != null) {
-      builder.append("/f[");
+      builder.append("/f");
       filterMany.queryPlanHash(builder);
-      builder.append("]");
     }
     if (fetchConfig != null) {
-      builder.append("/c:").append(fetchConfig.hashCode());
+      builder.append("/c").append(fetchConfig.hashCode());
     }
-    builder.append("]");
+    builder.append("}");
   }
 
 }

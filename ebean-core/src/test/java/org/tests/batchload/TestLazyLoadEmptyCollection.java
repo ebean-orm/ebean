@@ -24,7 +24,7 @@ public class TestLazyLoadEmptyCollection extends TransactionalTestCase {
     Ebean.save(c);
 
     List<Customer> list = Ebean.find(Customer.class)
-      .fetch("contacts", new FetchConfig().query(0))
+      .fetch("contacts", new FetchConfig().query())
       .fetch("contacts.notes", new FetchConfig().query(100))
       .findList();
 

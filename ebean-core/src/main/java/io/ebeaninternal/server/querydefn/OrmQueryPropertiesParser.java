@@ -29,8 +29,10 @@ class OrmQueryPropertiesParser {
       this.cache = cache;
       this.properties = properties;
       this.included = included;
-      if (lazyFetchBatch > -1 || queryFetchBatch > -1) {
-        this.fetchConfig = new FetchConfig().lazy(lazyFetchBatch).query(queryFetchBatch);
+      if (queryFetchBatch > 0) {
+        this.fetchConfig = FetchConfig.ofQuery(queryFetchBatch);
+      } else if (lazyFetchBatch > 0) {
+        this.fetchConfig = FetchConfig.ofLazy(lazyFetchBatch);
       } else {
         this.fetchConfig = OrmQueryProperties.DEFAULT_FETCH;
       }
@@ -57,8 +59,8 @@ class OrmQueryPropertiesParser {
   private boolean allProperties;
   private boolean readOnly;
   private boolean cache;
-  private int queryFetchBatch = -1;
-  private int lazyFetchBatch = -1;
+  private int queryFetchBatch;
+  private int lazyFetchBatch;
 
   private OrmQueryPropertiesParser(String inputProperties) {
     this.inputProperties = inputProperties;

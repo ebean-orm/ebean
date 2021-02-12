@@ -40,7 +40,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
     this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
-    this.currentBuffer = createBuffer(firstBatchSize);
+    this.currentBuffer = createBuffer(batchSize);
   }
 
   private LoadBuffer createBuffer(int size) {
@@ -58,11 +58,10 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
     if (bufferList != null) {
       bufferList.clear();
     }
-    currentBuffer = createBuffer(secondaryBatchSize);
+    currentBuffer = createBuffer(batchSize);
   }
 
   private void configureQuery(SpiQuery<?> query) {
-
     setLabel(query);
     parent.propagateQueryState(query, docStoreMapped);
     query.setParentNode(objectGraphNode);
@@ -85,9 +84,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
   }
 
   public void register(BeanCollection<?> bc) {
-
     if (currentBuffer.isFull()) {
-      currentBuffer = createBuffer(secondaryBatchSize);
+      currentBuffer = createBuffer(batchSize);
     }
     currentBuffer.add(bc);
     bc.setLoader(currentBuffer);
@@ -105,13 +103,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
           if (!loadBuffer.list.isEmpty()) {
             LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest);
             parent.getEbeanServer().loadMany(req);
-            if (!queryProps.isQueryFetchAll()) {
-              // Stop - only fetch the first batch ... the rest will be lazy loaded
-              break;
-            }
           }
         }
-
         if (forEach) {
           clear();
         } else {

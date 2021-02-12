@@ -17,11 +17,11 @@ class ParseFetchConfig {
 
     if (path.startsWith("lazy")) {
       if (path.length() == 4) {
-        return new FetchConfig().lazy();
+        return FetchConfig.ofLazy();
       } else if (path.charAt(4) == '(') {
         path = path.substring(5);
         int batchSize = parseBatchSize(path);
-        return new FetchConfig().lazy(batchSize);
+        return FetchConfig.ofLazy(batchSize);
       } else {
         return null;
       }
@@ -29,11 +29,11 @@ class ParseFetchConfig {
 
     if (path.startsWith("query")) {
       if (path.length() == 5) {
-        return new FetchConfig().query();
+        return FetchConfig.ofQuery();
       } else if (path.charAt(5) == '(') {
         path = path.substring(6);
         int batchSize = parseBatchSize(path);
-        return new FetchConfig().query(batchSize);
+        return FetchConfig.ofQuery(batchSize);
       } else {
         return null;
       }

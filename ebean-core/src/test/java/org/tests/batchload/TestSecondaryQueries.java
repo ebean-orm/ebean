@@ -105,7 +105,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     Query<Customer> query = Ebean.find(Customer.class)
       .select("name")
-      .fetch("contacts", "+query")
+      .fetchQuery("contacts")
       .setId(custId);
 
     LoggedSqlCollector.start();

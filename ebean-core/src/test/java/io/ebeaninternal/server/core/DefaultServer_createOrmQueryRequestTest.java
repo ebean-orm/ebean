@@ -76,7 +76,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void when_extra_queryFetchToMany_then_same() {
 
     assertDifferent(detail(query().select("id,name").fetch("customer")),
-      detail(query().select("id,name").fetch("customer").fetch("details", new FetchConfig().query())));
+      detail(query().select("id,name").fetch("customer").fetch("details", FetchConfig.ofQuery())));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     // with the fetch of customer the foreign key must be added to the root query
     assertDifferent(detail(query().select("id,name")),
-      detail(query().select("id,name").fetch("customer", new FetchConfig().query())));
+      detail(query().select("id,name").fetch("customer", FetchConfig.ofQuery())));
   }
 
   @Test
@@ -173,7 +173,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .fetch("details", new FetchConfig().lazy());
+      .fetch("details", FetchConfig.ofLazy());
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();

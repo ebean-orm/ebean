@@ -11,11 +11,11 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
  */
 class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
-  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
+  private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
 
-  private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
+  private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
 
-  private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
+  private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private final OrmQueryDetail detail;
 
