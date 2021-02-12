@@ -38,20 +38,6 @@
       <version>12.6.8-SNAPSHOT</version>
     </dependency>
 
-    <!-- In future ebean-ddl-generator would only be dependency of ebean-test -->
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.8-SNAPSHOT</version>
-    </dependency>
-
-    <!-- In future this is optional and not included by default -->
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-autotune</artifactId>
-      <version>12.6.8-SNAPSHOT</version>
-    </dependency>
-
   </dependencies>
 
   <build>
