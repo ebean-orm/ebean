@@ -33,15 +33,12 @@ public class OrmQueryProperties implements Serializable {
   private final String properties;
   private final Set<String> included;
   private final FetchConfig fetchConfig;
+  private final boolean cache;
 
   /**
    * Flag set when this fetch path needs to be a query join.
    */
   private boolean markForQueryJoin;
-
-  private boolean cache;
-
-  private boolean readOnly;
 
   /**
    * Included bean joins.
@@ -82,6 +79,7 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     this.properties = null;
     this.included = null;
+    this.cache = false;
     this.fetchConfig = DEFAULT_FETCH;
   }
 
@@ -96,26 +94,16 @@ public class OrmQueryProperties implements Serializable {
     OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.properties = response.properties;
     this.included = response.included;
-    this.cache = response.cache;
-    this.readOnly = response.readOnly;
-    if (fetchConfig != null) {
-      this.fetchConfig = fetchConfig;
-      if (fetchConfig.isCache()) {
-        this.cache = true;
-      }
-    } else {
-      this.fetchConfig = response.fetchConfig;
-    }
+    this.fetchConfig = fetchConfig != null ? fetchConfig : DEFAULT_FETCH;
+    this.cache = fetchConfig.isCache();
   }
 
   public OrmQueryProperties(String path, Set<String> included) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    // for rawSql parsedProperties can be empty (when only fetching Id property)
     this.included = included;
     this.properties = String.join(",", included);
     this.cache = false;
-    this.readOnly = false;
     this.fetchConfig = DEFAULT_FETCH;
   }
 
@@ -128,7 +116,6 @@ public class OrmQueryProperties implements Serializable {
     this.path = source.path;
     this.properties = source.properties;
     this.cache = source.cache;
-    this.readOnly = source.readOnly;
     this.filterMany = source.filterMany;
     this.markForQueryJoin = source.markForQueryJoin;
     this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
@@ -151,6 +138,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Move a OrderBy.Property from the main query to this query join.
    */
+  @SuppressWarnings("rawtypes")
   void addSecJoinOrderProperty(OrderBy.Property orderProp) {
     if (orderBy == null) {
       orderBy = new OrderBy();
@@ -166,7 +154,7 @@ public class OrmQueryProperties implements Serializable {
    * Return the expressions used to filter on this path. This should be a many path to use this
    * method.
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({"rawtypes","unchecked"})
   public <T> SpiExpressionList<T> filterMany(Query<T> rootQuery) {
     if (filterMany == null) {
       FilterExprPath exprPath = new FilterExprPath(path);
@@ -371,14 +359,7 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Return true if this path has the +readonly option.
-   */
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  /**
-   * Return true if this path has the +cache option to hit the cache.
+   * Return true if this path should hit the L2 cache.
    */
   public boolean isCache() {
     return cache;
