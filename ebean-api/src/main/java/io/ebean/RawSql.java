@@ -107,7 +107,7 @@ package io.ebean;
  *
  *   List<OrderAggregate> orders = DB.find(OrderAggregate.class)
  *     .setRawSql(rawSql)
- *     .fetch("order", "status,orderDate", new FetchConfig().query())
+ *     .fetch("order", "status,orderDate", FetchConfig.ofQuery())
  *     .fetch("order.customer", "name")
  *     .where().gt("order.id", 0)
  *     .having().gt("totalAmount", 20)

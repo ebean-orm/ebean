@@ -514,7 +514,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, fetchProperties, new FetchConfig().query())
+   *  fetch(path, fetchProperties, FetchConfig.ofQuery())
    *
    * }</pre>
    * <p>
@@ -548,7 +548,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, fetchProperties, new FetchConfig().lazy())
+   *  fetch(path, fetchProperties, FetchConfig.ofLazy())
    *
    * }</pre>
    * <p>
@@ -573,7 +573,7 @@ public interface Query<T> {
    * // fetch customers (their id, name and status)
    * List<Customer> customers = DB.find(Customer.class)
    *     .select("name, status")
-   *     .fetch("contacts", "firstName,lastName,email", new FetchConfig().lazy(10))
+   *     .fetch("contacts", "firstName,lastName,email", FetchConfig.ofLazy(10))
    *     .findList();
    *
    * }</pre>
@@ -610,7 +610,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, new FetchConfig().query())
+   *  fetch(path, FetchConfig.ofQuery())
    *
    * }</pre>
    * <p>
@@ -639,7 +639,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, new FetchConfig().lazy())
+   *  fetch(path, FetchConfig.ofLazy())
    *
    * }</pre>
    * <p>
@@ -662,7 +662,7 @@ public interface Query<T> {
    * // fetch customers (their id, name and status)
    * List<Customer> customers = DB.find(Customer.class)
    *     // lazy fetch contacts with a batch size of 100
-   *     .fetch("contacts", new FetchConfig().lazy(100))
+   *     .fetch("contacts", FetchConfig.ofLazy(100))
    *     .findList();
    *
    * }</pre>
@@ -844,7 +844,7 @@ public interface Query<T> {
    * <pre>{@code
    *
    *  DB.find(Customer.class)
-   *     .fetch("contacts", new FetchConfig().query(2))
+   *     .fetch("contacts", FetchConfig.ofQuery(2))
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
    *     .setMaxRows(2000)
