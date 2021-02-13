@@ -197,13 +197,6 @@ public interface ExpressionList<T> {
   Query<T> forUpdate();
 
   /**
-   * Deprecated - migrate to withLock().
-   * Execute using "for update" with given lock type (currently Postgres only).
-   */
-  @Deprecated
-  Query<T> forUpdate(Query.LockType lockType);
-
-  /**
    * Execute using "for update" clause with No Wait option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
@@ -212,26 +205,12 @@ public interface ExpressionList<T> {
   Query<T> forUpdateNoWait();
 
   /**
-   * Deprecated - migrate to withLock().
-   * Execute using "for update nowait" with given lock type (currently Postgres only).
-   */
-  @Deprecated
-  Query<T> forUpdateNoWait(Query.LockType lockType);
-
-  /**
    * Execute using "for update" clause with Skip Locked option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
    * </p>
    */
   Query<T> forUpdateSkipLocked();
-
-  /**
-   * Deprecated - migrate to withLock().
-   * Execute using "for update skip locked" with given lock type (currently Postgres only).
-   */
-  @Deprecated
-  Query<T> forUpdateSkipLocked(Query.LockType lockType);
 
   /**
    * Execute the query including soft deleted rows.

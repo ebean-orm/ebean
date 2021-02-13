@@ -570,21 +570,6 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   }
 
   @Override
-  public Query<T> forUpdate(LockType lockType) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> forUpdateNoWait(LockType lockType) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> forUpdateSkipLocked(LockType lockType) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
   public boolean isForUpdate() {
     return false;
   }

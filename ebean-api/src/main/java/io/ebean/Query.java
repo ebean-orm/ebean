@@ -1674,12 +1674,6 @@ public interface Query<T> {
   Query<T> forUpdate();
 
   /**
-   * Execute using "for update" with given lock type (currently Postgres only).
-   */
-  @Deprecated
-  Query<T> forUpdate(LockType lockType);
-
-  /**
    * Execute using "for update" clause with "no wait" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
@@ -1689,12 +1683,6 @@ public interface Query<T> {
   Query<T> forUpdateNoWait();
 
   /**
-   * Execute using "for update nowait" with given lock type (currently Postgres only).
-   */
-  @Deprecated
-  Query<T> forUpdateNoWait(LockType lockType);
-
-  /**
    * Execute using "for update" clause with "skip locked" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
@@ -1702,12 +1690,6 @@ public interface Query<T> {
    * The same as <code>withLock(LockType.UPDATE, LockWait.SKIPLOCKED)</code>.
    */
   Query<T> forUpdateSkipLocked();
-
-  /**
-   * Execute using "for update skip locked" with given lock type (currently Postgres only).
-   */
-  @Deprecated
-  Query<T> forUpdateSkipLocked(LockType lockType);
 
   /**
    * Return true if this query has forUpdate set.
