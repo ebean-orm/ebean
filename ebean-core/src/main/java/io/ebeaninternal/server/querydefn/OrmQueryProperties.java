@@ -26,7 +26,7 @@ public class OrmQueryProperties implements Serializable {
 
   private static final long serialVersionUID = -8785582703966455658L;
 
-  static final FetchConfig DEFAULT_FETCH = new FetchConfig();
+  static final FetchConfig DEFAULT_FETCH = FetchConfig.ofDefault();
 
   private final String parentPath;
   private final String path;

@@ -45,8 +45,11 @@ public class FetchConfig implements Serializable {
   private int hashCode;
 
   /**
+   * Deprecated - migrate to one of the static factory methods like {@link FetchConfig#ofQuery()}
+   *
    * Construct using default JOIN mode.
    */
+  @Deprecated
   public FetchConfig() {
     //this.mode = JOIN_MODE;
     this.batchSize = 100;
@@ -60,7 +63,7 @@ public class FetchConfig implements Serializable {
   }
 
   /**
-   * Return FetchConfig that will eagerly fetch the relationship using L2 cache.
+   * Return FetchConfig to eagerly fetch the relationship using L2 cache.
    * <p>
    * Any cache misses will be loaded by secondary query to the database.
    */
@@ -69,31 +72,38 @@ public class FetchConfig implements Serializable {
   }
 
   /**
-   * Return FetchConfig that use a eager secondary query to fetch the relationship.
+   * Return FetchConfig to eagerly fetch the relationship using a secondary query.
    */
   public static FetchConfig ofQuery() {
     return new FetchConfig(QUERY_MODE, 100);
   }
 
   /**
-   * Return FetchConfig that use a eager secondary query to fetch the relationship specifying the batch size.
+   * Return FetchConfig to eagerly fetch the relationship using a secondary with a given batch size.
    */
   public static FetchConfig ofQuery(int batchSize) {
     return new FetchConfig(QUERY_MODE, batchSize);
   }
 
   /**
-   * Return FetchConfig that use lazy loading to fetch the relationship.
+   * Return FetchConfig to lazily load the relationship.
    */
   public static FetchConfig ofLazy() {
     return new FetchConfig(LAZY_MODE, 10);
   }
 
   /**
-   * Return FetchConfig that use lazy loading to fetch the relationship specifying the batch size.
+   * Return FetchConfig to lazily load the relationship specifying the batch size.
    */
   public static FetchConfig ofLazy(int batchSize) {
     return new FetchConfig(LAZY_MODE, batchSize);
+  }
+
+  /**
+   * Return FetchConfig to fetch the relationship using SQL join.
+   */
+  public static FetchConfig ofDefault() {
+    return new FetchConfig(JOIN_MODE, 100);
   }
 
   /**
@@ -110,41 +120,37 @@ public class FetchConfig implements Serializable {
   }
 
   /**
-   * Specify that this path should be lazy loaded using the default batch load size.
+   * Deprecated - migrate to FetchConfig.ofLazy().
    */
+  @Deprecated
   public FetchConfig lazy() {
     return mutate(LAZY_MODE, 10);
   }
 
   /**
-   * Specify that this path should be lazy loaded with a specified batch size.
-   *
-   * @param batchSize the batch size for lazy loading
+   * Deprecated - migrate to FetchConfig.ofLazy(batchSize).
    */
+  @Deprecated
   public FetchConfig lazy(int batchSize) {
     return mutate(LAZY_MODE, batchSize);
   }
 
   /**
-   * Eagerly fetccd h the beans in this path as a separate query (rather than as
+   * Deprecated - migrate to FetchConfig.ofQuery().
+   *
+   * Eagerly fetch the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
    * This will use the default batch size for separate query which is 100.
-   * </p>
    */
+  @Deprecated
   public FetchConfig query() {
     return mutate(QUERY_MODE, 100);
   }
 
   /**
-   * Eagerly fetch the beans fetching the beans from the L2 bean cache
-   * and using the DB for beans not in the cache.
-   */
-  public FetchConfig cache() {
-    return mutate(CACHE_MODE, 100);
-  }
-
-  /**
+   * Deprecated - migrate to FetchConfig.ofQuery(batchSize).
+   *
    * Eagerly fetch the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
@@ -158,11 +164,14 @@ public class FetchConfig implements Serializable {
    *
    * @param batchSize the batch size used to load beans on this path
    */
+  @Deprecated
   public FetchConfig query(int batchSize) {
     return mutate(QUERY_MODE, batchSize);
   }
 
   /**
+   * Deprecated - migrate to FetchConfig.ofQuery(batchSize).
+   *
    * Eagerly fetch the first batch of beans on this path.
    * This is similar to {@link #query(int)} but only fetches the first batch.
    * <p>
@@ -175,6 +184,17 @@ public class FetchConfig implements Serializable {
   @Deprecated
   public FetchConfig queryFirst(int batchSize) {
     return query(batchSize);
+  }
+
+  /**
+   * Deprecated - migrate to FetchConfig.ofCache().
+   *
+   * Eagerly fetch the beans fetching the beans from the L2 bean cache
+   * and using the DB for beans not in the cache.
+   */
+  @Deprecated
+  public FetchConfig cache() {
+    return mutate(CACHE_MODE, 100);
   }
 
   /**
