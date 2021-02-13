@@ -41,8 +41,6 @@ public class OrmQueryProperties implements Serializable {
 
   private boolean cache;
 
-  private boolean readOnly;
-
   /**
    * Included bean joins.
    */
@@ -111,7 +109,6 @@ public class OrmQueryProperties implements Serializable {
     this.included = included;
     this.properties = String.join(",", included);
     this.cache = false;
-    this.readOnly = false;
     this.fetchConfig = DEFAULT_FETCH;
   }
 
@@ -124,7 +121,6 @@ public class OrmQueryProperties implements Serializable {
     this.path = source.path;
     this.properties = source.properties;
     this.cache = source.cache;
-    this.readOnly = source.readOnly;
     this.filterMany = source.filterMany;
     this.markForQueryJoin = source.markForQueryJoin;
     this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
@@ -365,13 +361,6 @@ public class OrmQueryProperties implements Serializable {
 
   public int getBatchSize() {
     return fetchConfig.getBatchSize();
-  }
-
-  /**
-   * Return true if this path has the +readonly option.
-   */
-  public boolean isReadOnly() {
-    return readOnly;
   }
 
   /**
