@@ -96,15 +96,11 @@ public class OrmQueryProperties implements Serializable {
     OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.properties = response.properties;
     this.included = response.included;
-    this.cache = response.cache;
-    this.readOnly = response.readOnly;
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
-      if (fetchConfig.isCache()) {
-        this.cache = true;
-      }
+      this.cache = fetchConfig.isCache();
     } else {
-      this.fetchConfig = response.fetchConfig;
+      this.fetchConfig = DEFAULT_FETCH;
     }
   }
 
@@ -151,6 +147,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Move a OrderBy.Property from the main query to this query join.
    */
+  @SuppressWarnings("rawtypes")
   void addSecJoinOrderProperty(OrderBy.Property orderProp) {
     if (orderBy == null) {
       orderBy = new OrderBy();
@@ -166,7 +163,7 @@ public class OrmQueryProperties implements Serializable {
    * Return the expressions used to filter on this path. This should be a many path to use this
    * method.
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({"rawtypes","unchecked"})
   public <T> SpiExpressionList<T> filterMany(Query<T> rootQuery) {
     if (filterMany == null) {
       FilterExprPath exprPath = new FilterExprPath(path);

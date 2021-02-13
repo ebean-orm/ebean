@@ -21,7 +21,7 @@ public class TestLazyJoin extends BaseTestCase {
 
     Query<Order> query = Ebean.find(Order.class)
       .select("status")
-      .fetch("customer", "+lazy(10) name, status")
+      .fetchLazy("customer", "name, status")
       .fetch("customer.contacts")
       .order().asc("id");
 

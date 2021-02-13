@@ -624,7 +624,7 @@ public class EqlParserTest extends BaseTestCase {
   public void fetch_query50_asHint() {
 
     ResetBasicData.reset();
-    Query<Customer> query = parse("fetch billingAddress (+query(50),city)");
+    Query<Customer> query = parse("fetch query(50) billingAddress (city)");
     query.findList();
 
     assertSql(query).doesNotContain(", t1.city");
@@ -634,7 +634,7 @@ public class EqlParserTest extends BaseTestCase {
   public void fetch_lazy50_asHint() {
 
     ResetBasicData.reset();
-    Query<Customer> query = parse("fetch billingAddress (+lazy(50),city) order by id");
+    Query<Customer> query = parse("fetch lazy(50) billingAddress (city) order by id");
     List<Customer> list = query.findList();
 
     assertSql(query).doesNotContain(", t1.city");
