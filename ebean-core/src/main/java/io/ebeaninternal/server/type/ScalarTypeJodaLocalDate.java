@@ -37,9 +37,10 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
     return LocalDate.fromDateFields(date);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Date convertToDate(LocalDate value) {
-    return new java.sql.Date(convertToMillis(value));
+    return new Date(value .getYear() - 1900, value .getMonthOfYear() - 1, value .getDayOfMonth());
   }
 
   @Override
@@ -53,7 +54,7 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
   @Override
   public LocalDate toBeanType(Object value) {
     if (value instanceof java.util.Date) {
-      return convertFromMillis(((java.util.Date) value).getTime());
+      return LocalDate.fromDateFields((java.util.Date)value);
     }
     return (LocalDate) value;
   }
