@@ -6,16 +6,6 @@
     <groupId>io.ebean</groupId>
     <version>12.7.1-SNAPSHOT</version>
   </parent>
-<!--  <parent>-->
-<!--    <groupId>org.avaje</groupId>-->
-<!--    <artifactId>java8-oss</artifactId>-->
-<!--    <version>2.3</version>-->
-<!--  </parent>-->
-
-  <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.6.5</tag>
-  </scm>
 
   <name>ebean querybean</name>
   <description>Ebean querybean support</description>
