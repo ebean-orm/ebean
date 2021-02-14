@@ -133,8 +133,15 @@ public class OrmQueryDetail implements Serializable {
   /**
    * set the properties to include on the base / root entity.
    */
-  public void select(String columns) {
-    baseProps = new OrmQueryProperties(null, columns, null);
+  public void select(String properties) {
+    baseProps = new OrmQueryProperties(null, properties, null);
+  }
+
+  /**
+   * Set select properties that are already parsed.
+   */
+  public void selectProperties(Set<String> properties) {
+    baseProps = new OrmQueryProperties(null, properties, OrmQueryProperties.DEFAULT_FETCH);
   }
 
   void selectProperties(OrmQueryProperties other) {
@@ -267,6 +274,13 @@ public class OrmQueryDetail implements Serializable {
    */
   public void fetch(String path, String partialProps, FetchConfig fetchConfig) {
     fetch(new OrmQueryProperties(path, partialProps, fetchConfig));
+  }
+
+  /**
+   * Set fetch properties that are already parsed.
+   */
+  public void fetchProperties(String path, Set<String> properties, FetchConfig fetchConfig) {
+    fetch(new OrmQueryProperties(path, properties, fetchConfig));
   }
 
   void fetchProperties(String path, OrmQueryProperties other) {

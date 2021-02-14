@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * Parses the path properties string.
  */
-class OrmQueryPropertiesParser {
+final class OrmQueryPropertiesParser {
 
   private static final Response EMPTY = new Response(false, null);
   private static final Response ALL = new Response(true, null);
@@ -30,33 +30,20 @@ class OrmQueryPropertiesParser {
    * Parses the path properties string returning the parsed properties and options.
    * In general it is comma delimited with some special strings like +lazy(20).
    */
-  public static Response parse(String rawProperties) {
-    return new OrmQueryPropertiesParser(rawProperties).parse();
-  }
-
-  private final String inputProperties;
-
-  private OrmQueryPropertiesParser(String inputProperties) {
-    this.inputProperties = inputProperties;
-  }
-
-  /**
-   * Parse the raw string properties input.
-   */
-  private Response parse() {
-    if (inputProperties == null || inputProperties.isEmpty()) {
+  static Response parse(String rawProperties) {
+    if (rawProperties == null || rawProperties.isEmpty()) {
       return EMPTY;
     }
-    if (inputProperties.equals("*")) {
+    if (rawProperties.equals("*")) {
       return ALL;
     }
-    return new Response(false, splitRawSelect(inputProperties));
+    return new Response(false, splitRawSelect(rawProperties));
   }
 
   /**
    * Split allowing 'dynamic function based properties'.
    */
-  private Set<String> splitRawSelect(String inputProperties) {
+  private static Set<String> splitRawSelect(String inputProperties) {
     return DSelectColumnsParser.parse(inputProperties);
   }
 

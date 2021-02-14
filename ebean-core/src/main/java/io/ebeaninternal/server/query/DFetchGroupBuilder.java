@@ -33,7 +33,7 @@ class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
   @Override
   public FetchGroupBuilder<T> fetch(String path) {
-    detail.fetch(path, null, DEFAULT_FETCH);
+    detail.fetchProperties(path, null, DEFAULT_FETCH);
     return this;
   }
 
@@ -53,7 +53,6 @@ class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
   }
 
   private FetchGroupBuilder<T> fetchNested(String path, FetchGroup nestedGroup, FetchConfig fetchConfig) {
-
     OrmQueryDetail nestedDetail = ((SpiFetchGroup) nestedGroup).underlying();
     detail.addNested(path, nestedDetail, fetchConfig);
     return this;
@@ -61,19 +60,19 @@ class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
   @Override
   public FetchGroupBuilder<T> fetchQuery(String path) {
-    detail.fetch(path, null, FETCH_QUERY);
+    detail.fetchProperties(path, null, FETCH_QUERY);
     return this;
   }
 
   @Override
   public FetchGroupBuilder<T> fetchCache(String path) {
-    detail.fetch(path, null, FETCH_CACHE);
+    detail.fetchProperties(path, null, FETCH_CACHE);
     return this;
   }
 
   @Override
   public FetchGroupBuilder<T> fetchLazy(String path) {
-    detail.fetch(path, null, FETCH_LAZY);
+    detail.fetchProperties(path, null, FETCH_LAZY);
     return this;
   }
 

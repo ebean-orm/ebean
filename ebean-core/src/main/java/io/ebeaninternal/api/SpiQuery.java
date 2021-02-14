@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Object Relational query - Internal extension to Query object.
  */
-public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
+public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCodes {
 
   enum Mode {
     NORMAL(false), LAZYLOAD_MANY(false), LAZYLOAD_BEAN(true), REFRESH_BEAN(true);

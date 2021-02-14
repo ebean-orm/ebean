@@ -103,12 +103,16 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public OrmQueryProperties(String path, Set<String> included) {
+    this(path, included, DEFAULT_FETCH);
+  }
+
+  OrmQueryProperties(String path, Set<String> included, FetchConfig fetchConfig) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
     this.included = included;
-    this.cache = false;
-    this.fetchConfig = DEFAULT_FETCH;
     this.allProperties = false;
+    this.fetchConfig = fetchConfig;
+    this.cache = fetchConfig.isCache();
   }
 
   OrmQueryProperties(String path, OrmQueryProperties other, FetchConfig fetchConfig) {

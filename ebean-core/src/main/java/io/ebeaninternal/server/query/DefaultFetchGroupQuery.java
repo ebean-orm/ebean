@@ -25,6 +25,7 @@ import io.ebean.Transaction;
 import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.service.SpiFetchGroupQuery;
+import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
@@ -43,7 +44,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
-class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
+class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
 
@@ -627,5 +628,15 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   @Override
   public Query<T> orderById(boolean orderById) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public void selectProperties(Set<String> props) {
+    detail.selectProperties(props);
+  }
+
+  @Override
+  public void fetchProperties(String property, Set<String> columns, FetchConfig config) {
+    detail.fetchProperties(property, columns, config);
   }
 }

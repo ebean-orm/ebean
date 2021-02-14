@@ -25,6 +25,7 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebean.text.PathProperties;
+import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
 import javax.annotation.Nonnull;
@@ -32,6 +33,7 @@ import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -278,22 +280,21 @@ public abstract class TQRootBean<T, R> {
    */
   @SafeVarargs
   public final R select(TQProperty<R>... properties) {
-    StringBuilder selectProps = new StringBuilder(50);
-    for (int i = 0; i < properties.length; i++) {
-      if (i > 0) {
-        selectProps.append(",");
-      }
-      selectProps.append(properties[i].propertyName());
-    }
-    query.select(selectProps.toString());
+    ((SpiQueryFetch)query).selectProperties(properties(properties));
     return root;
+  }
+
+  private Set<String> properties(TQProperty<R>[] properties) {
+    Set<String> props = new LinkedHashSet<>();
+    for (TQProperty<R> property : properties) {
+      props.add(property.propertyName());
+    }
+    return props;
   }
 
   /**
    * Specify a path to load including all its properties.
-   * <p>
-   * The same as {@link #fetch(String, String)} with the fetchProperties as "*".
-   * </p>
+   *
    * <pre>{@code
    *
    * List<Customer> customers =
