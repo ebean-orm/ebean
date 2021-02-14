@@ -59,9 +59,9 @@ public class OrmQueryDetail implements Serializable {
    * Add a nested OrmQueryDetail to this detail.
    */
   public void addNested(String path, OrmQueryDetail other, FetchConfig config) {
-    fetch(path, other.baseProps.getProperties(), config);
+    fetchProperties(path, other.baseProps, config);
     for (Map.Entry<String, OrmQueryProperties> entry : other.fetchPaths.entrySet()) {
-      fetch(path + "." + entry.getKey(), entry.getValue().getProperties(), entry.getValue().getFetchConfig());
+      fetchProperties(path + "." + entry.getKey(), entry.getValue(), entry.getValue().getFetchConfig());
     }
   }
 
@@ -135,6 +135,10 @@ public class OrmQueryDetail implements Serializable {
    */
   public void select(String columns) {
     baseProps = new OrmQueryProperties(null, columns, null);
+  }
+
+  void selectProperties(OrmQueryProperties other) {
+    baseProps = new OrmQueryProperties(null, other, OrmQueryProperties.DEFAULT_FETCH);
   }
 
   boolean containsProperty(String property) {
@@ -262,8 +266,15 @@ public class OrmQueryDetail implements Serializable {
    * @param partialProps the properties on the join property to include
    */
   public void fetch(String path, String partialProps, FetchConfig fetchConfig) {
-
     fetch(new OrmQueryProperties(path, partialProps, fetchConfig));
+  }
+
+  void fetchProperties(String path, OrmQueryProperties other) {
+    fetchProperties(path, other, other.getFetchConfig());
+  }
+
+  void fetchProperties(String path, OrmQueryProperties other, FetchConfig fetchConfig) {
+    fetch(new OrmQueryProperties(path, other, fetchConfig));
   }
 
   /**

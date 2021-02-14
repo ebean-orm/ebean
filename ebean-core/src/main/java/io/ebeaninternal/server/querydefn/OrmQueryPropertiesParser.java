@@ -9,24 +9,20 @@ import java.util.Set;
  */
 class OrmQueryPropertiesParser {
 
-  private static final Response EMPTY = new Response();
+  private static final Response EMPTY = new Response(false, null);
+  private static final Response ALL = new Response(true, null);
 
   /**
    * Immutable response of the parsed properties and options.
    */
   static class Response {
 
-    final String properties;
+    final boolean allProperties;
     final Set<String> included;
 
-    private Response(String properties, Set<String> included) {
-      this.properties = properties;
+    private Response(boolean allProperties, Set<String> included) {
+      this.allProperties = allProperties;
       this.included = included;
-    }
-
-    private Response() {
-      this.properties = "";
-      this.included = null;
     }
   }
 
@@ -39,7 +35,6 @@ class OrmQueryPropertiesParser {
   }
 
   private final String inputProperties;
-  private boolean allProperties;
 
   private OrmQueryPropertiesParser(String inputProperties) {
     this.inputProperties = inputProperties;
@@ -53,20 +48,9 @@ class OrmQueryPropertiesParser {
       return EMPTY;
     }
     if (inputProperties.equals("*")) {
-      return new Response("*", null);
+      return ALL;
     }
-    Set<String> fields = splitRawSelect(inputProperties);
-    for (String val : fields) {
-      if (val.equals("*")) {
-        allProperties = true;
-        break;
-      }
-    }
-    String properties = allProperties ? "*" : inputProperties;
-    if (fields.isEmpty()) {
-      fields = null;
-    }
-    return new Response(properties, fields);
+    return new Response(false, splitRawSelect(inputProperties));
   }
 
   /**

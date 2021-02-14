@@ -20,6 +20,7 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
@@ -288,6 +289,16 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * invoking a lazy load was included in the query.
    */
   boolean selectAllForLazyLoadProperty();
+
+  /**
+   * Set the select properties.
+   */
+  void selectProperties(OrmQueryProperties other);
+
+  /**
+   * Set the fetch properties for the given path.
+   */
+  void fetchProperties(String path, OrmQueryProperties other);
 
   /**
    * Set the on a secondary query given the label, relativePath and profile location of the parent query.
