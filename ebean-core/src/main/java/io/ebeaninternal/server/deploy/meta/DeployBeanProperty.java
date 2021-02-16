@@ -1140,10 +1140,19 @@ public class DeployBeanProperty {
     return result;
   }
 
-  public List<Size> getMetaAnnotationSize() {
+  public List<Size> getMetaAnnotationJavaxSize() {
     final List<Size> size = getMetaAnnotations(Size.class);
     final List<Size.List> lists = getMetaAnnotations(Size.List.class);
     for (Size.List list : lists) {
+      Collections.addAll(size, list.value());
+    }
+    return size;
+  }
+
+  public List<jakarta.validation.constraints.Size> getMetaAnnotationJakartaSize() {
+    final List<jakarta.validation.constraints.Size> size = getMetaAnnotations(jakarta.validation.constraints.Size.class);
+    final List<jakarta.validation.constraints.Size.List> lists = getMetaAnnotations(jakarta.validation.constraints.Size.List.class);
+    for (jakarta.validation.constraints.Size.List list : lists) {
       Collections.addAll(size, list.value());
     }
     return size;

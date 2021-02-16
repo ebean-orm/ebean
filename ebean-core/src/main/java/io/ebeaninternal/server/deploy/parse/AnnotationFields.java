@@ -258,19 +258,38 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void initValidation(DeployBeanProperty prop) {
-    NotNull notNull = get(prop, NotNull.class);
-    if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-      // Not null on all validation groups so enable
-      // DDL generation of Not Null Constraint
-      prop.setNullable(false);
+    if (javaxValidationAnnotations) {
+      NotNull notNull = get(prop, NotNull.class);
+      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
+        // Not null on all validation groups so enable
+        // DDL generation of Not Null Constraint
+        prop.setNullable(false);
+      }
+    }
+    if (jakartaValidationAnnotations) {
+      jakarta.validation.constraints.NotNull notNull = get(prop, jakarta.validation.constraints.NotNull.class);
+      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
+        // Not null on all validation groups so enable
+        // DDL generation of Not Null Constraint
+        prop.setNullable(false);
+      }
     }
 
     if (!prop.isLob()) {
       // take the max size of all @Size annotations
       int maxSize = -1;
-      for (Size size : prop.getMetaAnnotationSize()) {
-        if (size.max() < Integer.MAX_VALUE) {
-          maxSize = Math.max(maxSize, size.max());
+      if (javaxValidationAnnotations) {
+        for (Size size : prop.getMetaAnnotationJavaxSize()) {
+          if (size.max() < Integer.MAX_VALUE) {
+            maxSize = Math.max(maxSize, size.max());
+          }
+        }
+      }
+      if (jakartaValidationAnnotations) {
+        for (jakarta.validation.constraints.Size size : prop.getMetaAnnotationJakartaSize()) {
+          if (size.max() < Integer.MAX_VALUE) {
+            maxSize = Math.max(maxSize, size.max());
+          }
         }
       }
       if (maxSize != -1) {
@@ -280,7 +299,7 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void initTenantId(DeployBeanProperty prop) {
-    if (validationAnnotations) {
+    if (javaxValidationAnnotations || jakartaValidationAnnotations) {
       initValidation(prop);
     }
     if (has(prop, TenantId.class)) {

@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
-class InitMetaValidationAnnotation {
+class InitMetaJakartaValidationAnnotation {
 
   static void init(ReadAnnotationConfig readConfig) {
     readConfig.addMetaAnnotation(Size.class);

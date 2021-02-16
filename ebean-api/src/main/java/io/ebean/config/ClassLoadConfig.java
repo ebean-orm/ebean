@@ -41,6 +41,13 @@ public class ClassLoadConfig {
   }
 
   /**
+   * Return true if jakarta validation annotations like Size and NotNull are present.
+   */
+  public boolean isJakartaValidationAnnotationsPresent() {
+    return isPresent("jakarta.validation.constraints.NotNull");
+  }
+
+  /**
    * Return true if javax PostConstruct annotation is present (maybe not in java9).
    * If not we don't support PostConstruct lifecycle events.
    */

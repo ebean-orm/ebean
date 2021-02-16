@@ -26,14 +26,17 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   final Class<?> beanType;
 
-  final boolean validationAnnotations;
+  final boolean javaxValidationAnnotations;
+
+  final boolean jakartaValidationAnnotations;
 
   final ReadAnnotationConfig readConfig;
 
   AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info.getUtil());
     this.readConfig = readConfig;
-    this.validationAnnotations = readConfig.isJavaxValidationAnnotations();
+    this.javaxValidationAnnotations = readConfig.isJavaxValidationAnnotations();
+    this.jakartaValidationAnnotations = readConfig.isJakartaValidationAnnotations();
     this.info = info;
     this.beanType = info.getDescriptor().getBeanType();
     this.descriptor = info.getDescriptor();
@@ -132,7 +135,7 @@ public abstract class AnnotationParser extends AnnotationBase {
    * can be applied to DDL generation.
    */
   boolean isEbeanValidationGroups(Class<?>[] groups) {
-    if (!util.isUseJavaxValidationNotNull()) {
+    if (!util.isUseValidationNotNull()) {
       return false;
     }
     return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
