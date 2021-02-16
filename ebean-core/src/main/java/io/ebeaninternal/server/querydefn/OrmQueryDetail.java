@@ -111,7 +111,7 @@ public class OrmQueryDetail implements Serializable {
    */
   public String asStringDebug() {
     StringBuilder sb = new StringBuilder();
-    if (!baseProps.isEmpty()) {
+    if (baseProps.notEmpty()) {
       baseProps.asStringDebug("select ", sb);
     }
     if (fetchPaths != null) {

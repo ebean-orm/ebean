@@ -11,12 +11,9 @@ import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//import org.tests.model.basic.ResetBasicData;
-
 public class ProfileOriginTest extends BaseTestCase {
 
-
-  private BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
+  private final BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
 
   @Test
   public void buildDetail() {
