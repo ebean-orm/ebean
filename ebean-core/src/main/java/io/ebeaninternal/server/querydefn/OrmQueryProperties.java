@@ -214,7 +214,7 @@ public class OrmQueryProperties implements Serializable {
    */
   @SuppressWarnings("unchecked")
   public void configureBeanQuery(SpiQuery<?> query) {
-    if (notEmpty()) {
+    if (hasProperties()) {
       query.selectProperties(this);
     }
 
@@ -242,17 +242,13 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public boolean hasSelectClause() {
-    if (allProperties) {
-      return true;
-    }
-    // explicitly selected some properties
-    return included != null || filterMany != null;
+    return allProperties || included != null || filterMany != null;
   }
 
   /**
-   * Return true if the properties and configuration are empty.
+   * Return true if explicit properties have been specified.
    */
-  boolean notEmpty() {
+  boolean hasProperties() {
     return allProperties || included != null;
   }
 
