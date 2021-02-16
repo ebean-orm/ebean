@@ -1393,6 +1393,26 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void selectProperties(Set<String> props) {
+    detail.selectProperties(props);
+  }
+
+  @Override
+  public void fetchProperties(String property, Set<String> columns, FetchConfig config) {
+    detail.fetchProperties(property, columns, config);
+  }
+
+  @Override
+  public void selectProperties(OrmQueryProperties properties) {
+    detail.selectProperties(properties);
+  }
+
+  @Override
+  public void fetchProperties(String path, OrmQueryProperties other) {
+    detail.fetchProperties(path, other);
+  }
+
+  @Override
   public DefaultOrmQuery<T> select(String columns) {
     detail.select(columns);
     return this;
