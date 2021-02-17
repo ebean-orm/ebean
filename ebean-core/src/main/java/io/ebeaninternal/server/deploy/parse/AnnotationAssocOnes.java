@@ -4,13 +4,11 @@ import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
-import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
@@ -117,8 +115,16 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
     if (nonNull != null) {
       prop.setNullable(false);
     }
-    if (validationAnnotations) {
+    if (javaxValidationAnnotations) {
       NotNull notNull = get(prop, NotNull.class);
+      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
+        prop.setNullable(false);
+        // overrides optional attribute of ManyToOne etc
+        prop.getTableJoin().setType(SqlJoinType.INNER);
+      }
+    }
+    if (jakartaValidationAnnotations) {
+      jakarta.validation.constraints.NotNull notNull = get(prop, jakarta.validation.constraints.NotNull.class);
       if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
         prop.setNullable(false);
         // overrides optional attribute of ManyToOne etc

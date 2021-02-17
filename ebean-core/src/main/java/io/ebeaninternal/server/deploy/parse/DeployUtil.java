@@ -57,7 +57,7 @@ public class DeployUtil {
 
   private final Encryptor bytesEncryptor;
 
-  private final boolean useJavaxValidationNotNull;
+  private final boolean useValidationNotNull;
 
   public DeployUtil(TypeManager typeMgr, DatabaseConfig config) {
     this.typeManager = typeMgr;
@@ -67,7 +67,7 @@ public class DeployUtil {
     this.encryptKeyManager = config.getEncryptKeyManager();
     Encryptor be = config.getEncryptor();
     this.bytesEncryptor = be != null ? be : new SimpleAesEncryptor();
-    this.useJavaxValidationNotNull = config.isUseJavaxValidationNotNull();
+    this.useValidationNotNull = config.isUseValidationNotNull();
   }
 
   public TypeManager getTypeManager() {
@@ -286,8 +286,8 @@ public class DeployUtil {
     return type.equals(String.class);
   }
 
-  boolean isUseJavaxValidationNotNull() {
-    return useJavaxValidationNotNull;
+  boolean isUseValidationNotNull() {
+    return useValidationNotNull;
   }
 
   /**

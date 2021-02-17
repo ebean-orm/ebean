@@ -21,6 +21,7 @@ class ReadAnnotationConfig {
   private final boolean disableL2Cache;
   private final boolean eagerFetchLobs;
   private final boolean javaxValidationAnnotations;
+  private final boolean jakartaValidationAnnotations;
   private final boolean jacksonAnnotations;
   private final boolean idGeneratorAutomatic;
 
@@ -34,6 +35,7 @@ class ReadAnnotationConfig {
     this.eagerFetchLobs = config.isEagerFetchLobs();
     this.idGeneratorAutomatic = config.isIdGeneratorAutomatic();
     this.javaxValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJavaxValidationAnnotationsPresent();
+    this.jakartaValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJakartaValidationAnnotationsPresent();
     this.jacksonAnnotations = generatedPropFactory.getClassLoadConfig().isJacksonAnnotationsPresent();
     this.metaAnnotations.add(Column.class);
     this.metaAnnotations.add(Formula.class);
@@ -73,6 +75,10 @@ class ReadAnnotationConfig {
 
   boolean isJavaxValidationAnnotations() {
     return javaxValidationAnnotations;
+  }
+
+  boolean isJakartaValidationAnnotations() {
+    return jakartaValidationAnnotations;
   }
 
   boolean isJacksonAnnotations() {
