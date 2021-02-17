@@ -9,7 +9,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.validation.groups.Default;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -26,17 +25,11 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   final Class<?> beanType;
 
-  final boolean javaxValidationAnnotations;
-
-  final boolean jakartaValidationAnnotations;
-
   final ReadAnnotationConfig readConfig;
 
   AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info.getUtil());
     this.readConfig = readConfig;
-    this.javaxValidationAnnotations = readConfig.isJavaxValidationAnnotations();
-    this.jakartaValidationAnnotations = readConfig.isJakartaValidationAnnotations();
     this.info = info;
     this.beanType = info.getDescriptor().getBeanType();
     this.descriptor = info.getDescriptor();
@@ -128,17 +121,6 @@ public abstract class AnnotationParser extends AnnotationBase {
     if (!isEmpty(name)) {
       prop.setDbColumn(databasePlatform.convertQuotedIdentifiers(name));
     }
-  }
-
-  /**
-   * Return true if the validation groups are {@link Default} (respectively empty)
-   * can be applied to DDL generation.
-   */
-  boolean isEbeanValidationGroups(Class<?>[] groups) {
-    if (!util.isUseValidationNotNull()) {
-      return false;
-    }
-    return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
   }
 
   String[] convertColumnNames(String[] columnNames) {

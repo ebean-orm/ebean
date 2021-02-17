@@ -26,7 +26,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.validation.constraints.NotNull;
 
 /**
  * Read the deployment annotations for Associated One beans.
@@ -115,21 +114,10 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
     if (nonNull != null) {
       prop.setNullable(false);
     }
-    if (javaxValidationAnnotations) {
-      NotNull notNull = get(prop, NotNull.class);
-      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-        prop.setNullable(false);
-        // overrides optional attribute of ManyToOne etc
-        prop.getTableJoin().setType(SqlJoinType.INNER);
-      }
-    }
-    if (jakartaValidationAnnotations) {
-      jakarta.validation.constraints.NotNull notNull = get(prop, jakarta.validation.constraints.NotNull.class);
-      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-        prop.setNullable(false);
-        // overrides optional attribute of ManyToOne etc
-        prop.getTableJoin().setType(SqlJoinType.INNER);
-      }
+    if (readConfig.isValidationNotNull(prop)) {
+      // overrides optional attribute of ManyToOne etc
+      prop.setNullable(false);
+      prop.getTableJoin().setType(SqlJoinType.INNER);
     }
 
     // check for manually defined joins
