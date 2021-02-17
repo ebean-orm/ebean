@@ -69,8 +69,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
@@ -258,48 +256,19 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void initValidation(DeployBeanProperty prop) {
-    if (javaxValidationAnnotations) {
-      NotNull notNull = get(prop, NotNull.class);
-      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-        // Not null on all validation groups so enable
-        // DDL generation of Not Null Constraint
-        prop.setNullable(false);
-      }
+    if (readConfig.isValidationNotNull(prop)) {
+      prop.setNullable(false);
     }
-    if (jakartaValidationAnnotations) {
-      jakarta.validation.constraints.NotNull notNull = get(prop, jakarta.validation.constraints.NotNull.class);
-      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-        // Not null on all validation groups so enable
-        // DDL generation of Not Null Constraint
-        prop.setNullable(false);
-      }
-    }
-
     if (!prop.isLob()) {
-      // take the max size of all @Size annotations
-      int maxSize = -1;
-      if (javaxValidationAnnotations) {
-        for (Size size : prop.getMetaAnnotationJavaxSize()) {
-          if (size.max() < Integer.MAX_VALUE) {
-            maxSize = Math.max(maxSize, size.max());
-          }
-        }
-      }
-      if (jakartaValidationAnnotations) {
-        for (jakarta.validation.constraints.Size size : prop.getMetaAnnotationJakartaSize()) {
-          if (size.max() < Integer.MAX_VALUE) {
-            maxSize = Math.max(maxSize, size.max());
-          }
-        }
-      }
-      if (maxSize != -1) {
+      int maxSize = readConfig.maxValidationSize(prop);
+      if (maxSize > 0) {
         prop.setDbLength(maxSize);
       }
     }
   }
 
   private void initTenantId(DeployBeanProperty prop) {
-    if (javaxValidationAnnotations || jakartaValidationAnnotations) {
+    if (readConfig.checkValidationAnnotations()) {
       initValidation(prop);
     }
     if (has(prop, TenantId.class)) {

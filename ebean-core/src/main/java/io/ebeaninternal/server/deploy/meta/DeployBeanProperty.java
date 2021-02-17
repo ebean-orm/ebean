@@ -34,7 +34,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import javax.validation.constraints.Size;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -1138,24 +1137,6 @@ public class DeployBeanProperty {
       }
     }
     return result;
-  }
-
-  public List<Size> getMetaAnnotationJavaxSize() {
-    final List<Size> size = getMetaAnnotations(Size.class);
-    final List<Size.List> lists = getMetaAnnotations(Size.List.class);
-    for (Size.List list : lists) {
-      Collections.addAll(size, list.value());
-    }
-    return size;
-  }
-
-  public List<jakarta.validation.constraints.Size> getMetaAnnotationJakartaSize() {
-    final List<jakarta.validation.constraints.Size> size = getMetaAnnotations(jakarta.validation.constraints.Size.class);
-    final List<jakarta.validation.constraints.Size.List> lists = getMetaAnnotations(jakarta.validation.constraints.Size.List.class);
-    for (jakarta.validation.constraints.Size.List list : lists) {
-      Collections.addAll(size, list.value());
-    }
-    return size;
   }
 
   public Formula getMetaAnnotationFormula(Platform platform) {
