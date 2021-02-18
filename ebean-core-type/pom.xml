@@ -11,11 +11,6 @@
   <name>ebean core type</name>
   <description>ebean scalar types api</description>
 
-  <properties>
-    <jackson-core.version>2.11.3</jackson-core.version>
-    <jackson-databind.version>2.11.3</jackson-databind.version>
-  </properties>
-
   <dependencies>
 
     <dependency>
@@ -27,7 +22,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson-core.version}</version>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 

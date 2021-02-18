@@ -15,7 +15,6 @@
 
   <properties>
     <postgis.jdbc.version>2.2.1</postgis.jdbc.version>
-    <jackson-core.version>2.11.3</jackson-core.version>
   </properties>
 
   <dependencies>
@@ -31,7 +30,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson-core.version}</version>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 
