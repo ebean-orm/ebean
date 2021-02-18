@@ -1,0 +1,9 @@
+{
+  "some": "val",
+  "someNull": "actualNotNull",
+  "matchNull": null,
+  "nullObject": {
+    "id": 42
+  }
+
+}

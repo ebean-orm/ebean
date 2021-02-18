@@ -18,6 +18,8 @@ public class BSimpleWithGen {
 
   private String name;
 
+  private String other;
+
   @Transient
   private Map<String, List<String>> someMap;
 
@@ -29,6 +31,11 @@ public class BSimpleWithGen {
 
   public BSimpleWithGen(String name) {
     this.name = name;
+  }
+
+  public BSimpleWithGen(String name, String other) {
+    this.name = name;
+    this.other = other;
   }
 
   public Integer getId() {

@@ -12,6 +12,18 @@ import java.nio.charset.StandardCharsets;
 class IOUtils {
 
   /**
+   * Read the content for the given resource path.
+   */
+  static String readResource(String resourcePath) {
+    try {
+      InputStream is = IOUtils.class.getResourceAsStream(resourcePath);
+      return IOUtils.readUtf8(is).trim();
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Error reading resource " + resourcePath, e);
+    }
+  }
+
+  /**
    * Reads the entire contents of the specified input stream and return them as UTF-8 string.
    */
   static String readUtf8(InputStream in) throws IOException {

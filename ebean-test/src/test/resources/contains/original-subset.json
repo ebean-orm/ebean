@@ -1,0 +1,15 @@
+{
+  "someString1": "string1",
+  "someValue1": 1,
+  "someArray2": [
+    {
+      "value1": 11,
+      "array1": [],
+      "object2": {
+        "v1": "v1",
+        "v4": []
+      },
+      "objectNull": null
+    }
+  ]
+}

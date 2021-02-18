@@ -1,0 +1,26 @@
+{
+  "someString1": "aaaa",
+  "someString2": "string2",
+  "someValue1": 99,
+  "someValue2": 2,
+  "someArray1": [
+    "a"
+  ],
+  "someArray2": [
+    {
+      "value1": [],
+      "value2": {},
+      "array1": [
+        "1"
+      ],
+      "object1": {
+        "val5": "a",
+        "val6": 1
+      },
+      "object2": null,
+      "objectNull": {
+        "val": []
+      }
+    }
+  ]
+}

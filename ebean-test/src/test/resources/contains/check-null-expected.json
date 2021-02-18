@@ -1,0 +1,7 @@
+{
+  "some": "val",
+  "someNull": null,
+  "extra": "notThere",
+  "matchNull": null,
+  "nullObject": null
+}
