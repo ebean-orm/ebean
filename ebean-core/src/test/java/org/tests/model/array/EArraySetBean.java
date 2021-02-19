@@ -1,6 +1,7 @@
 package org.tests.model.array;
 
 
+import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbArray;
 
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Cache
 public class EArraySetBean {
 
   @Id
@@ -29,6 +31,9 @@ public class EArraySetBean {
 
   @DbArray
   Set<Double> doubs;
+
+  @DbArray
+  Set<EArrayBean.Status> status;
 
   @Version
   Long version;
@@ -79,6 +84,14 @@ public class EArraySetBean {
 
   public void setDoubs(Set<Double> doubs) {
     this.doubs = doubs;
+  }
+
+  public Set<EArrayBean.Status> getStatus() {
+    return status;
+  }
+
+  public void setStatus(Set<EArrayBean.Status> status) {
+    this.status = status;
   }
 
   public Long getVersion() {

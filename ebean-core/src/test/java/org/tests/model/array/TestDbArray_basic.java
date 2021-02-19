@@ -249,4 +249,31 @@ public class TestDbArray_basic extends BaseTestCase {
     assertThat(found.getIntEnums()).containsExactly(null, IntEnum.ZERO, null, IntEnum.TWO);
     Ebean.delete(bean);
   }
+
+  @Test
+  @IgnorePlatform(Platform.HANA)
+  public void hitCache() {
+
+    List<UUID> uids = new ArrayList<>();
+    uids.add(UUID.randomUUID());
+    uids.add(UUID.randomUUID());
+
+    List<EArrayBean.Status> statuses = new ArrayList<>();
+    statuses.add(EArrayBean.Status.ONE);
+    statuses.add(EArrayBean.Status.THREE);
+
+    EArrayBean bean = new EArrayBean();
+    bean.setName("hitCache");
+    bean.setUids(uids);
+    bean.setStatuses(statuses);
+
+    Ebean.save(bean);
+    // load cache
+    Ebean.find(EArrayBean.class, bean.getId());
+    // hit cache
+    EArrayBean found = Ebean.find(EArrayBean.class, bean.getId());
+
+    assertThat(found.getUids()).isEqualTo(uids);
+    assertThat(found.getStatuses()).isEqualTo(statuses);
+  }
 }
