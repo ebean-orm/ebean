@@ -1,6 +1,7 @@
 package org.tests.model.array;
 
 
+import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.NotNull;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Cache
 public class EArrayBean {
 
   enum Status {

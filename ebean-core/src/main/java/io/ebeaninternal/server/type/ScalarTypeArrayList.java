@@ -105,7 +105,7 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
       if (element == null) {
         list.add(null);
       } else {
-        list.add(converter.toElement(element));
+        list.add(converter.fromDbArray(element));
       }
     }
     return new ModifyAwareList(list);
@@ -145,15 +145,27 @@ public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements Sc
   @Override
   public List parse(String value) {
     try {
-      return EJson.parseList(value, false);
+      return convert(EJson.parseList(value, false));
     } catch (IOException e) {
       throw new TextException("Failed to parse JSON [{}] as List", value, e);
     }
   }
 
+  /**
+   * Convert from the json types to the proper scalar types (uuid, enum, double etc)
+   */
+  @SuppressWarnings("rawtypes")
+  private List convert(List<Object> rawList) {
+    List list = new ArrayList(rawList.size());
+    for (Object rawVal : rawList) {
+      list.add(converter.fromSerialized(rawVal));
+    }
+    return new ModifyAwareList(list);
+  }
+
   @Override
   public List jsonRead(JsonParser parser) throws IOException {
-    return EJson.parseList(parser, parser.getCurrentToken());
+    return convert(EJson.parseList(parser, parser.getCurrentToken()));
   }
 
   @Override

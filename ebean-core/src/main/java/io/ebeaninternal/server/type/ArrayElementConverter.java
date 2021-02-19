@@ -10,9 +10,14 @@ import java.util.UUID;
 interface ArrayElementConverter<T> {
 
   /**
-   * Convert the array element to the logical type.
+   * Convert element it's json serialized form.
    */
-  T toElement(Object rawValue);
+  T fromSerialized(Object rawValue);
+
+  /**
+   * Convert the array element from it's DB array form.
+   */
+  T fromDbArray(Object rawValue);
 
   default Object[] toDbArray(Object[] objects) {
     return objects;
@@ -46,7 +51,12 @@ interface ArrayElementConverter<T> {
   class LongConverter implements ArrayElementConverter<Long> {
 
     @Override
-    public Long toElement(Object rawValue) {
+    public Long fromSerialized(Object rawValue) {
+      return fromDbArray(rawValue);
+    }
+
+    @Override
+    public Long fromDbArray(Object rawValue) {
       if (rawValue instanceof Long) {
         return (Long) rawValue;
       } else {
@@ -58,7 +68,12 @@ interface ArrayElementConverter<T> {
   class IntegerConverter implements ArrayElementConverter<Integer> {
 
     @Override
-    public Integer toElement(Object rawValue) {
+    public Integer fromSerialized(Object rawValue) {
+      return ((Number) rawValue).intValue();
+    }
+
+    @Override
+    public Integer fromDbArray(Object rawValue) {
       if (rawValue instanceof Integer) {
         return (Integer) rawValue;
       } else {
@@ -70,7 +85,12 @@ interface ArrayElementConverter<T> {
   class DoubleConverter implements ArrayElementConverter<Double> {
 
     @Override
-    public Double toElement(Object rawValue) {
+    public Double fromSerialized(Object rawValue) {
+      return fromDbArray(rawValue);
+    }
+
+    @Override
+    public Double fromDbArray(Object rawValue) {
       if (rawValue instanceof Double) {
         return (Double) rawValue;
       } else {
@@ -82,21 +102,34 @@ interface ArrayElementConverter<T> {
   /**
    * String converter (noop based).
    */
-  class StringConverter extends NoopConverter<String> {
+  class StringConverter implements ArrayElementConverter<String> {
+
+    public String fromDbArray(Object rawValue) {
+      return (String) rawValue;
+    }
+
+    @Override
+    public String fromSerialized(Object rawValue) {
+      return (String) rawValue;
+    }
   }
 
   /**
-   * UUID converter (noop based).
+   * UUID converter.
    */
-  class UuidConverter extends NoopConverter<UUID> {
-  }
+  class UuidConverter implements ArrayElementConverter<UUID> {
 
-  class NoopConverter<T> implements ArrayElementConverter<T> {
-
-    @SuppressWarnings("unchecked")
     @Override
-    public T toElement(Object rawValue) {
-      return (T) rawValue;
+    public java.util.UUID fromSerialized(Object rawValue) {
+      return java.util.UUID.fromString((String)rawValue);
+    }
+
+    @Override
+    public java.util.UUID fromDbArray(Object rawValue) {
+      if (rawValue instanceof UUID) {
+        return (java.util.UUID) rawValue;
+      }
+      return java.util.UUID.fromString(rawValue.toString());
     }
   }
 
@@ -113,7 +146,12 @@ interface ArrayElementConverter<T> {
     }
 
     @Override
-    public Object toElement(Object rawValue) {
+    public Object fromSerialized(Object rawValue) {
+      return scalarType.parse((String) rawValue);
+    }
+
+    @Override
+    public Object fromDbArray(Object rawValue) {
       return scalarType.toBeanType(rawValue);
     }
 
