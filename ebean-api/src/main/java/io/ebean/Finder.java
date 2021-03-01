@@ -37,7 +37,7 @@ import java.util.List;
  *   }
  * }
  *
- * ＠Entity
+ * @Entity
  * public class Customer extends BaseModel {
  *
  *   public static final CustomerFinder find = new CustomerFinder();
@@ -80,7 +80,7 @@ public class Finder<I, T> {
    *   // ... add extra customer specific finder methods
    * }
    *
-   * ＠Entity
+   * @Entity
    * public class Customer extends BaseModel {
    *
    *   public static final CustomerFinder find = new CustomerFinder();

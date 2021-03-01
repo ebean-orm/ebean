@@ -14,7 +14,7 @@ import java.util.Optional;
  *
  * public class CustomerFinder extends BeanFinder<Long,Customer> {
  *
- *   ＠Inject
+ *   @Inject
  *   public CustomerFinder(Database database) {
  *     super(Customer.class, database);
  *   }

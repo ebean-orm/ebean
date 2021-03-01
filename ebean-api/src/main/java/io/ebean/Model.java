@@ -32,16 +32,16 @@ import io.ebean.bean.EntityBean;
  *     // Typically there is a common base model that has some
  *     // common properties like the ones below
  *
- *   ＠MappedSuperclass
+ *   @MappedSuperclass
  *   public class BaseModel extends Model {
  *
- *     ＠Id Long id;
+ *     @Id Long id;
  *
- *     ＠Version Long version;
+ *     @Version Long version;
  *
- *     ＠WhenCreated Timestamp whenCreated;
+ *     @WhenCreated Timestamp whenCreated;
  *
- *     ＠WhenUpdated Timestamp whenUpdated;
+ *     @WhenUpdated Timestamp whenUpdated;
  *
  *     ...
  *   }
@@ -52,7 +52,7 @@ import io.ebean.bean.EntityBean;
  *
  *     // Extend the mappedSuperclass
  *
- *     ＠Entity ＠Table(name="o_account")
+ *     @Entity @Table(name="o_account")
  *     public class Customer extends BaseModel {
  *
  *       String name;
