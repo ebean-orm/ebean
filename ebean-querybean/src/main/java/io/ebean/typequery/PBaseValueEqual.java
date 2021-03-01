@@ -1,5 +1,7 @@
 package io.ebean.typequery;
 
+import io.ebean.Query;
+
 import java.util.Collection;
 
 /**
@@ -223,5 +225,26 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   public final R isIn(Collection<T> values) {
     expr().in(_name, values);
     return _root;
+  }
+
+  /**
+   * Is in the result of a subquery.
+   *
+   * @param subQuery values provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R in(Query<?> subQuery) {
+    expr().in(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Is in the result of a subquery. Synonym for in().
+   *
+   * @param subQuery values provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R isIn(Query<?> subQuery) {
+    return in(subQuery);
   }
 }
