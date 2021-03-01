@@ -87,7 +87,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   SqlTreeNodeBean(String prefix, STreePropertyAssoc beanProp, SqlTreeProperties props,
                   List<SqlTreeNode> myChildren, boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
-
     this(prefix, beanProp, beanProp.target(), props, myChildren, withId, null, temporalMode, disableLazyLoad);
   }
 
@@ -197,7 +196,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   private class LoadInherit extends Load {
 
-    LoadInherit(DbReadContext ctx, EntityBean parentBean) {
+    private LoadInherit(DbReadContext ctx, EntityBean parentBean) {
       super(ctx, parentBean);
     }
 
@@ -218,10 +217,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     @Override
     void loadProperties() {
-      // take account of inheritance and due to subclassing approach
-      // need to get a 'local' version of the property
+      // take account of inheritance
       for (STreeProperty property : properties) {
-        // get a local version of the BeanProperty
         localDesc.inheritanceLoad(sqlBeanLoad, property, ctx);
       }
     }
@@ -248,7 +245,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     SqlBeanLoad sqlBeanLoad;
     boolean lazyLoadMany;
 
-    Load(DbReadContext ctx, EntityBean parentBean) {
+    private Load(DbReadContext ctx, EntityBean parentBean) {
       this.ctx = ctx;
       this.parentBean = parentBean;
     }
@@ -366,7 +363,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
         if (disableLazyLoad) {
           // bean does not have an Id or is SqlSelect based
           ebi.setDisableLazyLoad(true);
-
         } else if (partialObject) {
           if (readId) {
             // register for lazy loading
@@ -390,7 +386,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
     private void createListProxies() {
       STreePropertyAssocMany fetchedMany = ctx.getManyProperty();
       boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
-      // load the List/Set/Map proxy objects (deferred fetching of lists)
       for (STreePropertyAssocMany many : localDesc.propsMany()) {
         if (many != fetchedMany) {
           // create a proxy for the many (deferred fetching)
@@ -491,8 +486,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
         property.appendSelect(ctx, subQuery);
       }
     }
-    for (SqlTreeNode aChildren : children) {
-      aChildren.appendGroupBy(ctx, subQuery);
+    for (SqlTreeNode child : children) {
+      child.appendGroupBy(ctx, subQuery);
     }
     ctx.popTableAlias();
     ctx.popJoin();
@@ -529,11 +524,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
       appendSelectId(ctx, idBinder.getBeanProperty());
     }
     appendSelect(ctx, subQuery, properties);
-
-    for (SqlTreeNode aChildren : children) {
-      // read each child... and let them set their
-      // values back to this localBean
-      aChildren.appendSelect(ctx, subQuery);
+    for (SqlTreeNode child : children) {
+      child.appendSelect(ctx, subQuery);
     }
     ctx.popTableAlias();
     ctx.popJoin();
@@ -581,10 +573,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
     appendExtraWhere(ctx);
-    for (SqlTreeNode aChildren : children) {
-      // recursively add to the where clause any
-      // fixed predicates (extraWhere etc)
-      aChildren.appendWhere(ctx);
+    for (SqlTreeNode child : children) {
+      child.appendWhere(ctx);
     }
   }
 
@@ -620,10 +610,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
       property.appendFrom(ctx, joinType);
     }
 
-    for (SqlTreeNode aChildren : children) {
-      aChildren.appendFrom(ctx, joinType);
+    for (SqlTreeNode child : children) {
+      child.appendFrom(ctx, joinType);
     }
-
     ctx.popTableAlias();
     ctx.popJoin();
   }
@@ -648,8 +637,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (intersectionAsOfTableAlias) {
       query.incrementAsOfTableCount();
     }
-    for (SqlTreeNode aChildren : children) {
-      aChildren.addAsOfTableAlias(query);
+    for (SqlTreeNode child : children) {
+      child.addAsOfTableAlias(query);
     }
   }
 
