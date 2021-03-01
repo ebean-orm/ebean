@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -16,7 +15,6 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +54,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * False if report bean and has no id property.
    */
   final boolean readId;
+  private final boolean readIdNormal;
 
   private final boolean disableLazyLoad;
 
@@ -120,7 +119,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
     boolean aggregationRoot = props.isAggregationRoot();
     // the bean has an Id property and we want to use it
     this.readId = !aggregationRoot && withId && desc.hasId();
-    this.disableLazyLoad = disableLazyLoad || !readId || desc.isRawSqlBased() || temporalVersions;
+    this.readIdNormal = readId && !temporalVersions;
+    this.disableLazyLoad = disableLazyLoad || !readIdNormal || desc.isRawSqlBased();
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[0]);
@@ -230,7 +230,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Load a bean instance.
    */
-  private class Load {
+  class Load {
 
     final DbReadContext ctx;
     final EntityBean parentBean;
@@ -253,7 +253,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       this.parentBean = parentBean;
     }
 
-    void initLazyParent() throws SQLException {
+    private void initLazyParent() throws SQLException {
       if (lazyLoadParentIdBinder != null) {
         lazyLoadParentId = lazyLoadParentIdBinder.read(ctx);
       }
@@ -265,12 +265,12 @@ class SqlTreeNodeBean implements SqlTreeNode {
       localIdBinder = idBinder;
     }
 
-    void initPersistenceContext() {
+    private void initPersistenceContext() {
       queryMode = ctx.getQueryMode();
-      persistenceContext = (!readId || temporalVersions) ? null : ctx.getPersistenceContext();
+      persistenceContext = (!readIdNormal) ? null : ctx.getPersistenceContext();
     }
 
-    void readId() throws SQLException {
+    private void readId() throws SQLException {
       if (readId) {
         id = localIdBinder.readSet(ctx, localBean);
         if (id == null) {
@@ -311,7 +311,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
 
-    void initSqlLoadBean() {
+    private void initSqlLoadBean() {
       ctx.setCurrentPrefix(prefix, pathMap);
       ctx.propagateState(localBean);
       sqlBeanLoad = new SqlBeanLoad(ctx, localType, localBean, queryMode);
@@ -323,33 +323,29 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
 
-    void loadChildren() throws SQLException {
-      //boolean lazyLoadMany = false;
+    private void loadChildren() throws SQLException {
       if (localBean == null && queryMode == Mode.LAZYLOAD_MANY) {
         // batch lazy load many into existing contextBean
         localBean = contextBean;
         lazyLoadMany = true;
       }
-      // recursively continue reading...
-      for (SqlTreeNode aChildren : children) {
-        // read each child... and let them set their
-        // values back to this localBean
-        aChildren.load(ctx, localBean, contextBean);
+      for (SqlTreeNode child : children) {
+        child.load(ctx, localBean, contextBean);
       }
     }
 
-    boolean isLazyLoadManyRoot() {
+    private boolean isLazyLoadManyRoot() {
       return queryMode == Mode.LAZYLOAD_MANY && isRoot();
     }
 
-    EntityBean getContextBean() {
+    private EntityBean getContextBean() {
       return contextBean;
     }
 
-    void postLoad() {
+    private void postLoad() {
       if (!lazyLoadMany && localBean != null) {
         ctx.setCurrentPrefix(prefix, pathMap);
-        if (readId && !temporalVersions) {
+        if (readIdNormal) {
           createListProxies();
         }
         if (temporalMode == SpiQuery.TemporalMode.DRAFT) {
@@ -411,21 +407,20 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
 
-    void setBeanToParent() {
+    private void setBeanToParent() {
       if (parentBean != null) {
         // set this back to the parentBean
         nodeBeanProp.setValue(parentBean, contextBean);
       }
     }
 
-    EntityBean complete() {
-      if (!readId || temporalVersions) {
+    private EntityBean complete() {
+      if (!readIdNormal) {
         // a bean with no Id (never found in context)
         if (lazyLoadParentId != null) {
           ctx.setLazyLoadedChildBean(localBean, lazyLoadParentId);
         }
         return localBean;
-
       } else {
         if (lazyLoadParentId != null) {
           ctx.setLazyLoadedChildBean(contextBean, lazyLoadParentId);
@@ -434,7 +429,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
 
-    void initialise() throws SQLException {
+    private void initialise() throws SQLException {
       initLazyParent();
       initBeanType();
       initPersistenceContext();
@@ -443,6 +438,27 @@ class SqlTreeNodeBean implements SqlTreeNode {
       loadProperties();
       loadChildren();
     }
+
+    /**
+     * Perform the load returning the loaded bean.
+     */
+    EntityBean perform() throws SQLException {
+      initialise();
+      if (isLazyLoadManyRoot()) {
+        return getContextBean();
+      }
+      postLoad();
+      setBeanToParent();
+      return complete();
+    }
+
+    /**
+     * Return true if this bean was already in the context. If already in the
+     * context we need to check if it is already contained in the collection.
+     */
+    boolean isContextBean() {
+      return localBean == null;
+    }
   }
 
   /**
@@ -450,14 +466,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   @Override
   public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
-    Load load = (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
-    load.initialise();
-    if (load.isLazyLoadManyRoot()) {
-      return load.getContextBean();
-    }
-    load.postLoad();
-    load.setBeanToParent();
-    return load.complete();
+    return createLoad(ctx, parentBean).perform();
+  }
+
+  /**
+   * Create the loader with or without inheritance.
+   */
+  Load createLoad(DbReadContext ctx, EntityBean parentBean) {
+    return (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
   }
 
   @Override

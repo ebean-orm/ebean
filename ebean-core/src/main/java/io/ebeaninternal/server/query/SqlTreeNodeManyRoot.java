@@ -25,13 +25,14 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
   @Override
   public EntityBean load(DbReadContext cquery, EntityBean parentBean, EntityBean contextParent) throws SQLException {
-    // pass in null for parentBean because the localBean
-    // that is built is added to a collection rather than
-    // being set to the parentBean directly
-    EntityBean detailBean = super.load(cquery, null, null);
-    // initialise the collection and add detailBean if it is not null
+    // pass in null for parentBean because added to a collection rather than set to the parentBean
+    SqlTreeNodeBean.Load load = createLoad(cquery, null);
+    EntityBean detailBean = load.perform();
     if (contextParent != null) {
-      manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, true);
+      // Add to the collection and initialise collection if needed
+      // A null detailBean may initialise an empty collection
+      // Check for bean existing in collection based on load.isContextBean()
+      manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, load.isContextBean());
     }
     return detailBean;
   }
