@@ -70,7 +70,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public void internalAddWithCheck(Object bean) {
-    if (set == null || !set.contains(bean)) {
+    if (set == null || bean == null || !set.contains(bean)) {
       internalAdd(bean);
     }
   }

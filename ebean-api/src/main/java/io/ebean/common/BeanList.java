@@ -87,7 +87,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public void internalAddWithCheck(Object bean) {
-    if (list == null || !containsInstance(bean)) {
+    if (list == null || bean == null || !containsInstance(bean)) {
       internalAdd(bean);
     }
   }
