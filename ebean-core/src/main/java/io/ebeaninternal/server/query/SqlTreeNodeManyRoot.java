@@ -18,14 +18,9 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
     this.manyProp = prop;
   }
 
-  /**
-   * Append the property columns to the buffer.
-   */
   @Override
-  public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
-    ctx.pushTableAlias(prefix);
-    appendSelectId(ctx, idBinder.getBeanProperty());
-    ctx.popTableAlias();
+  public boolean hasMany() {
+    return true;
   }
 
   @Override
@@ -41,6 +36,15 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
     return detailBean;
   }
 
+  /**
+   * Append the property columns to the buffer.
+   */
+  @Override
+  public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
+    ctx.pushTableAlias(prefix);
+    appendSelectId(ctx, idBinder.getBeanProperty());
+    ctx.popTableAlias();
+  }
 
   /**
    * append extraWhere to the join.
@@ -63,10 +67,5 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     super.appendFrom(ctx, joinType.autoToOuter());
-  }
-
-  @Override
-  public boolean hasMany() {
-    return true;
   }
 }
