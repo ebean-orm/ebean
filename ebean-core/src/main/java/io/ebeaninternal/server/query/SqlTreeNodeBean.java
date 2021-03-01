@@ -230,7 +230,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Load a bean instance.
    */
-  private class Load {
+  class Load {
 
     final DbReadContext ctx;
     final EntityBean parentBean;
@@ -324,17 +324,13 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     private void loadChildren() throws SQLException {
-      //boolean lazyLoadMany = false;
       if (localBean == null && queryMode == Mode.LAZYLOAD_MANY) {
         // batch lazy load many into existing contextBean
         localBean = contextBean;
         lazyLoadMany = true;
       }
-      // recursively continue reading...
-      for (SqlTreeNode aChildren : children) {
-        // read each child... and let them set their
-        // values back to this localBean
-        aChildren.load(ctx, localBean, contextBean);
+      for (SqlTreeNode child : children) {
+        child.load(ctx, localBean, contextBean);
       }
     }
 
@@ -425,7 +421,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
           ctx.setLazyLoadedChildBean(localBean, lazyLoadParentId);
         }
         return localBean;
-
       } else {
         if (lazyLoadParentId != null) {
           ctx.setLazyLoadedChildBean(contextBean, lazyLoadParentId);
@@ -443,6 +438,27 @@ class SqlTreeNodeBean implements SqlTreeNode {
       loadProperties();
       loadChildren();
     }
+
+    /**
+     * Perform the load returning the loaded bean.
+     */
+    EntityBean perform() throws SQLException {
+      initialise();
+      if (isLazyLoadManyRoot()) {
+        return getContextBean();
+      }
+      postLoad();
+      setBeanToParent();
+      return complete();
+    }
+
+    /**
+     * Return true if this bean was already in the context. If already in the
+     * context we need to check if it is already contained in the collection.
+     */
+    boolean isContextBean() {
+      return localBean == null;
+    }
   }
 
   /**
@@ -450,14 +466,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   @Override
   public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
-    Load load = (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
-    load.initialise();
-    if (load.isLazyLoadManyRoot()) {
-      return load.getContextBean();
-    }
-    load.postLoad();
-    load.setBeanToParent();
-    return load.complete();
+    return createLoad(ctx, parentBean).perform();
+  }
+
+  /**
+   * Create the loader with or without inheritance.
+   */
+  Load createLoad(DbReadContext ctx, EntityBean parentBean) {
+    return (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
   }
 
   @Override
