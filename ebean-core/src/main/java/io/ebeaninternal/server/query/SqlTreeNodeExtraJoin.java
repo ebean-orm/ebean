@@ -178,14 +178,6 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
     return null;
   }
 
-  /**
-   * Does nothing.
-   */
-  @Override
-  public <T> Version<T> loadVersion(DbReadContext ctx) {
-    return null;
-  }
-
   @Override
   public boolean hasMany() {
     return manyJoin;

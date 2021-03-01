@@ -100,12 +100,6 @@ class SqlTreeNodeFormulaWhereJoin implements SqlTreeNode {
   }
 
   @Override
-  public <T> Version<T> loadVersion(DbReadContext ctx) {
-    // nothing to do here
-    return null;
-  }
-
-  @Override
   public boolean hasMany() {
     return true;
   }

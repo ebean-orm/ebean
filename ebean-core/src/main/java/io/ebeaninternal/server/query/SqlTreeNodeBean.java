@@ -193,20 +193,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   /**
-   * Read the version bean.
-   */
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
-    // read the sys period lower and upper bounds
-    // these are always the first 2 columns in the resultSet
-    Timestamp start = ctx.getDataReader().getTimestamp();
-    Timestamp end = ctx.getDataReader().getTimestamp();
-    T bean = (T) load(ctx, null, null);
-    return new Version<>(bean, start, end);
-  }
-
-  /**
    * Load that takes into account inheritance.
    */
   private class LoadInherit extends Load {

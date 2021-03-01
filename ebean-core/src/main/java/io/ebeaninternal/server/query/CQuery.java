@@ -142,7 +142,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Tree that knows how to build the master and detail beans from the
    * resultSet.
    */
-  private final SqlTreeNode rootNode;
+  private final SqlTreeRoot rootNode;
 
   /**
    * For master detail query.
@@ -444,13 +444,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     if (manyProperty == null) {
       // only single resultSet row required to build object so we are done
       // read a single resultSet row into single bean
-      nextBean = rootNode.load(this, null, null);
+      nextBean = rootNode.load(this);
       return true;
     }
 
     if (nextBean == null) {
       // very first read
-      nextBean = rootNode.load(this, null, null);
+      nextBean = rootNode.load(this);
     } else {
       // nextBean set to previously read currentBean
       nextBean = currentBean;
@@ -478,7 +478,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * is different to the nextBean (false if we need to read more rows).
    */
   private boolean checkForDifferentBean() throws SQLException {
-    currentBean = rootNode.load(this, null, null);
+    currentBean = rootNode.load(this);
     return currentBean != nextBean;
   }
 
