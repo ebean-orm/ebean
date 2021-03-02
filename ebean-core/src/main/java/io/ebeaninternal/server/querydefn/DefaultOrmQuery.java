@@ -53,6 +53,7 @@ import io.ebeaninternal.server.deploy.BeanNaturalKey;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.expression.IdInExpression;
 import io.ebeaninternal.server.expression.SimpleExpression;
@@ -536,6 +537,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     if (havingExpressions != null) {
       havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
+    }
+    if (orderBy != null) {
+      for (Property orderProperty : orderBy.getProperties()) {
+        ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(orderProperty.getProperty());
+        if (elProp != null && elProp.containsFormulaWithJoin()) {
+          manyWhereJoins.addFormulaWithJoin(orderProperty.getProperty());
+        }
+      }
     }
   }
 
