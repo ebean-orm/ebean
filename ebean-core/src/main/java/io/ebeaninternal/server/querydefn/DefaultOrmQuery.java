@@ -1441,6 +1441,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public Query<T> fetch(String path, String properties, FetchConfig config) {
+    if (nativeSql != null && (config == null || config.isJoin())) {
+      // can't use fetch join with nativeSql (as the root query)
+      config = FETCH_QUERY;
+    }
     return fetchInternal(path, properties, config);
   }
 
