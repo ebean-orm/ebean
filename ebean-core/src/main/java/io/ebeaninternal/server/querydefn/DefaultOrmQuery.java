@@ -1425,52 +1425,56 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> fetch(String property) {
-    return fetch(property, null, null);
+  public Query<T> fetch(String path) {
+    return fetch(path, null, null);
   }
 
   @Override
-  public Query<T> fetchQuery(String property) {
-    return fetch(property, null, FETCH_QUERY);
-  }
-
-  public Query<T> fetchCache(String property) {
-    return fetch(property, null, FETCH_CACHE);
+  public Query<T> fetch(String path, FetchConfig joinConfig) {
+    return fetch(path, null, joinConfig);
   }
 
   @Override
-  public Query<T> fetchLazy(String property) {
-    return fetch(property, null, FETCH_LAZY);
+  public Query<T> fetch(String path, String properties) {
+    return fetch(path, properties, null);
   }
 
   @Override
-  public Query<T> fetch(String property, FetchConfig joinConfig) {
-    return fetch(property, null, joinConfig);
+  public Query<T> fetch(String path, String properties, FetchConfig config) {
+    return fetchInternal(path, properties, config);
   }
 
   @Override
-  public Query<T> fetch(String property, String columns) {
-    return fetch(property, columns, null);
+  public Query<T> fetchQuery(String path) {
+    return fetchInternal(path, null, FETCH_QUERY);
+  }
+
+  public Query<T> fetchCache(String path) {
+    return fetchInternal(path, null, FETCH_CACHE);
   }
 
   @Override
-  public Query<T> fetchQuery(String property, String columns) {
-    return fetch(property, columns, FETCH_QUERY);
+  public Query<T> fetchLazy(String path) {
+    return fetchInternal(path, null, FETCH_LAZY);
   }
 
   @Override
-  public Query<T> fetchCache(String property, String columns) {
-    return fetch(property, columns, FETCH_CACHE);
+  public Query<T> fetchQuery(String path, String properties) {
+    return fetchInternal(path, properties, FETCH_QUERY);
   }
 
   @Override
-  public Query<T> fetchLazy(String property, String columns) {
-    return fetch(property, columns, FETCH_LAZY);
+  public Query<T> fetchCache(String path, String properties) {
+    return fetchInternal(path, properties, FETCH_CACHE);
   }
 
   @Override
-  public Query<T> fetch(String property, String columns, FetchConfig config) {
-    detail.fetch(property, columns, config);
+  public Query<T> fetchLazy(String path, String properties) {
+    return fetchInternal(path, properties, FETCH_LAZY);
+  }
+
+  private Query<T> fetchInternal(String path, String properties, FetchConfig config) {
+    detail.fetch(path, properties, config);
     return this;
   }
 
