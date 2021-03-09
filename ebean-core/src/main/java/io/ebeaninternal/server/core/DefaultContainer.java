@@ -135,16 +135,11 @@ public class DefaultContainer implements SpiContainer {
           configProvider.apply((ServerConfig)config);
         }
       }
-      if (config.isAutoLoadModuleInfo()) {
-        // auto register entity classes (default db)
-        for (ModuleInfoLoader loader : ServiceLoader.load(ModuleInfoLoader.class)) {
-          config.addAll(loader.entityClasses());
-        }
-      }
-    } else if (config.isAutoLoadModuleInfo()) {
-      // auto register entity classes (other named db)
+    }
+    if (config.isAutoLoadModuleInfo()) {
+      // auto register entity classes
       for (ModuleInfoLoader loader : ServiceLoader.load(ModuleInfoLoader.class)) {
-        config.addAll(loader.entityClassesFor(config.getName()));
+        config.addAll(loader.classesFor(config.getName(), config.isDefaultServer()));
       }
     }
   }
