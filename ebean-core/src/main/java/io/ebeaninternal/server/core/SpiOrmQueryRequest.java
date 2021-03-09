@@ -80,9 +80,14 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <A> List<A> findIds();
 
   /**
-   * Execute the find returning a QueryIterator and visitor pattern.
+   * Execute findEach iterating results one bean at a time.
    */
   void findEach(Consumer<T> consumer);
+
+  /**
+   * Execute findEach with a batch consumer.
+   */
+  void findEach(int batch, Consumer<List<T>> batchConsumer);
 
   /**
    * Execute the find returning a QueryIterator and visitor pattern.

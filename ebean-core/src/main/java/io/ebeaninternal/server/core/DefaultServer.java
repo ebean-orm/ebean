@@ -1447,6 +1447,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction t) {
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
+//    if (request.isUseDocStore()) {
+//      docStore().findEach(request, consumer);
+//      return;
+//    }
+    request.initTransIfRequired();
+    request.findEach(batch, consumer);
+    // no try finally - findEach guarantee's cleanup of the transaction if required
+  }
+
+  @Override
   public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction t) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
     if (request.isUseDocStore()) {

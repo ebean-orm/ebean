@@ -308,6 +308,13 @@ public interface ExpressionList<T> {
   void findEach(Consumer<T> consumer);
 
   /**
+   * Execute findEach with a batch consumer.
+   *
+   * @see Query#findEach(int, Consumer)
+   */
+  void findEach(int batch, Consumer<List<T>> consumer);
+
+  /**
    * Execute the query processing the beans one at a time with the ability to
    * stop processing before reading all the beans.
    *

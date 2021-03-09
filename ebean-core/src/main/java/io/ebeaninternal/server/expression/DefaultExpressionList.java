@@ -437,6 +437,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    query.findEach(batch, consumer);
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     query.findEachWhile(consumer);
   }

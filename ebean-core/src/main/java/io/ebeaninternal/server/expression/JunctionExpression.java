@@ -447,6 +447,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    exprList.findEach(batch, consumer);
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     exprList.findEachWhile(consumer);
   }

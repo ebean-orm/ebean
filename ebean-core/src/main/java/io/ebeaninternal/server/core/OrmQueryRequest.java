@@ -431,6 +431,24 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> batchConsumer) {
+    final List<T> buffer = new ArrayList<>(batch);
+    try (QueryIterator<T> it = queryEngine.findIterate(this)) {
+      while (it.hasNext()) {
+        buffer.add(it.next());
+        if (buffer.size() >= batch) {
+          batchConsumer.accept(buffer);
+          buffer.clear();
+        }
+      }
+      if (!buffer.isEmpty()) {
+        // consume the remainder
+        batchConsumer.accept(buffer);
+      }
+    }
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     try (QueryIterator<T> it = queryEngine.findIterate(this)) {
       while (it.hasNext()) {

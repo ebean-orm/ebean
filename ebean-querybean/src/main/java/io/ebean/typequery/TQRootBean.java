@@ -1794,24 +1794,19 @@ public abstract class TQRootBean<T, R> {
    * This method is appropriate to process very large query results as the
    * beans are consumed one at a time and do not need to be held in memory
    * (unlike #findList #findSet etc)
-   * </p>
    * <p>
    * Note that internally Ebean can inform the JDBC driver that it is expecting larger
    * resultSet and specifically for MySQL this hint is required to stop it's JDBC driver
    * from buffering the entire resultSet. As such, for smaller resultSets findList() is
    * generally preferable.
-   * </p>
    * <p>
    * Compared with #findEachWhile this will always process all the beans where as
    * #findEachWhile provides a way to stop processing the query result early before
    * all the beans have been read.
-   * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the QueryEachConsumer (SAM) interface which is better suited to use
-   * with Java8 closures.
-   * </p>
-   * <p>
+   * iterator uses the Consumer interface which is better suited to use with closures.
+   *
    * <pre>{@code
    *
    *  new QCustomer()
@@ -1832,15 +1827,29 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Execute findEach streaming query batching the results for consuming.
+   * <p>
+   * This query execution will stream the results and is suited to consuming
+   * large numbers of results from the database.
+   * <p>
+   * Typically we use this batch consumer when we want to do further processing on
+   * the beans and want to do that processing in batch form, for example - 100 at
+   * a time.
+   *
+   * @param batch    The number of beans processed in the batch
+   * @param consumer Process the batch of beans
+   */
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    query.findEach(batch, consumer);
+  }
+
+  /**
    * Execute the query using callbacks to a visitor to process the resulting
    * beans one at a time.
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the QueryEachWhileConsumer (SAM) interface which is better suited to use
-   * with Java8 closures.
-   * </p>
-   * <p>
-   * <p>
+   * iterator uses the Predicate interface which is better suited to use with closures.
+   *
    * <pre>{@code
    *
    *  new QCustomer()

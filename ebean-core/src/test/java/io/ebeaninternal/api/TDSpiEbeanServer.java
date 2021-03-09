@@ -676,6 +676,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction t) {
+  }
+
+  @Override
   public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction) {
   }
 

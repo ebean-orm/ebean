@@ -160,6 +160,13 @@ public interface ExtendedServer {
   <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
 
   /**
+   * Execute findEach with batch consumer.
+   *
+   * @see Query#findEach(int, Consumer)
+   */
+  <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction t);
+
+  /**
    * Execute the query visiting the each bean one at a time.
    * <p>
    * Compared to findEach() this provides the ability to stop processing the query
