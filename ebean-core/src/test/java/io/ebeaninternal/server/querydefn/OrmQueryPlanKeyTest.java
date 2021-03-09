@@ -18,8 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
-
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private DefaultOrmQuery<Customer> query() {
     return (DefaultOrmQuery) server().find(Customer.class);
   }
@@ -85,41 +84,40 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_firstRowsDifferent() {
 
-    CQueryPlanKey key1 = query().setFirstRow(10).createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setFirstRow(10));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    key1 = query().setFirstRow(10).createQueryPlanKey();
-    key2 = query().setFirstRow(9).createQueryPlanKey();
+    key1 = planKey(query().setFirstRow(10));
+    key2 = planKey(query().setFirstRow(9));
     assertDifferent(key1, key2);
 
-    key1 = query().createQueryPlanKey();
-    key2 = query().setFirstRow(9).createQueryPlanKey();
+    key1 = planKey(query());
+    key2 = planKey(query().setFirstRow(9));
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_maxRowsDifferent() {
 
-    CQueryPlanKey key1 = query().setMaxRows(10).createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setMaxRows(10));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    key1 = query().setMaxRows(10).createQueryPlanKey();
-    key2 = query().setMaxRows(9).createQueryPlanKey();
+    key1 = planKey(query().setMaxRows(10));
+    key2 = planKey(query().setMaxRows(9));
     assertDifferent(key1, key2);
 
-    key1 = query().createQueryPlanKey();
-    key2 = query().setMaxRows(9).createQueryPlanKey();
+    key1 = planKey(query());
+    key2 = planKey(query().setMaxRows(9));
     assertDifferent(key1, key2);
-
   }
 
   @Test
   public void equals_when_firstRowsMaxRowsSame() {
 
-    CQueryPlanKey key1 = query().setMaxRows(10).setFirstRow(20).createQueryPlanKey();
-    CQueryPlanKey key2 = query().setFirstRow(20).setMaxRows(10).createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setMaxRows(10).setFirstRow(20));
+    CQueryPlanKey key2 = planKey(query().setFirstRow(20).setMaxRows(10));
     assertSame(key1, key2);
   }
 
@@ -132,43 +130,43 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffOrderByNull() {
 
-    CQueryPlanKey key1 = query().order("id").createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().order("id"));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    key1 = ((DefaultOrmQuery) query().order().asc("id")).createQueryPlanKey();
-    key2 = query().createQueryPlanKey();
+    key1 = planKey(query().order().asc("id"));
+    key2 = planKey(query());
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_orderBySame() {
 
-    CQueryPlanKey key1 = query().order("id, name").createQueryPlanKey();
-    CQueryPlanKey key2 = query().order("id, name").createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().order("id, name"));
+    CQueryPlanKey key2 = planKey(query().order("id, name"));
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffDistinct() {
 
-    CQueryPlanKey key1 = query().setDistinct(true).createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setDistinct(true));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_sameDistinct() {
 
-    CQueryPlanKey key1 = query().setDistinct(true).createQueryPlanKey();
-    CQueryPlanKey key2 = query().setDistinct(true).createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setDistinct(true));
+    CQueryPlanKey key2 = planKey(query().setDistinct(true));
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_useDocStore() {
-    CQueryPlanKey key1 = query().setUseDocStore(true).createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setUseDocStore(true));
+    CQueryPlanKey key2 = planKey(query());
 
     assertDifferent(key1, key2);
   }
@@ -176,78 +174,77 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffMapKey() {
 
-    CQueryPlanKey key1 = query().setMapKey("name").createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setMapKey("name"));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    CQueryPlanKey key3 = query().setMapKey("email").createQueryPlanKey();
+    CQueryPlanKey key3 = planKey(query().setMapKey("email"));
     assertDifferent(key1, key3);
 
-    CQueryPlanKey key4 = query().setMapKey("name").createQueryPlanKey();
+    CQueryPlanKey key4 = planKey(query().setMapKey("name"));
     assertSame(key1, key4);
   }
 
   @Test
   public void equals_when_diffIdNull() {
 
-    CQueryPlanKey key1 = query().setId(42).createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setId(42));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
   }
 
   @Test
   public void equals_when_idBothGiven() {
 
-    CQueryPlanKey key1 = query().setId(42).createQueryPlanKey();
-    CQueryPlanKey key2 = query().setId(23).createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().setId(42));
+    CQueryPlanKey key2 = planKey(query().setId(23));
     assertSame(key1, key2);
   }
 
   @Test
   public void equals_when_diffTemporalMode() {
 
-    CQueryPlanKey key1 = query().createQueryPlanKey();
-    CQueryPlanKey key2 = query().asDraft().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query());
+    CQueryPlanKey key2 = planKey(query().asDraft());
     assertDifferent(key1, key2);
 
-    CQueryPlanKey key3 = query().asOf(new Timestamp(System.currentTimeMillis())).createQueryPlanKey();
+    CQueryPlanKey key3 = planKey(query().asOf(new Timestamp(System.currentTimeMillis())));
     assertDifferent(key1, key3);
 
-    CQueryPlanKey key4 = query().setIncludeSoftDeletes().createQueryPlanKey();
+    CQueryPlanKey key4 = planKey(query().setIncludeSoftDeletes());
     assertDifferent(key1, key4);
   }
 
   @Test
   public void equals_when_diffForUpdate() {
 
-    CQueryPlanKey key1 = query().forUpdate().createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().forUpdate());
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    CQueryPlanKey key3 = query().forUpdateNoWait().createQueryPlanKey();
+    CQueryPlanKey key3 = planKey(query().forUpdateNoWait());
     assertDifferent(key1, key3);
 
-    CQueryPlanKey key4 = query().forUpdateSkipLocked().createQueryPlanKey();
+    CQueryPlanKey key4 = planKey(query().forUpdateSkipLocked());
     assertDifferent(key1, key4);
 
-    CQueryPlanKey key5 = query().forUpdate().createQueryPlanKey();
+    CQueryPlanKey key5 = planKey(query().forUpdate());
     assertSame(key1, key5);
   }
 
   @Test
   public void equals_when_diffRootAliasNull() {
 
-    CQueryPlanKey key1 = query().alias("alias").createQueryPlanKey();
-    CQueryPlanKey key2 = query().createQueryPlanKey();
+    CQueryPlanKey key1 = planKey(query().alias("alias"));
+    CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    CQueryPlanKey key3 = query().alias("diff").createQueryPlanKey();
+    CQueryPlanKey key3 = planKey(query().alias("diff"));
     assertDifferent(key1, key3);
 
-    CQueryPlanKey key4 = query().alias("alias").createQueryPlanKey();
+    CQueryPlanKey key4 = planKey(query().alias("alias"));
     assertSame(key1, key4);
   }
-
 
   private DefaultOrmQuery<Customer> list_id_eq_42() {
     return (DefaultOrmQuery<Customer>) server().find(Customer.class)
@@ -298,7 +295,6 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     assertDifferent(key1, key4);
   }
 
-
   @Test
   public void equals_when_sameHaving() {
 
@@ -309,7 +305,7 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
   @Test
   public void equals_when_manualId_andSelectClause() {
-    DefaultOrmQuery<Customer> q1 = query().select("name");
+    DefaultOrmQuery<Customer> q1 = (DefaultOrmQuery<Customer>)query().select("name");
     q1.setManualId();
 
     assertDifferent(q1, query().select("name"));
@@ -327,16 +323,19 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
     return planKey(id.query());
   }
 
+  @SuppressWarnings({"rawtypes"})
   private CQueryPlanKey planKey(Query<Customer> query) {
     return ((DefaultOrmQuery) query).createQueryPlanKey();
   }
 
-  private void assertDifferent(DefaultOrmQuery q1, DefaultOrmQuery q2) {
-    assertDifferent(q1.createQueryPlanKey(), q2.createQueryPlanKey());
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private void assertDifferent(Query q1, Query q2) {
+    assertDifferent(planKey(q1), planKey(q2));
   }
 
-  private void assertSame(DefaultOrmQuery q1, DefaultOrmQuery q2) {
-    assertSame(q1.createQueryPlanKey(), q2.createQueryPlanKey());
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private void assertSame(Query q1, Query q2) {
+    assertSame(planKey(q1), planKey(q2));
   }
 
   private void assertDifferent(CQueryPlanKey key1, CQueryPlanKey key2) {

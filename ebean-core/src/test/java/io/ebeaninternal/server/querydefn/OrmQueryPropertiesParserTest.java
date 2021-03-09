@@ -11,7 +11,8 @@ public class OrmQueryPropertiesParserTest {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse(null);
     assertAllDefaults(res);
-    assertThat(res.properties).isEqualTo("");
+    assertThat(res.allProperties).isFalse();
+    assertThat(res.included).isNull();
   }
 
   @Test
@@ -19,7 +20,8 @@ public class OrmQueryPropertiesParserTest {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("");
     assertAllDefaults(res);
-    assertThat(res.properties).isEqualTo("");
+    assertThat(res.allProperties).isFalse();
+    assertThat(res.included).isNull();
   }
 
   @Test
@@ -27,13 +29,15 @@ public class OrmQueryPropertiesParserTest {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("*");
     assertAllDefaults(res);
-    assertThat(res.properties).isEqualTo("*");
+    assertThat(res.allProperties).isTrue();
+    assertThat(res.included).isNull();
   }
 
   @Test
   public void when_no_spaces() {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("id,name");
+    assertThat(res.allProperties).isFalse();
     assertThat(res.included).containsExactly("id", "name");
   }
 
@@ -41,6 +45,7 @@ public class OrmQueryPropertiesParserTest {
   public void when_spaced() {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("id, name");
+    assertThat(res.allProperties).isFalse();
     assertThat(res.included).containsExactly("id", "name");
   }
 
@@ -48,6 +53,7 @@ public class OrmQueryPropertiesParserTest {
   public void when_formula() {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("a,MD5(id::text) as b,c");
+    assertThat(res.allProperties).isFalse();
     assertThat(res.included).containsExactly("a", "MD5(id::text) as b", "c");
   }
 

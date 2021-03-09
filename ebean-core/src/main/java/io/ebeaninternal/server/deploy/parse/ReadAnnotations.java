@@ -14,12 +14,6 @@ public class ReadAnnotations {
 
   public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
     this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, config);
-    if (readConfig.isJavaxValidationAnnotations()) {
-      InitMetaValidationAnnotation.init(readConfig);
-    }
-    if (readConfig.isJacksonAnnotations()) {
-      InitMetaJacksonAnnotation.init(readConfig);
-    }
   }
 
   /**

@@ -200,7 +200,7 @@ public interface ExpressionFactory {
   Expression gtOrNull(String propertyName, Object value);
 
   /**
-   * Greater than or Equal to OR Null <code> >= or null </code>
+   * Greater than or Equal to OR Null ({@code >= or null })
    * <p>
    * A convenient expression combining GE and Is Null.  Most often useful for range
    * expressions where the top range value is nullable.
@@ -227,7 +227,7 @@ public interface ExpressionFactory {
   Expression ltOrNull(String propertyName, Object value);
 
   /**
-   * Less Than or Equal to OR Null <code> <= or null </code>
+   * Less Than or Equal to OR Null ({@code <= or null })
    * <p>
    * A convenient expression combining LE and Is Null.  Most often useful for range
    * expressions where the bottom range value is nullable.

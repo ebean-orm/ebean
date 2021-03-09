@@ -46,6 +46,11 @@ public class TestDbArray_asSet extends BaseTestCase {
     bean.getOtherIds().add(97L);
     bean.setDoubs(doubles);
 
+    Set<EArrayBean.Status> status = new LinkedHashSet<>();
+    status.add(EArrayBean.Status.ONE);
+    status.add(EArrayBean.Status.TWO);
+    bean.setStatus(status);
+
     Ebean.save(bean);
 
     found = Ebean.find(EArraySetBean.class, bean.getId());
@@ -153,5 +158,32 @@ public class TestDbArray_asSet extends BaseTestCase {
 
     Ebean.saveAll(all);
     Ebean.deleteAll(all);
+  }
+
+  @Test
+  @IgnorePlatform(Platform.HANA)
+  public void hitCache() {
+
+    Set<UUID> uids = new LinkedHashSet<>();
+    uids.add(UUID.randomUUID());
+    uids.add(UUID.randomUUID());
+
+    Set<EArrayBean.Status> statuses = new LinkedHashSet<>();
+    statuses.add(EArrayBean.Status.ONE);
+    statuses.add(EArrayBean.Status.THREE);
+
+    EArraySetBean bean = new EArraySetBean();
+    bean.setName("hitCache");
+    bean.setUids(uids);
+    bean.setStatus(statuses);
+
+    Ebean.save(bean);
+    // load cache
+    Ebean.find(EArraySetBean.class, bean.getId());
+    // hit cache
+    EArraySetBean found = Ebean.find(EArraySetBean.class, bean.getId());
+
+    assertThat(found.getUids()).isEqualTo(uids);
+    assertThat(found.getStatus()).isEqualTo(statuses);
   }
 }

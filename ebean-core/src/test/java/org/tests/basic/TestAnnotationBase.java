@@ -144,10 +144,80 @@ public class TestAnnotationBase extends BaseTestCase {
     }
   }
 
+  @Entity
+  public static class TestJakartaAnnotationBaseEntity extends MappedBaseEntity {
+    @Where(clause = "SELECT 'mysql' from 1", platforms = Platform.MYSQL)
+    @Where(clause = "SELECT 'h2' from 1", platforms = H2)
+    @Where(clause = "SELECT 'other' from 1")
+    private String direct;
+
+    @MetaTest
+    private String meta;
+
+    @MetaTest
+    @Where(clause = "SELECT 'oracle' from 1", platforms = Platform.ORACLE)
+    private String mixed;
+
+    @jakarta.validation.constraints.Size.List({
+      @jakarta.validation.constraints.Size(max = 10, message = "max length for you is 10"),
+      @jakarta.validation.constraints.Size(min = 1),
+      @jakarta.validation.constraints.Size(max = 40, message = "max value for you is 40", groups = ValidationGroupSomething.class)
+    })
+    private String constraintAnnotation;
+
+    @NotNull
+    private String null1;
+
+
+    @NotNull(groups = ValidationGroupSomething.class)
+    private String null2;
+
+    private String null3;
+
+    public String getConstraintAnnotation() {
+      return constraintAnnotation;
+    }
+
+    public void setConstraintAnnotation(String constraintAnnotation) {
+      this.constraintAnnotation = constraintAnnotation;
+    }
+
+    public String getNull1() {
+      return null1;
+    }
+
+    public void setNull1(String null1) {
+      this.null1 = null1;
+    }
+
+    public String getNull2() {
+      return null2;
+    }
+
+    public void setNull2(String null2) {
+      this.null2 = null2;
+    }
+
+    public String getNull3() {
+      return null3;
+    }
+
+    public void setNull3(String null3) {
+      this.null3 = null3;
+    }
+  }
+
 
   @Test
   public void testFindMaxSize() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
+    BeanProperty bp = descriptor.findProperty("constraintAnnotation");
+    assertEquals(40, bp.getDbLength());
+  }
+
+  @Test
+  public void testFindJakartaMaxSize() throws SecurityException {
+    BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestJakartaAnnotationBaseEntity.class);
     BeanProperty bp = descriptor.findProperty("constraintAnnotation");
     assertEquals(40, bp.getDbLength());
   }
@@ -162,6 +232,20 @@ public class TestAnnotationBase extends BaseTestCase {
   @Test
   public void testNotNullWithGroup() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
+
+    BeanProperty bp = descriptor.findProperty("null1");
+    assertFalse(bp.isNullable());
+
+    bp = descriptor.findProperty("null2");
+    assertTrue(bp.isNullable());
+
+    bp = descriptor.findProperty("null3");
+    assertTrue(bp.isNullable());
+  }
+
+  @Test
+  public void testJakartaNotNullWithGroup() throws SecurityException {
+    BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestJakartaAnnotationBaseEntity.class);
 
     BeanProperty bp = descriptor.findProperty("null1");
     assertFalse(bp.isNullable());

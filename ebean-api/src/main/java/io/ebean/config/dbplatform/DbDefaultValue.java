@@ -79,7 +79,7 @@ public class DbDefaultValue {
   }
 
   /**
-   * This method checks & convert the {@link DbDefault#value()} to a valid SQL literal.
+   * This method checks and converts the {@link DbDefault#value()} to a valid SQL literal.
    *
    * This is mainly to quote string literals and verify integer/dates for correctness.
    * <p>

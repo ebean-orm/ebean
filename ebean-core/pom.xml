@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.7.1-SNAPSHOT</version>
+    <version>12.7.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -17,11 +17,6 @@
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
     <tag>ebean-parent-12.6.5</tag>
   </scm>
-
-  <properties>
-    <jackson-core.version>2.11.3</jackson-core.version>
-    <jackson-databind.version>2.11.3</jackson-databind.version>
-  </properties>
 
   <profiles>
     <profile>
@@ -92,19 +87,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.7.1-SNAPSHOT</version>
+      <version>12.7.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>12.7.1-SNAPSHOT</version>
+      <version>12.7.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.7.1-SNAPSHOT</version>
+      <version>12.7.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -138,6 +133,12 @@
       <version>1.1.0.Final</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.0</version>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>joda-time</groupId>
@@ -157,14 +158,14 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson-core.version}</version>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson-databind.version}</version>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 

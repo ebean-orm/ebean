@@ -909,7 +909,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> gtOrNull(String propertyName, Object value);
 
   /**
-   * Greater Than or Equal to OR Null - <code> >= or null </code>.
+   * Greater Than or Equal to OR Null - ({@code >= or null }).
    */
   ExpressionList<T> geOrNull(String propertyName, Object value);
 
@@ -930,7 +930,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> ltOrNull(String propertyName, Object value);
 
   /**
-   * Less Than or Equal to OR Null - <code> <= or null </code>.
+   * Less Than or Equal to OR Null - ({@code <= or null }).
    */
   ExpressionList<T> leOrNull(String propertyName, Object value);
 

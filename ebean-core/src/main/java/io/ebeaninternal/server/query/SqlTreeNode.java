@@ -74,11 +74,6 @@ interface SqlTreeNode {
   EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean contextBean) throws SQLException;
 
   /**
-   * Load a version of a @History bean with effective dates.
-   */
-  <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException;
-
-  /**
    * Return true if the query has a many join.
    */
   boolean hasMany();

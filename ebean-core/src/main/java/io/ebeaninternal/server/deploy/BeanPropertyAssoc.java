@@ -609,7 +609,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
 
     String msg = "Error with the Join on [" + getFullBeanName()
       + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
-      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped?";
+      + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped? "
+      + " or a @JoinColumn needs an explicit referencedColumnName specified?";
     throw new PersistenceException(msg);
   }
 }

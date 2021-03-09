@@ -442,9 +442,10 @@ class CQueryBuilder {
       int cols = 1 + metaData.getColumnCount();
       List<String> propertyNames = new ArrayList<>(cols - 1);
       for (int i = 1; i < cols; i++) {
+        String schemaName = metaData.getSchemaName(i).toLowerCase();
         String tableName = metaData.getTableName(i).toLowerCase();
         String columnName = metaData.getColumnName(i).toLowerCase();
-        String path = desc.findBeanPath(tableName, columnName);
+        String path = desc.findBeanPath(schemaName, tableName, columnName);
         if (path != null) {
           propertyNames.add(path);
         } else {

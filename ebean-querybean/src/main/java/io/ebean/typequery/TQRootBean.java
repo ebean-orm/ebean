@@ -25,6 +25,7 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebean.text.PathProperties;
+import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
 import javax.annotation.Nonnull;
@@ -32,6 +33,7 @@ import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,55 +43,39 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Base root query bean.
+ * Base root query bean providing common features for all root query beans.
  * <p>
- * With code generation for each entity bean type a query bean is created that extends this.
+ * For each entity bean querybean-generator generates a query bean that extends TQRootBean.
  * <p>
- * Provides common features for all root query beans
+ *
  * </p>
- * <p>
- * <h2>Example - QCustomer extends TQRootBean</h2>
- * <p>
- * These 'query beans' like QCustomer are generated using the <code>avaje-ebeanorm-typequery-generator</code>.
- * </p>
- * <pre>{@code
- *
- *   public class QCustomer extends TQRootBean<Customer,QCustomer> {
- *
- *     // properties
- *     public PLong<QCustomer> id;
- *
- *     public PString<QCustomer> name;
- *     ...
- *
- * }</pre>
- * <p>
  * <h2>Example - usage of QCustomer</h2>
  * <pre>{@code
  *
- *    Date fiveDaysAgo = ...
+ *  Date fiveDaysAgo = ...
  *
- *    List<Customer> customers =
- *        new QCustomer()
- *          .name.ilike("rob")
- *          .status.equalTo(Customer.Status.GOOD)
- *          .registered.after(fiveDaysAgo)
- *          .contacts.email.endsWith("@foo.com")
- *          .orderBy()
- *            .name.asc()
- *            .registered.desc()
- *          .findList();
+ *  List<Customer> customers =
+ *      new QCustomer()
+ *        .name.ilike("rob")
+ *        .status.equalTo(Customer.Status.GOOD)
+ *        .registered.after(fiveDaysAgo)
+ *        .contacts.email.endsWith("@foo.com")
+ *        .orderBy()
+ *          .name.asc()
+ *          .registered.desc()
+ *        .findList();
  *
  * }</pre>
  * <p>
  * <h2>Resulting SQL where</h2>
  * <p>
- * <pre>{@code sql
+ * <pre>{@code
  *
- *     where lower(t0.name) like ?  and t0.status = ?  and t0.registered > ?  and u1.email like ?
- *     order by t0.name, t0.registered desc;
+ *   where lower(t0.name) like ?  and t0.status = ?  and t0.registered > ?  and u1.email like ?
+ *   order by t0.name, t0.registered desc;
  *
- *     --bind(rob,GOOD,Mon Jul 27 12:05:37 NZST 2015,%@foo.com)
+ *   --bind(rob,GOOD,Mon Jul 27 12:05:37 NZST 2015,%@foo.com)
+ *
  * }</pre>
  *
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
@@ -278,22 +264,21 @@ public abstract class TQRootBean<T, R> {
    */
   @SafeVarargs
   public final R select(TQProperty<R>... properties) {
-    StringBuilder selectProps = new StringBuilder(50);
-    for (int i = 0; i < properties.length; i++) {
-      if (i > 0) {
-        selectProps.append(",");
-      }
-      selectProps.append(properties[i].propertyName());
-    }
-    query.select(selectProps.toString());
+    ((SpiQueryFetch) query).selectProperties(properties(properties));
     return root;
+  }
+
+  private Set<String> properties(TQProperty<R>[] properties) {
+    Set<String> props = new LinkedHashSet<>();
+    for (TQProperty<R> property : properties) {
+      props.add(property.propertyName());
+    }
+    return props;
   }
 
   /**
    * Specify a path to load including all its properties.
-   * <p>
-   * The same as {@link #fetch(String, String)} with the fetchProperties as "*".
-   * </p>
+   *
    * <pre>{@code
    *
    * List<Customer> customers =

@@ -2,6 +2,7 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.FetchConfig;
 import io.ebean.PagedList;
 import org.assertj.core.util.Lists;
 import org.ebeantest.LoggedSqlCollector;
@@ -243,6 +244,104 @@ public class TestQueryFindNative extends BaseTestCase {
 
     if (isH2()) {
       assertThat(loggedSql.get(0)).contains("from o_customer order by order_column_1 limit 10 offset 1");
+    }
+  }
+
+
+  @Test
+  public void findNativeWithOneFetchQuery() {
+
+    ResetBasicData.reset();
+
+    String sql = "select * from o_customer";
+
+    LoggedSqlCollector.start();
+
+    List<Customer> result = DB.findNative(Customer.class, sql)
+            .fetchQuery("contacts")
+            .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    if (isH2()) {
+      assertThat(loggedSql).hasSize(2);
+      assertThat(loggedSql.get(0)).contains("from o_customer");
+      assertThat(loggedSql.get(1)).contains("from contact");
+    }
+  }
+
+  @Test
+  public void findNativeWithOneFetch() {
+
+    ResetBasicData.reset();
+
+    String sql = "select * from o_customer";
+
+    LoggedSqlCollector.start();
+
+    List<Customer> result = DB.findNative(Customer.class, sql)
+            .fetch("contacts", "firstName, lastName")
+            .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    if (isH2()) {
+      assertThat(loggedSql).hasSize(2);
+      assertThat(loggedSql.get(0)).contains("from o_customer");
+      assertThat(loggedSql.get(1)).contains("select t0.customer_id, t0.id, t0.first_name, t0.last_name from contact t0 where");
+    }
+  }
+
+  @Test
+  public void findNativeWithMultipleFetchQuery() {
+
+    ResetBasicData.reset();
+
+    String sql = "select * from o_customer";
+
+    LoggedSqlCollector.start();
+
+    List<Customer> result = DB.findNative(Customer.class, sql)
+            .fetchQuery("orders")
+            .fetchQuery("contacts")
+            .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    if (isH2()) {
+      assertThat(loggedSql).hasSize(3);
+      assertThat(loggedSql.get(0)).contains("from o_customer");
+      assertThat(loggedSql).anyMatch(s -> s.contains("from o_order"));
+      assertThat(loggedSql).anyMatch(s -> s.contains("from contact"));
+    }
+  }
+
+  @Test
+  public void findNativeWithMultipleFetch() {
+
+    ResetBasicData.reset();
+
+    String sql = "select * from o_customer";
+
+    LoggedSqlCollector.start();
+
+    List<Customer> result = DB.findNative(Customer.class, sql)
+            // with nativeSql fetch (default) are converted to fetchQuery()
+            .fetch("orders")
+            .fetch("contacts", FetchConfig.ofDefault())
+            .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    if (isH2()) {
+      assertThat(loggedSql).hasSize(3);
+      assertThat(loggedSql.get(0)).contains("from o_customer");
+      assertThat(loggedSql).anyMatch(s -> s.contains("from o_order"));
+      assertThat(loggedSql).anyMatch(s -> s.contains("from contact"));
     }
   }
 

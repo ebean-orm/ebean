@@ -9,10 +9,10 @@ import java.util.Collection;
  * <p>
  * <pre>{@code
  *
- * ＠Repository
+ * @Repository
  * public class CustomerRepository extends BeanRepository<Long,Customer> {
  *
- *   ＠Inject
+ *   @Inject
  *   public CustomerRepository(Database server) {
  *     super(Customer.class, server);
  *   }

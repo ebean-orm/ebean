@@ -122,8 +122,8 @@ class SqlTree {
     return inheritanceWhereSql;
   }
 
-  SqlTreeNode getRootNode() {
-    return rootNode;
+  SqlTreeRoot getRootNode() {
+    return (SqlTreeRoot)rootNode;
   }
 
   /**

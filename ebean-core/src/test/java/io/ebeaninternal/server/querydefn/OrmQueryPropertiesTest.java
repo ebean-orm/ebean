@@ -14,17 +14,12 @@ public class OrmQueryPropertiesTest {
     return sb.toString();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void construct_with_propertySet_when_null() {
-    new OrmQueryProperties(null, (LinkedHashSet<String>) null);
-  }
-
   @Test
   public void construct_with_propertySet_when_empty() {
 
     OrmQueryProperties p1 = new OrmQueryProperties(null, new LinkedHashSet<>());
-    assertThat(p1.getProperties()).isEqualTo("");
     assertThat(p1.allProperties()).isFalse();
+    assertThat(p1.getIncluded()).isEmpty();
   }
 
   @Test
@@ -34,7 +29,7 @@ public class OrmQueryPropertiesTest {
     set.add("name");
     OrmQueryProperties p1 = new OrmQueryProperties(null, set);
 
-    assertThat(p1.getProperties()).isEqualTo("name");
+    assertThat(p1.getIncluded()).containsOnly("name");
     assertThat(p1.allProperties()).isFalse();
   }
 
@@ -47,7 +42,7 @@ public class OrmQueryPropertiesTest {
     set.add("startDate");
     OrmQueryProperties p1 = new OrmQueryProperties(null, set);
 
-    assertThat(p1.getProperties()).isEqualTo("id,name,startDate");
+    assertThat(p1.getIncluded()).containsOnly("id", "name", "startDate");
     assertThat(p1.allProperties()).isFalse();
   }
 

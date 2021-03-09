@@ -4,13 +4,11 @@ import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
-import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
@@ -28,7 +26,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.validation.constraints.NotNull;
 
 /**
  * Read the deployment annotations for Associated One beans.
@@ -117,13 +114,10 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
     if (nonNull != null) {
       prop.setNullable(false);
     }
-    if (validationAnnotations) {
-      NotNull notNull = get(prop, NotNull.class);
-      if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-        prop.setNullable(false);
-        // overrides optional attribute of ManyToOne etc
-        prop.getTableJoin().setType(SqlJoinType.INNER);
-      }
+    if (readConfig.isValidationNotNull(prop)) {
+      // overrides optional attribute of ManyToOne etc
+      prop.setNullable(false);
+      prop.getTableJoin().setType(SqlJoinType.INNER);
     }
 
     // check for manually defined joins

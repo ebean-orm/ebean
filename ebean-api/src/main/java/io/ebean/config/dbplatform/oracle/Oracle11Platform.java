@@ -13,6 +13,7 @@ public class Oracle11Platform extends OraclePlatform {
     this.platform = Platform.ORACLE11;
     this.columnAliasPrefix = "c";
     this.sqlLimiter = new OracleRownumSqlLimiter();
+    this.basicSqlLimiter = new OracleRownumBasicLimiter();
     dbIdentity.setIdType(IdType.SEQUENCE);
   }
 }

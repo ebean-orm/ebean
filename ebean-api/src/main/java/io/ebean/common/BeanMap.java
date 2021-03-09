@@ -77,7 +77,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   public void internalPutWithCheck(Object key, Object bean) {
-    if (map == null || !map.containsKey(key)) {
+    if (map == null || key == null || !map.containsKey(key)) {
       internalPut(key, bean);
     }
   }

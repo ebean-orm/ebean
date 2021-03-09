@@ -727,7 +727,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     String[] cols = indexDef.getColumns();
     BeanProperty[] props = new BeanProperty[cols.length];
     for (int i = 0; i < cols.length; i++) {
-      String propName = findBeanPath("", cols[i]);
+      String propName = findBeanPath("", "", cols[i]);
       if (propName == null) {
         return;
       }
@@ -2472,18 +2472,27 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the property path given the db table and column.
    */
-  public String findBeanPath(String tableName, String columnName) {
-    if (tableName.isEmpty() || tableName.equalsIgnoreCase(baseTable)) {
+  public String findBeanPath(String schemaName, String tableName, String columnName) {
+    if (matchBaseTable(schemaName, tableName)) {
       return columnPath.get(columnName);
     }
     BeanPropertyAssoc<?> assocProperty = tablePath.get(tableName);
+    if (assocProperty == null) {
+      assocProperty = tablePath.get(schemaName + "." + tableName);
+    }
     if (assocProperty != null) {
-      String relativePath = assocProperty.getTargetDescriptor().findBeanPath(tableName, columnName);
+      String relativePath = assocProperty.getTargetDescriptor().findBeanPath(schemaName, tableName, columnName);
       if (relativePath != null) {
         return SplitName.add(assocProperty.getName(), relativePath);
       }
     }
     return null;
+  }
+
+  private boolean matchBaseTable(String schemaName, String tableName) {
+    return tableName.isEmpty()
+      || baseTable.equalsIgnoreCase(tableName)
+      || baseTable.equalsIgnoreCase(schemaName + "." + tableName);
   }
 
   /**
