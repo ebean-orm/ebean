@@ -810,7 +810,7 @@ public interface Query<T> {
    * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the Consumer interface which is better suited to use with Java8 closures.
+   * iterator uses the Consumer interface which is better suited to use with closures.
    * </p>
    * <pre>{@code
    *
@@ -830,6 +830,21 @@ public interface Query<T> {
   void findEach(Consumer<T> consumer);
 
   /**
+   * Execute findEach streaming query batching the results for consuming.
+   * <p>
+   * This query execution will stream the results and is suited to consuming
+   * large numbers of results from the database.
+   * <p>
+   * Typically we use this batch consumer when we want to do further processing on
+   * the beans and want to do that processing in batch form, for example - 100 at
+   * a time.
+   *
+   * @param batch    The number of beans processed in the batch
+   * @param consumer Process the batch of beans
+   */
+  void findEach(int batch, Consumer<List<T>> consumer);
+
+  /**
    * Execute the query using callbacks to a visitor to process the resulting
    * beans one at a time.
    * <p>
@@ -839,12 +854,12 @@ public interface Query<T> {
    * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the Predicate (SAM) interface which is better suited to use with Java8 closures.
+   * iterator uses the Predicate interface which is better suited to use with closures.
    * </p>
    * <pre>{@code
    *
    *  DB.find(Customer.class)
-   *     .fetch("contacts", FetchConfig.ofQuery(2))
+   *     .fetchQuery("contacts")
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
    *     .setMaxRows(2000)

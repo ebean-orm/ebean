@@ -1552,6 +1552,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    server.findEach(this, batch, consumer, transaction);
+  }
+
+  @Override
   public QueryIterator<T> findIterate() {
     return server.findIterate(this, transaction);
   }

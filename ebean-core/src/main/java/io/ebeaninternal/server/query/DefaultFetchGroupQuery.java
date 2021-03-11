@@ -264,6 +264,11 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch 
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
