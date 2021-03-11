@@ -102,13 +102,14 @@
               <sourceDirs>
                 <sourceDir>src/test/kotlin</sourceDir>
               </sourceDirs>
-              <annotationProcessorPaths>
-                <annotationProcessorPath>
-                  <groupId>io.ebean</groupId>
-                  <artifactId>kotlin-querybean-generator</artifactId>
-                  <version>12.7.1</version>
-                </annotationProcessorPath>
-              </annotationProcessorPaths>
+<!--              <annotationProcessorPaths>-->
+<!--                <annotationProcessorPath>-->
+<!--                  <groupId>io.ebean</groupId>-->
+<!--                  <artifactId>kotlin-querybean-generator</artifactId>-->
+<!--&lt;!&ndash;                  <version>12.7.1</version>&ndash;&gt;-->
+<!--                  <version>12.7.3-SNAPSHOT</version>-->
+<!--                </annotationProcessorPath>-->
+<!--              </annotationProcessorPaths>-->
             </configuration>
           </execution>
         </executions>

@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test
 
 class AddressTest {
 
-  private val fieldsInQueryBean = javaClass.classLoader.loadClass("org.example.domain.query.QAddress")
-    ?.declaredFields
-    ?: fail()
+//  private val fieldsInQueryBean = javaClass.classLoader.loadClass("org.example.domain.query.QAddress")
+//    ?.declaredFields
+//    ?: fail()
   private val fieldsInBean = Address::class.java.declaredFields
 
   @Test
@@ -22,8 +22,8 @@ class AddressTest {
     assertTrue(fieldsInBean.any { it.name == fieldName }) {
       "$fieldName does not exist in Address."
     }
-    assertTrue(fieldsInQueryBean.none { it.name == fieldName}) {
-      "$fieldName does exists in query bean for Address (QAddress)."
-    }
+//    assertTrue(fieldsInQueryBean.none { it.name == fieldName}) {
+//      "$fieldName does exists in query bean for Address (QAddress)."
+//    }
   }
 }
