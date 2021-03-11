@@ -83,4 +83,13 @@ public class JsonAssertContainsTest {
     assertThat(contains.path("a")).isEqualTo("a");
     assertThat(contains.path("b")).isEqualTo("b");
   }
+
+  @Test
+  public void assertContainsArrayShuffled() {
+    JsonNode array = readNodeFromResource("/contains/array.json");
+    JsonNode arrayShuffled = readNodeFromResource("/contains/array-shuffled.json");
+
+    JsonAssertContains.assertContains(array, arrayShuffled);
+    JsonAssertContains.assertContains(arrayShuffled, array);
+  }
 }
