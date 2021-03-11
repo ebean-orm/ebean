@@ -33,6 +33,7 @@ public class DatabaseFactory {
 
   private static final ReentrantLock lock = new ReentrantLock();
   private static SpiContainer container;
+  private static String defaultServerName;
 
   static {
     EbeanVersion.getVersion();
@@ -76,6 +77,12 @@ public class DatabaseFactory {
       }
       Database server = createInternal(config);
       if (config.isRegister()) {
+        if (config.isDefaultServer()) {
+          if (defaultServerName != null) {
+            throw new IllegalStateException("Registering [" + config.getName() + "] as the default server but [" + defaultServerName + "] is already registered as the default");
+          }
+          defaultServerName = config.getName();
+        }
         DbPrimary.setSkip(true);
         DbContext.getInstance().register(server, config.isDefaultServer());
       }

@@ -74,9 +74,11 @@ public class ServerConfigTest {
     props.setProperty("loadModuleInfo", "true");
     props.setProperty("collectQueryPlanThresholdMicros", "10000");
     props.setProperty("forUpdateNoKey", "true");
+    props.setProperty("defaultServer", "false");
 
     serverConfig.loadFromProperties(props);
 
+    assertFalse(serverConfig.isDefaultServer());
     assertTrue(serverConfig.isDisableL2Cache());
     assertTrue(serverConfig.isNotifyL2CacheInForeground());
     assertTrue(serverConfig.isDbOffline());
@@ -134,6 +136,7 @@ public class ServerConfigTest {
 
     ServerConfig serverConfig = new ServerConfig();
     assertTrue(serverConfig.isIdGeneratorAutomatic());
+    assertTrue(serverConfig.isDefaultServer());
 
     serverConfig.setIdGeneratorAutomatic(false);
     assertFalse(serverConfig.isIdGeneratorAutomatic());

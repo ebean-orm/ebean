@@ -2795,6 +2795,7 @@ public class DatabaseConfig {
     }
     loadDocStoreSettings(p);
 
+    defaultServer = p.getBoolean("defaultServer", defaultServer);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);
     dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
