@@ -3,6 +3,22 @@
   "someString2": "string2",
   "someValue1": 99,
   "someValue2": 2,
+  "someObject1": {
+    "value1": [],
+    "value2": {
+
+    },
+    "array1": [
+      101
+    ],
+    "object1": {
+      "val5": "val5",
+      "val6": "val6"
+    },
+    "object2": null,
+    "objectNull": {
+    }
+  },
   "someArray1": [
     "a"
   ],
