@@ -151,7 +151,7 @@ public final class SqlTreeBuilder {
   }
 
   private String buildGroupByClause() {
-    if (rawSql || !rootNode.isAggregation()) {
+    if (rawSql || (!rootNode.isAggregation() && query.getHavingExpressions() == null)) {
       return null;
     }
     ctx.startGroupBy();

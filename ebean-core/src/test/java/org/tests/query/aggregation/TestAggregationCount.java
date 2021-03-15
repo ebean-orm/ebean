@@ -3,6 +3,7 @@ package org.tests.query.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
+import io.ebeantest.LoggedSql;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,6 +90,22 @@ public class TestAggregationCount extends BaseTestCase {
       String name = eventOne.getName();
       assertThat(name).isNotNull();
     }
+  }
+
+  @Test
+  public void findCount_withHaving() {
+    Query<TEventOne> query = Ebean.find(TEventOne.class)
+      //.select("id, totalUnits")
+      .having()
+      .ge("totalUnits", 1)
+      .query();
+
+    LoggedSql.start();
+    int count = query.findCount();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("group by t0.id");
+    assertThat(count).isGreaterThan(0);
   }
 
   @Test
