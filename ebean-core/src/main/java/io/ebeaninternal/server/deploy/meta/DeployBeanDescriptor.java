@@ -16,6 +16,7 @@ import io.ebean.event.BeanPostLoad;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -1149,8 +1150,21 @@ public class DeployBeanDescriptor<T> {
       return null;
     }
     // use 'current' table alias - refer BeanProperty appendSelect() for aggregation
-    DeployBeanProperty property = propMap.get(expression);
-    return (property == null) ? null : "${ta}." + property.getDbColumn();
+    String[] split = SplitName.split(expression);
+    if (split[0] == null) {
+      DeployBeanProperty property = propMap.get(expression);
+      return (property == null) ? null : "${ta}." + property.getDbColumn();
+    } else {
+      DeployBeanProperty property = propMap.get(split[0]);
+      if (property instanceof DeployBeanPropertyAssoc) {
+        DeployBeanPropertyAssoc<?> prop = (DeployBeanPropertyAssoc<?>) property;
+        DeployBeanProperty beanProperty = prop.getTargetDeploy().getBeanProperty(split[1]);
+        if (beanProperty != null) {
+          return "u1." + beanProperty.getDbColumn();
+        }
+      }
+      return null;
+    }
   }
 
   /**

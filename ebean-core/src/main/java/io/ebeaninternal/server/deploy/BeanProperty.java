@@ -324,9 +324,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.generatedProperty = deploy.getGeneratedProperty();
     this.getter = deploy.getGetter();
     this.setter = deploy.getSetter();
+    this.aggregation = deploy.parseAggregation();
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
     this.dbComment = deploy.getDbComment();
-    this.aggregation = deploy.parseAggregation();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;

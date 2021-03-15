@@ -682,7 +682,6 @@ public class DeployBeanProperty {
    */
   public void setAggregationPrefix(String prefix) {
     this.aggregationPrefix = prefix;
-    this.aggregation = (prefix == null) ? aggregation : aggregation.replace(aggregationPrefix, "u1");
   }
 
   public String getElPrefix() {
@@ -715,7 +714,7 @@ public class DeployBeanProperty {
       return sqlFormulaSelect;
     }
     if (aggregation != null) {
-      return aggregation;
+      return aggregationParsed == null ? dbColumn : aggregationParsed;
     }
     return dbColumn;
   }

@@ -37,10 +37,10 @@ public class TEventOne {
   @Aggregation("count(logs.id)")
   Long count;
 
-  @Aggregation("sum(logs.units)")
+  @Aggregation("sum(logs.myUnits)")
   Double totalUnits;
 
-  @Aggregation("sum(logs.units * logs.amount)")
+  @Aggregation("sum(logs.myUnits * logs.amount)")
   Double totalAmount;
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
