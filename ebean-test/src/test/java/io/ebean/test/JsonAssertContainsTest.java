@@ -33,7 +33,6 @@ public class JsonAssertContainsTest {
     JsonNode expected = readNodeFromResource("/contains/original-subset-modified.json");
     try {
       JsonAssertContains.assertContains(original, expected);
-      Assertions.fail("Expected an exception to be thrown");
     } catch (AssertionError e) {
       String exceptionMessage = e.getMessage();
       System.out.println(exceptionMessage);
@@ -48,7 +47,9 @@ public class JsonAssertContainsTest {
         "Expected field 'someObject1.object2' to be of type 'NULL' but was 'OBJECT'",
         "Expected field 'someObject1.objectNull' to be of type 'OBJECT' but was 'NULL'")
         .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
     }
+    Assertions.fail("Expected an exception to be thrown");
   }
 
 
@@ -58,13 +59,14 @@ public class JsonAssertContainsTest {
     JsonNode expected = readNodeFromResource("/contains/check-null-expected.json");
     try {
       JsonAssertContains.assertContains(original, expected);
-      Assertions.fail("Expected an exception to be thrown");
     } catch (AssertionError e) {
       String exceptionMessage = e.getMessage();
       Stream.of("Expected field 'someNull' to be of type 'NULL' but was 'STRING'",
         "Expected field 'extra' to be present")
         .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
     }
+    Assertions.fail("Expected an exception to be thrown");
   }
 
   @Test
@@ -73,12 +75,13 @@ public class JsonAssertContainsTest {
     JsonNode expected = readNodeFromResource("/contains/check-type-expected.json");
     try {
       JsonAssertContains.assertContains(original, expected);
-      Assertions.fail("Expected an exception to be thrown");
     } catch (AssertionError e) {
       String exceptionMessage = e.getMessage();
       Stream.of("Expected field 'some' to be of type 'NUMBER' but was 'STRING'")
         .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
     }
+    Assertions.fail("Expected an exception to be thrown");
   }
 
   @Test
@@ -114,13 +117,14 @@ public class JsonAssertContainsTest {
 
     try {
       JsonAssertContains.assertContains(actual, original);
-      Assertions.fail("Expected an exception to be thrown");
     } catch (AssertionError e) {
-      System.out.println(e);
       String exceptionMessage = e.getMessage();
       Stream.of("Unable to match expected element '[5]' in the actual array",
         "Unable to match expected element '[4]' in the actual array")
         .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
     }
+
+    Assertions.fail("Expected an exception to be thrown");
   }
 }
