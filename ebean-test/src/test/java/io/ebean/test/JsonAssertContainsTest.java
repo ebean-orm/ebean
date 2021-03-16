@@ -38,10 +38,10 @@ public class JsonAssertContainsTest {
       System.out.println(exceptionMessage);
       Stream.of("Expected field 'someString1' to be equal to '\"aaaa\"' but was '\"string1\"",
         "Expected field 'someValue1' to be equal to '99' but was '1'",
-        "Unable to match expected element 'someArray1[0]' in the actual array",
         "Expected field 'someObject1.value1' to be of type 'ARRAY' but was 'NUMBER'",
         "Expected field 'someObject1.value2' to be of type 'OBJECT' but was 'STRING'",
-        "Unable to match expected element 'someObject1.array1[0]' in the actual array",
+        "Expected array element 'someObject1.array1[0]' was not matched to an element in the actual array - element: 101",
+        "Actual array element 'someObject1.array1[0]' was not matched to an element in the expected array - element: 99",
         "Expected field 'someObject1.object1.val5' to be present",
         "Expected field 'someObject1.object1.val6' to be present",
         "Expected field 'someObject1.object2' to be of type 'NULL' but was 'OBJECT'",
@@ -119,8 +119,72 @@ public class JsonAssertContainsTest {
       JsonAssertContains.assertContains(actual, original);
     } catch (AssertionError e) {
       String exceptionMessage = e.getMessage();
-      Stream.of("Unable to match expected element '[5]' in the actual array",
-        "Unable to match expected element '[4]' in the actual array")
+      Stream.of("Unmatched array size for '', expected 6 but got 4 elements",
+        "Expected array element '[2]' was not matched to an element in the actual array - element: {\"c\":3}",
+        "Expected array element '[4]' was not matched to an element in the actual array - element: {\"e\":5}",
+        "Expected array element '[5]' was not matched to an element in the actual array - element: {\"f\":6}",
+        "Actual array element '[3]' was not matched to an element in the expected array - element: {\"b\":2}")
+        .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
+    }
+
+    Assertions.fail("Expected an exception to be thrown");
+  }
+
+  @Test
+  public void assertNestedArray_ordering() {
+    JsonNode original = readNodeFromResource("/contains/nested-array.json");
+    JsonNode actual = readNodeFromResource("/contains/nested-array-ordering.json");
+    JsonAssertContains.assertContains(actual, original);
+  }
+
+  @Test
+  public void assertNestedArray_both() {
+    try {
+      JsonNode original = readNodeFromResource("/contains/nested-array.json");
+      JsonNode actual = readNodeFromResource("/contains/nested-array-both.json");
+      JsonAssertContains.assertContains(actual, original);
+    } catch (AssertionError e) {
+      String exceptionMessage = e.getMessage();
+      Stream.of(
+        "Expected array element 'someArray1[1]' was not matched to an element in the actual array - element: {\"name\":\"b\"}",
+        "Actual array element 'someArray1[0]' was not matched to an element in the expected array - element: {\"name\":\"z\"}")
+        .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
+    }
+
+    Assertions.fail("Expected an exception to be thrown");
+  }
+
+  @Test
+  public void assertNestedArray_extraExpected() {
+    try {
+      JsonNode original = readNodeFromResource("/contains/nested-array.json");
+      JsonNode actual = readNodeFromResource("/contains/nested-array-extraExpected.json");
+      JsonAssertContains.assertContains(actual, original);
+    } catch (AssertionError e) {
+      String exceptionMessage = e.getMessage();
+      Stream.of(
+        "Unmatched array size for 'someArray1', expected 3 but got 4 elements",
+        "Actual array element 'someArray1[2]' was not matched to an element in the expected array - element: {\"name\":\"d\"}")
+        .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
+      return;
+    }
+
+    Assertions.fail("Expected an exception to be thrown");
+  }
+
+  @Test
+  public void assertNestedArray_missExpected() {
+    try {
+      JsonNode original = readNodeFromResource("/contains/nested-array.json");
+      JsonNode actual = readNodeFromResource("/contains/nested-array-missExpected.json");
+      JsonAssertContains.assertContains(actual, original);
+    } catch (AssertionError e) {
+      String exceptionMessage = e.getMessage();
+      Stream.of(
+        "Unmatched array size for 'someArray1', expected 3 but got 2 elements",
+        "Expected array element 'someArray1[1]' was not matched to an element in the actual array - element: {\"name\":\"b\"}")
         .forEach(assertionError -> assertThat(exceptionMessage).contains(assertionError));
       return;
     }

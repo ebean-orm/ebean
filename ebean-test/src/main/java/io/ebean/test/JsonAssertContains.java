@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.assertj.core.api.Assertions;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Perform traversal of JsonNodes comparing against an expected JsonNode that
  * typically contains a subset of the data (typically excludes any generated properties
  * like when modified timestamps etc).
  */
-public class JsonAssertContains {
+class JsonAssertContains {
 
   private final Stack<String> path = new Stack<>();
 
@@ -88,63 +87,7 @@ public class JsonAssertContains {
     if (!expectedJsonNode.isArray()) {
       return CompareResult.NOT_APPLICABLE;
     }
-
-    Map<Integer, Set<Integer>> matchingIndexes = findMatchingIndexes(actualJsonNode, expectedJsonNode);
-    List<Integer> unmatchedIndexes = listUnmatchedIndexes(expectedJsonNode.size(), matchingIndexes);
-    List<Map.Entry<Integer, Set<Integer>>> remainingEntries = removeMultipleMatches(matchingIndexes);
-    if (!remainingEntries.isEmpty()) {
-      unmatchedIndexes.addAll(remainingEntries.stream().map(Map.Entry::getKey).collect(Collectors.toList()));
-    }
-
-    List<String> errors = unmatchedIndexes.stream()
-      .map(index -> String.format("Unable to match expected element '%s[%d]' in the actual array", path(), index))
-      .collect(Collectors.toList());
-
-    return CompareResult.errors(errors);
-  }
-
-  private List<Integer> listUnmatchedIndexes(int size, Map<Integer, Set<Integer>> matchingIndexes) {
-    List<Integer> unmatched = new LinkedList<>();
-    for (int i = 0; i < size; i++) {
-      if (!matchingIndexes.containsKey(i)) {
-        unmatched.add(i);
-      }
-    }
-    return unmatched;
-  }
-
-  private List<Map.Entry<Integer, Set<Integer>>> removeMultipleMatches(Map<Integer, Set<Integer>> matchingIndexes) {
-    List<Map.Entry<Integer, Set<Integer>>> entries = new ArrayList<>(matchingIndexes.entrySet());
-    entries.sort(Comparator.comparingInt(entry -> entry.getValue().size()));
-    ListIterator<Map.Entry<Integer, Set<Integer>>> iterator = entries.listIterator();
-
-    while (iterator.hasNext()) {
-      Map.Entry<Integer, Set<Integer>> next = iterator.next();
-      if (!next.getValue().isEmpty()) {
-        iterator.remove();
-        Integer aMatchingIndex = next.getValue().stream().findFirst().get();
-        removeAllMatchingIndexesOf(aMatchingIndex, entries);
-      }
-    }
-
-    return entries;
-  }
-
-  private void removeAllMatchingIndexesOf(Integer aMatchingIndex, List<Map.Entry<Integer, Set<Integer>>> matchingIndexes) {
-    matchingIndexes.forEach(entry -> entry.getValue().remove(aMatchingIndex));
-  }
-
-  private Map<Integer, Set<Integer>> findMatchingIndexes(JsonNode actualJsonNode, JsonNode expectedJsonNode) {
-    Map<Integer, Set<Integer>> matchingElementsIndexes = new HashMap<>();
-    for (int e = 0; e < expectedJsonNode.size(); e++) {
-      for (int a = 0; a < actualJsonNode.size(); a++) {
-        CompareResult result = checkRecursive("[" + e + "]", actualJsonNode.get(a), expectedJsonNode.get(e));
-        if (result.isApplicable() && !result.hasErrors()) {
-          matchingElementsIndexes.computeIfAbsent(e, key -> new HashSet<>()).add(a);
-        }
-      }
-    }
-    return matchingElementsIndexes;
+    return new MatchArrayElements(actualJsonNode, expectedJsonNode).match();
   }
 
   private CompareResult checkObject(JsonNode actualJsonNode, JsonNode expectedJsonNode) {
@@ -187,4 +130,64 @@ public class JsonAssertContains {
     }
     return String.join(".", path).replace(".[", "[");
   }
+
+  /**
+   * Match two arrays allowing elements to be in a different order.
+   */
+  private class MatchArrayElements {
+    private final JsonNode actualJsonNode;
+    private final JsonNode expectedJsonNode;
+    private final Map<Integer, JsonNode> expectedMap = new LinkedHashMap<>();
+    private final Map<Integer, JsonNode> actualMap = new LinkedHashMap<>();
+
+    MatchArrayElements(JsonNode actualJsonNode, JsonNode expectedJsonNode) {
+      this.actualJsonNode = actualJsonNode;
+      this.expectedJsonNode = expectedJsonNode;
+      for (int e = 0; e < expectedJsonNode.size(); e++) {
+        expectedMap.put(e, expectedJsonNode.get(e));
+      }
+      for (int a = 0; a < actualJsonNode.size(); a++) {
+        actualMap.put(a, actualJsonNode.get(a));
+      }
+    }
+
+    CompareResult match() {
+      Iterator<Map.Entry<Integer, JsonNode>> iterator = expectedMap.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Map.Entry<Integer, JsonNode> expectedEntry = iterator.next();
+        int matchPos = findFirstMatch(expectedEntry.getKey(), expectedEntry.getValue());
+        if (matchPos > -1) {
+          iterator.remove();
+        }
+      }
+
+      List<String> errors = new ArrayList<>();
+      if (actualJsonNode.size() != expectedJsonNode.size()) {
+        errors.add(String.format("Unmatched array size for '%s', expected %d but got %d elements", path(), expectedJsonNode.size(), actualJsonNode.size()));
+      }
+      // unmatched expected -> actual
+      for (Map.Entry<Integer, JsonNode> entry : expectedMap.entrySet()) {
+        errors.add(String.format("Expected array element '%s[%d]' was not matched to an element in the actual array - element: %s", path(), entry.getKey(), entry.getValue()));
+      }
+      // unmatched actual -> expected
+      for (Map.Entry<Integer, JsonNode> entry : actualMap.entrySet()) {
+        errors.add(String.format("Actual array element '%s[%d]' was not matched to an element in the expected array - element: %s", path(), entry.getKey(), entry.getValue()));
+      }
+      return CompareResult.errors(errors);
+    }
+
+    private int findFirstMatch(int e, JsonNode expectedNode) {
+      Iterator<Map.Entry<Integer, JsonNode>> iterator = actualMap.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Map.Entry<Integer, JsonNode> entry = iterator.next();
+        CompareResult result = checkRecursive("[" + e + "]", entry.getValue(), expectedNode);
+        if (result.isApplicable() && !result.hasErrors()) {
+          iterator.remove();
+          return entry.getKey();
+        }
+      }
+      return -1;
+    }
+  }
+
 }

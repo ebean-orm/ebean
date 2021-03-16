@@ -4,35 +4,36 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CompareResult {
-    private final boolean applicable;
-    private final List<String> errors;
+final class CompareResult {
 
-    public static final CompareResult NO_ERRORS = new CompareResult(true, Collections.emptyList());
-    public static final CompareResult NOT_APPLICABLE = new CompareResult(false, Collections.emptyList());
+  private final boolean applicable;
+  private final List<String> errors;
 
-    public static CompareResult error(String error) {
-        return new CompareResult(true, Collections.singletonList(error));
-    }
+  static final CompareResult NO_ERRORS = new CompareResult(true, Collections.emptyList());
+  static final CompareResult NOT_APPLICABLE = new CompareResult(false, Collections.emptyList());
 
-    public static CompareResult errors(List<String> errors) {
-        return new CompareResult(true, errors);
-    }
+  static CompareResult error(String error) {
+    return new CompareResult(true, Collections.singletonList(error));
+  }
 
-    private CompareResult(boolean applicable, List<String> errors) {
-        this.applicable = applicable;
-        this.errors = new ArrayList<>(errors);
-    }
+  static CompareResult errors(List<String> errors) {
+    return new CompareResult(true, errors);
+  }
 
-    public boolean isApplicable() {
-        return applicable;
-    }
+  private CompareResult(boolean applicable, List<String> errors) {
+    this.applicable = applicable;
+    this.errors = new ArrayList<>(errors);
+  }
 
-    public boolean hasErrors() {
-        return !errors.isEmpty();
-    }
+  boolean isApplicable() {
+    return applicable;
+  }
 
-    public List<String> getErrors() {
-        return errors;
-    }
+  boolean hasErrors() {
+    return !errors.isEmpty();
+  }
+
+  List<String> getErrors() {
+    return errors;
+  }
 }

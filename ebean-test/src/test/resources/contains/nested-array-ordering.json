@@ -1,0 +1,8 @@
+{
+  "someString1": "string1",
+  "someArray1": [
+    {"name":"c"},
+    {"name":"a"},
+    {"name":"b"}
+  ]
+}
