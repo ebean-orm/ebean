@@ -38,8 +38,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import java.util.Set;
 
-import static io.ebean.util.StringHelper.isNull;
-
 /**
  * Read the deployment annotation for Assoc Many beans.
  */
@@ -346,18 +344,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
     return append(joinTable.catalog(), joinTable.schema(), joinTable.name());
   }
 
-  private String append(String catalog, String schema, String name) {
-    StringBuilder sb = new StringBuilder();
-    if (!isNull(catalog)) {
-      sb.append(catalog).append(".");
-    }
-    if (!isNull(schema)) {
-      sb.append(schema).append(".");
-    }
-    sb.append(name);
-    return sb.toString();
-  }
-
   /**
    * Return the full table name
    */
@@ -366,6 +352,13 @@ class AnnotationAssocManys extends AnnotationAssoc {
       return null;
     }
     return append(collectionTable.catalog(), collectionTable.schema(), collectionTable.name());
+  }
+
+  /**
+   * Return the full table name taking into account quoted identifiers.
+   */
+  private String append(String catalog, String schema, String name) {
+    return namingConvention.getTableName(catalog, schema, name);
   }
 
   /**
@@ -414,8 +407,8 @@ class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty localId = localTable.getIdProperty();
       if (localId != null) {
         // add the source to intersection join columns
-        String fkCol = localTableName + "_" + localId.getDbColumn();
-        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), namingConvention.getColumnFromProperty(null, fkCol)));
+        String fkCol = namingConvention.deriveM2MColumn(localTableName, localId.getDbColumn());
+        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkCol));
       }
     }
 
@@ -424,8 +417,8 @@ class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty otherId = otherTable.getIdProperty();
       if (otherId != null) {
         // set the intersection to dest table join columns
-        final String fkCol = otherTableName + "_" + otherId.getDbColumn();
-        destJoin.addJoinColumn(new DeployTableJoinColumn(namingConvention.getColumnFromProperty(null, fkCol), otherId.getDbColumn()));
+        String fkCol = namingConvention.deriveM2MColumn(otherTableName, otherId.getDbColumn());
+        destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherId.getDbColumn()));
       }
     }
 

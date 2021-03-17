@@ -40,11 +40,6 @@ public class MatchingNamingConvention extends AbstractNamingConvention {
   }
 
   @Override
-  public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName) {
-    return dbColumnName;
-  }
-
-  @Override
   public String getForeignKey(String prefix, String fkProperty) {
     prefix = databasePlatform.unQuote(prefix);
     fkProperty = databasePlatform.unQuote(fkProperty);

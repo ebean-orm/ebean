@@ -20,7 +20,7 @@ public final class TableName {
   /**
    * The name.
    */
-  private String name;
+  private final String name;
 
   /**
    * Construct with the given catalog schema and table name.
@@ -29,7 +29,6 @@ public final class TableName {
    * </p>
    */
   public TableName(String catalog, String schema, String name) {
-    super();
     this.catalog = catalog != null ? catalog.trim() : null;
     this.schema = schema != null ? schema.trim() : null;
     this.name = name != null ? name.trim() : null;
@@ -110,14 +109,11 @@ public final class TableName {
    * @return the qualified name
    */
   public String getQualifiedName() {
-
     StringBuilder buffer = new StringBuilder();
-
     // Add catalog
     if (catalog != null) {
       buffer.append(catalog);
     }
-
     // Add schema
     if (schema != null) {
       if (buffer.length() > 0) {
@@ -125,31 +121,27 @@ public final class TableName {
       }
       buffer.append(schema);
     }
-
     if (buffer.length() > 0) {
       buffer.append(".");
     }
-    buffer.append(name);
-
-    return buffer.toString();
+    return buffer.append(name).toString();
   }
 
   /**
    * Append a catalog and schema prefix if they exist to the string builder.
    */
-  public void appendCatalogAndSchema(StringBuilder buffer) {
-    if (catalog != null) {
-      buffer.append(catalog).append(".");
-    }
+  public String withCatalogAndSchema(String name) {
     if (schema != null) {
-      buffer.append(schema).append(".");
+      name = schema + "." + name;
     }
+    if (catalog != null) {
+      name = catalog + "." + name;
+    }
+    return name;
   }
 
   /**
    * Checks if is table name is valid i.e. it has at least a name.
-   *
-   * @return true, if is valid
    */
   public boolean isValid() {
     return name != null && !name.isEmpty();

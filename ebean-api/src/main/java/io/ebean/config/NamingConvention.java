@@ -54,23 +54,21 @@ public interface NamingConvention {
   TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable);
 
   /**
+   * Derive a DB Column from a FK table and column.
+   */
+  String deriveM2MColumn(String tableName, String dbColumn);
+
+  /**
+   * Return the full table name taking into account quoted identifiers.
+   */
+  String getTableName(String catalog, String schema, String name);
+
+  /**
    * Return the column name given the property name.
    *
    * @return the column name for a given property
    */
   String getColumnFromProperty(Class<?> beanClass, String propertyName);
-
-  /**
-   * Return the property name from the column name.
-   * <p>
-   * This is used to help mapping of raw SQL queries onto bean properties.
-   * </p>
-   *
-   * @param beanClass    the bean class
-   * @param dbColumnName the db column name
-   * @return the property name from the column name
-   */
-  String getPropertyFromColumn(Class<?> beanClass, String dbColumnName);
 
   /**
    * Return the sequence name given the table name (for DB's that use sequences).

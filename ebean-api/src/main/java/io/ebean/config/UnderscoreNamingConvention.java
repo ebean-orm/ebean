@@ -61,18 +61,6 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
   }
 
   /**
-   * Converts underscore based column name to Camel case property name.
-   *
-   * @param beanClass    the bean class
-   * @param dbColumnName the db column name
-   * @return the property from column
-   */
-  @Override
-  public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName) {
-    return toCamelFromUnderscore(dbColumnName);
-  }
-
-  /**
    * Return true if the result will be upper case.
    * <p>
    * False if it will be lower case.
