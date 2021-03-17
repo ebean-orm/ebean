@@ -177,9 +177,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   @SuppressWarnings("unchecked")
   public Object toJdbcType(Object value) {
     Object sv = converter.unwrapValue((B) value);
-    if (sv == null) {
-      return nullValue;
-    }
     return scalarType.toJdbcType(sv);
   }
 
