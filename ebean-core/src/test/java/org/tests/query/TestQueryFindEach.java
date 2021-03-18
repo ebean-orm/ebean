@@ -2,7 +2,6 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.FetchConfig;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
@@ -10,8 +9,11 @@ import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasicLog;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.o2m.OmBasicChild;
 import org.tests.o2m.OmBasicParent;
@@ -21,13 +23,14 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class TestQueryFindEach extends BaseTestCase {
 
+  private static final Logger log = LoggerFactory.getLogger(TestQueryFindEach.class);
   private final Random random = new Random();
+  private final AtomicInteger batchCount = new AtomicInteger();
+  private final AtomicInteger rowCount = new AtomicInteger();
 
   @Test
   public void test() {
@@ -47,6 +50,63 @@ public class TestQueryFindEach extends BaseTestCase {
     });
 
     assertEquals(2, counter.get());
+  }
+
+  private void resetFindEachCounts() {
+    batchCount.set(0);
+    rowCount.set(0);
+  }
+
+  private void seedData() {
+    for (int i = 0; i < 15; i++) {
+      EBasicLog log = new EBasicLog("findEachBatch "+i);
+      DB.save(log);
+    }
+  }
+
+  @Test
+  public void findEachBatch() {
+    seedData();
+
+    resetFindEachCounts();
+    findEachWithBatch(5);
+    assertThat(batchCount.get()).isEqualTo(3);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(10);
+    assertThat(batchCount.get()).isEqualTo(2);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(14);
+    assertThat(batchCount.get()).isEqualTo(2);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(15);
+    assertThat(batchCount.get()).isEqualTo(1);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(16);
+    assertThat(batchCount.get()).isEqualTo(1);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(20);
+    assertThat(batchCount.get()).isEqualTo(1);
+    assertThat(rowCount.get()).isEqualTo(15);
+  }
+
+  private void findEachWithBatch(int batchSize) {
+    DB.find(EBasicLog.class)
+      .where().startsWith("name","findEachBatch")
+      .findEach(batchSize, batch -> {
+        int batchId = batchCount.incrementAndGet();
+        int rows = rowCount.addAndGet(batch.size());
+        log.info("batch id:{} size:{} total rows:{}", batchId, batch.size(), rows);
+      });
   }
 
   @Test
