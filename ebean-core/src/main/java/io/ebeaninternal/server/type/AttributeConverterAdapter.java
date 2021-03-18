@@ -10,14 +10,24 @@ import javax.persistence.AttributeConverter;
 class AttributeConverterAdapter<B,S> implements ScalarTypeConverter<B, S> {
 
   private final AttributeConverter<B,S> converter;
+  private final B nullValue;
 
   AttributeConverterAdapter(AttributeConverter<B, S> converter) {
     this.converter = converter;
+    this.nullValue = probeNullValue();
+  }
+
+  private B probeNullValue() {
+    try {
+      return converter.convertToEntityAttribute(null);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   @Override
   public B getNullValue() {
-    return null;
+    return nullValue;
   }
 
   @Override
