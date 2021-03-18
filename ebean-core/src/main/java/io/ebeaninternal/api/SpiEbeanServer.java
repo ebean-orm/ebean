@@ -265,6 +265,11 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer);
 
   /**
+   * DTO findEach batch query.
+   */
+  <T> void findDtoEach(SpiDtoQuery<T> query, int batch, Consumer<List<T>> consumer);
+
+  /**
    * DTO findEachWhile query.
    */
   <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer);

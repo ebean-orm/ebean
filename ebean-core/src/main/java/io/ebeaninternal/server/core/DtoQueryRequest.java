@@ -92,6 +92,11 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     queryEngine.findEach(this, consumer);
   }
 
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    flushJdbcBatchOnQuery();
+    queryEngine.findEach(this, batch, consumer);
+  }
+
   public void findEachWhile(Predicate<T> consumer) {
     flushJdbcBatchOnQuery();
     queryEngine.findEachWhile(this, consumer);

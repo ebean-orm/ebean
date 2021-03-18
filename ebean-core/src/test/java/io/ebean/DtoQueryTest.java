@@ -10,17 +10,22 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasicLog;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DtoQueryTest extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(DtoQueryTest.class);
+
+  private final AtomicInteger batchCount = new AtomicInteger();
+  private final AtomicInteger rowCount = new AtomicInteger();
 
   @Test
   public void dto_findList_constructorMatch() {
@@ -76,6 +81,63 @@ public class DtoQueryTest extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
+  }
+
+  private void resetFindEachCounts() {
+    batchCount.set(0);
+    rowCount.set(0);
+  }
+
+  @Test
+  public void dto_findEachBatch() {
+    seedData(); // 15 rows inserted to fetch
+
+    resetFindEachCounts();
+    findEachWithBatch(5);
+    assertThat(batchCount.get()).isEqualTo(3);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(10);
+    assertThat(batchCount.get()).isEqualTo(2);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(14);
+    assertThat(batchCount.get()).isEqualTo(2);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(15);
+    assertThat(batchCount.get()).isEqualTo(1);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(16);
+    assertThat(batchCount.get()).isEqualTo(1);
+    assertThat(rowCount.get()).isEqualTo(15);
+
+    resetFindEachCounts();
+    findEachWithBatch(20);
+    assertThat(batchCount.get()).isEqualTo(1);
+    assertThat(rowCount.get()).isEqualTo(15);
+  }
+
+  private void findEachWithBatch(int batchSize) {
+    server().findDto(DCust.class, "select id, name from e_basic_log where name like ?")
+      .setParameter("dtoFindEachBatch%")
+      .findEach(batchSize, batch -> {
+        int batchId = batchCount.incrementAndGet();
+        int rows = rowCount.addAndGet(batch.size());
+        log.info("batch {} rows {}", batchId, rows);
+      });
+  }
+
+  private void seedData() {
+    for (int i = 0; i < 15; i++) {
+      EBasicLog log = new EBasicLog("dtoFindEachBatch "+i);
+      DB.save(log);
+    }
   }
 
   @Test

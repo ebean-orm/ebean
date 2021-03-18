@@ -116,7 +116,7 @@ public class EBasicWithLog {
   }
 
   private void writeLog(String title) {
-    EBasicLog log = new EBasicLog();
+    EBasicLog log = new EBasicLog(name);
     log.setName(title);
     DB.save(log);
   }

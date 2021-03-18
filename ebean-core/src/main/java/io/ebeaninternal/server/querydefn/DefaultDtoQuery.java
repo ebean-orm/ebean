@@ -103,6 +103,11 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    server.findDtoEach(this, batch, consumer);
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     server.findDtoEachWhile(this, consumer);
   }

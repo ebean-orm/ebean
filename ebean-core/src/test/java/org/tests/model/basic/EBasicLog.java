@@ -13,6 +13,10 @@ public class EBasicLog {
 
   String name;
 
+  public EBasicLog(String name) {
+    this.name = name;
+  }
+
   public Long getId() {
     return id;
   }

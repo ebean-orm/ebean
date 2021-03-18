@@ -54,6 +54,17 @@ public interface DtoQuery<T> {
   void findEach(Consumer<T> consumer);
 
   /**
+   * Execute the query iterating the results and batching them for the consumer.
+   * <p>
+   * This runs like findEach streaming results from the database but just collects the results
+   * into batches to pass to the consumer.
+   *
+   * @param batch    The number of dto beans to collect before given them to the consumer
+   * @param consumer The consumer to process the batch of DTO beans
+   */
+  void findEach(int batch, Consumer<List<T>> consumer);
+
+  /**
    * Execute the query iterating a row at a time with the ability to stop consuming part way through.
    * <p>
    * Returning false after processing a row stops the iteration through the query results.

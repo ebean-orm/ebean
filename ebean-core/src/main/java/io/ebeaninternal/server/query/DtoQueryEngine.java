@@ -42,7 +42,28 @@ public class DtoQueryEngine {
       }
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
+    } finally {
+      request.close();
+    }
+  }
 
+  public <T> void findEach(DtoQueryRequest<T> request, int batchSize, Consumer<List<T>> consumer) {
+    try {
+      List<T> buffer = new ArrayList<>();
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      while (request.next()) {
+        buffer.add(request.readNextBean());
+        if (buffer.size() >= batchSize) {
+          consumer.accept(buffer);
+          buffer.clear();
+        }
+      }
+      if (!buffer.isEmpty()) {
+        // consume the remainder
+        consumer.accept(buffer);
+      }
+    } catch (Exception e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     } finally {
       request.close();
     }
