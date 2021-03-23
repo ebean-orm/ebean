@@ -31,9 +31,9 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
 alter table migtest_e_basic modify user_id default 23;
 alter table migtest_e_basic modify user_id not null;
-alter table migtest_e_basic add column old_boolean number(1) default 0 not null;
-alter table migtest_e_basic add column old_boolean2 number(1);
-alter table migtest_e_basic add column eref_id number(10);
+alter table migtest_e_basic add old_boolean number(1) default 0 not null;
+alter table migtest_e_basic add old_boolean2 number(1);
+alter table migtest_e_basic add eref_id number(10);
 
 alter table migtest_e_basic drop constraint uq_mgtst__bsc_stts_ndxtst1;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
@@ -47,8 +47,8 @@ comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 alter table migtest_e_history2 modify test_string drop default;
 alter table migtest_e_history2 modify test_string null;
-alter table migtest_e_history2 add column obsolete_string1 varchar2(255);
-alter table migtest_e_history2 add column obsolete_string2 varchar2(255);
+alter table migtest_e_history2 add obsolete_string1 varchar2(255);
+alter table migtest_e_history2 add obsolete_string2 varchar2(255);
 
 alter table migtest_e_history4 modify test_number number(10);
 alter table migtest_e_history6 modify test_number1 drop default;
