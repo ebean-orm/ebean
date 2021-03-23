@@ -182,7 +182,7 @@ public class DLoadContext implements LoadContext {
    * Return the minimum batch size when using QueryIterator with query joins.
    */
   @Override
-  public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
+  public int getSecondaryQueriesMinBatchSize() {
     if (secQuery == null) {
       return -1;
     }
@@ -190,7 +190,7 @@ public class DLoadContext implements LoadContext {
     for (OrmQueryProperties aSecQuery : secQuery) {
       int batchSize = aSecQuery.getBatchSize();
       if (batchSize == 0) {
-        batchSize = defaultQueryBatch;
+        batchSize = 100;
       }
       maxBatch = Math.max(maxBatch, batchSize);
     }

@@ -37,8 +37,6 @@ public class CQueryEngine {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryEngine.class);
 
-  private static final int defaultSecondaryQueryBatchSize = 100;
-
   private static final String T0 = "t0";
 
   private final int defaultFetchSizeFindList;
@@ -214,7 +212,7 @@ public class CQueryEngine {
         logSql(cquery);
       }
       // first check batch sizes set on query joins
-      int iterateBufferSize = request.getSecondaryQueriesMinBatchSize(defaultSecondaryQueryBatchSize);
+      int iterateBufferSize = request.getSecondaryQueriesMinBatchSize();
       if (iterateBufferSize < 1) {
         // not set on query joins so check if batch size set on query itself
         int queryBatch = request.getQuery().getLazyLoadBatchSize();
