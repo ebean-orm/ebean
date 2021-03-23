@@ -90,7 +90,7 @@ public class DLoadContext implements LoadContext {
     this.planLabel = null;
     this.profileLocation = null;
     this.profilingListener = null;
-    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
+    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
   }
 
   private ObjectGraphOrigin initOrigin() {
@@ -128,7 +128,7 @@ public class DLoadContext implements LoadContext {
     }
 
     // initialise rootBeanContext after origin and relativePath have been set
-    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
+    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
     registerSecondaryQueries(secondaryQueries);
   }
 
@@ -182,7 +182,7 @@ public class DLoadContext implements LoadContext {
    * Return the minimum batch size when using QueryIterator with query joins.
    */
   @Override
-  public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
+  public int getSecondaryQueriesMinBatchSize() {
     if (secQuery == null) {
       return -1;
     }
@@ -190,7 +190,7 @@ public class DLoadContext implements LoadContext {
     for (OrmQueryProperties aSecQuery : secQuery) {
       int batchSize = aSecQuery.getBatchSize();
       if (batchSize == 0) {
-        batchSize = defaultQueryBatch;
+        batchSize = 100;
       }
       maxBatch = Math.max(maxBatch, batchSize);
     }
@@ -287,51 +287,55 @@ public class DLoadContext implements LoadContext {
     getManyContext(path, many).register(bc);
   }
 
+  int batchSize(OrmQueryProperties props) {
+    if (props == null) {
+      return defaultBatchSize;
+    }
+    int batchSize = props.getBatchSize();
+    return batchSize == 0 ? defaultBatchSize : batchSize;
+  }
+
   DLoadBeanContext getBeanContext(String path) {
     if (path == null) {
       return rootBeanContext;
     }
-    return beanMap.computeIfAbsent(path, p -> createBeanContext(p, defaultBatchSize, null));
+    return beanMap.computeIfAbsent(path, p -> createBeanContext(p, null));
   }
 
   DLoadBeanContext getBeanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
     String key = path + ":" + property.getTargetDescriptor().getName();
-    return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path, defaultBatchSize, null));
+    return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path, null));
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
-    int batchSize = props.getBatchSize();
-    if (batchSize == 0) {
-      batchSize = defaultBatchSize;
-    }
     String path = props.getPath();
     if (many) {
-      manyMap.put(path, createManyContext(path, batchSize, props));
+      manyMap.put(path, createManyContext(path, props));
     } else {
-      beanMap.put(path, createBeanContext(path, batchSize, props));
+      beanMap.put(path, createBeanContext(path, props));
     }
   }
 
   DLoadManyContext getManyContext(String path, BeanPropertyAssocMany<?> many) {
-    return manyMap.computeIfAbsent(path, p -> createManyContext(p, many, defaultBatchSize));
+    return manyMap.computeIfAbsent(path, p -> createManyContext(p, many));
   }
 
-  private DLoadManyContext createManyContext(String path, BeanPropertyAssocMany<?> many, int batchSize) {
-    return new DLoadManyContext(this, many, path, batchSize, null);
+  private DLoadManyContext createManyContext(String path, BeanPropertyAssocMany<?> many) {
+    return new DLoadManyContext(this, many, path, null);
   }
 
-  private DLoadManyContext createManyContext(String path, int batchSize, OrmQueryProperties queryProps) {
+  private DLoadManyContext createManyContext(String path, OrmQueryProperties queryProps) {
     BeanPropertyAssocMany<?> p = (BeanPropertyAssocMany<?>) getBeanProperty(rootDescriptor, path);
-    return new DLoadManyContext(this, p, path, batchSize, queryProps);
+    return new DLoadManyContext(this, p, path, queryProps);
   }
 
-  private DLoadBeanContext createBeanContext(String path, int batchSize, OrmQueryProperties queryProps) {
+  private DLoadBeanContext createBeanContext(String path, OrmQueryProperties queryProps) {
     BeanPropertyAssoc<?> p = (BeanPropertyAssoc<?>) getBeanProperty(rootDescriptor, path);
-    return new DLoadBeanContext(this, p.getTargetDescriptor(), path, batchSize, queryProps);
+    return new DLoadBeanContext(this, p.getTargetDescriptor(), path, queryProps);
   }
 
-  private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path, int batchSize, OrmQueryProperties queryProps) {
-    return new DLoadBeanContext(this, property.getTargetDescriptor(), path, batchSize, queryProps);
+  private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path, OrmQueryProperties queryProps) {
+    return new DLoadBeanContext(this, property.getTargetDescriptor(), path, queryProps);
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {

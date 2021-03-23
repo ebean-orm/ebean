@@ -1,6 +1,5 @@
 package io.ebean;
 
-import io.ebean.FetchConfig;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +9,7 @@ public class FetchConfigTest {
   @Test
   public void testLazy() {
     FetchConfig config = new FetchConfig().lazy();
-    assertThat(config.getBatchSize()).isEqualTo(10);
+    assertThat(config.getBatchSize()).isEqualTo(0);
   }
 
   @Test

@@ -19,7 +19,7 @@ public class ParseFetchConfigTest {
   @Test
   public void parseLazy() {
     FetchConfig lazy = ParseFetchConfig.parse("lazy");
-    assertThat(lazy.getBatchSize()).isEqualTo(10);
+    assertThat(lazy.getBatchSize()).isEqualTo(0);
   }
 
   @Test

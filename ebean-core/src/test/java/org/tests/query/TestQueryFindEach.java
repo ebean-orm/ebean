@@ -169,20 +169,38 @@ public class TestQueryFindEach extends BaseTestCase {
     DB.find(OmBasicParent.class).delete();
     insertData();
 
+    test_setLazyLoadBatchSize_withFetchLazy();
+
     LoggedSqlCollector.start();
-    try (final Transaction transaction = DB.beginTransaction()) {
-      // DB.find(OmBasicParent.class).findList();
-      DB.find(OmBasicChild.class)
-        .setLazyLoadBatchSize(100)
-        //.fetchQuery("parent","name")
-        //.fetch("parent","name")
-        .findEach(child -> {
-          assertNotNull(child.getParent().getName());
-        });
-    }
+
+    DB.find(OmBasicChild.class)
+      .setLazyLoadBatchSize(100)
+      .findEach(child -> {
+        assertNotNull(child.getParent().getName());
+      });
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql.size()).isLessThan(50);
+  }
+
+  private void test_setLazyLoadBatchSize_withFetchLazy() {
+
+    LoggedSqlCollector.start();
+
+    DB.find(OmBasicParent.class)
+      .setLazyLoadBatchSize(5)
+      .fetchLazy("children")
+      .setMaxRows(50)
+      .findEach(it -> {
+        it.getChildren().size();
+      });
+
+    final List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(11);
+    assertThat(sql.get(0)).contains(" from om_basic_parent ");
+    for (int i = 1; i < 11; i++) {
+      assertThat(sql.get(i)).contains(" --bind(Array[5]");
+    }
   }
 
   @Transactional(batchSize = 40)
