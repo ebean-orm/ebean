@@ -2693,7 +2693,10 @@ public class DatabaseConfig {
   }
 
   /**
-   * Load settings from ebean.properties.
+   * Load settings from application.properties, application.yaml and other sources.
+   * <p>
+   * Uses <code>avaje-config</code> to load configuration properties.  Goto https://avaje.io/config
+   * for detail on how and where properties are loaded from.
    */
   public void loadFromProperties() {
     this.properties = Config.asProperties();
