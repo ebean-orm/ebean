@@ -18,6 +18,7 @@ public class PostgresDdl extends PlatformDdl {
     this.dropTableCascade = " cascade";
     this.columnSetType = "type ";
     this.alterTableIfExists = "if exists ";
+    this.createIndexIfNotExists = "if not exists ";
     this.columnSetNull = "drop not null";
     this.addForeignKeySkipCheck = " not valid";
     this.indexConcurrent = "concurrently ";

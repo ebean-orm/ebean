@@ -3,7 +3,6 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbIdentity;
@@ -113,6 +112,7 @@ public class PlatformDdl {
 
   protected String uniqueIndex = "unique";
   protected String indexConcurrent = "";
+  protected String createIndexIfNotExists = "";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -413,6 +413,9 @@ public class PlatformDdl {
     buffer.append("index ");
     if (create.isConcurrent()) {
       buffer.append(indexConcurrent);
+    }
+    if (create.isNotExistsCheck()) {
+      buffer.append(createIndexIfNotExists);
     }
     buffer.append(maxConstraintName(create.getIndexName())).append(" on ").append(create.getTableName());
     appendColumns(create.getColumns(), buffer);

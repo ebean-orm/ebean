@@ -12,7 +12,11 @@ class WriteCreateIndex {
   private final boolean unique;
   private final boolean concurrent;
   private final String definition;
+  private final boolean notExistsCheck;
 
+  /**
+   * Create index for foreign key.
+   */
   WriteCreateIndex(String indexName, String tableName, String[] columns, boolean unique) {
     this.indexName = indexName;
     this.tableName = tableName;
@@ -20,8 +24,12 @@ class WriteCreateIndex {
     this.unique = unique;
     this.concurrent = false;
     this.definition = null;
+    this.notExistsCheck = false;
   }
 
+  /**
+   * Create non-foreign key index.
+   */
   public WriteCreateIndex(CreateIndex index) {
     this.indexName = index.getIndexName();
     this.tableName = index.getTableName();
@@ -29,6 +37,7 @@ class WriteCreateIndex {
     this.unique = Boolean.TRUE.equals(index.isUnique());
     this.concurrent = Boolean.TRUE.equals(index.isConcurrent());
     this.definition = index.getDefinition();
+    this.notExistsCheck = true;
   }
 
   public String getIndexName() {
@@ -57,5 +66,9 @@ class WriteCreateIndex {
 
   public boolean useDefinition() {
     return definition != null && !definition.isEmpty();
+  }
+
+  public boolean isNotExistsCheck() {
+    return notExistsCheck;
   }
 }
