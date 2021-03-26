@@ -18,8 +18,8 @@
     <ebean-migration.version>12.4.0</ebean-migration.version>
     <ebean-test-docker.version>4.1</ebean-test-docker.version>
     <ebean-datasource.version>7.0</ebean-datasource.version>
-    <ebean-agent.version>12.6.6</ebean-agent.version>
-    <ebean-maven-plugin.version>12.6.6</ebean-maven-plugin.version>
+    <ebean-agent.version>12.8.1</ebean-agent.version>
+    <ebean-maven-plugin.version>12.8.1</ebean-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
