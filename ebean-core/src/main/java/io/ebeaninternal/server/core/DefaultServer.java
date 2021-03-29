@@ -125,6 +125,7 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -137,7 +138,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -196,7 +196,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final SpiLogManager logManager;
   private final PersistenceContextScope defaultPersistenceContextScope;
   private final int lazyLoadBatchSize;
-  private final int queryBatchSize;
   private final boolean updateAllPropertiesInBatch;
   private final long slowQueryMicros;
   private final SlowQueryListener slowQueryListener;
@@ -217,7 +216,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.extraMetrics = config.getExtraMetrics();
     this.serverName = this.config.getName();
     this.lazyLoadBatchSize = this.config.getLazyLoadBatchSize();
-    this.queryBatchSize = this.config.getQueryBatchSize();
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
     this.encryptKeyManager = this.config.getEncryptKeyManager();
@@ -303,10 +301,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
-  }
-
-  public int getQueryBatchSize() {
-    return queryBatchSize;
   }
 
   @Override
@@ -1150,6 +1144,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   public <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction) {
     return Optional.ofNullable(findOne(query, transaction));
@@ -1180,6 +1175,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> Set<T> findSet(Query<T> query, Transaction t) {
@@ -1196,6 +1192,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
@@ -1217,6 +1214,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   @SuppressWarnings("unchecked")
   public <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction t) {
@@ -1227,7 +1225,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     try {
       request.initTransIfRequired();
-      return (List<A>) request.findSingleAttributeList();
+      return request.findSingleAttributeList();
     } finally {
       request.endTransIfRequired();
     }
@@ -1277,6 +1275,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   public <A, T> List<A> findIds(Query<T> query, Transaction t) {
     return findIdsWithCopy(((SpiQuery<T>) query).copy(), t);
@@ -1337,26 +1336,29 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   public <T> FutureRowCount<T> findFutureCount(Query<T> q, Transaction t) {
     SpiQuery<T> copy = ((SpiQuery<T>) q).copy();
     copy.setFutureFetch(true);
     Transaction newTxn = createTransaction();
-    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<T>(this, copy, newTxn));
+    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, newTxn));
     backgroundExecutor.execute(queryFuture.getFutureTask());
     return queryFuture;
   }
 
+  @Nonnull
   @Override
   public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction t) {
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
     copy.setFutureFetch(true);
     Transaction newTxn = createTransaction();
-    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<T>(this, copy, newTxn));
+    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, newTxn));
     backgroundExecutor.execute(queryFuture.getFutureTask());
     return queryFuture;
   }
 
+  @Nonnull
   @Override
   public <T> FutureList<T> findFutureList(Query<T> query, Transaction t) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
@@ -1369,11 +1371,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // Create a new transaction solely to execute the findList() at some future time
     Transaction newTxn = createTransaction();
-    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<T>(this, spiQuery, newTxn));
+    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, newTxn));
     backgroundExecutor.execute(queryFuture.getFutureTask());
     return queryFuture;
   }
 
+  @Nonnull
   @Override
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
@@ -1387,6 +1390,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new LimitOffsetPagedList<>(this, spiQuery);
   }
 
+  @Nonnull
   @Override
   public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
@@ -1399,11 +1403,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
     return findStream(query, transaction);
   }
 
+  @Nonnull
   @Override
   public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
@@ -1470,6 +1476,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // no try finally - findEachWhile guarantee's cleanup of the transaction if required
   }
 
+  @Nonnull
   @Override
   public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, transaction);
@@ -1481,6 +1488,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   public <T> List<T> findList(Query<T> query, Transaction t) {
     return findList(query, t, false);
@@ -1540,6 +1548,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nonnull
   @Override
   public List<SqlRow> findList(SqlQuery query, Transaction t) {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
@@ -2241,6 +2250,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return checkUniqueness(bean, null);
   }
 
+  @Nonnull
   @Override
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     EntityBean entityBean = checkEntityBean(bean);
@@ -2252,14 +2262,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     Object id = idProperty.getVal(entityBean);
     if (entityBean._ebean_getIntercept().isNew() && id != null) {
-      // Primary Key is changeable only on new models - so skip check if we are not
-      // new.
+      // Primary Key is changeable only on new models - so skip check if we are not new
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
       query.setId(id);
       if (findCount(query, transaction) > 0) {
-        Set<Property> ret = new HashSet<>();
-        ret.add(idProperty);
-        return ret;
+        return Collections.singleton(idProperty);
       }
     }
     for (BeanProperty[] props : beanDesc.getUniqueProps()) {
