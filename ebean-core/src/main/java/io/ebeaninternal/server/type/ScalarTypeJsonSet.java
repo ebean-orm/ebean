@@ -122,9 +122,6 @@ final class ScalarTypeJsonSet {
 
     @Override
     public final String formatValue(Set value) {
-      if (value.isEmpty()) {
-        return "[]";
-      }
       try {
         return EJson.write(value);
       } catch (IOException e) {
