@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -37,7 +38,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * The underlying map (ConcurrentHashMap or similar)
    */
-  protected final Map<Object, CacheEntry> map;
+  protected final Map<Object, SoftReference<CacheEntry>> map;
 
   protected final CountMetric hitCount;
   protected final CountMetric missCount;
@@ -199,7 +200,8 @@ public class DefaultServerCache implements ServerCache {
    * Get the cache entry - override for query cache to validate dependent tables.
    */
   protected CacheEntry getCacheEntry(Object id) {
-    return map.get(key(id));
+    final SoftReference<CacheEntry> ref = map.get(key(id));
+    return ref != null ? ref.get() : null;
   }
 
   @Override
@@ -213,7 +215,7 @@ public class DefaultServerCache implements ServerCache {
   @Override
   public void put(Object id, Object value) {
     Object key = key(id);
-    map.put(key, new CacheEntry(key, value));
+    map.put(key, new SoftReference<>(new CacheEntry(key, value)));
     putCount.increment();
   }
 
@@ -222,8 +224,8 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public void remove(Object id) {
-    CacheEntry entry = map.remove(key(id));
-    if (entry != null) {
+    SoftReference<CacheEntry> entry = map.remove(key(id));
+    if (entry != null && entry.get() != null) {
       removeCount.increment();
     }
   }
@@ -266,6 +268,7 @@ public class DefaultServerCache implements ServerCache {
     long startNanos = System.nanoTime();
 
     long trimmedByIdle = 0;
+    long trimmedByGC = 0;
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
@@ -274,10 +277,14 @@ public class DefaultServerCache implements ServerCache {
     long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
     long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
 
-    Iterator<CacheEntry> it = map.values().iterator();
+    Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
     while (it.hasNext()) {
-      CacheEntry cacheEntry = it.next();
-      if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
+      SoftReference<CacheEntry> ref = it.next();
+      final CacheEntry cacheEntry = ref.get();
+      if (cacheEntry == null) {
+        it.remove();
+        trimmedByGC++;
+      } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
         it.remove();
         trimmedByIdle++;
 
@@ -290,27 +297,27 @@ public class DefaultServerCache implements ServerCache {
       }
     }
 
-    if (trimForMaxSize > 0) {
-      trimmedByLRU = activeList.size() - maxSize;
-      if (trimmedByLRU > 0) {
-        // sort into last access time ascending
-        activeList.sort(BY_LAST_ACCESS);
-        int trimSize = getTrimSize();
-        for (int i = trimSize; i < activeList.size(); i++) {
-          // remove if still in the cache
-          map.remove(activeList.get(i).getKey());
+    if (trimForMaxSize > 0 && activeList.size() > maxSize) {
+      // sort into last access time ascending
+      activeList.sort(BY_LAST_ACCESS);
+      int trimSize = getTrimSize();
+      for (int i = trimSize; i < activeList.size(); i++) {
+        // remove if still in the cache
+        if (map.remove(activeList.get(i).getKey()) != null) {
+          trimmedByLRU++;
         }
       }
     }
 
     evictCount.add(trimmedByIdle);
+    evictCount.add(trimmedByGC);
     evictCount.add(trimmedByTTL);
     evictCount.add(trimmedByLRU);
 
     if (logger.isTraceEnabled()) {
       long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-      logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
-        , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
+      logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
+        name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
     }
   }
 
