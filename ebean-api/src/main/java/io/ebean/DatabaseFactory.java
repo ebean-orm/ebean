@@ -78,7 +78,7 @@ public class DatabaseFactory {
       Database server = createInternal(config);
       if (config.isRegister()) {
         if (config.isDefaultServer()) {
-          if (defaultServerName != null) {
+          if (defaultServerName != null && !defaultServerName.equals(config.getName())) {
             throw new IllegalStateException("Registering [" + config.getName() + "] as the default server but [" + defaultServerName + "] is already registered as the default");
           }
           defaultServerName = config.getName();
