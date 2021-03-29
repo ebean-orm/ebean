@@ -120,8 +120,8 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     this.allProperties = other.allProperties;
     this.included = other.included;
-    this.cache = other.cache;
     this.fetchConfig = fetchConfig;
+    this.cache = fetchConfig.isCache();
   }
 
   /**

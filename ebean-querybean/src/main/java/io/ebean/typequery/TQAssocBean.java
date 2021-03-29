@@ -2,7 +2,10 @@ package io.ebean.typequery;
 
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
+import io.ebean.FetchGroup;
 import io.ebeaninternal.api.SpiQueryFetch;
+import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -142,7 +145,34 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
     return _root;
   }
 
-  private final SpiQueryFetch spiQuery() {
+  /**
+   * Fetch using the nested FetchGroup.
+   */
+  public R fetch(FetchGroup<T> nestedGroup) {
+    return fetchNested(nestedGroup, FETCH_DEFAULT);
+  }
+
+  /**
+   * Fetch query using the nested FetchGroup.
+   */
+  public R fetchQuery(FetchGroup<T> nestedGroup) {
+    return fetchNested(nestedGroup, FETCH_QUERY);
+  }
+
+  /**
+   * Fetch cache using the nested FetchGroup.
+   */
+  public R fetchCache(FetchGroup<T> nestedGroup) {
+    return fetchNested(nestedGroup, FETCH_CACHE);
+  }
+
+  private R fetchNested(FetchGroup<T> nestedGroup, FetchConfig fetchConfig) {
+    OrmQueryDetail nestedDetail = ((SpiFetchGroup) nestedGroup).underlying();
+    spiQuery().addNested(_name, nestedDetail, fetchConfig);
+    return _root;
+  }
+
+  private SpiQueryFetch spiQuery() {
     return (SpiQueryFetch)((TQRootBean) _root).query();
   }
 
