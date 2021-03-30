@@ -72,10 +72,11 @@ public class ServerConfigTest {
     props.setProperty("enabledL2Regions", "r0,users,orgs");
     props.setProperty("caseSensitiveCollation", "false");
     props.setProperty("loadModuleInfo", "true");
-    props.setProperty("collectQueryPlanThresholdMicros", "10000");
     props.setProperty("forUpdateNoKey", "true");
     props.setProperty("defaultServer", "false");
 
+    props.setProperty("queryPlan.enable", "true");
+    props.setProperty("queryPlan.thresholdMicros", "10000");
     props.setProperty("queryPlan.capture", "true");
     props.setProperty("queryPlan.capturePeriodSecs", "42");
     props.setProperty("queryPlan.captureMaxTimeMillis", "560");
@@ -102,7 +103,6 @@ public class ServerConfigTest {
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.MILLIS, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.MILLIS, serverConfig.getJsonDate());
-    assertEquals(10000, serverConfig.getCollectQueryPlanThresholdMicros());
 
     assertEquals("r0,users,orgs", serverConfig.getEnabledL2Regions());
 
@@ -111,6 +111,8 @@ public class ServerConfigTest {
     assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());
     assertEquals(98, serverConfig.getBackgroundExecutorShutdownSecs());
 
+    assertTrue(serverConfig.isQueryPlanEnable());
+    assertEquals(10000, serverConfig.getQueryPlanThresholdMicros());
     assertTrue(serverConfig.isQueryPlanCapture());
     assertEquals(42, serverConfig.getQueryPlanCapturePeriodSecs());
     assertEquals(560, serverConfig.getQueryPlanCaptureMaxTimeMillis());
@@ -154,8 +156,9 @@ public class ServerConfigTest {
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(serverConfig.isAutoLoadModuleInfo());
-    assertEquals(Long.MAX_VALUE, serverConfig.getCollectQueryPlanThresholdMicros());
 
+    assertFalse(serverConfig.isQueryPlanEnable());
+    assertEquals(Long.MAX_VALUE, serverConfig.getQueryPlanThresholdMicros());
     assertFalse(serverConfig.isQueryPlanCapture());
     assertEquals(600, serverConfig.getQueryPlanCapturePeriodSecs());
     assertEquals(10000L, serverConfig.getQueryPlanCaptureMaxTimeMillis());

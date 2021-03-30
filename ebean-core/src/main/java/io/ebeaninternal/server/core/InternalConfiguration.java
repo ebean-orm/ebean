@@ -617,10 +617,10 @@ public class InternalConfiguration {
   }
 
   public QueryPlanManager initQueryPlanManager(TransactionManager transactionManager) {
-    if (!config.isCollectQueryPlans()) {
+    if (!config.isQueryPlanEnable()) {
       return QueryPlanManager.NOOP;
     }
-    long threshold = config.getCollectQueryPlanThresholdMicros();
+    long threshold = config.getQueryPlanThresholdMicros();
     return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.getPlatform()), extraMetrics);
   }
 

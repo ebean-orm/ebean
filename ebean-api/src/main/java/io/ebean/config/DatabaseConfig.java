@@ -500,15 +500,15 @@ public class DatabaseConfig {
   /**
    * Set to true to enable bind capture required for query plan capture.
    */
-  private boolean collectQueryPlans;
+  private boolean queryPlanEnable;
 
   /**
    * The default threshold in micros for collecting query plans.
    */
-  private long collectQueryPlanThresholdMicros = Long.MAX_VALUE;
+  private long queryPlanThresholdMicros = Long.MAX_VALUE;
 
   /**
-   * Set to true to enable automatic query plan capture.
+   * Set to true to enable automatic periodic query plan capture.
    */
   private boolean queryPlanCapture;
   private long queryPlanCapturePeriodSecs = 60 * 10; // 10 minutes
@@ -2813,8 +2813,8 @@ public class DatabaseConfig {
     dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
-    collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
-    collectQueryPlanThresholdMicros = p.getLong("collectQueryPlanThresholdMicros", collectQueryPlanThresholdMicros);
+    queryPlanEnable = p.getBoolean("queryPlan.enable", queryPlanEnable);
+    queryPlanThresholdMicros = p.getLong("queryPlan.thresholdMicros", queryPlanThresholdMicros);
     queryPlanCapture = p.getBoolean("queryPlan.capture", queryPlanCapture);
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
     queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
@@ -3188,29 +3188,32 @@ public class DatabaseConfig {
   /**
    * Return true if query plan capture is enabled.
    */
-  public boolean isCollectQueryPlans() {
-    return collectQueryPlans;
+  public boolean isQueryPlanEnable() {
+    return queryPlanEnable;
   }
 
   /**
    * Set to true to enable query plan capture.
    */
-  public void setCollectQueryPlans(boolean collectQueryPlans) {
-    this.collectQueryPlans = collectQueryPlans;
+  public void setQueryPlanEnable(boolean queryPlanEnable) {
+    this.queryPlanEnable = queryPlanEnable;
   }
 
   /**
    * Return the query plan collection threshold in microseconds.
    */
-  public long getCollectQueryPlanThresholdMicros() {
-    return collectQueryPlanThresholdMicros;
+  public long getQueryPlanThresholdMicros() {
+    return queryPlanThresholdMicros;
   }
 
   /**
    * Set the query plan collection threshold in microseconds.
+   * <p>
+   * Queries executing slower than this will have bind values captured such that later
+   * the query plan can be captured and reported.
    */
-  public void setCollectQueryPlanThresholdMicros(long collectQueryPlanThresholdMicros) {
-    this.collectQueryPlanThresholdMicros = collectQueryPlanThresholdMicros;
+  public void setQueryPlanThresholdMicros(long queryPlanThresholdMicros) {
+    this.queryPlanThresholdMicros = queryPlanThresholdMicros;
   }
 
   /**
