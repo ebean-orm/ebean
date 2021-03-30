@@ -175,17 +175,24 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    // change default collect query plan threshold to 200 micros
+    QueryPlanInit init0 = new QueryPlanInit();
+    init0.setAll(true);
+    init0.setThresholdMicros(200);
+    final List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanInit(init0);
+    assertThat(plans.size()).isGreaterThan(1);
+
     // the server has some plans
     runQueries();
 
-    // enable query plan bind capture on all plans threshold 100 micros
+    // change query plan threshold to 100 micros
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
     init.setThresholdMicros(100);
     final List<MetaQueryPlan> appliedToPlans = server().getMetaInfoManager().queryPlanInit(init);
     assertThat(appliedToPlans.size()).isGreaterThan(4);
 
-    // will collect bind captures
+    // run queries again
     runQueries();
 
     ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
@@ -203,12 +210,21 @@ public class TestCustomerFinder extends BaseTestCase {
 
     // obtains db query plans ...
     QueryPlanRequest request = new QueryPlanRequest();
-    List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanCollectNow(request);
-    assertThat(plans).isNotEmpty();
+    // collect max 1000 plans (use something more like 10)
+    request.setMaxCount(1_000);
+    // don't collect any more plans if used 10 secs
+    request.setMaxTimeMillis(10_000);
+    List<MetaQueryPlan> plans0 = server().getMetaInfoManager().queryPlanCollectNow(request);
+    assertThat(plans0).isNotEmpty();
 
     for (MetaQueryPlan plan : plans) {
+      logger.info("queryplan label:{}, queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
+        plan.getLabel(), plan.getQueryTimeMicros(), plan.getProfileLocation(),
+        plan.getSql(), plan.getBind(), plan.getPlan());
       System.out.println(plan);
     }
+
+    //DB.getBackgroundExecutor().scheduleWithFixedDelay(...)
   }
 
   @Test

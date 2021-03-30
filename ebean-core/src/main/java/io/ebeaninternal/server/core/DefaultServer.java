@@ -2329,6 +2329,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   List<MetaQueryPlan> queryPlanInit(QueryPlanInit initRequest) {
+    if (initRequest.isAll()) {
+      queryPlanManager.setDefaultThreshold(initRequest.getThresholdMicros());
+    }
     return beanDescriptorManager.queryPlanInit(initRequest);
   }
 

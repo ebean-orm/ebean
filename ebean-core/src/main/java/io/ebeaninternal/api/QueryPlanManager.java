@@ -13,6 +13,11 @@ public interface QueryPlanManager {
   QueryPlanManager NOOP = new NoopQueryPlanManager();
 
   /**
+   * Update the global default threshold used when new query plans are created.
+   */
+  void setDefaultThreshold(long thresholdMicros);
+
+  /**
    * Create the bind capture for the given query plan.
    */
   SpiQueryBindCapture createBindCapture(SpiQueryPlan queryPlan);

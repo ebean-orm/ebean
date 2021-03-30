@@ -30,13 +30,13 @@ public class CQueryPlanManager implements QueryPlanManager {
 
   private final TransactionManager transactionManager;
 
-  private final long defaultThreshold;
-
   private final QueryPlanLogger planLogger;
 
   private final TimedMetric timeCollection;
 
   private final TimedMetric timeBindCapture;
+
+  private long defaultThreshold;
 
   public CQueryPlanManager(TransactionManager transactionManager, long defaultThreshold, QueryPlanLogger planLogger, ExtraMetrics extraMetrics) {
     this.transactionManager = transactionManager;
@@ -44,6 +44,11 @@ public class CQueryPlanManager implements QueryPlanManager {
     this.planLogger = planLogger;
     this.timeCollection = extraMetrics.getPlanCollect();
     this.timeBindCapture = extraMetrics.getBindCapture();
+  }
+
+  @Override
+  public void setDefaultThreshold(long thresholdMicros) {
+    this.defaultThreshold = thresholdMicros;
   }
 
   @Override
