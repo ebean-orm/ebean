@@ -76,6 +76,11 @@ public class ServerConfigTest {
     props.setProperty("forUpdateNoKey", "true");
     props.setProperty("defaultServer", "false");
 
+    props.setProperty("queryPlan.capture", "true");
+    props.setProperty("queryPlan.capturePeriodSecs", "42");
+    props.setProperty("queryPlan.captureMaxTimeMillis", "560");
+    props.setProperty("queryPlan.captureMaxCount", "7");
+
     serverConfig.loadFromProperties(props);
 
     assertFalse(serverConfig.isDefaultServer());
@@ -105,6 +110,11 @@ public class ServerConfigTest {
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
     assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());
     assertEquals(98, serverConfig.getBackgroundExecutorShutdownSecs());
+
+    assertTrue(serverConfig.isQueryPlanCapture());
+    assertEquals(42, serverConfig.getQueryPlanCapturePeriodSecs());
+    assertEquals(560, serverConfig.getQueryPlanCaptureMaxTimeMillis());
+    assertEquals(7, serverConfig.getQueryPlanCaptureMaxCount());
 
     assertThat(serverConfig.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
@@ -145,6 +155,11 @@ public class ServerConfigTest {
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(serverConfig.isAutoLoadModuleInfo());
     assertEquals(Long.MAX_VALUE, serverConfig.getCollectQueryPlanThresholdMicros());
+
+    assertFalse(serverConfig.isQueryPlanCapture());
+    assertEquals(600, serverConfig.getQueryPlanCapturePeriodSecs());
+    assertEquals(10000L, serverConfig.getQueryPlanCaptureMaxTimeMillis());
+    assertEquals(10, serverConfig.getQueryPlanCaptureMaxCount());
 
     serverConfig.setLoadModuleInfo(false);
     assertFalse(serverConfig.isAutoLoadModuleInfo());

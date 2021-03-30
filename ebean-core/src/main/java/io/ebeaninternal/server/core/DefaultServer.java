@@ -45,12 +45,7 @@ import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.common.CopyOnFirstWriteList;
-import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.EncryptKeyManager;
-import io.ebean.config.SlowQueryEvent;
-import io.ebean.config.SlowQueryListener;
-import io.ebean.config.TenantMode;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.ShutdownManager;
@@ -145,6 +140,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -404,6 +400,31 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
     }
+    startQueryPlanCapture();
+  }
+
+  private void startQueryPlanCapture() {
+    if (config.isQueryPlanCapture()) {
+      long secs = config.getQueryPlanCapturePeriodSecs();
+      if (secs > 10) {
+        logger.info("capture query plan enabled, every {}secs", secs);
+        backgroundExecutor.scheduleWithFixedDelay(this::collectQueryPlans, secs, secs, TimeUnit.SECONDS);
+      }
+    }
+  }
+
+  private void collectQueryPlans() {
+    QueryPlanRequest request = new QueryPlanRequest();
+    request.setMaxCount(config.getQueryPlanCaptureMaxCount());
+    request.setMaxTimeMillis(config.getQueryPlanCaptureMaxTimeMillis());
+
+    // obtains query explain plans ...
+    List<MetaQueryPlan> plans = metaInfoManager.queryPlanCollectNow(request);
+    QueryPlanListener listener = config.getQueryPlanListener();
+    if (listener == null) {
+      listener = DefaultQueryPlanListener.INSTANT;
+    }
+    listener.process(new QueryPlanCapture(this, plans));
   }
 
   @Override

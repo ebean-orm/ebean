@@ -498,7 +498,7 @@ public class DatabaseConfig {
   private boolean notifyL2CacheInForeground;
 
   /**
-   * Set to true to support query plan capture.
+   * Set to true to enable bind capture required for query plan capture.
    */
   private boolean collectQueryPlans;
 
@@ -506,6 +506,15 @@ public class DatabaseConfig {
    * The default threshold in micros for collecting query plans.
    */
   private long collectQueryPlanThresholdMicros = Long.MAX_VALUE;
+
+  /**
+   * Set to true to enable automatic query plan capture.
+   */
+  private boolean queryPlanCapture;
+  private long queryPlanCapturePeriodSecs = 60 * 10; // 10 minutes
+  private long queryPlanCaptureMaxTimeMillis = 10_000; // 10 seconds
+  private int queryPlanCaptureMaxCount = 10;
+  private QueryPlanListener queryPlanListener;
 
   /**
    * The time in millis used to determine when a query is alerted for being slow.
@@ -1045,7 +1054,6 @@ public class DatabaseConfig {
    * This is a performance optimisation to reduce the number times Ebean
    * requests a sequence to be used as an Id for a bean (aka reduce network
    * chatter).
-
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
@@ -2807,6 +2815,10 @@ public class DatabaseConfig {
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
     collectQueryPlanThresholdMicros = p.getLong("collectQueryPlanThresholdMicros", collectQueryPlanThresholdMicros);
+    queryPlanCapture = p.getBoolean("queryPlan.capture", queryPlanCapture);
+    queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
+    queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
+    queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
@@ -3199,6 +3211,84 @@ public class DatabaseConfig {
    */
   public void setCollectQueryPlanThresholdMicros(long collectQueryPlanThresholdMicros) {
     this.collectQueryPlanThresholdMicros = collectQueryPlanThresholdMicros;
+  }
+
+  /**
+   * Return true if periodic capture of query plans is enabled.
+   */
+  public boolean isQueryPlanCapture() {
+    return queryPlanCapture;
+  }
+
+  /**
+   * Set to true to turn on periodic capture of query plans.
+   */
+  public void setQueryPlanCapture(boolean queryPlanCapture) {
+    this.queryPlanCapture = queryPlanCapture;
+  }
+
+  /**
+   * Return the frequency to capture query plans.
+   */
+  public long getQueryPlanCapturePeriodSecs() {
+    return queryPlanCapturePeriodSecs;
+  }
+
+  /**
+   * Set the frequency in seconds to capture query plans.
+   */
+  public void setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
+    this.queryPlanCapturePeriodSecs = queryPlanCapturePeriodSecs;
+  }
+
+  /**
+   * Return the time after which a capture query plans request will
+   * stop capturing more query plans.
+   * <p>
+   * Effectively this controls the amount of load/time we want to
+   * allow for query plan capture.
+   */
+  public long getQueryPlanCaptureMaxTimeMillis() {
+    return queryPlanCaptureMaxTimeMillis;
+  }
+
+  /**
+   * Set the time after which a capture query plans request will
+   * stop capturing more query plans.
+   * <p>
+   * Effectively this controls the amount of load/time we want to
+   * allow for query plan capture.
+   */
+  public void setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
+    this.queryPlanCaptureMaxTimeMillis = queryPlanCaptureMaxTimeMillis;
+  }
+
+  /**
+   * Return the max number of query plans captured per request.
+   */
+  public int getQueryPlanCaptureMaxCount() {
+    return queryPlanCaptureMaxCount;
+  }
+
+  /**
+   * Set the max number of query plans captured per request.
+   */
+  public void setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
+    this.queryPlanCaptureMaxCount = queryPlanCaptureMaxCount;
+  }
+
+  /**
+   * Return the listener used to process captured query plans.
+   */
+  public QueryPlanListener getQueryPlanListener() {
+    return queryPlanListener;
+  }
+
+  /**
+   * Set the listener used to process captured query plans.
+   */
+  public void setQueryPlanListener(QueryPlanListener queryPlanListener) {
+    this.queryPlanListener = queryPlanListener;
   }
 
   /**
