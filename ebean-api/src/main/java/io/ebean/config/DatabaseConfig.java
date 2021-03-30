@@ -3108,14 +3108,17 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return the query plan time to live.
+   * Return the time to live for ebean's internal query plan.
    */
   public int getQueryPlanTTLSeconds() {
     return queryPlanTTLSeconds;
   }
 
   /**
-   * Set the query plan time to live.
+   * Set the time to live for ebean's internal query plan.
+   * <p>
+   * This is the plan that knows how to execute the query, read the result
+   * and collects execution metrics. By default this is set to 5 mins.
    */
   public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
