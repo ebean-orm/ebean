@@ -96,6 +96,11 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
+  public void setTransparentPersistence(boolean transparentPersistence) {
+    // do nothing
+  }
+
+  @Override
   public void setLabel(String label) {
     // do nothing
   }

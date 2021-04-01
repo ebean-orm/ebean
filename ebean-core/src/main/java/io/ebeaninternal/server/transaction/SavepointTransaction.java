@@ -61,6 +61,11 @@ class SavepointTransaction extends SpiTransactionProxy {
   }
 
   @Override
+  public void setTransparentPersistence(boolean transparentPersistence) {
+    throw new IllegalStateException("This is not handled yet. Need to review this case.");
+  }
+
+  @Override
   public void commit() {
     if (rollbackOnly) {
       rollbackSavepoint(null);

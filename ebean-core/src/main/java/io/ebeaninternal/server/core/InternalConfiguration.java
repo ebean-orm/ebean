@@ -423,13 +423,13 @@ public class InternalConfiguration {
   /**
    * Create the TransactionManager taking into account autoCommit mode.
    */
-  TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
+  TransactionManager createTransactionManager(SpiServer server, DocStoreUpdateProcessor indexUpdateProcessor) {
 
     TransactionScopeManager scopeManager = createTransactionScopeManager();
     boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || config.isNotifyL2CacheInForeground();
 
     TransactionManagerOptions options =
-      new TransactionManagerOptions(notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
+      new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
         indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
         tableModState, cacheNotify, clockService);
 

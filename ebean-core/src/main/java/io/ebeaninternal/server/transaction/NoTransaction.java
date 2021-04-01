@@ -26,6 +26,11 @@ class NoTransaction implements SpiTransaction {
   static final NoTransaction INSTANCE = new NoTransaction();
 
   @Override
+  public void setTransparentPersistence(boolean transparentPersistence) {
+    // do nothing
+  }
+
+  @Override
   public void setLabel(String label) {
     // do nothing
   }

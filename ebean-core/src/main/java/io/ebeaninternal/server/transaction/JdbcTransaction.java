@@ -187,6 +187,8 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private final long startNanos;
 
+  private boolean transparentPersistence;
+
   /**
    * Create a new JdbcTransaction.
    */
@@ -292,6 +294,12 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
     sb.append("] ");
     return sb.toString();
+  }
+
+  @Override
+  public void setTransparentPersistence(boolean transparentPersistence) {
+    this.transparentPersistence = transparentPersistence;
+    this.batchMode = true;
   }
 
   @Override
@@ -774,6 +782,10 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Flush the JDBC batch and execute derived relationship statements if necessary.
    */
   private void internalBatchFlush() {
+    if (transparentPersistence) {
+      // Experimental - flush dirty beans held by the persistence context
+      manager.flushTransparent(persistenceContext, this);
+    }
     batchFlush();
     if (deferredList != null) {
       for (PersistDeferredRelationship deferred : deferredList) {
@@ -1042,7 +1054,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
-      if (queryOnly) {
+      if (queryOnly && !transparentPersistence) {
         connectionEndForQueryOnly();
       } else {
         flushCommitAndNotify();

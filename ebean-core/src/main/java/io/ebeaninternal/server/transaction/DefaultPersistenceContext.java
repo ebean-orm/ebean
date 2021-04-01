@@ -1,11 +1,9 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -201,6 +199,20 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   }
 
   @Override
+  public List<Object> dirtyBeans() {
+    lock.lock();
+    try {
+      List<Object> list = new ArrayList<>();
+      for (ClassContext classContext : typeCache.values()) {
+        classContext.dirtyBeans(list);
+      }
+      return list;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
   public String toString() {
     lock.lock();
     try {
@@ -317,6 +329,17 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       }
       deleteSet.add(id);
       map.remove(id);
+    }
+
+    /**
+     * Add the dirty beans to the list.
+     */
+    void dirtyBeans(List<Object> list) {
+      for (Object value : map.values()) {
+        if (((EntityBean) value)._ebean_getIntercept().isDirty()) {
+          list.add(value);
+        }
+      }
     }
   }
 

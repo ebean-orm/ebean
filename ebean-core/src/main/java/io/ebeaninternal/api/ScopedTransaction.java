@@ -132,6 +132,11 @@ public class ScopedTransaction extends SpiTransactionProxy {
   }
 
   @Override
+  public void setTransparentPersistence(boolean transparentPersistence) {
+    current.getTransaction().setTransparentPersistence(transparentPersistence);
+  }
+
+  @Override
   public void setRollbackOnly() {
     current.setRollbackOnly();
   }
