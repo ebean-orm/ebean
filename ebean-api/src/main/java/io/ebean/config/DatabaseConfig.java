@@ -233,6 +233,12 @@ public class DatabaseConfig {
   private String historyTableSuffix = "_history";
 
   /**
+   * When true explicit transactions beans that have been made dirty will be
+   * automatically persisted via update on flush.
+   */
+  private boolean autoPersistUpdates;
+
+  /**
    * Use for transaction scoped batch mode.
    */
   private PersistBatch persistBatch = PersistBatch.NONE;
@@ -903,6 +909,20 @@ public class DatabaseConfig {
    */
   public void setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider) {
     this.tenantCatalogProvider = tenantCatalogProvider;
+  }
+
+  /**
+   * Return true if dirty beans are automatically persisted.
+   */
+  public boolean isAutoPersistUpdates() {
+    return autoPersistUpdates;
+  }
+
+  /**
+   * Set to true if dirty beans are automatically persisted.
+   */
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    this.autoPersistUpdates = autoPersistUpdates;
   }
 
   /**
@@ -2807,6 +2827,7 @@ public class DatabaseConfig {
     loadDocStoreSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);
     dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
@@ -3348,7 +3369,7 @@ public class DatabaseConfig {
     this.loadModuleInfo = loadModuleInfo;
   }
 
-  public enum UuidVersion {
+    public enum UuidVersion {
     VERSION4,
     VERSION1,
     VERSION1RND

@@ -104,6 +104,8 @@ public class TransactionManager implements SpiTransactionManager {
    */
   final DocStoreUpdateProcessor docStoreUpdateProcessor;
 
+  private final boolean autoPersistUpdates;
+
   private final boolean persistBatch;
 
   private final boolean persistBatchOnCascade;
@@ -165,6 +167,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.supportsSavepointId = databasePlatform.isSupportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
+    this.autoPersistUpdates = options.config.isAutoPersistUpdates();
     this.persistBatch = PersistBatch.ALL == options.config.getPersistBatch();
     this.persistBatchOnCascade = PersistBatch.ALL == options.config.appliedPersistBatchOnCascade();
     this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
@@ -283,11 +286,15 @@ public class TransactionManager implements SpiTransactionManager {
     return bulkEventListenerMap;
   }
 
-  boolean getPersistBatch() {
+  boolean isAutoPersistUpdates() {
+    return autoPersistUpdates;
+  }
+
+  boolean isPersistBatch() {
     return persistBatch;
   }
 
-  public boolean getPersistBatchOnCascade() {
+  boolean isPersistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 

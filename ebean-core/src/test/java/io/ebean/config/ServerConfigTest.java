@@ -149,6 +149,7 @@ public class ServerConfigTest {
     ServerConfig serverConfig = new ServerConfig();
     assertTrue(serverConfig.isIdGeneratorAutomatic());
     assertTrue(serverConfig.isDefaultServer());
+    assertFalse(serverConfig.isAutoPersistUpdates());
 
     serverConfig.setIdGeneratorAutomatic(false);
     assertFalse(serverConfig.isIdGeneratorAutomatic());
@@ -166,6 +167,8 @@ public class ServerConfigTest {
 
     serverConfig.setLoadModuleInfo(false);
     assertFalse(serverConfig.isAutoLoadModuleInfo());
+    serverConfig.setAutoPersistUpdates(true);
+    assertTrue(serverConfig.isAutoPersistUpdates());
   }
 
   @Test
