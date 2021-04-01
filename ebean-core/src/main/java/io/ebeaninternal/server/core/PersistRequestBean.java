@@ -1038,6 +1038,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (!publish) {
       beanDescriptor.setDraft(entityBean);
     }
+    if (transaction.isTransparentPersistence() && idValue != null) {
+      // with getGeneratedKeys off we will not have a idValue
+      beanDescriptor.contextPut(transaction.getPersistenceContext(), idValue, entityBean);
+    }
   }
 
   public boolean isReference() {

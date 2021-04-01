@@ -18,6 +18,42 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestTransparentPersist extends BaseTestCase {
 
   @Test
+  public void insertFlush_mutateFlush_expect_update() {
+
+    LoggedSql.start();
+
+    EBasicVer newBean;
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+
+      newBean = new EBasicVer("insertMe");
+      DB.save(newBean);
+
+      // flush - new bean needs to get registered into persistence context
+      transaction.flush();
+
+      // make it dirty, we expect it to execute an update on flush()
+      newBean.setName("make it dirty - auto save");
+
+      // flush again, auto persist dirty bean in persistence context
+      transaction.commit();
+    }
+
+    List<String> sql = LoggedSql.stop();
+
+    EBasicVer found = DB.find(EBasicVer.class, newBean.getId());
+    assertThat(found.getName()).isEqualTo("make it dirty - auto save");
+
+    assertThat(sql).hasSize(4);
+    assertThat(sql.get(0)).contains("insert into e_basicver");
+    assertThat(sql.get(1)).contains(" -- bind(");
+    assertThat(sql.get(2)).contains("update e_basicver set name=?, last_update=? where id=? and last_update=?");
+    assertThat(sql.get(3)).contains(" -- bind(");
+
+    DB.delete(found);
+  }
+
+  @Test
   public void delete_expect_beanRemovedFromPersistenceContext() {
 
     EBasicVer b0 = new EBasicVer("simpleDelete");

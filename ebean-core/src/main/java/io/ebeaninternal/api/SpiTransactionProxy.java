@@ -44,6 +44,16 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setTransparentPersistence(boolean transparentPersistence) {
+    transaction.setTransparentPersistence(transparentPersistence);
+  }
+
+  @Override
+  public boolean isTransparentPersistence() {
+    return transaction.isTransparentPersistence();
+  }
+
+  @Override
   public void commitAndContinue() {
     transaction.commitAndContinue();
   }

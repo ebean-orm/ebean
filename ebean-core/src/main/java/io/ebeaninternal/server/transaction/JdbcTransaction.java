@@ -303,6 +303,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
+  public boolean isTransparentPersistence() {
+    return transparentPersistence;
+  }
+
+  @Override
   public boolean isSkipCacheExplicit() {
     return (skipCache != null && !skipCache);
   }
