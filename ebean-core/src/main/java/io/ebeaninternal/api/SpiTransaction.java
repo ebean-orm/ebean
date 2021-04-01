@@ -148,9 +148,9 @@ public interface SpiTransaction extends Transaction {
   int depth();
 
   /**
-   * Return true if transparent persistence is turned on.
+   * Return true if dirty beans are automatically persisted.
    */
-  boolean isTransparentPersistence();
+  boolean isAutoPersistUpdates();
 
   /**
    * Return true if this transaction was created explicitly via

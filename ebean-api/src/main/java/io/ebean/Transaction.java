@@ -60,12 +60,12 @@ public interface Transaction extends AutoCloseable {
   void register(TransactionCallback callback);
 
   /**
-   * EXPERIMENTAL - turn on transparent persistence and batchMode true.
+   * EXPERIMENTAL - turn on automatic persistence of dirty beans and batchMode true.
    * <p>
    * With this turned on beans that are dirty in the persistence context
    * are automatically persisted on flush() and commit().
    */
-  void setTransparentPersistence(boolean transparentPersistence);
+  void setAutoPersistUpdates(boolean autoPersistUpdates);
 
   /**
    * Set a label on the transaction.

@@ -44,13 +44,13 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void setTransparentPersistence(boolean transparentPersistence) {
-    transaction.setTransparentPersistence(transparentPersistence);
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    transaction.setAutoPersistUpdates(autoPersistUpdates);
   }
 
   @Override
-  public boolean isTransparentPersistence() {
-    return transaction.isTransparentPersistence();
+  public boolean isAutoPersistUpdates() {
+    return transaction.isAutoPersistUpdates();
   }
 
   @Override

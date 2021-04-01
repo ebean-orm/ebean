@@ -24,7 +24,7 @@ public class TestTransparentPersist extends BaseTestCase {
 
     EBasicVer newBean;
     try (Transaction transaction = DB.beginTransaction()) {
-      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
 
       newBean = new EBasicVer("insertMe");
       DB.save(newBean);
@@ -60,7 +60,7 @@ public class TestTransparentPersist extends BaseTestCase {
     DB.save(b0);
 
     try (Transaction transaction = DB.beginTransaction()) {
-      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
 
       EBasicVer found = DB.find(EBasicVer.class, b0.getId());
       // make it dirty
@@ -88,7 +88,7 @@ public class TestTransparentPersist extends BaseTestCase {
 
     EBasicVer newBean;
     try (Transaction transaction = DB.beginTransaction()) {
-      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
 
       EBasicVer found = DB.find(EBasicVer.class, b0.getId());
       found.setName("auto dirty");
@@ -127,7 +127,7 @@ public class TestTransparentPersist extends BaseTestCase {
     transPersist.save();
 
     try (Transaction transaction = DB.beginTransaction()) {
-      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
 
       EBasicVer found = DB.find(EBasicVer.class, transPersist.getId());
       found.setName("Persisted automatically as dirty");
@@ -152,7 +152,7 @@ public class TestTransparentPersist extends BaseTestCase {
     DB.save(order);
 
     try (Transaction transaction = DB.beginTransaction()) {
-      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
 
       Order foundOrder = DB.find(Order.class, order.getId());
       foundOrder.setStatus(Order.Status.APPROVED);
@@ -188,7 +188,7 @@ public class TestTransparentPersist extends BaseTestCase {
     LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
-      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
 
       Order foundOrder = DB.find(Order.class, order.getId());
       // we ONLY mutate the foreign key

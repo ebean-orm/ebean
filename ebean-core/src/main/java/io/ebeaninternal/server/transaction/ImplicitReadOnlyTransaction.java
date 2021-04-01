@@ -96,12 +96,12 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   }
 
   @Override
-  public void setTransparentPersistence(boolean transparentPersistence) {
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
     // do nothing
   }
 
   @Override
-  public boolean isTransparentPersistence() {
+  public boolean isAutoPersistUpdates() {
     return false;
   }
 

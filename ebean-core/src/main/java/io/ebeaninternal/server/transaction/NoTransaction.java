@@ -26,12 +26,12 @@ class NoTransaction implements SpiTransaction {
   static final NoTransaction INSTANCE = new NoTransaction();
 
   @Override
-  public void setTransparentPersistence(boolean transparentPersistence) {
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
     // do nothing
   }
 
   @Override
-  public boolean isTransparentPersistence() {
+  public boolean isAutoPersistUpdates() {
     return false;
   }
 
