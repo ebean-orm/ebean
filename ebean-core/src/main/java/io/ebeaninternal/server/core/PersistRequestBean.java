@@ -888,6 +888,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Remove deleted beans from the persistence context early.
+   */
+  public void removeFromPersistenceContext() {
+    idValue = beanDescriptor.getId(entityBean);
+    beanDescriptor.contextDeleted(transaction.getPersistenceContext(), idValue);
+  }
+
+  /**
    * Aggressive L1 and L2 cache cleanup for deletes.
    */
   private void postDelete() {

@@ -18,6 +18,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestTransparentPersist extends BaseTestCase {
 
   @Test
+  public void delete_expect_beanRemovedFromPersistenceContext() {
+
+    EBasicVer b0 = new EBasicVer("simpleDelete");
+    DB.save(b0);
+
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setTransparentPersistence(true); // EXPERIMENTAL feature
+
+      EBasicVer found = DB.find(EBasicVer.class, b0.getId());
+      // make it dirty
+      found.setName("make it dirty");
+
+      // delete it, should remove it from the "live" part of persistence context
+      // with the expectation that no update is executed (no dirty in PC update)
+      DB.delete(found);
+      transaction.commit();
+    }
+
+    EBasicVer after = DB.find(EBasicVer.class, b0.getId());
+    assertThat(after).isNull();
+  }
+
+  @Test
   public void simpleInsertUpdateDelete_experimental() {
 
     EBasicVer b0 = new EBasicVer("simpleIUD_0");
