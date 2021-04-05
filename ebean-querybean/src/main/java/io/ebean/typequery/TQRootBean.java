@@ -679,7 +679,7 @@ public abstract class TQRootBean<T, R> {
    * Provides us with the ability to explicitly use Postgres
    * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  R withLock(Query.LockType lockType) {
+  public R withLock(Query.LockType lockType) {
     query.withLock(lockType);
     return root;
   }
@@ -693,7 +693,7 @@ public abstract class TQRootBean<T, R> {
    * Provides us with the ability to explicitly use Postgres
    * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  R withLock(Query.LockType lockType, Query.LockWait lockWait) {
+  public R withLock(Query.LockType lockType, Query.LockWait lockWait) {
     query.withLock(lockType, lockWait);
     return root;
   }
