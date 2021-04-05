@@ -71,6 +71,7 @@ public class QCustomerTest {
       // not found using other transaction
       final Customer foundNot = new QCustomer()
         .name.eq("explicitTransaction")
+        .withLock(Query.LockType.SHARE)
         .findOne();
       assertThat(foundNot).isNull();
 
