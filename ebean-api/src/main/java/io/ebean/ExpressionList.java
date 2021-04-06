@@ -1671,7 +1671,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> endAnd();
 
   /**
-   * End a AND junction - synonym for endJunction().
+   * End a OR junction - synonym for endJunction().
    */
   ExpressionList<T> endOr();
 
