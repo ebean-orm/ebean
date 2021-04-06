@@ -4,21 +4,22 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
+import io.ebeaninternal.server.core.CacheOptions;
+import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
+import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import org.junit.Test;
-import org.tests.model.basic.Animal;
-import org.tests.model.basic.AnimalShelter;
-import org.tests.model.basic.Cat;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Dog;
-import org.tests.model.basic.Order;
+import org.tests.model.basic.*;
 import org.tests.model.bridge.BSite;
 import org.tests.model.bridge.BUser;
 
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BeanDescriptorTest extends BaseTestCase {
 
@@ -86,6 +87,42 @@ public class BeanDescriptorTest extends BaseTestCase {
     Collection<? extends Property> props = desc.allProperties();
 
     assertThat(props).extracting("name").contains("id", "status", "orderDate", "shipDate");
+  }
+
+  @Test
+  public void matchBaseTable() {
+    BeanDescriptor<Customer> desc = getBeanDescriptor(Customer.class);
+    assertTrue(desc.matchBaseTable("o_customer"));
+  }
+
+  @Test
+  public void matchBaseTable_whenTableHasSchema_expect_matchRegardlessOfSchema() {
+
+    DeployBeanDescriptor<Customer> deploy = mockDeployCustomer();
+
+    when(deploy.getBaseTable()).thenReturn("foo.o_customer");
+    BeanDescriptor<?> desc1 = new BeanDescriptor<>(mockOwner(), deploy);
+    assertTrue(desc1.matchBaseTable("o_customer"));
+
+    when(deploy.getBaseTable()).thenReturn("bar.o_customer");
+    BeanDescriptor<?> desc2 = new BeanDescriptor<>(mockOwner(), deploy);
+    assertTrue(desc2.matchBaseTable("o_customer"));
+  }
+
+  @SuppressWarnings("unchecked")
+  private DeployBeanDescriptor<Customer> mockDeployCustomer() {
+    DeployBeanDescriptor<Customer> deploy = mock(DeployBeanDescriptor.class);
+    when(deploy.getBeanType()).thenReturn(Customer.class);
+    when(deploy.getIdentityMode()).thenReturn(DeployIdentityMode.auto());
+    when(deploy.buildIdentityMode()).thenReturn(IdentityMode.NONE);
+    when(deploy.getCacheOptions()).thenReturn(CacheOptions.NO_CACHING);
+    return deploy;
+  }
+
+  private BeanDescriptorMap mockOwner() {
+    BeanDescriptorMap owner = mock(BeanDescriptorMap.class);
+    when(owner.createDocStoreBeanAdapter(any(), any())).thenReturn(mock(DocStoreBeanAdapter.class));
+    return owner;
   }
 
   @Test
