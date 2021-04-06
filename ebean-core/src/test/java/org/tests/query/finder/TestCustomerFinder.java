@@ -55,7 +55,6 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(json1).contains("\"name\":\"txn.main\"");
     assertThat(json1).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(json1).doesNotContain("\"sql\":\"select t0.id, t0.status, t0.name");
-
   }
 
   @Test
@@ -85,7 +84,6 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(customer.getName()).isEqualTo(customer1.getName());
 
     assertThat(Customer.find.db().getName()).isEqualTo(DB.getDefault().getName());
-
   }
 
   @Test
@@ -178,7 +176,7 @@ public class TestCustomerFinder extends BaseTestCase {
     // change default collect query plan threshold to 200 micros
     QueryPlanInit init0 = new QueryPlanInit();
     init0.setAll(true);
-    init0.setThresholdMicros(200);
+    init0.setThresholdMicros(2);
     final List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanInit(init0);
     assertThat(plans.size()).isGreaterThan(1);
 
@@ -188,7 +186,7 @@ public class TestCustomerFinder extends BaseTestCase {
     // change query plan threshold to 100 micros
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
-    init.setThresholdMicros(100);
+    init.setThresholdMicros(1);
     final List<MetaQueryPlan> appliedToPlans = server().getMetaInfoManager().queryPlanInit(init);
     assertThat(appliedToPlans.size()).isGreaterThan(4);
 
