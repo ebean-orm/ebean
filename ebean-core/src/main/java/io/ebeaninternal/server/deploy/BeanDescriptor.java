@@ -3134,7 +3134,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return ebi.isReference() || referenceIdPropertyOnly(ebi);
   }
 
-  boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
+  public boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
     return idOnlyReference && ebi.hasIdOnly(idPropertyIndex);
   }
 

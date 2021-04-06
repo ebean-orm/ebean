@@ -1032,6 +1032,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  /**
+   * Return if persist can be skipped on the reference only bean.
+   */
+  public boolean isSkipReference() {
+    return intercept.isReference() || (Flags.isRecurse(flags) && beanDescriptor.referenceIdPropertyOnly(intercept));
+  }
+
   public boolean isReference() {
     return beanDescriptor.isReference(intercept);
   }
