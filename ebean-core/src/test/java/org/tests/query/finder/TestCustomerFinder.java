@@ -31,7 +31,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer0 = new StringBuilder();
-    server().getMetaInfoManager()
+    DB.getDefault().getMetaInfoManager()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer0);
@@ -45,7 +45,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer1 = new StringBuilder();
-    server().getMetaInfoManager()
+    DB.getDefault().getMetaInfoManager()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer1);
@@ -193,7 +193,7 @@ public class TestCustomerFinder extends BaseTestCase {
     // run queries again
     runQueries();
 
-    ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
+    ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
 
     List<MetaQueryMetric> planStats = metrics.getQueryMetrics();
     assertThat(planStats.size()).isGreaterThan(4);
