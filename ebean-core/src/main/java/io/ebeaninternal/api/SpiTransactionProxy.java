@@ -44,6 +44,16 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    transaction.setAutoPersistUpdates(autoPersistUpdates);
+  }
+
+  @Override
+  public boolean isAutoPersistUpdates() {
+    return transaction.isAutoPersistUpdates();
+  }
+
+  @Override
   public void commitAndContinue() {
     transaction.commitAndContinue();
   }

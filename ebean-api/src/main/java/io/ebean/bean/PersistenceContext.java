@@ -1,5 +1,7 @@
 package io.ebean.bean;
 
+import java.util.List;
+
 /**
  * Holds entity beans by there type and id.
  * <p>
@@ -76,6 +78,11 @@ public interface PersistenceContext {
    * during large query iteration.
    */
   boolean resetLimit();
+
+  /**
+   * Return the list of dirty beans held by this persistence context.
+   */
+  List<Object> dirtyBeans();
 
   /**
    * Wrapper on a bean to also indicate if a bean has been deleted.

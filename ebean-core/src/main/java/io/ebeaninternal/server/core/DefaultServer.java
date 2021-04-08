@@ -236,7 +236,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.clockService = config.getClockService();
 
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
-    this.transactionManager = config.createTransactionManager(docStoreComponents.updateProcessor());
+    this.transactionManager = config.createTransactionManager(this, docStoreComponents.updateProcessor());
     this.documentStore = docStoreComponents.documentStore();
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
     this.metaInfoManager = new DefaultMetaInfoManager(this);

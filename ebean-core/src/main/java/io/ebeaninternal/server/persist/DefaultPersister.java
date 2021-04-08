@@ -881,6 +881,7 @@ public final class DefaultPersister implements Persister {
     }
 
     int count = request.executeOrQueue();
+    request.removeFromPersistenceContext();
 
     if (request.isPersistCascade()) {
       deleteAssocOne(request);

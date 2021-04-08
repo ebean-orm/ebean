@@ -187,6 +187,8 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private final long startNanos;
 
+  private boolean autoPersistUpdates;
+
   /**
    * Create a new JdbcTransaction.
    */
@@ -209,11 +211,12 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.batchOnCascadeMode = false;
         this.onQueryOnly = OnQueryOnly.ROLLBACK;
       } else {
+        this.autoPersistUpdates = explicit && manager.isAutoPersistUpdates();
         this.logSql = manager.isLogSql();
         this.logSummary = manager.isLogSummary();
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
-        this.batchMode = manager.getPersistBatch();
-        this.batchOnCascadeMode = manager.getPersistBatchOnCascade();
+        this.batchMode = manager.isPersistBatch();
+        this.batchOnCascadeMode = manager.isPersistBatchOnCascade();
         this.onQueryOnly = manager.getOnQueryOnly();
       }
 
@@ -292,6 +295,17 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
     sb.append("] ");
     return sb.toString();
+  }
+
+  @Override
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    this.autoPersistUpdates = autoPersistUpdates;
+    this.batchMode = true;
+  }
+
+  @Override
+  public boolean isAutoPersistUpdates() {
+    return autoPersistUpdates;
   }
 
   @Override
@@ -774,6 +788,10 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Flush the JDBC batch and execute derived relationship statements if necessary.
    */
   private void internalBatchFlush() {
+    if (autoPersistUpdates) {
+      // Experimental - flush dirty beans held by the persistence context
+      manager.flushTransparent(persistenceContext, this);
+    }
     batchFlush();
     if (deferredList != null) {
       for (PersistDeferredRelationship deferred : deferredList) {
@@ -1042,7 +1060,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
-      if (queryOnly) {
+      if (queryOnly && !autoPersistUpdates) {
         connectionEndForQueryOnly();
       } else {
         flushCommitAndNotify();
