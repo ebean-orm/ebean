@@ -73,6 +73,10 @@ public class ScopeTrans {
         restoreBatchGeneratedKeys = transaction.getBatchGetGeneratedKeys();
         restoreBatchFlushOnQuery = transaction.isFlushOnQuery();
       }
+      Boolean autoPersistUpdates = txScope.getAutoPersistUpdates();
+      if (autoPersistUpdates != null) {
+        transaction.setAutoPersistUpdates(autoPersistUpdates);
+      }
       if (txScope.isBatchSet()) {
         transaction.setBatchMode(txScope.isBatchMode());
       }

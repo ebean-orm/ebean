@@ -50,7 +50,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>6.15</version>
+      <version>7.0</version>
     </dependency>
 
     <dependency>

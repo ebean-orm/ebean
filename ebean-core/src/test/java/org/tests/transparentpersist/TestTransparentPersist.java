@@ -1,9 +1,7 @@
 package org.tests.transparentpersist;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.Transaction;
+import io.ebean.*;
+import io.ebean.annotation.*;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeantest.LoggedSql;
 import org.junit.Test;
@@ -218,6 +216,43 @@ public class TestTransparentPersist extends BaseTestCase {
     DB.delete(Customer.class, checkOrder.getCustomer().getId());
     DB.delete(Customer.class, c0.getId());
   }
+
+  @Test
+  public void txScope_setAutoPersistUpdates() {
+
+    EBasicVer b0 = new EBasicVer("txScopeUpdate");
+    b0.save();
+
+    DB.execute(TxScope.required().setAutoPersistUpdates(TxOption.ON), () -> {
+      EBasicVer found = DB.find(EBasicVer.class, b0.getId());
+      found.setName("mutable txScope bean");
+    });
+
+    EBasicVer after = DB.find(EBasicVer.class, b0.getId());
+    assertThat(after.getName()).isEqualTo("mutable txScope bean");
+
+    DB.delete(after);
+  }
+
+//  @Test
+//  public void txn_setAutoPersistUpdates() {
+//
+//    EBasicVer b0 = new EBasicVer("txn autoPersistUpdates ON");
+//    b0.save();
+//
+//    performUpdate(b0);
+//
+//    EBasicVer after = DB.find(EBasicVer.class, b0.getId());
+//    assertThat(after.getName()).isEqualTo("mutated with autoPersistUpdates ON");
+//
+//    DB.delete(after);
+//  }
+//
+//  @Transactional(autoPersistUpdates = TxOption.ON)
+//  private void performUpdate(EBasicVer b0) {
+//    EBasicVer found = DB.find(EBasicVer.class, b0.getId());
+//    found.setName("mutated with autoPersistUpdates ON");
+//  }
 
   @Test
   public void simulate_transparentPersistence_forSimpleUpdate() {

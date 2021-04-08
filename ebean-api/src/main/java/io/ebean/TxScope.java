@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxIsolation;
+import io.ebean.annotation.TxOption;
 import io.ebean.annotation.TxType;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public final class TxScope {
   private String serverName;
 
   private TxIsolation isolation;
+
+  private TxOption autoPersistUpdates;
 
   private PersistBatch batch;
 
@@ -124,6 +127,13 @@ public final class TxScope {
   }
 
   /**
+   * Return the AutoPersistUpdates mode as a nullable Boolean.
+   */
+  public Boolean getAutoPersistUpdates() {
+    return autoPersistUpdates == null ? null : autoPersistUpdates.asBoolean();
+  }
+
+  /**
    * Return true if PersistBatch has been set.
    */
   public boolean isBatchSet() {
@@ -173,6 +183,14 @@ public final class TxScope {
    */
   public TxScope setType(TxType type) {
     this.type = type;
+    return this;
+  }
+
+  /**
+   * Set the autoPersistUpdates mode.
+   */
+  public TxScope setAutoPersistUpdates(TxOption autoPersistUpdates) {
+    this.autoPersistUpdates = autoPersistUpdates;
     return this;
   }
 
