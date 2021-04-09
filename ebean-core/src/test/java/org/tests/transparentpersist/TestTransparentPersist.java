@@ -234,25 +234,25 @@ public class TestTransparentPersist extends BaseTestCase {
     DB.delete(after);
   }
 
-//  @Test
-//  public void txn_setAutoPersistUpdates() {
-//
-//    EBasicVer b0 = new EBasicVer("txn autoPersistUpdates ON");
-//    b0.save();
-//
-//    performUpdate(b0);
-//
-//    EBasicVer after = DB.find(EBasicVer.class, b0.getId());
-//    assertThat(after.getName()).isEqualTo("mutated with autoPersistUpdates ON");
-//
-//    DB.delete(after);
-//  }
-//
-//  @Transactional(autoPersistUpdates = TxOption.ON)
-//  private void performUpdate(EBasicVer b0) {
-//    EBasicVer found = DB.find(EBasicVer.class, b0.getId());
-//    found.setName("mutated with autoPersistUpdates ON");
-//  }
+  @Test
+  public void txn_setAutoPersistUpdates() {
+
+    EBasicVer b0 = new EBasicVer("txn autoPersistUpdates ON");
+    b0.save();
+
+    performUpdate(b0);
+
+    EBasicVer after = DB.find(EBasicVer.class, b0.getId());
+    assertThat(after.getName()).isEqualTo("mutated with autoPersistUpdates ON");
+
+    DB.delete(after);
+  }
+
+  @Transactional(autoPersistUpdates = TxOption.ON)
+  private void performUpdate(EBasicVer b0) {
+    EBasicVer found = DB.find(EBasicVer.class, b0.getId());
+    found.setName("mutated with autoPersistUpdates ON");
+  }
 
   @Test
   public void simulate_transparentPersistence_forSimpleUpdate() {
