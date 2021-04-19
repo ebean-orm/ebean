@@ -18,6 +18,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.core.EncryptAlias;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -64,6 +65,8 @@ import static io.ebean.util.StringHelper.replace;
 public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
+
+  private static final String ENC_PREFIX = " " + EncryptAlias.PREFIX;
 
   /**
    * Flag to mark this is the id property.
@@ -531,7 +534,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the SQL for the column including decryption function and column alias.
    */
   private String getDecryptSqlWithColumnAlias(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + " _e_" + tableAlias + "_" + this.getDbColumn();
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + ENC_PREFIX + tableAlias + "_" + this.getDbColumn();
   }
 
   @Override
