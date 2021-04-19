@@ -81,18 +81,18 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     @Override
     public void visitOneImported(BeanPropertyAssocOne<?> p) {
-
+      // do nothing
     }
 
     @Override
-    public void visitScalar(BeanProperty p) {
+    public void visitScalar(BeanProperty p, boolean allowNonNull) {
       sb.append(",").append(p.getDbColumn());
       colCount++;
     }
 
     @Override
     public void visitEnd() {
-
+      // do nothing
     }
   }
 

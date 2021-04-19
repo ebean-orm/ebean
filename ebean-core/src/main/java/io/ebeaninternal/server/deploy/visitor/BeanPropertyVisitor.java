@@ -40,8 +40,8 @@ public interface BeanPropertyVisitor {
   void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded);
 
   /**
-   * Visit a scalar property.
+   * Visit a scalar property specify allowing non-null (e.g. embedded bean scalar properties).
    */
-  void visitScalar(BeanProperty p);
+  void visitScalar(BeanProperty p, boolean allowNonNull);
 
 }

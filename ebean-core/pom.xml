@@ -72,7 +72,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.1</version>
+      <version>12.8.4a</version>
       <scope>test</scope>
     </dependency>
 
