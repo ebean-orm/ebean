@@ -354,7 +354,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
-    if (descriptor != null) {
+    if (s != null && descriptor != null) {
       s = s.replace("${ta}.", "${}");
       s = s.replace("${ta}", "${}");
       if (dbEncrypted) {
