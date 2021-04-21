@@ -58,6 +58,12 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
+  public void prefixProperty(String path) {
+    expOne.prefixProperty(path);
+    expTwo.prefixProperty(path);
+  }
+
+  @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;

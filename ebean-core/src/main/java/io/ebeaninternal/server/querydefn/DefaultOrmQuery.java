@@ -1238,6 +1238,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Prepare the expressions (compile sub-queries etc).
    */
   private void prepareExpressions(BeanQueryRequest<?> request) {
+    detail.prepareExpressions(request);
     if (whereExpressions != null) {
       whereExpressions.prepareExpression(request);
     }

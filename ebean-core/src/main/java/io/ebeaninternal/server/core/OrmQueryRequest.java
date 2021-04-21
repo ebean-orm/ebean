@@ -219,10 +219,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void prepareQuery() {
+    secondaryQueries = query.convertJoins();
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
-    this.secondaryQueries = query.convertJoins();
-    this.queryPlanKey = query.prepare(this);
+    queryPlanKey = query.prepare(this);
   }
 
   public boolean isNativeSql() {

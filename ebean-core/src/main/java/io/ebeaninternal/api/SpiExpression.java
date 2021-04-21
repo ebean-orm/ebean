@@ -105,4 +105,9 @@ public interface SpiExpression extends Expression {
    * Check for match to a natural key query returning false if it doesn't match.
    */
   boolean naturalKey(NaturalKeyQueryData<?> data);
+
+  /**
+   * Apply property prefix when filterMany expressions included into main query.
+   */
+  void prefixProperty(String path);
 }

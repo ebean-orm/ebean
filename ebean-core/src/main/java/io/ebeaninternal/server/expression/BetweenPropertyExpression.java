@@ -17,14 +17,20 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   private static final String BETWEEN = " between ";
 
-  private final String lowProperty;
-  private final String highProperty;
+  private String lowProperty;
+  private String highProperty;
   private final Object value;
 
   BetweenPropertyExpression(String lowProperty, String highProperty, Object value) {
     this.lowProperty = lowProperty;
     this.highProperty = highProperty;
     this.value = value;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    this.lowProperty = path + "." + lowProperty;
+    this.highProperty = path + "." + highProperty;
   }
 
   protected String name(String propName) {
