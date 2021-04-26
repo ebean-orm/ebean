@@ -100,9 +100,9 @@ alter table migtest_e_softdelete add column deleted boolean default false not nu
 
 alter table migtest_oto_child add column master_id bigint;
 
-create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
-create index ix_migtest_oto_child_name on migtest_oto_child (name);
+create index if not exists ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index if not exists ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index if not exists ix_migtest_oto_child_name on migtest_oto_child (name);
 drop index if exists ix_migtest_e_basic_indextest1;
 drop index if exists ix_migtest_e_basic_indextest5;
 drop index if exists idxd_migtest_0;

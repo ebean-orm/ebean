@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>2.3</version>
+    <version>3.1</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.8.1-SNAPSHOT</version>
+  <version>12.8.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>

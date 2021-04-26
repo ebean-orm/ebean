@@ -33,7 +33,7 @@ abstract class DLoadBaseContext {
 
   final boolean queryFetch;
 
-  DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
+  DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, OrmQueryProperties queryProps) {
     this.parent = parent;
     this.serverName = parent.getEbeanServer().getName();
     this.desc = desc;
@@ -42,11 +42,7 @@ abstract class DLoadBaseContext {
     this.hitCache = parent.isBeanCacheGet() && desc.isBeanCaching();
     this.objectGraphNode = parent.getObjectGraphNode(path);
     this.queryFetch = queryProps != null && queryProps.isQueryFetch();
-    this.batchSize = initBatchSize(defaultBatchSize, queryProps);
-  }
-
-  private int initBatchSize(int batchSize, OrmQueryProperties queryProps) {
-    return queryProps == null ? batchSize : queryProps.getBatchSize();
+    this.batchSize = parent.batchSize(queryProps);
   }
 
   /**

@@ -23,6 +23,9 @@ import java.util.function.Predicate;
  */
 public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
 
+  private static final String ENC_PREFIX = EncryptAlias.PREFIX;
+  private static final String ENC_PREFIX_UPPER = EncryptAlias.PREFIX.toUpperCase();
+
   private final SpiDtoQuery<T> query;
 
   private final DtoQueryEngine queryEngine;
@@ -133,9 +136,9 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   }
 
   static String parseColumn(String columnLabel) {
-    if (columnLabel.startsWith("_e_") || columnLabel.startsWith("_E_")) {
+    if (columnLabel.startsWith(ENC_PREFIX) || columnLabel.startsWith(ENC_PREFIX_UPPER)) {
       // encrypted column alias in the form _e_<tableAlias>_<column>
-      final int pos = columnLabel.indexOf("_", 3);
+      final int pos = columnLabel.indexOf("_", 4);
       if (pos > -1) {
         return columnLabel.substring(pos + 1);
       }

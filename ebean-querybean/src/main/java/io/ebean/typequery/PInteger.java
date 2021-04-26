@@ -24,4 +24,70 @@ public class PInteger<R> extends PBaseNumber<R,Integer> {
     super(name, root, prefix);
   }
 
+  /**
+   * Add bitwise AND expression of the given bit flags to compare with the match/mask.
+   * <p>
+   * <pre>{@code
+   *
+   * // Flags Bulk + Size = Size
+   * // ... meaning Bulk is not set and Size is set
+   *
+   * int selectedFlags = BwFlags.HAS_BULK + BwFlags.HAS_SIZE;
+   * int mask = BwFlags.HAS_SIZE; // Only Size flag set
+   *
+   * bitwiseAnd(selectedFlags, mask)
+   *
+   * }</pre>
+   *
+   * @param flags        The flags we are looking for
+   */
+  public R bitwiseAnd(int flags, int mask) {
+    expr().bitwiseAnd(_name, flags, mask);
+    return _root;
+  }
+
+  /**
+   * Add expression for ALL of the given bit flags to be set.
+   * <pre>{@code
+   *
+   * bitwiseAll(BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param flags        The flags we are looking for
+   */
+  public R bitwiseAll(int flags) {
+    expr().bitwiseAll(_name, flags);
+    return _root;
+  }
+
+  /**
+   * Add expression for ANY of the given bit flags to be set.
+   * <pre>{@code
+   *
+   * bitwiseAny(BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param flags        The flags we are looking for
+   */
+  public R bitwiseAny(int flags) {
+    expr().bitwiseAny(_name, flags);
+    return _root;
+  }
+
+  /**
+   * Add expression for the given bit flags to be NOT set.
+   * <pre>{@code
+   *
+   * bitwiseNot(BwFlags.HAS_COLOUR)
+   *
+   * }</pre>
+   *
+   * @param flags        The flags we are looking for
+   */
+  public R bitwiseNot(int flags) {
+    expr().bitwiseNot(_name, flags);
+    return _root;
+  }
 }

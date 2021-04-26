@@ -1,38 +1,42 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
+import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestRawSqlPositionedParams extends BaseTestCase {
+
+  private static final RawSql RAWSQL_1 = RawSqlBuilder
+    .parse("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
+    .create();
+
+  private static final RawSql RAW_SQL_2 = RawSqlBuilder
+    .unparsed("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
+    .columnMapping("r.id", "id")
+    .columnMapping("r.name", "name")
+    .create();
 
   @Test
   public void test() {
 
     ResetBasicData.reset();
 
-    RawSql rawSql = RawSqlBuilder
-      .parse("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
-      .create();
+    List<Customer> list = DB.find(Customer.class)
+      .setRawSql(RAWSQL_1)
+      .setParameter(1)
+      .setParameter("R%")
+      .where().lt("id", 2001)
+      .findList();
 
-    Query<Customer> query = Ebean.find(Customer.class);
-    query.setRawSql(rawSql);
-    query.setParameter(1, 1);
-    query.setParameter(2, "R%");
-    query.where().lt("id", 2001);
-
-    List<Customer> list = query.findList();
-
-    assertNotNull(list);
+    assertThat(list).isNotNull();
   }
 
   @Test
@@ -40,18 +44,12 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    RawSql rawSql = RawSqlBuilder
-      .unparsed("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
-      .columnMapping("r.id", "id")
-      .columnMapping("r.name", "name").create();
+    List<Customer> list = DB.find(Customer.class)
+      .setRawSql(RAW_SQL_2)
+      .setParameter(1)
+      .setParameter("R%")
+      .findList();
 
-    Query<Customer> query = Ebean.find(Customer.class);
-    query.setRawSql(rawSql);
-    query.setParameter(1, 1);
-    query.setParameter(2, "R%");
-
-    List<Customer> list = query.findList();
-
-    assertNotNull(list);
+    assertThat(list).isNotNull();
   }
 }

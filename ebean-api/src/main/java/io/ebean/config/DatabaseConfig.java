@@ -233,6 +233,12 @@ public class DatabaseConfig {
   private String historyTableSuffix = "_history";
 
   /**
+   * When true explicit transactions beans that have been made dirty will be
+   * automatically persisted via update on flush.
+   */
+  private boolean autoPersistUpdates;
+
+  /**
    * Use for transaction scoped batch mode.
    */
   private PersistBatch persistBatch = PersistBatch.NONE;
@@ -498,14 +504,23 @@ public class DatabaseConfig {
   private boolean notifyL2CacheInForeground;
 
   /**
-   * Set to true to support query plan capture.
+   * Set to true to enable bind capture required for query plan capture.
    */
-  private boolean collectQueryPlans;
+  private boolean queryPlanEnable;
 
   /**
    * The default threshold in micros for collecting query plans.
    */
-  private long collectQueryPlanThresholdMicros = Long.MAX_VALUE;
+  private long queryPlanThresholdMicros = Long.MAX_VALUE;
+
+  /**
+   * Set to true to enable automatic periodic query plan capture.
+   */
+  private boolean queryPlanCapture;
+  private long queryPlanCapturePeriodSecs = 60 * 10; // 10 minutes
+  private long queryPlanCaptureMaxTimeMillis = 10_000; // 10 seconds
+  private int queryPlanCaptureMaxCount = 10;
+  private QueryPlanListener queryPlanListener;
 
   /**
    * The time in millis used to determine when a query is alerted for being slow.
@@ -897,6 +912,20 @@ public class DatabaseConfig {
   }
 
   /**
+   * Return true if dirty beans are automatically persisted.
+   */
+  public boolean isAutoPersistUpdates() {
+    return autoPersistUpdates;
+  }
+
+  /**
+   * Set to true if dirty beans are automatically persisted.
+   */
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    this.autoPersistUpdates = autoPersistUpdates;
+  }
+
+  /**
    * Return the PersistBatch mode to use by default at the transaction level.
    * <p>
    * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
@@ -1045,7 +1074,6 @@ public class DatabaseConfig {
    * This is a performance optimisation to reduce the number times Ebean
    * requests a sequence to be used as an Id for a bean (aka reduce network
    * chatter).
-
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
@@ -2693,7 +2721,10 @@ public class DatabaseConfig {
   }
 
   /**
-   * Load settings from ebean.properties.
+   * Load settings from application.properties, application.yaml and other sources.
+   * <p>
+   * Uses <code>avaje-config</code> to load configuration properties.  Goto https://avaje.io/config
+   * for detail on how and where properties are loaded from.
    */
   public void loadFromProperties() {
     this.properties = Config.asProperties();
@@ -2796,14 +2827,19 @@ public class DatabaseConfig {
     loadDocStoreSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);
     dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
     dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
-    collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
-    collectQueryPlanThresholdMicros = p.getLong("collectQueryPlanThresholdMicros", collectQueryPlanThresholdMicros);
+    queryPlanEnable = p.getBoolean("queryPlan.enable", queryPlanEnable);
+    queryPlanThresholdMicros = p.getLong("queryPlan.thresholdMicros", queryPlanThresholdMicros);
+    queryPlanCapture = p.getBoolean("queryPlan.capture", queryPlanCapture);
+    queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
+    queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
+    queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
@@ -3093,14 +3129,17 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return the query plan time to live.
+   * Return the time to live for ebean's internal query plan.
    */
   public int getQueryPlanTTLSeconds() {
     return queryPlanTTLSeconds;
   }
 
   /**
-   * Set the query plan time to live.
+   * Set the time to live for ebean's internal query plan.
+   * <p>
+   * This is the plan that knows how to execute the query, read the result
+   * and collects execution metrics. By default this is set to 5 mins.
    */
   public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
@@ -3173,29 +3212,110 @@ public class DatabaseConfig {
   /**
    * Return true if query plan capture is enabled.
    */
-  public boolean isCollectQueryPlans() {
-    return collectQueryPlans;
+  public boolean isQueryPlanEnable() {
+    return queryPlanEnable;
   }
 
   /**
    * Set to true to enable query plan capture.
    */
-  public void setCollectQueryPlans(boolean collectQueryPlans) {
-    this.collectQueryPlans = collectQueryPlans;
+  public void setQueryPlanEnable(boolean queryPlanEnable) {
+    this.queryPlanEnable = queryPlanEnable;
   }
 
   /**
    * Return the query plan collection threshold in microseconds.
    */
-  public long getCollectQueryPlanThresholdMicros() {
-    return collectQueryPlanThresholdMicros;
+  public long getQueryPlanThresholdMicros() {
+    return queryPlanThresholdMicros;
   }
 
   /**
    * Set the query plan collection threshold in microseconds.
+   * <p>
+   * Queries executing slower than this will have bind values captured such that later
+   * the query plan can be captured and reported.
    */
-  public void setCollectQueryPlanThresholdMicros(long collectQueryPlanThresholdMicros) {
-    this.collectQueryPlanThresholdMicros = collectQueryPlanThresholdMicros;
+  public void setQueryPlanThresholdMicros(long queryPlanThresholdMicros) {
+    this.queryPlanThresholdMicros = queryPlanThresholdMicros;
+  }
+
+  /**
+   * Return true if periodic capture of query plans is enabled.
+   */
+  public boolean isQueryPlanCapture() {
+    return queryPlanCapture;
+  }
+
+  /**
+   * Set to true to turn on periodic capture of query plans.
+   */
+  public void setQueryPlanCapture(boolean queryPlanCapture) {
+    this.queryPlanCapture = queryPlanCapture;
+  }
+
+  /**
+   * Return the frequency to capture query plans.
+   */
+  public long getQueryPlanCapturePeriodSecs() {
+    return queryPlanCapturePeriodSecs;
+  }
+
+  /**
+   * Set the frequency in seconds to capture query plans.
+   */
+  public void setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
+    this.queryPlanCapturePeriodSecs = queryPlanCapturePeriodSecs;
+  }
+
+  /**
+   * Return the time after which a capture query plans request will
+   * stop capturing more query plans.
+   * <p>
+   * Effectively this controls the amount of load/time we want to
+   * allow for query plan capture.
+   */
+  public long getQueryPlanCaptureMaxTimeMillis() {
+    return queryPlanCaptureMaxTimeMillis;
+  }
+
+  /**
+   * Set the time after which a capture query plans request will
+   * stop capturing more query plans.
+   * <p>
+   * Effectively this controls the amount of load/time we want to
+   * allow for query plan capture.
+   */
+  public void setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
+    this.queryPlanCaptureMaxTimeMillis = queryPlanCaptureMaxTimeMillis;
+  }
+
+  /**
+   * Return the max number of query plans captured per request.
+   */
+  public int getQueryPlanCaptureMaxCount() {
+    return queryPlanCaptureMaxCount;
+  }
+
+  /**
+   * Set the max number of query plans captured per request.
+   */
+  public void setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
+    this.queryPlanCaptureMaxCount = queryPlanCaptureMaxCount;
+  }
+
+  /**
+   * Return the listener used to process captured query plans.
+   */
+  public QueryPlanListener getQueryPlanListener() {
+    return queryPlanListener;
+  }
+
+  /**
+   * Set the listener used to process captured query plans.
+   */
+  public void setQueryPlanListener(QueryPlanListener queryPlanListener) {
+    this.queryPlanListener = queryPlanListener;
   }
 
   /**
@@ -3249,7 +3369,7 @@ public class DatabaseConfig {
     this.loadModuleInfo = loadModuleInfo;
   }
 
-  public enum UuidVersion {
+    public enum UuidVersion {
     VERSION4,
     VERSION1,
     VERSION1RND

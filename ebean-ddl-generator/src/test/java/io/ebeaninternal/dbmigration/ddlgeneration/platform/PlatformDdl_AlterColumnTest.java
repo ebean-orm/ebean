@@ -9,10 +9,14 @@ import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.Column;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -236,6 +240,22 @@ public class PlatformDdl_AlterColumnTest {
       exceptionCaught = true;
     }
     assertTrue(exceptionCaught);
+  }
+
+  @Test
+  public void oracle_alterTableAddColumn() throws IOException {
+    DdlWrite write = new DdlWrite();
+    oraDdl.alterTableAddColumn(write.apply(), "my_table", simpleColumn(), false, "1");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table my_table add my_column int default 1 not null;\n");
+  }
+
+  private Column simpleColumn() {
+    Column column = new Column();
+    column.setName("my_column");
+    column.setType("int");
+    column.setNotnull(true);
+    column.setDefaultValue("1");
+    return column;
   }
 
   @Test

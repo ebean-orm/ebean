@@ -60,6 +60,14 @@ public interface Transaction extends AutoCloseable {
   void register(TransactionCallback callback);
 
   /**
+   * EXPERIMENTAL - turn on automatic persistence of dirty beans and batchMode true.
+   * <p>
+   * With this turned on beans that are dirty in the persistence context
+   * are automatically persisted on flush() and commit().
+   */
+  void setAutoPersistUpdates(boolean autoPersistUpdates);
+
+  /**
    * Set a label on the transaction.
    * <p>
    * This label is used to group transaction execution times for performance metrics reporting.
@@ -339,15 +347,12 @@ public interface Transaction extends AutoCloseable {
    * The batch is automatically flushed when it hits the batch size and also when we
    * execute queries or when we mix UpdateSql and CallableSql with save and delete of
    * beans.
-   * </p>
    * <p>
    * We use {@link #flush()} to explicitly flush the batch and we can use
    * {@link #setFlushOnQuery(boolean)} and {@link #setFlushOnMixed(boolean)}
    * to control the automatic flushing behaviour.
-   * </p>
    * <p>
    * Example: batch processing of CallableSql executing every 10 rows
-   * </p>
    *
    * <pre>{@code
    *
@@ -392,14 +397,11 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * This only takes effect when batch mode on the transaction has not already meant that
    * JDBC batch mode is being used.
-   * </p>
    * <p>
    * This is useful when the single save() or delete() cascades. For example, inserting a 'master' cascades
    * and inserts a collection of 'detail' beans. The detail beans can be inserted using JDBC batch.
-   * </p>
    * <p>
    * This is effectively already turned on for all platforms apart from older Sql Server.
-   * </p>
    *
    * @param batchMode the batch mode to use per save(), insert(), update() or delete()
    * @see io.ebean.config.DatabaseConfig#setPersistBatchOnCascade(PersistBatch)
@@ -422,15 +424,19 @@ public interface Transaction extends AutoCloseable {
   int getBatchSize();
 
   /**
-   * Specify if you want batched inserts to use getGeneratedKeys.
+   * Specify if we want batched inserts to use getGeneratedKeys.
    * <p>
    * By default batched inserts will try to use getGeneratedKeys if it is
    * supported by the underlying jdbc driver and database.
-   * </p>
    * <p>
-   * You may want to turn getGeneratedKeys off when you are inserting a large
-   * number of objects and you don't care about getting back the ids.
-   * </p>
+   * We want to turn off getGeneratedKeys when we are inserting a large
+   * number of objects and we don't care about getting back the ids. In this
+   * way we avoid the extra cost of getting back the generated id values
+   * from the database.
+   * <p>
+   * Note that when we do turn off getGeneratedKeys then we have the limitation
+   * that after a bean has been inserted we are unable to then mutate the bean
+   * and update it in the same transaction as we have not obtained it's id value.
    */
   void setGetGeneratedKeys(boolean getGeneratedKeys);
 
@@ -449,13 +455,11 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * If you want to execute both WITHOUT having the batch automatically flush
    * you need to call this with batchFlushOnMixed = false.
-   * </p>
    * <p>
    * Note that UpdateSql and CallableSql are ALWAYS executed first (before the
    * beans are executed). This is because the UpdateSql and CallableSql have
    * already been bound to their PreparedStatements. The beans on the other hand
    * have a 2 step process (delayed binding).
-   * </p>
    */
   void setFlushOnMixed(boolean batchFlushOnMixed);
 
@@ -473,7 +477,6 @@ public interface Transaction extends AutoCloseable {
    * <p>
    * Calling this method with batchFlushOnQuery = false means that you can
    * execute a query and the batch will not be automatically flushed.
-   * </p>
    */
   void setFlushOnQuery(boolean batchFlushOnQuery);
 
@@ -490,7 +493,6 @@ public interface Transaction extends AutoCloseable {
    * should be flushed prior to executing a query.
    * <p>
    * The default is for this to be true.
-   * </p>
    */
   boolean isFlushOnQuery();
 
@@ -507,7 +509,6 @@ public interface Transaction extends AutoCloseable {
    * flush the batch if you like.
    * <p>
    * Flushing occurs automatically when:
-   * </p>
    * <ul>
    * <li>the batch size is reached</li>
    * <li>A query is executed on the same transaction</li>
@@ -533,11 +534,9 @@ public interface Transaction extends AutoCloseable {
    * commit() rollback() and end() methods on the Transaction should still be
    * used. Calling these methods on the Connection would be a big no no unless
    * you know what you are doing.
-   * </p>
    * <p>
    * Examples of when a developer may wish to use the connection directly are:
    * Savepoints, advanced CLOB BLOB use and advanced stored procedure calls.
-   * </p>
    */
   Connection getConnection();
 
@@ -545,17 +544,14 @@ public interface Transaction extends AutoCloseable {
    * Add table modification information to the TransactionEvent.
    * <p>
    * Use this in conjunction with getConnection() and raw JDBC.
-   * </p>
    * <p>
    * This effectively informs Ebean of the data that has been changed by the
    * transaction and this information is normally automatically handled by Ebean
    * when you save entity beans or use UpdateSql etc.
-   * </p>
    * <p>
    * If you use raw JDBC then you can use this method to inform Ebean for the
    * tables that have been modified. Ebean uses this information to keep its
    * caches in synch and maintain text indexes.
-   * </p>
    */
   void addModification(String tableName, boolean inserts, boolean updates, boolean deletes);
 

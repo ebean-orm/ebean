@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.8.1-SNAPSHOT</version>
+    <version>12.8.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.1</version>
+      <version>12.8.4a</version>
       <scope>test</scope>
     </dependency>
 
@@ -87,19 +87,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.8.1-SNAPSHOT</version>
+      <version>12.8.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>12.8.1-SNAPSHOT</version>
+      <version>12.8.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.8.1-SNAPSHOT</version>
+      <version>12.8.4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -302,7 +302,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>12.6.6</version>
+        <version>12.8.2</version>
         <executions>
           <execution>
             <id>test</id>

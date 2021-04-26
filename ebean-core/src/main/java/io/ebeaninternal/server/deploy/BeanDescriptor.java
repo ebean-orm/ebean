@@ -2473,7 +2473,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    * Return the property path given the db table and column.
    */
   public String findBeanPath(String schemaName, String tableName, String columnName) {
-    if (matchBaseTable(schemaName, tableName)) {
+    if (matchBaseTable(tableName)) {
       return columnPath.get(columnName);
     }
     BeanPropertyAssoc<?> assocProperty = tablePath.get(tableName);
@@ -2489,10 +2489,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return null;
   }
 
-  private boolean matchBaseTable(String schemaName, String tableName) {
+  boolean matchBaseTable(String tableName) {
     return tableName.isEmpty()
       || baseTable.equalsIgnoreCase(tableName)
-      || baseTable.equalsIgnoreCase(schemaName + "." + tableName);
+      || baseTable.endsWith("." + tableName);
   }
 
   /**
@@ -3134,7 +3134,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return ebi.isReference() || referenceIdPropertyOnly(ebi);
   }
 
-  boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
+  public boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
     return idOnlyReference && ebi.hasIdOnly(idPropertyIndex);
   }
 

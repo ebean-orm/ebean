@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.FetchConfig;
+import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 import java.util.Set;
 
@@ -19,4 +20,8 @@ public interface SpiQueryFetch {
    */
   void fetchProperties(String name, Set<String> properties, FetchConfig config);
 
+  /**
+   * Add a nested fetch graph.
+   */
+  void addNested(String name, OrmQueryDetail nestedDetail, FetchConfig config);
 }

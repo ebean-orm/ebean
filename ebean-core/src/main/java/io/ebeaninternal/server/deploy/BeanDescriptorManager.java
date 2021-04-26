@@ -93,6 +93,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorManager.class);
 
   private static final BeanDescComparator beanDescComparator = new BeanDescComparator();
+  public static final String JAVA_LANG_RECORD = "java.lang.Record";
 
   private final ReadAnnotations readAnnotations;
   private final TransientProperties transientProperties;
@@ -1418,12 +1419,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void checkInheritedClasses(Class<?> beanClass) {
     Class<?> superclass = beanClass.getSuperclass();
-    if (Object.class.equals(superclass)) {
+    if (Object.class.equals(superclass) || Model.class.equals(superclass) || JAVA_LANG_RECORD.equals(superclass.getName())) {
       // we got to the top of the inheritance
-      return;
-    }
-    if (Model.class.equals(superclass)) {
-      // top of the inheritance. Not enhancing Model at this stage
       return;
     }
     if (!EntityBean.class.isAssignableFrom(superclass)) {

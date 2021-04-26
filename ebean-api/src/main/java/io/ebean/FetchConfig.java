@@ -46,7 +46,7 @@ public class FetchConfig implements Serializable {
 
   /**
    * Deprecated - migrate to one of the static factory methods like {@link FetchConfig#ofQuery()}
-   *
+   * <p>
    * Construct using default JOIN mode.
    */
   @Deprecated
@@ -89,7 +89,7 @@ public class FetchConfig implements Serializable {
    * Return FetchConfig to lazily load the relationship.
    */
   public static FetchConfig ofLazy() {
-    return new FetchConfig(LAZY_MODE, 10);
+    return new FetchConfig(LAZY_MODE, 0);
   }
 
   /**
@@ -110,8 +110,8 @@ public class FetchConfig implements Serializable {
    * We want to migrate away from mutating FetchConfig to a fully immutable FetchConfig.
    */
   private FetchConfig mutate(int mode, int batchSize) {
-    if (batchSize < 1) {
-      throw new IllegalArgumentException("batch size "+batchSize+" must be > 0");
+    if (batchSize < 0) {
+      throw new IllegalArgumentException("batch size " + batchSize + " must be > 0");
     }
     this.mode = mode;
     this.batchSize = batchSize;
@@ -124,7 +124,7 @@ public class FetchConfig implements Serializable {
    */
   @Deprecated
   public FetchConfig lazy() {
-    return mutate(LAZY_MODE, 10);
+    return mutate(LAZY_MODE, 0);
   }
 
   /**
@@ -137,7 +137,7 @@ public class FetchConfig implements Serializable {
 
   /**
    * Deprecated - migrate to FetchConfig.ofQuery().
-   *
+   * <p>
    * Eagerly fetch the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
@@ -150,17 +150,15 @@ public class FetchConfig implements Serializable {
 
   /**
    * Deprecated - migrate to FetchConfig.ofQuery(batchSize).
-   *
+   * <p>
    * Eagerly fetch the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
    * The queryBatchSize is the number of parent id's that this separate query
    * will load per batch.
-   * </p>
    * <p>
    * This will load all beans on this path eagerly unless a {@link #lazy(int)}
    * is also used.
-   * </p>
    *
    * @param batchSize the batch size used to load beans on this path
    */
@@ -171,13 +169,12 @@ public class FetchConfig implements Serializable {
 
   /**
    * Deprecated - migrate to FetchConfig.ofQuery(batchSize).
-   *
+   * <p>
    * Eagerly fetch the first batch of beans on this path.
    * This is similar to {@link #query(int)} but only fetches the first batch.
    * <p>
    * If there are more parent beans than the batch size then they will not be
    * loaded eagerly but instead use lazy loading.
-   * </p>
    *
    * @param batchSize the number of parent beans this path is populated for
    */
@@ -188,7 +185,7 @@ public class FetchConfig implements Serializable {
 
   /**
    * Deprecated - migrate to FetchConfig.ofCache().
-   *
+   * <p>
    * Eagerly fetch the beans fetching the beans from the L2 bean cache
    * and using the DB for beans not in the cache.
    */

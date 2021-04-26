@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.8.1-SNAPSHOT</version>
+    <version>12.8.4-SNAPSHOT</version>
   </parent>
 
   <name>kotlin querybean generator</name>
@@ -12,7 +12,7 @@
   <artifactId>kotlin-querybean-generator</artifactId>
 
   <properties>
-    <kotlin.version>1.4.21</kotlin.version>
+    <kotlin.version>1.4.31</kotlin.version>
   </properties>
 
   <dependencies>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>12.8.1-SNAPSHOT</version>
+      <version>12.8.4-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.8.1-SNAPSHOT</version>
+      <version>12.8.4-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.8.1-SNAPSHOT</version>
+      <version>12.8.4-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -81,46 +81,47 @@
   <build>
     <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     <plugins>
-      <plugin>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-maven-plugin</artifactId>
-        <version>${kotlin.version}</version>
-        <executions>
-          <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>test-compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>test-kapt</id>
-            <goals>
-              <goal>test-kapt</goal>
-            </goals>
-            <configuration>
-              <sourceDirs>
-                <sourceDir>src/test/kotlin</sourceDir>
-              </sourceDirs>
-<!--              <annotationProcessorPaths>-->
-<!--                <annotationProcessorPath>-->
-<!--                  <groupId>io.ebean</groupId>-->
-<!--                  <artifactId>kotlin-querybean-generator</artifactId>-->
-<!--&lt;!&ndash;                  <version>12.7.1</version>&ndash;&gt;-->
-<!--                  <version>12.8.0-SNAPSHOT</version>-->
-<!--                </annotationProcessorPath>-->
-<!--              </annotationProcessorPaths>-->
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <jvmTarget>1.8</jvmTarget>
-        </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>org.jetbrains.kotlin</groupId>-->
+<!--        <artifactId>kotlin-maven-plugin</artifactId>-->
+<!--        <version>${kotlin.version}</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>test-compile</id>-->
+<!--            <phase>test-compile</phase>-->
+<!--            <goals>-->
+<!--              <goal>test-compile</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <id>test-kapt</id>-->
+<!--            <goals>-->
+<!--              <goal>test-kapt</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <sourceDirs>-->
+<!--                <sourceDir>src/test/kotlin</sourceDir>-->
+<!--              </sourceDirs>-->
+<!--&lt;!&ndash;              <annotationProcessorPaths>&ndash;&gt;-->
+<!--&lt;!&ndash;                <annotationProcessorPath>&ndash;&gt;-->
+<!--&lt;!&ndash;                  <groupId>io.ebean</groupId>&ndash;&gt;-->
+<!--&lt;!&ndash;                  <artifactId>kotlin-querybean-generator</artifactId>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                  <version>12.7.1</version>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                  <version>12.8.0-SNAPSHOT</version>&ndash;&gt;-->
+<!--&lt;!&ndash;                </annotationProcessorPath>&ndash;&gt;-->
+<!--&lt;!&ndash;              </annotationProcessorPaths>&ndash;&gt;-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <configuration>-->
+<!--          <jvmTarget>1.8</jvmTarget>-->
+<!--&lt;!&ndash;          <args></args>&ndash;&gt;-->
+<!--        </configuration>-->
+<!--      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.2</version>
+        <version>3.8.1</version>
         <executions>
           <execution>
             <id>default-testCompile</id>
@@ -145,7 +146,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>12.6.6</version>
+        <version>12.8.2</version>
         <executions>
           <execution>
             <id>test</id>

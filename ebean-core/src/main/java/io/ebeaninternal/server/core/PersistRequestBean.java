@@ -888,6 +888,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Remove deleted beans from the persistence context early.
+   */
+  public void removeFromPersistenceContext() {
+    idValue = beanDescriptor.getId(entityBean);
+    beanDescriptor.contextDeleted(transaction.getPersistenceContext(), idValue);
+  }
+
+  /**
    * Aggressive L1 and L2 cache cleanup for deletes.
    */
   private void postDelete() {
@@ -1030,6 +1038,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (!publish) {
       beanDescriptor.setDraft(entityBean);
     }
+    if (transaction.isAutoPersistUpdates() && idValue != null) {
+      // with getGeneratedKeys off we will not have a idValue
+      beanDescriptor.contextPut(transaction.getPersistenceContext(), idValue, entityBean);
+    }
+  }
+
+  /**
+   * Return if persist can be skipped on the reference only bean.
+   */
+  public boolean isSkipReference() {
+    return intercept.isReference() || (Flags.isRecurse(flags) && beanDescriptor.referenceIdPropertyOnly(intercept));
   }
 
   public boolean isReference() {

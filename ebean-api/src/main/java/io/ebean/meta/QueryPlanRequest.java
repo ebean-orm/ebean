@@ -41,6 +41,9 @@ public class QueryPlanRequest {
 
   /**
    * Set the maximum number of plans to capture.
+   * <p>
+   * Use this to limit how much query plan capturing is done as query
+   * plan capture is actual database load.
    */
   public void setMaxCount(int maxCount) {
     this.maxCount = maxCount;
@@ -58,7 +61,9 @@ public class QueryPlanRequest {
   /**
    * Set the maximum amount of time we want to use to capture plans.
    * <p>
-   * Query plan collection will stop once this time is exceeded.
+   * Query plan collection will stop once this time is exceeded. We use
+   * this to ensure the query plan capture does not use excessive amount
+   * of time - put too much load on the database.
    */
   public void setMaxTimeMillis(long maxTimeMillis) {
     this.maxTimeMillis = maxTimeMillis;

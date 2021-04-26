@@ -46,7 +46,12 @@ public class MainMemoryLeak {
     config.addClass(ECachedBean.class);
     config.loadFromProperties();
 
+    Database server1 = DatabaseFactory.create(config);
+    assert server1 != null;
+
+    // create again for #2193
     Database server = DatabaseFactory.create(config);
+    assert server != null;
 
     // create a string with 10k chars
     char[] c = new char[10_000];

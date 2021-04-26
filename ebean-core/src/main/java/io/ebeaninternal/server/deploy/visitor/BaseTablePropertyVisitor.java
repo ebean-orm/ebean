@@ -44,9 +44,11 @@ public abstract class BaseTablePropertyVisitor implements BeanPropertyVisitor {
   public abstract void visitOneImported(BeanPropertyAssocOne<?> p);
 
   /**
-   * Override this method for normal scalar property.
+   * Override this method for normal scalar property. With allowNonNull
+   * used with properties of Embedded beans that can only be Nonnull when
+   * the Embedded bean is Nonnull.
    */
   @Override
-  public abstract void visitScalar(BeanProperty p);
+  public abstract void visitScalar(BeanProperty p, boolean allowNonNull);
 
 }

@@ -161,11 +161,11 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
-create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index if not exists ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM';
-create index concurrently ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);
-create index ix_migtest_oto_child_lowername on migtest_oto_child (lower(name));
+create index concurrently if not exists ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);
+create index if not exists ix_migtest_oto_child_lowername on migtest_oto_child (lower(name));
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 

@@ -148,6 +148,11 @@ public interface SpiTransaction extends Transaction {
   int depth();
 
   /**
+   * Return true if dirty beans are automatically persisted.
+   */
+  boolean isAutoPersistUpdates();
+
+  /**
    * Return true if this transaction was created explicitly via
    * <code>Ebean.beginTransaction()</code>.
    */

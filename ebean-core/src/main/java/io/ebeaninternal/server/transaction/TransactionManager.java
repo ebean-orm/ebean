@@ -5,6 +5,7 @@ import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxType;
+import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
@@ -17,6 +18,7 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricMap;
+import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.ScopeTrans;
 import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiLogManager;
@@ -59,6 +61,8 @@ public class TransactionManager implements SpiTransactionManager {
 
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
+  private final SpiServer server;
+
   private final BeanDescriptorManager beanDescriptorManager;
 
   /**
@@ -99,6 +103,8 @@ public class TransactionManager implements SpiTransactionManager {
    * The elastic search index update processor.
    */
   final DocStoreUpdateProcessor docStoreUpdateProcessor;
+
+  private final boolean autoPersistUpdates;
 
   private final boolean persistBatch;
 
@@ -153,7 +159,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Create the TransactionManager
    */
   public TransactionManager(TransactionManagerOptions options) {
-
+    this.server = options.server;
     this.logManager = options.logManager;
     this.txnLogger = logManager.txn();
     this.txnDebug = txnLogger.isDebug();
@@ -161,6 +167,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.supportsSavepointId = databasePlatform.isSupportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
+    this.autoPersistUpdates = options.config.isAutoPersistUpdates();
     this.persistBatch = PersistBatch.ALL == options.config.getPersistBatch();
     this.persistBatchOnCascade = PersistBatch.ALL == options.config.appliedPersistBatchOnCascade();
     this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
@@ -279,11 +286,15 @@ public class TransactionManager implements SpiTransactionManager {
     return bulkEventListenerMap;
   }
 
-  boolean getPersistBatch() {
+  boolean isAutoPersistUpdates() {
+    return autoPersistUpdates;
+  }
+
+  boolean isPersistBatch() {
     return persistBatch;
   }
 
-  public boolean getPersistBatchOnCascade() {
+  boolean isPersistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
@@ -785,5 +796,15 @@ public class TransactionManager implements SpiTransactionManager {
 
   public boolean isLogSummary() {
     return logManager.sum().isDebug();
+  }
+
+  /**
+   * Experimental - find dirty beans in the persistence context and persist them.
+   */
+  public void flushTransparent(PersistenceContext persistenceContext, SpiTransaction transaction) {
+    List<Object> dirtyBeans = persistenceContext.dirtyBeans();
+    if (!dirtyBeans.isEmpty()) {
+      server.updateAll(dirtyBeans, transaction);
+    }
   }
 }

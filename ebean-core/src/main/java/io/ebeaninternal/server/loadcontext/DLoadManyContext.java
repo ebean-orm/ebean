@@ -31,11 +31,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
   private LoadBuffer currentBuffer;
 
-  DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property,
-                          String path, int defaultBatchSize, OrmQueryProperties queryProps) {
-
-    super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
-
+  DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property, String path, OrmQueryProperties queryProps) {
+    super(parent, property.getBeanDescriptor(), path, queryProps);
     this.property = property;
     this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)

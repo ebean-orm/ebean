@@ -15,6 +15,7 @@ public class OracleDdl extends PlatformDdl {
     this.dropConstraintIfExists = "drop constraint";
     this.dropIndexIfExists = "drop index ";
     this.dropTableCascade = " cascade constraints purge";
+    this.addColumn = "add";
     this.alterColumn = "modify";
     this.columnSetNotnull = "not null";
     this.columnSetNull = "null";

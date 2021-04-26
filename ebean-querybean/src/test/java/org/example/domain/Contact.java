@@ -3,6 +3,7 @@ package org.example.domain;
 import io.ebean.annotation.DbArray;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,33 +12,35 @@ import java.util.Map;
  * Contact entity bean.
  */
 @Entity
-@Table(name="be_contact")
+@Table(name = "be_contact")
 public class Contact extends BaseModel {
 
   @DbArray
-  List<String> phoneNumbers = new ArrayList();
+  List<String> phoneNumbers = new ArrayList<>();
 
-  @Column(length=50)
+  @Column(length = 50)
   String firstName;
 
-  @Column(length=50)
+  @Column(length = 50)
   String lastName;
 
-  @Column(length=200)
+  @Column(length = 200)
   String email;
 
-  @Column(length=20)
+  @Column(length = 20)
   String phone;
 
-  @ManyToOne(optional=false)
+  ZonedDateTime zoneDateTime;
+
+  @ManyToOne(optional = false)
   Customer customer;
 
   @OneToMany(mappedBy = "contact")
   List<ContactNote> notes;
 
   @OneToMany(cascade = CascadeType.PERSIST)
-  @MapKey(name="key")
-  Map<String,ContactOther> others;
+  @MapKey(name = "key")
+  Map<String, ContactOther> others;
 
   /**
    * Default constructor.
@@ -83,6 +86,14 @@ public class Contact extends BaseModel {
 
   public void setPhone(String phone) {
     this.phone = phone;
+  }
+
+  public ZonedDateTime getZoneDateTime() {
+    return zoneDateTime;
+  }
+
+  public void setZoneDateTime(ZonedDateTime zoneDateTime) {
+    this.zoneDateTime = zoneDateTime;
   }
 
   public Customer getCustomer() {
