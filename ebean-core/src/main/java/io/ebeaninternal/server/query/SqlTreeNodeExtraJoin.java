@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -130,11 +131,19 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       }
     }
 
+    boolean oneToOneExported = false;
+    if (assocBeanProperty instanceof BeanPropertyAssocOne) {
+      BeanPropertyAssocOne<?> oneToOneProp = (BeanPropertyAssocOne<?>) assocBeanProperty;
+      if (oneToOneProp.isOneToOneExported()) {
+        oneToOneExported = true;
+      }
+    }
+
     if (pathContainsMany) {
       // "promote" to left join as the path contains a many
       joinType = SqlJoinType.OUTER;
     }
-    if (!manyToMany) {
+    if (!manyToMany && !oneToOneExported) {
       if (assocBeanProperty.isFormula()) {
         // add joins for formula beans
         assocBeanProperty.appendFrom(ctx, joinType);
