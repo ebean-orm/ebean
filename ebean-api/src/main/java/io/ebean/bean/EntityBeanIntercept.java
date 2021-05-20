@@ -85,6 +85,8 @@ public final class EntityBeanIntercept implements Serializable {
    */
   private static final byte FLAG_CHANGED_PROP = 2;
 
+  private static final byte FLAG_CHANGEDLOADED_PROP = 3;
+
   /**
    * Flags indicating if a property is a dirty embedded bean. Used to distinguish
    * between an embedded bean being completely overwritten and one of its
@@ -569,6 +571,10 @@ public final class EntityBeanIntercept implements Serializable {
     flags[propertyIndex] |= FLAG_CHANGED_PROP;
   }
 
+  private void setChangeLoaded(int propertyIndex) {
+    flags[propertyIndex] |= FLAG_CHANGEDLOADED_PROP;
+  }
+
   /**
    * Set that an embedded bean has had one of its properties changed.
    */
@@ -937,7 +943,7 @@ public final class EntityBeanIntercept implements Serializable {
       if (readOnly) {
         throw new IllegalStateException("This bean is readOnly");
       }
-      setChangedProperty(propertyIndex);
+      setChangeLoaded(propertyIndex);
     }
   }
 
