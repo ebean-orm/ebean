@@ -201,7 +201,6 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
     @Override
     public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-
       lock.lock();
       try {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
@@ -215,6 +214,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
               // find it using instance equality - avoiding equals() and potential deadlock issue
               if (list.get(i) == bc) {
                 list.remove(i);
+                bc.setLoader(context.parent.getEbeanServer());
                 return;
               }
             }
@@ -222,10 +222,9 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
           }
         }
 
-        // Should reduce the list by checking each beanCollection in the L2 first before executing the query
-
-        LoadManyRequest req = new LoadManyRequest(this, onlyIds, useCache);
-        context.parent.getEbeanServer().loadMany(req);
+        context.parent.getEbeanServer().loadMany(new LoadManyRequest(this, onlyIds, useCache));
+        // clear the buffer as all entries have been loaded
+        list.clear();
       } finally {
         lock.unlock();
       }
