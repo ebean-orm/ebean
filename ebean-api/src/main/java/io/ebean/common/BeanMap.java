@@ -194,7 +194,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     }
     if (map == null) {
       sb.append("deferred ");
-
     } else {
       sb.append("size[").append(map.size()).append("]");
       sb.append(" map").append(map);
