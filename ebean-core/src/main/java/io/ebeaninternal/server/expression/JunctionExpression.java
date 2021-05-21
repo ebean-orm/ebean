@@ -67,6 +67,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public void prefixProperty(String path) {
+    exprList.prefixProperty(path);
+  }
+
+  @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;

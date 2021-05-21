@@ -288,10 +288,44 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   }
 
   @Test
-  public void test_removeJoinToMany_when_filterMany() {
+  public void test_filterMany_included() {
 
     Query<Order> query = Ebean.find(Order.class)
       .fetch("details")
+      .fetch("details.product")
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .filterMany("details").eq("orderQuantity", 10)
+      .query();
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query);
+    OrmQueryDetail detail = queryRequest.getQuery().getDetail();
+
+    assertThat(detail.getFetchPaths()).containsExactly("details", "details.product", "customer");
+  }
+
+  @Test
+  public void test_filterMany_excludedByOrdering() {
+
+    Query<Order> query = Ebean.find(Order.class)
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .fetch("details")
+      .fetch("details.product")
+      .filterMany("details").eq("orderQuantity", 10)
+      .query();
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query);
+    OrmQueryDetail detail = queryRequest.getQuery().getDetail();
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
+  }
+
+  @Test
+  public void test_filterMany_excludedExplicitly() {
+
+    Query<Order> query = Ebean.find(Order.class)
+      .fetchQuery("details")
       .fetch("details.product")
       .fetch("customer")
       .fetch("customer.contacts")

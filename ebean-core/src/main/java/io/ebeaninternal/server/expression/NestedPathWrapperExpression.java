@@ -25,6 +25,11 @@ class NestedPathWrapperExpression implements SpiExpression {
   }
 
   @Override
+  public void prefixProperty(String path) {
+    // do nothing
+  }
+
+  @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;

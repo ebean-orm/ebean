@@ -89,6 +89,13 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   @Override
+  public void prefixProperty(String path) {
+    for (SpiExpression exp : list) {
+      exp.prefixProperty(path);
+    }
+  }
+
+  @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;
