@@ -54,7 +54,6 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
   }
 
   private void readAssocOne(DeployBeanPropertyAssocOne<?> prop) {
-
     ManyToOne manyToOne = get(prop, ManyToOne.class);
     if (manyToOne != null) {
       readManyToOne(manyToOne, prop);
@@ -183,7 +182,6 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
   }
 
   private void readManyToOne(ManyToOne propAnn, DeployBeanPropertyAssocOne<?> beanProp) {
-
     setCascadeTypes(propAnn.cascade(), beanProp.getCascadeInfo());
     setTargetType(propAnn.targetEntity(), beanProp);
     setBeanTable(beanProp);
@@ -194,7 +192,6 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
   }
 
   private void readOneToOne(OneToOne propAnn, DeployBeanPropertyAssocOne<?> prop) {
-
     prop.setOneToOne();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
@@ -223,21 +220,19 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
   }
 
   private void readPrimaryKeyJoin(PrimaryKeyJoinColumn primaryKeyJoin, DeployBeanPropertyAssocOne<?> prop) {
-
     if (!prop.isOneToOne()) {
       throw new IllegalStateException("Expecting property " + prop.getFullBeanName() + " with PrimaryKeyJoinColumn to be a OneToOne?");
     }
     prop.setPrimaryKeyJoin(true);
 
     if (!primaryKeyJoin.name().isEmpty()) {
-      log.warn("Automatically determining join columns and ignoring PrimaryKeyJoinColumn.name {} on {}", primaryKeyJoin.name(), prop.getFullBeanName());
+      log.info("Automatically determining join columns for @PrimaryKeyJoinColumn - ignoring PrimaryKeyJoinColumn.name attribute [{}] on {}", primaryKeyJoin.name(), prop.getFullBeanName());
     }
     if (!primaryKeyJoin.referencedColumnName().isEmpty()) {
-      log.warn("Automatically determining join columns and Ignoring PrimaryKeyJoinColumn.referencedColumnName {} on {}", primaryKeyJoin.referencedColumnName(), prop.getFullBeanName());
+      log.info("Automatically determining join columns for @PrimaryKeyJoinColumn - Ignoring PrimaryKeyJoinColumn.referencedColumnName attribute [{}] on {}", primaryKeyJoin.referencedColumnName(), prop.getFullBeanName());
     }
 
     BeanTable baseBeanTable = factory.getBeanTable(info.getDescriptor().getBeanType());
-
     String localPrimaryKey = baseBeanTable.getIdColumn();
     String foreignColumn = getBeanTable(prop).getIdColumn();
 
@@ -245,7 +240,6 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
   }
 
   private void readEmbedded(DeployBeanPropertyAssocOne<?> prop, Embedded embedded) {
-
     if (descriptor.isDocStoreOnly() && prop.getDocStoreDoc() == null) {
       prop.setDocStoreEmbedded("");
     }
@@ -257,7 +251,6 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
     } catch (NoSuchMethodError e) {
       // using standard JPA API without prefix option, maybe in EE container
     }
-
     readEmbeddedAttributeOverrides(prop);
   }
 
