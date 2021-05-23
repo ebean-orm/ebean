@@ -1,11 +1,7 @@
 package org.tests.model.map;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.MapKey;
-import javax.persistence.OneToMany;
-import java.util.HashMap;
+import javax.persistence.*;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Entity
@@ -16,9 +12,9 @@ public class MpUser {
 
   private String name;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @MapKey(name = "code")
-  public Map<String, MpRole> roles = new HashMap<>();
+  private Map<String, MpRole> roles = new LinkedHashMap<>();
 
   public Long getId() {
     return id;
