@@ -5,6 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Expr;
 import io.ebean.Query;
 import org.junit.Test;
+import org.tests.basic.one2one.Wheel;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 
@@ -80,6 +81,24 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
     String sql = sqlOf(query);
     assertSqlOuterJoins(sql);
     assertThat(sql).contains("where (t0.user_name = ? or u1.roleid = ?)");
+  }
+
+  @Test
+  public void testSelectOneToOneDisjunction() {
+    Ebean.beginTransaction();
+    try {
+      Query<Wheel> query = Ebean.find(Wheel.class)
+              .select("id")
+              .where().or()
+              .ge("tire.id", 100)
+              .lt("tire.id", 100)
+              .endOr().query();
+      query.findList();
+      String sql = sqlOf(query);
+      assertThat(sql).contains("join");
+    } finally {
+      Ebean.rollbackTransaction();
+    }
   }
 
   private void queryOrExpression(Integer roleid) {
