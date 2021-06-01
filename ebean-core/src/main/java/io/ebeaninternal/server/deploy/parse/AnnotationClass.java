@@ -6,6 +6,8 @@ import io.ebean.annotation.DbPartition;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.Draftable;
 import io.ebean.annotation.DraftableElement;
+import io.ebean.annotation.EntityImplements;
+import io.ebean.annotation.EntityOverride;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Identity;
 import io.ebean.annotation.Index;
@@ -14,6 +16,7 @@ import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.StorageEngine;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
+import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
@@ -29,6 +32,7 @@ import javax.persistence.IdClass;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.Set;
 
 import static io.ebean.util.AnnotationUtil.typeGet;
 
@@ -84,7 +88,7 @@ final class AnnotationClass extends AnnotationParser {
    */
   private void setTableName() {
     if (descriptor.isBaseTableType()) {
-      Class<?> beanType = descriptor.getBeanType();
+      Class<?> beanType = descriptor.getBaseBeanType();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null) {
         beanType = inheritInfo.getRoot().getType();
@@ -187,6 +191,18 @@ final class AnnotationClass extends AnnotationParser {
     }
     for (NamedQuery namedQuery : annotationClassNamedQuery(cls)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
+    }
+
+    Set<EntityImplements> entityImplements = AnnotationUtil.typeGetAll(cls, EntityImplements.class);
+    for (EntityImplements ann : entityImplements) {
+      for (Class<?> iface : ann.value()) {
+        descriptor.addInterface(iface);
+      }
+    }
+
+    EntityOverride entityOverride = AnnotationUtil.typeGet(cls, EntityOverride.class);
+    if (entityOverride != null) {
+      descriptor.setOverridePriority(entityOverride.priority());
     }
   }
 

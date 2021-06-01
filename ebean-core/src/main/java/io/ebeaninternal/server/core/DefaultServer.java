@@ -47,7 +47,14 @@ import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.common.CopyOnFirstWriteList;
-import io.ebean.config.*;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.DatabaseConfig;
+import io.ebean.config.EncryptKeyManager;
+import io.ebean.config.QueryPlanCapture;
+import io.ebean.config.QueryPlanListener;
+import io.ebean.config.SlowQueryEvent;
+import io.ebean.config.SlowQueryListener;
+import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.ShutdownManager;
@@ -649,7 +656,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T createEntityBean(Class<T> type) {
-    return descriptor(type).createBean();
+    final BeanDescriptor<T> desc = descriptor(type);
+    if (desc == null) {
+      throw new IllegalArgumentException("No bean type " + type.getName() + " registered");
+    }
+    return desc.createBean();
   }
 
   /**
