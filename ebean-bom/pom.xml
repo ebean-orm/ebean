@@ -19,7 +19,7 @@
     <ebean-test-docker.version>4.1</ebean-test-docker.version>
     <ebean-datasource.version>7.0</ebean-datasource.version>
     <ebean-agent.version>12.9.0</ebean-agent.version>
-    <ebean-maven-plugin.version>12.9.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>12.9.1</ebean-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
