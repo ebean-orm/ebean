@@ -143,13 +143,13 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       // "promote" to left join as the path contains a many
       joinType = SqlJoinType.OUTER;
     }
-    if (!manyToMany && !oneToOneExported) {
+    if (!manyToMany) {
       if (assocBeanProperty.isFormula()) {
         // add joins for formula beans
         assocBeanProperty.appendFrom(ctx, joinType);
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
-      if (assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
+      if (!oneToOneExported && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
         ctx.append(" and ").append(assocBeanProperty.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
       }
     }
