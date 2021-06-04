@@ -72,7 +72,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.8.4a</version>
+      <version>12.9.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -116,6 +116,15 @@
       <groupId>io.avaje</groupId>
       <artifactId>avaje-jsr305</artifactId>
       <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
+         and not require a separate module for it -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.199</version>
       <scope>provided</scope>
     </dependency>
 
@@ -212,15 +221,6 @@
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
       <scope>test</scope>
-    </dependency>
-
-    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
-         and not require a separate module for it -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.4.199</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
