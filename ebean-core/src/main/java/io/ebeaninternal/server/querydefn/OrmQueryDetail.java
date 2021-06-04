@@ -100,7 +100,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Return the detail in string form.
    */
-  public String asStringDebug() {
+  public String asString() {
     StringBuilder sb = new StringBuilder();
     if (baseProps.hasProperties()) {
       baseProps.asStringDebug("select ", sb);
