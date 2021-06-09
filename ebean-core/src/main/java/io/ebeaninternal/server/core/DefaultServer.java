@@ -1444,21 +1444,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private <T> Stream<T> toStream(QueryIterator<T> queryIterator) {
-    return stream(spliteratorUnknownSize(queryIterator, Spliterator.ORDERED), false)
-      .onClose(new QueryIteratorClose(queryIterator));
-  }
-
-  private static class QueryIteratorClose implements Runnable {
-    private final QueryIterator<?> iterator;
-
-    private QueryIteratorClose(QueryIterator<?> iterator) {
-      this.iterator = iterator;
-    }
-
-    @Override
-    public void run() {
-      iterator.close();
-    }
+    return stream(spliteratorUnknownSize(queryIterator, Spliterator.ORDERED), false).onClose(queryIterator::close);
   }
 
   @Override
