@@ -110,9 +110,12 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     return queryEngine.findList(this);
   }
 
+  public boolean next() throws SQLException {
+    return dataReader.next();
+  }
+
   @SuppressWarnings("unchecked")
   public T readNextBean() throws SQLException {
-    dataReader.resetColumnPosition();
     return (T) plan.readRow(dataReader);
   }
 

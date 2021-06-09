@@ -486,14 +486,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Return true if we can move to the next resultSet row.
    */
   private boolean moveToNextRow() throws SQLException {
-
     if (!dataReader.next()) {
       noMoreRows = true;
       return false;
     }
-
     rowCount++;
-    dataReader.resetColumnPosition();
     return true;
   }
 
@@ -502,7 +499,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   boolean readBean() throws SQLException {
-
     boolean result = hasNext();
     updateExecutionStatistics();
     return result;

@@ -111,7 +111,6 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
           value = new CountedValue<>(value, dataReader.getLong());
         }
         result.add(value);
-        dataReader.resetColumnPosition();
         rowCount++;
       }
 

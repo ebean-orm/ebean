@@ -43,12 +43,8 @@ public class RsetDataReader implements DataReader {
 
   @Override
   public boolean next() throws SQLException {
-    return rset.next();
-  }
-
-  @Override
-  public void resetColumnPosition() {
     pos = 0;
+    return rset.next();
   }
 
   @Override
@@ -75,7 +71,6 @@ public class RsetDataReader implements DataReader {
     return rset.getBigDecimal(pos());
   }
 
-
   @Override
   public InputStream getBinaryStream() throws SQLException {
     return rset.getBinaryStream(pos());
@@ -84,19 +79,13 @@ public class RsetDataReader implements DataReader {
   @Override
   public Boolean getBoolean() throws SQLException {
     boolean v = rset.getBoolean(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return v;
+    return rset.wasNull() ? null : v;
   }
 
   @Override
   public Byte getByte() throws SQLException {
     byte v = rset.getByte(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return v;
+    return rset.wasNull() ? null : v;
   }
 
   @Override
@@ -117,61 +106,41 @@ public class RsetDataReader implements DataReader {
   @Override
   public Double getDouble() throws SQLException {
     double v = rset.getDouble(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return v;
+    return rset.wasNull() ? null : v;
   }
 
   @Override
   public Float getFloat() throws SQLException {
     float v = rset.getFloat(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return v;
+    return rset.wasNull() ? null : v;
   }
 
   @Override
   public Integer getInt() throws SQLException {
     int v = rset.getInt(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return v;
+    return rset.wasNull() ? null : v;
   }
-
 
   @Override
   public Long getLong() throws SQLException {
     long v = rset.getLong(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return v;
+    return rset.wasNull() ? null : v;
   }
-
 
   public Ref getRef() throws SQLException {
     return rset.getRef(pos());
   }
 
-
   @Override
   public Short getShort() throws SQLException {
     short s = rset.getShort(pos());
-    if (rset.wasNull()) {
-      return null;
-    }
-    return s;
+    return rset.wasNull() ? null : s;
   }
-
 
   @Override
   public String getString() throws SQLException {
     return rset.getString(pos());
   }
-
 
   @Override
   public Time getTime() throws SQLException {
@@ -196,14 +165,10 @@ public class RsetDataReader implements DataReader {
   @Override
   public String getStringFromStream() throws SQLException {
     Reader reader = rset.getCharacterStream(pos());
-    if (reader == null) {
-      return null;
-    }
-    return readStringLob(reader);
+    return reader == null ? null : readStringLob(reader);
   }
 
   protected String readStringLob(Reader reader) throws SQLException {
-
     char[] buffer = new char[clobBufferSize];
     int readLength;
     StringBuilder out = new StringBuilder(stringInitialSize);
@@ -215,7 +180,6 @@ public class RsetDataReader implements DataReader {
     } catch (IOException e) {
       throw new SQLException("IOException reading Clob " + e.getMessage());
     }
-
     return out.toString();
   }
 
@@ -226,19 +190,16 @@ public class RsetDataReader implements DataReader {
   }
 
   protected byte[] getBinaryLob(InputStream in) throws SQLException {
-
     if (in == null) {
       return null;
     }
     try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
       byte[] buf = new byte[bufferSize];
       int len;
       while ((len = in.read(buf, 0, buf.length)) != -1) {
         out.write(buf, 0, len);
       }
       byte[] data = out.toByteArray();
-
       if (data.length == 0) {
         data = null;
       }

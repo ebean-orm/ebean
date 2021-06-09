@@ -139,6 +139,11 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     rows++;
   }
 
+  @Override
+  public boolean next() throws SQLException {
+    return resultSet.next();
+  }
+
   public <T> List<T> mapList(RowMapper<T> mapper) throws SQLException {
     List<T> list = new ArrayList<>();
     while (next()) {

@@ -1,13 +1,8 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiSqlBinding;
-import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
@@ -84,11 +79,6 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   /**
-   * Set the resultSet and associated query plan if known.
-   */
-  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
-
-  /**
    * Return the bindLog for this request.
    */
   public String getBindLog() {
@@ -96,11 +86,14 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   /**
+   * Set the resultSet and associated query plan if known.
+   */
+  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
+
+  /**
    * Return true if we can navigate to the next row.
    */
-  public boolean next() throws SQLException {
-    return resultSet.next();
-  }
+  public abstract boolean next() throws SQLException;
 
   protected abstract void requestComplete();
 
@@ -112,7 +105,6 @@ public abstract class AbstractSqlQueryRequest {
     JdbcClose.close(resultSet);
     JdbcClose.close(pstmt);
   }
-
 
   /**
    * Prepare the SQL taking into account named bind parameters.
