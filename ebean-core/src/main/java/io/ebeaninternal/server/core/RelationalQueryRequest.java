@@ -79,7 +79,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   public void findEach(Consumer<SqlRow> consumer) {
     flushJdbcBatchOnQuery();
-    queryEngine.findEach(this, this::createNewRow, consumer);
+    queryEngine.findEachRow(this, (resultSet, rowNum) -> consumer.accept(createNewRow()));
   }
 
   public void findEachWhile(Predicate<SqlRow> consumer) {

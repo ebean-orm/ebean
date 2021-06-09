@@ -17,7 +17,6 @@ import io.ebeaninternal.server.persist.Binder;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -60,14 +59,10 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Predicate<T> consumer) {
+  public void findEachRow(RelationalQueryRequest request, RowConsumer consumer) {
     try {
       request.executeSql(binder, SpiQuery.Type.ITERATE);
-      while (request.next()) {
-        if (!consumer.test(reader.read())) {
-          break;
-        }
-      }
+      request.mapEach(consumer);
       request.logSummary();
 
     } catch (Exception e) {
@@ -79,11 +74,13 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Consumer<T> consumer) {
+  public <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Predicate<T> consumer) {
     try {
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
-        consumer.accept(reader.read());
+        if (!consumer.test(reader.read())) {
+          break;
+        }
       }
       request.logSummary();
 
@@ -112,12 +109,15 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public void findEachRow(RelationalQueryRequest request, RowConsumer consumer) {
+  public <T> List<T> findList(RelationalQueryRequest request, RowReader<T> reader) {
     try {
       request.executeSql(binder, SpiQuery.Type.LIST);
-      request.mapEach(consumer);
+      List<T> rows = new ArrayList<>();
+      while (request.next()) {
+        rows.add(reader.read());
+      }
       request.logSummary();
-
+      return rows;
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
@@ -162,24 +162,6 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       request.logSummary();
       return rows;
 
-    } catch (Exception e) {
-      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
-    } finally {
-      request.close();
-    }
-  }
-
-  @Override
-  public <T> List<T> findList(RelationalQueryRequest request, RowReader<T> reader) {
-    try {
-      request.executeSql(binder, SpiQuery.Type.LIST);
-      List<T> rows = new ArrayList<>();
-      while (request.next()) {
-        rows.add(reader.read());
-      }
-      request.logSummary();
-      return rows;
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
