@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.lib;
+package io.ebeaninternal.server.util;
 
 /**
  * String utility for adding strings together.
@@ -11,7 +11,6 @@ public class Str {
    * Append strings together.
    */
   public static String add(String s0, String s1, String... args) {
-
     // determine a decent buffer size
     int len = 16 + s0.length();
     if (s1 != null) {

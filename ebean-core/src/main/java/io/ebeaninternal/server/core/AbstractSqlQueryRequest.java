@@ -3,7 +3,7 @@ package io.ebeaninternal.server.core;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.*;
-import io.ebeaninternal.server.lib.Str;
+import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.util.BindParamsParser;
