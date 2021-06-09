@@ -2,7 +2,6 @@ package org.tests.query.sqlquery;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
@@ -361,7 +360,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    int expectedRows = Ebean.find(Order.class).findCount();
+    int expectedRows = DB.find(Order.class).findCount();
 
     final AtomicInteger count = new AtomicInteger();
 

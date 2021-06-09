@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.RowConsumer;
-import io.ebean.RowMapper;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlBinding;
 
@@ -63,7 +59,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   <T> List<T> findListMapper(RowMapper<T> mapper) {
     flushJdbcBatchOnQuery();
-    return queryEngine.findListMapper(this, mapper);
+    return queryEngine.findList(this, () -> mapper.map(resultSet, rows++));
   }
 
   <T> T findOneMapper(RowMapper<T> mapper) {
@@ -83,17 +79,17 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   public void findEach(Consumer<SqlRow> consumer) {
     flushJdbcBatchOnQuery();
-    queryEngine.findEach(this, consumer);
+    queryEngine.findEach(this, this::createNewRow, consumer);
   }
 
   public void findEachWhile(Predicate<SqlRow> consumer) {
     flushJdbcBatchOnQuery();
-    queryEngine.findEach(this, consumer);
+    queryEngine.findEach(this, this::createNewRow, consumer);
   }
 
   public List<SqlRow> findList() {
     flushJdbcBatchOnQuery();
-    return queryEngine.findList(this);
+    return queryEngine.findList(this, this::createNewRow);
   }
 
   /**
@@ -135,21 +131,14 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     return resultSet;
   }
 
-  public void incrementRows() {
-    rows++;
-  }
-
   @Override
   public boolean next() throws SQLException {
-    return resultSet.next();
-  }
-
-  public <T> List<T> mapList(RowMapper<T> mapper) throws SQLException {
-    List<T> list = new ArrayList<>();
-    while (next()) {
-      list.add(mapper.map(resultSet, rows++));
+    if (!resultSet.next()) {
+      return false;
+    } else {
+      rows++;
+      return true;
     }
-    return list;
   }
 
   public <T> T mapOne(RowMapper<T> mapper) throws SQLException {

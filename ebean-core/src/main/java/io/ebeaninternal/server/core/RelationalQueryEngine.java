@@ -20,17 +20,17 @@ public interface RelationalQueryEngine {
   /**
    * Find a list of beans using relational query.
    */
-  List<SqlRow> findList(RelationalQueryRequest request);
+  <T> List<T> findList(RelationalQueryRequest request, RowReader<T> reader);
 
   /**
    * Find each query using relational query.
    */
-  void findEach(RelationalQueryRequest request, Consumer<SqlRow> consumer);
+  <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Consumer<T> consumer);
 
   /**
    * Find each while query using relational query.
    */
-  void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer);
+  <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Predicate<T> consumer);
 
   /**
    * Find single attribute.
@@ -46,11 +46,6 @@ public interface RelationalQueryEngine {
    * Find one via mapper.
    */
   <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper);
-
-  /**
-   * Find list via mapper.
-   */
-  <T> List<T> findListMapper(RelationalQueryRequest request, RowMapper<T> mapper);
 
   /**
    * Find each via raw consumer.

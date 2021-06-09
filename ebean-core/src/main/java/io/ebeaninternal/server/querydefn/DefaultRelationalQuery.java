@@ -23,9 +23,9 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   private final transient SpiEbeanServer server;
 
-  private String label;
+  private final String query;
 
-  private String query;
+  private String label;
 
   private int firstRow;
 
@@ -208,19 +208,25 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     return query;
   }
 
-  <T> T mapperFindOne(RowMapper<T> mapper) {
+  private <T> T mapperFindOne(RowMapper<T> mapper) {
     return server.findOneMapper(this, mapper);
   }
 
-  <T> List<T> mapperFindList(RowMapper<T> mapper) {
+  private <T> List<T> mapperFindList(RowMapper<T> mapper) {
     return server.findListMapper(this, mapper);
   }
 
+  private <T> void mapperFindEach(RowMapper<T> mapper, Consumer<T> consumer) {
+    server.findEachRow(this, (resultSet, rowNum) -> consumer.accept(mapper.map(resultSet, rowNum)));
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public <T> TypeQuery<T> mapToScalar(Class<T> attributeType) {
     return new Scalar(attributeType);
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public <T> TypeQuery<T> mapTo(RowMapper<T> mapper) {
     return new Mapper(mapper);
@@ -271,6 +277,11 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     @Override
     public List<T> findList() {
       return mapperFindList(mapper);
+    }
+
+    //@Override
+    public void findEach(Consumer<T> consumer) {
+      mapperFindEach(mapper, consumer);
     }
   }
 }
