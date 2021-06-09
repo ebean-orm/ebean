@@ -1607,6 +1607,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> void findSingleAttributeEach(SpiSqlQuery query, Class<T> cls, Consumer<T> consumer) {
+    executeSqlQuery((req) -> req.findSingleAttributeEach(cls, consumer), query);
+  }
+
+  @Override
   public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
     return executeSqlQuery((req) -> req.findSingleAttributeList(cls), query);
   }

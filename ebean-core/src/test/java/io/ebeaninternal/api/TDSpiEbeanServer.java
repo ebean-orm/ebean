@@ -494,6 +494,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> void findSingleAttributeEach(SpiSqlQuery query, Class<T> cls, Consumer<T> consumer) {
+  }
+
+  @Override
   public <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper) {
     return null;
   }

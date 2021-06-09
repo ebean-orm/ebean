@@ -235,6 +235,11 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls);
 
   /**
+   * SqlQuery find single attribute streaming the result to a consumer.
+   */
+  <T> void findSingleAttributeEach(SpiSqlQuery query, Class<T> cls, Consumer<T> consumer);
+
+  /**
    * SqlQuery find one with mapper.
    */
   <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper);

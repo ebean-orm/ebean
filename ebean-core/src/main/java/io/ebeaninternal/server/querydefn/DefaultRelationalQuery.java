@@ -254,6 +254,15 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     public List<T> findList() {
       return findSingleAttributeList(type);
     }
+
+    @Override
+    public void findEach(Consumer<T> consumer) {
+      scalarFindEach(type, consumer);
+    }
+  }
+
+  private <T> void scalarFindEach(Class<T> type, Consumer<T> consumer) {
+    server.findSingleAttributeEach(this, type, consumer);
   }
 
   private class Mapper<T> implements SqlQuery.TypeQuery<T> {
@@ -279,7 +288,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
       return mapperFindList(mapper);
     }
 
-    //@Override
+    @Override
     public void findEach(Consumer<T> consumer) {
       mapperFindEach(mapper, consumer);
     }

@@ -365,5 +365,10 @@ public interface SqlQuery extends Serializable {
      * Return the list of values.
      */
     List<T> findList();
+
+    /**
+     * Find streaming the result effectively consuming a row at a time.
+     */
+    void findEach(Consumer<T> consumer);
   }
 }

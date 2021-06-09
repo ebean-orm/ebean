@@ -17,6 +17,7 @@ import io.ebeaninternal.server.persist.Binder;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -59,7 +60,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public void findEachRow(RelationalQueryRequest request, RowConsumer consumer) {
+  public void findEach(RelationalQueryRequest request, RowConsumer consumer) {
     try {
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       request.mapEach(consumer);
@@ -93,7 +94,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+  public <T> T findOne(RelationalQueryRequest request, RowMapper<T> mapper) {
     try {
       request.executeSql(binder, SpiQuery.Type.BEAN);
       T value = request.mapOne(mapper);
@@ -170,4 +171,23 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> void findSingleAttributeEach(RelationalQueryRequest request, Class<T> cls, Consumer<T> consumer) {
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
+    try {
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      while (dataReader.next()) {
+        consumer.accept(scalarType.read(dataReader));
+      }
+      request.logSummary();
+
+    } catch (Exception e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
 }

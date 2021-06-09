@@ -30,12 +30,12 @@ public interface RelationalQueryEngine {
   /**
    * Find each via raw consumer.
    */
-  void findEachRow(RelationalQueryRequest request, RowConsumer mapper);
+  void findEach(RelationalQueryRequest request, RowConsumer mapper);
 
   /**
    * Find one via mapper.
    */
-  <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper);
+  <T> T findOne(RelationalQueryRequest request, RowMapper<T> mapper);
 
   /**
    * Find single attribute.
@@ -46,6 +46,11 @@ public interface RelationalQueryEngine {
    * Find single attribute list.
    */
   <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls);
+
+  /**
+   * Find single attribute streaming the result to a consumer.
+   */
+  <T> void findSingleAttributeEach(RelationalQueryRequest request, Class<T> cls, Consumer<T> consumer);
 
   /**
    * Collect SQL query execution statistics.

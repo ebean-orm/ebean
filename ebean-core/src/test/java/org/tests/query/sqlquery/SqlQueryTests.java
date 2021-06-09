@@ -40,6 +40,28 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
+  public void findSingleAttributeEach_decimal() {
+
+    ResetBasicData.reset();
+
+    String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
+
+    AtomicLong counter = new AtomicLong();
+    AtomicLong inc = new AtomicLong();
+
+    DB.sqlQuery(sql)
+      .setParameter(3)
+      .mapToScalar(BigDecimal.class)
+      .findEach(val -> {
+        counter.incrementAndGet();
+        inc.addAndGet(val.longValue());
+      });
+
+    assertThat(inc.get()).isGreaterThan(counter.get());
+    assertThat(counter.get()).isGreaterThan(0);
+  }
+
+  @Test
   public void findSingleDecimal() {
 
     ResetBasicData.reset();
@@ -140,6 +162,24 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   private static final CustMapper CUST_MAPPER = new CustMapper();
+
+  @Test
+  public void findEach_mapper() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name is not null";
+
+    AtomicInteger counter = new AtomicInteger();
+    DB.sqlQuery(sql)
+      .mapTo(CUST_MAPPER)
+      .findEach(custDto -> {
+        counter.incrementAndGet();
+        assertThat(custDto.name).isNotNull();
+      });
+
+    assertThat(counter.get()).isGreaterThan(0);
+  }
 
   @Test
   public void findOne_mapper() {
