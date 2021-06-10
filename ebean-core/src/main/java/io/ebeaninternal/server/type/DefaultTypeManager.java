@@ -49,77 +49,50 @@ import java.util.concurrent.ConcurrentHashMap;
  * Default implementation of TypeManager.
  * <p>
  * Manages the list of ScalarType that is available.
- * </p>
  */
 public final class DefaultTypeManager implements TypeManager {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultTypeManager.class);
 
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
-
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
-
   private final ConcurrentHashMap<String, ScalarType<?>> logicalMap;
 
   private final DefaultTypeFactory extraTypeFactory;
 
   private final ScalarType<?> hstoreType = new ScalarTypePostgresHstore();
-
   private final ScalarTypeFile fileType = new ScalarTypeFile();
-
   private final ScalarType<?> charType = new ScalarTypeChar();
-
   private final ScalarType<?> charArrayType = new ScalarTypeCharArray();
-
   private final ScalarType<?> longVarcharType = new ScalarTypeLongVarchar();
-
   private final ScalarType<?> clobType = new ScalarTypeClob();
-
   private final ScalarType<?> byteType = new ScalarTypeByte();
-
   private final ScalarType<?> binaryType = new ScalarTypeBytesBinary();
-
   private final ScalarType<?> blobType = new ScalarTypeBytesBlob();
-
   private final ScalarType<?> varbinaryType = new ScalarTypeBytesVarbinary();
-
   private final ScalarType<?> longVarbinaryType = new ScalarTypeBytesLongVarbinary();
-
   private final ScalarType<?> shortType = new ScalarTypeShort();
-
   private final ScalarType<?> integerType = ScalarTypeInteger.INSTANCE;
-
   private final ScalarType<?> longType = new ScalarTypeLong();
-
   private final ScalarType<?> doubleType = new ScalarTypeDouble();
-
   private final ScalarType<?> floatType = new ScalarTypeFloat();
-
   private final ScalarType<?> bigDecimalType = new ScalarTypeBigDecimal();
-
   private final ScalarType<?> timeType = new ScalarTypeTime();
-
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
   private final ScalarType<?> currencyType = new ScalarTypeCurrency();
   private final ScalarType<?> timeZoneType = new ScalarTypeTimeZone();
-
   private final ScalarType<?> stringType = ScalarTypeString.INSTANCE;
-
   private final ScalarType<?> classType = new ScalarTypeClass();
 
   private final JsonConfig.DateTime jsonDateTime;
   private final JsonConfig.Date jsonDate;
 
   private final Object objectMapper;
-
   private final boolean objectMapperPresent;
-
   private final boolean postgres;
-
   private final boolean offlineMigrationGeneration;
-
   private final EnumType defaultEnumType;
 
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
@@ -158,7 +131,6 @@ public final class DefaultTypeManager implements TypeManager {
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
-
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
 
@@ -166,16 +138,13 @@ public final class DefaultTypeManager implements TypeManager {
     this.postgres = isPostgres(config.getDatabasePlatform());
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
-
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
-
     this.defaultEnumType = config.getDefaultEnumType();
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
     initialiseJodaTypes(config);
     initialiseJacksonTypes(config);
-
     loadTypesFromProviders(config, objectMapper);
     loadGeoTypeBinder(config);
 
@@ -555,8 +524,7 @@ public final class DefaultTypeManager implements TypeManager {
   private ScalarTypeEnum<?> createEnumScalarType2(Class<?> enumType) {
     boolean integerType = true;
     Map<String, String> nameValueMap = new LinkedHashMap<>();
-    Field[] fields = enumType.getDeclaredFields();
-    for (Field field : fields) {
+    for (Field field : enumType.getDeclaredFields()) {
       EnumValue enumValue = AnnotationUtil.get(field, EnumValue.class);
       if (enumValue != null) {
         nameValueMap.put(field.getName(), enumValue.value());
@@ -619,8 +587,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private ScalarTypeEnum<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
-    Method[] methods = enumType.getMethods();
-    for (Method method : methods) {
+    for (Method method : enumType.getMethods()) {
       DbEnumValue dbValue = AnnotationUtil.get(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
@@ -635,7 +602,6 @@ public final class DefaultTypeManager implements TypeManager {
    * Create the Mapping of Enum fields to DB values using EnumValue annotations.
    * <p>
    * Return null if the EnumValue annotations are not present/used.
-   * </p>
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
@@ -664,11 +630,11 @@ public final class DefaultTypeManager implements TypeManager {
     EnumToDbValueMap<?> beanDbMap = EnumToDbValueMap.create(integerType);
     int maxValueLen = 0;
     for (Map.Entry<String, String> entry : nameValueMap.entrySet()) {
-      String name = entry.getKey();
+      String name = entry.getKey().trim();
       String value = entry.getValue();
       maxValueLen = Math.max(maxValueLen, value.length());
-      Object enumValue = Enum.valueOf(enumType, name.trim());
-      beanDbMap.add(enumValue, value, name.trim());
+      Object enumValue = Enum.valueOf(enumType, name);
+      beanDbMap.add(enumValue, value, name);
     }
     if (dbColumnLength == 0 && !integerType) {
       dbColumnLength = maxValueLen;
@@ -678,11 +644,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   /**
    * Automatically find any ScalarTypes by searching through the class path.
-   * <p>
-   * In avaje.properties define a list of packages in which ScalarTypes are
-   * found. This will search for any class that implements the ScalarType
-   * interface and register it with this TypeManager.
-   * </p>
    */
   private void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
     for (Class<? extends ScalarType<?>> cls : bootupClasses.getScalarTypes()) {
@@ -720,8 +681,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void initialiseScalarConverters(BootupClasses bootupClasses) {
-    List<Class<? extends ScalarTypeConverter<?, ?>>> foundTypes = bootupClasses.getScalarConverters();
-    for (Class<? extends ScalarTypeConverter<?, ?>> foundType : foundTypes) {
+    for (Class<? extends ScalarTypeConverter<?, ?>> foundType : bootupClasses.getScalarConverters()) {
       try {
         Class<?>[] paramTypes = TypeReflectHelper.getParams(foundType, ScalarTypeConverter.class);
         if (paramTypes.length != 2) {
@@ -745,8 +705,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void initialiseAttributeConverters(BootupClasses bootupClasses) {
-    List<Class<? extends AttributeConverter<?, ?>>> foundTypes = bootupClasses.getAttributeConverters();
-    for (Class<? extends AttributeConverter<?, ?>> foundType : foundTypes) {
+    for (Class<? extends AttributeConverter<?, ?>> foundType : bootupClasses.getAttributeConverters()) {
       try {
         Class<?>[] paramTypes = TypeReflectHelper.getParams(foundType, AttributeConverter.class);
         if (paramTypes.length != 2) {
@@ -855,23 +814,16 @@ public final class DefaultTypeManager implements TypeManager {
 
     nativeMap.put(DbPlatformType.HSTORE, hstoreType);
 
-    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(jsonDateTime, jsonDate);
-    addType(java.util.Date.class, utilDateType);
-
-    ScalarType<?> calType = extraTypeFactory.createCalendar(jsonDateTime);
-    addType(Calendar.class, calType);
-
-    ScalarType<?> mathBigIntType = extraTypeFactory.createMathBigInteger();
-    addType(BigInteger.class, mathBigIntType);
+    addType(java.util.Date.class, extraTypeFactory.createUtilDate(jsonDateTime, jsonDate));
+    addType(Calendar.class, extraTypeFactory.createCalendar(jsonDateTime));
+    addType(BigInteger.class, extraTypeFactory.createMathBigInteger());
 
     ScalarTypeBool booleanType = extraTypeFactory.createBoolean();
     addType(Boolean.class, booleanType);
     addType(boolean.class, booleanType);
-
     // register the boolean literals to the platform for DDL default values
     databasePlatform.setDbTrueLiteral(booleanType.getDbTrueLiteral());
     databasePlatform.setDbFalseLiteral(booleanType.getDbFalseLiteral());
-
     // always register Types.BOOLEAN to our boolean type
     nativeMap.put(Types.BOOLEAN, booleanType);
     if (booleanType.getJdbcType() == Types.BIT) {
@@ -880,7 +832,6 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     PlatformConfig.DbUuid dbUuid = config.getPlatformConfig().getDbUuid();
-
     if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
       addType(UUID.class, new ScalarTypeUUIDNative());
     } else {
