@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -30,38 +29,23 @@ import java.util.Set;
 /**
  * Supports @DbJson properties using Jackson ObjectMapper.
  */
-public class ScalarTypeJsonObjectMapper {
+class ScalarTypeJsonObjectMapper {
 
   /**
    * Create and return the appropriate ScalarType.
    */
-  public static ScalarType<?> createTypeFor(boolean postgres, AnnotatedField field, ObjectMapper objectMapper,
-                                            int dbType, DocPropertyType docType) {
-
+  static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
     Class<?> type = field.getRawType();
-    String pgType = getPostgresType(postgres, dbType);
     if (Set.class.equals(type)) {
-      return new OmSet(objectMapper, field, dbType, pgType, docType);
+      return new OmSet(jsonManager, field, dbType, docType);
     }
     if (List.class.equals(type)) {
-      return new OmList(objectMapper, field, dbType, pgType, docType);
+      return new OmList(jsonManager, field, dbType, docType);
     }
     if (Map.class.equals(type)) {
-      return new OmMap(objectMapper, field, dbType, pgType);
+      return new OmMap(jsonManager, field, dbType);
     }
-    return new GenericObject(objectMapper, field, dbType, pgType);
-  }
-
-  private static String getPostgresType(boolean postgres, int dbType) {
-    if (postgres) {
-      switch (dbType) {
-        case DbPlatformType.JSON:
-          return PostgresHelper.JSON_TYPE;
-        case DbPlatformType.JSONB:
-          return PostgresHelper.JSONB_TYPE;
-      }
-    }
-    return null;
+    return new GenericObject(jsonManager, field, dbType, type);
   }
 
   /**
@@ -69,8 +53,8 @@ public class ScalarTypeJsonObjectMapper {
    */
   private static class GenericObject extends Base<Object> {
 
-    public GenericObject(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType) {
-      super(Object.class, objectMapper, field, dbType, pgType, DocPropertyType.OBJECT);
+    GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, Class<?> rawType) {
+      super(Object.class, jsonManager, field, dbType, DocPropertyType.OBJECT, rawType);
     }
   }
 
@@ -80,8 +64,8 @@ public class ScalarTypeJsonObjectMapper {
   @SuppressWarnings("rawtypes")
   private static class OmSet extends Base<Set> {
 
-    public OmSet(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType, DocPropertyType docType) {
-      super(Set.class, objectMapper, field, dbType, pgType, docType);
+    OmSet(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+      super(Set.class, jsonManager, field, dbType, docType);
     }
 
     @Override
@@ -98,8 +82,8 @@ public class ScalarTypeJsonObjectMapper {
   @SuppressWarnings("rawtypes")
   private static class OmList extends Base<List> {
 
-    public OmList(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType, DocPropertyType docType) {
-      super(List.class, objectMapper, field, dbType, pgType, docType);
+    OmList(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+      super(List.class, jsonManager, field, dbType, docType);
     }
 
     @Override
@@ -116,8 +100,8 @@ public class ScalarTypeJsonObjectMapper {
   @SuppressWarnings("rawtypes")
   private static class OmMap extends Base<Map> {
 
-    public OmMap(ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType) {
-      super(Map.class, objectMapper, field, dbType, pgType, DocPropertyType.OBJECT);
+    OmMap(TypeJsonManager jsonManager, AnnotatedField field, int dbType) {
+      super(Map.class, jsonManager, field, dbType, DocPropertyType.OBJECT);
     }
 
     @Override
@@ -135,24 +119,23 @@ public class ScalarTypeJsonObjectMapper {
   private static abstract class Base<T> extends ScalarTypeBase<T> {
 
     private final ObjectWriter objectWriter;
-
     private final ObjectMapper objectReader;
-
     private final JavaType deserType;
-
     private final String pgType;
-
     private final DocPropertyType docType;
+    private final TypeJsonManager.DirtyHandler dirtyHandler;
 
-    /**
-     * Construct given the object mapper, property type and DB type for storage.
-     */
-    public Base(Class<T> cls, ObjectMapper objectMapper, AnnotatedField field, int dbType, String pgType, DocPropertyType docType) {
+    Base(Class<T> cls, TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+      this(cls, jsonManager, field, dbType, docType, cls);
+    }
+
+    Base(Class<T> cls, TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType, Class<?> rawType) {
       super(cls, false, dbType);
-      this.pgType = pgType;
+      this.objectReader = jsonManager.objectMapper();
+      this.pgType = jsonManager.postgresType(dbType);
       this.docType = docType;
-      this.objectReader = objectMapper;
-      final JacksonTypeHelper helper = new JacksonTypeHelper(field, objectMapper);
+      this.dirtyHandler = jsonManager.dirtyHandler(cls, rawType);
+      final JacksonTypeHelper helper = new JacksonTypeHelper(field, objectReader);
       this.deserType = helper.type();
       this.objectWriter = helper.objectWriter();
     }
@@ -170,7 +153,7 @@ public class ScalarTypeJsonObjectMapper {
      */
     @Override
     public boolean isDirty(Object value) {
-      return CheckMarkedDirty.isDirty(value);
+      return dirtyHandler.isDirty(value);
     }
 
     @Override
