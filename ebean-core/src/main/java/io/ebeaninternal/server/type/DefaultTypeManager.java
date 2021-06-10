@@ -3,11 +3,7 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbEnumType;
-import io.ebean.annotation.DbEnumValue;
-import io.ebean.annotation.EnumValue;
-import io.ebean.annotation.Platform;
+import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
 import io.ebean.config.PlatformConfig;
@@ -34,48 +30,19 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.AttributeConverter;
 import javax.persistence.EnumType;
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -722,20 +689,18 @@ public final class DefaultTypeManager implements TypeManager {
       try {
         ScalarType<?> scalarType;
         if (objectMapper == null) {
-          scalarType = cls.newInstance();
+          scalarType = cls.getDeclaredConstructor().newInstance();
         } else {
           try {
             // first try objectMapper constructor
-            Constructor<? extends ScalarType<?>> constructor = cls.getConstructor(ObjectMapper.class);
-            scalarType = constructor.newInstance((ObjectMapper) objectMapper);
+            scalarType = cls.getDeclaredConstructor(ObjectMapper.class).newInstance(objectMapper);
           } catch (NoSuchMethodException e) {
-            scalarType = cls.newInstance();
+            scalarType = cls.getDeclaredConstructor().newInstance();
           }
         }
         addCustomType(scalarType);
       } catch (Exception e) {
-        String msg = "Error loading ScalarType [" + cls.getName() + "]";
-        logger.error(msg, e);
+        logger.error("Error loading ScalarType [" + cls.getName() + "]", e);
       }
     }
   }
@@ -768,7 +733,7 @@ public final class DefaultTypeManager implements TypeManager {
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
-        ScalarTypeConverter converter = foundType.newInstance();
+        ScalarTypeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
         logger.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
         add(stw);
@@ -793,7 +758,7 @@ public final class DefaultTypeManager implements TypeManager {
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
-        AttributeConverter converter = foundType.newInstance();
+        AttributeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
         logger.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
         add(stw);
@@ -1027,6 +992,7 @@ public final class DefaultTypeManager implements TypeManager {
     nativeMap.put(Types.TIMESTAMP, timestampType);
   }
 
+  @SuppressWarnings("rawtypes")
   private void addInetAddressType(ScalarType scalarType) {
     addType(InetAddress.class, scalarType);
     addType(Inet4Address.class, scalarType);
