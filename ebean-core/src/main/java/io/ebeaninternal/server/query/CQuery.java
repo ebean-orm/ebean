@@ -2,13 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.QueryIterator;
 import io.ebean.Version;
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.NodeUsageCollector;
-import io.ebean.bean.NodeUsageListener;
-import io.ebean.bean.ObjectGraphNode;
-import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.*;
 import io.ebean.core.type.DataReader;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.util.JdbcClose;
@@ -19,12 +13,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.DbReadContext;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.deploy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -47,11 +32,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * The SqlSelect is based on a tree (Object Graph). The tree is traversed to see
  * what parts are included in the tree according to the value of
  * find.getInclude();
- * </p>
  * <p>
  * The tree structure is flattened into a SqlSelectChain. The SqlSelectChain is
  * the key object used in reading the flat resultSet back into Objects.
- * </p>
  */
 public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
 
@@ -205,19 +188,15 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.query = request.getQuery();
     this.queryMode = query.getMode();
     this.lazyLoadManyProperty = query.getLazyLoadMany();
-
     this.readOnly = request.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
-
     this.objectGraphNode = query.getParentNode();
     this.profilingListener = query.getProfilingListener();
     this.autoTuneProfiling = profilingListener != null;
     this.profilingListenerRef = autoTuneProfiling ? new WeakReference<>(profilingListener) : null;
-
     // set the generated sql back to the query
     // so its available to the user...
     query.setGeneratedSql(queryPlan.getSql());
-
     SqlTree sqlTree = queryPlan.getSqlTree();
     this.rootNode = sqlTree.getRootNode();
     this.manyProperty = sqlTree.getManyProperty();
@@ -373,7 +352,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Close the resources.
    * <p>
    * The JDBC resultSet and statement need to be closed. Its important that this method is called.
-   * </p>
    */
   public void close() {
     try {
@@ -405,14 +383,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   @Override
   public void setLazyLoadedChildBean(EntityBean bean, Object lazyLoadParentId) {
-
     if (lazyLoadParentId != null) {
       if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
         // get the appropriate parent bean from the persistence context
         this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.getBeanDescriptor().contextGet(getPersistenceContext(), lazyLoadParentId);
         this.lazyLoadParentId = lazyLoadParentId;
       }
-
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
       lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean, true);
     }
@@ -423,10 +399,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * <p>
    * If the query includes a many then the first object in the returned array is
    * the one/master and the second the many/detail.
-   * </p>
    */
   private boolean readNextBean() throws SQLException {
-
     if (!moveToNextRow()) {
       if (currentBean == null) {
         nextBean = null;
@@ -440,7 +414,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     }
 
     loadedBeanCount++;
-
     if (manyProperty == null) {
       // only single resultSet row required to build object so we are done
       // read a single resultSet row into single bean
@@ -535,20 +508,16 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Read version beans and their effective dates.
    */
   List<Version<T>> readVersions() throws SQLException {
-
     List<Version<T>> versionList = new ArrayList<>();
-
     Version<T> version;
     while ((version = readNextVersion()) != null) {
       versionList.add(version);
     }
-
     updateExecutionStatistics();
     return versionList;
   }
 
   private Version<T> readNextVersion() throws SQLException {
-
     if (moveToNextRow()) {
       return rootNode.loadVersion(this);
     }
@@ -692,7 +661,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Should we create profileNodes for beans created in this query.
    * <p>
    * This is true for all queries except lazy load bean queries.
-   * </p>
    */
   @Override
   public boolean isAutoTuneProfiling() {
@@ -703,13 +671,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   private String getPath(String propertyName) {
-
     if (currentPrefix == null) {
       return propertyName;
     } else if (propertyName == null) {
       return currentPrefix;
     }
-
     String path = currentPathMap.get(propertyName);
     if (path != null) {
       return path;
@@ -720,7 +686,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
-
     ObjectGraphNode node = request.getGraphContext().getObjectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListenerRef));
   }
@@ -745,7 +710,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * a find many query with read auditing so build the ReadEvent and log it.
    */
   void auditFindMany() {
-
     if (auditIds != null && !auditIds.isEmpty()) {
       // get the id values of the underlying collection
       ReadEvent futureReadEvent = query.getFutureFetchAudit();
@@ -783,7 +747,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    * Add the id to the audit id buffer and flush if needed in batches of 100.
    */
   private void auditNextBean() {
-
     if (auditIds == null) {
       auditIds = new ArrayList<>(100);
     }
