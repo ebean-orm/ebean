@@ -3179,7 +3179,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value == null || beanProperty.isDirtyValue(value)) {
+        if (value != null && beanProperty.isDirtyValue(value)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);
