@@ -32,39 +32,47 @@ public final class EntityBeanIntercept implements Serializable {
   private static final int STATE_REFERENCE = 1;
   private static final int STATE_LOADED = 2;
 
+  /**
+   * Used when a bean is partially filled.
+   */
+  private static final byte FLAG_LOADED_PROP = 1;
+  private static final byte FLAG_CHANGED_PROP = 2;
+  private static final byte FLAG_CHANGEDLOADED_PROP = 3;
+  /**
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
+   * between an embedded bean being completely overwritten and one of its
+   * embedded properties being made dirty.
+   */
+  private static final byte FLAG_EMBEDDED_DIRTY = 4;
+  /**
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
+   * between an embedded bean being completely overwritten and one of its
+   * embedded properties being made dirty.
+   */
+  private static final byte FLAG_ORIG_VALUE_SET = 8;
+
   private transient final ReentrantLock lock = new ReentrantLock();
-
   private transient NodeUsageCollector nodeUsageCollector;
-
   private transient PersistenceContext persistenceContext;
-
   private transient BeanLoader beanLoader;
-
   private transient PreGetterCallback preGetterCallback;
 
   private String ebeanServerName;
-
   private boolean deletedFromCollection;
 
   /**
    * The actual entity bean that 'owns' this intercept.
    */
   private final EntityBean owner;
-
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
-
   /**
    * One of NEW, REF, UPD.
    */
   private int state;
-
   private boolean forceUpdate;
-
   private boolean readOnly;
-
   private boolean dirty;
-
   /**
    * Flag set to disable lazy loading - typically for SQL "report" type entity beans.
    */
@@ -74,37 +82,9 @@ public final class EntityBeanIntercept implements Serializable {
    * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
    */
   private boolean lazyLoadFailure;
-
-  /**
-   * Used when a bean is partially filled.
-   */
-  private static final byte FLAG_LOADED_PROP = 1;
-
-  /**
-   * Set of changed properties.
-   */
-  private static final byte FLAG_CHANGED_PROP = 2;
-
-  private static final byte FLAG_CHANGEDLOADED_PROP = 3;
-
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
-  private static final byte FLAG_EMBEDDED_DIRTY = 4;
-
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
-  private static final byte FLAG_ORIG_VALUE_SET = 8;
-
-  private final byte[] flags;
-
   private boolean fullyLoadedBean;
   private boolean loadedFromCache;
+  private final byte[] flags;
   private Object[] origValues;
   private Exception[] loadErrors;
   private int lazyLoadProperty = -1;
@@ -982,7 +962,6 @@ public final class EntityBeanIntercept implements Serializable {
       setChangedPropertyValue(propertyIndex, intercept, oldValue);
     }
   }
-
 
   /**
    * Check for primitive boolean.
