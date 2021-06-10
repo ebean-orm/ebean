@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.9.2</version>
+    <version>12.9.3-SNAPSHOT</version>
   </parent>
 <!--  <parent>-->
 <!--    <groupId>org.avaje</groupId>-->
@@ -14,7 +14,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.9.2</tag>
+    <tag>ebean-parent-12.8.0</tag>
   </scm>
 
   <name>ebean external mapping xml</name>
@@ -33,7 +33,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.9.2</version>
+      <version>12.9.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -59,14 +59,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.9.2</version>
+      <version>12.9.3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.9.2</version>
+      <version>12.9.3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
