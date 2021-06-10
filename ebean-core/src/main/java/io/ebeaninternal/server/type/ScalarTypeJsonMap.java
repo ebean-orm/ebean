@@ -123,7 +123,7 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
    */
   @Override
   public boolean isDirty(Object value) {
-    return CheckMarkedDirty.isDirty(value);
+    return TypeJsonManager.checkIsDirty(value);
   }
 
   @Override

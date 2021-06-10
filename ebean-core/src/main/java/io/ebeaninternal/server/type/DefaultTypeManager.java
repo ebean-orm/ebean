@@ -92,6 +92,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final Object objectMapper;
   private final boolean objectMapperPresent;
   private final boolean postgres;
+  private final TypeJsonManager jsonManager;
   private final boolean offlineMigrationGeneration;
   private final EnumType defaultEnumType;
 
@@ -131,11 +132,11 @@ public final class DefaultTypeManager implements TypeManager {
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
+    this.postgres = isPostgres(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
-
+    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.isJsonDirtyByDefault()) : null;
     this.extraTypeFactory = new DefaultTypeFactory(config);
-    this.postgres = isPostgres(config.getDatabasePlatform());
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
@@ -425,7 +426,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, (AnnotatedField) prop.getJacksonField(), (ObjectMapper) objectMapper, dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, (AnnotatedField) prop.getJacksonField(), dbType, docType);
   }
 
   /**

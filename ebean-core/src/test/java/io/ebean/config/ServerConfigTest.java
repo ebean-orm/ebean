@@ -62,6 +62,7 @@ public class ServerConfigTest {
     props.setProperty("dbOffline", "true");
     props.setProperty("jsonDateTime", "MILLIS");
     props.setProperty("jsonDate", "MILLIS");
+    props.setProperty("jsonDirtyByDefault", "false");
     props.setProperty("autoReadOnlyDataSource", "true");
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
@@ -103,6 +104,9 @@ public class ServerConfigTest {
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.MILLIS, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.MILLIS, serverConfig.getJsonDate());
+    assertFalse(serverConfig.isJsonDirtyByDefault());
+    serverConfig.setJsonDirtyByDefault(true);
+    assertTrue(serverConfig.isJsonDirtyByDefault());
 
     assertEquals("r0,users,orgs", serverConfig.getEnabledL2Regions());
 
@@ -155,6 +159,7 @@ public class ServerConfigTest {
     assertFalse(serverConfig.isIdGeneratorAutomatic());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
+    assertTrue(serverConfig.isJsonDirtyByDefault());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(serverConfig.isAutoLoadModuleInfo());
 
