@@ -71,12 +71,6 @@ public interface QueryIterator<T> extends Iterator<T>, AutoCloseable {
   T next();
 
   /**
-   * Remove is not allowed.
-   */
-  @Override
-  void remove();
-
-  /**
    * Close the underlying resources held by this iterator.
    */
   @Override

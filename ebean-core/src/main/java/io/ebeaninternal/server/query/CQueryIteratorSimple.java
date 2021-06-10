@@ -14,7 +14,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
   private final CQuery<T> cquery;
 
   private final OrmQueryRequest<T> request;
-  
+
   private boolean closed;
 
   CQueryIteratorSimple(CQuery<T> cquery, OrmQueryRequest<T> request) {
@@ -54,8 +54,4 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
     }
   }
 
-  @Override
-  public void remove() {
-    throw new PersistenceException("Remove not allowed");
-  }
 }

@@ -48,8 +48,4 @@ class DtoQueryIterator<T> implements QueryIterator<T> {
     }
   }
 
-  @Override
-  public void remove() {
-    throw new IllegalStateException("remove() not allowed");
-  }
 }
