@@ -142,7 +142,7 @@ public class ScalarTypeJsonObjectMapper {
 
     private final ObjectMapper objectReader;
 
-    private JavaType deserType;
+    private final JavaType deserType;
 
     private final String pgType;
 
@@ -224,12 +224,7 @@ public class ScalarTypeJsonObjectMapper {
         if (value == null) {
           binder.setNull(Types.VARCHAR); // use varchar, otherwise SqlServer/db2 will fail with 'Invalid JDBC data type 5.001.'
         } else {
-          try {
-            String json = objectWriter.writeValueAsString(value);
-            binder.setString(json);
-          } catch (JsonProcessingException e) {
-            throw new SQLException("Unable to create JSON", e);
-          }
+          binder.setString(formatValue(value));
         }
       }
     }
