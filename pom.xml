@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.9.2-SNAPSHOT</version>
+  <version>12.9.2</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -18,7 +18,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.8.0</tag>
+    <tag>ebean-parent-12.9.2</tag>
   </scm>
 
   <licenses>
