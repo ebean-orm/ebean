@@ -60,7 +60,6 @@ public class OracleDbEncrypt extends AbstractDbEncrypt {
    * @param decryptFunction the decrypt stored procedure
    */
   public OracleDbEncrypt(String encryptFunction, String decryptFunction) {
-
     this.varcharEncryptFunction = new OraVarcharFunction(encryptFunction, decryptFunction);
     this.dateEncryptFunction = new OraDateFunction(encryptFunction, decryptFunction);
   }
