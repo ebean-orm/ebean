@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.QueryIterator;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
 
 import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -31,6 +33,15 @@ public class DtoQueryEngine {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     } finally {
       request.close();
+    }
+  }
+
+  public <T> QueryIterator<T> findIterate(DtoQueryRequest<T> request) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      return new DtoQueryIterator<>(request);
+    } catch (SQLException e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     }
   }
 

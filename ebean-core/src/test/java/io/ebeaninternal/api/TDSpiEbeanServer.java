@@ -454,6 +454,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> QueryIterator<T> findDtoIterate(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <T> Stream<T> findDtoStream(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
   public <T> List<T> findDtoList(SpiDtoQuery<T> query) {
     return null;
   }

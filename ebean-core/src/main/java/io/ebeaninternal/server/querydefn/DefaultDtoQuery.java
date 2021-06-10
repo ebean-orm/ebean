@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
+import io.ebean.QueryIterator;
 import io.ebean.Transaction;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiDtoQuery;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Default implementation of DtoQuery.
@@ -110,6 +112,16 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   @Override
   public void findEachWhile(Predicate<T> consumer) {
     server.findDtoEachWhile(this, consumer);
+  }
+
+  @Override
+  public QueryIterator<T> findIterate() {
+    return server.findDtoIterate(this);
+  }
+
+  @Override
+  public Stream<T> findStream() {
+    return server.findDtoStream(this);
   }
 
   @Override

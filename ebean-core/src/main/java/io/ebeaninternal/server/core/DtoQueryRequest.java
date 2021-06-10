@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.QueryIterator;
 import io.ebean.core.type.DataReader;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -88,6 +89,11 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       long exeMicros = (System.nanoTime() - startNano) / 1000L;
       plan.collect(exeMicros);
     }
+  }
+
+  public QueryIterator<T> findIterate() {
+    flushJdbcBatchOnQuery();
+    return queryEngine.findIterate(this);
   }
 
   public void findEach(Consumer<T> consumer) {

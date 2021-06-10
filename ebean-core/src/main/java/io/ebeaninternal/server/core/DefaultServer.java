@@ -1433,14 +1433,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Nonnull
   @Override
   public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
-    try {
-      request.initTransIfRequired();
-      return toStream(request.findIterate());
-    } catch (RuntimeException ex) {
-      request.endTransIfRequired();
-      throw ex;
-    }
+    return toStream(findIterate(query, transaction));
   }
 
   private <T> Stream<T> toStream(QueryIterator<T> queryIterator) {
@@ -1638,6 +1631,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } finally {
       request.endTransIfRequired();
     }
+  }
+
+  @Override
+  public <T> QueryIterator<T> findDtoIterate(SpiDtoQuery<T> query) {
+    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    try {
+      request.initTransIfRequired();
+      return request.findIterate();
+    } catch (RuntimeException ex) {
+      request.endTransIfRequired();
+      throw ex;
+    }
+  }
+
+  @Override
+  public <T> Stream<T> findDtoStream(SpiDtoQuery<T> query) {
+    return toStream(findDtoIterate(query));
   }
 
   @Override

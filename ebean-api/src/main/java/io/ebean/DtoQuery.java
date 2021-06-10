@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Query for performing native SQL queries that return DTO Bean's.
@@ -44,6 +45,26 @@ public interface DtoQuery<T> {
    */
   @Nonnull
   List<T> findList();
+
+  /**
+   * Execute the query iterating a row at a time.
+   * <p>
+   * Note that the QueryIterator holds resources related to the underlying
+   * resultSet and potentially connection and MUST be closed. We should use
+   * QueryIterator in a <em>try with resource block</em>.
+   */
+  @Nonnull
+  QueryIterator<T> findIterate();
+
+  /**
+   * Execute the query returning a Stream.
+   * <p>
+   * Note that the Stream holds resources related to the underlying
+   * resultSet and potentially connection and MUST be closed. We should use
+   * the Stream in a <em>try with resource block</em>.
+   */
+  @Nonnull
+  Stream<T> findStream();
 
   /**
    * Execute the query iterating a row at a time.
