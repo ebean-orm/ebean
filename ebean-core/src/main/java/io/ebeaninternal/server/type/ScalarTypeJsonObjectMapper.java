@@ -3,13 +3,9 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
@@ -156,34 +152,9 @@ public class ScalarTypeJsonObjectMapper {
       this.pgType = pgType;
       this.docType = docType;
       this.objectReader = objectMapper;
-
-      JavaType javaType = field.getType();
-      DeserializationConfig deserConfig = objectMapper.getDeserializationConfig();
-      AnnotationIntrospector ai = deserConfig.getAnnotationIntrospector();
-
-      if (ai != null && javaType != null && !javaType.hasRawClass(Object.class)) {
-        try {
-          this.deserType = ai.refineDeserializationType(deserConfig, field, javaType);
-        } catch (JsonMappingException e) {
-          throw new RuntimeException(e);
-        }
-      } else {
-        this.deserType = javaType;
-      }
-
-      SerializationConfig serConfig = objectMapper.getSerializationConfig();
-       ai = deserConfig.getAnnotationIntrospector();
-
-       if (ai != null && javaType != null && !javaType.hasRawClass(Object.class)) {
-         try {
-           JavaType serType = ai.refineSerializationType(serConfig, field, javaType);
-           this.objectWriter = objectMapper.writerFor(serType);
-         } catch (JsonMappingException e) {
-           throw new RuntimeException(e);
-         }
-       } else {
-         this.objectWriter = objectMapper.writerFor(javaType);
-       }
+      final JacksonTypeHelper helper = new JacksonTypeHelper(field, objectMapper);
+      this.deserType = helper.type();
+      this.objectWriter = helper.objectWriter();
     }
 
     /**
