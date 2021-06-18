@@ -13,12 +13,10 @@ import java.util.Set;
  * from the Map Set or List. The purpose of gathering the additions and removals
  * is to support persisting ManyToMany objects. The additions and removals
  * become inserts and deletes from the intersection table.
- * </p>
  * <p>
  * Technically this is <em>NOT</em> an extension of
  * <em>java.util.Collection</em>. The reason being that java.util.Map is not a
  * Collection. I realise this makes this name confusing so I apologise for that.
- * </p>
  */
 public interface BeanCollection<E> extends Serializable {
 
@@ -68,7 +66,6 @@ public interface BeanCollection<E> extends Serializable {
    * Return true if the collection is uninitialised or is empty without any held modifications.
    * <p>
    * Returning true means can safely skip cascade save for this bean collection.
-   * </p>
    */
   boolean isSkipSave();
 
@@ -93,7 +90,6 @@ public interface BeanCollection<E> extends Serializable {
    * <p>
    * That is, if the collection was not loaded due to filterMany predicates etc
    * then make sure the collection is set to empty.
-   * </p>
    */
   boolean checkEmptyLazyLoad();
 
@@ -136,10 +132,7 @@ public interface BeanCollection<E> extends Serializable {
   boolean isReadOnly();
 
   /**
-   * Add the bean to the collection.
-   * <p>
-   * This is disallowed for BeanMap.
-   * </p>
+   * Add the bean to the collection. This is disallowed for BeanMap.
    */
   void internalAdd(Object bean);
 
@@ -168,7 +161,6 @@ public interface BeanCollection<E> extends Serializable {
    * Map.Entry.
    * <p>
    * For maps this returns the entrySet as we need the keys of the map.
-   * </p>
    */
   Collection<?> getActualEntries();
 
@@ -186,13 +178,17 @@ public interface BeanCollection<E> extends Serializable {
   boolean isReference();
 
   /**
+   * Return true if the collection is modify listening and has modifications.
+   */
+  boolean hasModifications();
+
+  /**
    * Set modify listening on or off. This is used to keep track of objects that
    * have been added to or removed from the list set or map.
    * <p>
    * This is required only for ManyToMany collections. The additions and
    * deletions are used to insert or delete entries from the intersection table.
    * Otherwise modifyListening is false.
-   * </p>
    */
   void setModifyListening(ModifyListenMode modifyListenMode);
 
@@ -206,7 +202,6 @@ public interface BeanCollection<E> extends Serializable {
    * <p>
    * This will potentially end up as an insert into a intersection table for a
    * ManyToMany.
-   * </p>
    */
   void modifyAddition(E bean);
 
@@ -215,7 +210,6 @@ public interface BeanCollection<E> extends Serializable {
    * <p>
    * This will potentially end up as an delete from an intersection table for a
    * ManyToMany.
-   * </p>
    */
   void modifyRemoval(Object bean);
 

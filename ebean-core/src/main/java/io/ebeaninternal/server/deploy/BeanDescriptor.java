@@ -38,15 +38,7 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.Property;
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.ConcurrencyMode;
-import io.ebeaninternal.api.LoadBeanContext;
-import io.ebeaninternal.api.LoadContext;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiUpdatePlan;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
@@ -119,7 +111,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements BeanType<T>, STreeType {
+public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
@@ -1880,7 +1872,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     if (refBean == null) {
       refBean = createReference(readOnly, false, id, pc);
     }
-    return (EntityBean)refBean;
+    return (EntityBean) refBean;
   }
 
   /**
@@ -2934,6 +2926,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       return Boolean.TRUE == draft.getValue(entityBean);
     }
     // no draft property - so return false
+    return false;
+  }
+
+  @Override
+  public boolean isToManyDirty(EntityBean bean) {
+    final EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    for (BeanPropertyAssocMany<?> many : propertiesManySave) {
+      if (ebi.isLoadedProperty(many.getPropertyIndex())) {
+        final BeanCollection<?> value = (BeanCollection<?>) many.getValue(bean);
+        if (value != null && value.hasModifications()) {
+          return true;
+        }
+      }
+    }
     return false;
   }
 

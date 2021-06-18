@@ -1,13 +1,10 @@
 package io.ebean.bean;
 
-import java.util.List;
-
 /**
  * Holds entity beans by there type and id.
  * <p>
  * This is used to ensure only one instance for a given entity type and id is
  * used to build object graphs from queries and lazy loading.
- * </p>
  */
 public interface PersistenceContext {
 
@@ -22,7 +19,6 @@ public interface PersistenceContext {
    * <p>
    * Returns an existing entity bean (if one is already there) and otherwise
    * returns null.
-   * </p>
    */
   Object putIfAbsent(Class<?> rootType, Object id, Object bean);
 
@@ -80,16 +76,10 @@ public interface PersistenceContext {
   boolean resetLimit();
 
   /**
-   * Return the list of dirty beans held by this persistence context.
-   */
-  List<Object> dirtyBeans();
-
-  /**
    * Wrapper on a bean to also indicate if a bean has been deleted.
    * <p>
    * If a bean has been deleted then for the same persistence context is should
    * not be able to be fetched from persistence context or L2 cache.
-   * </p>
    */
   class WithOption {
 

@@ -2,6 +2,9 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
+import io.ebeaninternal.api.SpiBeanType;
+import io.ebeaninternal.api.SpiBeanTypeManager;
+import io.ebeaninternal.api.SpiPersistenceContext;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -11,19 +14,16 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * Ensures only one instance of a bean is used according to its type and unique
  * id.
- * </p>
  * <p>
  * PersistenceContext lives on a Transaction and as such is expected to only
  * have a single thread accessing it at a time. This is not expected to be used
  * concurrently.
- * </p>
  * <p>
  * Duplicate beans are ones having the same type and unique id value. These are
  * considered duplicates and replaced by the bean instance that was already
  * loaded into the PersistenceContext.
- * </p>
  */
-public final class DefaultPersistenceContext implements PersistenceContext {
+public final class DefaultPersistenceContext implements SpiPersistenceContext {
 
   /**
    * Map used hold caches. One cache per bean type.
@@ -199,12 +199,12 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   }
 
   @Override
-  public List<Object> dirtyBeans() {
+  public List<Object> dirtyBeans(SpiBeanTypeManager manager) {
     lock.lock();
     try {
       List<Object> list = new ArrayList<>();
       for (ClassContext classContext : typeCache.values()) {
-        classContext.dirtyBeans(list);
+        classContext.dirtyBeans(manager, list);
       }
       return list;
     } finally {
@@ -223,26 +223,26 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   }
 
   private ClassContext getClassContext(Class<?> rootType) {
-    return typeCache.computeIfAbsent(rootType, k -> new ClassContext());
+    return typeCache.computeIfAbsent(rootType, k -> new ClassContext(rootType));
   }
 
   private static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<>();
-
+    private final Class<?> rootType;
     private Set<Object> deleteSet;
-
     private int initialSize;
-
     private ClassContext parent;
 
-    private ClassContext() {
+    private ClassContext(Class<?> rootType) {
+      this.rootType = rootType;
     }
 
     /**
      * Create as a shallow copy.
      */
     private ClassContext(ClassContext source, boolean initial) {
+      this.rootType = source.rootType;
       if (initial || source.isTransfer()) {
         parent = source.transferParent();
         initialSize = parent.size();
@@ -334,9 +334,11 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     /**
      * Add the dirty beans to the list.
      */
-    void dirtyBeans(List<Object> list) {
+    void dirtyBeans(SpiBeanTypeManager manager, List<Object> list) {
+      final SpiBeanType beanType = manager.getBeanType(rootType);
       for (Object value : map.values()) {
-        if (((EntityBean) value)._ebean_getIntercept().isDirty()) {
+        EntityBean bean = (EntityBean) value;
+        if (bean._ebean_getIntercept().isDirty() || beanType.isToManyDirty(bean)) {
           list.add(value);
         }
       }

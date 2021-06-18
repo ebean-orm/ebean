@@ -3,9 +3,9 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
+import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
@@ -349,12 +349,12 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext getPersistenceContext() {
     return null;
   }
 
   @Override
-  public void setPersistenceContext(PersistenceContext context) {
+  public void setPersistenceContext(SpiPersistenceContext context) {
   }
 
   @Override

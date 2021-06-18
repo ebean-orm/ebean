@@ -2,9 +2,11 @@ package org.tests.transparentpersist;
 
 import io.ebean.*;
 import io.ebean.annotation.*;
+import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeantest.LoggedSql;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.Order;
@@ -200,8 +202,6 @@ public class TestTransparentPersist extends BaseTestCase {
       foundOrder.getShipments().remove(0);
       OrderShipment osh2 = new OrderShipment();
       foundOrder.addShipment(osh2);
-      // if this is called insert is performed but no delete
-      // DB.save(foundOrder);
       transaction.commit();
     }
 
@@ -305,7 +305,8 @@ public class TestTransparentPersist extends BaseTestCase {
   }
 
   private List<Object> getDirtyBeansFromPersistenceContext(Transaction transaction) {
-    return ((SpiTransaction)transaction).getPersistenceContext().dirtyBeans();
+    final SpiBeanTypeManager mgr = Mockito.mock(SpiBeanTypeManager.class);
+    return ((SpiTransaction)transaction).getPersistenceContext().dirtyBeans(mgr);
   }
 
 }

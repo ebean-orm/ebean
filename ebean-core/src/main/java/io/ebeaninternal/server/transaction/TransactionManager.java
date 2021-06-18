@@ -5,7 +5,6 @@ import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxType;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
@@ -19,15 +18,7 @@ import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricMap;
 import io.ebean.plugin.SpiServer;
-import io.ebeaninternal.api.ScopeTrans;
-import io.ebeaninternal.api.ScopedTransaction;
-import io.ebeaninternal.api.SpiLogManager;
-import io.ebeaninternal.api.SpiLogger;
-import io.ebeaninternal.api.SpiProfileHandler;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiTransactionManager;
-import io.ebeaninternal.api.TransactionEvent;
-import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
@@ -770,8 +761,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Experimental - find dirty beans in the persistence context and persist them.
    */
-  public void flushTransparent(PersistenceContext persistenceContext, SpiTransaction transaction) {
-    List<Object> dirtyBeans = persistenceContext.dirtyBeans();
+  public void flushTransparent(SpiPersistenceContext persistenceContext, SpiTransaction transaction) {
+    List<Object> dirtyBeans = persistenceContext.dirtyBeans(beanDescriptorManager);
     if (!dirtyBeans.isEmpty()) {
       server.updateAll(dirtyBeans, transaction);
     }
