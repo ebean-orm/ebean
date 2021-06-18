@@ -22,6 +22,7 @@ public class OraclePlatform extends DatabasePlatform {
   public OraclePlatform() {
     super();
     this.platform = Platform.ORACLE;
+    this.columnAliasPrefix = "c";
     this.supportsDeleteTableAlias = true;
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
