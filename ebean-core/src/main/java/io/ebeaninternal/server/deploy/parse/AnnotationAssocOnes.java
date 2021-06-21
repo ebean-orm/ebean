@@ -96,7 +96,7 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
     Where where = prop.getMetaAnnotationWhere(platform);
     if (where != null) {
       // not expecting this to be used on assoc one properties
-      prop.setExtraWhere(where.clause());
+      prop.setExtraWhere(processFormula(where.clause()));
     }
 
     PrimaryKeyJoinColumn primaryKeyJoin = get(prop, PrimaryKeyJoinColumn.class);

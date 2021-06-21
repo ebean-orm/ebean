@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
+
+import io.ebean.annotation.Where;
+
 import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;
@@ -25,6 +28,10 @@ public class OmBasicParent {
    */
   @OneToMany(cascade = ALL, mappedBy = "parent")
   private List<? extends OmBasicChild> children;
+
+  @OneToMany(cascade = ALL, mappedBy = "parent")
+  @Where(clause = "'${dbTableName}' = ${ta}.name")
+  private List<? extends OmBasicChild> childrenWithWhere;
 
   public OmBasicParent(String name) {
     this.name = name;
@@ -57,4 +64,13 @@ public class OmBasicParent {
   public void setChildren(List<? extends OmBasicChild> children) {
     this.children = children;
   }
+
+  public List<? extends OmBasicChild> getChildrenWithWhere() {
+    return childrenWithWhere;
+  }
+
+  public void setChildrenWithWhere(List<? extends OmBasicChild> childrenWithWhere) {
+    this.childrenWithWhere = childrenWithWhere;
+  }
+
 }

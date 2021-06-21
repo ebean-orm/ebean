@@ -149,7 +149,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
-    if (p.hasJoinTable() && p.getMappedBy() == null) {
+    if (p.createJoinTable()) {
       // only create on other 'owning' side
 
       // build the create table and fkey constraints

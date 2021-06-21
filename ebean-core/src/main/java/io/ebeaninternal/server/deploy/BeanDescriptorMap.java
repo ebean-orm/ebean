@@ -76,4 +76,10 @@ public interface BeanDescriptorMap {
    * Return true if Jackson core is present on the classpath.
    */
   boolean isJacksonCorePresent();
+  
+  /**
+   * Returns true, if the given table (or view) is managed by ebean
+   * (= an entity exists)
+   */
+  boolean isTableManaged(String tableName);
 }

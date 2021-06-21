@@ -2010,6 +2010,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
+   * Returns true, if the table is managed (i.e. an existing m2m relation).
+   */
+  public boolean isTableManaged(String tableName) {
+    return owner.isTableManaged(tableName);
+  }
+  
+  /**
    * Return the order column property.
    */
   public BeanProperty getOrderColumn() {
