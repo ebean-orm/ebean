@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CancelableQuery;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
 import io.ebean.bean.*;
@@ -139,8 +140,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   private PreparedStatement pstmt;
 
-  private boolean cancelled;
-
   private String bindLog;
 
   private final CQueryPlan queryPlan;
@@ -272,15 +271,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   public void cancel() {
     lock.lock();
     try {
-      this.cancelled = true;
-      if (pstmt != null) {
-        try {
-          logger.debug("Cancelling query");
-          pstmt.cancel();
-        } catch (SQLException e) {
-          throw new PersistenceException("Error cancelling query", e);
-        }
-      }
+      JdbcClose.cancel(pstmt);
     } finally {
       lock.unlock();
     }
@@ -312,9 +303,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   ResultSet prepareResultSet(boolean forwardOnlyHint) throws SQLException {
     lock.lock();
     try {
-      if (cancelled) {
-        throw new SQLException("Query cancelled");
-      }
+      // cancelled before we started
+      query.checkCancelled();
       startNano = System.nanoTime();
       SpiTransaction t = request.getTransaction();
       profileOffset = t.profileOffset();
@@ -342,10 +332,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
         pstmt.setFetchSize(query.getBufferFetchSizeHint());
       }
       bindLog = predicates.bind(queryPlan.bindEncryptedProperties(pstmt, conn));
-      return pstmt.executeQuery();
     } finally {
       lock.unlock();
     }
+    ResultSet ret = pstmt.executeQuery();
+    query.checkCancelled();
+    return ret;
   }
 
   /**
@@ -491,7 +483,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   boolean hasNext() throws SQLException {
     lock.lock();
     try {
-      if (noMoreRows || cancelled) {
+      query.checkCancelled();
+      if (noMoreRows) {
         return false;
       }
       if (hasNextCache) {

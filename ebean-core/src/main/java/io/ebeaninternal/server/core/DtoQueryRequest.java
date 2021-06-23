@@ -53,6 +53,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       ormQuery.setType(type);
       ormQuery.setManualId();
 
+      query.setCancelableQuery(ormQuery);
       // execute the underlying ORM query returning the ResultSet
       SpiResultSet result = server.findResultSet(ormQuery, transaction);
       this.pstmt = result.getStatement();
@@ -117,6 +118,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   }
 
   public boolean next() throws SQLException {
+    query.checkCancelled();
     return dataReader.next();
   }
 

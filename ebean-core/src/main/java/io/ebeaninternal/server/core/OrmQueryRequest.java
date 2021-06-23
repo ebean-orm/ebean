@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CacheMode;
+import io.ebean.CancelableQuery;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.QueryIterator;
@@ -35,7 +36,6 @@ import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

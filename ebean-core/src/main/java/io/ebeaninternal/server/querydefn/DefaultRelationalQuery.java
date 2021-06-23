@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 /**
  * Default implementation of SQuery - SQL Query.
  */
-public class DefaultRelationalQuery implements SpiSqlQuery {
+public class DefaultRelationalQuery extends AbstractQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
 
