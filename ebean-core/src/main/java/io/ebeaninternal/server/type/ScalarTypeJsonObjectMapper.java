@@ -20,18 +20,11 @@ import javax.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Supports @DbJson properties using Jackson ObjectMapper.
@@ -75,12 +68,12 @@ class ScalarTypeJsonObjectMapper {
       super(Set.class, jsonManager, field, dbType, docType);
     }
 
-//    @Override
-//    @SuppressWarnings("unchecked")
-//    public Set read(DataReader reader) throws SQLException {
-//      Set value = super.read(reader);
-//      return value == null ? null : new ModifyAwareSet(value);
-//    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Set read(DataReader reader) throws SQLException {
+      Set value = super.read(reader);
+      return value == null ? null : new ModifyAwareSet(value);
+    }
   }
 
   /**
@@ -93,12 +86,12 @@ class ScalarTypeJsonObjectMapper {
       super(List.class, jsonManager, field, dbType, docType);
     }
 
-//    @Override
-//    @SuppressWarnings("unchecked")
-//    public List read(DataReader reader) throws SQLException {
-//      List value = super.read(reader);
-//      return value == null ? null : new ModifyAwareList(value);
-//    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List read(DataReader reader) throws SQLException {
+      List value = super.read(reader);
+      return value == null ? null : new ModifyAwareList(value);
+    }
   }
 
   /**
@@ -111,12 +104,12 @@ class ScalarTypeJsonObjectMapper {
       super(Map.class, jsonManager, field, dbType, DocPropertyType.OBJECT);
     }
 
-//    @Override
-//    @SuppressWarnings("unchecked")
-//    public Map read(DataReader reader) throws SQLException {
-//      Map value = super.read(reader);
-//      return value == null ? null : new ModifyAwareMap(value);
-//    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map read(DataReader reader) throws SQLException {
+      Map value = super.read(reader);
+      return value == null ? null : new ModifyAwareMap(value);
+    }
   }
 
   /**
@@ -161,18 +154,7 @@ class ScalarTypeJsonObjectMapper {
      */
     @Override
     public boolean isDirty(Object value) {
-      if (value == null)
-        return true;
-      TrackReference<Object> key = new TrackReference<Object>(value);
-      String json = originalJson.get(key);
-      if (json == null) {
-        return true;
-      }
-      try {
-        return !json.equals(objectWriter.writeValueAsString(value));
-      } catch (IOException e) {
-        return true; // Checkme: what to do
-      }
+      return dirtyHandler.isDirty(value, objectWriter);
     }
 
     @Override
@@ -183,52 +165,13 @@ class ScalarTypeJsonObjectMapper {
       }
       try {
         T ret = objectReader.readValue(json, deserType);
-        track(ret, json);
+        dirtyHandler.track(ret,json);
         return ret;
       } catch (IOException e) {
         throw new TextException("Failed to parse JSON [{}] as " + deserType, json, e);
       }
     }
     
-
-    private Map<TrackReference<T>, String> originalJson = new ConcurrentHashMap<>();
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
-    
-    private static class TrackReference<T> extends WeakReference<T> {
-
-      private final int hashCode;
-
-      public TrackReference(T referent) {
-        super(referent);
-        hashCode = System.identityHashCode(referent);
-      }
-      
-      public TrackReference(T referent, ReferenceQueue<? super T> q) {
-        super(referent, q);
-        hashCode = System.identityHashCode(referent);
-      }
-      
-      @Override
-      public int hashCode() {
-        return hashCode;
-      }
-      @Override
-      public boolean equals(Object other) {
-        return other instanceof TrackReference && this.get() == ((TrackReference<?>)other).get();
-      }
-    }
-    
-    private void track(T obj, String json) {
-      if (obj != null) {
-        TrackReference<T> ref = new TrackReference<T>(obj, queue);
-        originalJson.put(ref, json);
-
-        while (( ref = (TrackReference<T>) queue.poll()) != null) {
-          originalJson.remove(ref);
-        }
-      }
-    }
-
     @Override
     public void bind(DataBinder binder, T value) throws SQLException {
       if (pgType != null) {
