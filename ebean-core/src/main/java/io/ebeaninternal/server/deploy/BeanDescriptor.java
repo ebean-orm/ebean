@@ -1748,6 +1748,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
+   * Return false for IdClass case with multiple @Id properties.
+   */
+  public boolean hasSingleIdProperty() {
+    return idPropertyIndex != -1;
+  }
+
+  /**
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
   public boolean isMultiValueIdSupported() {
@@ -3145,7 +3152,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
-    return ebi.isLoadedProperty(idPropertyIndex);
+    // assume id loaded for IdClass case with idPropertyIndex == -1
+    return idPropertyIndex == -1 ? true : ebi.isLoadedProperty(idPropertyIndex);
   }
 
   boolean hasIdValue(EntityBean bean) {

@@ -1,7 +1,9 @@
 package org.tests.model.bridge;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
+import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -37,6 +39,28 @@ public class TestIdClassScalar extends BaseTestCase {
 
     assertThat(a.hashCode()).isEqualTo(a.otherHash());
 
+  }
+
+  @Test
+  public void insertBatch() {
+    UUID siteId = UUID.randomUUID();
+    UUID userId = UUID.randomUUID();
+
+    try (final Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+
+      BSiteUserD access = new BSiteUserD(BAccessLevel.ONE, siteId, userId);
+      DB.save(access);
+
+      final UUID siteId1 = access.getSiteId(); // ArrayIndexOutOfBoundsException here
+      assertThat(siteId1).isNotNull();
+      assertThat(access.getUserId()).isEqualTo(userId);
+
+      transaction.commit();
+    }
+
+    DB.delete(BSiteUserD.class, new BEmbId(siteId, userId));
   }
 
   @Test
