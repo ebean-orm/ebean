@@ -5,6 +5,8 @@ import io.ebean.DB;
 import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaTimedMetric;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -23,6 +25,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class SqlQueryTests extends BaseTestCase {
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectFunction() {
+
+    String sql = "select length(?)";
+    final Long val = DB.sqlQuery(sql).setParameter("NotVeryLong").mapToScalar(Long.class).findOne();
+    assertThat(val).isEqualTo(11);
+
+    String sql2 = "select length(:val)";
+    final Long val2 = DB.sqlQuery(sql2).setParameter("val", "NotVeryLong").mapToScalar(Long.class).findOne();
+    assertThat(val2).isEqualTo(11);
+  }
 
   @Test
   public void findSingleAttributeList_decimal() {
