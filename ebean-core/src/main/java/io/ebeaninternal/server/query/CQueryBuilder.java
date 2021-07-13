@@ -616,11 +616,19 @@ class CQueryBuilder {
         if (request.isInlineCountDistinct()) {
           sb.append(")");
         }
-        if (distinct && dbOrderBy != null && !query.isSingleAttribute()) {
+        if (distinct && dbOrderBy != null) {
           // add the orderBy columns to the select clause (due to distinct)
           final OrderBy<?> orderBy = query.getOrderBy();
           if (orderBy != null && orderBy.supportsSelect()) {
-            sb.append(", ").append(DbOrderByTrim.trim(dbOrderBy));
+            String trimmed = DbOrderByTrim.trim(dbOrderBy);
+            if (query.isSingleAttribute() && trimmed.equals(select.getSelectSql())) {
+              // NOP, already in SQL
+              // TODO: what to do if we select("id").orderBy("prop,id")?
+              // Can we live with a query like "select t0.id, t0.prop, t0.id from"
+              // or should we elliminate the second "t0.id" from select
+            } else {
+              sb.append(", ").append(trimmed);
+            }
           }
         }
       }
