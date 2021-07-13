@@ -1,6 +1,9 @@
 package org.tests.transaction;
 
-import io.ebean.*;
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.Transaction;
+import io.ebean.TransactionCallbackAdapter;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -14,20 +17,12 @@ public class TestTransactionCallback extends BaseTestCase {
   int countPreRollback;
   int countPostRollback;
 
-  @Test(expected = PersistenceException.class)
-  public void test_noActiveTransaction() {
-
-    Ebean.register(new MyCallback());
-  }
-
   @Test
   public void test_commitAndRollback() {
-
-
-    try (Transaction txn = Ebean.beginTransaction()) {
-      Ebean.register(new MyCallback());
-      txn.getConnection();
-      Ebean.commitTransaction();
+    try (Transaction txn = DB.beginTransaction()) {
+      DB.register(new MyCallback());
+      txn.getConnection(); // Ebean assumes writes have occurred
+      txn.commit();
     }
 
     assertEquals(1, countPreCommit);
@@ -35,11 +30,11 @@ public class TestTransactionCallback extends BaseTestCase {
     assertEquals(0, countPreRollback);
     assertEquals(0, countPostRollback);
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      Ebean.register(new MyCallback());
+      DB.register(new MyCallback());
     } finally {
-      Ebean.rollbackTransaction();
+      DB.rollbackTransaction();
     }
 
     assertEquals(1, countPreCommit);
@@ -75,12 +70,14 @@ public class TestTransactionCallback extends BaseTestCase {
   }
 
   @Test(expected = PersistenceException.class)
-  public void test_withEbeanserver() {
-
-    EbeanServer server = Ebean.getServer(null);
-    server.register(new MyCallback());
+  public void test_noActiveTransaction() {
+    DB.register(new MyCallback());
   }
 
+  @Test(expected = PersistenceException.class)
+  public void test_noActiveTransaction_withDatabase() {
+    DB.getDefault().register(new MyCallback());
+  }
 
   class MyCallback extends TransactionCallbackAdapter {
 
