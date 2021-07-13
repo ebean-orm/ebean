@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CancelableQuery;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
@@ -13,11 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Executes the select row count query.
  */
-class CQueryRowCount implements SpiProfileTransactionEvent {
+class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
 
@@ -57,6 +59,8 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
   private int rowCount;
 
   private long profileOffset;
+  
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Create the Sql select based on the request.
@@ -110,14 +114,22 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       SpiTransaction t = getTransaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
-      pstmt = conn.prepareStatement(sql);
+      lock.lock();
+      try {
+        query.checkCancelled();
+        pstmt = conn.prepareStatement(sql);
 
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
+        if (query.getTimeout() > 0) {
+          pstmt.setQueryTimeout(query.getTimeout());
+        }
+
+        bindLog = predicates.bind(pstmt, conn);
+      } finally {
+        lock.unlock();
       }
-
-      bindLog = predicates.bind(pstmt, conn);
       rset = pstmt.executeQuery();
+      query.checkCancelled();
+      
       if (!rset.next()) {
         throw new PersistenceException("Expecting 1 row but got none?");
       }
@@ -160,5 +172,15 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
 
   Set<String> getDependentTables() {
     return queryPlan.getDependentTables();
+  }
+
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
   }
 }

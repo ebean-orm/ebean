@@ -66,4 +66,17 @@ public class JdbcClose {
       logger.warn("Error on connection rollback", e);
     }
   }
+
+  /**
+   * Cancels the statement
+   */
+  public static void cancel(Statement stmt) {
+    try {
+      if (stmt != null) {
+        stmt.cancel();
+      }
+    } catch (SQLException e) {
+      logger.warn("Error on cancelling statement", e);
+    }
+  }
 }

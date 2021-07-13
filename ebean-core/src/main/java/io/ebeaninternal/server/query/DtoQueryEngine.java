@@ -29,7 +29,7 @@ public class DtoQueryEngine {
       }
       return rows;
 
-    } catch (Throwable e) {
+    } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     } finally {
       request.close();
@@ -51,7 +51,7 @@ public class DtoQueryEngine {
       while (request.next()) {
         consumer.accept(request.readNextBean());
       }
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     } finally {
       request.close();
@@ -88,9 +88,8 @@ public class DtoQueryEngine {
           break;
         }
       }
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
     } finally {
       request.close();
     }

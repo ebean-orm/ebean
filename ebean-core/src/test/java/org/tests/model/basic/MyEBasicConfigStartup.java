@@ -59,19 +59,19 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
     @Override
     public void inserted(Object bean) {
       insertCount.incrementAndGet();
-      System.out.println("-- EBasic inserted " + ((EBasic) bean).getId());
+      // System.out.println("-- EBasic inserted " + ((EBasic) bean).getId());
     }
 
     @Override
     public void updated(Object bean, Set<String> updatedProperties) {
       updateCount.incrementAndGet();
-      System.out.println("-- EBasic updated " + ((EBasic) bean).getId() + " updatedProperties: " + updatedProperties);
+      // System.out.println("-- EBasic updated " + ((EBasic) bean).getId() + " updatedProperties: " + updatedProperties);
     }
 
     @Override
     public void deleted(Object bean) {
       deleteCount.incrementAndGet();
-      System.out.println("-- EBasic deleted " + ((EBasic) bean).getId());
+      // System.out.println("-- EBasic deleted " + ((EBasic) bean).getId());
     }
 
   }

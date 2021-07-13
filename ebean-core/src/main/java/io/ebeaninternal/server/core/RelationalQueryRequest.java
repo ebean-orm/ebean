@@ -139,6 +139,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   @Override
   public boolean next() throws SQLException {
+    query.checkCancelled();
     if (!resultSet.next()) {
       return false;
     } else {

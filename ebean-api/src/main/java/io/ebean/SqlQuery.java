@@ -37,7 +37,7 @@ import java.util.function.Predicate;
  *
  * }</pre>
  */
-public interface SqlQuery extends Serializable {
+public interface SqlQuery extends Serializable, CancelableQuery {
 
   /**
    * Execute the query returning a list.

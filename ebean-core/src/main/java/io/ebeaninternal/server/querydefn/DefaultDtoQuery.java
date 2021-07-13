@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of DtoQuery.
  */
-public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
+public class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
 
   private final SpiEbeanServer server;
 

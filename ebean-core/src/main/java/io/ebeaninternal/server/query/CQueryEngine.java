@@ -66,11 +66,13 @@ public class CQueryEngine {
 
   public <T> int delete(OrmQueryRequest<T> request) {
     CQueryUpdate query = queryBuilder.buildUpdateQuery(true, request);
+    request.setCancelableQuery(query);
     return executeUpdate(request, query);
   }
 
   public <T> int update(OrmQueryRequest<T> request) {
     CQueryUpdate query = queryBuilder.buildUpdateQuery(false, request);
+    request.setCancelableQuery(query);
     return executeUpdate(request, query);
   }
 
@@ -97,6 +99,7 @@ public class CQueryEngine {
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
 
     CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchAttributeQuery(request);
+    request.setCancelableQuery(rcQuery);
     return findAttributeList(request, rcQuery);
   }
 
@@ -151,6 +154,7 @@ public class CQueryEngine {
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchIdsQuery(request);
+    request.setCancelableQuery(rcQuery);
     return findAttributeList(request, rcQuery);
   }
 
@@ -164,6 +168,7 @@ public class CQueryEngine {
   public <T> int findCount(OrmQueryRequest<T> request) {
 
     CQueryRowCount rcQuery = queryBuilder.buildRowCountQuery(request);
+    request.setCancelableQuery(rcQuery);
     try {
 
       int count = rcQuery.findCount();
@@ -235,8 +240,10 @@ public class CQueryEngine {
 
     } catch (SQLException e) {
       try {
+        PersistenceException pex = cquery.createPersistenceException(e);
+        // create exception before closing connection
         cquery.close();
-        throw cquery.createPersistenceException(e);
+        throw pex;
       } finally {
         request.rollbackTransIfRequired();
       }
@@ -259,6 +266,7 @@ public class CQueryEngine {
     // order by lower sys period desc
     query.order().desc(sysPeriodLower);
     CQuery<T> cquery = queryBuilder.buildQuery(request);
+    request.setCancelableQuery(cquery);
     try {
       cquery.prepareBindExecuteQuery();
       if (request.isLogSql()) {
@@ -327,6 +335,7 @@ public class CQueryEngine {
    */
   public <T> SpiResultSet findResultSet(OrmQueryRequest<T> request) {
     CQuery<T> cquery = queryBuilder.buildQuery(request);
+    request.setCancelableQuery(cquery);
     try {
       boolean fwdOnly;
       if (request.isFindIterate()) {
@@ -411,6 +420,7 @@ public class CQueryEngine {
     EntityBean bean = null;
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
+    request.setCancelableQuery(cquery);
 
     try {
       cquery.prepareBindExecuteQuery();
