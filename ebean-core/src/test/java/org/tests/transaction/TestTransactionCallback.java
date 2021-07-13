@@ -1,10 +1,6 @@
 package org.tests.transaction;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
-import io.ebean.Transaction;
-import io.ebean.TransactionCallbackAdapter;
+import io.ebean.*;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -50,8 +46,32 @@ public class TestTransactionCallback extends BaseTestCase {
     assertEquals(1, countPostCommit);
     assertEquals(1, countPreRollback);
     assertEquals(1, countPostRollback);
+  }
 
+  @Test
+  public void test_commit_whenNoDbWrite() {
+    try (Transaction txn = DB.beginTransaction()) {
+      DB.register(new MyCallback());
+      txn.commit();
+    }
 
+    assertEquals(1, countPreCommit);
+    assertEquals(1, countPostCommit);
+    assertEquals(0, countPreRollback);
+    assertEquals(0, countPostRollback);
+  }
+
+  @Test
+  public void test_rollback_whenNoDbWrite() {
+    try (Transaction txn = DB.beginTransaction()) {
+      DB.register(new MyCallback());
+      txn.rollback();
+    }
+
+    assertEquals(0, countPreCommit);
+    assertEquals(0, countPostCommit);
+    assertEquals(1, countPreRollback);
+    assertEquals(1, countPostRollback);
   }
 
   @Test(expected = PersistenceException.class)

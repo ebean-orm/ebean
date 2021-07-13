@@ -941,11 +941,13 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   private void connectionEndForQueryOnly() {
     try {
+      withEachCallback(TransactionCallback::preCommit);
       if (onQueryOnly == OnQueryOnly.COMMIT) {
         performCommit();
       } else {
         performRollback();
       }
+      withEachCallback(TransactionCallback::postCommit);
     } catch (SQLException e) {
       logger.error("Error when ending a query only transaction via " + onQueryOnly, e);
     }
