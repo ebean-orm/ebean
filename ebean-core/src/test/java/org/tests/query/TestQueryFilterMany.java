@@ -183,7 +183,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(1, sqlList.size());
-    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where exists (select 1 from o_order x where x.kcustomer_id = t0.id) and 1=0 order by t0.id");
+    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where exists (select 1 from o_order x where x.kcustomer_id = t0.id and x.order_date is not null) and 1=0 order by t0.id");
   }
 
   @Test
