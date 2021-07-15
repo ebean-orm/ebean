@@ -3,6 +3,7 @@ package org.tests.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
+import io.ebean.Ebean;
 import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
@@ -131,6 +132,43 @@ public class TestQueryCache extends BaseTestCase {
         .eq("columnB", "count")
         .findCount();
     assertThat(count2).isEqualTo(count1);
+    sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+  }
+
+  @Test
+  public void exists() {
+
+    new EColAB("06", "exists").save();
+    new EColAB("07", "exists").save();
+
+    LoggedSqlCollector.start();
+
+    boolean exists0 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "exists")
+      .exists();
+
+    boolean exists1 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "exists")
+      .exists();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(exists0).isEqualTo(exists1);
+    assertThat(sql).hasSize(1);
+
+    // and now, ensure that we hit the database
+    LoggedSqlCollector.start();
+    boolean exists2 = Ebean.find(EColAB.class)
+      .setUseQueryCache(CacheMode.OFF)
+      .where()
+      .eq("columnB", "exists")
+      .exists();
+    assertThat(exists2).isEqualTo(exists1);
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
   }

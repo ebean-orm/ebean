@@ -1291,7 +1291,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> boolean exists(Query<T> ormQuery, Transaction transaction) {
     Query<T> ormQueryCopy = ormQuery.copy().setMaxRows(1);
-    SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, ormQueryCopy, transaction);
+    SpiOrmQueryRequest<?> request = createQueryRequest(Type.EXISTS, ormQueryCopy, transaction);
+    List<Object> ids = request.getFromQueryCache();
+    if (ids != null) {
+      return !ids.isEmpty();
+    }
+
     try {
       request.initTransIfRequired();
       return !request.findIds().isEmpty();
