@@ -750,12 +750,15 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
+
+    ZoneId zoneId = getZoneId(config);
+
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     addType(java.time.Period.class, new ScalarTypePeriod());
     addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
     addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
-    addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
-    addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
+    addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime, zoneId));
+    addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime, zoneId));
     addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
     addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
     addType(Month.class, new ScalarTypeMonth());
@@ -769,6 +772,11 @@ public final class DefaultTypeManager implements TypeManager {
     addType(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
     boolean durationNanos = config.isDurationWithNanos();
     addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
+  }
+
+  private ZoneId getZoneId(DatabaseConfig config) {
+    final String dataTimeZone = config.getDataTimeZone();
+    return (dataTimeZone == null) ? ZoneOffset.systemDefault() : TimeZone.getTimeZone(dataTimeZone).toZoneId();
   }
 
   private void addType(Class<?> clazz, ScalarType<?> scalarType) {

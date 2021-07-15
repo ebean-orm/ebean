@@ -13,8 +13,11 @@ import java.time.ZonedDateTime;
  */
 public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTime> {
 
-  public ScalarTypeZonedDateTime(JsonConfig.DateTime mode) {
+  private final ZoneId zoneId;
+
+  public ScalarTypeZonedDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
     super(mode, ZonedDateTime.class, false, Types.TIMESTAMP);
+    this.zoneId = zoneId;
   }
 
   @Override
@@ -44,7 +47,7 @@ public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTim
 
   @Override
   public ZonedDateTime convertFromInstant(Instant ts) {
-    return ZonedDateTime.ofInstant(ts, ZoneId.systemDefault());
+    return ZonedDateTime.ofInstant(ts, zoneId);
   }
 
   @Override
