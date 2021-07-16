@@ -64,7 +64,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
 	    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) " +
         "from (select distinct t0.id, t0.name as attribute_ " +
-        "from o_customer t0 left join contact u1 on u1.customer_id = t0.id left join o_order u2 on u2.kcustomer_id = t0.id " +
+        "from o_customer t0 left join contact u1 on u1.customer_id = t0.id left join o_order u2 on u2.kcustomer_id = t0.id and u2.order_date is not null " +
         "where t0.name = ? and (u2.status = ? or u1.first_name = ?)) r1 " +
         "group by r1.attribute_ " +
         "order by count(*) desc, r1.attribute_");

@@ -177,7 +177,7 @@ import java.util.stream.Stream;
  *
  * @param <T> the type of Entity bean this query will fetch.
  */
-public interface Query<T> {
+public interface Query<T> extends CancelableQuery {
 
   /**
    * The lock type (strength) to use with query FOR UPDATE row locking.
@@ -290,15 +290,6 @@ public interface Query<T> {
    * }</pre>
    */
   UpdateQuery<T> asUpdate();
-
-  /**
-   * Cancel the query execution if supported by the underlying database and
-   * driver.
-   * <p>
-   * This must be called from a different thread to the query executor.
-   * </p>
-   */
-  void cancel();
 
   /**
    * Return a copy of the query.

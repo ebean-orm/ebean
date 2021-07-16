@@ -86,6 +86,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
    * collection.
    */
   public void setExtraWhere(String extraWhere) {
+    this.tableJoin.setExtraWhere(extraWhere);
     this.extraWhere = extraWhere;
   }
 

@@ -3,7 +3,6 @@ package io.ebeaninternal.api;
 import io.ebean.ProfileLocation;
 import io.ebean.Transaction;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
@@ -196,7 +195,7 @@ public interface SpiTransaction extends Transaction {
    * later. This is along the lines of 'extended persistence context'
    * behaviour.
    */
-  PersistenceContext getPersistenceContext();
+  SpiPersistenceContext getPersistenceContext();
 
   /**
    * Set the persistence context to this transaction.
@@ -208,7 +207,7 @@ public interface SpiTransaction extends Transaction {
    * and setPersistenceContext() enable a developer to reuse a single
    * PersistenceContext with multiple transactions.
    */
-  void setPersistenceContext(PersistenceContext context);
+  void setPersistenceContext(SpiPersistenceContext context);
 
   /**
    * Return the underlying Connection for internal use.

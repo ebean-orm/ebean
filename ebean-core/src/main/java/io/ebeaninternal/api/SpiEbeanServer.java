@@ -1,14 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebean.DtoQuery;
-import io.ebean.EbeanServer;
-import io.ebean.ExtendedServer;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.RowConsumer;
-import io.ebean.RowMapper;
-import io.ebean.Transaction;
-import io.ebean.TxScope;
+import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.CallOrigin;
 import io.ebean.config.DatabaseConfig;
@@ -25,6 +17,7 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Service Provider extension to EbeanServer.
@@ -235,6 +228,11 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls);
 
   /**
+   * SqlQuery find single attribute streaming the result to a consumer.
+   */
+  <T> void findSingleAttributeEach(SpiSqlQuery query, Class<T> cls, Consumer<T> consumer);
+
+  /**
    * SqlQuery find one with mapper.
    */
   <T> T findOneMapper(SpiSqlQuery query, RowMapper<T> mapper);
@@ -248,6 +246,16 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
    * SqlQuery find each with consumer.
    */
   void findEachRow(SpiSqlQuery query, RowConsumer consumer);
+
+  /**
+   * DTO findIterate query.
+   */
+  <T> QueryIterator<T> findDtoIterate(SpiDtoQuery<T> query);
+
+  /**
+   * DTO findStream query.
+   */
+  <T> Stream<T> findDtoStream(SpiDtoQuery<T> query);
 
   /**
    * DTO findList query.

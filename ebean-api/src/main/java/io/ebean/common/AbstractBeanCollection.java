@@ -136,6 +136,11 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   // ---------------------------------------------------------
 
   @Override
+  public boolean hasModifications() {
+    return modifyHolder != null && modifyHolder.hasModifications();
+  }
+
+  @Override
   public ModifyListenMode getModifyListening() {
     return modifyListenMode;
   }
@@ -145,7 +150,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
    */
   @Override
   public void setModifyListening(ModifyListenMode mode) {
-
     this.modifyListenMode = mode;
     this.modifyListening = mode != null && ModifyListenMode.NONE != mode;
     if (modifyListening) {

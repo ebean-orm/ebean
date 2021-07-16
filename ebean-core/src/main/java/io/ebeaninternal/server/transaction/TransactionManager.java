@@ -5,7 +5,6 @@ import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxType;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
@@ -19,15 +18,7 @@ import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricMap;
 import io.ebean.plugin.SpiServer;
-import io.ebeaninternal.api.ScopeTrans;
-import io.ebeaninternal.api.ScopedTransaction;
-import io.ebeaninternal.api.SpiLogManager;
-import io.ebeaninternal.api.SpiLogger;
-import io.ebeaninternal.api.SpiProfileHandler;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiTransactionManager;
-import io.ebeaninternal.api.TransactionEvent;
-import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
@@ -53,7 +44,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Manages transactions.
  * <p>
  * Keeps the Cache and Cluster in sync when transactions are committed.
- * </p>
  */
 public class TransactionManager implements SpiTransactionManager {
 
@@ -198,8 +188,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnMain = metricFactory.createTimedMetric("txn.main");
     this.txnReadOnly = metricFactory.createTimedMetric("txn.readonly");
     this.txnNamed = metricFactory.createTimedMetricMap("txn.named.");
-    // Add gauges for db pool size
-
     scopeManager.register(this);
   }
 
@@ -304,20 +292,16 @@ public class TransactionManager implements SpiTransactionManager {
    * There is a potential optimisation available when read committed is the default
    * isolation level. If it is, then Connections used only for queries do not require
    * commit or rollback but instead can just be put back into the pool via close().
-   * </p>
    * <p>
    * If the Isolation level is higher (say SERIALIZABLE) then Connections used
    * just for queries do need to be committed or rollback after the query.
-   * </p>
    */
   OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
-
     // first check for a system property 'override'
     String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
     if (systemPropertyValue != null) {
       return OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
     }
-
     // default to rollback if not defined on the platform
     return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
@@ -359,9 +343,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Wrap an externally supplied Connection with a known transaction id.
    */
   private SpiTransaction wrapExternalConnection(String id, Connection c) {
-
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
-
     // set the default batch mode
     t.setBatchMode(persistBatch);
     t.setBatchOnCascade(persistBatchOnCascade);
@@ -409,7 +391,6 @@ public class TransactionManager implements SpiTransactionManager {
    */
   @Override
   public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
-
     try {
       if (txnLogger.isDebug()) {
         String msg = transaction.getLogPrefix() + "Rollback";
@@ -418,7 +399,6 @@ public class TransactionManager implements SpiTransactionManager {
         }
         txnLogger.debug(msg);
       }
-
     } catch (Exception ex) {
       logger.error("Error while notifying TransactionEventListener of rollback event", ex);
     }
@@ -445,7 +425,6 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   private void formatThrowable(Throwable e, StringBuilder sb) {
-
     sb.append(e.toString());
     StackTraceElement[] stackTrace = e.getStackTrace();
     if (stackTrace.length > 0) {
@@ -468,11 +447,9 @@ public class TransactionManager implements SpiTransactionManager {
       if (txnLogger.isDebug()) {
         txnLogger.debug(transaction.getLogPrefix() + "Commit");
       }
-
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
-
     } catch (Exception ex) {
       logger.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
@@ -488,7 +465,6 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   private void externalModificationEvent(TransactionEventTable tableEvents) {
-
     TransactionEvent event = new TransactionEvent();
     event.add(tableEvents);
 
@@ -501,25 +477,21 @@ public class TransactionManager implements SpiTransactionManager {
    * Notify local BeanPersistListeners etc of events from another server in the cluster.
    */
   public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
-
     if (clusterLogger.isDebugEnabled()) {
       clusterLogger.debug("processing {}", remoteEvent);
     }
-
     CacheChangeSet changeSet = new CacheChangeSet();
 
     RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
     if (tableMod != null) {
       changeSet.addInvalidate(tableMod.getTables());
     }
-
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
       for (TableIUD tableIUD : tableIUDList) {
         beanDescriptorManager.cacheNotify(tableIUD, changeSet);
       }
     }
-
     // note DeleteById is written as BeanPersistIds and getBeanPersistList()
     // processes both Bean IUD and DeleteById
     List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
@@ -528,7 +500,6 @@ public class TransactionManager implements SpiTransactionManager {
         persistIds.notifyCache(changeSet);
       }
     }
-
     changeSet.apply();
   }
 
@@ -543,10 +514,8 @@ public class TransactionManager implements SpiTransactionManager {
    * Prepare and then send/log the changeSet.
    */
   void sendChangeLog(final ChangeSet changeSet) {
-
     // can set userId, userIpAddress & userContext if desired
     if (changeLogPrepare.prepare(changeSet)) {
-
       if (changeLogAsync) {
         // call the log method in background
         backgroundExecutor.execute(() -> changeLogListener.log(changeSet));
@@ -653,9 +622,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Begin a scoped transaction.
    */
   public ScopedTransaction beginScopedTransaction(TxScope txScope) {
-
     txScope = initTxScope(txScope);
-
     ScopedTransaction txnContainer = getActiveScoped();
 
     boolean setToScope;
@@ -678,7 +645,6 @@ public class TransactionManager implements SpiTransactionManager {
     if (nestedSavepoint && (type == TxType.REQUIRED || type == TxType.REQUIRES_NEW)) {
       createTransaction = true;
       transaction = createSavepoint(transaction, this);
-
     } else {
       createTransaction = isCreateNewTransaction(transaction, type);
       if (createTransaction) {
@@ -748,32 +714,26 @@ public class TransactionManager implements SpiTransactionManager {
    * Determine whether to create a new transaction or not.
    * <p>
    * This will also potentially throw exceptions for MANDATORY and NEVER types.
-   * </p>
    */
   private boolean isCreateNewTransaction(SpiTransaction current, TxType type) {
     switch (type) {
       case REQUIRED:
       case SUPPORTS:
         return current == null;
-
       case REQUIRES_NEW:
         return true;
-
       case MANDATORY:
         if (current == null) {
           throw new PersistenceException("Transaction missing when MANDATORY");
         }
         return false;
-
       case NEVER:
         if (current != null) {
           throw new PersistenceException("Transaction exists for Transactional NEVER");
         }
         return true; // always use NoTransaction instance
-
       case NOT_SUPPORTED:
         return true; // always use NoTransaction instance
-
       default:
         throw new RuntimeException("Should never get here?");
     }
@@ -801,8 +761,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Experimental - find dirty beans in the persistence context and persist them.
    */
-  public void flushTransparent(PersistenceContext persistenceContext, SpiTransaction transaction) {
-    List<Object> dirtyBeans = persistenceContext.dirtyBeans();
+  public void flushTransparent(SpiPersistenceContext persistenceContext, SpiTransaction transaction) {
+    List<Object> dirtyBeans = persistenceContext.dirtyBeans(beanDescriptorManager);
     if (!dirtyBeans.isEmpty()) {
       server.updateAll(dirtyBeans, transaction);
     }

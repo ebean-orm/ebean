@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -130,6 +131,14 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       }
     }
 
+    boolean oneToOneExported = false;
+    if (assocBeanProperty instanceof BeanPropertyAssocOne) {
+      BeanPropertyAssocOne<?> oneToOneProp = (BeanPropertyAssocOne<?>) assocBeanProperty;
+      if (oneToOneProp.isOneToOneExported()) {
+        oneToOneExported = true;
+      }
+    }
+
     if (pathContainsMany) {
       // "promote" to left join as the path contains a many
       joinType = SqlJoinType.OUTER;
@@ -140,7 +149,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
         assocBeanProperty.appendFrom(ctx, joinType);
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
-      if (assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
+      if (!oneToOneExported && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
         ctx.append(" and ").append(assocBeanProperty.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
       }
     }

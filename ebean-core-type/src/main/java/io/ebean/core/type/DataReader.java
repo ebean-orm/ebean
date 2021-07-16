@@ -11,8 +11,6 @@ public interface DataReader {
 
   boolean next() throws SQLException;
 
-  void resetColumnPosition();
-
   void incrementPos(int increment);
 
   byte[] getBinaryBytes() throws SQLException;

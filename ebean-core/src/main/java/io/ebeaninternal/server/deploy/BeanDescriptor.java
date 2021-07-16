@@ -38,15 +38,7 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.Property;
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.ConcurrencyMode;
-import io.ebeaninternal.api.LoadBeanContext;
-import io.ebeaninternal.api.LoadContext;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiUpdatePlan;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
@@ -119,7 +111,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements BeanType<T>, STreeType {
+public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
@@ -1756,6 +1748,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return false for IdClass case with multiple @Id properties.
+   */
+  public boolean hasSingleIdProperty() {
+    return idPropertyIndex != -1;
+  }
+
+  /**
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
   public boolean isMultiValueIdSupported() {
@@ -1880,7 +1879,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     if (refBean == null) {
       refBean = createReference(readOnly, false, id, pc);
     }
-    return (EntityBean)refBean;
+    return (EntityBean) refBean;
   }
 
   /**
@@ -2017,6 +2016,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return owner.getBeanDescriptor(otherType);
   }
 
+  /**
+   * Returns true, if the table is managed (i.e. an existing m2m relation).
+   */
+  public boolean isTableManaged(String tableName) {
+    return owner.isTableManaged(tableName);
+  }
+  
   /**
    * Return the order column property.
    */
@@ -2937,6 +2943,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return false;
   }
 
+  @Override
+  public boolean isToManyDirty(EntityBean bean) {
+    final EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    for (BeanPropertyAssocMany<?> many : propertiesManySave) {
+      if (ebi.isLoadedProperty(many.getPropertyIndex())) {
+        final BeanCollection<?> value = (BeanCollection<?>) many.getValue(bean);
+        if (value != null && value.hasModifications()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Return true if the bean is draftable and considered a 'live' instance.
    */
@@ -3139,7 +3159,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
-    return ebi.isLoadedProperty(idPropertyIndex);
+    // assume id loaded for IdClass case with idPropertyIndex == -1
+    return idPropertyIndex == -1 ? true : ebi.isLoadedProperty(idPropertyIndex);
   }
 
   boolean hasIdValue(EntityBean bean) {
@@ -3179,7 +3200,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       int propertyIndex = beanProperty.getPropertyIndex();
       if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value == null || beanProperty.isDirtyValue(value)) {
+        if (value != null && beanProperty.isDirtyValue(value)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);

@@ -23,6 +23,11 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
+  public void prefixProperty(String path) {
+    exp.prefixProperty(path);
+  }
+
+  @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
     // can't use naturalKey cache
     return false;

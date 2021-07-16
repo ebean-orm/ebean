@@ -2,12 +2,15 @@ package org.tests.transparentpersist;
 
 import io.ebean.*;
 import io.ebean.annotation.*;
+import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeantest.LoggedSql;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderShipment;
 
 import java.util.List;
 
@@ -181,6 +184,8 @@ public class TestTransparentPersist extends BaseTestCase {
     Order order = new Order();
     order.setStatus(Order.Status.NEW);
     order.setCustomer(c0);
+    OrderShipment osh1 = new OrderShipment();
+    order.addShipment(osh1);
     DB.save(order);
 
     LoggedSql.start();
@@ -194,7 +199,9 @@ public class TestTransparentPersist extends BaseTestCase {
       Customer c1 = new Customer();
       c1.setName("newCust CascadePersist");
       foundOrder.setCustomer(c1);
-
+      foundOrder.getShipments().remove(0);
+      OrderShipment osh2 = new OrderShipment();
+      foundOrder.addShipment(osh2);
       transaction.commit();
     }
 
@@ -204,13 +211,19 @@ public class TestTransparentPersist extends BaseTestCase {
 
     assertThat(checkOrder.getStatus()).isEqualTo(Order.Status.NEW);
     assertThat(checkOrder.getCustomer().getName()).isEqualTo("newCust CascadePersist");
+    assertThat(checkOrder.getShipments().size()).isEqualTo(1);
 
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(10);
     assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.order_date");
     assertThat(sql.get(1)).contains("insert into o_customer");
     assertThat(sql.get(2)).contains(" -- bind(");
     assertThat(sql.get(3)).contains("update o_order set updtime=?, kcustomer_id=? where id=? and updtime=?");
     assertThat(sql.get(4)).contains(" -- bind(");
+    assertThat(sql.get(5)).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
+    assertThat(sql.get(6)).contains("delete from or_order_ship");
+    assertThat(sql.get(7)).contains(" -- bind(");
+    assertThat(sql.get(8)).contains("insert into or_order_ship");
+    assertThat(sql.get(9)).contains(" -- bind(");
 
     DB.delete(checkOrder);
     DB.delete(Customer.class, checkOrder.getCustomer().getId());
@@ -292,7 +305,8 @@ public class TestTransparentPersist extends BaseTestCase {
   }
 
   private List<Object> getDirtyBeansFromPersistenceContext(Transaction transaction) {
-    return ((SpiTransaction)transaction).getPersistenceContext().dirtyBeans();
+    final SpiBeanTypeManager mgr = Mockito.mock(SpiBeanTypeManager.class);
+    return ((SpiTransaction)transaction).getPersistenceContext().dirtyBeans(mgr);
   }
 
 }

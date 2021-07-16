@@ -39,9 +39,7 @@ public class TestQueryFindStream extends BaseTestCase {
 
   @Test
   public void findLargeStream_basic() {
-
     ResetBasicData.reset();
-
     try (Stream<Customer> stream = DB.find(Customer.class)
       .findLargeStream()) {
 
@@ -61,8 +59,16 @@ public class TestQueryFindStream extends BaseTestCase {
   }
 
   @Test
-  public void manualTest_findSteam_when_streamNotClosed_connectionLeak() {
+  public void manualTest_findSteam_when_closeWithResources() {
+    // confirm manually the stream is closed via try with resources block
+    try (Stream<Customer> stream = DB.find(Customer.class).findStream()) {
+      // silly assert
+      assertThat(stream.hashCode()).isNotZero();
+    }
+  }
 
+  @Test
+  public void manualTest_findSteam_when_streamNotClosed_connectionLeak() {
     Stream<Customer> stream = DB.find(Customer.class).findStream();
     // remember a steam MUST be closed or we leak resources
     // comment out the close(); below to leak a connection

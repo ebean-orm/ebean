@@ -3,20 +3,16 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebeaninternal.api.SpiProfileTransactionEvent;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.TransactionEvent;
-import io.ebeaninternal.api.TxnProfileEventCodes;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.lib.Str;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
+import io.ebeaninternal.server.util.Str;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +21,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -99,7 +90,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   /**
    * Holder of the objects fetched to ensure unique objects are used.
    */
-  private PersistenceContext persistenceContext;
+  private SpiPersistenceContext persistenceContext;
 
   /**
    * Used to give developers more control over the insert update and delete
@@ -806,7 +797,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return the persistence context associated with this transaction.
    */
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
 
@@ -816,10 +807,9 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * This could be considered similar to EJB3 Extended PersistanceContext. In
    * that you get the PersistanceContext from a transaction, hold onto it, and
    * then set it back later to a second transaction.
-   * </p>
    */
   @Override
-  public void setPersistenceContext(PersistenceContext context) {
+  public void setPersistenceContext(SpiPersistenceContext context) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
@@ -951,11 +941,13 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   private void connectionEndForQueryOnly() {
     try {
+      withEachCallback(TransactionCallback::preCommit);
       if (onQueryOnly == OnQueryOnly.COMMIT) {
         performCommit();
       } else {
         performRollback();
       }
+      withEachCallback(TransactionCallback::postCommit);
     } catch (SQLException e) {
       logger.error("Error when ending a query only transaction via " + onQueryOnly, e);
     }

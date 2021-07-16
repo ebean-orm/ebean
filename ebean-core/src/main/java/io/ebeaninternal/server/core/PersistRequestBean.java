@@ -379,9 +379,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void setBatched() {
     batched = true;
     if (type == Type.INSERT || type == Type.UPDATE) {
-      // used to trigger automatic jdbc batch flush
-      intercept.registerGetterCallback(this);
-      getterCallback = true;
+      if (beanDescriptor.hasSingleIdProperty()) {
+        // used to trigger automatic jdbc batch flush
+        intercept.registerGetterCallback(this);
+        getterCallback = true;
+      }
     }
   }
 

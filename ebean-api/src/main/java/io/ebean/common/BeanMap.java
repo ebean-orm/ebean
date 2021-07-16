@@ -175,10 +175,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   /**
    * Returns the map entrySet.
-   * <p>
-   * This is because the key values may need to be set against the details (so
-   * they don't need to be set twice).
-   * </p>
    */
   @Override
   public Collection<?> getActualEntries() {
@@ -194,7 +190,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     }
     if (map == null) {
       sb.append("deferred ");
-
     } else {
       sb.append("size[").append(map.size()).append("]");
       sb.append(" map").append(map);
@@ -243,17 +238,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
-  @SuppressWarnings({"unchecked"})
   public Set<Entry<K, E>> entrySet() {
     init();
     if (isReadOnly()) {
       return Collections.unmodifiableSet(map.entrySet());
     }
-    if (modifyListening) {
-      Set<Entry<K, E>> s = map.entrySet();
-      return new ModifySet(this, s);
-    }
-    return map.entrySet();
+    return modifyListening ? new ModifyEntrySet<>(this, map.entrySet()) : map.entrySet();
   }
 
   @Override
@@ -274,8 +264,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     if (isReadOnly()) {
       return Collections.unmodifiableSet(map.keySet());
     }
-    // we don't really care about modifications to the ketSet?
-    return map.keySet();
+    return modifyListening ? new ModifyKeySet<>(this, map.keySet()) : map.keySet();
   }
 
   @Override
@@ -346,11 +335,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     if (isReadOnly()) {
       return Collections.unmodifiableCollection(map.values());
     }
-    if (modifyListening) {
-      Collection<E> c = map.values();
-      return new ModifyCollection<>(this, c);
-    }
-    return map.values();
+    return modifyListening ? new ModifyCollection<>(this, map.values()) : map.values();
   }
 
   @Override

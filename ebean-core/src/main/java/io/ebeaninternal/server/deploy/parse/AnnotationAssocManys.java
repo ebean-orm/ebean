@@ -118,7 +118,7 @@ class AnnotationAssocManys extends AnnotationAssoc {
 
     Where where = prop.getMetaAnnotationWhere(platform);
     if (where != null) {
-      prop.setExtraWhere(where.clause());
+      prop.setExtraWhere(processFormula(where.clause()));
     }
 
     FetchPreference fetchPreference = get(prop, FetchPreference.class);

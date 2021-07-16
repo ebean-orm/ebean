@@ -20,6 +20,11 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
   }
 
   @Override
+  public void prefixProperty(String path) {
+    throw new IllegalStateException("Not allowed?");
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.writeId(value);
   }

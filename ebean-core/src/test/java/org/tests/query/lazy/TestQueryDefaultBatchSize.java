@@ -2,6 +2,7 @@ package org.tests.query.lazy;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.ProfileLocation;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -13,12 +14,18 @@ import java.util.List;
 
 public class TestQueryDefaultBatchSize extends BaseTestCase {
 
+  private static final ProfileLocation loc0 = ProfileLocation.create();
+  private static final ProfileLocation loc1 = ProfileLocation.create();
+  private static final ProfileLocation loc2 = ProfileLocation.create();
+  private static final ProfileLocation loc3 = ProfileLocation.create();
+
   @Test
   public void test_findEach() {
 
     ResetBasicData.reset();
 
     Ebean.find(Order.class)
+      .setProfileLocation(loc0)
       .setLazyLoadBatchSize(2)
       .findEach(bean -> doStuff(bean));
   }
@@ -29,6 +36,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.find(Order.class)
+      .setProfileLocation(loc1)
       .fetch("details", "id")
       .fetch("details.product", "sku")
       .fetch("customer")
@@ -44,6 +52,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
 
     List<Order> orders =
       Ebean.find(Order.class)
+        .setProfileLocation(loc2)
         .setLazyLoadBatchSize(2)
         .findList();
 
@@ -59,6 +68,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
 
     List<Order> orders =
       Ebean.find(Order.class)
+        .setProfileLocation(loc3)
         .fetch("details", "id")
         .fetch("details.product", "sku")
         .fetch("customer")

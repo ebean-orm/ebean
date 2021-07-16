@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.QueryIterator;
 import io.ebean.core.type.DataReader;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -52,6 +53,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       ormQuery.setType(type);
       ormQuery.setManualId();
 
+      query.setCancelableQuery(ormQuery);
       // execute the underlying ORM query returning the ResultSet
       SpiResultSet result = server.findResultSet(ormQuery, transaction);
       this.pstmt = result.getStatement();
@@ -90,6 +92,11 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     }
   }
 
+  public QueryIterator<T> findIterate() {
+    flushJdbcBatchOnQuery();
+    return queryEngine.findIterate(this);
+  }
+
   public void findEach(Consumer<T> consumer) {
     flushJdbcBatchOnQuery();
     queryEngine.findEach(this, consumer);
@@ -110,9 +117,13 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     return queryEngine.findList(this);
   }
 
+  public boolean next() throws SQLException {
+    query.checkCancelled();
+    return dataReader.next();
+  }
+
   @SuppressWarnings("unchecked")
   public T readNextBean() throws SQLException {
-    dataReader.resetColumnPosition();
     return (T) plan.readRow(dataReader);
   }
 

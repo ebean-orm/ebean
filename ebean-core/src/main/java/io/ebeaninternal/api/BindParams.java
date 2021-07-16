@@ -155,7 +155,6 @@ public class BindParams implements Serializable {
    * Set an In Out parameter using position.
    */
   public void setParameter(int position, Object value, int outType) {
-
     Param p = getParam(position);
     p.setInValue(value);
     p.setOutType(outType);
@@ -178,8 +177,8 @@ public class BindParams implements Serializable {
    * Using position set the In value of a parameter. Note that for nulls you
    * must use setNullParameter.
    */
+  @SuppressWarnings("rawtypes")
   public void setParameter(int position, Object value) {
-
     Param p = getParam(position);
     if (value instanceof Collection) {
       // use of postgres ANY with positioned parameter
@@ -214,7 +213,6 @@ public class BindParams implements Serializable {
    * Set a named In Out parameter.
    */
   public void setParameter(String name, Object value, int outType) {
-
     Param p = getParam(name);
     p.setInValue(value);
     p.setOutType(outType);
@@ -232,7 +230,6 @@ public class BindParams implements Serializable {
    * Set a named In parameter that is not null.
    */
   public Param setParameter(String name, Object value) {
-
     Param p = getParam(name);
     p.setInValue(value);
     return p;
@@ -299,7 +296,6 @@ public class BindParams implements Serializable {
    * Return true if the bind hash and count has not changed.
    */
   public boolean isSameBindHash() {
-
     if (bindHash == null) {
       bindHash = calcQueryPlanHash();
       return false;
@@ -329,10 +325,6 @@ public class BindParams implements Serializable {
     private final List<Param> paramList;
 
     private final StringBuilder preparedSql;
-
-    public OrderedList() {
-      this(new ArrayList<>());
-    }
 
     public OrderedList(List<Param> paramList) {
       this.paramList = paramList;

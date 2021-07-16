@@ -25,6 +25,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.platform = Platform.SQLSERVER;
     // disable persistBatchOnCascade mode for
     // SQL Server unless we are using sequences
+    this.dbEncrypt = new SqlServerDbEncrypt();
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;

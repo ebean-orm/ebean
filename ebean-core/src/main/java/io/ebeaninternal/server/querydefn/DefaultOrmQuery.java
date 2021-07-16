@@ -55,10 +55,10 @@ import io.ebeaninternal.server.deploy.BeanNaturalKey;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.expression.IdInExpression;
 import io.ebeaninternal.server.expression.SimpleExpression;
-import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
@@ -81,7 +81,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of an Object Relational query.
  */
-public class DefaultOrmQuery<T> implements SpiQuery<T> {
+public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
 
@@ -112,10 +112,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private TableJoin m2mIncludeJoin;
 
   private ProfilingListener profilingListener;
-
-  private boolean cancelled;
-
-  private CancelableQuery cancelableQuery;
 
   private Type type;
 
@@ -539,6 +535,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (havingExpressions != null) {
       havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
     }
+    if (orderBy != null) {
+      for (Property orderProperty : orderBy.getProperties()) {
+        ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(orderProperty.getProperty());
+        if (elProp != null && elProp.containsFormulaWithJoin()) {
+          manyWhereJoins.addFormulaWithJoin(orderProperty.getProperty());
+        }
+      }
+    }
   }
 
   /**
@@ -856,6 +860,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.parentNode = parentNode;
     copy.forUpdate = forUpdate;
     copy.rawSql = rawSql;
+    setCancelableQuery(copy); // required to cancel findId query
     return copy;
   }
 
@@ -1238,6 +1243,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Prepare the expressions (compile sub-queries etc).
    */
   private void prepareExpressions(BeanQueryRequest<?> request) {
+    detail.prepareExpressions(request);
     if (whereExpressions != null) {
       whereExpressions.prepareExpression(request);
     }
@@ -2046,16 +2052,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void setCancelableQuery(CancelableQuery cancelableQuery) {
-    lock.lock();
-    try {
-      this.cancelableQuery = cancelableQuery;
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
   public Query<T> setBaseTable(String baseTable) {
     this.baseTable = baseTable;
     return this;
@@ -2082,28 +2078,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return rootTableAlias != null ? rootTableAlias : defaultAlias;
   }
 
-  @Override
-  public void cancel() {
-    lock.lock();
-    try {
-      if (!cancelled && cancelableQuery != null) {
-        cancelled = true;
-        cancelableQuery.cancel();
-      }
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
-  public boolean isCancelled() {
-    lock.lock();
-    try {
-      return cancelled;
-    } finally {
-      lock.unlock();
-    }
-  }
 
   @Override
   public Set<String> validate() {

@@ -176,7 +176,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     }
     if (set == null) {
       sb.append("deferred ");
-
     } else {
       sb.append("size[").append(set.size()).append("]");
       sb.append(" set").append(set);

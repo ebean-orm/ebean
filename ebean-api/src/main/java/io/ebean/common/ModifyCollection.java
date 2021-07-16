@@ -25,7 +25,7 @@ class ModifyCollection<E> implements Collection<E> {
    * The owner is notified of the additions and removals.
    * </p>
    */
-  public ModifyCollection(BeanCollection<E> owner, Collection<E> c) {
+  ModifyCollection(BeanCollection<E> owner, Collection<E> c) {
     this.owner = owner;
     this.c = c;
   }

@@ -1,25 +1,28 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import io.ebean.config.JsonConfig;
 import org.junit.Test;
 
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ScalarTypeLocalDateTimeTest {
 
-  ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.MILLIS);
+  private final ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.MILLIS);
+
+  private final JsonFactory factory = new JsonFactory();
 
   // warm up
-  LocalDateTime warmUp = LocalDateTime.now();
+  private final LocalDateTime warmUp = LocalDateTime.now();
 
   @Test
-  public void testNowToMillis() throws Exception {
+  public void testNowToMillis() {
 
     warmUp.hashCode();
 
@@ -29,7 +32,7 @@ public class ScalarTypeLocalDateTimeTest {
   }
 
   @Test
-  public void testConvertToMillis() throws Exception {
+  public void testConvertToMillis() {
 
     LocalDateTime now = LocalDateTime.now().withNano(123_000_000); // jdk11 workaround
     long asMillis = type.convertToMillis(now);
@@ -39,7 +42,7 @@ public class ScalarTypeLocalDateTimeTest {
   }
 
   @Test
-  public void testConvertFromTimestamp() throws Exception {
+  public void testConvertFromTimestamp() {
 
     Timestamp now = new Timestamp(System.currentTimeMillis());
 
@@ -72,6 +75,24 @@ public class ScalarTypeLocalDateTimeTest {
 
     Timestamp timestamp1 = type.convertToTimestamp(val1);
     assertEquals(timestamp, timestamp1);
+  }
+
+
+  @Test
+  public void testJsonRaw() throws Exception {
+
+    final LocalDateTime of = LocalDateTime.of(2020, 5, 4, 13, 20, 40);
+
+    ScalarTypeLocalDateTime typeIso = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
+
+    StringWriter writer = new StringWriter();
+    JsonGenerator generator = factory.createGenerator(writer);
+
+    typeIso.jsonWrite(generator, of);
+    generator.flush();
+
+    assertThat(of.toString()).isEqualTo("2020-05-04T13:20:40");
+    assertThat(writer.toString()).isEqualTo("\"2020-05-04T13:20:40\"");
   }
 
   @Test

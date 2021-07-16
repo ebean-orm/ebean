@@ -1382,7 +1382,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Nonnull
   @Override
   public <T> FutureList<T> findFutureList(Query<T> query, Transaction t) {
-    SpiQuery<T> spiQuery = (SpiQuery<T>) query;
+    SpiQuery<T> spiQuery = (SpiQuery<T>) query.copy();
     spiQuery.setFutureFetch(true);
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
@@ -1433,32 +1433,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Nonnull
   @Override
   public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
-    try {
-      request.initTransIfRequired();
-      return toStream(request.findIterate());
-    } catch (RuntimeException ex) {
-      request.endTransIfRequired();
-      throw ex;
-    }
+    return toStream(findIterate(query, transaction));
   }
 
   private <T> Stream<T> toStream(QueryIterator<T> queryIterator) {
-    return stream(spliteratorUnknownSize(queryIterator, Spliterator.ORDERED), false)
-      .onClose(new QueryIteratorClose(queryIterator));
-  }
-
-  private static class QueryIteratorClose implements Runnable {
-    private final QueryIterator<?> iterator;
-
-    private QueryIteratorClose(QueryIterator<?> iterator) {
-      this.iterator = iterator;
-    }
-
-    @Override
-    public void run() {
-      iterator.close();
-    }
+    return stream(spliteratorUnknownSize(queryIterator, Spliterator.ORDERED), false).onClose(queryIterator::close);
   }
 
   @Override
@@ -1607,6 +1586,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> void findSingleAttributeEach(SpiSqlQuery query, Class<T> cls, Consumer<T> consumer) {
+    executeSqlQuery((req) -> req.findSingleAttributeEach(cls, consumer), query);
+  }
+
+  @Override
   public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
     return executeSqlQuery((req) -> req.findSingleAttributeList(cls), query);
   }
@@ -1647,6 +1631,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     } finally {
       request.endTransIfRequired();
     }
+  }
+
+  @Override
+  public <T> QueryIterator<T> findDtoIterate(SpiDtoQuery<T> query) {
+    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    try {
+      request.initTransIfRequired();
+      return request.findIterate();
+    } catch (RuntimeException ex) {
+      request.endTransIfRequired();
+      throw ex;
+    }
+  }
+
+  @Override
+  public <T> Stream<T> findDtoStream(SpiDtoQuery<T> query) {
+    return toStream(findDtoIterate(query));
   }
 
   @Override

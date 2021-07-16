@@ -24,7 +24,7 @@ class SimpleModuleInfoWriter {
   SimpleModuleInfoWriter(ProcessingContext processingContext) {
     this.processingContext = processingContext;
     this.factoryPackage = processingContext.getFactoryPackage();
-    this.factoryShortName = "_ebean$ModuleInfo";
+    this.factoryShortName = "_Ebean$ModuleInfo";
     this.factoryFullName = factoryPackage + "." + factoryShortName;
   }
 

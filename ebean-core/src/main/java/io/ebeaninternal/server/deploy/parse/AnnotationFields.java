@@ -153,7 +153,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Formula formula = prop.getMetaAnnotationFormula(platform);
     if (formula != null) {
-      prop.setSqlFormula(formula.select(), formula.join());
+      prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
 
     initWhoProperties(prop);
@@ -334,7 +334,7 @@ public class AnnotationFields extends AnnotationParser {
     }
     Formula formula = prop.getMetaAnnotationFormula(platform);
     if (formula != null) {
-      prop.setSqlFormula(formula.select(), formula.join());
+      prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
 
     final Aggregation aggregation = prop.getMetaAnnotation(Aggregation.class);

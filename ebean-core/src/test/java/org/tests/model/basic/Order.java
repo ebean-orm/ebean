@@ -101,7 +101,7 @@ public class Order implements Serializable {
   @DocEmbedded
   List<OrderDetail> details;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
   List<OrderShipment> shipments;
 
   @Override
