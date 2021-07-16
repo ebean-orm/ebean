@@ -21,7 +21,6 @@ import org.tests.model.rawsql.ERawSqlAggBean;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -327,11 +326,10 @@ public class TestRawSqlBuilder extends BaseTestCase {
     pfc.setContent(bytes);
     DB.save(pfc);
 
-    final String sql = "select content from persistent_file_content where id = ?";
-
     List<SqlRow> rows = new ArrayList<>();
     final DataSourceConfig config = ((DefaultServer) DB.getDefault()).getServerConfig().getDataSourceConfig();
 
+    final String sql = "select content from persistent_file_content where id = ?";
     try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
          PreparedStatement stmt = connection.prepareStatement(sql)) {
       stmt.setLong(1, pfc.getId());
@@ -344,7 +342,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     }
 
     assertThat(rows).hasSize(1);
-    assertThat(((Blob) rows.get(0).get("content")).getBytes(0, bytes.length)).isEqualTo(bytes);
+    assertThat(rows.get(0).get("content")).isEqualTo(bytes);
   }
 
 }

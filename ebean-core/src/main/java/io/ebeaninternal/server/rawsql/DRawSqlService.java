@@ -49,7 +49,6 @@ public class DRawSqlService implements SpiRawSqlService {
       if (ret.containsKey(name)) {
         name = combine(meta.getSchemaName(i), meta.getTableName(i), name);
       }
-      ret.put(name, resultSet.getObject(i));
 
       // convert (C/B)LOBs to java objects.
       // A java.sql.Clob depends on an open connection, so storing this object in a map
