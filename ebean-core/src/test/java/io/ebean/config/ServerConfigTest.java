@@ -62,6 +62,7 @@ public class ServerConfigTest {
     props.setProperty("dbOffline", "true");
     props.setProperty("jsonDateTime", "MILLIS");
     props.setProperty("jsonDate", "MILLIS");
+    props.setProperty("jsonDirtyByDefault", "false");
     props.setProperty("autoReadOnlyDataSource", "true");
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
@@ -72,9 +73,15 @@ public class ServerConfigTest {
     props.setProperty("enabledL2Regions", "r0,users,orgs");
     props.setProperty("caseSensitiveCollation", "false");
     props.setProperty("loadModuleInfo", "true");
-    props.setProperty("collectQueryPlanThresholdMicros", "10000");
     props.setProperty("forUpdateNoKey", "true");
     props.setProperty("defaultServer", "false");
+
+    props.setProperty("queryPlan.enable", "true");
+    props.setProperty("queryPlan.thresholdMicros", "10000");
+    props.setProperty("queryPlan.capture", "true");
+    props.setProperty("queryPlan.capturePeriodSecs", "42");
+    props.setProperty("queryPlan.captureMaxTimeMillis", "560");
+    props.setProperty("queryPlan.captureMaxCount", "7");
 
     serverConfig.loadFromProperties(props);
 
@@ -97,7 +104,9 @@ public class ServerConfigTest {
     assertEquals(PlatformConfig.DbUuid.BINARY, serverConfig.getPlatformConfig().getDbUuid());
     assertEquals(JsonConfig.DateTime.MILLIS, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.MILLIS, serverConfig.getJsonDate());
-    assertEquals(10000, serverConfig.getCollectQueryPlanThresholdMicros());
+    assertFalse(serverConfig.isJsonDirtyByDefault());
+    serverConfig.setJsonDirtyByDefault(true);
+    assertTrue(serverConfig.isJsonDirtyByDefault());
 
     assertEquals("r0,users,orgs", serverConfig.getEnabledL2Regions());
 
@@ -105,6 +114,13 @@ public class ServerConfigTest {
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
     assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());
     assertEquals(98, serverConfig.getBackgroundExecutorShutdownSecs());
+
+    assertTrue(serverConfig.isQueryPlanEnable());
+    assertEquals(10000, serverConfig.getQueryPlanThresholdMicros());
+    assertTrue(serverConfig.isQueryPlanCapture());
+    assertEquals(42, serverConfig.getQueryPlanCapturePeriodSecs());
+    assertEquals(560, serverConfig.getQueryPlanCaptureMaxTimeMillis());
+    assertEquals(7, serverConfig.getQueryPlanCaptureMaxCount());
 
     assertThat(serverConfig.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
@@ -137,17 +153,27 @@ public class ServerConfigTest {
     ServerConfig serverConfig = new ServerConfig();
     assertTrue(serverConfig.isIdGeneratorAutomatic());
     assertTrue(serverConfig.isDefaultServer());
+    assertFalse(serverConfig.isAutoPersistUpdates());
 
     serverConfig.setIdGeneratorAutomatic(false);
     assertFalse(serverConfig.isIdGeneratorAutomatic());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
+    assertTrue(serverConfig.isJsonDirtyByDefault());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(serverConfig.isAutoLoadModuleInfo());
-    assertEquals(Long.MAX_VALUE, serverConfig.getCollectQueryPlanThresholdMicros());
+
+    assertFalse(serverConfig.isQueryPlanEnable());
+    assertEquals(Long.MAX_VALUE, serverConfig.getQueryPlanThresholdMicros());
+    assertFalse(serverConfig.isQueryPlanCapture());
+    assertEquals(600, serverConfig.getQueryPlanCapturePeriodSecs());
+    assertEquals(10000L, serverConfig.getQueryPlanCaptureMaxTimeMillis());
+    assertEquals(10, serverConfig.getQueryPlanCaptureMaxCount());
 
     serverConfig.setLoadModuleInfo(false);
     assertFalse(serverConfig.isAutoLoadModuleInfo());
+    serverConfig.setAutoPersistUpdates(true);
+    assertTrue(serverConfig.isAutoPersistUpdates());
   }
 
   @Test

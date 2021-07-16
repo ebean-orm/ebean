@@ -71,7 +71,6 @@ public class LoadManyRequest extends LoadRequest {
    * This for use when lazy loading is invoked on methods such as clear() and removeAll() where it
    * generally makes sense to only fetch the Id values as the other property information is not
    * used.
-   * </p>
    */
   private boolean isOnlyIds() {
     return onlyIds;
@@ -91,18 +90,16 @@ public class LoadManyRequest extends LoadRequest {
     return loadContext.getBatchSize();
   }
 
-  private List<Object> getParentIdList() {
-
+  private List<Object> parentIdList(SpiEbeanServer server) {
     List<Object> idList = new ArrayList<>();
-
     BeanPropertyAssocMany<?> many = getMany();
     for (BeanCollection<?> bc : batch) {
       idList.add(many.getParentId(bc.getOwnerBean()));
+      bc.setLoader(server); // don't use the load buffer again
     }
     if (many.getTargetDescriptor().isPadInExpression()) {
       BindPadding.padIds(idList);
     }
-
     return idList;
   }
 
@@ -111,9 +108,7 @@ public class LoadManyRequest extends LoadRequest {
   }
 
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
-
     BeanPropertyAssocMany<?> many = getMany();
-
     SpiQuery<?> query = many.newQuery(server);
     String orderBy = many.getLazyFetchOrderBy();
     if (orderBy != null) {
@@ -124,11 +119,11 @@ public class LoadManyRequest extends LoadRequest {
     if (extraWhere != null) {
       // replace special ${ta} placeholder with the base table alias
       // which is always t0 and add the extra where clause
-      query.where().raw(extraWhere.replace("${ta}", "t0"));
+      query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
     }
 
     query.setLazyLoadForParents(many);
-    many.addWhereParentIdIn(query, getParentIdList(), loadContext.isUseDocStore());
+    many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
     query.setPersistenceContext(loadContext.getPersistenceContext());
 
     String mode = isLazy() ? "+lazy" : "+query";
@@ -146,7 +141,6 @@ public class LoadManyRequest extends LoadRequest {
       // override to just select the Id values
       query.select(many.getTargetIdProperty());
     }
-
     return query;
   }
 
@@ -154,10 +148,8 @@ public class LoadManyRequest extends LoadRequest {
    * After the query execution check for empty collections and load L2 cache if desired.
    */
   public void postLoad() {
-
     BeanDescriptor<?> desc = loadContext.getBeanDescriptor();
     BeanPropertyAssocMany<?> many = getMany();
-
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
     for (BeanCollection<?> bc : batch) {
@@ -172,6 +164,5 @@ public class LoadManyRequest extends LoadRequest {
         desc.cacheManyPropPut(many, bc, parentId);
       }
     }
-
   }
 }

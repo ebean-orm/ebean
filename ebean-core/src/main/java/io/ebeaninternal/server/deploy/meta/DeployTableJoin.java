@@ -33,6 +33,8 @@ public class DeployTableJoin {
   private ArrayList<DeployTableJoinColumn> columns = new ArrayList<>(4);
 
   private InheritInfo inheritInfo;
+  
+  private String extraWhere;
 
   /**
    * Create a DeployTableJoin.
@@ -137,6 +139,18 @@ public class DeployTableJoin {
     this.type = type;
   }
 
+  /**
+   * Returns the clause of an extra &#64;Where annotation.
+   * @return
+   */
+  public String getExtraWhere() {
+    return extraWhere;
+  }
+  
+  public void setExtraWhere(String extraWhere) {
+    this.extraWhere = extraWhere;
+  }
+  
   public DeployTableJoin createInverse(String tableName) {
 
     DeployTableJoin inverse = new DeployTableJoin();

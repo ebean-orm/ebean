@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.RowConsumer;
-import io.ebean.RowMapper;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlBinding;
 
@@ -57,18 +53,24 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   boolean findEachRow(RowConsumer mapper) {
     flushJdbcBatchOnQuery();
-    queryEngine.findEachRow(this, mapper);
+    queryEngine.findEach(this, mapper);
     return true;
   }
 
   <T> List<T> findListMapper(RowMapper<T> mapper) {
     flushJdbcBatchOnQuery();
-    return queryEngine.findListMapper(this, mapper);
+    return queryEngine.findList(this, () -> mapper.map(resultSet, rows++));
   }
 
   <T> T findOneMapper(RowMapper<T> mapper) {
     flushJdbcBatchOnQuery();
-    return queryEngine.findOneMapper(this, mapper);
+    return queryEngine.findOne(this, mapper);
+  }
+
+  public <T> boolean findSingleAttributeEach(Class<T> cls, Consumer<T> consumer) {
+    flushJdbcBatchOnQuery();
+    queryEngine.findSingleAttributeEach(this, cls, consumer);
+    return true;
   }
 
   public <T> List<T> findSingleAttributeList(Class<T> cls) {
@@ -83,17 +85,17 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   public void findEach(Consumer<SqlRow> consumer) {
     flushJdbcBatchOnQuery();
-    queryEngine.findEach(this, consumer);
+    queryEngine.findEach(this, (resultSet, rowNum) -> consumer.accept(createNewRow()));
   }
 
   public void findEachWhile(Predicate<SqlRow> consumer) {
     flushJdbcBatchOnQuery();
-    queryEngine.findEach(this, consumer);
+    queryEngine.findEach(this, this::createNewRow, consumer);
   }
 
   public List<SqlRow> findList() {
     flushJdbcBatchOnQuery();
-    return queryEngine.findList(this);
+    return queryEngine.findList(this, this::createNewRow);
   }
 
   /**
@@ -135,16 +137,15 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     return resultSet;
   }
 
-  public void incrementRows() {
-    rows++;
-  }
-
-  public <T> List<T> mapList(RowMapper<T> mapper) throws SQLException {
-    List<T> list = new ArrayList<>();
-    while (next()) {
-      list.add(mapper.map(resultSet, rows++));
+  @Override
+  public boolean next() throws SQLException {
+    query.checkCancelled();
+    if (!resultSet.next()) {
+      return false;
+    } else {
+      rows++;
+      return true;
     }
-    return list;
   }
 
   public <T> T mapOne(RowMapper<T> mapper) throws SQLException {

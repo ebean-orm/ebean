@@ -25,6 +25,10 @@ public class PersonCacheEmail {
     this.email = email;
   }
 
+  public PersonCacheEmail(String id) {
+    this.id = id;
+  }
+
   public String getId() {
     return id;
   }

@@ -16,7 +16,7 @@ import java.util.Objects;
  * on the Query object.
  * </p>
  */
-public final class OrderBy<T> implements Serializable {
+public class OrderBy<T> implements Serializable {
 
   private static final long serialVersionUID = 9157089257745730539L;
 
@@ -69,7 +69,6 @@ public final class OrderBy<T> implements Serializable {
    * Add a property with ascending order to this OrderBy.
    */
   public Query<T> asc(String propertyName) {
-
     list.add(new Property(propertyName, true));
     return query;
   }
@@ -97,7 +96,6 @@ public final class OrderBy<T> implements Serializable {
     list.add(new Property(propertyName, false, collation));
     return query;
   }
-
 
   /**
    * Return true if the property is known to be contained in the order by clause.
@@ -207,7 +205,6 @@ public final class OrderBy<T> implements Serializable {
     if (!(obj instanceof OrderBy<?>)) {
       return false;
     }
-
     OrderBy<?> e = (OrderBy<?>) obj;
     return e.list.equals(list);
   }
@@ -249,7 +246,7 @@ public final class OrderBy<T> implements Serializable {
   /**
    * A property and its ascending descending order.
    */
-  public static final class Property implements Serializable {
+  public static class Property implements Serializable {
 
     private static final long serialVersionUID = 1546009780322478077L;
 
@@ -415,13 +412,10 @@ public final class OrderBy<T> implements Serializable {
   }
 
   private void parse(String orderByClause) {
-
     if (orderByClause == null) {
       return;
     }
-
-    String[] chunks = orderByClause.split(",");
-    for (String chunk : chunks) {
+    for (String chunk : orderByClause.split(",")) {
       Property p = parseProperty(chunk);
       if (p != null) {
         list.add(p);
@@ -467,8 +461,7 @@ public final class OrderBy<T> implements Serializable {
     if (s.startsWith("desc")) {
       return false;
     }
-    String m = "Expecting [" + s + "] to be asc or desc?";
-    throw new RuntimeException(m);
+    throw new RuntimeException("Expecting [" + s + "] to be asc or desc?");
   }
 
   private boolean isEmptyString(String s) {

@@ -76,8 +76,4 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     }
   }
 
-  @Override
-  public void remove() {
-    throw new PersistenceException("Remove not allowed");
-  }
 }

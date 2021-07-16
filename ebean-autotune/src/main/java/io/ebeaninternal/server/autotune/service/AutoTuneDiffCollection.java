@@ -113,7 +113,7 @@ public class AutoTuneDiffCollection {
 
     diffCount++;
 
-    Origin origin = createOrigin(entry, point, tuneDetail.toString());
+    Origin origin = createOrigin(entry, point, tuneDetail.asString());
     ProfileDiff diff = document.getProfileDiff();
     if (diff == null) {
       diff = new ProfileDiff();
@@ -147,7 +147,7 @@ public class AutoTuneDiffCollection {
     Origin origin = new Origin();
     origin.setKey(point.getKey());
     origin.setBeanType(point.getBeanType());
-    origin.setDetail(entry.getDetail().toString());
+    origin.setDetail(entry.getDetail().asString());
     origin.setCallStack(point.getCallOrigin().getFullDescription());
     origin.setOriginal(query);
 

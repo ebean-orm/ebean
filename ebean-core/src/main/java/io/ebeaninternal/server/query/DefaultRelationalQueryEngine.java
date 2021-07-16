@@ -3,6 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
 import io.ebean.SqlRow;
+import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
@@ -10,10 +11,10 @@ import io.ebean.metric.TimedMetricMap;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
+import io.ebeaninternal.server.core.RowReader;
 import io.ebeaninternal.server.persist.Binder;
 
 import javax.persistence.PersistenceException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -59,12 +60,26 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public void findEach(RelationalQueryRequest request, Predicate<SqlRow> consumer) {
+  public void findEach(RelationalQueryRequest request, RowConsumer consumer) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.mapEach(consumer);
+      request.logSummary();
 
+    } catch (Exception e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
+
+  @Override
+  public <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Predicate<T> consumer) {
     try {
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
-        if (!consumer.test(readRow(request))) {
+        if (!consumer.test(reader.read())) {
           break;
         }
       }
@@ -79,25 +94,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public void findEach(RelationalQueryRequest request, Consumer<SqlRow> consumer) {
-
-    try {
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
-      while (request.next()) {
-        consumer.accept(readRow(request));
-      }
-      request.logSummary();
-
-    } catch (Exception e) {
-      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
-    } finally {
-      request.close();
-    }
-  }
-
-  @Override
-  public <T> T findOneMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+  public <T> T findOne(RelationalQueryRequest request, RowMapper<T> mapper) {
     try {
       request.executeSql(binder, SpiQuery.Type.BEAN);
       T value = request.mapOne(mapper);
@@ -113,13 +110,15 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   }
 
   @Override
-  public <T> List<T> findListMapper(RelationalQueryRequest request, RowMapper<T> mapper) {
+  public <T> List<T> findList(RelationalQueryRequest request, RowReader<T> reader) {
     try {
       request.executeSql(binder, SpiQuery.Type.LIST);
-      List<T> list = request.mapList(mapper);
+      List<T> rows = new ArrayList<>();
+      while (request.next()) {
+        rows.add(reader.read());
+      }
       request.logSummary();
-      return list;
-
+      return rows;
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
@@ -128,12 +127,19 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void findEachRow(RelationalQueryRequest request, RowConsumer consumer) {
+  public <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls) {
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
-      request.executeSql(binder, SpiQuery.Type.LIST);
-      request.mapEach(consumer);
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      T value = null;
+      if (dataReader.next()) {
+        value = scalarType.read(dataReader);
+      }
       request.logSummary();
+      return value;
 
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
@@ -147,68 +153,13 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
   @Override
   public <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls) {
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
-    return findScalarList(request, scalarType);
-  }
-
-  private <T> List<T> findScalarList(RelationalQueryRequest request, ScalarType<T> scalarType) {
     try {
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
-      List<T> list = new ArrayList<>();
-      while (request.next()) {
-        request.incrementRows();
-        list.add(scalarType.read(binder.createDataReader(request.getResultSet())));
+      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      List<T> rows = new ArrayList<>();
+      while (dataReader.next()) {
+        rows.add(scalarType.read(dataReader));
       }
-
-      request.logSummary();
-      return list;
-
-    } catch (Exception e) {
-      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
-    } finally {
-      request.close();
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls) {
-
-    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
-    return findScalar(request, scalarType);
-  }
-
-  private <T> T findScalar(RelationalQueryRequest request, ScalarType<T> scalarType) {
-    try {
-      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
-
-      T value = null;
-      if (request.next()) {
-        request.incrementRows();
-        value = scalarType.read(binder.createDataReader(request.getResultSet()));
-      }
-
-      request.logSummary();
-      return value;
-
-    } catch (Exception e) {
-      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
-    } finally {
-      request.close();
-    }
-  }
-
-  @Override
-  public List<SqlRow> findList(RelationalQueryRequest request) {
-
-    try {
-      request.executeSql(binder, SpiQuery.Type.LIST);
-      List<SqlRow> rows = new ArrayList<>();
-      while (request.next()) {
-        rows.add(readRow(request));
-      }
-
       request.logSummary();
       return rows;
 
@@ -220,11 +171,23 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     }
   }
 
-  /**
-   * Read the row from the ResultSet and return as a MapBean.
-   */
-  private SqlRow readRow(RelationalQueryRequest request) throws SQLException {
-    return request.createNewRow();
-  }
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> void findSingleAttributeEach(RelationalQueryRequest request, Class<T> cls, Consumer<T> consumer) {
+    ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
+    try {
+      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      while (dataReader.next()) {
+        consumer.accept(scalarType.read(dataReader));
+      }
+      request.logSummary();
 
+    } catch (Exception e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
+
+    } finally {
+      request.close();
+    }
+  }
 }

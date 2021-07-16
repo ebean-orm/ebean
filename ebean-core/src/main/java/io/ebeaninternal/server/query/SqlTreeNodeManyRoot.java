@@ -47,16 +47,6 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
     ctx.popTableAlias();
   }
 
-  /**
-   * append extraWhere to the join.
-   */
-  @Override
-  protected SqlJoinType appendFromAsJoin(DbSqlContext ctx, SqlJoinType joinType) {
-    SqlJoinType join = super.appendFromAsJoin(ctx, joinType);
-    super.appendExtraWhere(ctx);
-    return join;
-  }
-
   @Override
   protected void appendExtraWhere(DbSqlContext ctx) {
     // extraWhere is already appended to the tableJoin

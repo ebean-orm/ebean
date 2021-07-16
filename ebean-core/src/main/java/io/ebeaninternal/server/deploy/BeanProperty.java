@@ -18,6 +18,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.core.EncryptAlias;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -55,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.ebean.util.StringHelper.replace;
-
 /**
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
@@ -64,6 +63,8 @@ import static io.ebean.util.StringHelper.replace;
 public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
+
+  private static final String ENC_PREFIX = " " + EncryptAlias.PREFIX;
 
   /**
    * Flag to mark this is the id property.
@@ -353,13 +354,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
-    if (descriptor != null) {
-      s = replace(s, "${ta}.", "${}");
-      s = replace(s, "${ta}", "${}");
+    if (s != null && descriptor != null) {
+      s = s.replace("${ta}.", "${}");
+      s = s.replace("${ta}", "${}");
       if (dbEncrypted) {
         s = dbEncryptFunction.getDecryptSql(s);
         String namedParam = ":encryptkey_" + descriptor.getBaseTable() + "___" + dbColumn;
-        s = replace(s, "?", namedParam);
+        s = s.replace("?", namedParam);
       }
     }
     return InternString.intern(s);
@@ -531,7 +532,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the SQL for the column including decryption function and column alias.
    */
   private String getDecryptSqlWithColumnAlias(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + " _e_" + tableAlias + "_" + this.getDbColumn();
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + ENC_PREFIX + tableAlias + "_" + this.getDbColumn();
   }
 
   @Override

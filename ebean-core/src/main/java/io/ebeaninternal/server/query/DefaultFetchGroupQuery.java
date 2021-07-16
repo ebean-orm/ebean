@@ -644,4 +644,9 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch 
   public void fetchProperties(String property, Set<String> columns, FetchConfig config) {
     detail.fetchProperties(property, columns, config);
   }
+
+  @Override
+  public void addNested(String name, OrmQueryDetail nestedDetail, FetchConfig config) {
+    detail.addNested(name, nestedDetail, config);
+  }
 }

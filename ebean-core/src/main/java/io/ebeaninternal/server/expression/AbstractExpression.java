@@ -16,10 +16,15 @@ import io.ebeaninternal.api.NaturalKeyQueryData;
  */
 public abstract class AbstractExpression implements SpiExpression {
 
-  protected final String propName;
+  protected String propName;
 
   protected AbstractExpression(String propName) {
     this.propName = propName;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    this.propName = path + "." + propName;
   }
 
   @Override

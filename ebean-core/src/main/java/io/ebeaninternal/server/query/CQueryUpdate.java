@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CancelableQuery;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
@@ -10,11 +11,12 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Executes the delete query.
+ * Executes the update query.
  */
-class CQueryUpdate implements SpiProfileTransactionEvent {
+class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
 
@@ -45,6 +47,8 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
 
   private long profileOffset;
 
+  private final ReentrantLock lock = new ReentrantLock();
+  
   /**
    * Create the Sql select based on the request.
    */
@@ -82,15 +86,22 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
       SpiTransaction t = getTransaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
-      pstmt = conn.prepareStatement(sql);
+      lock.lock();
+      try {
+        query.checkCancelled();
+        pstmt = conn.prepareStatement(sql);
 
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
+        if (query.getTimeout() > 0) {
+          pstmt.setQueryTimeout(query.getTimeout());
+        }
+
+        bindLog = predicates.bind(pstmt, conn);
+      } finally {
+        lock.unlock();
       }
-
-      bindLog = predicates.bind(pstmt, conn);
       rowCount = pstmt.executeUpdate();
-
+      query.checkCancelled();
+      
       long executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(executionTimeMicros)) {
@@ -121,5 +132,15 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
     getTransaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), rowCount, query.getProfileId());
+  }
+
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
   }
 }

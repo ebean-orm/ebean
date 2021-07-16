@@ -72,7 +72,7 @@ public class VisitProperties {
 
     } else {
       // simple scalar type
-      pv.visitScalar(p);
+      pv.visitScalar(p, true);
     }
   }
 

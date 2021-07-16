@@ -33,7 +33,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   @Override
   public boolean isDirty(Object value) {
-    return CheckMarkedDirty.isDirty(value);
+    return TypeJsonManager.checkIsDirty(value);
   }
 
   @SuppressWarnings("unchecked")

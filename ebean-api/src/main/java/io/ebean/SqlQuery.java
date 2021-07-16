@@ -37,7 +37,7 @@ import java.util.function.Predicate;
  *
  * }</pre>
  */
-public interface SqlQuery extends Serializable {
+public interface SqlQuery extends Serializable, CancelableQuery {
 
   /**
    * Execute the query returning a list.
@@ -365,5 +365,10 @@ public interface SqlQuery extends Serializable {
      * Return the list of values.
      */
     List<T> findList();
+
+    /**
+     * Find streaming the result effectively consuming a row at a time.
+     */
+    void findEach(Consumer<T> consumer);
   }
 }

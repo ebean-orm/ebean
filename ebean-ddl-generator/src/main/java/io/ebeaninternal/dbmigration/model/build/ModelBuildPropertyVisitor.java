@@ -149,7 +149,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
-    if (p.hasJoinTable() && p.getMappedBy() == null) {
+    if (p.createJoinTable()) {
       // only create on other 'owning' side
 
       // build the create table and fkey constraints
@@ -175,7 +175,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     if (p instanceof BeanPropertyAssocOne) {
       visitOneImported((BeanPropertyAssocOne<?>)p);
     } else {
-      visitScalar(p);
+      // only allow Nonnull if embedded is Nonnull
+      visitScalar(p, !embedded.isNullable());
     }
     if (embedded.isId()) {
       // compound primary key
@@ -259,8 +260,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   }
 
   @Override
-  public void visitScalar(BeanProperty p) {
-
+  public void visitScalar(BeanProperty p, boolean allowNonNull) {
     if (p.isSecondaryTable()) {
       lastColumn = null;
       return;
@@ -292,7 +292,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
     } else {
       col.setDefaultValue(p.getDbColumnDefault());
-      if (!p.isNullable() || p.isDDLNotNull()) {
+      if (allowNonNull && (!p.isNullable() || p.isDDLNotNull())) {
         col.setNotnull(true);
       }
     }

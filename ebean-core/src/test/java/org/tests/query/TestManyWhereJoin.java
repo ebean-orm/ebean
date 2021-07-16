@@ -41,7 +41,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     }
     assertThat(sql).contains("join o_order ");
     assertThat(sql).contains(".status = ?");
-    assertThat(sql).contains("t0.id, t0.status from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id where u1.status = ?");
+    assertThat(sql).contains("t0.id, t0.status from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id and u1.order_date is not null where u1.status = ?");
   }
 
   @Test

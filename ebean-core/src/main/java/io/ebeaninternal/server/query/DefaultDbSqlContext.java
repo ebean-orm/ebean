@@ -11,11 +11,10 @@ import java.util.HashSet;
 class DefaultDbSqlContext implements DbSqlContext {
 
   private static final String COMMA = ", ";
-
   private static final String PERIOD = ".";
   private static final int STRING_BUILDER_INITIAL_CAPACITY = 140;
-
   private static final String tableAliasPlaceHolder = "${ta}";
+  private static final String tableAliasManyPlaceHolder = "${mta}";
 
   private final String columnAliasPrefix;
 
@@ -111,27 +110,22 @@ class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2) {
-
+  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String extraWhere) {
     if (tableJoins == null) {
       tableJoins = new HashSet<>();
     }
-
     String joinKey = table + "-" + a1 + "-" + a2;
     if (tableJoins.contains(joinKey)) {
       return;
     }
 
     tableJoins.add(joinKey);
-
     sb.append(" ").append(type);
     boolean addAsOfOnClause = false;
     if (draftSupport != null) {
       appendTable(table, draftSupport.getDraftTable(table));
-
     } else if (!historyQuery) {
       sb.append(" ").append(table).append(" ");
-
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
@@ -164,13 +158,17 @@ class DefaultDbSqlContext implements DbSqlContext {
     if (addAsOfOnClause) {
       sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
     }
+    if (extraWhere != null && !extraWhere.isEmpty()) {
+      sb.append(" and ");
+      // we will also need a many-table alias here
+      sb.append(extraWhere.replace(tableAliasPlaceHolder, a2).replace(tableAliasManyPlaceHolder, a1));
+    }
   }
 
   private void appendTable(String table, String draftTable) {
     if (draftTable != null) {
       // there is an associated history table and view so use that
       sb.append(" ").append(draftTable).append(" ");
-
     } else {
       sb.append(" ").append(table).append(" ");
     }
@@ -193,7 +191,6 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public String getRelativePrefix(String propName) {
-
     return currentPrefix == null ? propName : currentPrefix + "." + propName;
   }
 
@@ -228,7 +225,6 @@ class DefaultDbSqlContext implements DbSqlContext {
       // the same join has already been added.
       return;
     }
-
     // we only want to add this join once
     formulaJoins.add(converted);
     sb.append(" ");
@@ -263,13 +259,10 @@ class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public void appendHistorySysPeriod() {
-
     String tableAlias = tableAliasStack.peek();
-
     sb.append(COMMA);
     sb.append(historySupport.getSysPeriodLower(tableAlias));
     appendColumnAlias();
-
     sb.append(COMMA);
     sb.append(historySupport.getSysPeriodUpper(tableAlias));
     appendColumnAlias();

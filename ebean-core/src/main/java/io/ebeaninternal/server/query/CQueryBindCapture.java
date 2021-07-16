@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 class CQueryBindCapture implements SpiQueryBindCapture {
 
-  private static final double multiplier = 1.3d;
+  private static final double multiplier = 1.5d;
 
   private final ReentrantLock lock = new ReentrantLock();
   private final CQueryPlanManager manager;

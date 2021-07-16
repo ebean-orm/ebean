@@ -69,7 +69,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     assertEquals(list.size(), rowCount);
     assertEquals(2, sqlLogged.size());
     assertThat(trimSql(sqlLogged.get(1), 1)).contains(
-      "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id where u1.product_id = ?)");
+      "select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id = ?)");
 
   }
 
@@ -95,7 +95,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
     assertEquals(1, sqlLogged.size());
-    assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id where u1.product_id = ?)");
+    assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id = ?)");
 
     query.findList();
   }

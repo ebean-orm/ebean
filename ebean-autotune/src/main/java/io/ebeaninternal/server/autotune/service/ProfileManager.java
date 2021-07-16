@@ -46,7 +46,6 @@ public class ProfileManager implements ProfilingListener {
 
   @Override
   public boolean isProfileRequest(ObjectGraphNode origin, SpiQuery<?> query) {
-
     ProfileOrigin profileOrigin = profileMap.get(origin.getOriginQueryPoint().getKey());
     if (profileOrigin == null) {
       profileMap.put(origin.getOriginQueryPoint().getKey(), createProfileOrigin(origin, query));
@@ -61,12 +60,11 @@ public class ProfileManager implements ProfilingListener {
    * <p>
    * For new profiling entries it is useful to compare the profiling against the current
    * query detail that is specified in the code (as the query might already be manually optimised).
-   * </p>
    */
   private ProfileOrigin createProfileOrigin(ObjectGraphNode origin, SpiQuery<?> query) {
     ProfileOrigin profileOrigin = new ProfileOrigin(origin.getOriginQueryPoint(), queryTuningAddVersion, profilingBase, profilingRate);
     // set the current query detail (fetch group) so that we can compare against profiling for new entries
-    profileOrigin.setOriginalQuery(query.getDetail().toString());
+    profileOrigin.setOriginalQuery(query.getDetail().asString());
     return profileOrigin;
   }
 
@@ -77,7 +75,6 @@ public class ProfileManager implements ProfilingListener {
    */
   @Override
   public void collectQueryInfo(ObjectGraphNode node, long beans, long micros) {
-
     if (node != null) {
       ObjectGraphOrigin origin = node.getOriginQueryPoint();
       if (origin != null) {
@@ -92,11 +89,9 @@ public class ProfileManager implements ProfilingListener {
    * <p>
    * This is sent to use from a EntityBeanIntercept when the finalise method
    * is called on the bean.
-   * </p>
    */
   @Override
   public void collectNodeUsage(NodeUsageCollector usageCollector) {
-
     ProfileOrigin profileOrigin = getProfileOrigin(usageCollector.getNode().getOriginQueryPoint());
     profileOrigin.collectUsageInfo(usageCollector);
   }
@@ -114,16 +109,13 @@ public class ProfileManager implements ProfilingListener {
    * Collect all the profiling information.
    */
   public AutoTuneCollection profilingCollection(boolean reset) {
-
     AutoTuneCollection req = new AutoTuneCollection();
-
     for (ProfileOrigin origin : profileMap.values()) {
       BeanDescriptor<?> desc = server.getBeanDescriptorById(origin.getOrigin().getBeanType());
       if (desc != null) {
         origin.profilingCollection(desc, req, reset);
       }
     }
-
     return req;
   }
 

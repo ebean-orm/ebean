@@ -6,10 +6,13 @@ import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,6 +31,73 @@ public class DtoQuery2Test extends BaseTestCase {
 
     log.info(list.toString());
     assertThat(list).isNotEmpty();
+  }
+
+  @Test
+  public void dto_findIterator_closeWithResources() {
+    ResetBasicData.reset();
+
+    int counter = 0;
+    try (QueryIterator<DCust> iterator = server()
+      .findDto(DCust.class, "select id, name from o_customer where id > ?")
+      .setParameter(0)
+      .findIterate()) {
+
+      if (iterator.hasNext()) {
+        counter++;
+      }
+    }
+
+    assertThat(counter).isEqualTo(1);
+  }
+
+  @Test
+  public void dto_findIterator() {
+    ResetBasicData.reset();
+    final int expectedCount = server().find(Customer.class).findCount();
+
+    LoggedSqlCollector.start();
+    int counter = 0;
+    try (final QueryIterator<DCust> iterator = server().findDto(DCust.class, "select id, name from o_customer where id > :id")
+      .setParameter("id", 0)
+      .findIterate()) {
+
+      while (iterator.hasNext()) {
+        final DCust cust = iterator.next();
+        counter++;
+        assertThat(cust).isNotNull();
+        assertThat(cust.getName()).isNotNull();
+      }
+    }
+
+    assertThat(counter).isEqualTo(expectedCount);
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
+  }
+
+  @Test
+  public void dto_findStream() {
+    ResetBasicData.reset();
+    final int expectedCount = server().find(Customer.class).findCount();
+
+    LoggedSqlCollector.start();
+
+    try (final Stream<DCust> stream =
+           server()
+             .findDto(DCust.class, "select id, name from o_customer where id > ?")
+             .setParameter(0)
+             .findStream()) {
+
+      final List<String> names = stream
+        .map(DCust::getName)
+        .collect(Collectors.toList());
+
+      assertThat(names.size()).isEqualTo(expectedCount);
+    }
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
   @Test

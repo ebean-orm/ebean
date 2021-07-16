@@ -198,10 +198,9 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
     if (list == null) {
       sb.append("deferred ");
-
     } else {
       sb.append("size[").append(list.size()).append("] ");
-      sb.append("list").append(list).append("");
+      sb.append("list").append(list);
     }
     return sb.toString();
   }

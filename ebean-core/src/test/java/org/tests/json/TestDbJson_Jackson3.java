@@ -9,6 +9,7 @@ import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.PlainBean;
 import org.tests.model.json.PlainBeanDirtyAware;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,18 +60,20 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     EBasicJsonList bean = new EBasicJsonList();
     bean.setName("p1");
     bean.setPlainBean(contentBean);
+    bean.setBeanList(Arrays.asList(contentBean));
 
     DB.save(bean);
     final EBasicJsonList found = DB.find(EBasicJsonList.class, bean.getId());
     // json bean not modified but not aware
     // ideally don't load the json content if we are not going to modify it
     found.setName("p1-mod");
+    found.setBeanList(null);
 
     LoggedSql.start();
     DB.save(found);
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, beans=?, bean_list=?, plain_bean=?, version=? where id=?");
+    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, bean_list=?, plain_bean=?, version=? where id=?");
   }
 }

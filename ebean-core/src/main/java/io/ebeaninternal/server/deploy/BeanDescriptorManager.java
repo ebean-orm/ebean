@@ -26,9 +26,7 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
-import io.ebeaninternal.api.ConcurrencyMode;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
@@ -88,7 +86,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Creates BeanDescriptors.
  */
-public class BeanDescriptorManager implements BeanDescriptorMap {
+public class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeManager {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorManager.class);
 
@@ -261,6 +259,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   public BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId) {
     return descQueueMap.get(queueId);
+  }
+
+  @Override
+  public SpiBeanType getBeanType(Class<?> entityType) {
+    return getBeanDescriptor(entityType);
   }
 
   @Override
@@ -440,6 +443,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   public List<? extends BeanType<?>> getBeanTypes(String tableName) {
     return tableToDescMap.get(tableName.toLowerCase());
+  }
+
+  @Override
+  public boolean isTableManaged(String tableName) {
+    return tableToDescMap.get(tableName.toLowerCase()) != null
+        || tableToViewDescMap.get(tableName.toLowerCase()) != null;
   }
 
   /**

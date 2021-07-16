@@ -127,6 +127,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public void prefixProperty(String path) {
+    for (SpiExpression exp : list) {
+      exp.prefixProperty(path);
+    }
+  }
+
+  @Override
   public Junction<T> toJunction() {
     return new JunctionExpression<>(Junction.Type.FILTER, this);
   }

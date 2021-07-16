@@ -81,7 +81,7 @@ public final class BatchControl {
    */
   private int bufferMax;
 
-  private Queue[] queues = new Queue[3];
+  private final Queue[] queues = new Queue[3];
 
   /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.

@@ -3,7 +3,7 @@ package io.ebeaninternal.api;
 /**
  * SQL query binding (for SqlQuery and DtoQuery).
  */
-public interface SpiSqlBinding {
+public interface SpiSqlBinding extends SpiCancelableQuery {
 
   /**
    * Return the named or positioned parameters.

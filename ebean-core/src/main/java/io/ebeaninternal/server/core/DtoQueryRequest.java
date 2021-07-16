@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.QueryIterator;
 import io.ebean.core.type.DataReader;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -22,6 +23,9 @@ import java.util.function.Predicate;
  * Wraps the objects involved in executing a DtoQuery.
  */
 public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
+
+  private static final String ENC_PREFIX = EncryptAlias.PREFIX;
+  private static final String ENC_PREFIX_UPPER = EncryptAlias.PREFIX.toUpperCase();
 
   private final SpiDtoQuery<T> query;
 
@@ -49,6 +53,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       ormQuery.setType(type);
       ormQuery.setManualId();
 
+      query.setCancelableQuery(ormQuery);
       // execute the underlying ORM query returning the ResultSet
       SpiResultSet result = server.findResultSet(ormQuery, transaction);
       this.pstmt = result.getStatement();
@@ -87,6 +92,11 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     }
   }
 
+  public QueryIterator<T> findIterate() {
+    flushJdbcBatchOnQuery();
+    return queryEngine.findIterate(this);
+  }
+
   public void findEach(Consumer<T> consumer) {
     flushJdbcBatchOnQuery();
     queryEngine.findEach(this, consumer);
@@ -107,9 +117,13 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     return queryEngine.findList(this);
   }
 
+  public boolean next() throws SQLException {
+    query.checkCancelled();
+    return dataReader.next();
+  }
+
   @SuppressWarnings("unchecked")
   public T readNextBean() throws SQLException {
-    dataReader.resetColumnPosition();
     return (T) plan.readRow(dataReader);
   }
 
@@ -133,9 +147,9 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   }
 
   static String parseColumn(String columnLabel) {
-    if (columnLabel.startsWith("_e_") || columnLabel.startsWith("_E_")) {
+    if (columnLabel.startsWith(ENC_PREFIX) || columnLabel.startsWith(ENC_PREFIX_UPPER)) {
       // encrypted column alias in the form _e_<tableAlias>_<column>
-      final int pos = columnLabel.indexOf("_", 3);
+      final int pos = columnLabel.indexOf("_", 4);
       if (pos > -1) {
         return columnLabel.substring(pos + 1);
       }

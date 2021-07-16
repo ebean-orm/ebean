@@ -9,6 +9,11 @@ import java.util.List;
 class NoopQueryPlanManager implements QueryPlanManager {
 
   @Override
+  public void setDefaultThreshold(long thresholdMicros) {
+    // do nothing
+  }
+
+  @Override
   public SpiQueryBindCapture createBindCapture(SpiQueryPlan queryPlan) {
     return SpiQueryBindCapture.NOOP;
   }

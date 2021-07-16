@@ -1,14 +1,10 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.EbeanServer;
+import io.ebean.CancelableQuery;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiSqlBinding;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.lib.Str;
+import io.ebeaninternal.api.*;
+import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.util.BindParamsParser;
@@ -17,11 +13,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Wraps the objects involved in executing a SQL / Relational Query.
  */
-public abstract class AbstractSqlQueryRequest {
+public abstract class AbstractSqlQueryRequest implements CancelableQuery {
 
   protected final SpiSqlBinding query;
 
@@ -41,6 +40,8 @@ public abstract class AbstractSqlQueryRequest {
 
   protected long startNano;
 
+  private final ReentrantLock lock = new ReentrantLock();
+  
   /**
    * Create the BeanFindRequest.
    */
@@ -48,6 +49,7 @@ public abstract class AbstractSqlQueryRequest {
     this.server = server;
     this.query = query;
     this.transaction = (SpiTransaction) t;
+    this.query.setCancelableQuery(this);
   }
 
   /**
@@ -84,11 +86,6 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   /**
-   * Set the resultSet and associated query plan if known.
-   */
-  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
-
-  /**
    * Return the bindLog for this request.
    */
   public String getBindLog() {
@@ -96,11 +93,14 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   /**
+   * Set the resultSet and associated query plan if known.
+   */
+  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
+
+  /**
    * Return true if we can navigate to the next row.
    */
-  public boolean next() throws SQLException {
-    return resultSet.next();
-  }
+  public abstract boolean next() throws SQLException;
 
   protected abstract void requestComplete();
 
@@ -112,7 +112,6 @@ public abstract class AbstractSqlQueryRequest {
     JdbcClose.close(resultSet);
     JdbcClose.close(pstmt);
   }
-
 
   /**
    * Prepare the SQL taking into account named bind parameters.
@@ -145,24 +144,30 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
-    prepareSql();
-    Connection conn = transaction.getInternalConnection();
-    pstmt = conn.prepareStatement(sql);
-    if (query.getTimeout() > 0) {
-      pstmt.setQueryTimeout(query.getTimeout());
+    lock.lock();
+    try {
+      query.checkCancelled();
+      prepareSql();
+      Connection conn = transaction.getInternalConnection();
+      pstmt = conn.prepareStatement(sql);
+      if (query.getTimeout() > 0) {
+        pstmt.setQueryTimeout(query.getTimeout());
+      }
+      if (query.getBufferFetchSizeHint() > 0) {
+        pstmt.setFetchSize(query.getBufferFetchSizeHint());
+      }
+      BindParams bindParams = query.getBindParams();
+      if (!bindParams.isEmpty()) {
+        this.bindLog = binder.bind(bindParams, pstmt, conn);
+      }
+      if (isLogSql()) {
+        transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
+      }
+    } finally {
+      lock.unlock();
     }
-    if (query.getBufferFetchSizeHint() > 0) {
-      pstmt.setFetchSize(query.getBufferFetchSizeHint());
-    }
-    BindParams bindParams = query.getBindParams();
-    if (!bindParams.isEmpty()) {
-      this.bindLog = binder.bind(bindParams, pstmt, conn);
-    }
-    if (isLogSql()) {
-      transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
-    }
-
     setResultSet(pstmt.executeQuery(), null);
+    query.checkCancelled();
   }
 
   /**
@@ -172,4 +177,13 @@ public abstract class AbstractSqlQueryRequest {
     return sql;
   }
 
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
+  }
 }

@@ -4,6 +4,7 @@ import io.ebean.ExpressionFactory;
 import io.ebean.FetchConfig;
 import io.ebean.OrderBy;
 import io.ebean.Query;
+import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
@@ -120,8 +121,8 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     this.allProperties = other.allProperties;
     this.included = other.included;
-    this.cache = other.cache;
     this.fetchConfig = fetchConfig;
+    this.cache = fetchConfig.isCache();
   }
 
   /**
@@ -178,8 +179,6 @@ public class OrmQueryProperties implements Serializable {
       SpiExpressionFactory queryEf = (SpiExpressionFactory) rootQuery.getExpressionFactory();
       ExpressionFactory filterEf = queryEf.createExpressionFactory();// exprPath);
       filterMany = new FilterExpressionList(exprPath, filterEf, rootQuery);
-      // by default we need to make this a 'query join' now
-      markForQueryJoin = true;
     }
     return filterMany;
   }
@@ -195,6 +194,24 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
+   * Adjust filterMany expressions for inclusion in main query.
+   */
+  public void filterManyInline() {
+    if (filterMany != null){
+      filterMany.prefixProperty(path);
+    }
+  }
+
+  /**
+   * Prepare filterMany expressions for query plan key.
+   */
+  public void prepareExpressions(BeanQueryRequest<?> request) {
+    if (filterMany != null) {
+      filterMany.prepareExpression(request);
+    }
+  }
+
+  /**
    * Return the filterMany expression list (can be null).
    */
   public SpiExpressionList<?> getFilterMany() {
@@ -206,7 +223,6 @@ public class OrmQueryProperties implements Serializable {
    */
   public void setFilterMany(SpiExpressionList<?> filterMany) {
     this.filterMany = filterMany;
-    this.markForQueryJoin = true;
   }
 
   /**

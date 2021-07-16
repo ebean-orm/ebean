@@ -2,10 +2,11 @@ package org.tests.query.sqlquery;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaTimedMetric;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -25,6 +26,19 @@ import static org.junit.Assert.assertEquals;
 
 public class SqlQueryTests extends BaseTestCase {
 
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectFunction() {
+
+    String sql = "select length(?)";
+    final Long val = DB.sqlQuery(sql).setParameter("NotVeryLong").mapToScalar(Long.class).findOne();
+    assertThat(val).isEqualTo(11);
+
+    String sql2 = "select length(:val)";
+    final Long val2 = DB.sqlQuery(sql2).setParameter("val", "NotVeryLong").mapToScalar(Long.class).findOne();
+    assertThat(val2).isEqualTo(11);
+  }
+
   @Test
   public void findSingleAttributeList_decimal() {
 
@@ -38,6 +52,28 @@ public class SqlQueryTests extends BaseTestCase {
       .findList();
 
     assertThat(lineAmounts).isNotEmpty();
+  }
+
+  @Test
+  public void findSingleAttributeEach_decimal() {
+
+    ResetBasicData.reset();
+
+    String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
+
+    AtomicLong counter = new AtomicLong();
+    AtomicLong inc = new AtomicLong();
+
+    DB.sqlQuery(sql)
+      .setParameter(3)
+      .mapToScalar(BigDecimal.class)
+      .findEach(val -> {
+        counter.incrementAndGet();
+        inc.addAndGet(val.longValue());
+      });
+
+    assertThat(inc.get()).isGreaterThan(counter.get());
+    assertThat(counter.get()).isGreaterThan(0);
   }
 
   @Test
@@ -141,6 +177,24 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   private static final CustMapper CUST_MAPPER = new CustMapper();
+
+  @Test
+  public void findEach_mapper() {
+
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name is not null";
+
+    AtomicInteger counter = new AtomicInteger();
+    DB.sqlQuery(sql)
+      .mapTo(CUST_MAPPER)
+      .findEach(custDto -> {
+        counter.incrementAndGet();
+        assertThat(custDto.name).isNotNull();
+      });
+
+    assertThat(counter.get()).isGreaterThan(0);
+  }
 
   @Test
   public void findOne_mapper() {
@@ -361,7 +415,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    int expectedRows = Ebean.find(Order.class).findCount();
+    int expectedRows = DB.find(Order.class).findCount();
 
     final AtomicInteger count = new AtomicInteger();
 
