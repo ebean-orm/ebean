@@ -59,6 +59,52 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
+  public void findSingleAttribute() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("findSingleAttribute");
+    DB.save(bean);
+
+    LoggedSqlCollector.start();
+
+    final String name0 = DB.find(EBasicSoftDelete.class)
+      .select("name")
+      .where().eq("name", "findSingleAttribute")
+      .findSingleAttribute();
+
+    List<String> sql0 = LoggedSqlCollector.current();
+    assertThat(sql0.get(0)).contains("where t0.name = ? and t0.deleted =");
+    assertThat(name0).isEqualTo("findSingleAttribute");
+
+    // now soft delete the bean
+    DB.delete(bean);
+    List<String> sqlUpdate = LoggedSqlCollector.current();
+    assertThat(sqlUpdate.get(0)).contains("update ebasic_sdchild set");
+
+    // use setIncludeSoftDeletes
+    final String name1 = DB.find(EBasicSoftDelete.class)
+      .select("name")
+      .where().eq("name", "findSingleAttribute")
+      .setIncludeSoftDeletes()
+      .findSingleAttribute();
+
+    List<String> sql1 = LoggedSqlCollector.current();
+    assertThat(sql1.get(0)).doesNotContain(" and t0.deleted =");
+    assertThat(name1).isEqualTo("findSingleAttribute");
+
+
+    // not using setIncludeSoftDeletes, so don't find it
+    final String name2 = DB.find(EBasicSoftDelete.class)
+      .select("name")
+      .where().eq("name", "findSingleAttribute")
+      .findSingleAttribute();
+
+    List<String> sql2 = LoggedSqlCollector.stop();
+    assertThat(sql2.get(0)).contains(" and t0.deleted =");
+    assertThat(name2).isNull();
+  }
+
+  @Test
   public void testFindIdsWhenIncludeSoftDeletedChlld() {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
