@@ -476,7 +476,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Return the number of properties.
    */
   public int getPropertyLength() {
-    return owner._ebean_getPropertyNames().length;
+    return flags.length;
   }
 
   /**
@@ -564,7 +564,7 @@ public final class EntityBeanIntercept implements Serializable {
 
   private void setOriginalValue(int propertyIndex, Object value) {
     if (origValues == null) {
-      origValues = new Object[owner._ebean_getPropertyNames().length];
+      origValues = new Object[flags.length];
     }
     if ((flags[propertyIndex] & FLAG_ORIG_VALUE_SET) == 0) {
       flags[propertyIndex] |= FLAG_ORIG_VALUE_SET;
@@ -577,7 +577,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   private void setOriginalValueForce(int propertyIndex, Object value) {
     if (origValues == null) {
-      origValues = new Object[owner._ebean_getPropertyNames().length];
+      origValues = new Object[flags.length];
     }
     origValues[propertyIndex] = value;
   }
@@ -1112,7 +1112,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setLoadError(int propertyIndex, Exception t) {
     if (loadErrors == null) {
-      loadErrors = new Exception[owner._ebean_getPropertyNames().length];
+      loadErrors = new Exception[flags.length];
     }
     loadErrors[propertyIndex] = t;
     flags[propertyIndex] |= FLAG_LOADED_PROP;
