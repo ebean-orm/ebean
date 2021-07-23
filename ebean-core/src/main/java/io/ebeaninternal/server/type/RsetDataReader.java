@@ -20,20 +20,27 @@ import java.util.Calendar;
 public class RsetDataReader implements DataReader {
 
   private static final int bufferSize = 512;
-
   static final int clobBufferSize = 512;
-
   static final int stringInitialSize = 512;
 
   private final DataTimeZone dataTimeZone;
-
   private final ResultSet rset;
-
   protected int pos;
+  private String json;
 
   public RsetDataReader(DataTimeZone dataTimeZone, ResultSet rset) {
     this.dataTimeZone = dataTimeZone;
     this.rset = rset;
+  }
+
+  @Override
+  public void pushJson(String json) {
+    this.json = json;
+  }
+
+  @Override
+  public String popJson() {
+    return json;
   }
 
   @Override

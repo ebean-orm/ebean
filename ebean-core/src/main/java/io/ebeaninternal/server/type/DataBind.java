@@ -36,11 +36,22 @@ public class DataBind implements DataBinder {
   private List<InputStream> inputStreams;
 
   protected int pos;
+  private String json;
 
   public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;
     this.pstmt = pstmt;
     this.connection = connection;
+  }
+
+  @Override
+  public void pushJson(String json) {
+    this.json = json;
+  }
+
+  @Override
+  public String popJson() {
+    return json;
   }
 
   @Override

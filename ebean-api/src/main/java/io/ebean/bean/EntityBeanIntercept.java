@@ -92,6 +92,17 @@ public final class EntityBeanIntercept implements Serializable {
   private int sortOrder;
 
   /**
+   * Holds MD5 hash of json loaded jackson beans.
+   */
+  private String[] mutableHash;
+
+  /**
+   * Holds json content determined at point of dirty check.
+   * Stored here on dirty check such that we only convert to json once.
+   */
+  private String[] mutableContent;
+
+  /**
    * Create a intercept with a given entity.
    */
   public EntityBeanIntercept(Object ownerBean) {
@@ -1137,5 +1148,27 @@ public final class EntityBeanIntercept implements Serializable {
       }
     }
     return ret;
+  }
+
+  public String mutableHash(int propertyIndex) {
+    return mutableHash == null ? null : mutableHash[propertyIndex];
+  }
+
+  public void mutableHash(int propertyIndex, String content) {
+    if (mutableHash == null) {
+      mutableHash = new String[flags.length];
+    }
+    mutableHash[propertyIndex] = content;
+  }
+
+  public String mutableContent(int propertyIndex) {
+    return mutableContent == null ? null : mutableContent[propertyIndex];
+  }
+
+  public void mutableContent(int propertyIndex, String content) {
+    if (mutableContent == null) {
+      mutableContent = new String[flags.length];
+    }
+    mutableContent[propertyIndex] = content;
   }
 }

@@ -13,6 +13,7 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.text.TextException;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
@@ -31,11 +32,8 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.LocalEncryptedType;
-import io.ebeaninternal.server.type.ScalarTypeBoolean;
-import io.ebeaninternal.server.type.ScalarTypeEnum;
-import io.ebeaninternal.server.type.ScalarTypeLogicalType;
+import io.ebeaninternal.server.type.*;
+import io.ebeaninternal.server.util.Md5;
 import io.ebeaninternal.util.ValueUtil;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -54,6 +52,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -220,6 +219,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   @SuppressWarnings("rawtypes")
   final ScalarType scalarType;
+  final boolean jsonMapperType;
 
   private final DocPropertyOptions docOptions;
 
@@ -333,6 +333,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.formula = sqlFormulaSelect != null;
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
+    this.jsonMapperType = (scalarType == null) ? false : scalarType.isJsonMapper();
     this.lob = isLobType(dbType);
     this.propertyType = deploy.getPropertyType();
     this.field = deploy.getField();
@@ -427,6 +428,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.setter = source.setter;
     this.dbType = source.getDbType(true);
     this.scalarType = source.scalarType;
+    this.jsonMapperType = source.jsonMapperType;
     this.lob = isLobType(dbType);
     this.propertyType = source.getPropertyType();
     this.field = source.getField();
@@ -630,8 +632,17 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       Object value = scalarType.read(reader);
       if (bean != null) {
         setValue(bean, value);
+        if (jsonMapperType) {
+          String json = reader.popJson();
+          if (json != null) {
+            final String hash = Md5.hash(json);
+            bean._ebean_getIntercept().mutableHash(propertyIndex, hash);
+          }
+        }
       }
       return value;
+    } catch (TextException e) {
+      throw e;
     } catch (Exception e) {
       throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
     }
@@ -643,13 +654,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
     try {
-      Object value = scalarType.read(ctx.getDataReader());
-      if (bean != null) {
-        setValue(bean, value);
-      }
-      return value;
-    } catch (Exception e) {
-      throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
+      return readSet(ctx.getDataReader(), bean);
+    } catch (TextException e) {
+      bean._ebean_getIntercept().setLoadError(propertyIndex, e);
+      ctx.handleLoadError(getFullBeanName(), e);
+      return getValue(bean);
     }
   }
 
@@ -1018,7 +1027,19 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
-  boolean isDirtyValue(Object value) {
+  boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
+    if (jsonMapperType) {
+      // dirty detection based on md5 hash of json content
+      final String json = scalarType.jsonMapper(value);
+      final String newHash = Md5.hash(json);
+      final String oldHash = ebi.mutableHash(propertyIndex);
+      if (!Objects.equals(newHash, oldHash)) {
+        ebi.mutableContent(propertyIndex, json); // so we only convert to json once
+        ebi.mutableHash(propertyIndex, newHash); // for dirty detection next time
+        return true;
+      }
+      return false;
+    }
     return scalarType.isDirty(value);
   }
 

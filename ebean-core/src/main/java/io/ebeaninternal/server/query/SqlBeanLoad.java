@@ -25,7 +25,6 @@ public class SqlBeanLoad {
   private final boolean rawSql;
 
   SqlBeanLoad(DbReadContext ctx, Class<?> type, EntityBean bean, Mode queryMode) {
-
     this.ctx = ctx;
     this.rawSql = ctx.isRawSql();
     this.type = type;
@@ -69,16 +68,16 @@ public class SqlBeanLoad {
     }
 
     try {
-      Object dbVal = prop.read(ctx);
       if (!refreshLoading) {
-        prop.setValue(bean, dbVal);
-      } else {
-        prop.setValueIntercept(bean, dbVal);
+        return prop.readSet(ctx, bean);
       }
-
+      // TODO: maybe create prop.readSetIntercept() and move this
+      Object dbVal = prop.read(ctx);
+      prop.setValueIntercept(bean, dbVal);
       return dbVal;
 
     } catch (Exception e) {
+      // TODO: maybe move this into prop.readSetIntercept()
       bean._ebean_getIntercept().setLoadError(prop.getPropertyIndex(), e);
       ctx.handleLoadError(prop.getFullBeanName(), e);
       return prop.getValue(bean);

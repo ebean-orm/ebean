@@ -43,6 +43,13 @@ class FactoryProperty {
       return  new BindableAssocOne((BeanPropertyAssocOne<?>)prop);
     }
 
+    if (prop.getScalarType().isJsonMapper()) {
+      if (DmlMode.INSERT == mode) {
+        return new BindablePropertyJsonInsert(prop);
+      } else if (DmlMode.UPDATE == mode) {
+        return new BindablePropertyJsonUpdate(prop);
+      }
+    }
     return new BindableProperty(prop);
   }
 }

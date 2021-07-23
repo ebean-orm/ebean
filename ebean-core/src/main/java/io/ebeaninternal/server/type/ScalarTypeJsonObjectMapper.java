@@ -56,6 +56,50 @@ class ScalarTypeJsonObjectMapper {
     GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, Class<?> rawType) {
       super(Object.class, jsonManager, field, dbType, DocPropertyType.OBJECT, rawType);
     }
+
+    @Override
+    public boolean isJsonMapper() {
+      return true;
+    }
+
+    @Override
+    public String jsonMapper(Object value) {
+      return formatValue(value);
+    }
+
+    @Override
+    public Object read(DataReader reader) throws SQLException {
+      String json = reader.getString();
+      if (json == null || json.isEmpty()) {
+        return null;
+      }
+      // pushJson such that we MD5 and store on EntityBeanIntercept later
+      reader.pushJson(json);
+      try {
+        return objectReader.readValue(json, deserType);
+      } catch (IOException e) {
+        throw new TextException("Failed to parse JSON [{}] as " + deserType, json, e);
+      }
+    }
+
+    @Override
+    public void bind(DataBinder binder, Object value) throws SQLException {
+      // popJson as dirty detection already converted to json string
+      String rawJson = binder.popJson();
+      if (rawJson == null && value != null) {
+        rawJson = formatValue(value); // not expected, need to check?
+      }
+      if (pgType != null) {
+        binder.setObject(PostgresHelper.asObject(pgType, rawJson));
+      } else {
+        if (value == null) {
+          // use varchar, otherwise SqlServer/db2 will fail with 'Invalid JDBC data type 5.001.'
+          binder.setNull(Types.VARCHAR);
+        } else {
+          binder.setString(rawJson);
+        }
+      }
+    }
   }
 
   /**
@@ -118,10 +162,10 @@ class ScalarTypeJsonObjectMapper {
    */
   private static abstract class Base<T> extends ScalarTypeBase<T> {
 
-    private final ObjectWriter objectWriter;
-    private final ObjectMapper objectReader;
-    private final JavaType deserType;
-    private final String pgType;
+    protected final ObjectWriter objectWriter;
+    protected final ObjectMapper objectReader;
+    protected final JavaType deserType;
+    protected final String pgType;
     private final DocPropertyType docType;
     private final TypeJsonManager.DirtyHandler dirtyHandler;
 
