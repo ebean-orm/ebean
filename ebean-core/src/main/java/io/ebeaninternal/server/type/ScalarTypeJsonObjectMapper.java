@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 
-import io.ebean.bean.MutableJson;
+import io.ebean.bean.MutableHash;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -51,7 +51,59 @@ class ScalarTypeJsonObjectMapper {
     }
     return new GenericObject(jsonManager, field, dbType, type);
   }
+  
+  private static class Md5MutableHash implements MutableHash {
 
+    private final String md5;
+    
+    Md5MutableHash(String json) {
+      md5 = Md5.hash(json);
+    }
+    
+    @Override
+    public boolean isEqualToObject(Object obj) {
+      return true; // we cannot determine differences...
+    }
+
+    @Override
+    public boolean isEqualToJson(String json) {
+      return Md5.hash(json).equals(md5);
+    }
+
+    @Override
+    public Object get() {
+      return null; // cannot create object from json
+    }
+
+  }
+  
+  private static class JsonMutableHash implements MutableHash {
+
+    private final String originalJson;
+    private ScalarType<?> parent;
+    
+    JsonMutableHash(ScalarType<?> parent, String json) {
+      this.parent = parent;
+      originalJson = json;
+    }
+    
+    @Override
+    public boolean isEqualToObject(Object obj) {
+      return isEqualToJson(parent.format(obj));
+    }
+
+    @Override
+    public boolean isEqualToJson(String json) {
+      return Objects.equals(originalJson, json);
+    }
+
+    @Override
+    public Object get() {
+      return parent.parse(originalJson);
+    }
+
+  }
+  
   /**
    * Maps any type (Object) using Jackson ObjectMapper.
    */
@@ -71,63 +123,16 @@ class ScalarTypeJsonObjectMapper {
       return formatValue(value);
     }
     
-    private class Md5MutableJson implements MutableJson {
 
-      private String md5;
-      Md5MutableJson(String json) {
-        md5 = Md5.hash(json);
-      }
-      @Override
-      public boolean isEqualToObject(Object obj) {
-        return true; // we cannot determine differences...
-      }
 
-      @Override
-      public boolean isEqualToJson(String json) {
-        return Md5.hash(json).equals(md5);
-      }
 
-      @Override
-      public Object get() {
-        return null; // cannot create object from json
-      }
-      @Override
-      public void update(Object obj) {
-        md5 = Md5.hash(format(obj));
-      }
-    }
-
-    private class PlainMutableJson implements MutableJson {
-
-      private String originalJson;
-      PlainMutableJson(String json) {
-        originalJson = json;
-      }
-      @Override
-      public boolean isEqualToObject(Object obj) {
-        return isEqualToJson(format(obj));
-      }
-
-      @Override
-      public boolean isEqualToJson(String json) {
-        return Objects.equals(originalJson, json);
-      }
-
-      @Override
-      public Object get() {
-        return parse(originalJson);
-      }
-      @Override
-      public void update(Object obj) {
-        originalJson = format(obj);
-      }
-    }
+    
     @Override
-    public MutableJson jsonMutable(String originalJson) {
-      if (false) {
-        return new Md5MutableJson(originalJson);
+    public MutableHash createMutableHash(String json) {
+      if (false) { // TODO should we make that configurable?
+        return new Md5MutableHash(json);
       } else {
-        return new PlainMutableJson(originalJson);
+        return new JsonMutableHash(this, json);
       }
     }
 

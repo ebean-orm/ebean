@@ -50,6 +50,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     EBasicJsonJackson3 bean = new EBasicJsonJackson3();
     bean.setName("b1");
     bean.setPlainValue(contentBean);
+    bean.setPlainValue2(contentBean);
 
     bean.save();
 
@@ -121,10 +122,11 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
       .containsExactlyInAnyOrder("beanList=null,[name:a]","name=p1-mod,p1","version=2,1");
     
     
-    found.getPlainBean().setName("b");
+    assertThat(DB.getBeanState(found).isDirty()).isFalse();
     
-    // CHECKME: How do we get these checks to work?
-    // assertThat(DB.getBeanState(found).isDirty()).isTrue();
+    found.getPlainBean().setName("b");
+
+    assertThat(DB.getBeanState(found).isDirty()).isTrue();
     
     state = DB.getBeanState(found);
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainBean");
@@ -144,5 +146,25 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(EBasicJsonListPersistController.updatedValues.entrySet())
       .extracting(Map.Entry::toString)
       .containsExactlyInAnyOrder("plainBean=name:b,name:a", "version=3,2");
+  }
+  
+  @Test
+  public void updateIncludesJsonColumn_when_list_loadedAndNotDirtyAware() {
+
+    PlainBean contentBean = new PlainBean("a", 42);
+    EBasicJsonList bean = new EBasicJsonList();
+    bean.setName("p1");
+    bean.setPlainBean(contentBean);
+    bean.setBeanList(Arrays.asList(contentBean));
+
+    DB.save(bean);
+    final EBasicJsonList found = DB.find(EBasicJsonList.class, bean.getId());
+    found.getBeanList().get(0).setName("p1-mod");
+
+    BeanState state = DB.getBeanState(found);
+    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
+    // this test fails, because we have a OmList instead of a GenericObject
+    // TODO: Can/Should we enhance the @DbJson/@DbJsonB annotations with a property "dirtyDetection" 
+  
   }
 }

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.MutableHash;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 import java.sql.SQLException;
@@ -25,8 +26,10 @@ class BindablePropertyJsonUpdate extends BindableProperty {
     if (bean == null) {
       request.bind(null, prop);
     } else {
-      // on update push json
+      // on update store hash and push json
       final String json = bean._ebean_getIntercept().mutableContent(propertyIndex);
+      final MutableHash hash = prop.createMutableHash(json);
+      bean._ebean_getIntercept().mutableHash(propertyIndex, hash);
       request.pushJson(json);
       final Object value = prop.getValue(bean);
       request.bind(value, prop);

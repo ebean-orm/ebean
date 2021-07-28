@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.MutableHash;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -817,6 +818,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public Object parse(String value) {
     return scalarType.parse(value);
+  }
+  
+  /**
+   * creates a mutableHash for the given JSON value.
+   */
+  public MutableHash createMutableHash(String json) {
+    return scalarType.createMutableHash(json);
   }
 
   /**
