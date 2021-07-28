@@ -7,7 +7,7 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import io.ebeaninternal.server.util.Md5;
+import io.ebeaninternal.server.util.Checksum;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -66,10 +66,14 @@ public class BeanPropertyJsonMapper extends BeanProperty {
 
   private static class Md5MutableHash implements MutableHash {
 
-    private final String md5;
+    private final String hash;
 
     Md5MutableHash(String json) {
-      md5 = Md5.hash(json);
+      this.hash = hash(json);
+    }
+
+    private String hash(String json) {
+      return String.valueOf(Checksum.checksum(json));
     }
 
     @Override
@@ -79,7 +83,7 @@ public class BeanPropertyJsonMapper extends BeanProperty {
 
     @Override
     public boolean isEqualToJson(String json) {
-      return Md5.hash(json).equals(md5);
+      return hash(json).equals(hash);
     }
 
     @Override

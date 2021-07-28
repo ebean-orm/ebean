@@ -21,7 +21,6 @@ public final class Md5 {
    * Convert the digest into a hex value.
    */
   private static String digestToHex(byte[] digest) {
-
     StringBuilder sb = new StringBuilder();
     for (byte aDigest : digest) {
       sb.append(Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1));
