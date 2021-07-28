@@ -650,7 +650,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(Query<?> ormQuery, Transaction transaction) {
+  public <T> boolean exists(Query<T> ormQuery, Transaction transaction) {
     return false;
   }
 
