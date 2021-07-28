@@ -96,11 +96,11 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   private static class JsonMutableHash implements MutableHash {
 
     private final String originalJson;
-    private ScalarType<?> parent;
+    private final ScalarType<?> parent;
 
     JsonMutableHash(ScalarType<?> parent, String json) {
       this.parent = parent;
-      originalJson = json;
+      this.originalJson = json;
     }
 
     @Override
