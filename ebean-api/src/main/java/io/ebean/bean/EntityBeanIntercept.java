@@ -470,6 +470,10 @@ public final class EntityBeanIntercept implements Serializable {
    * Return the original value that was changed via an update.
    */
   public Object getOrigValue(int propertyIndex) {
+    if ((flags[propertyIndex] & (FLAG_ORIG_VALUE_SET | FLAG_MUTABLE_HASH_SET)) == FLAG_MUTABLE_HASH_SET) {
+      // mutable hash set, but not ORIG_VALUE
+      setOriginalValue(propertyIndex, mutableHash[propertyIndex].get());
+    }
     if (origValues == null) {
       return null;
     }
@@ -718,11 +722,6 @@ public final class EntityBeanIntercept implements Serializable {
         String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
         Object newVal = owner._ebean_getField(i);
         Object oldVal = getOrigValue(i);
-        if ((flags[i] & (FLAG_ORIG_VALUE_SET | FLAG_MUTABLE_HASH_SET)) == FLAG_MUTABLE_HASH_SET) {
-          // mutable hash set, but not ORIG_VALUE
-          oldVal = mutableHash[i].get();
-          setOriginalValue(i, oldVal);
-        }
         if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
         }
