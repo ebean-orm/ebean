@@ -3,9 +3,7 @@ package io.ebean.common;
 import io.ebean.bean.EntityBean;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Holds sets of additions and deletions from a 'owner' List Set or Map.
@@ -23,19 +21,19 @@ class ModifyHolder<E> implements Serializable {
   /**
    * Deletions list for manyToMany persistence.
    */
-  private Set<E> modifyDeletions = new LinkedHashSet<>();
+  private Map<E,Object> modifyDeletions = new IdentityHashMap<>();
 
   /**
    * Additions list for manyToMany persistence.
    */
-  private Set<E> modifyAdditions = new LinkedHashSet<>();
+  private Map<E,Object> modifyAdditions = new IdentityHashMap<>();
 
   private boolean touched;
 
   void reset() {
     touched = false;
-    modifyDeletions = new LinkedHashSet<>();
-    modifyAdditions = new LinkedHashSet<>();
+    modifyDeletions = new IdentityHashMap<>();
+    modifyAdditions = new IdentityHashMap<>();
   }
 
   /**
@@ -50,51 +48,46 @@ class ModifyHolder<E> implements Serializable {
   }
 
   private boolean undoDeletion(E bean) {
-    return (bean != null) && modifyDeletions.remove(bean);
+    return (bean != null) && modifyDeletions.remove(bean) != null;
   }
 
   void modifyAddition(E bean) {
     if (bean != null) {
       touched = true;
-
       if (bean instanceof EntityBean) {
         ((EntityBean) bean)._ebean_getIntercept().setDeletedFromCollection(false);
       }
-
       // If it is to delete then just remove the deletion
       if (!undoDeletion(bean)) {
-        // Insert
-        modifyAdditions.add(bean);
+        modifyAdditions.put(bean, bean);
       }
     }
   }
 
   private boolean undoAddition(Object bean) {
-    return (bean != null) && modifyAdditions.remove(bean);
+    return (bean != null) && modifyAdditions.remove(bean) != null;
   }
 
   @SuppressWarnings("unchecked")
   void modifyRemoval(Object bean) {
     if (bean != null) {
       touched = true;
-
       if (bean instanceof EntityBean) {
         ((EntityBean) bean)._ebean_getIntercept().setDeletedFromCollection(true);
       }
-
       // If it is to be added then just remove the addition
       if (!undoAddition(bean)) {
-        modifyDeletions.add((E) bean);
+        modifyDeletions.put((E) bean, bean);
       }
     }
   }
 
   Set<E> getModifyAdditions() {
-    return modifyAdditions;
+    return modifyAdditions.keySet();
   }
 
   Set<E> getModifyRemovals() {
-    return modifyDeletions;
+    return modifyDeletions.keySet();
   }
 
   /**
