@@ -67,11 +67,6 @@ class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public String jsonMapper(Object value) {
-      return formatValue(value);
-    }
-
-    @Override
     public Object read(DataReader reader) throws SQLException {
       String json = reader.getString();
       if (json == null || json.isEmpty()) {

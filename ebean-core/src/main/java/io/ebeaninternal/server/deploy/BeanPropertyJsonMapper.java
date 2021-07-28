@@ -35,7 +35,7 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   @Override
   boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
     // dirty detection based on md5 hash of json content
-    final String json = scalarType.jsonMapper(value);
+    final String json = scalarType.format(value);
     final MutableHash oldHash = ebi.mutableHash(propertyIndex);
     if (oldHash == null || !oldHash.isEqualToJson(json)) {
       ebi.mutableContent(propertyIndex, json); // so we only convert to json once
