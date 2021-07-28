@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.persist.dmlbind;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.MutableHash;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.util.Md5;
 
 import java.sql.SQLException;
 
@@ -30,9 +30,9 @@ class BindablePropertyJsonInsert extends BindableProperty {
       if (value == null) {
         request.bind(null, prop);
       } else {
-        // on insert store MD5 hash and push json
+        // on insert store hash and push json
         final String json = prop.format(value);
-        final String hash = Md5.hash(json);
+        final MutableHash hash = prop.createMutableHash(json);
         bean._ebean_getIntercept().mutableHash(propertyIndex, hash);
         request.pushJson(json);
         request.bind(value, prop);

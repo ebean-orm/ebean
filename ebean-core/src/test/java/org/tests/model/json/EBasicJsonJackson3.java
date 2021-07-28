@@ -18,6 +18,9 @@ public class EBasicJsonJackson3 extends Model {
   @DbJson(length = 500)
   PlainBeanDirtyAware plainValue;
 
+  @DbJson(length = 500)
+  PlainBeanDirtyAware plainValue2;
+  
   @Version
   long version;
 
@@ -45,6 +48,14 @@ public class EBasicJsonJackson3 extends Model {
     this.plainValue = plainValue;
   }
 
+  public PlainBeanDirtyAware getPlainValue2() {
+    return plainValue2;
+  }
+
+  public void setPlainValue2(PlainBeanDirtyAware plainValue2) {
+    this.plainValue2 = plainValue2;
+  }
+  
   public long getVersion() {
     return version;
   }

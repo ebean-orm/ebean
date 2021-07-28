@@ -2,6 +2,8 @@ package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+
+import io.ebean.bean.MutableHash;
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 
@@ -39,6 +41,10 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   }
 
   default String jsonMapper(Object value) {
+    throw new UnsupportedOperationException();
+  }
+
+  default MutableHash createMutableHash(String json) {
     throw new UnsupportedOperationException();
   }
 

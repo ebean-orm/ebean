@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+
+import io.ebean.bean.MutableHash;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -15,6 +17,7 @@ import io.ebean.text.TextException;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
 import io.ebeaninternal.json.ModifyAwareSet;
+import io.ebeaninternal.server.util.Md5;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
@@ -24,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -47,7 +51,59 @@ class ScalarTypeJsonObjectMapper {
     }
     return new GenericObject(jsonManager, field, dbType, type);
   }
+  
+  private static class Md5MutableHash implements MutableHash {
 
+    private final String md5;
+    
+    Md5MutableHash(String json) {
+      md5 = Md5.hash(json);
+    }
+    
+    @Override
+    public boolean isEqualToObject(Object obj) {
+      return true; // we cannot determine differences...
+    }
+
+    @Override
+    public boolean isEqualToJson(String json) {
+      return Md5.hash(json).equals(md5);
+    }
+
+    @Override
+    public Object get() {
+      return null; // cannot create object from json
+    }
+
+  }
+  
+  private static class JsonMutableHash implements MutableHash {
+
+    private final String originalJson;
+    private ScalarType<?> parent;
+    
+    JsonMutableHash(ScalarType<?> parent, String json) {
+      this.parent = parent;
+      originalJson = json;
+    }
+    
+    @Override
+    public boolean isEqualToObject(Object obj) {
+      return isEqualToJson(parent.format(obj));
+    }
+
+    @Override
+    public boolean isEqualToJson(String json) {
+      return Objects.equals(originalJson, json);
+    }
+
+    @Override
+    public Object get() {
+      return parent.parse(originalJson);
+    }
+
+  }
+  
   /**
    * Maps any type (Object) using Jackson ObjectMapper.
    */
@@ -65,6 +121,19 @@ class ScalarTypeJsonObjectMapper {
     @Override
     public String jsonMapper(Object value) {
       return formatValue(value);
+    }
+    
+
+
+
+    
+    @Override
+    public MutableHash createMutableHash(String json) {
+      if (false) { // TODO should we make that configurable?
+        return new Md5MutableHash(json);
+      } else {
+        return new JsonMutableHash(this, json);
+      }
     }
 
     @Override
