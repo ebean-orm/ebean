@@ -44,10 +44,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
     throw new UnsupportedOperationException();
   }
 
-  default MutableHash createMutableHash(String json) {
-    throw new UnsupportedOperationException();
-  }
-
   /**
    * Return true if this is a binary type and can not support parse() and format() from/to string.
    * This allows Ebean to optimise marshalling types to string.

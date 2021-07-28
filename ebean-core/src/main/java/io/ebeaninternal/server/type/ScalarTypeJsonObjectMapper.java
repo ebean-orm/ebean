@@ -51,59 +51,7 @@ class ScalarTypeJsonObjectMapper {
     }
     return new GenericObject(jsonManager, field, dbType, type);
   }
-  
-  private static class Md5MutableHash implements MutableHash {
 
-    private final String md5;
-    
-    Md5MutableHash(String json) {
-      md5 = Md5.hash(json);
-    }
-    
-    @Override
-    public boolean isEqualToObject(Object obj) {
-      return true; // we cannot determine differences...
-    }
-
-    @Override
-    public boolean isEqualToJson(String json) {
-      return Md5.hash(json).equals(md5);
-    }
-
-    @Override
-    public Object get() {
-      return null; // cannot create object from json
-    }
-
-  }
-  
-  private static class JsonMutableHash implements MutableHash {
-
-    private final String originalJson;
-    private ScalarType<?> parent;
-    
-    JsonMutableHash(ScalarType<?> parent, String json) {
-      this.parent = parent;
-      originalJson = json;
-    }
-    
-    @Override
-    public boolean isEqualToObject(Object obj) {
-      return isEqualToJson(parent.format(obj));
-    }
-
-    @Override
-    public boolean isEqualToJson(String json) {
-      return Objects.equals(originalJson, json);
-    }
-
-    @Override
-    public Object get() {
-      return parent.parse(originalJson);
-    }
-
-  }
-  
   /**
    * Maps any type (Object) using Jackson ObjectMapper.
    */
@@ -121,19 +69,6 @@ class ScalarTypeJsonObjectMapper {
     @Override
     public String jsonMapper(Object value) {
       return formatValue(value);
-    }
-    
-
-
-
-    
-    @Override
-    public MutableHash createMutableHash(String json) {
-      if (false) { // TODO should we make that configurable?
-        return new Md5MutableHash(json);
-      } else {
-        return new JsonMutableHash(this, json);
-      }
     }
 
     @Override

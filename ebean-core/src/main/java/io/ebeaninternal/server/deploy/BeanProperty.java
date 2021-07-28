@@ -819,12 +819,12 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public Object parse(String value) {
     return scalarType.parse(value);
   }
-  
+
   /**
    * creates a mutableHash for the given JSON value.
    */
   public MutableHash createMutableHash(String json) {
-    return scalarType.createMutableHash(json);
+    throw new UnsupportedOperationException();
   }
 
   /**
