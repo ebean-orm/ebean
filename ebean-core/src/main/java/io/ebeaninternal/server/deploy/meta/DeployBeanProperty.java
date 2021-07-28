@@ -1201,4 +1201,7 @@ public class DeployBeanProperty {
     return false;
   }
 
+  boolean isJsonMapper() {
+    return scalarType != null && scalarType.isJsonMapper();
+  }
 }

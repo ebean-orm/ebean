@@ -219,7 +219,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   @SuppressWarnings("rawtypes")
   final ScalarType scalarType;
-  final boolean jsonMapperType;
 
   private final DocPropertyOptions docOptions;
 
@@ -333,7 +332,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.formula = sqlFormulaSelect != null;
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
-    this.jsonMapperType = (scalarType == null) ? false : scalarType.isJsonMapper();
     this.lob = isLobType(dbType);
     this.propertyType = deploy.getPropertyType();
     this.field = deploy.getField();
@@ -428,7 +426,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.setter = source.setter;
     this.dbType = source.getDbType(true);
     this.scalarType = source.scalarType;
-    this.jsonMapperType = source.jsonMapperType;
     this.lob = isLobType(dbType);
     this.propertyType = source.getPropertyType();
     this.field = source.getField();
@@ -632,13 +629,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       Object value = scalarType.read(reader);
       if (bean != null) {
         setValue(bean, value);
-        if (jsonMapperType) {
-          String json = reader.popJson();
-          if (json != null) {
-            final String hash = Md5.hash(json);
-            bean._ebean_getIntercept().mutableHash(propertyIndex, hash);
-          }
-        }
       }
       return value;
     } catch (TextException e) {
@@ -1028,18 +1018,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * This is only used for 'mutable' scalar types like hstore etc.
    */
   boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
-    if (jsonMapperType) {
-      // dirty detection based on md5 hash of json content
-      final String json = scalarType.jsonMapper(value);
-      final String newHash = Md5.hash(json);
-      final String oldHash = ebi.mutableHash(propertyIndex);
-      if (!Objects.equals(newHash, oldHash)) {
-        ebi.mutableContent(propertyIndex, json); // so we only convert to json once
-        ebi.mutableHash(propertyIndex, newHash); // for dirty detection next time
-        return true;
-      }
-      return false;
-    }
     return scalarType.isDirty(value);
   }
 

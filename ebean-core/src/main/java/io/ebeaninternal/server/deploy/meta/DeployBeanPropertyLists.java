@@ -1,15 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanDescriptorMap;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.BeanPropertyIdClass;
-import io.ebeaninternal.server.deploy.BeanPropertyOrderColumn;
-import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeString;
@@ -490,6 +482,9 @@ public class DeployBeanPropertyLists {
       return new BeanPropertyAssocMany(desc, (DeployBeanPropertyAssocMany) deployProp);
     }
 
+    if (deployProp.isJsonMapper()) {
+      return new BeanPropertyJsonMapper(desc, deployProp);
+    }
     return new BeanProperty(desc, deployProp);
   }
 
