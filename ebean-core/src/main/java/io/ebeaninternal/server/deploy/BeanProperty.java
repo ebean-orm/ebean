@@ -33,7 +33,6 @@ import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.*;
-import io.ebeaninternal.server.util.Md5;
 import io.ebeaninternal.util.ValueUtil;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -52,7 +51,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -643,13 +641,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-    try {
-      return readSet(ctx.getDataReader(), bean);
-    } catch (TextException e) {
-      bean._ebean_getIntercept().setLoadError(propertyIndex, e);
-      ctx.handleLoadError(getFullBeanName(), e);
-      return getValue(bean);
-    }
+    return readSet(ctx.getDataReader(), bean);
   }
 
   @SuppressWarnings("unchecked")
@@ -908,7 +900,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the name of the property.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public String getName() {
     return name;
   }
@@ -1280,7 +1273,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public Object localEncrypt(Object value) {
-    return ((LocalEncryptedType)scalarType).localEncrypt(value);
+    return ((LocalEncryptedType) scalarType).localEncrypt(value);
   }
 
   /**
@@ -1393,7 +1386,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public Class<?> getPropertyType() {
     return propertyType;
   }
