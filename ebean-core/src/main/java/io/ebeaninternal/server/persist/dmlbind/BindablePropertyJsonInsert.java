@@ -32,8 +32,7 @@ class BindablePropertyJsonInsert extends BindableProperty {
       } else {
         // on insert store MD5 hash and push json
         final String json = prop.format(value);
-        final String hash = Md5.hash(json);
-        bean._ebean_getIntercept().mutableHash(propertyIndex, hash);
+        bean._ebean_getIntercept().mutableHash(propertyIndex, prop.getScalarType().jsonMutable(json));
         request.pushJson(json);
         request.bind(value, prop);
       }

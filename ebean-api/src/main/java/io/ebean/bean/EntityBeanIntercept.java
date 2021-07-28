@@ -94,7 +94,7 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Holds MD5 hash of json loaded jackson beans.
    */
-  private String[] mutableHash;
+  private MutableJson[] mutableHash;
 
   /**
    * Holds json content determined at point of dirty check.
@@ -381,7 +381,11 @@ public final class EntityBeanIntercept implements Serializable {
     this.origValues = null;
     for (int i = 0; i < flags.length; i++) {
       flags[i] &= ~(FLAG_CHANGED_PROP + FLAG_ORIG_VALUE_SET);
+      if (mutableHash != null && mutableHash[i] != null) {
+        mutableHash[i].update(owner._ebean_getField(i));
+      }
     }
+    
     this.dirty = false;
   }
 
@@ -649,7 +653,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void addDirtyPropertyNames(Set<String> props, String prefix) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if ((flags[i] & FLAG_CHANGED_PROP) != 0 || isChangedByHash(i)) {
         // the property has been changed on this bean
         props.add((prefix == null ? getProperty(i) : prefix + getProperty(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
@@ -667,7 +671,7 @@ public final class EntityBeanIntercept implements Serializable {
     String[] names = owner._ebean_getPropertyNames();
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if ((flags[i] & FLAG_CHANGED_PROP) != 0 || isChangedByHash(i)) {
         if (propertyNames.contains(names[i])) {
           return true;
         }
@@ -695,7 +699,12 @@ public final class EntityBeanIntercept implements Serializable {
   public void addDirtyPropertyValues(Map<String, ValuePair> dirtyValues, String prefix) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if (isChangedByHash(i)) {
+        String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
+        Object newVal = owner._ebean_getField(i);
+        Object oldVal = mutableHash[i].get();
+        dirtyValues.put(propName, new ValuePair(newVal, oldVal));
+      } else if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
         // the property has been changed on this bean
         String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
         Object newVal = owner._ebean_getField(i);
@@ -1150,13 +1159,19 @@ public final class EntityBeanIntercept implements Serializable {
     return ret;
   }
 
-  public String mutableHash(int propertyIndex) {
+  private boolean isChangedByHash(int propertyIndex) {
+    return mutableHash != null 
+        && mutableHash[propertyIndex] != null
+        && !mutableHash[propertyIndex].isEqualToObject(owner._ebean_getField(propertyIndex));
+  }
+  
+  public MutableJson mutableHash(int propertyIndex) {
     return mutableHash == null ? null : mutableHash[propertyIndex];
   }
 
-  public void mutableHash(int propertyIndex, String content) {
+  public void mutableHash(int propertyIndex, MutableJson content) {
     if (mutableHash == null) {
-      mutableHash = new String[flags.length];
+      mutableHash = new MutableJson[flags.length];
     }
     mutableHash[propertyIndex] = content;
   }

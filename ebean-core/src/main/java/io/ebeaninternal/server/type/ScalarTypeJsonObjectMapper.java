@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+
+import io.ebean.bean.MutableJson;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -15,6 +17,7 @@ import io.ebean.text.TextException;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
 import io.ebeaninternal.json.ModifyAwareSet;
+import io.ebeaninternal.server.util.Md5;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
@@ -24,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -65,6 +69,66 @@ class ScalarTypeJsonObjectMapper {
     @Override
     public String jsonMapper(Object value) {
       return formatValue(value);
+    }
+    
+    private class Md5MutableJson implements MutableJson {
+
+      private String md5;
+      Md5MutableJson(String json) {
+        md5 = Md5.hash(json);
+      }
+      @Override
+      public boolean isEqualToObject(Object obj) {
+        return true; // we cannot determine differences...
+      }
+
+      @Override
+      public boolean isEqualToJson(String json) {
+        return Md5.hash(json).equals(md5);
+      }
+
+      @Override
+      public Object get() {
+        return null; // cannot create object from json
+      }
+      @Override
+      public void update(Object obj) {
+        md5 = Md5.hash(format(obj));
+      }
+    }
+
+    private class PlainMutableJson implements MutableJson {
+
+      private String originalJson;
+      PlainMutableJson(String json) {
+        originalJson = json;
+      }
+      @Override
+      public boolean isEqualToObject(Object obj) {
+        return isEqualToJson(format(obj));
+      }
+
+      @Override
+      public boolean isEqualToJson(String json) {
+        return Objects.equals(originalJson, json);
+      }
+
+      @Override
+      public Object get() {
+        return parse(originalJson);
+      }
+      @Override
+      public void update(Object obj) {
+        originalJson = format(obj);
+      }
+    }
+    @Override
+    public MutableJson jsonMutable(String originalJson) {
+      if (false) {
+        return new Md5MutableJson(originalJson);
+      } else {
+        return new PlainMutableJson(originalJson);
+      }
     }
 
     @Override

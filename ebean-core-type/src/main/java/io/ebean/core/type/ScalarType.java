@@ -2,6 +2,8 @@ package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+
+import io.ebean.bean.MutableJson;
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 
@@ -42,6 +44,9 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
     throw new UnsupportedOperationException();
   }
 
+  default MutableJson jsonMutable(String json) {
+    throw new UnsupportedOperationException();
+  }
   /**
    * Return true if this is a binary type and can not support parse() and format() from/to string.
    * This allows Ebean to optimise marshalling types to string.
