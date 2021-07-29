@@ -15,11 +15,14 @@ public class EBasicJsonJackson3 extends Model {
 
   String name;
 
-  @DbJson(length = 500)
+  @DbJson(length = 500, keepSource = true)
   PlainBeanDirtyAware plainValue;
 
   @DbJson(length = 500)
   PlainBeanDirtyAware plainValue2;
+  
+  @DbJson(length = 500, dirtyDetection = false) // CHECKME should this fall back to ModifyAwareType
+  PlainBeanDirtyAware plainValue3;
   
   @Version
   long version;
@@ -54,6 +57,14 @@ public class EBasicJsonJackson3 extends Model {
 
   public void setPlainValue2(PlainBeanDirtyAware plainValue2) {
     this.plainValue2 = plainValue2;
+  }
+  
+  public PlainBeanDirtyAware getPlainValue3() {
+    return plainValue3;
+  }
+  
+  public void setPlainValue3(PlainBeanDirtyAware plainValue3) {
+    this.plainValue3 = plainValue3;
   }
   
   public long getVersion() {

@@ -165,4 +165,73 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
 
   }
+  @Test
+  public void update_with_differentDbJsonSettings() {
+    PlainBeanDirtyAware contentBean1 = new PlainBeanDirtyAware("x", 42);
+    PlainBeanDirtyAware contentBean2 = new PlainBeanDirtyAware("y", 43);
+    PlainBeanDirtyAware contentBean3 = new PlainBeanDirtyAware("z", 44);
+
+    EBasicJsonJackson3 bean = new EBasicJsonJackson3();
+    bean.setName("b1");
+    bean.setPlainValue(contentBean1);
+    bean.setPlainValue2(contentBean2);
+    bean.setPlainValue3(contentBean3);
+
+    BeanState state = DB.getBeanState(bean);
+    // a new bean is not considered as dirty (thus have no changed props)
+    assertThat(state.isDirty()).isFalse();
+    assertThat(state.isNewOrDirty()).isTrue();
+    assertThat(state.getChangedProps()).isEmpty();
+    
+    bean.save();
+    
+    bean = DB.find(EBasicJsonJackson3.class, bean.getId());
+    state = DB.getBeanState(bean);
+    // a fresh loaded bean is also not considered as dirty
+    assertThat(state.isDirty()).isFalse();
+    assertThat(state.isNewOrDirty()).isFalse();
+    assertThat(state.getChangedProps()).isEmpty();
+    
+    bean.getPlainValue().setName("a"); // has keepSource=true 
+    
+    assertThat(state.isDirty()).isTrue();
+    assertThat(state.getChangedProps()).containsExactly("plainValue");
+    
+    bean.getPlainValue2().setName("b");
+    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainValue", "plainValue2");
+    
+    bean.getPlainValue3().setName("c"); // has dirtyDetection = false
+    
+    Map<String, ValuePair> dirtyValues = state.getDirtyValues();
+    assertThat(dirtyValues).hasSize(2).containsKeys("plainValue", "plainValue2");
+    
+    assertThat(dirtyValues.get("plainValue")).hasToString("name:a,name:x"); // keepSource=true -> origValue present 
+    assertThat(dirtyValues.get("plainValue2")).hasToString("name:b,null");  // without keepSourc no origValue present
+    
+    LoggedSql.start();
+    bean.save();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set plain_value=?, plain_value2=?, version=? where id=?");
+    
+    bean = DB.find(EBasicJsonJackson3.class, bean.getId());
+    assertThat(bean.getPlainValue().getName()).isEqualTo("a");
+    assertThat(bean.getPlainValue2().getName()).isEqualTo("b");
+    assertThat(bean.getPlainValue3().getName()).isEqualTo("z"); // value is not updated (CHECKME: 
+    
+    bean.getPlainValue3().setName("c");
+    bean.getPlainValue3().setMarkedDirty(true); // This seems to be broken now.
+
+//    state = DB.getBeanState(bean);
+//    dirtyValues = state.getDirtyValues();
+//    assertThat(dirtyValues).hasSize(1).containsKeys("plainValue3");
+//    
+//    assertThat(dirtyValues.get("plainValue3")).hasToString("name:c,name:z"); 
+    
+    LoggedSql.start();
+    bean.save();
+    sql = LoggedSql.stop();
+    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set plain_value3=?, version=? where id=?");
+    
+  }
+
 }
