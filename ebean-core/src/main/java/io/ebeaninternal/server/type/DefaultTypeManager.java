@@ -336,7 +336,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength) {
+  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength, boolean keepSource) {
     Class<?> type = prop.getPropertyType();
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
@@ -346,7 +346,7 @@ public final class DefaultTypeManager implements TypeManager {
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable());
       } else {
-        return createJsonObjectMapperType(prop, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType, keepSource);
       }
     }
     if (type.equals(Set.class)) {
@@ -354,14 +354,14 @@ public final class DefaultTypeManager implements TypeManager {
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable());
       } else {
-        return createJsonObjectMapperType(prop, dbType, docType);
+        return createJsonObjectMapperType(prop, dbType, docType, keepSource);
       }
     }
     if (type.equals(Map.class)) {
       if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
         return ScalarTypeJsonMap.typeFor(postgres, dbType);
       } else {
-        return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
+        return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT, keepSource);
       }
     }
     if (objectMapperPresent) {
@@ -380,7 +380,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
       }
     }
-    return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
+    return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT, keepSource);
   }
 
   /**
@@ -421,13 +421,12 @@ public final class DefaultTypeManager implements TypeManager {
     return Object.class.equals(typeArgs[1]) || "?".equals(typeArgs[1].toString());
   }
 
-  private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
+  private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType, boolean keepSource) {
     Class<?> type = prop.getPropertyType();
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    boolean modifyAwareCollection = !prop.isKeepSource();
-    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, (AnnotatedField) prop.getJacksonField(), dbType, docType, modifyAwareCollection);
+    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, (AnnotatedField) prop.getJacksonField(), dbType, docType, keepSource);
   }
 
   /**

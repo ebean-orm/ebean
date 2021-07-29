@@ -59,7 +59,7 @@ public interface TypeManager {
    * Note that type expected to be JsonNode or Map.
    * </p>
    */
-  ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength);
+  ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength, boolean keepSource);
 
   /**
    * Return the ScalarType used to handle DB ARRAY.
