@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -15,6 +16,7 @@ import io.ebean.text.TextException;
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareMap;
 import io.ebeaninternal.json.ModifyAwareSet;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
@@ -34,8 +36,16 @@ class ScalarTypeJsonObjectMapper {
   /**
    * Create and return the appropriate ScalarType.
    */
-  static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+  static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, DeployBeanProperty prop, int dbType, DocPropertyType docType) {
+    AnnotatedField field = (AnnotatedField) prop.getJacksonField();
     Class<?> type = field.getRawType();
+
+    MutationDetection mode = prop.getMutationDetection();
+    if (mode == MutationDetection.NONE) {
+      return new NoMutationDetection(jsonManager, field, dbType, type);
+    } else if (mode != MutationDetection.DEFAULT) {
+      return new GenericObject(jsonManager, field, dbType, type);
+    }
     if (Set.class.equals(type)) {
       return new OmSet(jsonManager, field, dbType, docType);
     }
@@ -45,11 +55,32 @@ class ScalarTypeJsonObjectMapper {
     if (Map.class.equals(type)) {
       return new OmMap(jsonManager, field, dbType);
     }
+    prop.setMutationDetection(MutationDetection.HASH);
     return new GenericObject(jsonManager, field, dbType, type);
   }
 
   /**
-   * Maps any type (Object) using Jackson ObjectMapper.
+   * No mutation detection on this json property.
+   */
+  private static class NoMutationDetection extends Base<Object> {
+
+    NoMutationDetection(TypeJsonManager jsonManager, AnnotatedField field, int dbType, Class<?> rawType) {
+      super(Object.class, jsonManager, field, dbType, DocPropertyType.OBJECT, rawType);
+    }
+
+    @Override
+    public boolean isMutable() {
+      return false;
+    }
+
+    @Override
+    public boolean isDirty(Object value) {
+      return false;
+    }
+  }
+
+  /**
+   * Supports HASH and SOURCE dirty detection modes.
    */
   private static class GenericObject extends Base<Object> {
 

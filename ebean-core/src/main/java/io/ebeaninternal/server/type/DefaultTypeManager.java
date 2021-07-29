@@ -2,7 +2,6 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
@@ -426,7 +425,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, (AnnotatedField) prop.getJacksonField(), dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, prop, dbType, docType);
   }
 
   /**

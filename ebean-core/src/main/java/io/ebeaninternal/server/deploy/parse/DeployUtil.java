@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbJson;
-import io.ebean.annotation.DbJsonB;
-import io.ebean.annotation.DbJsonType;
-import io.ebean.annotation.DbMap;
+import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptDeploy;
 import io.ebean.config.EncryptDeployManager;
@@ -214,21 +210,21 @@ public class DeployUtil {
    */
   void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
     int dbType = getDbJsonStorage(dbJsonType.storage());
-    setDbJsonType(prop, dbType, dbJsonType.length(), dbJsonType.dirtyDetection(), dbJsonType.keepSource());
+    setDbJsonType(prop, dbType, dbJsonType.length(), dbJsonType.mutationDetection());
   }
 
   void setDbJsonBType(DeployBeanProperty prop, DbJsonB dbJsonB) {
-    setDbJsonType(prop, DbPlatformType.JSONB, dbJsonB.length(), dbJsonB.dirtyDetection(), dbJsonB.keepSource());
+    setDbJsonType(prop, DbPlatformType.JSONB, dbJsonB.length(), dbJsonB.mutationDetection());
   }
 
-  private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, boolean dirtyDetection, boolean keepSource) {
+  private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, MutationDetection mutationDetection) {
+    prop.setDbType(dbType);
+    prop.setMutationDetection(mutationDetection);
     ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
     }
-    prop.setDbType(dbType);
     prop.setScalarType(scalarType);
-    prop.setJsonOptions(dirtyDetection, keepSource);
     if (dbType == Types.VARCHAR || dbLength > 0) {
       // determine the db column size
       int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;

@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
+import static io.ebean.annotation.MutationDetection.NONE;
+
 @Entity
 public class EBasicPlain {
 
@@ -17,7 +19,7 @@ public class EBasicPlain {
   @DbJson(length = 500)
   PlainBean plainBean;
 
-  @DbJson(length = 500, dirtyDetection = false)
+  @DbJson(length = 500, mutationDetection = NONE) // only update when property set
   PlainBean plainBean2;
 
   @Version

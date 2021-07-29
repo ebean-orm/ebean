@@ -1,18 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.DocCode;
-import io.ebean.annotation.DocProperty;
-import io.ebean.annotation.DocSortable;
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.Platform;
-import io.ebean.annotation.SoftDelete;
-import io.ebean.annotation.UpdatedTimestamp;
-import io.ebean.annotation.WhenCreated;
-import io.ebean.annotation.WhenModified;
-import io.ebean.annotation.Where;
-import io.ebean.annotation.WhoCreated;
-import io.ebean.annotation.WhoModified;
+import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -39,7 +27,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,8 +96,7 @@ public class DeployBeanProperty {
 
   private boolean jsonSerialize = true;
   private boolean jsonDeserialize = true;
-  private boolean dirtyDetection;
-  private boolean keepSource;
+  private MutationDetection mutationDetection;
 
   private boolean dbEncrypted;
   private DbEncryptFunction dbEncryptFunction;
@@ -329,18 +315,15 @@ public class DeployBeanProperty {
     this.jsonDeserialize = jsonDeserialize;
   }
 
-  /**
-   * Return true if we should have JSON dirty detection on this property.
-   */
-  public boolean isDirtyDetection() {
-    return dirtyDetection;
+  public MutationDetection getMutationDetection() {
+    if (mutationDetection == null) {
+      mutationDetection = MutationDetection.DEFAULT;
+    }
+    return mutationDetection;
   }
 
-  /**
-   * Return true if we should store source JSON content on this property.
-   */
-  public boolean isKeepSource() {
-    return keepSource;
+  public void setMutationDetection(MutationDetection dirtyDetection) {
+    this.mutationDetection = dirtyDetection;
   }
 
   /**
@@ -1221,8 +1204,4 @@ public class DeployBeanProperty {
     return scalarType != null && scalarType.isJsonMapper();
   }
 
-  public void setJsonOptions(boolean dirtyDetection, boolean keepSource) {
-    this.dirtyDetection = dirtyDetection;
-    this.keepSource = keepSource;
-  }
 }

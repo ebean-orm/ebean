@@ -7,12 +7,9 @@ import io.ebean.annotation.DbJsonType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static io.ebean.annotation.MutationDetection.SOURCE;
 
 @Entity
 public class EBasicJsonList {
@@ -31,7 +28,7 @@ public class EBasicJsonList {
   @DbJson(length = 700)
   Map<String, PlainBean> beanMap = new LinkedHashMap<>();
 
-  @DbJson(length = 500, keepSource = true) // such that we can rebuild old values
+  @DbJson(length = 500, mutationDetection = SOURCE) // such that we can rebuild old values
   PlainBean plainBean;
 
   @DbJson(length = 50)

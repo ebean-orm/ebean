@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.annotation.MutationDetection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.MutableValueNext;
 import io.ebean.bean.MutableValueInfo;
+import io.ebean.bean.MutableValueNext;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
@@ -14,26 +15,24 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Objects;
 
+/**
+ * Handle json property with MutationDetection of SOURCE or HASH only.
+ */
 public class BeanPropertyJsonMapper extends BeanProperty {
 
-  private static final NoDirtyDetection NO_DIRTY_DETECTION = new NoDirtyDetection();
-  private final boolean dirtyDetection;
-  private final boolean keepSource;
+  private final boolean sourceDetection;
 
   public BeanPropertyJsonMapper(BeanDescriptor<?> desc, DeployBeanProperty deployProp) {
     super(desc, deployProp);
-    this.dirtyDetection = deployProp.isDirtyDetection();
-    this.keepSource = deployProp.isKeepSource();
+    this.sourceDetection = deployProp.getMutationDetection() == MutationDetection.SOURCE;
   }
 
   @Override
   public MutableValueInfo createMutableInfo(String json) {
-    if (keepSource) {
+    if (sourceDetection) {
       return new SourceMutableValue(scalarType, json);
-    } else if (dirtyDetection) {
-      return new ChecksumMutableValue(scalarType, json);
     } else {
-      return NO_DIRTY_DETECTION;
+      return new ChecksumMutableValue(scalarType, json);
     }
   }
 
@@ -41,22 +40,19 @@ public class BeanPropertyJsonMapper extends BeanProperty {
    * Next when no prior MutableValueInfo.
    */
   private MutableValueNext next(String json) {
-    if (keepSource) {
+    if (sourceDetection) {
       return new SourceMutableValue(scalarType, json);
-    } else if (dirtyDetection) {
-      return new NextPair(json, new ChecksumMutableValue(scalarType, json));
     } else {
-      throw new IllegalStateException("Never get here");
+      return new NextPair(json, new ChecksumMutableValue(scalarType, json));
     }
   }
 
   /**
-   * Return true if the mutable value is considered dirty.
-   * This is only used for 'mutable' scalar types like hstore etc.
+   * Return true if the json property is considered dirty.
    */
   @Override
   boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
-    // dirty detection based on json content or checksum of json content
+    // mutation detection based on json content or checksum of json content
     // only perform serialisation to json once
     final String json = scalarType.format(value);
     final MutableValueInfo oldHash = ebi.mutableInfo(propertyIndex);
@@ -191,22 +187,6 @@ public class BeanPropertyJsonMapper extends BeanProperty {
     @Override
     public MutableValueInfo info() {
       return this;
-    }
-  }
-
-  /**
-   * No dirty detection on json content.
-   */
-  private static final class NoDirtyDetection implements MutableValueInfo {
-
-    @Override
-    public MutableValueNext nextDirty(String json) {
-      return null; // treat as not dirty
-    }
-
-    @Override
-    public boolean isEqualToObject(Object obj) {
-      return true; // treat as not dirty
     }
   }
 }

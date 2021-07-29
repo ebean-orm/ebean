@@ -60,7 +60,7 @@ public class TestJacksonPlainBean {
     // dirtyDetection = false, set a new plainBean2 instance, included in update
     found.setPlainBean2(new PlainBean("bar", 27));
     DB.save(found);
-    expectedSql( 0, "update ebasic_plain set plain_bean2=?, version=? where id=? and version=?");
+    expectedSql(0, "update ebasic_plain set plain_bean2=?, version=? where id=? and version=?");
 
     LoggedSqlCollector.stop();
   }
@@ -69,7 +69,4 @@ public class TestJacksonPlainBean {
     assertThat(LoggedSqlCollector.current().get(i)).contains(s);
   }
 
-  private void expectedSql(List<String> sql, int i, String s) {
-    assertThat(sql.get(i)).contains(s);
-  }
 }
