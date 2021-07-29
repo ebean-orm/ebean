@@ -51,7 +51,7 @@ public class BeanPropertyJsonMapper extends BeanProperty {
    * Return true if the json property is considered dirty.
    */
   @Override
-  boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
+  boolean checkMutable(Object value, boolean alreadyDirty, EntityBeanIntercept ebi) {
     // mutation detection based on json content or checksum of json content
     // only perform serialisation to json once
     final String json = scalarType.format(value);
