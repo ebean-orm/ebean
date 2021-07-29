@@ -3198,9 +3198,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
-      if (/*!ebi.isDirtyProperty(propertyIndex) && */ebi.isLoadedProperty(propertyIndex)) {
+      if (ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (/*value != null &&*/ beanProperty.isDirtyValue(value, ebi)) {
+        if (beanProperty.updateMutableValue(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);

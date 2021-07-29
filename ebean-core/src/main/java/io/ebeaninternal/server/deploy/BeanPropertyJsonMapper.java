@@ -55,7 +55,7 @@ public class BeanPropertyJsonMapper extends BeanProperty {
    * This is only used for 'mutable' scalar types like hstore etc.
    */
   @Override
-  boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
+  boolean updateMutableValue(Object value, boolean alreadyDirty, EntityBeanIntercept ebi) {
     // dirty detection based on json content or checksum of json content
     // only perform serialisation to json once
     final String json = scalarType.format(value);

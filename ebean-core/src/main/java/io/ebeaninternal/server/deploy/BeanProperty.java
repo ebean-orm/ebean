@@ -1015,11 +1015,12 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
-   * Return true if the mutable value is considered dirty.
-   * This is only used for 'mutable' scalar types like hstore etc.
+   * Return true if the mutable value is considered dirty. 
+   * This is only used for 'mutable' scalar types like hstore or DbJson etc.
+   * The method is called for all loaded properties once and may also update the MutableValueInfo
    */
-  boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
-    return value != null && scalarType.isDirty(value);
+  boolean updateMutableValue(Object value, boolean alreadyDirty,  EntityBeanIntercept ebi) {
+    return alreadyDirty || value != null && scalarType.isDirty(value);
   }
 
   /**
