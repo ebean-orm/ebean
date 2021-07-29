@@ -30,18 +30,18 @@ import io.ebean.annotation.Platform;
  * Tests, if all kind of queries are cancelable. There are two ways how to
  * cancel a query: <br/>
  * <b>At begin:</b>
- * 
+ *
  * <pre>
  * query = DB.find(...)
  * query.cancel();
  * query.findList();
  * </pre>
- * 
+ *
  * The query was caneled before executing. In this case we do hit the DB driver
  * <br/>
  * <br/>
  * <b>During run:</b>
- * 
+ *
  * <pre>
  * // Thread 1:              Thread 2
  * query = DB.find(...)
@@ -50,26 +50,26 @@ import io.ebean.annotation.Platform;
  *     ...finding            query.cancel();
  *      ...JDBC-Exception
  * </pre>
- * 
+ *
  * The test tries to simulate a slow query by installing the
  * {@link SlowDownEBasic} 'SELECT' trigger. The trigger can be configured to
  * wait 3 * <code>timing</code> ms and a second thread will cancel the query in
  * <code>timing</code> ms.
- * 
+ *
  * in this case, we expect a JDBC exception from the driver. <br/>
  * <br/>
  * NOTE:<br/>
  * H2 checks the cancel flag in org.h2.command.Prepared::setCurrentRowNumber
  * only every 128th row. So we need at least 128 models and we cannot check
  * queries like findCount or findOne, because they only return one row.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  *
  */
 public class SqlQueryCancelTest extends BaseTestCase {
 
-  private int timing = 10;
-  
+  private final int timing = 20;
+
   @BeforeClass
   public static void setupTestData() throws SQLException {
     for (int i = 0; i < 128; i++) {
@@ -98,10 +98,10 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelSqlDuringRun(q -> q.findEachWhile(e -> true));
   }
 
-  
+
   @Test
   public void cancelOrmQueryAtBegin() throws SQLException {
-    doCancelOrmAtBegin(Query::findCount); 
+    doCancelOrmAtBegin(Query::findCount);
     doCancelOrmAtBegin(Query::findFutureCount);
     // We cannot test 'findCount' due H2 restrictions
     doCancelOrmAtBegin(Query::findFutureIds);
@@ -206,7 +206,7 @@ public class SqlQueryCancelTest extends BaseTestCase {
       .isInstanceOf(PersistenceException.class)
       .hasMessageContaining("Query was cancelled");
   }
-  
+
   @Test
   public void cancelSqlDtoQueryAtBegin() throws SQLException {
 
@@ -290,7 +290,7 @@ public class SqlQueryCancelTest extends BaseTestCase {
   private void doCancelOrmFutureDuringRun(Function<Query<EBasic>, Future<?>> test) throws SQLException, InterruptedException, ExecutionException {
     Query<EBasic> warmup = DB.find(EBasic.class);
     test.apply(warmup).get();
-    
+
     Query<EBasic> query = DB.find(EBasic.class);
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> {
@@ -311,18 +311,18 @@ public class SqlQueryCancelTest extends BaseTestCase {
         .isInstanceOf(PersistenceException.class)
         .hasMessageContaining("Query was cancelled");
   }
-  
+
   private void doCancelOrmDtoDuringRun(Consumer<DtoQuery<EBasicDto>> test) throws SQLException {
     DtoQuery<EBasicDto> warmup = DB.find(EBasic.class).select("id,status").asDto(EBasicDto.class);
     test.accept(warmup);
-    
+
     DtoQuery<EBasicDto> query = DB.find(EBasic.class).select("id,status").asDto(EBasicDto.class);
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> test.accept(query))
         .isInstanceOf(PersistenceException.class)
         .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
   }
-  
+
   private void doCancelSqlDtoAtBegin(Consumer<DtoQuery<EBasicDto>> test) throws SQLException {
     DtoQuery<EBasicDto> query = DB.findDto(EBasicDto.class, "select id, status from e_basic");
     query.cancel();
@@ -334,14 +334,14 @@ public class SqlQueryCancelTest extends BaseTestCase {
   private void doCancelSqlDtoDuringRun(Consumer<DtoQuery<EBasicDto>> test) throws SQLException {
     DtoQuery<EBasicDto> warmup = DB.findDto(EBasicDto.class, "select id, status from e_basic");
     test.accept(warmup);
-    
+
     DtoQuery<EBasicDto> query = DB.findDto(EBasicDto.class, "select id, status from e_basic");
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> test.accept(query))
         .isInstanceOf(PersistenceException.class)
         .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
   }
-  
+
   private void executeDelayed(Runnable r) throws SQLException {
     // We modify the DB here. Otherwise we may hit an internal H2 cache, if the
     // same query is performed. Queries from the cache cannot be canceled.

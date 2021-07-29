@@ -55,7 +55,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Flags indicating if the mutable hash is set.
    */
   private static final byte FLAG_MUTABLE_HASH_SET = 16;
-  
+
   private transient final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
   private transient PersistenceContext persistenceContext;
@@ -677,7 +677,7 @@ public final class EntityBeanIntercept implements Serializable {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
         embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, getProperty(i) + ".");
-      } 
+      }
     }
   }
 
@@ -716,7 +716,6 @@ public final class EntityBeanIntercept implements Serializable {
   public void addDirtyPropertyValues(Map<String, ValuePair> dirtyValues, String prefix) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-   
       if (isChangedProp(i)) {
         // the property has been changed on this bean
         String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
@@ -1175,17 +1174,16 @@ public final class EntityBeanIntercept implements Serializable {
   private boolean isChangedProp(int i) {
     if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
       return true;
-    } else if (mutableHash == null || mutableHash[i] == null
-        || mutableHash[i].isEqualToObject(owner._ebean_getField(i))) {
+    } else if (mutableHash == null || mutableHash[i] == null || mutableHash[i].isEqualToObject(owner._ebean_getField(i))) {
       return false;
     } else {
-      // mark for change 
+      // mark for change
       flags[i] |= FLAG_CHANGED_PROP;
       dirty = true; // this makes the bean automatically dirty!
       return true;
     }
   }
-  
+
   public MutableHash mutableHash(int propertyIndex) {
     return mutableHash == null ? null : mutableHash[propertyIndex];
   }
