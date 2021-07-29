@@ -31,8 +31,7 @@ class BindablePropertyJsonUpdate extends BindableProperty {
       final MutableValueInfo hash = prop.createMutableInfo(json);
       bean._ebean_getIntercept().mutableInfo(propertyIndex, hash);
       request.pushJson(json);
-      final Object value = prop.getValue(bean);
-      request.bind(value, prop);
+      request.bind(prop.getValue(bean), prop);
     }
   }
 }
