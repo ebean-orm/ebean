@@ -15,16 +15,24 @@ import java.util.Objects;
 
 public class BeanPropertyJsonMapper extends BeanProperty {
 
+  private static final NoDirtyDetection NO_DIRTY_DETECTION = new NoDirtyDetection();
+  private final boolean dirtyDetection;
+  private final boolean keepSource;
+
   public BeanPropertyJsonMapper(BeanDescriptor<?> desc, DeployBeanProperty deployProp) {
     super(desc, deployProp);
+    this.dirtyDetection = deployProp.isDirtyDetection();
+    this.keepSource = deployProp.isKeepSource();
   }
 
   @Override
   public MutableHash createMutableHash(String json) {
-    if (false) { // TODO should we make that configurable?
-      return new Md5MutableHash(json);
-    } else {
+    if (keepSource) {
       return new JsonMutableHash(scalarType, json);
+    } else if (dirtyDetection) {
+      return new Md5MutableHash(scalarType, json);
+    } else {
+      return NO_DIRTY_DETECTION;
     }
   }
 
@@ -67,8 +75,10 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   private static class Md5MutableHash implements MutableHash {
 
     private final String hash;
+    private final ScalarType<?> parent;
 
-    Md5MutableHash(String json) {
+    Md5MutableHash(ScalarType<?> parent, String json) {
+      this.parent = parent;
       this.hash = hash(json);
     }
 
@@ -78,7 +88,7 @@ public class BeanPropertyJsonMapper extends BeanProperty {
 
     @Override
     public boolean isEqualToObject(Object obj) {
-      return true; // we cannot determine differences...
+      return isEqualToJson(parent.format(obj));
     }
 
     @Override
@@ -118,5 +128,21 @@ public class BeanPropertyJsonMapper extends BeanProperty {
       return parent.parse(originalJson);
     }
 
+  }
+
+  /**
+   * No dirty detection on JSON content.
+   */
+  private static class NoDirtyDetection implements MutableHash {
+
+    @Override
+    public boolean isEqualToJson(String json) {
+      return true;
+    }
+
+    @Override
+    public boolean isEqualToObject(Object obj) {
+      return true;
+    }
   }
 }

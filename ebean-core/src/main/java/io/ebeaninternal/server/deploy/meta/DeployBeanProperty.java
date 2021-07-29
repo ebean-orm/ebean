@@ -109,6 +109,8 @@ public class DeployBeanProperty {
 
   private boolean jsonSerialize = true;
   private boolean jsonDeserialize = true;
+  private boolean dirtyDetection;
+  private boolean keepSource;
 
   private boolean dbEncrypted;
   private DbEncryptFunction dbEncryptFunction;
@@ -325,6 +327,20 @@ public class DeployBeanProperty {
 
   public void setJsonDeserialize(boolean jsonDeserialize) {
     this.jsonDeserialize = jsonDeserialize;
+  }
+
+  /**
+   * Return true if we should have JSON dirty detection on this property.
+   */
+  public boolean isDirtyDetection() {
+    return dirtyDetection;
+  }
+
+  /**
+   * Return true if we should store source JSON content on this property.
+   */
+  public boolean isKeepSource() {
+    return keepSource;
   }
 
   /**
@@ -1203,5 +1219,10 @@ public class DeployBeanProperty {
 
   boolean isJsonMapper() {
     return scalarType != null && scalarType.isJsonMapper();
+  }
+
+  public void setJsonOptions(boolean dirtyDetection, boolean keepSource) {
+    this.dirtyDetection = dirtyDetection;
+    this.keepSource = keepSource;
   }
 }

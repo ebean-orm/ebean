@@ -213,23 +213,22 @@ public class DeployUtil {
    * This property is marked as a Lob object.
    */
   void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
-
     int dbType = getDbJsonStorage(dbJsonType.storage());
-    setDbJsonType(prop, dbType, dbJsonType.length());
+    setDbJsonType(prop, dbType, dbJsonType.length(), dbJsonType.dirtyDetection(), dbJsonType.keepSource());
   }
 
   void setDbJsonBType(DeployBeanProperty prop, DbJsonB dbJsonB) {
-    setDbJsonType(prop, DbPlatformType.JSONB, dbJsonB.length());
+    setDbJsonType(prop, DbPlatformType.JSONB, dbJsonB.length(), dbJsonB.dirtyDetection(), dbJsonB.keepSource());
   }
 
-  private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
-
+  private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, boolean dirtyDetection, boolean keepSource) {
     ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
     }
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
+    prop.setJsonOptions(dirtyDetection, keepSource);
     if (dbType == Types.VARCHAR || dbLength > 0) {
       // determine the db column size
       int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;

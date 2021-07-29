@@ -31,7 +31,7 @@ public class EBasicJsonList {
   @DbJson(length = 700)
   Map<String, PlainBean> beanMap = new LinkedHashMap<>();
 
-  @DbJson(length = 500)
+  @DbJson(length = 500, keepSource = true) // such that we can rebuild old values
   PlainBean plainBean;
 
   @DbJson(length = 50)
