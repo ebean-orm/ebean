@@ -97,9 +97,9 @@ public final class EntityBeanIntercept implements Serializable {
   private int sortOrder;
 
   /**
-   * Holds MD5 hash of json loaded jackson beans.
+   * Holds information of json loaded jackson beans (e.g. the original json or checksum).
    */
-  private MutableHash[] mutableHash;
+  private MutableValueInfo[] mutableInfo;
 
   /**
    * Holds json content determined at point of dirty check.
@@ -247,9 +247,9 @@ public final class EntityBeanIntercept implements Serializable {
     if (dirty) {
       return true;
     }
-    if (mutableHash != null) {
-      for (int i = 0; i < mutableHash.length; i++) {
-        if (mutableHash[i] != null && !mutableHash[i].isEqualToObject(owner._ebean_getField(i))) {
+    if (mutableInfo != null) {
+      for (int i = 0; i < mutableInfo.length; i++) {
+        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
           dirty = true;
           break;
         }
@@ -472,7 +472,7 @@ public final class EntityBeanIntercept implements Serializable {
   public Object getOrigValue(int propertyIndex) {
     if ((flags[propertyIndex] & (FLAG_ORIG_VALUE_SET | FLAG_MUTABLE_HASH_SET)) == FLAG_MUTABLE_HASH_SET) {
       // mutable hash set, but not ORIG_VALUE
-      setOriginalValue(propertyIndex, mutableHash[propertyIndex].get());
+      setOriginalValue(propertyIndex, mutableInfo[propertyIndex].get());
     }
     if (origValues == null) {
       return null;
@@ -1174,7 +1174,7 @@ public final class EntityBeanIntercept implements Serializable {
   private boolean isChangedProp(int i) {
     if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
       return true;
-    } else if (mutableHash == null || mutableHash[i] == null || mutableHash[i].isEqualToObject(owner._ebean_getField(i))) {
+    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
       return false;
     } else {
       // mark for change
@@ -1184,22 +1184,38 @@ public final class EntityBeanIntercept implements Serializable {
     }
   }
 
-  public MutableHash mutableHash(int propertyIndex) {
-    return mutableHash == null ? null : mutableHash[propertyIndex];
+  /**
+   * Return the MutableValueInfo for the given property or null.
+   */
+  public MutableValueInfo mutableInfo(int propertyIndex) {
+    return mutableInfo == null ? null : mutableInfo[propertyIndex];
   }
 
-  public void mutableHash(int propertyIndex, MutableHash content) {
-    if (mutableHash == null) {
-      mutableHash = new MutableHash[flags.length];
+  /**
+   * Set the MutableValueInfo for the given property.
+   */
+  public void mutableInfo(int propertyIndex, MutableValueInfo info) {
+    if (mutableInfo == null) {
+      mutableInfo = new MutableValueInfo[flags.length];
     }
     flags[propertyIndex] |= FLAG_MUTABLE_HASH_SET;
-    mutableHash[propertyIndex] = content;
+    mutableInfo[propertyIndex] = info;
   }
 
+  /**
+   * Return the [json] content of a mutable value.
+   */
   public String mutableContent(int propertyIndex) {
     return mutableContent == null ? null : mutableContent[propertyIndex];
   }
 
+  /**
+   * Set the [json] content of a mutable property.
+   * <p>
+   * Set here as the mutable property dirty detection is based on json content comparison.
+   * We only want to perform the json serialisation once so storing it here as part of
+   * dirty detection so that we can get it back to bind in insert or update etc.
+   */
   public void mutableContent(int propertyIndex, String content) {
     if (mutableContent == null) {
       mutableContent = new String[flags.length];

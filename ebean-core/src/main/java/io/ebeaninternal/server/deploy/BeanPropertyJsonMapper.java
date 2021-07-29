@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.MutableHash;
+import io.ebean.bean.MutableValueInfo;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
@@ -26,11 +26,11 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   }
 
   @Override
-  public MutableHash createMutableHash(String json) {
+  public MutableValueInfo createMutableInfo(String json) {
     if (keepSource) {
-      return new JsonMutableHash(scalarType, json);
+      return new SourceMutableValue(scalarType, json);
     } else if (dirtyDetection) {
-      return new Md5MutableHash(scalarType, json);
+      return new ChecksumMutableValue(scalarType, json);
     } else {
       return NO_DIRTY_DETECTION;
     }
@@ -42,9 +42,9 @@ public class BeanPropertyJsonMapper extends BeanProperty {
    */
   @Override
   boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
-    // dirty detection based on md5 hash of json content
+    // dirty detection based on json content or checksum of json content
     final String json = scalarType.format(value);
-    final MutableHash oldHash = ebi.mutableHash(propertyIndex);
+    final MutableValueInfo oldHash = ebi.mutableInfo(propertyIndex);
     if (oldHash == null || !oldHash.isEqualToJson(json)) {
       ebi.mutableContent(propertyIndex, json); // so we only convert to json once
       return true;
@@ -60,8 +60,8 @@ public class BeanPropertyJsonMapper extends BeanProperty {
         setValue(bean, value);
         String json = reader.popJson();
         if (json != null) {
-          final MutableHash hash = createMutableHash(json);
-          bean._ebean_getIntercept().mutableHash(propertyIndex, hash);
+          final MutableValueInfo hash = createMutableInfo(json);
+          bean._ebean_getIntercept().mutableInfo(propertyIndex, hash);
         }
       }
       return value;
@@ -72,18 +72,24 @@ public class BeanPropertyJsonMapper extends BeanProperty {
     }
   }
 
-  private static class Md5MutableHash implements MutableHash {
+  /**
+   * Hold checksum of json source content.
+   * <p>
+   * Dirty detection based on checksum difference on json form.
+   * Does not support rebuilding 'oldValue' as no original json content.
+   */
+  private static class ChecksumMutableValue implements MutableValueInfo {
 
-    private final String hash;
     private final ScalarType<?> parent;
+    private final long checksum;
 
-    Md5MutableHash(ScalarType<?> parent, String json) {
+    ChecksumMutableValue(ScalarType<?> parent, String json) {
       this.parent = parent;
-      this.hash = hash(json);
+      this.checksum = checksum(json);
     }
 
-    private String hash(String json) {
-      return String.valueOf(Checksum.checksum(json));
+    private long checksum(String json) {
+      return Checksum.checksum(json);
     }
 
     @Override
@@ -93,22 +99,24 @@ public class BeanPropertyJsonMapper extends BeanProperty {
 
     @Override
     public boolean isEqualToJson(String json) {
-      return hash(json).equals(hash);
+      return checksum(json) == checksum;
     }
 
     @Override
     public Object get() {
       return null; // cannot create object from json
     }
-
   }
 
-  private static class JsonMutableHash implements MutableHash {
+  /**
+   * Hold original json source content. This supports rebuilding the 'oldValue'.
+   */
+  private static class SourceMutableValue implements MutableValueInfo {
 
     private final String originalJson;
     private final ScalarType<?> parent;
 
-    JsonMutableHash(ScalarType<?> parent, String json) {
+    SourceMutableValue(ScalarType<?> parent, String json) {
       this.parent = parent;
       this.originalJson = json;
     }
@@ -125,24 +133,24 @@ public class BeanPropertyJsonMapper extends BeanProperty {
 
     @Override
     public Object get() {
+      // rebuild the 'oldValue' for change log etc
       return parent.parse(originalJson);
     }
-
   }
 
   /**
-   * No dirty detection on JSON content.
+   * No dirty detection on json content.
    */
-  private static class NoDirtyDetection implements MutableHash {
+  private static class NoDirtyDetection implements MutableValueInfo {
 
     @Override
     public boolean isEqualToJson(String json) {
-      return true;
+      return true; // treat as not dirty
     }
 
     @Override
     public boolean isEqualToObject(Object obj) {
-      return true;
+      return true; // treat as not dirty
     }
   }
 }

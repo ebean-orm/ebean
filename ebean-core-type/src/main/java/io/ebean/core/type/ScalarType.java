@@ -3,7 +3,6 @@ package io.ebean.core.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
-import io.ebean.bean.MutableHash;
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 
