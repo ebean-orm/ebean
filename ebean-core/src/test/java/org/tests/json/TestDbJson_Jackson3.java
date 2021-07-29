@@ -161,10 +161,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     final EBasicJsonList found = DB.find(EBasicJsonList.class, bean.getId());
     found.getBeanList().get(0).setName("p1-mod");
 
-//    BeanState state = DB.getBeanState(found);
-//    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
-    // this test fails, because we have a OmList instead of a GenericObject
-    // TODO: Can/Should we enhance the @DbJson/@DbJsonB annotations with a property "dirtyDetection"
-
+    BeanState state = DB.getBeanState(found);
+    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
   }
 }

@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import java.util.*;
 
+import static io.ebean.annotation.MutationDetection.HASH;
 import static io.ebean.annotation.MutationDetection.SOURCE;
 
 @Entity
@@ -22,7 +23,7 @@ public class EBasicJsonList {
   @DbJson(length = 700, name = "beans")
   Set<PlainBean> beanSet;
 
-  @DbJsonB
+  @DbJsonB(mutationDetection = HASH)
   List<PlainBean> beanList;
 
   @DbJson(length = 700)
