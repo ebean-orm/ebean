@@ -25,7 +25,7 @@ public class EBasicJsonList {
   @DbJson(length = 700, name = "beans")
   Set<PlainBean> beanSet;
 
-  @DbJsonB
+  @DbJsonB(keepSource = true)
   List<PlainBean> beanList;
 
   @DbJson(length = 700)

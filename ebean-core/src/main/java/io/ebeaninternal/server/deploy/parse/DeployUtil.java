@@ -222,13 +222,13 @@ public class DeployUtil {
   }
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, boolean dirtyDetection, boolean keepSource) {
+    prop.setJsonOptions(dirtyDetection, keepSource);
     ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
     }
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
-    prop.setJsonOptions(dirtyDetection, keepSource);
     if (dbType == Types.VARCHAR || dbLength > 0) {
       // determine the db column size
       int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;

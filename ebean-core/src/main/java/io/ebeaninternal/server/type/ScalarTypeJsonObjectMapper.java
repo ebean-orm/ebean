@@ -34,16 +34,18 @@ class ScalarTypeJsonObjectMapper {
   /**
    * Create and return the appropriate ScalarType.
    */
-  static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+  static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType, boolean modifyAwareCollection) {
     Class<?> type = field.getRawType();
-    if (Set.class.equals(type)) {
-      return new OmSet(jsonManager, field, dbType, docType);
-    }
-    if (List.class.equals(type)) {
-      return new OmList(jsonManager, field, dbType, docType);
-    }
-    if (Map.class.equals(type)) {
-      return new OmMap(jsonManager, field, dbType);
+    if (modifyAwareCollection) {
+      if (Set.class.equals(type)) {
+        return new OmSet(jsonManager, field, dbType, docType);
+      }
+      if (List.class.equals(type)) {
+        return new OmList(jsonManager, field, dbType, docType);
+      }
+      if (Map.class.equals(type)) {
+        return new OmMap(jsonManager, field, dbType);
+      }
     }
     return new GenericObject(jsonManager, field, dbType, type);
   }
