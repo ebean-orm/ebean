@@ -4,7 +4,6 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebeantest.LoggedSql;
-
 import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -110,5 +109,18 @@ public class TestQueryExists extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     assertThat(sql).contains("not exists (");
+  }
+
+  @Test
+  public void testExistsNoWhere() {
+    ResetBasicData.reset();
+
+    Query<Order> subQuery = Ebean.find(Order.class).alias("sq").select("id");
+    Query<Customer> query = Ebean.find(Customer.class).alias("qt").where().notExists(subQuery).query();
+
+    query.findList();
+    String sql = query.getGeneratedSql();
+
+    assertThat(sql).contains("not exists (select sq.id from o_order sq)");
   }
 }

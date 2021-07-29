@@ -44,7 +44,17 @@ public class TestSubQuery extends BaseTestCase {
     Query<Order> sq = DB.createQuery(Order.class).select("id").where()
       .isIn("details.product.id", productIds).query();
 
-    DB.find(Order.class).where().isIn("id", sq).findList();
+    assertThat(DB.find(Order.class).where().isIn("id", sq).findList()).hasSize(2);
+  }
+
+  @Test
+  public void test_IsInNoWhere() {
+    ResetBasicData.reset();
+
+    Query<Order> sq = DB.createQuery(Order.class).select("id");
+    int expectedSize = DB.find(Order.class).findCount(); // expect everything
+
+    assertThat(DB.find(Order.class).where().isIn("id", sq).findList()).hasSize(expectedSize);
   }
 
   public void testCompositeKey() {
