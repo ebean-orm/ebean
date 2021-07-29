@@ -16,24 +16,19 @@ public class TestJacksonPlainBean {
     DB.getDefault();
     LoggedSqlCollector.start();
 
-    PlainBean content = new PlainBean();
-    content.setAlong(42);
-    content.setName("foo");
-
+    PlainBean content = new PlainBean("foo", 42);
     EBasicPlain bean = new EBasicPlain();
     bean.setAttr("attr0");
     bean.setPlainBean(content);
-
+    bean.setPlainBean2(new PlainBean("bar", 27));
 
     DB.save(bean);
-    expectedSql(0, "insert into ebasic_plain (attr, plain_bean, version) values (?,?,?)");
-
+    expectedSql(0, "insert into ebasic_plain (attr, plain_bean, plain_bean2, version) values (?,?,?,?)");
 
     // inserted plainBean has not been mutated
     bean.setAttr("attr1");
     DB.save(bean);
     expectedSql(0, "update ebasic_plain set attr=?, version=? where id=? and version=?");
-
 
     // inserted plainBean has now been mutated
     content.setName("notFoo");
@@ -50,17 +45,24 @@ public class TestJacksonPlainBean {
     DB.save(found);
     expectedSql(1, "update ebasic_plain set plain_bean=?, version=? where id=? and version=?");
 
-
-    // update bean, mutate PlainBean only
+    // dirtyDetection = false, so not included in update
+    found.getPlainBean2().setName("Modification Ignored");
+    // dirtyDetection = true, mutation detected
     plainBean.setName("mod2");
     DB.save(found);
     expectedSql(0, "update ebasic_plain set plain_bean=?, version=? where id=? and version=?");
 
-
     // update bean, not mutating PlainBean
     found.setAttr("attr3");
     DB.save(found);
-    expectedSql(LoggedSqlCollector.stop(), 0, "update ebasic_plain set attr=?, version=? where id=? and version=?");
+    expectedSql(0, "update ebasic_plain set attr=?, version=? where id=? and version=?");
+
+    // dirtyDetection = false, set a new plainBean2 instance, included in update
+    found.setPlainBean2(new PlainBean("bar", 27));
+    DB.save(found);
+    expectedSql( 0, "update ebasic_plain set plain_bean2=?, version=? where id=? and version=?");
+
+    LoggedSqlCollector.stop();
   }
 
   private void expectedSql(int i, String s) {

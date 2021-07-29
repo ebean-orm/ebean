@@ -17,6 +17,9 @@ public class EBasicPlain {
   @DbJson(length = 500)
   PlainBean plainBean;
 
+  @DbJson(length = 500, dirtyDetection = false)
+  PlainBean plainBean2;
+
   @Version
   long version;
 
@@ -42,6 +45,14 @@ public class EBasicPlain {
 
   public void setPlainBean(PlainBean plainBean) {
     this.plainBean = plainBean;
+  }
+
+  public PlainBean getPlainBean2() {
+    return plainBean2;
+  }
+
+  public void setPlainBean2(PlainBean plainBean2) {
+    this.plainBean2 = plainBean2;
   }
 
   public long getVersion() {
