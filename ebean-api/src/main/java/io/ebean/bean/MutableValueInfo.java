@@ -12,12 +12,15 @@ package io.ebean.bean;
 public interface MutableValueInfo {
 
   /**
-   * Compares the given json to an internal value. Can be a hash/checksum comparison
-   * or a plain JSON string comparison (based on {@code @DbJson(keepSource)}).
+   * Compares the given json returning null if deemed unchanged or returning
+   * the MutableValueNext to use if deemed dirty/changed.
+   * <p>
+   * Returning MutableValueNext allows an implementation based on hash/checksum
+   * to only perform that computation once.
    *
-   * @return true if the value is considered unchanged (when comparing in json form).
+   * @return Null if deemed unchanged or the MutableValueNext if deemed changed.
    */
-  boolean isEqualToJson(String json);
+  MutableValueNext nextDirty(String json);
 
   /**
    * Compares the given object to an internal value.

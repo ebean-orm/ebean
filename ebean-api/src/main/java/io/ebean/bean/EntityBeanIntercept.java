@@ -105,7 +105,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Holds json content determined at point of dirty check.
    * Stored here on dirty check such that we only convert to json once.
    */
-  private String[] mutableContent;
+  private MutableValueNext[] mutableNext;
 
   /**
    * Create a intercept with a given entity.
@@ -395,7 +395,7 @@ public final class EntityBeanIntercept implements Serializable {
     this.owner._ebean_setEmbeddedLoaded();
     this.lazyLoadProperty = -1;
     this.origValues = null;
-    this.mutableContent = null;
+    this.mutableNext = null;
     for (int i = 0; i < flags.length; i++) {
       flags[i] &= ~(FLAG_CHANGED_PROP | FLAG_ORIG_VALUE_SET);
     }
@@ -1203,23 +1203,29 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Return the [json] content of a mutable value.
-   */
-  public String mutableContent(int propertyIndex) {
-    return mutableContent == null ? null : mutableContent[propertyIndex];
-  }
-
-  /**
-   * Set the [json] content of a mutable property.
+   * Dirty detection set the next mutable property content and info .
    * <p>
    * Set here as the mutable property dirty detection is based on json content comparison.
    * We only want to perform the json serialisation once so storing it here as part of
    * dirty detection so that we can get it back to bind in insert or update etc.
    */
-  public void mutableContent(int propertyIndex, String content) {
-    if (mutableContent == null) {
-      mutableContent = new String[flags.length];
+  public void mutableNext(int propertyIndex, MutableValueNext next) {
+    if (mutableNext == null) {
+      mutableNext = new MutableValueNext[flags.length];
     }
-    mutableContent[propertyIndex] = content;
+    mutableNext[propertyIndex] = next;
   }
+
+  /**
+   * Update the 'next' mutable info returning the content that was obtained via dirty detection.
+   */
+  public String mutableNext(int propertyIndex) {
+    if (mutableNext == null) {
+      return null;
+    }
+    final MutableValueNext next = mutableNext[propertyIndex];
+    mutableInfo(propertyIndex, next.info());
+    return next.content();
+  }
+
 }

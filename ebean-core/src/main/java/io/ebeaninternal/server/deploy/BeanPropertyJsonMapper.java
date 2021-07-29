@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.MutableValueNext;
 import io.ebean.bean.MutableValueInfo;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
@@ -37,16 +38,36 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   }
 
   /**
+   * Next when no prior MutableValueInfo.
+   */
+  private MutableValueNext next(String json) {
+    if (keepSource) {
+      return new SourceMutableValue(scalarType, json);
+    } else if (dirtyDetection) {
+      return new NextPair(json, new ChecksumMutableValue(scalarType, json));
+    } else {
+      throw new IllegalStateException("Never get here");
+    }
+  }
+
+  /**
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
   @Override
   boolean isDirtyValue(Object value, EntityBeanIntercept ebi) {
     // dirty detection based on json content or checksum of json content
+    // only perform serialisation to json once
     final String json = scalarType.format(value);
     final MutableValueInfo oldHash = ebi.mutableInfo(propertyIndex);
-    if (oldHash == null || !oldHash.isEqualToJson(json)) {
-      ebi.mutableContent(propertyIndex, json); // so we only convert to json once
+    if (oldHash == null) {
+      ebi.mutableNext(propertyIndex, next(json));
+      return true;
+    }
+    // only perform compute of checksum/hash once (if checksum based)
+    final MutableValueNext next = oldHash.nextDirty(json);
+    if (next != null) {
+      ebi.mutableNext(propertyIndex, next);
       return true;
     }
     return false;
@@ -72,34 +93,59 @@ public class BeanPropertyJsonMapper extends BeanProperty {
     }
   }
 
+  private static final class NextPair implements MutableValueNext {
+
+    private final String json;
+    private final MutableValueInfo next;
+
+    NextPair(String json, MutableValueInfo next) {
+      this.json = json;
+      this.next = next;
+    }
+
+    @Override
+    public String content() {
+      return json;
+    }
+
+    @Override
+    public MutableValueInfo info() {
+      return next;
+    }
+  }
+
   /**
-   * Hold checksum of json source content.
+   * Hold checksum of json source content to use for dirty detection.
    * <p>
-   * Dirty detection based on checksum difference on json form.
    * Does not support rebuilding 'oldValue' as no original json content.
    */
-  private static class ChecksumMutableValue implements MutableValueInfo {
+  private static final class ChecksumMutableValue implements MutableValueInfo {
 
     private final ScalarType<?> parent;
     private final long checksum;
 
     ChecksumMutableValue(ScalarType<?> parent, String json) {
       this.parent = parent;
-      this.checksum = checksum(json);
+      this.checksum = Checksum.checksum(json);
     }
 
-    private long checksum(String json) {
-      return Checksum.checksum(json);
+    /**
+     * Create with pre-computed checksum.
+     */
+    ChecksumMutableValue(ScalarType<?> parent, long checksum) {
+      this.parent = parent;
+      this.checksum = checksum;
+    }
+
+    @Override
+    public MutableValueNext nextDirty(String json) {
+      final long nextChecksum = Checksum.checksum(json);
+      return nextChecksum == checksum ? null : new NextPair(json, new ChecksumMutableValue(parent, nextChecksum));
     }
 
     @Override
     public boolean isEqualToObject(Object obj) {
-      return isEqualToJson(parent.format(obj));
-    }
-
-    @Override
-    public boolean isEqualToJson(String json) {
-      return checksum(json) == checksum;
+      return Checksum.checksum(parent.format(obj)) == checksum;
     }
 
     @Override
@@ -109,9 +155,9 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   }
 
   /**
-   * Hold original json source content. This supports rebuilding the 'oldValue'.
+   * Hold json source content. This supports rebuilding the 'oldValue'.
    */
-  private static class SourceMutableValue implements MutableValueInfo {
+  private static final class SourceMutableValue implements MutableValueInfo, MutableValueNext {
 
     private final String originalJson;
     private final ScalarType<?> parent;
@@ -122,13 +168,13 @@ public class BeanPropertyJsonMapper extends BeanProperty {
     }
 
     @Override
-    public boolean isEqualToObject(Object obj) {
-      return isEqualToJson(parent.format(obj));
+    public MutableValueNext nextDirty(String json) {
+      return Objects.equals(originalJson, json) ? null : new SourceMutableValue(parent, json);
     }
 
     @Override
-    public boolean isEqualToJson(String json) {
-      return Objects.equals(originalJson, json);
+    public boolean isEqualToObject(Object obj) {
+      return Objects.equals(originalJson, parent.format(obj));
     }
 
     @Override
@@ -136,16 +182,26 @@ public class BeanPropertyJsonMapper extends BeanProperty {
       // rebuild the 'oldValue' for change log etc
       return parent.parse(originalJson);
     }
+
+    @Override
+    public String content() {
+      return originalJson;
+    }
+
+    @Override
+    public MutableValueInfo info() {
+      return this;
+    }
   }
 
   /**
    * No dirty detection on json content.
    */
-  private static class NoDirtyDetection implements MutableValueInfo {
+  private static final class NoDirtyDetection implements MutableValueInfo {
 
     @Override
-    public boolean isEqualToJson(String json) {
-      return true; // treat as not dirty
+    public MutableValueNext nextDirty(String json) {
+      return null; // treat as not dirty
     }
 
     @Override
