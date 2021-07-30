@@ -198,15 +198,16 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(state.getChangedProps()).containsExactly("plainValue");
 
     bean.getPlainValue2().setName("b");
-    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainValue", "plainValue2");
+    bean.getPlainValue2().setMarkedDirty(true); // NOT in changedProps (which really only works on HASH and SOURCE)
+    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainValue"); //, "plainValue2");
 
     bean.getPlainValue3().setName("c"); // has mutationDetection = NONE
 
     Map<String, ValuePair> dirtyValues = state.getDirtyValues();
-    assertThat(dirtyValues).hasSize(2).containsKeys("plainValue", "plainValue2");
+    assertThat(dirtyValues).hasSize(1).containsKeys("plainValue"); //, "plainValue2");
 
     assertThat(dirtyValues.get("plainValue")).hasToString("name:a,name:x"); // SOURCE -> origValue present
-    assertThat(dirtyValues.get("plainValue2")).hasToString("name:b,null");  // without SOURCE no origValue present
+    // assertThat(dirtyValues.get("plainValue2")).hasToString("name:b,null");  // without SOURCE no origValue present
 
     LoggedSql.start();
     bean.save();
@@ -224,6 +225,13 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     bean.save();
     // no update as plainValue3 has MutationDetection.NONE (ModifyAwareType = NONE isn't an expected combination to me)
     assertThat(LoggedSql.collect()).isEmpty();
+
+    bean.getPlainValue2().setName("b2");
+    bean.getPlainValue2().setMarkedDirty(true); // This is used with MutationDetection.DEFAULT
+    bean.save();
+    sql = LoggedSql.collect();
+    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set plain_value2=?, version=? where id=? and version=?");
+
     LoggedSql.stop();
   }
 }

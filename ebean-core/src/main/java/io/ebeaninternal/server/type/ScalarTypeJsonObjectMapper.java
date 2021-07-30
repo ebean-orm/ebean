@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import io.ebean.ModifyAwareType;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
@@ -55,6 +56,9 @@ class ScalarTypeJsonObjectMapper {
     if (Map.class.equals(type)) {
       return new OmMap(jsonManager, field, dbType);
     }
+    if (ModifyAwareType.class.isAssignableFrom(type)) {
+      return new DirtyAware(jsonManager, field, dbType, type);
+    }
     prop.setMutationDetection(MutationDetection.HASH);
     return new GenericObject(jsonManager, field, dbType, type);
   }
@@ -76,6 +80,20 @@ class ScalarTypeJsonObjectMapper {
     @Override
     public boolean isDirty(Object value) {
       return false;
+    }
+  }
+
+  /**
+   * ModifyAwareType based detection - does not really support changed properties etc.
+   */
+  private static class DirtyAware extends Base<Object> {
+    DirtyAware(TypeJsonManager jsonManager, AnnotatedField field, int dbType, Class<?> rawType) {
+      super(Object.class, jsonManager, field, dbType, DocPropertyType.OBJECT, rawType);
+    }
+
+    @Override
+    public boolean isDirty(Object value) {
+      return super.isDirty(value);
     }
   }
 
