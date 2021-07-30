@@ -225,4 +225,20 @@ public class TestDbJson_List extends BaseTestCase {
 
     DB.delete(bean);
   }
+
+  @Test
+  public void testNullToEmpty() {
+    EBasicJsonList bean = new EBasicJsonList();
+    bean.setFlags(null);
+    bean.setTags(null);
+    bean.setBeanMap(null);
+    DB.save(bean);
+
+    bean = DB.find(EBasicJsonList.class)
+      .setId(bean.getId()).findOne();
+
+    assertThat(bean.getFlags()).isEmpty();
+    assertThat(bean.getTags()).isEmpty();
+    assertThat(bean.getBeanMap()).isEmpty();
+  }
 }
