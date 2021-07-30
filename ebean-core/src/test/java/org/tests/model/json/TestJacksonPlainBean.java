@@ -11,6 +11,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestJacksonPlainBean {
 
   @Test
+  public void insertNullStayNull() {
+
+    // insert with jackson beans as null
+    EBasicPlain bean = new EBasicPlain();
+    bean.setAttr("n0");
+    DB.save(bean);
+
+    LoggedSqlCollector.start();
+    bean.setAttr("n1");
+    DB.save(bean);
+    expectedSql(0, "update ebasic_plain set attr=?, version=? where id=? and version=?");
+
+    bean.setPlainBean(new PlainBean("x", 1));
+    DB.save(bean);
+    expectedSql(0, "update ebasic_plain set plain_bean=?, version=? where id=? and version=?");
+
+    final EBasicPlain found = DB.find(EBasicPlain.class, bean.getId());
+    found.setAttr("n2");
+    DB.save(found);
+    expectedSql(1, "update ebasic_plain set attr=?, version=? where id=? and version=?");
+
+    LoggedSqlCollector.stop();
+  }
+
+  @Test
   public void insertUpdate() {
 
     DB.getDefault();

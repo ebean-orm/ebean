@@ -57,6 +57,9 @@ public class BeanPropertyJsonMapper extends BeanProperty {
     final String json = scalarType.format(value);
     final MutableValueInfo oldHash = ebi.mutableInfo(propertyIndex);
     if (oldHash == null) {
+      if (value == null) {
+        return false; // no change, still null
+      }
       ebi.mutableNext(propertyIndex, next(json));
       return true;
     }
