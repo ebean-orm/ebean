@@ -224,6 +224,12 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     bean.save();
     // no update as plainValue3 has MutationDetection.NONE (ModifyAwareType = NONE isn't an expected combination to me)
     assertThat(LoggedSql.collect()).isEmpty();
+
+    bean.getPlainValue2().setName("b2"); // effectively HASH mode mutation detection
+    bean.save();
+    sql = LoggedSql.collect();
+    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set plain_value2=?, version=? where id=? and version=?");
+
     LoggedSql.stop();
   }
 }
