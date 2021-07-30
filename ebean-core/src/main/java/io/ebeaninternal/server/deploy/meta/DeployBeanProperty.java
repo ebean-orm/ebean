@@ -316,9 +316,6 @@ public class DeployBeanProperty {
   }
 
   public MutationDetection getMutationDetection() {
-    if (mutationDetection == null) {
-      mutationDetection = MutationDetection.DEFAULT;
-    }
     return mutationDetection;
   }
 
@@ -1204,4 +1201,7 @@ public class DeployBeanProperty {
     return scalarType != null && scalarType.isJsonMapper();
   }
 
+  boolean isJsonType() {
+    return mutationDetection != null;
+  }
 }

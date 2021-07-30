@@ -453,6 +453,9 @@ public class DeployBeanPropertyLists {
     if (deployProp.isJsonMapper()) {
       return new BeanPropertyJsonMapper(desc, deployProp);
     }
+    if (deployProp.isJsonType()) {
+      return new BeanPropertyJsonBasic(desc, deployProp);
+    }
     return new BeanProperty(desc, deployProp);
   }
 

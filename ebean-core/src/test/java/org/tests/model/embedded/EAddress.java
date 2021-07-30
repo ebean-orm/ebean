@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.Map;
 
 @Embeddable
 public class EAddress {
@@ -23,6 +24,9 @@ public class EAddress {
 
   @DbJson
   PlainBean jbean;
+
+  @DbJson
+  Map<String, Object> jraw;
 
   public String getStreet() {
     return street;
@@ -54,6 +58,14 @@ public class EAddress {
 
   public void setJbean(PlainBean jbean) {
     this.jbean = jbean;
+  }
+
+  public Map<String, Object> getJraw() {
+    return jraw;
+  }
+
+  public void setJraw(Map<String, Object> jraw) {
+    this.jraw = jraw;
   }
 
   public EAddressStatus getStatus() {

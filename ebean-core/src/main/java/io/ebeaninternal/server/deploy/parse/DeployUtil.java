@@ -205,9 +205,6 @@ public class DeployUtil {
     }
   }
 
-  /**
-   * This property is marked as a Lob object.
-   */
   void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
     int dbType = getDbJsonStorage(dbJsonType.storage());
     setDbJsonType(prop, dbType, dbJsonType.length(), dbJsonType.mutationDetection());

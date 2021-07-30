@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * Handle json property with MutationDetection of SOURCE or HASH only.
  */
-public class BeanPropertyJsonMapper extends BeanProperty {
+public class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
   private final boolean sourceDetection;
 
