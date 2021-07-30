@@ -2,25 +2,16 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.ModifyAwareType;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbPlatformType;
 
 class TypeJsonManager {
 
-  interface DirtyHandler {
-    boolean isDirty(Object value);
-  }
-
   private final boolean postgres;
   private final ObjectMapper objectMapper;
-  private final DirtyHandler defaultHandler;
-  private final DirtyHandler modifyAwareHandler;
 
-  TypeJsonManager(boolean postgres, Object objectMapper, boolean defaultDirty) {
+  TypeJsonManager(boolean postgres, Object objectMapper) {
     this.postgres = postgres;
     this.objectMapper = (ObjectMapper) objectMapper;
-    this.defaultHandler = new DefaultHandler(defaultDirty);
-    this.modifyAwareHandler = new ModifyAwareHandler();
   }
 
   ObjectMapper objectMapper() {
@@ -37,17 +28,6 @@ class TypeJsonManager {
       }
     }
     return null;
-  }
-
-  /**
-   * Return the DirtyHandler to use.
-   */
-  DirtyHandler dirtyHandler(Class<?> cls, Class<?> rawType) {
-    if (!Object.class.equals(cls) || ModifyAwareType.class.isAssignableFrom(rawType)) {
-      // Set, List and Map are modify aware
-      return modifyAwareHandler;
-    }
-    return defaultHandler;
   }
 
   /**
@@ -68,30 +48,6 @@ class TypeJsonManager {
       return true;
     } else {
       return false;
-    }
-  }
-
-  static final class ModifyAwareHandler implements DirtyHandler {
-    @Override
-    public boolean isDirty(Object value) {
-      return checkModifyAware(value);
-    }
-  }
-
-  /**
-   * Effectively constant based on {@link DatabaseConfig#isJsonDirtyByDefault()}
-   */
-  static final class DefaultHandler implements DirtyHandler {
-
-    private final boolean dirty;
-
-    DefaultHandler(boolean dirty) {
-      this.dirty = dirty;
-    }
-
-    @Override
-    public boolean isDirty(Object value) {
-      return dirty;
     }
   }
 

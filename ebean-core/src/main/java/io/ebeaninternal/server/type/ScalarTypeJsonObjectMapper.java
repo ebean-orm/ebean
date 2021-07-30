@@ -13,9 +13,6 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
-import io.ebeaninternal.json.ModifyAwareList;
-import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebeaninternal.json.ModifyAwareSet;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 import javax.persistence.PersistenceException;
@@ -24,9 +21,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Supports @DbJson properties using Jackson ObjectMapper.
@@ -38,25 +32,14 @@ class ScalarTypeJsonObjectMapper {
    */
   static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, DeployBeanProperty prop, int dbType, DocPropertyType docType) {
     AnnotatedField field = (AnnotatedField) prop.getJacksonField();
-    Class<?> type = field.getRawType();
-
     MutationDetection mode = prop.getMutationDetection();
     if (mode == MutationDetection.NONE) {
-      return new NoMutationDetection(jsonManager, field, dbType, type);
+      return new NoMutationDetection(jsonManager, field, dbType, docType);
     } else if (mode != MutationDetection.DEFAULT) {
-      return new GenericObject(jsonManager, field, dbType, type);
-    }
-    if (Set.class.equals(type)) {
-      return new OmSet(jsonManager, field, dbType, docType);
-    }
-    if (List.class.equals(type)) {
-      return new OmList(jsonManager, field, dbType, docType);
-    }
-    if (Map.class.equals(type)) {
-      return new OmMap(jsonManager, field, dbType);
+      return new GenericObject(jsonManager, field, dbType, docType);
     }
     prop.setMutationDetection(MutationDetection.HASH);
-    return new GenericObject(jsonManager, field, dbType, type);
+    return new GenericObject(jsonManager, field, dbType, docType);
   }
 
   /**
@@ -64,8 +47,8 @@ class ScalarTypeJsonObjectMapper {
    */
   private static class NoMutationDetection extends Base<Object> {
 
-    NoMutationDetection(TypeJsonManager jsonManager, AnnotatedField field, int dbType, Class<?> rawType) {
-      super(Object.class, jsonManager, field, dbType, DocPropertyType.OBJECT, rawType);
+    NoMutationDetection(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+      super(Object.class, jsonManager, field, dbType, docType);
     }
 
     @Override
@@ -84,8 +67,8 @@ class ScalarTypeJsonObjectMapper {
    */
   private static class GenericObject extends Base<Object> {
 
-    GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, Class<?> rawType) {
-      super(Object.class, jsonManager, field, dbType, DocPropertyType.OBJECT, rawType);
+    GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
+      super(Object.class, jsonManager, field, dbType, docType);
     }
 
     @Override
@@ -129,60 +112,6 @@ class ScalarTypeJsonObjectMapper {
   }
 
   /**
-   * Type for Sets wrapping the ObjectMapper Set as a ModifyAwareSet.
-   */
-  @SuppressWarnings("rawtypes")
-  private static class OmSet extends Base<Set> {
-
-    OmSet(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
-      super(Set.class, jsonManager, field, dbType, docType);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Set read(DataReader reader) throws SQLException {
-      Set value = super.read(reader);
-      return value == null ? null : new ModifyAwareSet(value);
-    }
-  }
-
-  /**
-   * Type for Lists wrapping the ObjectMapper List as a ModifyAwareList.
-   */
-  @SuppressWarnings("rawtypes")
-  private static class OmList extends Base<List> {
-
-    OmList(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
-      super(List.class, jsonManager, field, dbType, docType);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List read(DataReader reader) throws SQLException {
-      List value = super.read(reader);
-      return value == null ? null : new ModifyAwareList(value);
-    }
-  }
-
-  /**
-   * Type for Map wrapping the ObjectMapper Map as a ModifyAwareMap.
-   */
-  @SuppressWarnings("rawtypes")
-  private static class OmMap extends Base<Map> {
-
-    OmMap(TypeJsonManager jsonManager, AnnotatedField field, int dbType) {
-      super(Map.class, jsonManager, field, dbType, DocPropertyType.OBJECT);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map read(DataReader reader) throws SQLException {
-      Map value = super.read(reader);
-      return value == null ? null : new ModifyAwareMap(value);
-    }
-  }
-
-  /**
    * ScalarType that uses Jackson ObjectMapper to marshall/unmarshall to/from JSON
    * and storing them in one of JSON, JSONB, VARCHAR, CLOB or BLOB.
    */
@@ -193,37 +122,20 @@ class ScalarTypeJsonObjectMapper {
     protected final JavaType deserType;
     protected final String pgType;
     private final DocPropertyType docType;
-    private final TypeJsonManager.DirtyHandler dirtyHandler;
 
     Base(Class<T> cls, TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
-      this(cls, jsonManager, field, dbType, docType, cls);
-    }
-
-    Base(Class<T> cls, TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType, Class<?> rawType) {
       super(cls, false, dbType);
       this.objectReader = jsonManager.objectMapper();
       this.pgType = jsonManager.postgresType(dbType);
       this.docType = docType;
-      this.dirtyHandler = jsonManager.dirtyHandler(cls, rawType);
       final JacksonTypeHelper helper = new JacksonTypeHelper(field, objectReader);
       this.deserType = helper.type();
       this.objectWriter = helper.objectWriter();
     }
 
-    /**
-     * Consider as a mutable type. Use the isDirty() method to check for dirty state.
-     */
     @Override
     public boolean isMutable() {
       return true;
-    }
-
-    /**
-     * Return true if the value should be considered dirty (and included in an update).
-     */
-    @Override
-    public boolean isDirty(Object value) {
-      return dirtyHandler.isDirty(value);
     }
 
     @Override
