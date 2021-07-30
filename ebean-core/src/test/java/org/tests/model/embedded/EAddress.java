@@ -1,5 +1,8 @@
 package org.tests.model.embedded;
 
+import io.ebean.annotation.DbJson;
+import org.tests.model.json.PlainBean;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
@@ -17,6 +20,9 @@ public class EAddress {
 
   @Enumerated(EnumType.STRING)
   EAddressStatus status;
+
+  @DbJson
+  PlainBean jbean;
 
   public String getStreet() {
     return street;
@@ -40,6 +46,14 @@ public class EAddress {
 
   public void setCity(String city) {
     this.city = city;
+  }
+
+  public PlainBean getJbean() {
+    return jbean;
+  }
+
+  public void setJbean(PlainBean jbean) {
+    this.jbean = jbean;
   }
 
   public EAddressStatus getStatus() {

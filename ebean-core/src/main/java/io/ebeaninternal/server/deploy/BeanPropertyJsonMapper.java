@@ -27,6 +27,16 @@ public class BeanPropertyJsonMapper extends BeanProperty {
     this.sourceDetection = deployProp.getMutationDetection() == MutationDetection.SOURCE;
   }
 
+  private BeanPropertyJsonMapper(BeanPropertyJsonMapper source, BeanPropertyOverride override) {
+    super(source, override);
+    this.sourceDetection = source.sourceDetection;
+  }
+
+  @Override
+  public BeanProperty override(BeanPropertyOverride override) {
+    return new BeanPropertyJsonMapper(this, override);
+  }
+
   @Override
   public MutableValueInfo createMutableInfo(String json) {
     if (sourceDetection) {

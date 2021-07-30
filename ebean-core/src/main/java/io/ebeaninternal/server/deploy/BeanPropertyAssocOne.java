@@ -94,10 +94,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
-  /**
-   * Copy constructor for ManyToOne inside Embeddable.
-   */
-  public BeanPropertyAssocOne(BeanPropertyAssocOne source, BeanPropertyOverride override) {
+  @Override
+  public BeanPropertyAssocOne<?> override(BeanPropertyOverride override) {
+    return new BeanPropertyAssocOne<>(this, override);
+  }
+
+  protected BeanPropertyAssocOne(BeanPropertyAssocOne<T> source, BeanPropertyOverride override) {
     super(source, override);
     primaryKeyExport = source.primaryKeyExport;
     primaryKeyJoin = source.primaryKeyJoin;
@@ -255,12 +257,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private SqlUpdate deleteByParentIdList(List<Object> parentIds) {
-
-    StringBuilder sb = new StringBuilder(100);
-    sb.append(deleteByParentIdInSql);
-    sb.append(targetIdBinder.getIdInValueExpr(false, parentIds.size()));
-
-    DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
+    String sql = deleteByParentIdInSql + targetIdBinder.getIdInValueExpr(false, parentIds.size());
+    DefaultSqlUpdate delete = new DefaultSqlUpdate(sql);
     bindParentIds(delete, parentIds);
     return delete;
   }
@@ -501,7 +499,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return targetDescriptor.getIdProperty();
   }
 
-  ScalarType getIdScalarType() {
+  ScalarType<?> getIdScalarType() {
     return targetDescriptor.getIdProperty().scalarType;
   }
 

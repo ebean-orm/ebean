@@ -365,13 +365,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return InternString.intern(s);
   }
 
+  public BeanProperty override(BeanPropertyOverride override) {
+    return new BeanProperty(this, override);
+  }
+
   /**
-   * Create a Matching BeanProperty with some attributes overridden.
-   * <p>
-   * Primarily for supporting Embedded beans with overridden dbColumn
-   * mappings.
+   * Create a Matching BeanProperty with some attributes overridden for Embedded beans.
    */
-  public BeanProperty(BeanProperty source, BeanPropertyOverride override) {
+  protected BeanProperty(BeanProperty source, BeanPropertyOverride override) {
     this.descriptor = source.descriptor;
     this.propertyIndex = source.propertyIndex;
     this.name = source.getName();
