@@ -76,6 +76,9 @@ public class BeanPropertyJsonMapper extends BeanProperty {
   public Object readSet(DataReader reader, EntityBean bean) throws SQLException {
     try {
       Object value = scalarType.read(reader);
+      if (value == null) {
+        value = checkForEmpty(bean);
+      }
       if (bean != null) {
         setValue(bean, value);
         String json = reader.popJson();

@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -623,9 +624,21 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return scalarType.read(reader);
   }
 
+  protected Object checkForEmpty(EntityBean bean) {
+    final Object value = getValue(bean);
+    if (value instanceof Collection && ((Collection<?>) value).isEmpty()
+      || value instanceof Map && ((Map<?, ?>) value).isEmpty()) {
+      return value;
+    }
+    return null;
+  }
+
   public Object readSet(DataReader reader, EntityBean bean) throws SQLException {
     try {
       Object value = scalarType.read(reader);
+      if (value == null) {
+        value = checkForEmpty(bean);
+      }
       if (bean != null) {
         setValue(bean, value);
       }

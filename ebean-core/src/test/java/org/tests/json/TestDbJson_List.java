@@ -234,8 +234,7 @@ public class TestDbJson_List extends BaseTestCase {
     bean.setBeanMap(null);
     DB.save(bean);
 
-    bean = DB.find(EBasicJsonList.class)
-      .setId(bean.getId()).findOne();
+    bean = DB.find(EBasicJsonList.class).setId(bean.getId()).findOne();
 
     assertThat(bean.getFlags()).isEmpty();
     assertThat(bean.getTags()).isEmpty();
