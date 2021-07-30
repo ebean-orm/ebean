@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.MutableValueInfo;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -13,6 +14,7 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.text.TextException;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
@@ -31,11 +33,7 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.LocalEncryptedType;
-import io.ebeaninternal.server.type.ScalarTypeBoolean;
-import io.ebeaninternal.server.type.ScalarTypeEnum;
-import io.ebeaninternal.server.type.ScalarTypeLogicalType;
+import io.ebeaninternal.server.type.*;
 import io.ebeaninternal.util.ValueUtil;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -632,6 +630,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
         setValue(bean, value);
       }
       return value;
+    } catch (TextException e) {
+      throw e;
     } catch (Exception e) {
       throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
     }
@@ -642,15 +642,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-    try {
-      Object value = scalarType.read(ctx.getDataReader());
-      if (bean != null) {
-        setValue(bean, value);
-      }
-      return value;
-    } catch (Exception e) {
-      throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
-    }
+    return readSet(ctx.getDataReader(), bean);
   }
 
   @SuppressWarnings("unchecked")
@@ -829,6 +821,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * creates a mutableHash for the given JSON value.
+   */
+  public MutableValueInfo createMutableInfo(String json) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * Read the value for this property from L2 cache entry and set it to the bean.
    * <p>
    * This uses parse() as per the comment in getCacheDataValue().
@@ -909,7 +908,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the name of the property.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public String getName() {
     return name;
   }
@@ -1018,8 +1018,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
-  boolean isDirtyValue(Object value) {
-    return scalarType.isDirty(value);
+  boolean checkMutable(Object value, boolean alreadyDirty, EntityBeanIntercept ebi) {
+    return alreadyDirty || value != null && scalarType.isDirty(value);
   }
 
   /**
@@ -1281,7 +1281,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public Object localEncrypt(Object value) {
-    return ((LocalEncryptedType)scalarType).localEncrypt(value);
+    return ((LocalEncryptedType) scalarType).localEncrypt(value);
   }
 
   /**
@@ -1394,7 +1394,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public Class<?> getPropertyType() {
     return propertyType;
   }

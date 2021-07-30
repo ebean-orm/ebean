@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class EbeanServer_refresh {
 
@@ -39,8 +39,11 @@ public class EbeanServer_refresh {
 
     assertEquals(rows, 1);
 
+    basic.setName("modify");
+    assertTrue(DB.getBeanState(basic).isDirty());
     server.refresh(basic);
     assertEquals(basic.getStatus(), EBasic.Status.ACTIVE);
+    assertFalse(DB.getBeanState(basic).isDirty());
   }
 
   @Test

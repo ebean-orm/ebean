@@ -64,6 +64,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   @Override
+  public void pushJson(String json) {
+    dataBind.pushJson(json);
+  }
+
+  @Override
   public long now() {
     return now;
   }
