@@ -1,10 +1,8 @@
 package org.tests.model.json;
 
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebeantest.LoggedSql;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +16,7 @@ public class TestJacksonPlainBean {
     bean.setAttr("n0");
     DB.save(bean);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     bean.setAttr("n1");
     DB.save(bean);
     expectedSql(0, "update ebasic_plain set attr=?, version=? where id=? and version=?");
@@ -32,14 +30,14 @@ public class TestJacksonPlainBean {
     DB.save(found);
     expectedSql(1, "update ebasic_plain set attr=?, version=? where id=? and version=?");
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   @Test
   public void insertUpdate() {
 
     DB.getDefault();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     PlainBean content = new PlainBean("foo", 42);
     EBasicPlain bean = new EBasicPlain();
@@ -87,11 +85,11 @@ public class TestJacksonPlainBean {
     DB.save(found);
     expectedSql(0, "update ebasic_plain set plain_bean2=?, version=? where id=? and version=?");
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   private void expectedSql(int i, String s) {
-    assertThat(LoggedSqlCollector.current().get(i)).contains(s);
+    assertThat(LoggedSql.collect().get(i)).contains(s);
   }
 
 }

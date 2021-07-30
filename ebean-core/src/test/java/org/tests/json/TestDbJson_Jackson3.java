@@ -59,20 +59,15 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     LoggedSql.start();
     found.save();
-
-    List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set name=?, version=? where id=? and version=?");
+    expectedSql(0, "update ebasic_json_jackson3 set name=?, version=? where id=? and version=?");
 
     found.setName("b1-mod2");
     found.getPlainValue().setName("b");
     // found.getPlainValue().setMarkedDirty(true); // Irrelevant for SOURCE or HASH based mutation detection
 
     found.save();
-
-    sql = LoggedSql.stop();
-    assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set name=?, plain_value=?, version=? where id=? and version=?");
+    expectedSql(0, "update ebasic_json_jackson3 set name=?, plain_value=?, version=? where id=? and version=?");
+    LoggedSql.stop();
 
     final EBasicJsonJackson3 found2 = DB.find(EBasicJsonJackson3.class, bean.getId());
 
@@ -112,20 +107,16 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     LoggedSql.start();
     DB.save(found);
 
-    List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(1);
     // plain_bean=?, no longer included with MD5 dirty detection
-    assertThat(sql.get(0)).contains("update ebasic_json_list set name=?, bean_list=?, version=? where id=?");
+    expectedSql(0, "update ebasic_json_list set name=?, bean_list=?, version=? where id=?");
 
     assertThat(EBasicJsonListPersistController.updatedValues.entrySet())
       .extracting(Map.Entry::toString)
       .containsExactlyInAnyOrder("beanList=null,[name:a]","name=p1-mod,p1","version=2,1");
 
-
     assertThat(DB.getBeanState(found).isDirty()).isFalse();
 
     found.getPlainBean().setName("b");
-
     assertThat(DB.getBeanState(found).isDirty()).isTrue();
 
     state = DB.getBeanState(found);
@@ -138,14 +129,14 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     LoggedSql.start();
     DB.save(found);
 
-    sql = LoggedSql.stop();
-    assertThat(sql).hasSize(1);
     // plain_bean=?, no longer included with MD5 dirty detection
-    assertThat(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, version=? where id=?");
+    expectedSql(0, "update ebasic_json_list set plain_bean=?, version=? where id=?");
 
     assertThat(EBasicJsonListPersistController.updatedValues.entrySet())
       .extracting(Map.Entry::toString)
       .containsExactlyInAnyOrder("plainBean=name:b,name:a", "version=3,2");
+
+    LoggedSql.stop();
   }
 
   @Test
@@ -210,8 +201,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     LoggedSql.start();
     bean.save();
-    List<String> sql = LoggedSql.collect();
-    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set plain_value=?, plain_value2=?, version=? where id=?");
+    expectedSql(0, "update ebasic_json_jackson3 set plain_value=?, plain_value2=?, version=? where id=?");
 
     bean = DB.find(EBasicJsonJackson3.class, bean.getId());
     LoggedSql.collect(); // ignore the select
@@ -227,9 +217,12 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     bean.getPlainValue2().setName("b2"); // effectively HASH mode mutation detection
     bean.save();
-    sql = LoggedSql.collect();
-    assertThat(sql.get(0)).contains("update ebasic_json_jackson3 set plain_value2=?, version=? where id=? and version=?");
+    expectedSql(0, "update ebasic_json_jackson3 set plain_value2=?, version=? where id=? and version=?");
 
     LoggedSql.stop();
+  }
+
+  private void expectedSql(int i, String s) {
+    assertThat(LoggedSql.collect().get(i)).contains(s);
   }
 }
