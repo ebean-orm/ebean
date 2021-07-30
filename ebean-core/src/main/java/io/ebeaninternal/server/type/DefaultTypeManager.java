@@ -134,7 +134,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.postgres = isPostgres(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
-    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.isJsonDirtyByDefault()) : null;
+    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper) : null;
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
@@ -556,7 +556,7 @@ public final class DefaultTypeManager implements TypeManager {
       // no override or further mapping required
       return scalarType;
     }
-    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>)scalarType;
+    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>) scalarType;
     if (scalarEnum != null && !scalarEnum.isOverrideBy(type)) {
       if (type != null && !scalarEnum.isCompatible(type)) {
         throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
@@ -673,7 +673,7 @@ public final class DefaultTypeManager implements TypeManager {
   private Object initObjectMapper(DatabaseConfig config) {
     Object objectMapper = config.getObjectMapper();
     if (objectMapper == null) {
-      objectMapper = new ObjectMapper();
+      objectMapper = InitObjectMapper.init();
       config.setObjectMapper(objectMapper);
     }
     return objectMapper;

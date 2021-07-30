@@ -194,12 +194,6 @@ public class DatabaseConfig {
   private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
 
   /**
-   * When true then by default DbJson beans are assumed to be dirty.
-   * I believe we want to change this default to false in the future.
-   */
-  private boolean jsonDirtyByDefault = true;
-
-  /**
    * The database platform name. Used to imply a DatabasePlatform to use.
    */
   private String databasePlatformName;
@@ -741,26 +735,6 @@ public class DatabaseConfig {
    */
   public void setJsonInclude(JsonConfig.Include jsonInclude) {
     this.jsonInclude = jsonInclude;
-  }
-
-  /**
-   * Return true if DbJson beans are assumed dirty by default.
-   * <p>
-   * That is, when true beans that do not implement ModifyAwareType are by
-   * default assumed to be dirty and included in updates.
-   */
-  public boolean isJsonDirtyByDefault() {
-    return jsonDirtyByDefault;
-  }
-
-  /**
-   * Set to false if we want DbJson beans to not be assumed to be dirty.
-   * <p>
-   * That is, when true beans that do not implement ModifyAwareType are by
-   * default assumed to be dirty and included in updates.
-   */
-  public void setJsonDirtyByDefault(boolean jsonDirtyByDefault) {
-    this.jsonDirtyByDefault = jsonDirtyByDefault;
   }
 
   /**
@@ -2935,7 +2909,6 @@ public class DatabaseConfig {
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
     jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
     jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
-    jsonDirtyByDefault = p.getBoolean("jsonDirtyByDefault", jsonDirtyByDefault);
 
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);

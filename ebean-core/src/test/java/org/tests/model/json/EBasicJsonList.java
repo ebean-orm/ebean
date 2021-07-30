@@ -20,6 +20,7 @@ public class EBasicJsonList {
 
   String name;
 
+  // @JsonDeserialize(as=LinkedHashSet.class)
   @DbJson(length = 700, name = "beans")
   Set<PlainBean> beanSet;
 
