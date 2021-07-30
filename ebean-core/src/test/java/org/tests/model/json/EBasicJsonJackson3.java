@@ -2,10 +2,14 @@ package org.tests.model.json;
 
 import io.ebean.Model;
 import io.ebean.annotation.DbJson;
+import io.ebean.annotation.MutationDetection;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
+
+import static io.ebean.annotation.MutationDetection.NONE;
+import static io.ebean.annotation.MutationDetection.SOURCE;
 
 @Entity
 public class EBasicJsonJackson3 extends Model {
@@ -15,12 +19,15 @@ public class EBasicJsonJackson3 extends Model {
 
   String name;
 
-  @DbJson(length = 500)
+  @DbJson(length = 500, mutationDetection = SOURCE)
   PlainBeanDirtyAware plainValue;
 
   @DbJson(length = 500)
   PlainBeanDirtyAware plainValue2;
-  
+
+  @DbJson(length = 500, mutationDetection = NONE)
+  PlainBeanDirtyAware plainValue3;
+
   @Version
   long version;
 
@@ -55,7 +62,15 @@ public class EBasicJsonJackson3 extends Model {
   public void setPlainValue2(PlainBeanDirtyAware plainValue2) {
     this.plainValue2 = plainValue2;
   }
-  
+
+  public PlainBeanDirtyAware getPlainValue3() {
+    return plainValue3;
+  }
+
+  public void setPlainValue3(PlainBeanDirtyAware plainValue3) {
+    this.plainValue3 = plainValue3;
+  }
+
   public long getVersion() {
     return version;
   }
