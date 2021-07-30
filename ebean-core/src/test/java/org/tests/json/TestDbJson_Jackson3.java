@@ -66,7 +66,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     found.setName("b1-mod2");
     found.getPlainValue().setName("b");
-    found.getPlainValue().setMarkedDirty(true);
+    // found.getPlainValue().setMarkedDirty(true); // Irrelevant for SOURCE or HASH based mutation detection
 
     found.save();
 
@@ -192,7 +192,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(state.isNewOrDirty()).isFalse();
     assertThat(state.getChangedProps()).isEmpty();
 
-    bean.getPlainValue().setName("a"); // has keepSource=true
+    bean.getPlainValue().setName("a"); // has SOURCE
 
     assertThat(state.isDirty()).isTrue();
     assertThat(state.getChangedProps()).containsExactly("plainValue");
@@ -200,7 +200,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     bean.getPlainValue2().setName("b");
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainValue", "plainValue2");
 
-    bean.getPlainValue3().setName("c"); // has dirtyDetection = false
+    bean.getPlainValue3().setName("c"); // has mutationDetection = NONE
 
     Map<String, ValuePair> dirtyValues = state.getDirtyValues();
     assertThat(dirtyValues).hasSize(2).containsKeys("plainValue", "plainValue2");
