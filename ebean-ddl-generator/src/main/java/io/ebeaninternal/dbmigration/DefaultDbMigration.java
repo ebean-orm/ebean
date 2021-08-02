@@ -106,6 +106,7 @@ public class DefaultDbMigration implements DbMigration {
   private boolean addForeignKeySkipCheck;
   private int lockTimeoutSeconds;
   protected boolean includeBuiltInPartitioning = true;
+  protected boolean includeIndex;
 
   /**
    * Create for offline migration generation.
@@ -180,6 +181,11 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setGeneratePendingDrop(String generatePendingDrop) {
     this.generatePendingDrop = generatePendingDrop;
+  }
+
+  @Override
+  public void setIncludeIndex(boolean includeIndex) {
+    this.includeIndex = includeIndex;
   }
 
   @Override
@@ -273,7 +279,26 @@ public class DefaultDbMigration implements DbMigration {
    */
   @Override
   public String generateMigration() throws IOException {
-    return generateMigrationFor(false);
+    final String version = generateMigrationFor(false);
+    if (includeIndex) {
+      generateIndex(version);
+    }
+    return version;
+  }
+
+  /**
+   * Generate the {@code idx_platform.migrations} file.
+   */
+  private void generateIndex(String version) throws IOException {
+    final boolean overwrite = version != null;
+    final File topDir = migrationDirectory(false);
+    if (!platforms.isEmpty()) {
+      for (Pair pair : platforms) {
+        new IndexMigration(topDir, pair).generate(overwrite);
+      }
+    } else {
+      new IndexMigration(topDir, databasePlatform).generate(overwrite);
+    }
   }
 
   @Override

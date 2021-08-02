@@ -27,20 +27,22 @@ public class DbMigrationGenerateTest {
 
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationGenerateTest.class);
 
-  @Test
-  public void invokeTest() throws IOException {
-    main(null);
+  public static void main(String[] args) throws IOException {
+    run("ebean-ddl-generator/src/test/resources");
   }
 
-  public static void main(String[] args) throws IOException {
+  @Test
+  public void invokeTest() throws IOException {
+    run("src/test/resources");
+  }
 
-    logger.info("start");
+  public static void run(String pathToResources) throws IOException {
+    logger.info("start current directory: " + new File(".").getAbsolutePath());
 
     DefaultDbMigration migration = new DefaultDbMigration();
-
+    migration.setIncludeIndex(true);
     // We use src/test/resources as output directory (so we see in GIT if files will change)
-
-    migration.setPathToResources("src/test/resources");
+    migration.setPathToResources(pathToResources);
     migration.setMigrationPath("db/migration");
     migration.setMigrationPath(null); // use the default for this test
 

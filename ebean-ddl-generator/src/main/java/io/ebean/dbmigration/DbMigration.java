@@ -134,6 +134,14 @@ public interface DbMigration {
   void setStrictMode(boolean strictMode);
 
   /**
+   * Set to include generation of the index migration file.
+   * <p>
+   * When true this generates a {@code idx_<platform>.migrations} file. This can be used by the migration
+   * runner to improve performance of running migrations, especially when no migration changes have occurred.
+   */
+  void setIncludeIndex(boolean generateIndexFile);
+
+  /**
    * Set to true to include a generated header comment in the DDL script.
    */
   void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment);
