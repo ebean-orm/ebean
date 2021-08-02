@@ -70,8 +70,8 @@ public class DbMigrationGenerateTest {
     migration.setServer(server);
 
     // First, we clean up the output-directory
-    assertThat(migration.getMigrationDirectory().getAbsolutePath()).contains("migrationtest");
-    Files.walk(migration.getMigrationDirectory().toPath())
+    assertThat(migration.migrationDirectory().getAbsolutePath()).contains("migrationtest");
+    Files.walk(migration.migrationDirectory().toPath())
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
 
     // then we generate migration scripts for v1_0

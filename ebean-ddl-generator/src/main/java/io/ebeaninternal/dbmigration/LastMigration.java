@@ -18,7 +18,7 @@ class LastMigration {
   private static final String MODEL_XML = ".model.xml";
 
   /**
-   * Return the next migation version given the migration directory.
+   * Return the next migration version given the migration directory.
    */
   static String nextVersion(File migDir, File modelDir, boolean initMigration) {
     String last = lastVersion(migDir, modelDir);
