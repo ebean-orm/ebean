@@ -29,10 +29,9 @@ class LastMigration {
   }
 
   /**
-   * Return the last migation version given the migration directory.
+   * Return the last migration version given the migration directory.
    */
   static String lastVersion(File migDirectory, File modelDir) {
-
     List<MigrationVersion> versions = new ArrayList<>();
 
     File[] sqlFiles = migDirectory.listFiles(pathname -> includeSqlFile(pathname.getName().toLowerCase()));

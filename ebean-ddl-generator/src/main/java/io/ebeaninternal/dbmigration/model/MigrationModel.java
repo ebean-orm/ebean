@@ -18,12 +18,8 @@ public class MigrationModel {
   private static final Logger logger = LoggerFactory.getLogger(MigrationModel.class);
 
   private final ModelContainer model = new ModelContainer();
-
   private final File modelDirectory;
-
   private final String modelSuffix;
-
-  private MigrationVersion lastVersion;
 
   public MigrationModel(File modelDirectory, String modelSuffix) {
     this.modelDirectory = modelDirectory;
@@ -58,13 +54,8 @@ public class MigrationModel {
     if (!initMigration) {
       for (MigrationResource migrationResource : resources) {
         logger.debug("read {}", migrationResource);
-        model.apply(migrationResource.read(), migrationResource.getVersion());
+        model.apply(migrationResource.read(), migrationResource.version());
       }
-    }
-
-    // remember the last version
-    if (!resources.isEmpty()) {
-      lastVersion = resources.get(resources.size() - 1).getVersion();
     }
   }
 
@@ -72,10 +63,5 @@ public class MigrationModel {
     String fileName = xmlFile.getName();
     String versionName = fileName.substring(0, fileName.length() - modelSuffix.length());
     return MigrationVersion.parse(versionName);
-  }
-
-  public String getNextVersion(String initialVersion) {
-
-    return lastVersion == null ? initialVersion : lastVersion.nextVersion();
   }
 }

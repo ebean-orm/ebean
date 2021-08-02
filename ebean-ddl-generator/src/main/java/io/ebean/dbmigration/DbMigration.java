@@ -16,7 +16,6 @@ import java.util.ServiceLoader;
  * <p>
  * Typically this is run as a main method in src/test once a developer is happy
  * with the next set of changes to the model.
- * </p>
  *
  * <h3>Example: Run for a single specific platform</h3>
  *
@@ -39,11 +38,9 @@ import java.util.ServiceLoader;
  * are no longer being used by the application. These changes are called
  * "pending drops" and we must explicitly specify to include these in
  * a generated migration.
- * </p>
  * <p>
  * Use <code>setGeneratePendingDrop()</code> to specify a prior migration
  * that has drop column changes that we want to generate a migration for.
- * </p>
  *
  * <h3>Example: Generate for pending drops</h3>
  *
@@ -67,7 +64,6 @@ public interface DbMigration {
    * Create a DbMigration implementation to use.
    */
   static DbMigration create() {
-
     Iterator<DbMigration> loader = ServiceLoader.load(DbMigration.class).iterator();
     if (loader.hasNext()) {
       return loader.next();
@@ -76,7 +72,7 @@ public interface DbMigration {
   }
 
   /**
-   * Set to false to suppress logging to System out.
+   * Set logging to System out (defaults to true).
    */
   void setLogToSystemOut(boolean logToSystemOut);
 
@@ -105,13 +101,12 @@ public interface DbMigration {
   void setMigrationPath(String migrationPath);
 
   /**
-   * Set the server to use to determine the current model.
-   * Typically this is not called explicitly.
+   * Set the server to use to determine the current model. Usually this is not called explicitly.
    */
   void setServer(Database database);
 
   /**
-   * Set the DatabaseConfig to use. Typically this is not called explicitly.
+   * Set the DatabaseConfig to use. Usually this is not called explicitly.
    */
   void setServerConfig(DatabaseConfig config);
 
@@ -119,7 +114,6 @@ public interface DbMigration {
    * Set the specific platform to generate DDL for.
    * <p>
    * If not set this defaults to the platform of the default database.
-   * </p>
    */
   void setPlatform(Platform platform);
 
@@ -127,17 +121,15 @@ public interface DbMigration {
    * Set the specific platform to generate DDL for.
    * <p>
    * If not set this defaults to the platform of the default database.
-   * </p>
    */
   void setPlatform(DatabasePlatform databasePlatform);
 
   /**
-   * Set to false to turn off strict mode.
+   * Set to false in order to turn off strict mode.
    * <p>
    * Strict mode checks that a column changed to non-null on an existing table via DB migration has a default
    * value specified. Set this to false if that isn't the case but it is known that all the existing rows have
    * a value specified (there are no existing null values for the column).
-   * </p>
    */
   void setStrictMode(boolean strictMode);
 
@@ -182,7 +174,6 @@ public interface DbMigration {
    * Set to true if ALTER TABLE ADD FOREIGN KEY should be generated with an option to skip validation.
    * <p>
    * Currently this is only useful for Postgres DDL adding the <code>NOT VALID</code> option.
-   * </p>
    */
   void setAddForeignKeySkipCheck(boolean addForeignKeySkipCheck);
 
@@ -191,7 +182,6 @@ public interface DbMigration {
    * <p>
    * Currently this is only useful for Postgres migrations adding a <code>set lock_timeout</code>
    * statement to the generated database migration.
-   * </p>
    */
   void setLockTimeout(int seconds);
 
@@ -200,7 +190,6 @@ public interface DbMigration {
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms
    * from the migration (e.g. generate migration sql for MySql, Postgres and Oracle).
-   * </p>
    */
   void addPlatform(Platform platform);
 
