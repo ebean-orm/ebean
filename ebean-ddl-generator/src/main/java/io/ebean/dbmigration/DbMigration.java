@@ -196,19 +196,23 @@ public interface DbMigration {
   void setLockTimeout(int seconds);
 
   /**
-   * Add an additional platform to write the migration DDL.
+   * Add a platform to write the migration DDL.
    * <p>
    * Use this when you want to generate sql scripts for multiple database platforms
    * from the migration (e.g. generate migration sql for MySql, Postgres and Oracle).
    * </p>
    */
+  void addPlatform(Platform platform);
+
+  /**
+   * Add a platform to write with a given prefix.
+   */
   void addPlatform(Platform platform, String prefix);
 
   /**
-   * Add an additional databasePlatform to write the migration DDL.
+   * Add a databasePlatform to write the migration DDL.
    * <p>
    * Use this when you want to add preconfigured database platforms.
-   * </p>
    */
   void addDatabasePlatform(DatabasePlatform databasePlatform, String prefix);
 
@@ -256,9 +260,9 @@ public interface DbMigration {
    *
    *   migration.setPathToResources("src/main/resources");
    *
-   *   migration.addPlatform(Platform.POSTGRES, "pg");
-   *   migration.addPlatform(Platform.MYSQL, "mysql");
-   *   migration.addPlatform(Platform.ORACLE, "oracle");
+   *   migration.addPlatform(Platform.POSTGRES);
+   *   migration.addPlatform(Platform.MYSQL);
+   *   migration.addPlatform(Platform.ORACLE);
    *
    *   migration.generateMigration();
    *

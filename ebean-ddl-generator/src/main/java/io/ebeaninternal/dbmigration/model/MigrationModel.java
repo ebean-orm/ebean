@@ -34,16 +34,14 @@ public class MigrationModel {
    * Read all the migrations returning the model with all
    * the migrations applied in version order.
    *
-   * @param dbinitMigration If true we don't apply model changes, migration is from scratch.
+   * @param initMigration If true we don't apply model changes, migration is from scratch.
    */
-  public ModelContainer read(boolean dbinitMigration) {
-
-    readMigrations(dbinitMigration);
+  public ModelContainer read(boolean initMigration) {
+    readMigrations(initMigration);
     return model;
   }
 
-  private void readMigrations(boolean dbinitMigration) {
-
+  private void readMigrations(boolean initMigration) {
     // find all the migration xml files
     File[] xmlFiles = modelDirectory.listFiles(pathname -> pathname.getName().toLowerCase().endsWith(modelSuffix));
     if (xmlFiles == null || xmlFiles.length == 0) {
@@ -57,7 +55,7 @@ public class MigrationModel {
     // sort into version order before applying
     Collections.sort(resources);
 
-    if (!dbinitMigration) {
+    if (!initMigration) {
       for (MigrationResource migrationResource : resources) {
         logger.debug("read {}", migrationResource);
         model.apply(migrationResource.read(), migrationResource.getVersion());

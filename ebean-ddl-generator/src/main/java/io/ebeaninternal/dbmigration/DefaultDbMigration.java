@@ -259,13 +259,12 @@ public class DefaultDbMigration implements DbMigration {
     }
   }
 
-  /**
-   * Add an additional platform to write the migration DDL.
-   * <p>
-   * Use this when you want to generate sql scripts for multiple database platforms
-   * from the migration (e.g. generate migration sql for MySql, Postgres and Oracle).
-   * </p>
-   */
+  @Override
+  public void addPlatform(Platform platform) {
+    String prefix = platform.base().name().toLowerCase();
+    addPlatform(platform, prefix);
+  }
+
   @Override
   public void addPlatform(Platform platform, String prefix) {
     platforms.add(new Pair(getPlatform(platform), prefix));
@@ -286,7 +285,7 @@ public class DefaultDbMigration implements DbMigration {
    *
    *       DbMigration migration = DbMigration.create();
    *       migration.setPathToResources("src/main/resources");
-   *       migration.setPlatform(DbPlatformName.ORACLE);
+   *       migration.setPlatform(Platform.ORACLE);
    *
    *       migration.generateMigration();
    *
@@ -298,9 +297,9 @@ public class DefaultDbMigration implements DbMigration {
    *       DbMigration migration = DbMigration.create();
    *       migration.setPathToResources("src/main/resources");
    *
-   *       migration.addPlatform(DbPlatformName.POSTGRES, "pg");
-   *       migration.addPlatform(DbPlatformName.MYSQL, "mysql");
-   *       migration.addPlatform(DbPlatformName.ORACLE, "mysql");
+   *       migration.addPlatform(Platform.POSTGRES);
+   *       migration.addPlatform(Platform.MYSQL);
+   *       migration.addPlatform(Platform.ORACLE);
    *
    *       migration.generateMigration();
    *
@@ -318,10 +317,9 @@ public class DefaultDbMigration implements DbMigration {
     return generateMigrationFor(true);
   }
 
-  private String generateMigrationFor(boolean dbinitMigration) throws IOException {
-
-    // use this flag to stop other plugins like full DDL generation
+  private String generateMigrationFor(boolean initMigration) throws IOException {
     if (!online) {
+      // use this flag to stop other plugins like full DDL generation
       DbOffline.setGenerateMigration();
       if (databasePlatform == null && !platforms.isEmpty()) {
         // for multiple platform generation the first platform
@@ -334,8 +332,8 @@ public class DefaultDbMigration implements DbMigration {
       configurePlatforms();
     }
     try {
-      Request request = createRequest(dbinitMigration);
-      if (!dbinitMigration) {
+      Request request = createRequest(initMigration);
+      if (!initMigration) {
         // repeatable migrations
         if (platforms.isEmpty()) {
           generateExtraDdl(request.migrationDir, databasePlatform, request.isTablePartitioning());
@@ -512,31 +510,31 @@ public class DefaultDbMigration implements DbMigration {
     return version;
   }
 
-  private Request createRequest(boolean dbinitMigration) {
-    return new Request(dbinitMigration);
+  private Request createRequest(boolean initMigration) {
+    return new Request(initMigration);
   }
 
   private class Request {
 
-    final boolean dbinitMigration;
+    final boolean initMigration;
     final File migrationDir;
     final File modelDir;
     final CurrentModel currentModel;
     final ModelContainer migrated;
     final ModelContainer current;
 
-    private Request(boolean dbinitMigration) {
-      this.dbinitMigration = dbinitMigration;
+    private Request(boolean initMigration) {
+      this.initMigration = initMigration;
       this.currentModel = new CurrentModel(server, constraintNaming);
       this.current = currentModel.read();
-      this.migrationDir = getMigrationDirectory(dbinitMigration);
-      if (dbinitMigration) {
+      this.migrationDir = getMigrationDirectory(initMigration);
+      if (initMigration) {
         this.modelDir = null;
         this.migrated = new ModelContainer();
       } else {
         this.modelDir = getModelDirectory(migrationDir);
         MigrationModel migrationModel = new MigrationModel(modelDir, modelSuffix);
-        this.migrated = migrationModel.read(dbinitMigration);
+        this.migrated = migrationModel.read(false);
       }
     }
 
@@ -551,7 +549,7 @@ public class DefaultDbMigration implements DbMigration {
       // always read the next version using the main migration directory (not dbinit)
       File migDirectory = getMigrationDirectory(false);
       File modelDir = getModelDirectory(migDirectory);
-      return LastMigration.nextVersion(migDirectory, modelDir, dbinitMigration);
+      return LastMigration.nextVersion(migDirectory, modelDir, initMigration);
     }
 
     /**
@@ -588,7 +586,7 @@ public class DefaultDbMigration implements DbMigration {
     String fullVersion = getFullVersion(request.nextVersion(), dropsFor);
 
     logInfo("generating migration:%s", fullVersion);
-    if (!request.dbinitMigration && !writeMigrationXml(dbMigration, request.modelDir, fullVersion)) {
+    if (!request.initMigration && !writeMigrationXml(dbMigration, request.modelDir, fullVersion)) {
       logError("migration already exists, not generating DDL");
       return null;
     } else {
@@ -782,17 +780,15 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Return the file path to write the xml and sql to.
    */
-  File getMigrationDirectory(boolean dbinitMigration) {
-
+  File getMigrationDirectory(boolean initMigration) {
     // path to src/main/resources in typical maven project
     File resourceRootDir = new File(pathToResources);
     if (!resourceRootDir.exists()) {
       String msg = String.format("Error - path to resources %s does not exist. Absolute path is %s", pathToResources, resourceRootDir.getAbsolutePath());
       throw new UnknownResourcePathException(msg);
     }
-    String resourcePath = getMigrationPath(dbinitMigration);
-
-    // expect to be a path to something like - src/main/resources/dbmigration/model
+    String resourcePath = getMigrationPath(initMigration);
+    // expect to be a path to something like - src/main/resources/dbmigration
     File path = new File(resourceRootDir, resourcePath);
     if (!path.exists()) {
       if (!path.mkdirs()) {
@@ -802,8 +798,8 @@ public class DefaultDbMigration implements DbMigration {
     return path;
   }
 
-  private String getMigrationPath(boolean dbinitMigration) {
-    return dbinitMigration ? migrationInitPath : migrationPath;
+  private String getMigrationPath(boolean initMigration) {
+    return initMigration ? migrationInitPath : migrationPath;
   }
 
   /**

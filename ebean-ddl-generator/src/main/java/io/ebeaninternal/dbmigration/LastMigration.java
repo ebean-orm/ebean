@@ -20,13 +20,12 @@ class LastMigration {
   /**
    * Return the next migation version given the migration directory.
    */
-  static String nextVersion(File migDir, File modelDir, boolean dbinitMigration) {
-
+  static String nextVersion(File migDir, File modelDir, boolean initMigration) {
     String last = lastVersion(migDir, modelDir);
     if (last == null) {
       return null;
     }
-    return (dbinitMigration) ? last : MigrationVersion.parse(last).nextVersion();
+    return (initMigration) ? last : MigrationVersion.parse(last).nextVersion();
   }
 
   /**
