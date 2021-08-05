@@ -7,9 +7,7 @@ import io.ebean.EbeanVersion;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import io.ebean.annotation.Encrypted;
-import io.ebean.annotation.PersistBatch;
-import io.ebean.annotation.Platform;
+import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -192,6 +190,11 @@ public class DatabaseConfig {
    * By default all values are included.
    */
   private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
+
+  /**
+   * The default mode used for {@code @DbJson} with Jackson ObjectMapper.
+   */
+  private MutationDetection jsonMutationDetection = MutationDetection.HASH;
 
   /**
    * The database platform name. Used to imply a DatabasePlatform to use.
@@ -735,6 +738,24 @@ public class DatabaseConfig {
    */
   public void setJsonInclude(JsonConfig.Include jsonInclude) {
     this.jsonInclude = jsonInclude;
+  }
+
+  /**
+   * Return the default MutableDetection to use with {@code @DbJson} using Jackson.
+   *
+   * @see DbJson#mutationDetection()
+   */
+  public MutationDetection getJsonMutationDetection() {
+    return jsonMutationDetection;
+  }
+
+  /**
+   * Set the default MutableDetection to use with {@code @DbJson} using Jackson.
+   *
+   * @see DbJson#mutationDetection()
+   */
+  public void setJsonMutationDetection(MutationDetection jsonMutationDetection) {
+    this.jsonMutationDetection = jsonMutationDetection;
   }
 
   /**
@@ -2909,6 +2930,7 @@ public class DatabaseConfig {
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
     jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
     jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
+    jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);

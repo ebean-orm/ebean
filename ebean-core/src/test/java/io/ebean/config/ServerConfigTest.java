@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.datasource.DataSourceConfig;
@@ -62,7 +63,7 @@ public class ServerConfigTest {
     props.setProperty("dbOffline", "true");
     props.setProperty("jsonDateTime", "MILLIS");
     props.setProperty("jsonDate", "MILLIS");
-    props.setProperty("jsonDirtyByDefault", "false");
+    props.setProperty("jsonMutationDetection", "NONE");
     props.setProperty("autoReadOnlyDataSource", "true");
     props.setProperty("disableL2Cache", "true");
     props.setProperty("notifyL2CacheInForeground", "true");
@@ -98,6 +99,9 @@ public class ServerConfigTest {
 
     assertThat(serverConfig.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 
+    assertEquals(MutationDetection.NONE, serverConfig.getJsonMutationDetection());
+    serverConfig.setJsonMutationDetection(MutationDetection.SOURCE);
+    assertEquals(MutationDetection.SOURCE, serverConfig.getJsonMutationDetection());
     assertEquals(IdType.SEQUENCE, serverConfig.getIdType());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
@@ -156,6 +160,7 @@ public class ServerConfigTest {
     assertFalse(serverConfig.isIdGeneratorAutomatic());
     assertEquals(JsonConfig.DateTime.ISO8601, serverConfig.getJsonDateTime());
     assertEquals(JsonConfig.Date.ISO8601, serverConfig.getJsonDate());
+    assertEquals(MutationDetection.HASH, serverConfig.getJsonMutationDetection());
     assertTrue(serverConfig.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(serverConfig.isAutoLoadModuleInfo());
 

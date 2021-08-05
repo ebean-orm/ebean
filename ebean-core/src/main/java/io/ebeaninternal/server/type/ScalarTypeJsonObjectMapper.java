@@ -38,7 +38,8 @@ class ScalarTypeJsonObjectMapper {
     } else if (mode != MutationDetection.DEFAULT) {
       return new GenericObject(jsonManager, field, dbType, docType);
     }
-    prop.setMutationDetection(MutationDetection.HASH);
+    // using the global default MutationDetection mode (defaults to HASH)
+    prop.setMutationDetection(jsonManager.mutationDetection());
     return new GenericObject(jsonManager, field, dbType, docType);
   }
 

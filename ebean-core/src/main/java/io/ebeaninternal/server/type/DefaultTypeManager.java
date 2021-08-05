@@ -134,7 +134,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.postgres = isPostgres(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
-    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper) : null;
+    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.getJsonMutationDetection()) : null;
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());

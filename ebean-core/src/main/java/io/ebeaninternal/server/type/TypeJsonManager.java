@@ -2,16 +2,23 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.ModifyAwareType;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
 
 class TypeJsonManager {
 
   private final boolean postgres;
   private final ObjectMapper objectMapper;
+  private final MutationDetection mutationDetection;
 
-  TypeJsonManager(boolean postgres, Object objectMapper) {
+  TypeJsonManager(boolean postgres, Object objectMapper, MutationDetection mutationDetection) {
     this.postgres = postgres;
     this.objectMapper = (ObjectMapper) objectMapper;
+    this.mutationDetection = mutationDetection;
+  }
+
+  MutationDetection mutationDetection() {
+    return mutationDetection;
   }
 
   ObjectMapper objectMapper() {
