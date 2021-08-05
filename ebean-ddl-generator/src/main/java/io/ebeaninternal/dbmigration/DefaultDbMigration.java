@@ -281,7 +281,7 @@ public class DefaultDbMigration implements DbMigration {
   public String generateMigration() throws IOException {
     final String version = generateMigrationFor(false);
     if (includeIndex) {
-      generateIndex(version);
+      generateIndex();
     }
     return version;
   }
@@ -289,15 +289,14 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Generate the {@code idx_platform.migrations} file.
    */
-  private void generateIndex(String version) throws IOException {
-    final boolean overwrite = version != null;
+  private void generateIndex() throws IOException {
     final File topDir = migrationDirectory(false);
     if (!platforms.isEmpty()) {
       for (Pair pair : platforms) {
-        new IndexMigration(topDir, pair).generate(overwrite);
+        new IndexMigration(topDir, pair).generate();
       }
     } else {
-      new IndexMigration(topDir, databasePlatform).generate(overwrite);
+      new IndexMigration(topDir, databasePlatform).generate();
     }
   }
 

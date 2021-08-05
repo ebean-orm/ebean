@@ -397,6 +397,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       if (dbSchema != null) {
         migrationRunner.setDefaultDbSchema(dbSchema);
       }
+      migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
     }

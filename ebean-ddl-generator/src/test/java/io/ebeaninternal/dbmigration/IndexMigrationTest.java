@@ -24,7 +24,7 @@ public class IndexMigrationTest {
     }
     DatabasePlatform pg = new PostgresPlatform();
     IndexMigration indexMigration = new IndexMigration(topDir, pg);
-    indexMigration.generate(true);
+    indexMigration.generate();
 
 
     File expected = new File(topDir, "idx_postgres.migrations");
@@ -48,7 +48,7 @@ public class IndexMigrationTest {
     }
     DatabasePlatform pg = new H2Platform();
     IndexMigration indexMigration = new IndexMigration(topDir, pg);
-    indexMigration.generate(true);
+    indexMigration.generate();
 
     File expected = new File(topDir, "idx_h2.migrations");
     assertThat(expected).exists();

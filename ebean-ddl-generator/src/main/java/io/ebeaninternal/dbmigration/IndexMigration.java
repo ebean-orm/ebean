@@ -43,10 +43,7 @@ class IndexMigration {
     return new File(topDir, name);
   }
 
-  void generate(boolean overwrite) throws IOException {
-    if (!overwrite && indexFile.exists()) {
-      return;
-    }
+  void generate() throws IOException {
     readSqlFiles(topDir);
     generateIndex();
   }
