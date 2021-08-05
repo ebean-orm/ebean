@@ -30,7 +30,7 @@ public interface MetaQueryPlan {
   /**
    * Return the hash of the plan.
    */
-  String getHash();
+  long getHash();
 
   /**
    * Return a description of the bind values.

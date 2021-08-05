@@ -59,7 +59,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
     }
 
     @Override
-    public String getHash() {
+    public long getHash() {
       return meta.getHash();
     }
 

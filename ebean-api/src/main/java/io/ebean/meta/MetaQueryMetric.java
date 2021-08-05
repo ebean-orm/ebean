@@ -23,6 +23,6 @@ public interface MetaQueryMetric extends MetaTimedMetric {
   /**
    * Return the hash of the plan.
    */
-  String getHash();
+  long getHash();
 
 }

@@ -13,12 +13,12 @@ import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.util.Checksum;
 import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public class CQueryPlan implements SpiQueryPlan {
   private final boolean rawSql;
 
   private final String sql;
-  private final String hash;
+  private final long hash;
 
   private final String logWhereSql;
 
@@ -118,7 +118,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(query);
-    this.hash = md5Hash();
+    this.hash = Checksum.checksum(sql);
   }
 
   /**
@@ -143,7 +143,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCaptureRaw(sql, query);
-    this.hash = md5Hash();
+    this.hash = Checksum.checksum(sql);
   }
 
   private String deriveName(String label, SpiQuery.Type type, String simpleName) {
@@ -193,7 +193,7 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   @Override
-  public String getHash() {
+  public long getHash() {
     return hash;
   }
 
@@ -274,21 +274,6 @@ public class CQueryPlan implements SpiQueryPlan {
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
     return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
-  }
-
-  /**
-   * Return the MD5 hash of the sql.
-   */
-  private String md5Hash() {
-    StringBuilder sb = new StringBuilder(sql)
-      .append("|").append(name)
-      .append("|").append(location);
-    try {
-      return Md5.hash(sb.toString());
-    } catch (Exception e) {
-      logger.error("Failed to MD5 hash the query", e);
-      return "error";
-    }
   }
 
   SqlTree getSqlTree() {

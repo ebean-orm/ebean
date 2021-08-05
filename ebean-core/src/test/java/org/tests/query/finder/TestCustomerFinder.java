@@ -244,7 +244,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
     if (isH2() || isPostgres()) {
-      assertThat(metricsJson).contains("\"hash\":\"cc20eb930403cfd418db2d0475c6e26a\"");
+      assertThat(metricsJson).contains("\"hash\":3634991469");
       assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
     }
   }

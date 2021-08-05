@@ -20,7 +20,7 @@ public interface SpiQueryPlan {
   /**
    * The hash for the query plan.
    */
-  String getHash();
+  long getHash();
 
   /**
    * The SQL for the query plan.

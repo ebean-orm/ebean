@@ -16,12 +16,11 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private final String sql;
   private final String bind;
   private final String plan;
-
-  private String hash;
+  private final long hash;
   private long queryTimeMicros;
   private long captureCount;
 
-  DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
+  DQueryPlanOutput(Class<?> beanType, String label, long hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
     this.hash = hash;
@@ -32,7 +31,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   }
 
   @Override
-  public String getHash() {
+  public long getHash() {
     return hash;
   }
 
