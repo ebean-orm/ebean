@@ -4,10 +4,10 @@ package io.ebean.bean;
  * Holds information on mutable values (like plain beans stored as json).
  * <p>
  * Used internally in EntityBeanIntercept for dirty detection on mutable values.
- * Typically dirty detection is based on a hash/checksum of json content or the
+ * Typically, mutation detection is based on a hash/checksum of json content or the
  * original json content itself.
  * <p>
- * Refer to the mapping options {@code @DbJson(dirtyDetection)} and {@code @DbJson(keepSource)}.
+ * Refer to the mapping options {@code @DbJson(mutationDetection)}.
  */
 public interface MutableValueInfo {
 
