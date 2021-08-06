@@ -39,10 +39,10 @@ public class UpdateQueryTest extends BaseTestCase {
     assertSql(query).contains("update o_customer set status=?, updtime=? where status = ? and id > ?");
 
     ServerMetrics metrics = collectMetrics();
-    List<MetaQueryMetric> ormQueryMetrics = metrics.getQueryMetrics();
+    List<MetaQueryMetric> ormQueryMetrics = metrics.queryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
-    assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
-    assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateActive");
+    assertThat(ormQueryMetrics.get(0).type()).isEqualTo(Customer.class);
+    assertThat(ormQueryMetrics.get(0).label()).isEqualTo("updateActive");
   }
 
   @Test
@@ -69,10 +69,10 @@ public class UpdateQueryTest extends BaseTestCase {
     assertSql(sql.get(0)).contains("update o_customer set status = status");
 
     ServerMetrics metrics = collectMetrics();
-    List<MetaQueryMetric> ormQueryMetrics = metrics.getQueryMetrics();
+    List<MetaQueryMetric> ormQueryMetrics = metrics.queryMetrics();
     assertThat(ormQueryMetrics).hasSize(1);
-    assertThat(ormQueryMetrics.get(0).getType()).isEqualTo(Customer.class);
-    assertThat(ormQueryMetrics.get(0).getLabel()).isEqualTo("updateAll");
+    assertThat(ormQueryMetrics.get(0).type()).isEqualTo(Customer.class);
+    assertThat(ormQueryMetrics.get(0).label()).isEqualTo("updateAll");
   }
 
   @Test

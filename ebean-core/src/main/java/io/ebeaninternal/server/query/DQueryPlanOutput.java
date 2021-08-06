@@ -16,14 +16,14 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private final String sql;
   private final String bind;
   private final String plan;
-  private final long hash;
+  private final long sqlHash;
   private long queryTimeMicros;
   private long captureCount;
 
-  DQueryPlanOutput(Class<?> beanType, String label, long hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
+  DQueryPlanOutput(Class<?> beanType, String label, long sqlHash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
-    this.hash = hash;
+    this.sqlHash = sqlHash;
     this.sql = sql;
     this.profileLocation = profileLocation;
     this.bind = bind;
@@ -31,15 +31,15 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   }
 
   @Override
-  public long getHash() {
-    return hash;
+  public long sqlHash() {
+    return sqlHash;
   }
 
   /**
    * Return the associated bean.
    */
   @Override
-  public Class<?> getBeanType() {
+  public Class<?> beanType() {
     return beanType;
   }
 
@@ -47,12 +47,12 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the query label if set.
    */
   @Override
-  public String getLabel() {
+  public String label() {
     return label;
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return profileLocation;
   }
 
@@ -60,7 +60,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the sql of query.
    */
   @Override
-  public String getSql() {
+  public String sql() {
     return sql;
   }
 
@@ -68,7 +68,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return a description of the bind values used.
    */
   @Override
-  public String getBind() {
+  public String bind() {
     return bind;
   }
 
@@ -76,7 +76,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the query plan.
    */
   @Override
-  public String getPlan() {
+  public String plan() {
     return plan;
   }
 
@@ -85,7 +85,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * to build the query plan.
    */
   @Override
-  public long getQueryTimeMicros() {
+  public long queryTimeMicros() {
     return queryTimeMicros;
   }
 
@@ -93,13 +93,13 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the total count of times bind capture has occurred.
    */
   @Override
-  public long getCaptureCount() {
+  public long captureCount() {
     return captureCount;
   }
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + hash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + sqlHash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
   }
 
   /**

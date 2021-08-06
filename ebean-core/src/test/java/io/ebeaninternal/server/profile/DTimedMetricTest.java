@@ -17,16 +17,16 @@ public class DTimedMetricTest {
     metric.addSinceNanos(start);
 
     DTimeMetricStats stats = metric.collect(true);
-    assertThat(stats.getCount()).isEqualTo(1);
-    assertThat(stats.getTotal()).isGreaterThan(10);
-    assertThat(stats.getMax()).isEqualTo(stats.getTotal());
+    assertThat(stats.count()).isEqualTo(1);
+    assertThat(stats.total()).isGreaterThan(10);
+    assertThat(stats.max()).isEqualTo(stats.total());
 
     metric.addSinceNanos(start);
 
     stats = metric.collect(true);
-    assertThat(stats.getCount()).isEqualTo(1);
-    assertThat(stats.getTotal()).isGreaterThan(10);
-    assertThat(stats.getMax()).isEqualTo(stats.getTotal());
+    assertThat(stats.count()).isEqualTo(1);
+    assertThat(stats.total()).isGreaterThan(10);
+    assertThat(stats.max()).isEqualTo(stats.total());
   }
 
   @Test
@@ -40,16 +40,16 @@ public class DTimedMetricTest {
     metric.addBatchSince(start, 5);
 
     DTimeMetricStats stats = metric.collect(true);
-    assertThat(stats.getCount()).isEqualTo(5);
-    assertThat(stats.getTotal()).isGreaterThan(10000);
-    assertThat(stats.getMax()).isEqualTo(stats.getTotal() / 5);
-    assertThat(stats.getMax()).isGreaterThan(10000 / 5);
+    assertThat(stats.count()).isEqualTo(5);
+    assertThat(stats.total()).isGreaterThan(10000);
+    assertThat(stats.max()).isEqualTo(stats.total() / 5);
+    assertThat(stats.max()).isGreaterThan(10000 / 5);
 
     metric.addBatchSince(start, 2);
 
     stats = metric.collect(true);
-    assertThat(stats.getCount()).isEqualTo(2);
-    assertThat(stats.getTotal()).isGreaterThan(10000);
-    assertThat(stats.getMax()).isEqualTo(stats.getTotal() / 2);
+    assertThat(stats.count()).isEqualTo(2);
+    assertThat(stats.total()).isGreaterThan(10000);
+    assertThat(stats.max()).isEqualTo(stats.total() / 2);
   }
 }

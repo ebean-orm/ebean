@@ -60,12 +60,12 @@ class DTimeMetricStats implements TimedMetricStats {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
   @Override
-  public String getLocation() {
+  public String location() {
     return location;
   }
 
@@ -73,7 +73,7 @@ class DTimeMetricStats implements TimedMetricStats {
    * Return the count of values collected.
    */
   @Override
-  public long getCount() {
+  public long count() {
     return count;
   }
 
@@ -81,7 +81,7 @@ class DTimeMetricStats implements TimedMetricStats {
    * Return the total of all the values.
    */
   @Override
-  public long getTotal() {
+  public long total() {
     return total;
   }
 
@@ -89,7 +89,7 @@ class DTimeMetricStats implements TimedMetricStats {
    * Return the Max value collected.
    */
   @Override
-  public long getMax() {
+  public long max() {
     return max;
   }
 
@@ -97,7 +97,7 @@ class DTimeMetricStats implements TimedMetricStats {
    * Return the mean value rounded up.
    */
   @Override
-  public long getMean() {
+  public long mean() {
     return (count < 1) ? 0L : Math.round((double)(total / count));
   }
 

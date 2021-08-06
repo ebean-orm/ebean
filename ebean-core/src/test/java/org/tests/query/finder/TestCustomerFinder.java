@@ -176,7 +176,7 @@ public class TestCustomerFinder extends BaseTestCase {
     // change default collect query plan threshold to 200 micros
     QueryPlanInit init0 = new QueryPlanInit();
     init0.setAll(true);
-    init0.setThresholdMicros(2);
+    init0.thresholdMicros(2);
     final List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanInit(init0);
     assertThat(plans.size()).isGreaterThan(1);
 
@@ -186,7 +186,7 @@ public class TestCustomerFinder extends BaseTestCase {
     // change query plan threshold to 100 micros
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
-    init.setThresholdMicros(1);
+    init.thresholdMicros(1);
     final List<MetaQueryPlan> appliedToPlans = server().getMetaInfoManager().queryPlanInit(init);
     assertThat(appliedToPlans.size()).isGreaterThan(4);
 
@@ -195,30 +195,30 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
 
-    List<MetaQueryMetric> planStats = metrics.getQueryMetrics();
+    List<MetaQueryMetric> planStats = metrics.queryMetrics();
     assertThat(planStats.size()).isGreaterThan(4);
 
     for (MetaQueryMetric planStat : planStats) {
       System.out.println(planStat);
     }
 
-    for (MetaTimedMetric txnTimed : metrics.getTimedMetrics()) {
+    for (MetaTimedMetric txnTimed : metrics.timedMetrics()) {
       System.out.println(txnTimed);
     }
 
     // obtains db query plans ...
     QueryPlanRequest request = new QueryPlanRequest();
     // collect max 1000 plans (use something more like 10)
-    request.setMaxCount(1_000);
+    request.maxCount(1_000);
     // don't collect any more plans if used 10 secs
-    request.setMaxTimeMillis(10_000);
+    request.maxTimeMillis(10_000);
     List<MetaQueryPlan> plans0 = server().getMetaInfoManager().queryPlanCollectNow(request);
     assertThat(plans0).isNotEmpty();
 
     for (MetaQueryPlan plan : plans) {
       logger.info("queryPlan label:{}, queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
-        plan.getLabel(), plan.getQueryTimeMicros(), plan.getProfileLocation(),
-        plan.getSql(), plan.getBind(), plan.getPlan());
+        plan.label(), plan.queryTimeMicros(), plan.profileLocation(),
+        plan.sql(), plan.bind(), plan.plan());
       System.out.println(plan);
     }
 

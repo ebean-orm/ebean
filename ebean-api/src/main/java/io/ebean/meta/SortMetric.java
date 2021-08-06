@@ -32,7 +32,7 @@ public class SortMetric {
 
     @Override
     public int compare(MetaCountMetric o1, MetaCountMetric o2) {
-      return stringCompare(o1.getName(), o2.getName());
+      return stringCompare(o1.name(), o2.name());
     }
   }
 
@@ -43,8 +43,8 @@ public class SortMetric {
 
     @Override
     public int compare(MetaTimedMetric o1, MetaTimedMetric o2) {
-      int i = stringCompare(o1.getName(), o2.getName());
-      return i != 0 ? i : Long.compare(o1.getCount(), o2.getCount());
+      int i = stringCompare(o1.name(), o2.name());
+      return i != 0 ? i : Long.compare(o1.count(), o2.count());
     }
   }
 
@@ -55,7 +55,7 @@ public class SortMetric {
 
     @Override
     public int compare(MetaTimedMetric o1, MetaTimedMetric o2) {
-      return Long.compare(o2.getCount(), o1.getCount());
+      return Long.compare(o2.count(), o1.count());
     }
   }
 
@@ -66,7 +66,7 @@ public class SortMetric {
 
     @Override
     public int compare(MetaTimedMetric o1, MetaTimedMetric o2) {
-      return Long.compare(o2.getTotal(), o1.getTotal());
+      return Long.compare(o2.total(), o1.total());
     }
   }
 
@@ -77,7 +77,7 @@ public class SortMetric {
 
     @Override
     public int compare(MetaTimedMetric o1, MetaTimedMetric o2) {
-      return Long.compare(o2.getMean(), o1.getMean());
+      return Long.compare(o2.mean(), o1.mean());
     }
   }
 
@@ -88,7 +88,7 @@ public class SortMetric {
 
     @Override
     public int compare(MetaTimedMetric o1, MetaTimedMetric o2) {
-      return Long.compare(o2.getMax(), o1.getMax());
+      return Long.compare(o2.max(), o1.max());
     }
   }
 }

@@ -126,8 +126,8 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
 
     List<MetaTimedMetric> sqlMetrics = sqlMetrics();
     assertThat(sqlMetrics).hasSize(1);
-    assertThat(sqlMetrics.get(0).getName()).isEqualTo("sql.update.auditLargeUpdate");
-    assertThat(sqlMetrics.get(0).getCount()).isEqualTo(1);
+    assertThat(sqlMetrics.get(0).name()).isEqualTo("sql.update.auditLargeUpdate");
+    assertThat(sqlMetrics.get(0).count()).isEqualTo(1);
   }
 
   @Test

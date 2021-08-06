@@ -28,7 +28,7 @@ public class TestM2mDeleteObject extends BaseTestCase {
 
     List<MetaTimedMetric> sqlMetrics = sqlMetrics();
     assertThat(sqlMetrics).hasSize(1);
-    assertThat(sqlMetrics.get(0).getName()).isEqualTo("orm.update.deleteAllPermissions");
+    assertThat(sqlMetrics.get(0).name()).isEqualTo("orm.update.deleteAllPermissions");
 
     Tenant t = new Tenant("tenant");
 

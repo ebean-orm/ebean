@@ -21,17 +21,17 @@ public class DTimedMetricMapTest {
     BasicMetricVisitor visitor = new BasicMetricVisitor();
     metricMap.visit(visitor);
 
-    MetaTimedMetric timedMetric = visitor.getTimedMetrics().get(0);
-    assertThat(timedMetric.getCount()).isEqualTo(1);
-    assertThat(timedMetric.getTotal()).isGreaterThan(10);
+    MetaTimedMetric timedMetric = visitor.timedMetrics().get(0);
+    assertThat(timedMetric.count()).isEqualTo(1);
+    assertThat(timedMetric.total()).isGreaterThan(10);
 
     metricMap.addSinceNanos("some", nanos);
 
     visitor = new BasicMetricVisitor();
     metricMap.visit(visitor);
 
-    timedMetric = visitor.getTimedMetrics().get(0);
-    assertThat(timedMetric.getCount()).isEqualTo(1);
-    assertThat(timedMetric.getTotal()).isGreaterThan(10);
+    timedMetric = visitor.timedMetrics().get(0);
+    assertThat(timedMetric.count()).isEqualTo(1);
+    assertThat(timedMetric.total()).isGreaterThan(10);
   }
 }

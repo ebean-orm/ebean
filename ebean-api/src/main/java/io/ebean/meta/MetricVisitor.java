@@ -8,22 +8,22 @@ public interface MetricVisitor {
   /**
    * Return true if the metrics should be reset.
    */
-  boolean isReset();
+  boolean reset();
 
   /**
    * Return true if we should visit the transaction metrics.
    */
-  boolean isCollectTransactionMetrics();
+  boolean collectTransactionMetrics();
 
   /**
    * Return true if we should visit the ORM and SQL query metrics.
    */
-  boolean isCollectQueryMetrics();
+  boolean collectQueryMetrics();
 
   /**
    * Return true if we should visit the L2 cache metrics.
    */
-  boolean isCollectL2Metrics();
+  boolean collectL2Metrics();
 
   /**
    * Visit has started.

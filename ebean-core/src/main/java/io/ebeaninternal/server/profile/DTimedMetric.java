@@ -71,7 +71,7 @@ class DTimedMetric implements TimedMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-    DTimeMetricStats metric = collect(visitor.isReset());
+    DTimeMetricStats metric = collect(visitor.reset());
     if (metric != null) {
       visitor.visitTimed(metric);
     }
