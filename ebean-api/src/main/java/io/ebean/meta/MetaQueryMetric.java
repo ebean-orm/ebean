@@ -21,8 +21,8 @@ public interface MetaQueryMetric extends MetaTimedMetric {
   String getSql();
 
   /**
-   * Return the hash of the plan.
+   * Return the hash of the sql.
    */
-  String getHash();
+  long getSqlHash();
 
 }

@@ -18,9 +18,9 @@ public interface SpiQueryPlan {
   String getName();
 
   /**
-   * The hash for the query plan.
+   * The hash of the sql.
    */
-  String getHash();
+  long getSqlHash();
 
   /**
    * The SQL for the query plan.
