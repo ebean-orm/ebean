@@ -216,7 +216,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(plans0).isNotEmpty();
 
     for (MetaQueryPlan plan : plans) {
-      logger.info("queryplan label:{}, queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
+      logger.info("queryPlan label:{}, queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
         plan.getLabel(), plan.getQueryTimeMicros(), plan.getProfileLocation(),
         plan.getSql(), plan.getBind(), plan.getPlan());
       System.out.println(plan);
@@ -244,7 +244,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
     if (isH2() || isPostgres()) {
-      assertThat(metricsJson).contains("\"hash\":3634991469");
+      assertThat(metricsJson).contains("\"sqlHash\":3634991469");
       assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
     }
   }
@@ -267,7 +267,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).doesNotContain("\"loc\":");
-    assertThat(metricsJson).doesNotContain("\"hash\":");
+    assertThat(metricsJson).doesNotContain("\"sqlHash\":");
     assertThat(metricsJson).doesNotContain("\"sql\":");
   }
 

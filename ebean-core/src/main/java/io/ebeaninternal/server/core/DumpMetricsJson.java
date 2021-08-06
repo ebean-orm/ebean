@@ -197,7 +197,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricStart(metric);
     appendTiming(metric);
     if (withHash) {
-      keyVal("hash", metric.getHash());
+      keyVal("sqlHash", metric.getSqlHash());
     }
     if (isIncludeDetail(metric)) {
       appendExtra("loc", metric.getLocation());

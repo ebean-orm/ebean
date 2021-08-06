@@ -68,7 +68,7 @@ public class CQueryPlan implements SpiQueryPlan {
   private final boolean rawSql;
 
   private final String sql;
-  private final long hash;
+  private final long sqlHash;
 
   private final String logWhereSql;
 
@@ -118,7 +118,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(query);
-    this.hash = Checksum.checksum(sql);
+    this.sqlHash = Checksum.checksum(sql);
   }
 
   /**
@@ -143,7 +143,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCaptureRaw(sql, query);
-    this.hash = Checksum.checksum(sql);
+    this.sqlHash = Checksum.checksum(sql);
   }
 
   private String deriveName(String label, SpiQuery.Type type, String simpleName) {
@@ -193,8 +193,8 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   @Override
-  public long getHash() {
-    return hash;
+  public long getSqlHash() {
+    return sqlHash;
   }
 
   @Override
@@ -226,7 +226,7 @@ public class CQueryPlan implements SpiQueryPlan {
 
   @Override
   public DQueryPlanOutput createMeta(String bind, String planString) {
-    return new DQueryPlanOutput(getBeanType(), name, hash, sql, profileLocation, bind, planString);
+    return new DQueryPlanOutput(getBeanType(), name, sqlHash, sql, profileLocation, bind, planString);
   }
 
   public DataReader createDataReader(ResultSet rset) {
@@ -273,7 +273,7 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
-    return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
+    return rawSql ? planKey.getPartialKey() + "_" + sqlHash : planKey.getPartialKey();
   }
 
   SqlTree getSqlTree() {

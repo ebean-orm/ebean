@@ -10,7 +10,7 @@ class DQueryPlanMeta {
   private final ProfileLocation profileLocation;
   private final String name;
   private final String sql;
-  private final long hash;
+  private final long sqlHash;
 
   DQueryPlanMeta(Class<?> type, String label, ProfileLocation profileLocation, String sql) {
     this.type = type;
@@ -22,15 +22,15 @@ class DQueryPlanMeta {
       name += "_" + label;
     }
     this.name = name;
-    this.hash = Checksum.checksum(sql);
+    this.sqlHash = Checksum.checksum(sql);
   }
 
   public Class<?> getType() {
     return type;
   }
 
-  public long getHash() {
-    return hash;
+  public long getSqlHash() {
+    return sqlHash;
   }
 
   public String getName() {

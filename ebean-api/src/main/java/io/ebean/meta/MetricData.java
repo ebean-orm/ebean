@@ -6,7 +6,7 @@ package io.ebean.meta;
 public class MetricData {
 
   private String name;
-  private long hash;
+  private long sqlHash;
   private String loc;
   private String sql;
 
@@ -30,12 +30,12 @@ public class MetricData {
     this.name = name;
   }
 
-  public long getHash() {
-    return hash;
+  public long getSqlHash() {
+    return sqlHash;
   }
 
-  public void setHash(long hash) {
-    this.hash = hash;
+  public void setSqlHash(long sqlHash) {
+    this.sqlHash = sqlHash;
   }
 
   public String getLoc() {

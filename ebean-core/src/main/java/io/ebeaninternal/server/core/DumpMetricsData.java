@@ -67,7 +67,7 @@ class DumpMetricsData {
     final MetricData data = create(metric);
     appendCounters(data, metric);
     appendLocationAndSql(data, metric);
-    data.setHash(metric.getHash());
+    data.setSqlHash(metric.getSqlHash());
   }
 
   private void appendLocationAndSql(MetricData data, MetaQueryMetric metric) {

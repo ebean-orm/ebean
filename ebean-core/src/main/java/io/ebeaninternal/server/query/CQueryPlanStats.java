@@ -127,8 +127,8 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long getHash() {
-      return queryPlan.getHash();
+    public long getSqlHash() {
+      return queryPlan.getSqlHash();
     }
 
     @Override
