@@ -32,7 +32,7 @@ public class QueryPlanInit {
    * Return the query execution time threshold which must be exceeded to initiate
    * query plan collection.
    */
-  public long getThresholdMicros() {
+  public long thresholdMicros() {
     return thresholdMicros;
   }
 
@@ -40,7 +40,7 @@ public class QueryPlanInit {
    * Set the query execution time threshold which must be exceeded to initiate
    * query plan collection.
    */
-  public void setThresholdMicros(long thresholdMicros) {
+  public void thresholdMicros(long thresholdMicros) {
     this.thresholdMicros = thresholdMicros;
   }
 
@@ -54,14 +54,14 @@ public class QueryPlanInit {
   /**
    * Return the specific hashes that we want to collect query plans on.
    */
-  public Set<Long> getHashes() {
+  public Set<Long> sqlHashes() {
     return hashes;
   }
 
   /**
    * Set the specific hashes that we want to collect query plans on.
    */
-  public void setHashes(Set<Long> hashes) {
+  public void sqlHashes(Set<Long> hashes) {
     this.hashes = hashes;
   }
 }

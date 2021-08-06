@@ -1559,7 +1559,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (request.includeHash(queryPlan.getSqlHash())) {
-        queryPlan.queryPlanInit(request.getThresholdMicros());
+        queryPlan.queryPlanInit(request.thresholdMicros());
         list.add(queryPlan.createMeta(null, null));
       }
     }
@@ -1572,7 +1572,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        visitor.visitQuery(queryPlan.getSnapshot(visitor.isReset()));
+        visitor.visitQuery(queryPlan.getSnapshot(visitor.reset()));
       }
     }
   }

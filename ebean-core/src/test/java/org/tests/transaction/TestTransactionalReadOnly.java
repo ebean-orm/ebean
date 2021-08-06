@@ -20,9 +20,9 @@ public class TestTransactionalReadOnly extends BaseTestCase {
     resetAllMetrics();
     executeTransactionalUsingReadOnlyDataSource();
 
-    final List<MetaTimedMetric> timedMetrics = collectMetrics().getTimedMetrics();
+    final List<MetaTimedMetric> timedMetrics = collectMetrics().timedMetrics();
     final Optional<MetaTimedMetric> txnReadOnly = metric(timedMetrics, "txn.readonly");
-    assertThat(txnReadOnly.get().getCount()).isEqualTo(1);
+    assertThat(txnReadOnly.get().count()).isEqualTo(1);
     assertThat(metric(timedMetrics, "txn")).isEmpty();
   }
 
@@ -32,15 +32,15 @@ public class TestTransactionalReadOnly extends BaseTestCase {
     resetAllMetrics();
     executeTransactionalUsingMainDataSource();
 
-    final List<MetaTimedMetric> timedMetrics = collectMetrics().getTimedMetrics();
+    final List<MetaTimedMetric> timedMetrics = collectMetrics().timedMetrics();
     final Optional<MetaTimedMetric> txnMain = metric(timedMetrics, "txn.main");
-    assertThat(txnMain.get().getCount()).isEqualTo(1);
+    assertThat(txnMain.get().count()).isEqualTo(1);
     assertThat(metric(timedMetrics, "txn.readonly")).isEmpty();
   }
 
   private Optional<MetaTimedMetric> metric(List<MetaTimedMetric> timedMetrics, String name) {
     return timedMetrics.stream()
-        .filter(metaTimedMetric -> metaTimedMetric.getName().equals(name))
+        .filter(metaTimedMetric -> metaTimedMetric.name().equals(name))
         .findFirst();
   }
 

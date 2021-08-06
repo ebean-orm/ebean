@@ -10,45 +10,45 @@ public interface MetaQueryPlan {
   /**
    * Return the bean type for the query.
    */
-  Class<?> getBeanType();
+  Class<?> beanType();
 
   /**
    * Return the label of the query.
    */
-  String getLabel();
+  String label();
 
   /**
    * Return the profile location for the query.
    */
-  ProfileLocation getProfileLocation();
+  ProfileLocation profileLocation();
 
   /**
    * Return the sql of the query.
    */
-  String getSql();
+  String sql();
 
   /**
    * Return the hash of the plan.
    */
-  long getHash();
+  long sqlHash();
 
   /**
    * Return a description of the bind values.
    */
-  String getBind();
+  String bind();
 
   /**
    * Return the raw plan.
    */
-  String getPlan();
+  String plan();
 
   /**
    * Return the query execution time associated with the bind values capture.
    */
-  long getQueryTimeMicros();
+  long queryTimeMicros();
 
   /**
    * Return the total count of times bind capture has occurred.
    */
-  long getCaptureCount();
+  long captureCount();
 }

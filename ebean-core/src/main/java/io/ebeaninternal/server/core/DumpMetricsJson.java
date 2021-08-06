@@ -84,11 +84,11 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   private void collect(ServerMetrics serverMetrics) {
     try {
       start();
-      for (MetaTimedMetric metric : serverMetrics.getTimedMetrics()) {
+      for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {
         logTimed(metric);
       }
 
-      List<MetaCountMetric> countMetrics = serverMetrics.getCountMetrics();
+      List<MetaCountMetric> countMetrics = serverMetrics.countMetrics();
       if (!countMetrics.isEmpty()) {
         if (sortBy != null) {
           countMetrics.sort(SortMetric.COUNT_NAME);
@@ -98,7 +98,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
         }
       }
 
-      List<MetaQueryMetric> queryMetrics = serverMetrics.getQueryMetrics();
+      List<MetaQueryMetric> queryMetrics = serverMetrics.queryMetrics();
       if (!queryMetrics.isEmpty()) {
         if (sortBy != null) {
           queryMetrics.sort(sortBy);
@@ -170,7 +170,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     }
     objStart();
     key("name");
-    val(metric.getName());
+    val(metric.name());
   }
 
   private void metricEnd() throws IOException {
@@ -180,7 +180,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   private void logCount(MetaCountMetric metric) throws IOException {
     metricStart(metric);
     key("count");
-    val(metric.getCount());
+    val(metric.count());
     metricEnd();
   }
 
@@ -188,7 +188,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricStart(metric);
     appendTiming(metric);
     if (isIncludeDetail(metric)) {
-      appendExtra("loc", metric.getLocation());
+      appendExtra("loc", metric.location());
     }
     metricEnd();
   }
@@ -197,11 +197,11 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricStart(metric);
     appendTiming(metric);
     if (withHash) {
-      keyVal("sqlHash", metric.getSqlHash());
+      keyVal("sqlHash", metric.sqlHash());
     }
     if (isIncludeDetail(metric)) {
-      appendExtra("loc", metric.getLocation());
-      appendExtra("sql", metric.getSql());
+      appendExtra("loc", metric.location());
+      appendExtra("sql", metric.sql());
     }
     metricEnd();
   }
@@ -218,10 +218,10 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   }
 
   private void appendTiming(MetaTimedMetric timedMetric) throws IOException {
-    keyVal("count", timedMetric.getCount());
-    keyVal("total", timedMetric.getTotal());
-    keyVal("mean", timedMetric.getMean());
-    keyVal("max", timedMetric.getMax());
+    keyVal("count", timedMetric.count());
+    keyVal("total", timedMetric.total());
+    keyVal("mean", timedMetric.mean());
+    keyVal("max", timedMetric.max());
   }
 
   private void keyVal(String key, long value) throws IOException {

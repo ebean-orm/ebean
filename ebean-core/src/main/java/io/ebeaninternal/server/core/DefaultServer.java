@@ -416,8 +416,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void collectQueryPlans() {
     QueryPlanRequest request = new QueryPlanRequest();
-    request.setMaxCount(config.getQueryPlanCaptureMaxCount());
-    request.setMaxTimeMillis(config.getQueryPlanCaptureMaxTimeMillis());
+    request.maxCount(config.getQueryPlanCaptureMaxCount());
+    request.maxTimeMillis(config.getQueryPlanCaptureMaxTimeMillis());
 
     // obtains query explain plans ...
     List<MetaQueryPlan> plans = metaInfoManager.queryPlanCollectNow(request);
@@ -2328,13 +2328,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void visitMetrics(MetricVisitor visitor) {
     visitor.visitStart();
-    if (visitor.isCollectTransactionMetrics()) {
+    if (visitor.collectTransactionMetrics()) {
       transactionManager.visitMetrics(visitor);
     }
-    if (visitor.isCollectL2Metrics()) {
+    if (visitor.collectL2Metrics()) {
       serverCacheManager.visitMetrics(visitor);
     }
-    if (visitor.isCollectQueryMetrics()) {
+    if (visitor.collectQueryMetrics()) {
       beanDescriptorManager.visitMetrics(visitor);
       dtoBeanManager.visitMetrics(visitor);
       relationalQueryEngine.visitMetrics(visitor);
@@ -2351,7 +2351,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   List<MetaQueryPlan> queryPlanInit(QueryPlanInit initRequest) {
     if (initRequest.isAll()) {
-      queryPlanManager.setDefaultThreshold(initRequest.getThresholdMicros());
+      queryPlanManager.setDefaultThreshold(initRequest.thresholdMicros());
     }
     return beanDescriptorManager.queryPlanInit(initRequest);
   }

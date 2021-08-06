@@ -90,14 +90,14 @@ public abstract class BaseTestCase {
   }
 
   protected List<MetaTimedMetric> visitTimedMetrics() {
-    return collectMetrics().getTimedMetrics();
+    return collectMetrics().timedMetrics();
   }
 
   protected List<MetaTimedMetric> sqlMetrics() {
     List<MetaTimedMetric> timedMetrics = visitTimedMetrics();
 
     return timedMetrics.stream()
-      .filter((it) -> it.getName().startsWith("sql.") || it.getName().startsWith("orm."))
+      .filter((it) -> it.name().startsWith("sql.") || it.name().startsWith("orm."))
       .collect(Collectors.toList());
   }
 

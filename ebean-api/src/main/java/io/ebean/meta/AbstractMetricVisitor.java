@@ -18,22 +18,22 @@ public abstract class AbstractMetricVisitor implements MetricVisitor {
   }
 
   @Override
-  public boolean isReset() {
+  public boolean reset() {
     return reset;
   }
 
   @Override
-  public boolean isCollectTransactionMetrics() {
+  public boolean collectTransactionMetrics() {
     return collectTransactionMetrics;
   }
 
   @Override
-  public boolean isCollectQueryMetrics() {
+  public boolean collectQueryMetrics() {
     return collectQueryMetrics;
   }
 
   @Override
-  public boolean isCollectL2Metrics() {
+  public boolean collectL2Metrics() {
     return collectL2Metrics;
   }
 
