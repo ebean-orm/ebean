@@ -7,6 +7,14 @@ package io.ebean.meta;
 public interface MetaTimedMetric extends MetaMetric {
 
   /**
+   * Return the metric location hash if defined.
+   * <p>
+   * This hash excludes line number with the intention of being stable over time
+   * as code changes move the source line (but the method is the same).
+   */
+  long locationHash();
+
+  /**
    * Return the metric location if defined.
    */
   String location();

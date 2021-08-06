@@ -46,6 +46,14 @@ public interface ProfileLocation {
   String label();
 
   /**
+   * Return a hash of the location that intentionally excludes the line number.
+   * <p>
+   * The hash is expected to be stable regardless of line number in the source file
+   * so that is identifies the class and method location over a long time.
+   */
+  long hash();
+
+  /**
    * Return the full location.
    */
   String fullLocation();

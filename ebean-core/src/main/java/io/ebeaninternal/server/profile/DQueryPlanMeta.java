@@ -49,6 +49,10 @@ class DQueryPlanMeta {
     return (profileLocation == null) ? null : profileLocation.location();
   }
 
+  public long getLocationHash() {
+    return (profileLocation == null) ? 0 : profileLocation.hash();
+  }
+
   public String getSql() {
     return sql;
   }

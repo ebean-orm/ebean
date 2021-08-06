@@ -14,6 +14,7 @@ public class MetricData {
   private Long mean;
   private Long max;
   private Long total;
+  private long locHash;
 
   public MetricData(String name) {
     this.name = name;
@@ -36,6 +37,14 @@ public class MetricData {
 
   public void setSqlHash(long sqlHash) {
     this.sqlHash = sqlHash;
+  }
+
+  public void setLocHash(long locHash) {
+    this.locHash = locHash;
+  }
+
+  public long getLocHash() {
+    return locHash;
   }
 
   public String getLoc() {

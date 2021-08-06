@@ -134,6 +134,7 @@ class DumpMetrics {
     String location = metric.location();
     if (dumpLoc && location != null) {
       sb.append("\n  loc:").append(location);
+      sb.append("\n  locHash:").append(metric.locationHash());
     }
     if (dumpSql) {
       sb.append(" \n\n  sql:").append(metric.sql()).append("\n\n");

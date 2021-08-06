@@ -84,6 +84,11 @@ class DQueryPlanMetric implements QueryPlanMetric {
     }
 
     @Override
+    public long locationHash() {
+      return meta.getLocationHash();
+    }
+
+    @Override
     public long count() {
       return stats.count();
     }

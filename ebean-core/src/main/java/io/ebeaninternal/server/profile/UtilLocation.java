@@ -1,6 +1,20 @@
 package io.ebeaninternal.server.profile;
 
+import io.ebeaninternal.server.util.Checksum;
+
 final class UtilLocation {
+
+  /**
+   * Return a hash of the full description excluding the source line number.
+   */
+  static long hash(String full) {
+    final int pos = full.lastIndexOf('(');
+    if (pos > -1) {
+      return Checksum.checksum(full.substring(0, pos));
+    } else {
+      return Checksum.checksum(full);
+    }
+  }
 
   static String label(String shortDescription) {
     int pos = shortDescription.indexOf("(");
@@ -21,5 +35,4 @@ final class UtilLocation {
     }
     return desc;
   }
-
 }

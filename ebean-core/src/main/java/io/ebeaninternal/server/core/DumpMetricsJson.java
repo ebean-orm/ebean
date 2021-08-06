@@ -188,6 +188,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricStart(metric);
     appendTiming(metric);
     if (isIncludeDetail(metric)) {
+      keyVal("locHash", metric.locationHash());
       appendExtra("loc", metric.location());
     }
     metricEnd();
@@ -198,6 +199,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     appendTiming(metric);
     if (withHash) {
       keyVal("sqlHash", metric.sqlHash());
+      keyVal("locHash", metric.locationHash());
     }
     if (isIncludeDetail(metric)) {
       appendExtra("loc", metric.location());

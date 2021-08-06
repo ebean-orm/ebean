@@ -107,6 +107,11 @@ public final class CQueryPlanStats {
     }
 
     @Override
+    public long locationHash() {
+      return queryPlan.getLocationHash();
+    }
+
+    @Override
     public long count() {
       return metrics.count();
     }

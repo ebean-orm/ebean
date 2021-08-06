@@ -8,17 +8,14 @@ import io.ebean.ProfileLocation;
 class DProfileLocation implements ProfileLocation {
 
   private static final String IO_EBEAN = "io.ebean";
-
   private static final String UNKNOWN = "unknown";
 
   private String fullLocation;
-
   private String location;
-
   private String label;
+  private long hash;
 
   private final int lineNumber;
-
   private int traceCount;
 
   DProfileLocation() {
@@ -53,6 +50,7 @@ class DProfileLocation implements ProfileLocation {
     label = UtilLocation.label(shortDesc);
     location = shortDesc;
     fullLocation = loc;
+    hash = UtilLocation.hash(loc);
     initWith(label);
     return true;
   }
@@ -69,6 +67,11 @@ class DProfileLocation implements ProfileLocation {
   @Override
   public String location() {
     return location;
+  }
+
+  @Override
+  public long hash() {
+    return hash;
   }
 
   @Override

@@ -54,46 +54,32 @@ public class CQueryPlan implements SpiQueryPlan {
   static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
-
   private final ProfileLocation profileLocation;
-
   private final String location;
-
+  private final long locationHash;
   private final String label;
-
   private final String name;
-
   private final CQueryPlanKey planKey;
-
   private final boolean rawSql;
-
   private final String sql;
   private final long sqlHash;
-
   private final String logWhereSql;
-
   private final SqlTree sqlTree;
 
   /**
    * Encrypted properties required additional binding.
    */
   private final STreeProperty[] encryptedProps;
-
   private final CQueryPlanStats stats;
-
   private final Class<?> beanType;
-
   final DataTimeZone dataTimeZone;
-
   private final int asOfTableCount;
 
   /**
    * Key used to identify the query plan in audit logging.
    */
   private volatile String auditQueryHash;
-
   private final Set<String> dependentTables;
-
   private final SpiQueryBindCapture bindCapture;
 
   /**
@@ -106,9 +92,10 @@ public class CQueryPlan implements SpiQueryPlan {
     this.planKey = request.getQueryPlanKey();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
+    this.location = (profileLocation == null) ? null : profileLocation.location();
+    this.locationHash = (profileLocation == null) ? 0 : profileLocation.hash();
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
-    this.location = location();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -130,9 +117,10 @@ public class CQueryPlan implements SpiQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
+    this.location = (profileLocation == null) ? null : profileLocation.location();
+    this.locationHash = (profileLocation == null) ? 0 : profileLocation.hash();
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
-    this.location = location();
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;
@@ -167,10 +155,6 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private SpiQueryBindCapture initBindCaptureRaw(String sql, SpiQuery<?> query) {
     return sql.equals(RESULT_SET_BASED_RAW_SQL) || query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
-  }
-
-  private String location() {
-    return (profileLocation == null) ? null : profileLocation.location();
   }
 
   private CQueryPlanKey buildPlanKey(String sql, String logWhereSql) {
@@ -217,6 +201,10 @@ public class CQueryPlan implements SpiQueryPlan {
 
   public String getLocation() {
     return location;
+  }
+
+  public long getLocationHash() {
+    return locationHash;
   }
 
   @Override
