@@ -10,6 +10,9 @@ import org.tests.model.basic.UTMaster;
 import javax.persistence.OptimisticLockException;
 import java.sql.Timestamp;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 public class TestIUDVanilla extends BaseTestCase {
 
   @Test
@@ -78,5 +81,27 @@ public class TestIUDVanilla extends BaseTestCase {
     // for this case we know 42 should throw OptimisticLockException
     e0.setVersion(42);
     e0.update();
+  }
+
+  @Test
+  public void testOptimisticLockException() {
+    UTMaster e0 = new UTMaster("optLock");
+    DB.save(e0);
+
+    e0 = DB.find(UTMaster.class).where().eq("name", "optLock").findOne();
+    UTMaster e1 = DB.find(UTMaster.class).where().eq("name", "optLock").findOne();
+
+    int oldVersion = e0.getVersion();
+    e0.setDescription("foo");
+    e0.save();
+    assertThat(e0.getVersion()).isGreaterThan(oldVersion);
+
+    e1.setDescription("bar");
+    oldVersion = e1.getVersion();
+    assertThatThrownBy(e1::save).isInstanceOf(OptimisticLockException.class);
+    // after optimisticLockExecption, a restore of version is expected
+    assertThat(e1.getVersion()).isEqualTo(oldVersion);
+    // and subsequent saves must fail
+    assertThatThrownBy(e1::save).isInstanceOf(OptimisticLockException.class);
   }
 }

@@ -339,6 +339,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  private void onFailedUpdateUndoGeneratedProperties() {
+    for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
+      Object oldVal = intercept.getOrigValue(prop.getPropertyIndex());
+      prop.setValue(entityBean, oldVal);
+    }
+  }
+
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
       Object value = prop.getGeneratedProperty().getInsertValue(prop, entityBean, now());
@@ -857,6 +864,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public final void checkRowCount(int rowCount) {
     if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
       if (ConcurrencyMode.VERSION == concurrencyMode) {
+        onFailedUpdateUndoGeneratedProperties();
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");
