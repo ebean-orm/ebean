@@ -188,8 +188,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricStart(metric);
     appendTiming(metric);
     if (isIncludeDetail(metric)) {
-      keyVal("locHash", metric.locationHash());
-      appendExtra("loc", metric.location());
+      append("loc", metric.location());
     }
     metricEnd();
   }
@@ -198,12 +197,11 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     metricStart(metric);
     appendTiming(metric);
     if (withHash) {
-      keyVal("sqlHash", metric.sqlHash());
-      keyVal("locHash", metric.locationHash());
+      append("hash", metric.hash());
     }
     if (isIncludeDetail(metric)) {
-      appendExtra("loc", metric.location());
-      appendExtra("sql", metric.sql());
+      append("loc", metric.location());
+      append("sql", metric.sql());
     }
     metricEnd();
   }
@@ -212,7 +210,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     return includeExtraAttributes == 2 || includeExtraAttributes == 1 && metric.initialCollection();
   }
 
-  private void appendExtra(String key, String val) throws IOException {
+  private void append(String key, String val) throws IOException {
     if (val != null) {
       key(key);
       val(val);
@@ -220,13 +218,13 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   }
 
   private void appendTiming(MetaTimedMetric timedMetric) throws IOException {
-    keyVal("count", timedMetric.count());
-    keyVal("total", timedMetric.total());
-    keyVal("mean", timedMetric.mean());
-    keyVal("max", timedMetric.max());
+    append("count", timedMetric.count());
+    append("total", timedMetric.total());
+    append("mean", timedMetric.mean());
+    append("max", timedMetric.max());
   }
 
-  private void keyVal(String key, long value) throws IOException {
+  private void append(String key, long value) throws IOException {
     key(key);
     val(value);
   }

@@ -56,7 +56,6 @@ class DumpMetricsData {
     final MetricData data = create(metric);
     appendCounters(data, metric);
     data.setLoc(metric.location());
-    data.setLocHash(metric.locationHash());
   }
 
   private void addCount(MetaCountMetric metric) {
@@ -68,11 +67,10 @@ class DumpMetricsData {
     final MetricData data = create(metric);
     appendCounters(data, metric);
     appendLocationAndSql(data, metric);
-    data.setSqlHash(metric.sqlHash());
+    data.setHash(metric.hash());
   }
 
   private void appendLocationAndSql(MetricData data, MetaQueryMetric metric) {
-    data.setLocHash(metric.locationHash());
     data.setLoc(metric.location());
     data.setSql(metric.sql());
   }

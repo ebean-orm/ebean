@@ -30,7 +30,7 @@ public interface MetaQueryPlan {
   /**
    * Return the hash of the plan.
    */
-  long sqlHash();
+  String hash();
 
   /**
    * Return a description of the bind values.

@@ -16,14 +16,14 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private final String sql;
   private final String bind;
   private final String plan;
-  private final long sqlHash;
+  private final String hash;
   private long queryTimeMicros;
   private long captureCount;
 
-  DQueryPlanOutput(Class<?> beanType, String label, long sqlHash, String sql, ProfileLocation profileLocation, String bind, String plan) {
+  DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
-    this.sqlHash = sqlHash;
+    this.hash = hash;
     this.sql = sql;
     this.profileLocation = profileLocation;
     this.bind = bind;
@@ -31,8 +31,8 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   }
 
   @Override
-  public long sqlHash() {
-    return sqlHash;
+  public String hash() {
+    return hash;
   }
 
   /**
@@ -99,7 +99,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + sqlHash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + hash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
   }
 
   /**

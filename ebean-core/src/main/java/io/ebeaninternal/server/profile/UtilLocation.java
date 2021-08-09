@@ -1,28 +1,29 @@
 package io.ebeaninternal.server.profile;
 
-import io.ebeaninternal.server.util.Checksum;
-
 final class UtilLocation {
 
-  /**
-   * Return a hash of the full description excluding the source line number.
-   */
-  static long hash(String full) {
+  static String loc(String full) {
     final int pos = full.lastIndexOf('(');
     if (pos > -1) {
-      return Checksum.checksum(full.substring(0, pos));
+      return full.substring(0, pos);
     } else {
-      return Checksum.checksum(full);
+      return full;
     }
   }
 
-  static String label(String shortDescription) {
-    int pos = shortDescription.indexOf("(");
-    if (pos == -1) {
-      return shortDescription;
-    } else {
-      return trimInit(shortDescription.substring(0, pos));
+  static String label(String location) {
+    return trimInit(shortDesc(location));
+  }
+
+  private static String shortDesc(String location) {
+    int pos = location.lastIndexOf('.');
+    if (pos > -1) {
+      pos = location.lastIndexOf('.', pos - 1);
+      if (pos > -1) {
+        return location.substring(pos + 1);
+      }
     }
+    return location;
   }
 
   /**

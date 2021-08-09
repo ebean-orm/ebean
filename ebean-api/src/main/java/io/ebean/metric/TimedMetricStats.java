@@ -13,11 +13,6 @@ public interface TimedMetricStats extends MetaTimedMetric {
   void setLocation(String location);
 
   /**
-   * Additionally set the location hash.
-   */
-  void setLocationHash(long locationHash);
-
-  /**
    * Override the name based on profile location.
    */
   void setName(String name);

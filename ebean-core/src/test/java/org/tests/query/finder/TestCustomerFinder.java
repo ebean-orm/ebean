@@ -242,10 +242,9 @@ public class TestCustomerFinder extends BaseTestCase {
 
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
-    assertThat(metricsJson).contains("\"locHash\":3254522637");
-    assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:43)\"");
+    assertThat(metricsJson).contains("\"loc\":\"org.tests.model.basic.finder.CustomerFinder.byNameStatus\"");
     if (isH2() || isPostgres()) {
-      assertThat(metricsJson).contains("\"sqlHash\":3634991469");
+      assertThat(metricsJson).contains("\"hash\":\"de3affa5b4bff07e19c1c012590dcde6\"");
       assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
     }
   }

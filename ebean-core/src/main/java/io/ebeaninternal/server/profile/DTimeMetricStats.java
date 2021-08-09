@@ -14,7 +14,6 @@ class DTimeMetricStats implements TimedMetricStats {
 
   private String name;
   private String location;
-  private long locationHash;
 
   DTimeMetricStats(String name, boolean collected, long count, long total, long max) {
     this.name = name;
@@ -37,7 +36,6 @@ class DTimeMetricStats implements TimedMetricStats {
       .append(" max:").append(max);
     if (location != null) {
       sb.append(" loc:").append(location);
-      sb.append(" locHash:").append(locationHash);
     }
     return sb.toString();
   }
@@ -45,11 +43,6 @@ class DTimeMetricStats implements TimedMetricStats {
   @Override
   public void setLocation(String location) {
     this.location = location;
-  }
-
-  @Override
-  public void setLocationHash(long locationHash) {
-    this.locationHash = locationHash;
   }
 
   @Override
@@ -70,11 +63,6 @@ class DTimeMetricStats implements TimedMetricStats {
   @Override
   public String location() {
     return location;
-  }
-
-  @Override
-  public long locationHash() {
-    return locationHash;
   }
 
   /**
