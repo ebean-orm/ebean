@@ -23,25 +23,16 @@ import javax.persistence.PersistenceException;
 public abstract class AbstractSqlQueryRequest implements CancelableQuery {
 
   protected final SpiSqlBinding query;
-
   protected final SpiEbeanServer server;
-
   protected SpiTransaction transaction;
-
   private boolean createdTransaction;
-
   protected String sql;
-
   protected ResultSet resultSet;
-
   protected String bindLog = "";
-
   protected PreparedStatement pstmt;
-
   protected long startNano;
-
   private final ReentrantLock lock = new ReentrantLock();
-  
+
   /**
    * Create the BeanFindRequest.
    */
@@ -161,7 +152,8 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
         this.bindLog = binder.bind(bindParams, pstmt, conn);
       }
       if (isLogSql()) {
-        transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
+        long micros = (System.nanoTime() - startNano) / 1000L;
+        transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ") --micros(", micros + ")"));
       }
     } finally {
       lock.unlock();

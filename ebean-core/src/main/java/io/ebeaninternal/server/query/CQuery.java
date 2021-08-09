@@ -541,9 +541,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     updateStatistics();
   }
 
+  long micros() {
+    return (System.nanoTime() - startNano) / 1000L;
+  }
+
   private void updateStatistics() {
     try {
-      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      executionTimeMicros = micros();
       if (autoTuneProfiling) {
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
