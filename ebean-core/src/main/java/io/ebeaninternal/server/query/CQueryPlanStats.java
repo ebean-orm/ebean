@@ -107,11 +107,6 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long locationHash() {
-      return queryPlan.getLocationHash();
-    }
-
-    @Override
     public long count() {
       return metrics.count();
     }
@@ -132,8 +127,8 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public long sqlHash() {
-      return queryPlan.getSqlHash();
+    public String hash() {
+      return queryPlan.getHash();
     }
 
     @Override

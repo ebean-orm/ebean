@@ -59,8 +59,8 @@ class DQueryPlanMetric implements QueryPlanMetric {
     }
 
     @Override
-    public long sqlHash() {
-      return meta.getSqlHash();
+    public String hash() {
+      return meta.getHash();
     }
 
     @Override
@@ -81,11 +81,6 @@ class DQueryPlanMetric implements QueryPlanMetric {
     @Override
     public String location() {
       return meta.getLocation();
-    }
-
-    @Override
-    public long locationHash() {
-      return meta.getLocationHash();
     }
 
     @Override

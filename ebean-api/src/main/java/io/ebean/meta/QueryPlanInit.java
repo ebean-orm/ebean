@@ -10,7 +10,7 @@ public class QueryPlanInit {
 
   private boolean all;
 
-  private Set<Long> hashes = new HashSet<>();
+  private Set<String> hashes = new HashSet<>();
 
   private long thresholdMicros;
 
@@ -47,21 +47,21 @@ public class QueryPlanInit {
   /**
    * Return true if the query plan should be initiated based on it's hash.
    */
-  public boolean includeHash(long sqlHash) {
-    return all || hashes.contains(sqlHash);
+  public boolean includeHash(String hash) {
+    return all || hashes.contains(hash);
   }
 
   /**
    * Return the specific hashes that we want to collect query plans on.
    */
-  public Set<Long> sqlHashes() {
+  public Set<String> hashes() {
     return hashes;
   }
 
   /**
    * Set the specific hashes that we want to collect query plans on.
    */
-  public void sqlHashes(Set<Long> hashes) {
+  public void hashes(Set<String> hashes) {
     this.hashes = hashes;
   }
 }

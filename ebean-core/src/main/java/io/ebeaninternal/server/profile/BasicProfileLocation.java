@@ -10,12 +10,10 @@ final class BasicProfileLocation implements ProfileLocation {
   private final String fullLocation;
   private final String location;
   private final String label;
-  private final long hash;
 
   BasicProfileLocation(String fullLocation) {
     this.fullLocation = fullLocation;
-    this.hash = UtilLocation.hash(fullLocation);
-    this.location = shortDesc(fullLocation);
+    this.location = UtilLocation.loc(fullLocation);
     this.label = UtilLocation.label(location);
   }
 
@@ -45,11 +43,6 @@ final class BasicProfileLocation implements ProfileLocation {
   }
 
   @Override
-  public long hash() {
-    return hash;
-  }
-
-  @Override
   public String fullLocation() {
     return fullLocation;
   }
@@ -62,17 +55,6 @@ final class BasicProfileLocation implements ProfileLocation {
   @Override
   public void setTraceCount(int traceCount) {
     // do nothing
-  }
-
-  private String shortDesc(String location) {
-    int lastPer = location.lastIndexOf('.');
-    if (lastPer > -1) {
-      lastPer = location.lastIndexOf('.', lastPer - 1);
-      if (lastPer > -1) {
-        return location.substring(lastPer + 1);
-      }
-    }
-    return location;
   }
 
 }

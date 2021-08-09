@@ -45,15 +45,8 @@ public interface MetaQueryMetric extends MetaTimedMetric {
   }
 
   /**
-   * Return the hash of the sql.
+   * Return the hash of the plan.
    */
-  long sqlHash();
+  String hash();
 
-  /**
-   * Migrate to sqlHash().
-   */
-  @Deprecated
-  default long getSqlHash() {
-    return sqlHash();
-  }
 }

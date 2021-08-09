@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
-import io.ebeaninternal.server.util.Checksum;
+import io.ebeaninternal.server.util.Md5;
 
 class DQueryPlanMeta {
 
@@ -10,7 +10,7 @@ class DQueryPlanMeta {
   private final ProfileLocation profileLocation;
   private final String name;
   private final String sql;
-  private final long sqlHash;
+  private final String hash;
 
   DQueryPlanMeta(Class<?> type, String label, ProfileLocation profileLocation, String sql) {
     this.type = type;
@@ -22,15 +22,16 @@ class DQueryPlanMeta {
       name += "_" + label;
     }
     this.name = name;
-    this.sqlHash = Checksum.checksum(sql);
+    String loc = profileLocation == null ? null : profileLocation.location();
+    this.hash = Md5.hash(sql, name, loc);
   }
 
   public Class<?> getType() {
     return type;
   }
 
-  public long getSqlHash() {
-    return sqlHash;
+  public String getHash() {
+    return hash;
   }
 
   public String getName() {
@@ -47,10 +48,6 @@ class DQueryPlanMeta {
 
   public String getLocation() {
     return (profileLocation == null) ? null : profileLocation.location();
-  }
-
-  public long getLocationHash() {
-    return (profileLocation == null) ? 0 : profileLocation.hash();
   }
 
   public String getSql() {

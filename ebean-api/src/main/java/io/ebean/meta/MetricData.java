@@ -6,7 +6,7 @@ package io.ebean.meta;
 public class MetricData {
 
   private String name;
-  private long sqlHash;
+  private String hash;
   private String loc;
   private String sql;
 
@@ -14,7 +14,6 @@ public class MetricData {
   private Long mean;
   private Long max;
   private Long total;
-  private long locHash;
 
   public MetricData(String name) {
     this.name = name;
@@ -31,20 +30,12 @@ public class MetricData {
     this.name = name;
   }
 
-  public long getSqlHash() {
-    return sqlHash;
+  public String getHash() {
+    return hash;
   }
 
-  public void setSqlHash(long sqlHash) {
-    this.sqlHash = sqlHash;
-  }
-
-  public void setLocHash(long locHash) {
-    this.locHash = locHash;
-  }
-
-  public long getLocHash() {
-    return locHash;
+  public void setHash(String hash) {
+    this.hash = hash;
   }
 
   public String getLoc() {

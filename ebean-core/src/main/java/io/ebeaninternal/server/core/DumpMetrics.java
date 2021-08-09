@@ -120,7 +120,7 @@ class DumpMetrics {
     appendQueryName(metric, sb);
     appendCounters(metric, sb);
     if (dumpHash) {
-      sb.append("\n sqlHash:").append(metric.sqlHash());
+      sb.append("\n hash:").append(metric.hash());
     }
     appendProfileAndSql(metric, sb);
     out(sb.toString());
@@ -134,7 +134,6 @@ class DumpMetrics {
     String location = metric.location();
     if (dumpLoc && location != null) {
       sb.append("\n  loc:").append(location);
-      sb.append("\n  locHash:").append(metric.locationHash());
     }
     if (dumpSql) {
       sb.append(" \n\n  sql:").append(metric.sql()).append("\n\n");
