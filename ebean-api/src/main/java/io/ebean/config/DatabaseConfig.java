@@ -319,6 +319,8 @@ public class DatabaseConfig {
    */
   private ExternalTransactionManager externalTransactionManager;
 
+  private boolean skipDataSourceCheck;
+
   /**
    * The data source (if programmatically provided).
    */
@@ -1652,6 +1654,20 @@ public class DatabaseConfig {
   }
 
   /**
+   * Return true if the startup DataSource check should be skipped.
+   */
+  public boolean skipDataSourceCheck() {
+    return skipDataSourceCheck;
+  }
+
+  /**
+   * Set to true to skip the startup DataSource check.
+   */
+  public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
+    this.skipDataSourceCheck = skipDataSourceCheck;
+  }
+
+  /**
    * Return the DataSource.
    */
   public DataSource getDataSource() {
@@ -2932,6 +2948,7 @@ public class DatabaseConfig {
     jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
     jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
+    skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
