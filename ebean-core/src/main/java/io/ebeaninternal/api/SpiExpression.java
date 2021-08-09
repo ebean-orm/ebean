@@ -56,7 +56,7 @@ public interface SpiExpression extends Expression {
   /**
    * Return the hash value for the values that will be bound.
    */
-  int queryBindHash();
+  void queryBindHash(BindHash hash);
 
   /**
    * Return true if the expression is the same with respect to bind values.

@@ -54,12 +54,11 @@ public class BindParams implements Serializable {
     positionedParameters.clear();
   }
 
-  public int queryBindHash() {
-    int hc = namedParameters.hashCode();
+  public void queryBindHash(BindHash hash) {
+    hash.update(positionedParameters.size());
     for (Param positionedParameter : positionedParameters) {
-      hc = hc * 92821 + positionedParameter.hashCode();
+       positionedParameter.queryBindHash(hash);
     }
-    return hc;
   }
 
   /**
@@ -420,6 +419,10 @@ public class BindParams implements Serializable {
       hc = hc * 92821 + (type);
       hc = hc * 92821 + (inValue == null ? 0 : inValue.hashCode());
       return hc;
+    }
+
+    void queryBindHash(BindHash hash) {
+      hash.update(isInParam).update(isOutParam).update(type).update(inValue);
     }
 
     @Override

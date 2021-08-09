@@ -25,6 +25,7 @@ import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -225,13 +226,12 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public int queryBindHash() {
+  public void queryBindHash(BindHash hash) {
     int hc = JunctionExpression.class.getName().hashCode();
     List<SpiExpression> list = exprList.internalList();
     for (SpiExpression aList : list) {
-      hc = hc * 92821 + aList.queryBindHash();
+      aList.queryBindHash(hash);
     }
-    return hc;
   }
 
   @Override

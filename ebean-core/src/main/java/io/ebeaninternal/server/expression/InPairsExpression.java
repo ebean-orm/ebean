@@ -3,6 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.Pairs;
 import io.ebean.Pairs.Entry;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -124,12 +125,11 @@ class InPairsExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = 92821;
+  public void queryBindHash(BindHash hash) {
+    hash.update(entries.size());
     for (Pairs.Entry entry : entries) {
-      hc = 92821 * hc + entry.hashCode();
+      hash.update(entry.getA()).update(entry.getB());
     }
-    return hc;
   }
 
   @Override
