@@ -14,7 +14,11 @@ public class BasicProfileLocationTest {
 
     assertThat(loc.obtain()).isTrue();
     assertThat(loc.fullLocation()).endsWith(":12)");
-    assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0");
+    if (System.getProperty("java.version").startsWith("1.8")) {
+      assertThat(loc.location()).isEqualTo("sun.reflect.NativeMethodAccessorImpl.invoke0");
+    } else {
+      assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0");
+    }
     assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
   }
 
