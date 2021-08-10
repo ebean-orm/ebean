@@ -1300,7 +1300,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    BindHash hash = bindHashAlgorithm == null ? new HashCodeBindHash() : new MdBindHash(bindHashAlgorithm);
+    //BindHash hash = bindHashAlgorithm == null ? new HashCodeBindHash() : new MdBindHash(bindHashAlgorithm);
+    BindHash hash = new HashCodeBindHash();// : new MdBindHash(bindHashAlgorithm);
     queryBindHash(hash);
     hash.finish();
     return new HashQuery(queryPlanKey, hash);

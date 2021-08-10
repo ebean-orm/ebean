@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import io.ebeaninternal.api.BindHash;
@@ -12,28 +14,33 @@ import io.ebeaninternal.api.BindHash;
  */
 public class HashCodeBindHash implements BindHash {
 
-  int hashCode;
+  private final List<Object> values = new ArrayList<>();
+  private int hashCode;
 
   @Override
   public BindHash update(int intValue) {
+    values.add(intValue);
     hashCode = hashCode * 92821 + intValue;
     return this;
   }
 
   @Override
   public BindHash update(long longValue) {
+    values.add(longValue);
     hashCode = hashCode * 92821 + Long.hashCode(longValue);
     return this;
   }
 
   @Override
   public BindHash update(boolean boolValue) {
+    values.add(boolValue);
     hashCode = hashCode * 92821 + Boolean.hashCode(boolValue);
     return this;
   }
 
   @Override
   public BindHash update(Object value) {
+    values.add(value);
     hashCode = hashCode * 92821 + Objects.hashCode(value);
     return this;
   }
@@ -45,7 +52,7 @@ public class HashCodeBindHash implements BindHash {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof HashCodeBindHash && ((HashCodeBindHash) obj).hashCode == hashCode;
+    return obj instanceof HashCodeBindHash && ((HashCodeBindHash) obj).values.equals(values);
   }
 
   @Override
