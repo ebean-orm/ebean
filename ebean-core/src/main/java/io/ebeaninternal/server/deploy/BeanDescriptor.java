@@ -2519,7 +2519,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (propName.indexOf('(') > -1) {
       return findSqlTreeFormula(propName, path);
     }
-    return _findBeanProperty(propName);
+    return findProperty(propName);
   }
 
   /**
