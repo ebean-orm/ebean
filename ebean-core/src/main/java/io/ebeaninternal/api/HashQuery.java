@@ -7,12 +7,12 @@ public class HashQuery {
 
   private final CQueryPlanKey planHash;
 
-  private final int bindHash;
+  private final BindHash bindHash;
 
   /**
    * Create the HashQuery.
    */
-  public HashQuery(CQueryPlanKey planHash, int bindHash) {
+  public HashQuery(CQueryPlanKey planHash, BindHash bindHash) {
     this.planHash = planHash;
     this.bindHash = bindHash;
   }
@@ -25,7 +25,7 @@ public class HashQuery {
   @Override
   public int hashCode() {
     int hc = 92821 * planHash.hashCode();
-    hc = 92821 * hc + bindHash;
+    hc = 92821 * hc + bindHash.hashCode();
     return hc;
   }
 
@@ -39,6 +39,6 @@ public class HashQuery {
     }
 
     HashQuery e = (HashQuery) obj;
-    return e.bindHash == bindHash && e.planHash.equals(planHash);
+    return e.bindHash.equals(bindHash) && e.planHash.equals(planHash);
   }
 }

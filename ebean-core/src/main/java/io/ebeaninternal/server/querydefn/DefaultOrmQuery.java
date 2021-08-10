@@ -32,6 +32,8 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.LoadErrorHandler;
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.CacheIdLookup;
@@ -283,6 +285,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private boolean orderById;
 
+  private final String bindHashAlgorithm;
+
   private ProfileLocation profileLocation;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
@@ -291,6 +295,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     this.beanType = desc.getBeanType();
     this.server = server;
     this.orderById = server.getServerConfig().isDefaultOrderById();
+    this.bindHashAlgorithm = "MD5"; // TODO: server.getServerConfig().isUseMd5BindHash();
     this.disableLazyLoading = server.getServerConfig().isDisableLazyLoading();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
@@ -1276,15 +1281,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * </p>
    */
   @Override
-  public int queryBindHash() {
-    int hc = (id == null ? 0 : id.hashCode());
-    hc = hc * 92821 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
-    hc = hc * 92821 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
-    hc = hc * 92821 + (bindParams == null ? 0 : bindParams.queryBindHash());
-    hc = hc * 92821 + (asOf == null ? 0 : asOf.hashCode());
-    hc = hc * 92821 + (versionsStart == null ? 0 : versionsStart.hashCode());
-    hc = hc * 92821 + (versionsEnd == null ? 0 : versionsEnd.hashCode());
-    return hc;
+  public void queryBindHash(BindHash hash) {
+    hash.update(id);
+    if (whereExpressions != null) whereExpressions.queryBindHash(hash);
+    if (havingExpressions != null) havingExpressions.queryBindHash(hash);
+    if (bindParams != null) bindParams.queryBindHash(hash);
+    hash.update(asOf).update(versionsStart).update(versionsEnd);
   }
 
   /**
@@ -1298,8 +1300,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    int hc = queryBindHash();
-    return new HashQuery(queryPlanKey, hc);
+    BindHash hash = bindHashAlgorithm == null ? new HashCodeBindHash() : new MdBindHash(bindHashAlgorithm);
+    queryBindHash(hash);
+    hash.finish();
+    return new HashQuery(queryPlanKey, hash);
   }
 
   @Override

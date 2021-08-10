@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -39,8 +40,8 @@ class BitwiseExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return Long.hashCode(flags);
+  public void queryBindHash(BindHash hash) {
+    hash.update(flags).update(match);
   }
 
   @Override

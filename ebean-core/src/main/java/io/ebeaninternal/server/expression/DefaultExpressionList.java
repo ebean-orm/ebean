@@ -26,6 +26,7 @@ import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -678,12 +679,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Calculate a hash based on the expressions.
    */
   @Override
-  public int queryBindHash() {
-    int hash = DefaultExpressionList.class.getName().hashCode();
+  public void queryBindHash(BindHash hash) {
+    hash.update(list.size());
     for (SpiExpression aList : list) {
-      hash = hash * 92821 + aList.queryBindHash();
+      aList.queryBindHash(hash);
     }
-    return hash;
   }
 
   @Override

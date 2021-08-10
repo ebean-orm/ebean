@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -49,10 +50,8 @@ class BetweenExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = low().hashCode();
-    hc = hc * 92821 + high().hashCode();
-    return hc;
+  public void queryBindHash(BindHash hash) {
+    hash.update(low()).update(high());
   }
 
   @Override

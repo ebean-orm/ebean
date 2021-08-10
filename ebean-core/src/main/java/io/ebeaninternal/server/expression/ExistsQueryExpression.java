@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -91,8 +92,8 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
-  public int queryBindHash() {
-    return subQuery.queryBindHash();
+  public void queryBindHash(BindHash hash) {
+    subQuery.queryBindHash(hash);
   }
 
   @Override

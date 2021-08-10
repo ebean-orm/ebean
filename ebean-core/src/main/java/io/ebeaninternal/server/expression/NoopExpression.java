@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -74,9 +75,8 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
+  public void queryBindHash(BindHash hash) {
     // no bind values
-    return 0;
   }
 
   @Override

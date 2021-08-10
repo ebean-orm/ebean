@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindHash;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -49,12 +50,11 @@ public class ArrayContainsExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = values[0].hashCode();
-    for (int i = 1; i < values.length; i++) {
-      hc = hc * 92821 + values[i].hashCode();
+  public void queryBindHash(BindHash hash) {
+    hash.update(values.length);
+    for (int i = 0; i < values.length; i++) {
+      hash.update(values[i]);
     }
-    return hc;
   }
 
   @Override
