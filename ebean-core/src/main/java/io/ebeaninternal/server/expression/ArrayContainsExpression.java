@@ -52,8 +52,8 @@ public class ArrayContainsExpression extends AbstractExpression {
   @Override
   public void queryBindHash(BindHash hash) {
     hash.update(values.length);
-    for (int i = 0; i < values.length; i++) {
-      hash.update(values[i]);
+    for (Object value : values) {
+      hash.update(value);
     }
   }
 
