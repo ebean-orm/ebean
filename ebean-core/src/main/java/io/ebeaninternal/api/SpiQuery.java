@@ -84,7 +84,7 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
     /**
      * Find single attribute.
      */
-    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute"),
+    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute", false, false),
 
     /**
      * Find rowCount.
@@ -94,12 +94,12 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
     /**
      * A subquery used as part of an exists where clause.
      */
-    SQ_EXISTS(FIND_SUBQUERY, "sqExists"),
+    SQ_EXISTS(FIND_SUBQUERY, "sqExists", false, false),
 
     /**
      * A subquery used as part of an in where clause.
      */
-    SQ_IN(FIND_SUBQUERY, "sqIn"),
+    SQ_IN(FIND_SUBQUERY, "sqIn", false, false),
 
     /**
      * Delete query.
@@ -112,17 +112,21 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
     UPDATE(FIND_UPDATE, "update", true);
 
     private final boolean update;
+    private final boolean defaultSelect;
     private final String profileEventId;
     private final String label;
 
     Type(String profileEventId, String label) {
-      this(profileEventId, label, false);
+      this(profileEventId, label, false, true);
     }
-
     Type(String profileEventId, String label, boolean update) {
+      this(profileEventId, label, update, true);
+    }
+    Type(String profileEventId, String label, boolean update, boolean defaultSelect) {
       this.profileEventId = profileEventId;
       this.label = label;
       this.update = update;
+      this.defaultSelect = defaultSelect;
     }
 
     /**
@@ -130,6 +134,13 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
      */
     public boolean isUpdate() {
       return update;
+    }
+
+    /**
+     * Return true if this allows default select clause.
+     */
+    public boolean defaultSelect() {
+      return defaultSelect;
     }
 
     public String profileEventId() {
