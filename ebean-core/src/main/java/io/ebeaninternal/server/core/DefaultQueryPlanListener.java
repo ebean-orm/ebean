@@ -18,8 +18,8 @@ class DefaultQueryPlanListener implements QueryPlanListener {
     String dbName = capture.getDatabase().getName();
     for (MetaQueryPlan plan : capture.getPlans()) {
       log.info("queryPlan  db:{} label:{} queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
-        dbName, plan.getLabel(), plan.getQueryTimeMicros(), plan.getProfileLocation(),
-        plan.getSql(), plan.getBind(), plan.getPlan());
+        dbName, plan.label(), plan.queryTimeMicros(), plan.profileLocation(),
+        plan.sql(), plan.bind(), plan.plan());
     }
   }
 }

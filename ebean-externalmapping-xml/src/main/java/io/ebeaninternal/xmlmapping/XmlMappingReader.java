@@ -6,7 +6,6 @@ import io.ebeaninternal.xmlmapping.model.XmEbean;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -59,7 +58,7 @@ public class XmlMappingReader {
     try {
       List<XmEbean> mappings = new ArrayList<>();
       for (Resource xmlMappingRes : resourceList) {
-        try (InputStream is = new FileInputStream(xmlMappingRes.getLocationOnDisk())) {
+        try (InputStream is = xmlMappingRes.inputStream()) {
           mappings.add(XmlMappingReader.read(is));
         }
       }

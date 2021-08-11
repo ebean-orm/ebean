@@ -54,8 +54,8 @@ public class DbMigrationDropHistoryTest {
     migration.setServer(server);
 
     // First, we clean up the output-directory
-    assertThat(migration.getMigrationDirectory().getAbsolutePath()).contains("migrationtest-history");
-    Files.walk(migration.getMigrationDirectory().toPath())
+    assertThat(migration.migrationDirectory().getAbsolutePath()).contains("migrationtest-history");
+    Files.walk(migration.migrationDirectory().toPath())
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
 
     // then we generate migration scripts for v1_0

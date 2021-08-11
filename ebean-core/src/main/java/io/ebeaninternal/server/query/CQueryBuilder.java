@@ -189,6 +189,12 @@ class CQueryBuilder {
 
     SpiQuery<?> query = request.getQuery();
     query.setSingleAttribute();
+    if (!query.isIncludeSoftDeletes()) {
+      BeanDescriptor<?> desc = request.getBeanDescriptor();
+      if (desc.isSoftDelete()) {
+        query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+      }
+    }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
     CQueryPlan queryPlan = request.getQueryPlan();

@@ -67,7 +67,7 @@ public interface ExtendedServer {
    *
    * @return True if the query finds a matching row in the database
    */
-  <T> boolean exists(Query<?> ormQuery, Transaction transaction);
+  <T> boolean exists(Query<T> ormQuery, Transaction transaction);
 
   /**
    * Return the number of 'top level' or 'root' entities this query should return.

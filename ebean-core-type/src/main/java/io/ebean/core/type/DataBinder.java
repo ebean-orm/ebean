@@ -163,4 +163,15 @@ public interface DataBinder {
    * Bind an array value.
    */
   void setArray(String arrayType, Object[] elements) throws SQLException;
+
+  /**
+   * Push json from dirty detection to be available for binding.
+   */
+  void pushJson(String json);
+
+  /**
+   * Pop json made during dirty detection for scalarType binding.
+   */
+  String popJson();
+
 }

@@ -26,7 +26,7 @@ public class SortMetricTest {
     list.add(create("a"));
     list.sort(sortMetric);
 
-    String names = list.stream().map(DTimeMetricStats::getName).collect(Collectors.joining());
+    String names = list.stream().map(DTimeMetricStats::name).collect(Collectors.joining());
 
     assertEquals("nullabcd", names);
   }

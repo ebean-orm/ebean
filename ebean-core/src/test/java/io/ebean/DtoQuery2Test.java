@@ -191,13 +191,13 @@ public class DtoQuery2Test extends BaseTestCase {
     BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
     server().getMetaInfoManager().visitMetrics(basic);
 
-    List<MetaQueryMetric> stats = basic.getQueryMetrics();
+    List<MetaQueryMetric> stats = basic.queryMetrics();
     assertThat(stats).hasSize(1);
 
     MetaQueryMetric queryMetric = stats.get(0);
-    assertThat(queryMetric.getLabel()).isEqualTo("basic");
-    assertThat(queryMetric.getCount()).isEqualTo(3);
-    assertThat(queryMetric.getName()).isEqualTo("dto.DCust_basic");
+    assertThat(queryMetric.label()).isEqualTo("basic");
+    assertThat(queryMetric.count()).isEqualTo(3);
+    assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
 
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
@@ -207,7 +207,7 @@ public class DtoQuery2Test extends BaseTestCase {
 
     BasicMetricVisitor metric2 = server().getMetaInfoManager().visitBasic();
 
-    stats = metric2.getQueryMetrics();
+    stats = metric2.queryMetrics();
     assertThat(stats).hasSize(2);
 
     log.info("stats " + stats);

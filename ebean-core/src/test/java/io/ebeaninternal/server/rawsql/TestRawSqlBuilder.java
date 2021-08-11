@@ -9,17 +9,25 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.SqlRow;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.datasource.DataSourceConfig;
+import io.ebeaninternal.server.core.DefaultServer;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasicClob;
+import org.tests.model.basic.PersistentFileContent;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.rawsql.ERawSqlAggBean;
 
 import javax.sql.DataSource;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -281,6 +289,60 @@ public class TestRawSqlBuilder extends BaseTestCase {
         }
       }
     }
+  }
+
+  @Test
+  public void testCLobClosedConnection() throws Exception {
+    final EBasicClob eBasicClob = new EBasicClob();
+    eBasicClob.setName("eBasicClob");
+    final String description = "This is the CLob description";
+    eBasicClob.setDescription(description);
+    DB.save(eBasicClob);
+
+    final String sql = "select description from ebasic_clob where id = ?";
+
+    List<SqlRow> rows = new ArrayList<>();
+    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).getServerConfig().getDataSourceConfig();
+
+    try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
+         PreparedStatement stmt = connection.prepareStatement(sql)) {
+      stmt.setLong(1, eBasicClob.getId());
+
+      try (ResultSet resultSet = stmt.executeQuery()) {
+        while (resultSet.next()) {
+          rows.add(RawSqlBuilder.sqlRow(resultSet, "true", false));
+        }
+      }
+    }
+
+    assertThat(rows).hasSize(1);
+    assertThat(rows.get(0).getString("description")).isEqualTo(description);
+  }
+
+  @Test
+  public void testBLobClosedConnection() throws Exception {
+    final PersistentFileContent pfc = new PersistentFileContent();
+    final byte[] bytes = "This is the blob as String".getBytes(StandardCharsets.UTF_8);
+    pfc.setContent(bytes);
+    DB.save(pfc);
+
+    List<SqlRow> rows = new ArrayList<>();
+    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).getServerConfig().getDataSourceConfig();
+
+    final String sql = "select content from persistent_file_content where id = ?";
+    try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
+         PreparedStatement stmt = connection.prepareStatement(sql)) {
+      stmt.setLong(1, pfc.getId());
+
+      try (ResultSet resultSet = stmt.executeQuery()) {
+        while (resultSet.next()) {
+          rows.add(RawSqlBuilder.sqlRow(resultSet, "true", false));
+        }
+      }
+    }
+
+    assertThat(rows).hasSize(1);
+    assertThat(rows.get(0).get("content")).isEqualTo(bytes);
   }
 
 }

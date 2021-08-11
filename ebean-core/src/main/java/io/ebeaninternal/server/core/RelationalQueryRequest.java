@@ -18,11 +18,8 @@ import java.util.function.Predicate;
 public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   private final RelationalQueryEngine queryEngine;
-
   private String[] propertyNames;
-
   private int estimateCapacity;
-
   private int rows;
 
   /**

@@ -7,9 +7,7 @@ import io.ebean.EbeanVersion;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import io.ebean.annotation.Encrypted;
-import io.ebean.annotation.PersistBatch;
-import io.ebean.annotation.Platform;
+import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -194,10 +192,9 @@ public class DatabaseConfig {
   private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
 
   /**
-   * When true then by default DbJson beans are assumed to be dirty.
-   * I believe we want to change this default to false in the future.
+   * The default mode used for {@code @DbJson} with Jackson ObjectMapper.
    */
-  private boolean jsonDirtyByDefault = true;
+  private MutationDetection jsonMutationDetection = MutationDetection.HASH;
 
   /**
    * The database platform name. Used to imply a DatabasePlatform to use.
@@ -321,6 +318,8 @@ public class DatabaseConfig {
    * The external transaction manager (like Spring).
    */
   private ExternalTransactionManager externalTransactionManager;
+
+  private boolean skipDataSourceCheck;
 
   /**
    * The data source (if programmatically provided).
@@ -744,23 +743,21 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return true if DbJson beans are assumed dirty by default.
-   * <p>
-   * That is, when true beans that do not implement ModifyAwareType are by
-   * default assumed to be dirty and included in updates.
+   * Return the default MutableDetection to use with {@code @DbJson} using Jackson.
+   *
+   * @see DbJson#mutationDetection()
    */
-  public boolean isJsonDirtyByDefault() {
-    return jsonDirtyByDefault;
+  public MutationDetection getJsonMutationDetection() {
+    return jsonMutationDetection;
   }
 
   /**
-   * Set to false if we want DbJson beans to not be assumed to be dirty.
-   * <p>
-   * That is, when true beans that do not implement ModifyAwareType are by
-   * default assumed to be dirty and included in updates.
+   * Set the default MutableDetection to use with {@code @DbJson} using Jackson.
+   *
+   * @see DbJson#mutationDetection()
    */
-  public void setJsonDirtyByDefault(boolean jsonDirtyByDefault) {
-    this.jsonDirtyByDefault = jsonDirtyByDefault;
+  public void setJsonMutationDetection(MutationDetection jsonMutationDetection) {
+    this.jsonMutationDetection = jsonMutationDetection;
   }
 
   /**
@@ -1654,6 +1651,20 @@ public class DatabaseConfig {
    */
   public void setAutoTuneConfig(AutoTuneConfig autoTuneConfig) {
     this.autoTuneConfig = autoTuneConfig;
+  }
+
+  /**
+   * Return true if the startup DataSource check should be skipped.
+   */
+  public boolean skipDataSourceCheck() {
+    return skipDataSourceCheck;
+  }
+
+  /**
+   * Set to true to skip the startup DataSource check.
+   */
+  public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
+    this.skipDataSourceCheck = skipDataSourceCheck;
   }
 
   /**
@@ -2935,8 +2946,9 @@ public class DatabaseConfig {
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
     jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
     jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
-    jsonDirtyByDefault = p.getBoolean("jsonDirtyByDefault", jsonDirtyByDefault);
+    jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
+    skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);

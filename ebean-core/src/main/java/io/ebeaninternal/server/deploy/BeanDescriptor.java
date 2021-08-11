@@ -1559,7 +1559,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (request.includeHash(queryPlan.getHash())) {
-        queryPlan.queryPlanInit(request.getThresholdMicros());
+        queryPlan.queryPlanInit(request.thresholdMicros());
         list.add(queryPlan.createMeta(null, null));
       }
     }
@@ -1572,7 +1572,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        visitor.visitQuery(queryPlan.getSnapshot(visitor.isReset()));
+        visitor.visitQuery(queryPlan.getSnapshot(visitor.reset()));
       }
     }
   }
@@ -2022,7 +2022,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public boolean isTableManaged(String tableName) {
     return owner.isTableManaged(tableName);
   }
-  
+
   /**
    * Return the order column property.
    */
@@ -3198,9 +3198,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
-      if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
+      if (ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value != null && beanProperty.isDirtyValue(value)) {
+        if (beanProperty.checkMutable(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);

@@ -18,22 +18,20 @@ class LastMigration {
   private static final String MODEL_XML = ".model.xml";
 
   /**
-   * Return the next migation version given the migration directory.
+   * Return the next migration version given the migration directory.
    */
-  static String nextVersion(File migDir, File modelDir, boolean dbinitMigration) {
-
+  static String nextVersion(File migDir, File modelDir, boolean initMigration) {
     String last = lastVersion(migDir, modelDir);
     if (last == null) {
       return null;
     }
-    return (dbinitMigration) ? last : MigrationVersion.parse(last).nextVersion();
+    return (initMigration) ? last : MigrationVersion.parse(last).nextVersion();
   }
 
   /**
-   * Return the last migation version given the migration directory.
+   * Return the last migration version given the migration directory.
    */
   static String lastVersion(File migDirectory, File modelDir) {
-
     List<MigrationVersion> versions = new ArrayList<>();
 
     File[] sqlFiles = migDirectory.listFiles(pathname -> includeSqlFile(pathname.getName().toLowerCase()));

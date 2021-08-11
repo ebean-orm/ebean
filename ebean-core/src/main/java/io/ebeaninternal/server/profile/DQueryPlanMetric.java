@@ -19,7 +19,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-    TimedMetricStats stats = metric.collect(visitor.isReset());
+    TimedMetricStats stats = metric.collect(visitor.reset());
     if (stats != null) {
       visitor.visitQuery(new Stats(meta, stats, collected));
       collected = true;
@@ -45,11 +45,11 @@ class DQueryPlanMetric implements QueryPlanMetric {
 
     @Override
     public String toString() {
-      return meta + " " + stats + " sql:" + getSql();
+      return meta + " " + stats + " sql:" + sql();
     }
 
     @Override
-    public Class<?> getType() {
+    public Class<?> type() {
       return meta.getType();
     }
 
@@ -59,48 +59,48 @@ class DQueryPlanMetric implements QueryPlanMetric {
     }
 
     @Override
-    public String getHash() {
+    public String hash() {
       return meta.getHash();
     }
 
     @Override
-    public String getLabel() {
+    public String label() {
       return meta.getLabel();
     }
 
     @Override
-    public String getSql() {
+    public String sql() {
       return meta.getSql();
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return meta.getName();
     }
 
     @Override
-    public String getLocation() {
+    public String location() {
       return meta.getLocation();
     }
 
     @Override
-    public long getCount() {
-      return stats.getCount();
+    public long count() {
+      return stats.count();
     }
 
     @Override
-    public long getTotal() {
-      return stats.getTotal();
+    public long total() {
+      return stats.total();
     }
 
     @Override
-    public long getMax() {
-      return stats.getMax();
+    public long max() {
+      return stats.max();
     }
 
     @Override
-    public long getMean() {
-      return stats.getMean();
+    public long mean() {
+      return stats.mean();
     }
   }
 }

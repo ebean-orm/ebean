@@ -213,20 +213,38 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set a FetchGroup to control what part of the object graph is loaded.
    * <p>
-   * This is an alternative to using select() and fetch() providing a nice clean separation
-   * between what a query should load and the query predicates.
-   * </p>
+   * FetchGroup is immutable and threadsafe. We expect to create and store
+   * FetchGroup to a static final field and reuse the instance.
+   * <p>
+   * FetchGroup is an alternative to using select() and fetch() providing a nice
+   * clean separation between what a query should load and the query predicates.
    *
    * <pre>{@code
    *
-   * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class)
-   *   .select("name, status")
-   *   .fetch("contacts", "firstName, lastName, email")
-   *   .build();
+   * // immutable threadsafe
    *
-   * List<Customer> customers =
+   * static final FetchGroup<Customer> fetchGroup =
+   *   QCustomer.forFetchGroup()
+   *     .shippingAddress.fetch()
+   *     .contacts.fetch()
+   *     .buildFetchGroup();
    *
-   *   new QCustomer()
+   * List<Customer> customers = new QCustomer()
+   *   .select(fetchGroup)
+   *   .findList();
+   *
+   * }</pre>
+   *
+   *
+   * <pre>{@code
+   *
+   * static final FetchGroup<Customer> fetchGroup =
+   *   FetchGroup.of(Customer.class)
+   *     .select("name, status")
+   *     .fetch("contacts", "firstName, lastName, email")
+   *     .build();
+   *
+   * List<Customer> customers = new QCustomer()
    *   .select(fetchGroup)
    *   .findList();
    *

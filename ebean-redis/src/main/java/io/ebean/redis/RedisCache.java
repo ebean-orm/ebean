@@ -255,14 +255,13 @@ class RedisCache implements ServerCache {
 
   @Override
   public ServerCacheStatistics getStatistics(boolean reset) {
-
     ServerCacheStatistics cacheStats = new ServerCacheStatistics();
     cacheStats.setCacheName(cacheKey);
     cacheStats.setHitCount(hitCount.get(reset));
     cacheStats.setMissCount(missCount.get(reset));
-    cacheStats.setPutCount(metricPut.collect(reset).getCount());
-    cacheStats.setRemoveCount(metricRemove.collect(reset).getCount());
-    cacheStats.setClearCount(metricClear.collect(reset).getCount());
+    cacheStats.setPutCount(metricPut.collect(reset).count());
+    cacheStats.setRemoveCount(metricRemove.collect(reset).count());
+    cacheStats.setClearCount(metricClear.collect(reset).count());
     return cacheStats;
   }
 }

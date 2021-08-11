@@ -16,8 +16,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private final String sql;
   private final String bind;
   private final String plan;
-
-  private String hash;
+  private final String hash;
   private long queryTimeMicros;
   private long captureCount;
 
@@ -32,7 +31,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   }
 
   @Override
-  public String getHash() {
+  public String hash() {
     return hash;
   }
 
@@ -40,7 +39,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the associated bean.
    */
   @Override
-  public Class<?> getBeanType() {
+  public Class<?> beanType() {
     return beanType;
   }
 
@@ -48,12 +47,12 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the query label if set.
    */
   @Override
-  public String getLabel() {
+  public String label() {
     return label;
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return profileLocation;
   }
 
@@ -61,7 +60,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the sql of query.
    */
   @Override
-  public String getSql() {
+  public String sql() {
     return sql;
   }
 
@@ -69,7 +68,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return a description of the bind values used.
    */
   @Override
-  public String getBind() {
+  public String bind() {
     return bind;
   }
 
@@ -77,7 +76,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the query plan.
    */
   @Override
-  public String getPlan() {
+  public String plan() {
     return plan;
   }
 
@@ -86,7 +85,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * to build the query plan.
    */
   @Override
-  public long getQueryTimeMicros() {
+  public long queryTimeMicros() {
     return queryTimeMicros;
   }
 
@@ -94,7 +93,7 @@ class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Return the total count of times bind capture has occurred.
    */
   @Override
-  public long getCaptureCount() {
+  public long captureCount() {
     return captureCount;
   }
 

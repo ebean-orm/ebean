@@ -24,10 +24,10 @@ class CQueryPlanRequest {
   CQueryPlanRequest(Connection connection, QueryPlanRequest req, Iterator<CQueryBindCapture> iterator) {
     this.connection = connection;
     this.iterator = iterator;
-    this.maxCount = req.getMaxCount();
-    long reqSince = req.getSince();
+    this.maxCount = req.maxCount();
+    long reqSince = req.since();
     this.since = (reqSince == 0) ? Long.MAX_VALUE: reqSince;
-    long maxTimeMillis = req.getMaxTimeMillis();
+    long maxTimeMillis = req.maxTimeMillis();
     this.maxTime = maxTimeMillis > 0 ? System.currentTimeMillis() + maxTimeMillis : 0;
   }
 

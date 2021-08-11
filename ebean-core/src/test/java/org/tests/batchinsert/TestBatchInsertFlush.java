@@ -80,15 +80,15 @@ public class TestBatchInsertFlush extends BaseTestCase {
     }
 
     ServerMetrics metrics = collectMetrics();
-    List<MetaTimedMetric> txnStats = metrics.getTimedMetrics();
+    List<MetaTimedMetric> txnStats = metrics.timedMetrics();
     for (MetaTimedMetric txnMetric : txnStats) {
       System.out.println(txnMetric);
     }
     assertThat(txnStats).hasSize(4);
-    assertThat(txnStats.get(0).getName()).isEqualTo("txn.main");
-    assertThat(txnStats.get(1).getName()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
-    assertThat(txnStats.get(2).getName()).isEqualTo("iud.TSDetail.insertBatch");
-    assertThat(txnStats.get(3).getName()).isEqualTo("iud.TSMaster.insertBatch");
+    assertThat(txnStats.get(0).name()).isEqualTo("txn.main");
+    assertThat(txnStats.get(1).name()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
+    assertThat(txnStats.get(2).name()).isEqualTo("iud.TSDetail.insertBatch");
+    assertThat(txnStats.get(3).name()).isEqualTo("iud.TSMaster.insertBatch");
   }
 
   @Test

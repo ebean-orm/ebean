@@ -295,7 +295,16 @@ public class SaveManyBeans extends SaveManyBase {
     }
 
     transaction.depth(+1);
-
+    if (deletions != null && !deletions.isEmpty()) {
+      for (Object other : deletions) {
+        EntityBean otherDelete = (EntityBean) other;
+        // the object from the 'other' side of the ManyToMany
+        // build a intersection row for 'delete'
+        IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
+        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
+        persister.executeOrQueue(sqlDelete, transaction, queue);
+      }
+    }
     if (additions != null && !additions.isEmpty()) {
       for (Object other : additions) {
         EntityBean otherBean = (EntityBean) other;
@@ -316,16 +325,6 @@ public class SaveManyBeans extends SaveManyBase {
             persister.executeOrQueue(sqlInsert, transaction, queue);
           }
         }
-      }
-    }
-    if (deletions != null && !deletions.isEmpty()) {
-      for (Object other : deletions) {
-        EntityBean otherDelete = (EntityBean) other;
-        // the object from the 'other' side of the ManyToMany
-        // build a intersection row for 'delete'
-        IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
-        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
-        persister.executeOrQueue(sqlDelete, transaction, queue);
       }
     }
     // decrease the depth back to what it was

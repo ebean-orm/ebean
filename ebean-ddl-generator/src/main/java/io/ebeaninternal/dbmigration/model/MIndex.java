@@ -13,8 +13,8 @@ import java.util.Objects;
  */
 public class MIndex {
 
-  private String tableName;
-  private String indexName;
+  private final String tableName;
+  private final String indexName;
   private String platforms;
   private List<String> columns = new ArrayList<>();
   private boolean unique;

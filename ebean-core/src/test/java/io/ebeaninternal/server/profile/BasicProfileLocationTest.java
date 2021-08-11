@@ -14,7 +14,7 @@ public class BasicProfileLocationTest {
 
     assertThat(loc.obtain()).isTrue();
     assertThat(loc.fullLocation()).endsWith(":12)");
-    assertThat(loc.location()).isEqualTo("NativeMethodAccessorImpl.invoke0(Native Method:12)");
+    assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0");
     assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
   }
 
@@ -24,7 +24,7 @@ public class BasicProfileLocationTest {
     BasicProfileLocation loc = new BasicProfileLocation("com.foo.Bar.all");
     assertThat(loc.obtain()).isFalse();
     assertThat(loc.fullLocation()).isEqualTo("com.foo.Bar.all");
-    assertThat(loc.location()).isEqualTo("Bar.all");
+    assertThat(loc.location()).isEqualTo("com.foo.Bar.all");
     assertThat(loc.label()).isEqualTo("Bar.all");
   }
 
@@ -34,7 +34,7 @@ public class BasicProfileLocationTest {
     BasicProfileLocation loc = new BasicProfileLocation("foo.Bar.all");
     assertThat(loc.obtain()).isFalse();
     assertThat(loc.fullLocation()).isEqualTo("foo.Bar.all");
-    assertThat(loc.location()).isEqualTo("Bar.all");
+    assertThat(loc.location()).isEqualTo("foo.Bar.all");
     assertThat(loc.label()).isEqualTo("Bar.all");
   }
 }

@@ -42,11 +42,7 @@ class BeanEmbeddedMetaFactory {
       int dbScale = dbScale(column, sourceProperties[i]);
       String colDefn = getDbColumnDefn(column, sourceProperties[i]);
       BeanPropertyOverride overrides = new BeanPropertyOverride(dbColumn, dbNullable, dbLength, dbScale, colDefn);
-      if (sourceProperties[i] instanceof BeanPropertyAssocOne) {
-        embeddedProperties[i] = new BeanPropertyAssocOne((BeanPropertyAssocOne)sourceProperties[i], overrides);
-      } else {
-        embeddedProperties[i] = new BeanProperty(sourceProperties[i], overrides);
-      }
+      embeddedProperties[i] = sourceProperties[i].override(overrides);
     }
 
     return new BeanEmbeddedMeta(embeddedProperties);

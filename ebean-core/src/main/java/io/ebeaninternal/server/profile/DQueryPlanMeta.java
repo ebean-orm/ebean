@@ -22,15 +22,8 @@ class DQueryPlanMeta {
       name += "_" + label;
     }
     this.name = name;
-    this.hash = initHash();
-  }
-
-  private String initHash() {
-    StringBuilder sb = new StringBuilder(sql).append("|").append(name);
-    if (profileLocation != null) {
-      sb.append("|").append(profileLocation.location());
-    }
-    return Md5.hash(sb.toString());
+    String loc = profileLocation == null ? null : profileLocation.location();
+    this.hash = Md5.hash(sql, name, loc);
   }
 
   public Class<?> getType() {

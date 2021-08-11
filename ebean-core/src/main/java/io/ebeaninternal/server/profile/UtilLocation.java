@@ -2,13 +2,28 @@ package io.ebeaninternal.server.profile;
 
 final class UtilLocation {
 
-  static String label(String shortDescription) {
-    int pos = shortDescription.indexOf("(");
-    if (pos == -1) {
-      return shortDescription;
+  static String loc(String full) {
+    final int pos = full.lastIndexOf('(');
+    if (pos > -1) {
+      return full.substring(0, pos);
     } else {
-      return trimInit(shortDescription.substring(0, pos));
+      return full;
     }
+  }
+
+  static String label(String location) {
+    return trimInit(shortDesc(location));
+  }
+
+  private static String shortDesc(String location) {
+    int pos = location.lastIndexOf('.');
+    if (pos > -1) {
+      pos = location.lastIndexOf('.', pos - 1);
+      if (pos > -1) {
+        return location.substring(pos + 1);
+      }
+    }
+    return location;
   }
 
   /**
@@ -21,5 +36,4 @@ final class UtilLocation {
     }
     return desc;
   }
-
 }

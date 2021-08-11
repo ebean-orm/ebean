@@ -53,29 +53,24 @@ public class ModelDiff {
     this.baseModel = new ModelContainer();
   }
 
-
   /**
-   * Return true if the apply and drop changes are both empty.
-   * This means there are no migration changes.
+   * Return true if apply and drop changes are both empty. This means there are no migration changes.
    */
   public boolean isEmpty() {
     return applyChanges.isEmpty() && dropChanges.isEmpty();
   }
 
   /**
-   * Return the diff as a migration potentially containing
-   * an apply changeSet and a drop changeSet.
+   * Return the diff as a migration potentially containing an apply changeSet and a drop changeSet.
    */
   public Migration getMigration() {
-
     Migration migration = new Migration();
     if (!applyChanges.isEmpty()) {
-      // add a non empty apply changeSet
+      // add a non-empty apply changeSet
       migration.getChangeSet().add(getApplyChangeSet());
     }
-
     if (!dropChanges.isEmpty()) {
-      // add a non empty drop changeSet
+      // add a non-empty drop changeSet
       migration.getChangeSet().add(getDropChangeSet());
     }
     return migration;
@@ -121,7 +116,6 @@ public class ModelDiff {
    * Compare to a 'newer' model and collect the differences.
    */
   public void compareTo(ModelContainer newModel) {
-
     Map<String, MTable> newTables = newModel.getTables();
     for (MTable newTable : newTables.values()) {
 
@@ -179,7 +173,6 @@ public class ModelDiff {
    * Compare tables looking for add/drop/modify columns etc.
    */
   protected void compareTables(MTable currentTable, MTable newTable) {
-
     currentTable.compare(this, newTable);
   }
 
@@ -187,7 +180,6 @@ public class ModelDiff {
    * Compare tables looking for add/drop/modify columns etc.
    */
   protected void compareIndexes(MIndex currentIndex, MIndex newIndex) {
-
     currentIndex.compare(this, newIndex);
   }
 

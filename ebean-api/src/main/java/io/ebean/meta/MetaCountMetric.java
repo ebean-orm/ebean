@@ -8,6 +8,13 @@ public interface MetaCountMetric extends MetaMetric {
   /**
    * Return the total count.
    */
-  long getCount();
+  long count();
 
+  /**
+   * Migrate to count()
+   */
+  @Deprecated
+  default long getCount() {
+    return count();
+  }
 }

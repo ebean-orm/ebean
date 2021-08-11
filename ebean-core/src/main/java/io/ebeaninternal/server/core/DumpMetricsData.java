@@ -31,9 +31,9 @@ class DumpMetricsData {
 
   private void collect(ServerMetrics serverMetrics) {
 
-    final List<MetaTimedMetric> timedMetrics = serverMetrics.getTimedMetrics();
-    final List<MetaCountMetric> countMetrics = serverMetrics.getCountMetrics();
-    final List<MetaQueryMetric> queryMetrics = serverMetrics.getQueryMetrics();
+    final List<MetaTimedMetric> timedMetrics = serverMetrics.timedMetrics();
+    final List<MetaCountMetric> countMetrics = serverMetrics.countMetrics();
+    final List<MetaQueryMetric> queryMetrics = serverMetrics.queryMetrics();
 
     for (MetaTimedMetric metric : timedMetrics) {
       add(metric);
@@ -47,7 +47,7 @@ class DumpMetricsData {
   }
 
   private MetricData create(MetaMetric metric) {
-    MetricData data = new MetricData(metric.getName());
+    MetricData data = new MetricData(metric.name());
     list.add(data);
     return data;
   }
@@ -55,30 +55,30 @@ class DumpMetricsData {
   private void add(MetaTimedMetric metric) {
     final MetricData data = create(metric);
     appendCounters(data, metric);
-    data.setLoc(metric.getLocation());
+    data.setLoc(metric.location());
   }
 
   private void addCount(MetaCountMetric metric) {
     final MetricData data = create(metric);
-    data.setCount(metric.getCount());
+    data.setCount(metric.count());
   }
 
   private void addQuery(MetaQueryMetric metric) {
     final MetricData data = create(metric);
     appendCounters(data, metric);
     appendLocationAndSql(data, metric);
-    data.setHash(metric.getHash());
+    data.setHash(metric.hash());
   }
 
   private void appendLocationAndSql(MetricData data, MetaQueryMetric metric) {
-    data.setLoc(metric.getLocation());
-    data.setSql(metric.getSql());
+    data.setLoc(metric.location());
+    data.setSql(metric.sql());
   }
 
   private void appendCounters(MetricData data, MetaTimedMetric timedMetric) {
-    data.setCount(timedMetric.getCount());
-    data.setTotal(timedMetric.getTotal());
-    data.setMean(timedMetric.getMean());
-    data.setMax(timedMetric.getMax());
+    data.setCount(timedMetric.count());
+    data.setTotal(timedMetric.total());
+    data.setMean(timedMetric.mean());
+    data.setMax(timedMetric.max());
   }
 }
