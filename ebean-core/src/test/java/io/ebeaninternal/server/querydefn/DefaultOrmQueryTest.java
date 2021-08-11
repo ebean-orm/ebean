@@ -4,6 +4,7 @@ package io.ebeaninternal.server.querydefn;
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.Ebean;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isNotEqualTo(q2.createQueryPlanKey());
-    assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
+    assertThat(bindKey(q1)).isNotEqualTo(bindKey(q2));
   }
 
   @Test
@@ -73,7 +74,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
-    assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
+    assertThat(bindKey(q1)).isNotEqualTo(bindKey(q2));
   }
 
   @Test
@@ -84,7 +85,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
-    assertThat(q1.queryBindHash()).isEqualTo(q2.queryBindHash());
+    assertThat(bindKey(q1)).isEqualTo(bindKey(q2));
   }
 
   @Test
@@ -109,5 +110,11 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
     OrmQueryRequest<T> r2 = createQueryRequest(SpiQuery.Type.LIST, q2, null);
     q2.prepare(r2);
+  }
+
+  private BindValuesKey bindKey(DefaultOrmQuery<Order> query) {
+    BindValuesKey key = new BindValuesKey();
+    query.queryBindKey(key);
+    return key;
   }
 }

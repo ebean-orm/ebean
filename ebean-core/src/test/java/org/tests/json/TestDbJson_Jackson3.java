@@ -10,6 +10,7 @@ import io.ebeantest.LoggedSql;
 import org.junit.Test;
 import org.tests.model.json.EBasicJsonJackson3;
 import org.tests.model.json.EBasicJsonList;
+import org.tests.model.json.EBasicJsonMulti;
 import org.tests.model.json.PlainBean;
 import org.tests.model.json.PlainBeanDirtyAware;
 
@@ -220,6 +221,21 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     expectedSql(0, "update ebasic_json_jackson3 set plain_value2=?, version=? where id=? and version=?");
 
     LoggedSql.stop();
+  }
+  
+  @Test
+  public void push_pop_test() {
+    
+    EBasicJsonMulti bean = new EBasicJsonMulti();
+    bean.setPlainValue2(new PlainBeanDirtyAware("x", 42));
+    bean.save();
+    
+    bean = DB.find(EBasicJsonMulti.class, bean.getId());
+    bean.setPlainValue1(null); // already null
+    bean.setPlainValue2(null);
+    bean.setPlainValue3(null); // already null
+    BeanState state = DB.getBeanState(bean);
+    assertThat(state.getDirtyValues()).hasSize(1).containsKey("plainValue2");
   }
 
   private void expectedSql(int i, String s) {

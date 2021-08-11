@@ -5,6 +5,7 @@ import io.ebean.LikeType;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -136,10 +137,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     list = buildExpressions(desc);
-    if (list != null) {
-      for (SpiExpression aList : list) {
-        aList.containsMany(desc, whereManyJoins);
-      }
+    for (SpiExpression expr : list) {
+      expr.containsMany(desc, whereManyJoins);
     }
   }
 
@@ -186,8 +185,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (SpiExpression aList : list) {
-      aList.validate(validation);
+    for (SpiExpression expr : list) {
+      expr.validate(validation);
     }
   }
 
@@ -228,25 +227,20 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-
     builder.append("Example[");
-    for (SpiExpression aList : list) {
-      aList.queryPlanHash(builder);
+    for (SpiExpression expr : list) {
+      expr.queryPlanHash(builder);
       builder.append(",");
     }
     builder.append("]");
   }
 
-  /**
-   * Return a hash for the actual bind values used.
-   */
   @Override
-  public int queryBindHash() {
-    int hc = DefaultExampleExpression.class.getName().hashCode();
-    for (SpiExpression aList : list) {
-      hc = hc * 92821 + aList.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(list.size());
+    for (SpiExpression expr : list) {
+      expr.queryBindKey(key);
     }
-    return hc;
   }
 
   @Override
@@ -267,7 +261,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * Build the List of expressions.
    */
   private ArrayList<SpiExpression> buildExpressions(BeanDescriptor<?> beanDescriptor) {
-
     ArrayList<SpiExpression> list = new ArrayList<>();
     addExpressions(list, beanDescriptor, entity, null);
     return list;

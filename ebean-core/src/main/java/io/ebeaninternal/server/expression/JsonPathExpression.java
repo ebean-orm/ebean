@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -83,10 +84,8 @@ class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = (value == null) ? 0 : value.hashCode();
-    hc = (upperValue == null) ? hc : hc * 92821 + upperValue.hashCode();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(value).add(upperValue);
   }
 
   @Override

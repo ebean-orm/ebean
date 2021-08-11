@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -8,6 +9,7 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 
@@ -81,7 +83,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
    */
   protected CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
-    return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
+    return ebeanServer.compileQuery(Type.SQ_EXISTS, subQuery, queryRequest.getTransaction());
   }
 
   @Override
@@ -91,8 +93,8 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
-  public int queryBindHash() {
-    return subQuery.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    subQuery.queryBindKey(key);
   }
 
   @Override

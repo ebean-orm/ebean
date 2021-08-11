@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -103,8 +104,8 @@ class IsEmptyExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return 1;
+  public void queryBindKey(BindValuesKey key) {
+    // no bind values
   }
 
   @Override

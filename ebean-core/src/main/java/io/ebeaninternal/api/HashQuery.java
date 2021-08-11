@@ -6,15 +6,14 @@ package io.ebeaninternal.api;
 public class HashQuery {
 
   private final CQueryPlanKey planHash;
-
-  private final int bindHash;
+  private final BindValuesKey bindValuesKey;
 
   /**
    * Create the HashQuery.
    */
-  public HashQuery(CQueryPlanKey planHash, int bindHash) {
+  public HashQuery(CQueryPlanKey planHash, BindValuesKey bindValuesKey) {
     this.planHash = planHash;
-    this.bindHash = bindHash;
+    this.bindValuesKey = bindValuesKey;
   }
 
   @Override
@@ -25,7 +24,7 @@ public class HashQuery {
   @Override
   public int hashCode() {
     int hc = 92821 * planHash.hashCode();
-    hc = 92821 * hc + bindHash;
+    hc = 92821 * hc + bindValuesKey.hashCode();
     return hc;
   }
 
@@ -37,8 +36,7 @@ public class HashQuery {
     if (!(obj instanceof HashQuery)) {
       return false;
     }
-
     HashQuery e = (HashQuery) obj;
-    return e.bindHash == bindHash && e.planHash.equals(planHash);
+    return e.bindValuesKey.equals(bindValuesKey) && e.planHash.equals(planHash);
   }
 }

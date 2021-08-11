@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -95,8 +96,8 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return val().hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(val());
   }
 
   @Override

@@ -92,9 +92,7 @@ public class LoadBeanRequest extends LoadRequest {
    * Return the list of Id values for the beans in the lazy load buffer.
    */
   public List<Object> getIdList() {
-
     List<Object> idList = new ArrayList<>();
-
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     for (EntityBeanIntercept ebi : batch) {
       idList.add(desc.getId(ebi.getOwner()));
@@ -106,10 +104,8 @@ public class LoadBeanRequest extends LoadRequest {
    * Configure the query for lazy loading execution.
    */
   public void configureQuery(SpiQuery<?> query, List<Object> idList) {
-
     query.setMode(SpiQuery.Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.getPersistenceContext());
-
     String mode = isLazy() ? "+lazy" : "+query";
     query.setLoadDescription(mode, getDescription());
 
@@ -117,9 +113,7 @@ public class LoadBeanRequest extends LoadRequest {
       // cascade the batch size (if set) for further lazy loading
       query.setLazyLoadBatchSize(getBatchSize());
     }
-
     loadBuffer.configureQuery(query, lazyLoadProperty);
-
     if (idList.size() == 1) {
       query.where().idEq(idList.get(0));
     } else {
@@ -131,19 +125,16 @@ public class LoadBeanRequest extends LoadRequest {
    * Load the beans into the L2 cache if that is requested and check for load failures due to deletes.
    */
   public void postLoad(List<?> list) {
-
     Set<Object> loadedIds = new HashSet<>();
-
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     // collect Ids and maybe load bean cache
-    for (Object aList : list) {
-      EntityBean loadedBean = (EntityBean) aList;
+    for (Object bean : list) {
+      EntityBean loadedBean = (EntityBean) bean;
       loadedIds.add(desc.getId(loadedBean));
     }
     if (isLoadCache()) {
       desc.cacheBeanPutAll(list);
     }
-
     if (lazyLoadProperty != null) {
       for (EntityBeanIntercept ebi : batch) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
