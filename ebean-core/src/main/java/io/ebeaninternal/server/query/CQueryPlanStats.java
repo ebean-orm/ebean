@@ -83,56 +83,56 @@ public final class CQueryPlanStats {
 
     @Override
     public String toString() {
-      return "label:" + getLabel() + " location:" + getLocation() + " metrics:" + metrics + " sql:" + getSql();
+      return "label:" + label() + " location:" + location() + " metrics:" + metrics + " sql:" + sql();
     }
 
     @Override
-    public Class<?> getType() {
+    public Class<?> type() {
       return queryPlan.getBeanType();
     }
 
     @Override
-    public String getLabel() {
+    public String label() {
       return queryPlan.getLabel();
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return queryPlan.getName();
     }
 
     @Override
-    public String getLocation() {
+    public String location() {
       return queryPlan.getLocation();
     }
 
     @Override
-    public long getCount() {
-      return metrics.getCount();
+    public long count() {
+      return metrics.count();
     }
 
     @Override
-    public long getTotal() {
-      return metrics.getTotal();
+    public long total() {
+      return metrics.total();
     }
 
     @Override
-    public long getMax() {
-      return metrics.getMax();
+    public long max() {
+      return metrics.max();
     }
 
     @Override
-    public long getMean() {
-      return metrics.getMean();
+    public long mean() {
+      return metrics.mean();
     }
 
     @Override
-    public String getHash() {
+    public String hash() {
       return queryPlan.getHash();
     }
 
     @Override
-    public String getSql() {
+    public String sql() {
       return queryPlan.getSql();
     }
 

@@ -37,7 +37,6 @@ public class CustomerFinder extends Finder<Integer, Customer> {
   }
 
   public List<Customer> byNameStatus(String nameStartsWith, Customer.Status status) {
-
     return query("where status = :status and name istartsWith :name order by name")
       .setParameter("status", status)
       .setParameter("name", nameStartsWith)
@@ -45,7 +44,6 @@ public class CustomerFinder extends Finder<Integer, Customer> {
   }
 
   public List<String> namesStartingWith(String name) {
-
     return nativeSql("select name from o_customer where name like ? order by name")
       .setParameter(name + "%")
       .findSingleAttributeList();

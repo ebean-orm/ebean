@@ -255,6 +255,9 @@ public class DefaultContainer implements SpiContainer {
       }
       throw new RuntimeException("DataSource not set?");
     }
+    if (config.skipDataSourceCheck()) {
+      return true;
+    }
     try (Connection connection = config.getDataSource().getConnection()) {
       if (connection.getAutoCommit()) {
         logger.warn("DataSource [{}] has autoCommit defaulting to true!", config.getName());

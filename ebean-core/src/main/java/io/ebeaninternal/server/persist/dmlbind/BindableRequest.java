@@ -57,4 +57,9 @@ public interface BindableRequest {
    * Return true if this is an update request.
    */
   boolean isUpdate();
+
+  /**
+   * Push json content for scalarType bind().
+   */
+  void pushJson(String json);
 }

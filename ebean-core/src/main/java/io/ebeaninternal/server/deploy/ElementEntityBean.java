@@ -29,11 +29,6 @@ class ElementEntityBean implements EntityBean {
   }
 
   @Override
-  public String _ebean_getMarker() {
-    return null;
-  }
-
-  @Override
   public Object _ebean_newInstance() {
     return new ElementEntityBean(properties);
   }

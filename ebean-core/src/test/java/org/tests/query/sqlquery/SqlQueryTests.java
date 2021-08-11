@@ -407,7 +407,7 @@ public class SqlQueryTests extends BaseTestCase {
 
     List<MetaTimedMetric> sqlMetrics = sqlMetrics();
     assertThat(sqlMetrics).hasSize(1);
-    assertThat(sqlMetrics.get(0).getName()).isEqualTo("sql.query.findEach-Max10Rows");
+    assertThat(sqlMetrics.get(0).name()).isEqualTo("sql.query.findEach-Max10Rows");
   }
 
   @Test

@@ -13,7 +13,7 @@ final class BasicProfileLocation implements ProfileLocation {
 
   BasicProfileLocation(String fullLocation) {
     this.fullLocation = fullLocation;
-    this.location = shortDesc(fullLocation);
+    this.location = UtilLocation.loc(fullLocation);
     this.label = UtilLocation.label(location);
   }
 
@@ -55,17 +55,6 @@ final class BasicProfileLocation implements ProfileLocation {
   @Override
   public void setTraceCount(int traceCount) {
     // do nothing
-  }
-
-  private String shortDesc(String location) {
-    int lastPer = location.lastIndexOf('.');
-    if (lastPer > -1) {
-      lastPer = location.lastIndexOf('.', lastPer - 1);
-      if (lastPer > -1) {
-        return location.substring(lastPer + 1);
-      }
-    }
-    return location;
   }
 
 }

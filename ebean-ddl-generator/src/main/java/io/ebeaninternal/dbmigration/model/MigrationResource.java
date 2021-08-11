@@ -31,7 +31,7 @@ public class MigrationResource implements Comparable<MigrationResource> {
   /**
    * Return the version associated with this resource.
    */
-  public MigrationVersion getVersion() {
+  public MigrationVersion version() {
     return version;
   }
 
@@ -39,7 +39,6 @@ public class MigrationResource implements Comparable<MigrationResource> {
    * Read and return the migration from the resource.
    */
   public Migration read() {
-
     return MigrationXmlReader.read(migrationFile);
   }
 

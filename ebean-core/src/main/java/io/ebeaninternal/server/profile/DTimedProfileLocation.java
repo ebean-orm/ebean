@@ -48,7 +48,7 @@ class DTimedProfileLocation extends DProfileLocation implements TimedProfileLoca
 
   @Override
   public void visit(MetricVisitor visitor) {
-    TimedMetricStats collect = timedMetric.collect(visitor.isReset());
+    TimedMetricStats collect = timedMetric.collect(visitor.reset());
     if (collect != null) {
       if (overrideMetricName) {
         collect.setName(fullName);

@@ -365,11 +365,11 @@ public final class SqlTreeBuilder {
    * This means it can included individual properties of an embedded bean.
    * </p>
    */
-  private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName) {
-    STreeProperty p = desc.findProperty(propName);
+  private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName, String path) {
+    STreeProperty p = desc.findPropertyWithDynamic(propName, path);
     if (p == null) {
       logger.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
-
+      return;
     } else if (p instanceof STreePropertyAssoc && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
       int pos = propName.indexOf('.');
@@ -383,7 +383,7 @@ public final class SqlTreeBuilder {
 
   private void addProperty(SqlTreeProperties selectProps, STreeType desc, OrmQueryProperties queryProps, String propName) {
     if (subQuery) {
-      addPropertyToSubQuery(selectProps, desc, propName);
+      addPropertyToSubQuery(selectProps, desc, propName, queryProps.getPath());
       return;
     }
 

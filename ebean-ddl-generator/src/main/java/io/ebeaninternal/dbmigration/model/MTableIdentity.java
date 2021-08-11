@@ -17,7 +17,6 @@ public class MTableIdentity {
    * Return the IdentityMode from CreateTable.
    */
   public static IdentityMode fromCreateTable(CreateTable createTable) {
-
     IdType type = fromType(createTable.getIdentityType());
     IdentityGenerated generated = fromGenerated(createTable.getIdentityGenerated());
     int start = toInt(createTable.getIdentityStart(), createTable.getSequenceInitial());
@@ -39,7 +38,6 @@ public class MTableIdentity {
    * Set the IdentityMode to the CreateTable model.
    */
   public static void toCreateTable(IdentityMode identityMode, CreateTable createTable) {
-
     if (!identityMode.isPlatformDefault()) {
       createTable.setIdentityType(toType(identityMode.getIdType()));
     }

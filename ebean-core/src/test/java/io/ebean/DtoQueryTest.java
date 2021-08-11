@@ -42,14 +42,14 @@ public class DtoQueryTest extends BaseTestCase {
 
     ServerMetrics metrics = collectMetrics();
 
-    List<MetaQueryMetric> stats = metrics.getQueryMetrics();
+    List<MetaQueryMetric> stats = metrics.queryMetrics();
     for (MetaQueryMetric stat : stats) {
-      long meanMicros = stat.getMean();
+      long meanMicros = stat.mean();
       assertThat(meanMicros).isLessThan(900_000);
     }
 
     assertThat(stats).hasSize(1);
-    assertThat(stats.get(0).getCount()).isEqualTo(1);
+    assertThat(stats.get(0).count()).isEqualTo(1);
   }
 
   @Test
@@ -283,13 +283,13 @@ public class DtoQueryTest extends BaseTestCase {
     BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
     server().getMetaInfoManager().visitMetrics(basic);
 
-    List<MetaQueryMetric> stats = basic.getQueryMetrics();
+    List<MetaQueryMetric> stats = basic.queryMetrics();
     assertThat(stats).hasSize(1);
 
     MetaQueryMetric queryMetric = stats.get(0);
-    assertThat(queryMetric.getLabel()).isEqualTo("basic");
-    assertThat(queryMetric.getCount()).isEqualTo(3);
-    assertThat(queryMetric.getName()).isEqualTo("dto.DCust_basic");
+    assertThat(queryMetric.label()).isEqualTo("basic");
+    assertThat(queryMetric.count()).isEqualTo(3);
+    assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
 
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
@@ -299,7 +299,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     ServerMetrics metric2 = server().getMetaInfoManager().collectMetrics();
 
-    stats = metric2.getQueryMetrics();
+    stats = metric2.queryMetrics();
     assertThat(stats).hasSize(2);
 
     log.info("stats " + stats);

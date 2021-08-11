@@ -2,7 +2,6 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
@@ -135,7 +134,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.postgres = isPostgres(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
-    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.isJsonDirtyByDefault()) : null;
+    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.getJsonMutationDetection()) : null;
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
@@ -426,7 +425,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, (AnnotatedField) prop.getJacksonField(), dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, prop, dbType, docType);
   }
 
   /**
@@ -557,7 +556,7 @@ public final class DefaultTypeManager implements TypeManager {
       // no override or further mapping required
       return scalarType;
     }
-    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>)scalarType;
+    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>) scalarType;
     if (scalarEnum != null && !scalarEnum.isOverrideBy(type)) {
       if (type != null && !scalarEnum.isCompatible(type)) {
         throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
@@ -674,7 +673,7 @@ public final class DefaultTypeManager implements TypeManager {
   private Object initObjectMapper(DatabaseConfig config) {
     Object objectMapper = config.getObjectMapper();
     if (objectMapper == null) {
-      objectMapper = new ObjectMapper();
+      objectMapper = InitObjectMapper.init();
       config.setObjectMapper(objectMapper);
     }
     return objectMapper;
@@ -750,12 +749,15 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
+
+    ZoneId zoneId = getZoneId(config);
+
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     addType(java.time.Period.class, new ScalarTypePeriod());
     addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
     addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
-    addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime));
-    addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime));
+    addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime, zoneId));
+    addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime, zoneId));
     addType(Instant.class, new ScalarTypeInstant(jsonDateTime));
     addType(DayOfWeek.class, new ScalarTypeDayOfWeek());
     addType(Month.class, new ScalarTypeMonth());
@@ -769,6 +771,11 @@ public final class DefaultTypeManager implements TypeManager {
     addType(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
     boolean durationNanos = config.isDurationWithNanos();
     addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
+  }
+
+  private ZoneId getZoneId(DatabaseConfig config) {
+    final String dataTimeZone = config.getDataTimeZone();
+    return (dataTimeZone == null) ? ZoneOffset.systemDefault() : TimeZone.getTimeZone(dataTimeZone).toZoneId();
   }
 
   private void addType(Class<?> clazz, ScalarType<?> scalarType) {

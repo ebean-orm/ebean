@@ -4,7 +4,7 @@ import io.ebeaninternal.dbmigration.migration.Configuration;
 import io.ebeaninternal.dbmigration.migration.DefaultTablespace;
 
 /**
- * Holds configuration such as the default tablespaces to use for tables,
+ * Holds configuration such as the default tablespace to use for tables,
  * indexes, history tables etc.
  */
 public class MConfiguration {
@@ -32,7 +32,6 @@ public class MConfiguration {
    * </p>
    */
   public void apply(Configuration configuration) {
-
     DefaultTablespace defaultTablespace = configuration.getDefaultTablespace();
     if (defaultTablespace != null) {
       String tables = defaultTablespace.getTables();

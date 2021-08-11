@@ -24,7 +24,8 @@ public class EPerson {
   @Embedded
   @AttributeOverrides({
     @AttributeOverride(name = "city", column = @Column(name = "addr_city")),
-    @AttributeOverride(name = "status", column = @Column(name = "addr_status"))
+    @AttributeOverride(name = "status", column = @Column(name = "addr_status")),
+    @AttributeOverride(name = "jbean", column = @Column(name = "addr_jbean"))
   })
   EAddress address;
 

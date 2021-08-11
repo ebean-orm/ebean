@@ -27,35 +27,37 @@ public class DbMigrationGenerateTest {
 
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationGenerateTest.class);
 
-  @Test
-  public void invokeTest() throws IOException {
-    main(null);
+  public static void main(String[] args) throws IOException {
+    run("ebean-ddl-generator/src/test/resources");
   }
 
-  public static void main(String[] args) throws IOException {
+  @Test
+  public void invokeTest() throws IOException {
+    run("src/test/resources");
+  }
 
-    logger.info("start");
+  public static void run(String pathToResources) throws IOException {
+    logger.info("start current directory: " + new File(".").getAbsolutePath());
 
     DefaultDbMigration migration = new DefaultDbMigration();
-
+    migration.setIncludeIndex(true);
     // We use src/test/resources as output directory (so we see in GIT if files will change)
-
-    migration.setPathToResources("src/test/resources");
+    migration.setPathToResources(pathToResources);
     migration.setMigrationPath("db/migration");
     migration.setMigrationPath(null); // use the default for this test
 
     // migration.addPlatform(Platform.GENERIC, "generic"); there is no ddl handler for generic
     // migration.addPlatform(Platform.SQLANYWHERE, "sqlanywhere"); and sqlanywhere
-    migration.addPlatform(Platform.DB2, "db2");
-    migration.addPlatform(Platform.H2, "h2");
+    migration.addPlatform(Platform.DB2);
+    migration.addPlatform(Platform.H2);
     migration.addPlatform(Platform.HSQLDB, "hsqldb");
     migration.addPlatform(Platform.MYSQL, "mysql");
     migration.addPlatform(Platform.MYSQL55, "mysql55");
-    migration.addPlatform(Platform.POSTGRES, "postgres");
-    migration.addPlatform(Platform.ORACLE, "oracle");
-    migration.addPlatform(Platform.SQLITE, "sqlite");
+    migration.addPlatform(Platform.POSTGRES);
+    migration.addPlatform(Platform.ORACLE);
+    migration.addPlatform(Platform.SQLITE);
     migration.addPlatform(Platform.SQLSERVER17, "sqlserver17");
-    migration.addPlatform(Platform.HANA, "hana");
+    migration.addPlatform(Platform.HANA);
 
     DatabaseConfig config = new DatabaseConfig();
     config.setName("migrationtest");
@@ -70,8 +72,8 @@ public class DbMigrationGenerateTest {
     migration.setServer(server);
 
     // First, we clean up the output-directory
-    assertThat(migration.getMigrationDirectory().getAbsolutePath()).contains("migrationtest");
-    Files.walk(migration.getMigrationDirectory().toPath())
+    assertThat(migration.migrationDirectory().getAbsolutePath()).contains("migrationtest");
+    Files.walk(migration.migrationDirectory().toPath())
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
 
     // then we generate migration scripts for v1_0

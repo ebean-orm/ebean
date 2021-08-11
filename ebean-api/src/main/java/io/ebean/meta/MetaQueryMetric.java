@@ -8,21 +8,45 @@ public interface MetaQueryMetric extends MetaTimedMetric {
   /**
    * The type of entity or DTO bean.
    */
-  Class<?> getType();
+  Class<?> type();
+
+  /**
+   * Migrate to type().
+   */
+  @Deprecated
+  default Class<?> getType() {
+    return type();
+  }
 
   /**
    * The label for the query (can be null).
    */
-  String getLabel();
+  String label();
+
+  /**
+   * Migrate to label().
+   */
+  @Deprecated
+  default String getLabel() {
+    return label();
+  }
 
   /**
    * The actual SQL of the query.
    */
-  String getSql();
+  String sql();
+
+  /**
+   * Migrate to sql().
+   */
+  @Deprecated
+  default String getSql() {
+    return sql();
+  }
 
   /**
    * Return the hash of the plan.
    */
-  String getHash();
+  String hash();
 
 }

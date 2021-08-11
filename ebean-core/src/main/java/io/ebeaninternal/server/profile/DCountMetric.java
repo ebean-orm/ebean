@@ -49,7 +49,7 @@ class DCountMetric implements CountMetric {
   @Override
   public void visit(MetricVisitor visitor) {
 
-    long val = visitor.isReset() ? count.sumThenReset() : count.sum();
+    long val = visitor.reset() ? count.sumThenReset() : count.sum();
     if (val > 0) {
       visitor.visitCount(new DCountMetricStats(name, val));
     }
@@ -66,12 +66,12 @@ class DCountMetric implements CountMetric {
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return name;
     }
 
     @Override
-    public long getCount() {
+    public long count() {
       return count;
     }
   }

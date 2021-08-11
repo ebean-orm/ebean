@@ -4,7 +4,11 @@ import io.ebean.config.JsonConfig;
 import org.junit.Test;
 
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -12,12 +16,12 @@ import static org.junit.Assert.*;
 public class ScalarTypeZonedDateTimeTest {
 
 
-  ScalarTypeZonedDateTime type = new ScalarTypeZonedDateTime(JsonConfig.DateTime.MILLIS);
+  ScalarTypeZonedDateTime type = new ScalarTypeZonedDateTime(JsonConfig.DateTime.MILLIS, ZoneId.systemDefault());
 
   ZonedDateTime warmUp = ZonedDateTime.now();
 
   @Test
-  public void testConvertToMillis() throws Exception {
+  public void testConvertToMillis() {
 
     warmUp.hashCode();
 
@@ -29,7 +33,7 @@ public class ScalarTypeZonedDateTimeTest {
   }
 
   @Test
-  public void testConvertFromTimestamp() throws Exception {
+  public void testConvertFromTimestamp() {
 
     Timestamp now = new Timestamp(System.currentTimeMillis());
 
@@ -39,6 +43,41 @@ public class ScalarTypeZonedDateTimeTest {
     assertEquals(now, timestamp);
   }
 
+  @Test
+  public void convertFromInstant_with_UTC_expect_matchingZoneOffset() {
+    final TimeZone timeZoneToUse = TimeZone.getTimeZone("UTC");
+    final ZoneOffset expectedZoneOffset = ZoneOffset.UTC;
+
+    convertFromInstantWithConfiguredTimeZone(timeZoneToUse, expectedZoneOffset);
+  }
+
+  @Test
+  public void convertFromInstant_with_EST_expect_matchingZoneOffset() {
+    final TimeZone timeZoneToUse = TimeZone.getTimeZone("EST");
+    final ZoneOffset expectedOffset = OffsetDateTime.now(timeZoneToUse.toZoneId()).getOffset();
+
+    convertFromInstantWithConfiguredTimeZone(timeZoneToUse, expectedOffset);
+  }
+
+  private void convertFromInstantWithConfiguredTimeZone(TimeZone timeZoneToUse, ZoneOffset expectedZoneOffset) {
+    TimeZone previous = TimeZone.getDefault();
+    try {
+      OffsetDateTime dateTime = OffsetDateTime.parse("2021-01-01T00:00:00+11:00");
+
+      // test ScalarTypeOffsetDateTime with the configured timeZone to use
+      ScalarTypeZonedDateTime type = new ScalarTypeZonedDateTime(JsonConfig.DateTime.MILLIS, timeZoneToUse.toZoneId());
+
+      // effectively we desire to ignore the system timezone and use the configured one
+      TimeZone.setDefault(timeZoneToUse);
+
+      final ZonedDateTime zonedDateTime = type.convertFromInstant(dateTime.toInstant());
+
+      assertEquals(expectedZoneOffset, zonedDateTime.getOffset());
+
+    } finally {
+      TimeZone.setDefault(previous);
+    }
+  }
 
   @Test
   public void testToJdbcType() throws Exception {
@@ -68,11 +107,11 @@ public class ScalarTypeZonedDateTimeTest {
     JsonTester<ZonedDateTime> jsonTester = new JsonTester<>(type);
     jsonTester.test(now);
 
-    ScalarTypeZonedDateTime typeNanos = new ScalarTypeZonedDateTime(JsonConfig.DateTime.NANOS);
+    ScalarTypeZonedDateTime typeNanos = new ScalarTypeZonedDateTime(JsonConfig.DateTime.NANOS, ZoneId.systemDefault());
     jsonTester = new JsonTester<>(typeNanos);
     jsonTester.test(now);
 
-    ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601);
+    ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601, ZoneId.systemDefault());
     jsonTester = new JsonTester<>(typeIso);
     jsonTester.test(now);
   }
@@ -80,7 +119,7 @@ public class ScalarTypeZonedDateTimeTest {
   @Test
   public void toJsonISO8601() {
 
-    ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601);
+    ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601, ZoneId.systemDefault());
 
     ZonedDateTime now = ZonedDateTime.now();
     String asJson = typeIso.toJsonISO8601(now);

@@ -76,10 +76,11 @@ public class TestDbJson_List extends BaseTestCase {
     update_when_dirty();
     update_when_dirty_flags();
     update_when_dirty_SetListMap();
+
+    DB.delete(found);
   }
 
-  //@Test//(dependsOnMethods = "insert")
-  public void json_parse_format() {
+  private void json_parse_format() {
 
     String asJson = DB.json().toJson(found);
     assertThat(asJson).contains("\"tags\":[\"one\",\"two\"]");
@@ -104,8 +105,7 @@ public class TestDbJson_List extends BaseTestCase {
     assertThat(fromJson.getBeanMap()).hasSize(2);
   }
 
-  //@Test//(dependsOnMethods = "insert")
-  public void update_when_notDirty() {
+  private void update_when_notDirty() {
 
     found.setName("mod");
     LoggedSqlCollector.start();
@@ -113,10 +113,11 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertSql(sql.get(0)).contains("update ebasic_json_list set name=?, plain_bean=?, version=? where");
+    // plain_bean=?, no longer included with MD5 dirty detection
+    assertSql(sql.get(0)).contains("update ebasic_json_list set name=?, version=? where");
   }
 
-  public void update_when_dirty() {
+  private void update_when_dirty() {
 
     //found.setName("modAgain");
     found.getTags().add("three");
@@ -126,10 +127,11 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertSql(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, tags=?, version=? where id=? and version=?");
+    // plain_bean=? not included using MD5 dirty detection
+    assertSql(sql.get(0)).contains("update ebasic_json_list set tags=?, version=? where id=? and version=?");
   }
 
-  public void update_when_dirty_flags() {
+  private void update_when_dirty_flags() {
 
     //found.setName("modAgain");
     found.getFlags().remove(42L);
@@ -139,10 +141,11 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertSql(sql.get(0)).contains("update ebasic_json_list set plain_bean=?, flags=?, version=? where id=? and version=?;");
+    // plain_bean=? not included with MD5 dirty detection
+    assertSql(sql.get(0)).contains("update ebasic_json_list set flags=?, version=? where id=? and version=?;");
   }
 
-  public void update_when_dirty_SetListMap() {
+  private void update_when_dirty_SetListMap() {
 
     //found.setName("modAgain");
     found.getBeanSet().clear();
@@ -154,7 +157,8 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    assertSql(sql.get(0)).contains("update ebasic_json_list set beans=?, bean_list=?, bean_map=?, plain_bean=?, version=? where id=? and version=?");
+    // plain_bean=? not included with MD5 dirty detection
+    assertSql(sql.get(0)).contains("update ebasic_json_list set beans=?, bean_list=?, bean_map=?, version=? where id=? and version=?");
   }
 
   @Test
@@ -220,5 +224,20 @@ public class TestDbJson_List extends BaseTestCase {
       .hasMessageContaining("blabla");
 
     DB.delete(bean);
+  }
+
+  @Test
+  public void testNullToEmpty() {
+    EBasicJsonList bean = new EBasicJsonList();
+    bean.setFlags(null);
+    bean.setTags(null);
+    bean.setBeanMap(null);
+    DB.save(bean);
+
+    bean = DB.find(EBasicJsonList.class).setId(bean.getId()).findOne();
+
+    assertThat(bean.getFlags()).isEmpty();
+    assertThat(bean.getTags()).isEmpty();
+    assertThat(bean.getBeanMap()).isEmpty();
   }
 }

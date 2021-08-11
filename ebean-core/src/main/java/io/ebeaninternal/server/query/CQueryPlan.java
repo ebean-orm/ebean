@@ -13,12 +13,12 @@ import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.util.Md5;
 import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,46 +54,31 @@ public class CQueryPlan implements SpiQueryPlan {
   static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
-
   private final ProfileLocation profileLocation;
-
   private final String location;
-
   private final String label;
-
   private final String name;
-
   private final CQueryPlanKey planKey;
-
   private final boolean rawSql;
-
   private final String sql;
   private final String hash;
-
   private final String logWhereSql;
-
   private final SqlTree sqlTree;
 
   /**
    * Encrypted properties required additional binding.
    */
   private final STreeProperty[] encryptedProps;
-
   private final CQueryPlanStats stats;
-
   private final Class<?> beanType;
-
   final DataTimeZone dataTimeZone;
-
   private final int asOfTableCount;
 
   /**
    * Key used to identify the query plan in audit logging.
    */
   private volatile String auditQueryHash;
-
   private final Set<String> dependentTables;
-
   private final SpiQueryBindCapture bindCapture;
 
   /**
@@ -106,9 +91,9 @@ public class CQueryPlan implements SpiQueryPlan {
     this.planKey = request.getQueryPlanKey();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
+    this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
-    this.location = location();
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -118,7 +103,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(query);
-    this.hash = md5Hash();
+    this.hash = Md5.hash(sql, name, location);
   }
 
   /**
@@ -130,9 +115,9 @@ public class CQueryPlan implements SpiQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
+    this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
     this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
-    this.location = location();
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;
@@ -143,7 +128,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCaptureRaw(sql, query);
-    this.hash = md5Hash();
+    this.hash = Md5.hash(sql, name, location);
   }
 
   private String deriveName(String label, SpiQuery.Type type, String simpleName) {
@@ -167,10 +152,6 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private SpiQueryBindCapture initBindCaptureRaw(String sql, SpiQuery<?> query) {
     return sql.equals(RESULT_SET_BASED_RAW_SQL) || query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
-  }
-
-  private String location() {
-    return (profileLocation == null) ? null : profileLocation.location();
   }
 
   private CQueryPlanKey buildPlanKey(String sql, String logWhereSql) {
@@ -274,21 +255,6 @@ public class CQueryPlan implements SpiQueryPlan {
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
     return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
-  }
-
-  /**
-   * Return the MD5 hash of the sql.
-   */
-  private String md5Hash() {
-    StringBuilder sb = new StringBuilder(sql)
-      .append("|").append(name)
-      .append("|").append(location);
-    try {
-      return Md5.hash(sb.toString());
-    } catch (Exception e) {
-      logger.error("Failed to MD5 hash the query", e);
-      return "error";
-    }
   }
 
   SqlTree getSqlTree() {

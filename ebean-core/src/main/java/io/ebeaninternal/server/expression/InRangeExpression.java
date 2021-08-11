@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -47,10 +48,8 @@ class InRangeExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = low().hashCode();
-    hc = hc * 92821 + high().hashCode();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(low()).add(high());
   }
 
   @Override

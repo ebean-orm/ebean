@@ -28,11 +28,8 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   private static final String ENC_PREFIX_UPPER = EncryptAlias.PREFIX.toUpperCase();
 
   private final SpiDtoQuery<T> query;
-
   private final DtoQueryEngine queryEngine;
-
   private DtoQueryPlan plan;
-
   private DataReader dataReader;
 
   DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query) {

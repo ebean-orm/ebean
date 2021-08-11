@@ -16,10 +16,13 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.changelog.TxnState;
+import io.ebeantest.LoggedSql;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.tests.model.basic.EBasicChangeLog;
+import org.tests.model.json.PlainBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +133,31 @@ public class TestChangeLog extends BaseTestCase {
     assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
     assertThat(change.getData()).isNull();
   }
+  
+  @Test
+  public void testWithJsonMutationDetection() {
 
+    EBasicChangeLog bean = new EBasicChangeLog();
+    bean.setName(null);
+    bean.setShortDescription("hello");
+    PlainBean jsonBean = new PlainBean();
+    bean.setPlainBean(jsonBean);
+    jsonBean.setName("A");    
+    server.save(bean);
+    
+    BeanChange change = firstChange();
+    assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
+    
+    jsonBean.setName("B");
+    LoggedSql.start();
+    server.save(bean);
+    assertThat(LoggedSql.stop()).isNotEmpty();
+    
+    change = firstChange();
+    assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
+    assertThat(change.getData()).contains("\"plainBean\":{\"name\":\"B\"");
+    assertThat(change.getOldData()).contains("\"plainBean\":{\"name\":\"A\"");
+  }
   private Database createServer() {
 
     DatabaseConfig config = new DatabaseConfig();

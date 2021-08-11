@@ -397,6 +397,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       if (dbSchema != null) {
         migrationRunner.setDefaultDbSchema(dbSchema);
       }
+      migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
     }
@@ -415,8 +416,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void collectQueryPlans() {
     QueryPlanRequest request = new QueryPlanRequest();
-    request.setMaxCount(config.getQueryPlanCaptureMaxCount());
-    request.setMaxTimeMillis(config.getQueryPlanCaptureMaxTimeMillis());
+    request.maxCount(config.getQueryPlanCaptureMaxCount());
+    request.maxTimeMillis(config.getQueryPlanCaptureMaxTimeMillis());
 
     // obtains query explain plans ...
     List<MetaQueryPlan> plans = metaInfoManager.queryPlanCollectNow(request);
@@ -1283,14 +1284,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(Query<?> ormQuery, Transaction transaction) {
-    Query<?> ormQueryCopy = ormQuery.copy();
-    ormQueryCopy.setMaxRows(1);
+  public <T> boolean exists(Query<T> ormQuery, Transaction transaction) {
+    Query<T> ormQueryCopy = ormQuery.copy().setMaxRows(1);
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, ormQueryCopy, transaction);
     try {
       request.initTransIfRequired();
-      List<Object> ids = request.findIds();
-      return !ids.isEmpty();
+      return !request.findIds().isEmpty();
     } finally {
       request.endTransIfRequired();
     }
@@ -2056,17 +2055,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return transactionManager;
   }
 
-  public void register(BeanPersistController c) {
-    List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
-    for (BeanDescriptor<?> aList : list) {
-      aList.register(c);
+  public void register(BeanPersistController controller) {
+    for (BeanDescriptor<?> desc : beanDescriptorManager.getBeanDescriptorList()) {
+      desc.register(controller);
     }
   }
 
   public void deregister(BeanPersistController c) {
-    List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
-    for (BeanDescriptor<?> aList : list) {
-      aList.deregister(c);
+    for (BeanDescriptor<?> desc : beanDescriptorManager.getBeanDescriptorList()) {
+      desc.deregister(c);
     }
   }
 
@@ -2329,13 +2326,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void visitMetrics(MetricVisitor visitor) {
     visitor.visitStart();
-    if (visitor.isCollectTransactionMetrics()) {
+    if (visitor.collectTransactionMetrics()) {
       transactionManager.visitMetrics(visitor);
     }
-    if (visitor.isCollectL2Metrics()) {
+    if (visitor.collectL2Metrics()) {
       serverCacheManager.visitMetrics(visitor);
     }
-    if (visitor.isCollectQueryMetrics()) {
+    if (visitor.collectQueryMetrics()) {
       beanDescriptorManager.visitMetrics(visitor);
       dtoBeanManager.visitMetrics(visitor);
       relationalQueryEngine.visitMetrics(visitor);
@@ -2352,7 +2349,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   List<MetaQueryPlan> queryPlanInit(QueryPlanInit initRequest) {
     if (initRequest.isAll()) {
-      queryPlanManager.setDefaultThreshold(initRequest.getThresholdMicros());
+      queryPlanManager.setDefaultThreshold(initRequest.thresholdMicros());
     }
     return beanDescriptorManager.queryPlanInit(initRequest);
   }
