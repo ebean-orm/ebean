@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.Test;
 import org.tests.model.basic.CKeyParent;
@@ -16,11 +16,11 @@ public class TestQueryAlias extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class)
+    Query<CKeyParent> sq = DB.createQuery(CKeyParent.class)
       .select("id.oneKey").alias("st0")
       .setAutoTune(false).where().query();
 
-    Query<CKeyParent> pq = Ebean.find(CKeyParent.class).alias("myt0").where().in("id.oneKey", sq).query();
+    Query<CKeyParent> pq = DB.find(CKeyParent.class).alias("myt0").where().in("id.oneKey", sq).query();
 
     pq.findList();
 
@@ -36,17 +36,36 @@ public class TestQueryAlias extends BaseTestCase {
     assertThat(sql).contains("ckey_parent myt0");
     assertThat(sql).contains("(myt0.one_key) in (select st0.one_key from ckey_parent st0)");
   }
+  
+  @Test
+  public void testExistsWithConcat() {
+
+    ResetBasicData.reset();
+
+    Query<CKeyParent> sq = DB.createQuery(CKeyParent.class)
+      .select("concat(id.oneKey,id.twoKey)").alias("st0")
+      .setAutoTune(false).where().query();
+
+    Query<CKeyParent> pq = DB.find(CKeyParent.class).alias("myt0").where().in("concat(id.oneKey,id.twoKey)", sq).query();
+
+    pq.findList();
+
+    String sql = pq.getGeneratedSql();
+
+    assertThat(sql).contains("ckey_parent myt0");
+    assertThat(sql).contains("(concat(myt0.one_key,myt0.two_key)) in (select concat(st0.one_key,st0.two_key) from ckey_parent st0)");
+  }
 
   @Test
   public void testNotExists() {
 
     ResetBasicData.reset();
 
-    Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class)
+    Query<CKeyParent> sq = DB.createQuery(CKeyParent.class)
       .select("id.oneKey").alias("st0")
       .setAutoTune(false).where().query();
 
-    Query<CKeyParent> pq = Ebean.find(CKeyParent.class).alias("myt0").where().notIn("id.oneKey", sq).query();
+    Query<CKeyParent> pq = DB.find(CKeyParent.class).alias("myt0").where().notIn("id.oneKey", sq).query();
 
     pq.findList();
 
