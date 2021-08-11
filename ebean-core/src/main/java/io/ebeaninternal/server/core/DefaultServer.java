@@ -526,8 +526,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Compile a query. Only valid for ORM queries.
    */
   @Override
-  public <T> CQuery<T> compileQuery(Query<T> query, Transaction t) {
-    SpiOrmQueryRequest<T> qr = createQueryRequest(Type.SUBQUERY, query, t);
+  public <T> CQuery<T> compileQuery(Type type, Query<T> query, Transaction t) {
+    SpiOrmQueryRequest<T> qr = createQueryRequest(type, query, t);
     OrmQueryRequest<T> orm = (OrmQueryRequest<T>) qr;
     return cqueryEngine.buildQuery(orm);
   }

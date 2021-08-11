@@ -565,7 +565,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
    */
   private void markQueryJoins() {
-    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type != Type.ATTRIBUTE);
+    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), 
+        type != Type.ATTRIBUTE && type != Type.SQ_EXISTS && type != Type.SQ_IN);
   }
 
   private boolean isAllowOneManyFetch() {
@@ -578,7 +579,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public void setDefaultSelectClause() {
-    if (type != Type.ATTRIBUTE) {
+    if (type != Type.ATTRIBUTE && type != Type.SQ_EXISTS && type != Type.SQ_IN) {
       detail.setDefaultSelectClause(beanDescriptor);
     } else if (!detail.hasSelectClause()) {
       // explicit empty select when single attribute query on non-root fetch path

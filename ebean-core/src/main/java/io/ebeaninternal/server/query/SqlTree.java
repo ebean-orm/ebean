@@ -101,6 +101,7 @@ class SqlTree {
    * Return the String for the actual SQL.
    */
   String getSelectSql() {
+    assert selectSql != null : "selectSql was null";
     return selectSql;
   }
 
