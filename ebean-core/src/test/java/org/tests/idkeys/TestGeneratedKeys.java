@@ -1,34 +1,33 @@
 package org.tests.idkeys;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.junit.Test;
+import org.tests.idkeys.db.GenKeyIdentity;
+import org.tests.idkeys.db.GenKeySequence;
+
 import io.ebean.BaseTestCase;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.junit.Test;
-import org.tests.idkeys.db.GenKeyIdentity;
-import org.tests.idkeys.db.GenKeySequence;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 public class TestGeneratedKeys extends BaseTestCase {
 
   @Test
-  @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
+  @ForPlatform(Platform.H2)
   public void testSequence() throws SQLException {
-    SpiEbeanServer server = spiEbeanServer();
+    assumeTrue(idType() == IdType.SEQUENCE);
 
-    if (idType() != IdType.SEQUENCE) {
-      // only run this test when SEQUENCE is being used
-      return;
-    }
+    SpiEbeanServer server = spiEbeanServer();
 
     try (Transaction tx = server.beginTransaction()) {
 
@@ -49,30 +48,43 @@ public class TestGeneratedKeys extends BaseTestCase {
   }
 
   private long readSequenceValue(Transaction tx, String sequence) throws SQLException {
-    Statement stm = null;
-    try {
-      stm = tx.getConnection().createStatement();
-      ResultSet rs = stm.executeQuery("select currval('" + sequence + "')");
-      rs.next();
+    try (Statement stm = tx.getConnection().createStatement()) {
+      ResultSet rs;
 
-      return rs.getLong(1);
-    } finally {
-      if (stm != null) {
-        try {
-          stm.close();
-        } catch (SQLException e) {
-        }
+      switch (spiEbeanServer().getDatabasePlatform().getPlatform()) {
+        case H2 :
+          rs = stm.executeQuery("select currval('" + sequence + "')");
+          rs.next();
+          return rs.getLong(1);
+
+        case DB2 :
+          rs = stm.executeQuery("values previous value for " + sequence);
+          rs.next();
+          return rs.getLong(1);
+
+        case MARIADB :
+          rs = stm.executeQuery("select previous value for " + sequence);
+          rs.next();
+          return rs.getLong(1);
+
+        case SQLSERVER :
+          rs = stm.executeQuery(
+              "select current_value from sys.sequences where name = '"
+                  + sequence + "'");
+          rs.next();
+          return rs.getLong(1);
+
+        default :
+          throw new UnsupportedOperationException("reading sequence value from "
+              + spiEbeanServer().getDatabasePlatform().getPlatform()
+              + " is not supported.");
       }
     }
   }
 
   @Test
   public void testIdentity() throws SQLException {
-
-    if (idType() != IdType.IDENTITY) {
-      // only run this test when SEQUENCE is being used
-      return;
-    }
+    assumeTrue(idType() == IdType.SEQUENCE);
 
     try (Transaction tx = server().beginTransaction()) {
 
@@ -82,11 +94,29 @@ public class TestGeneratedKeys extends BaseTestCase {
 
       // For JDBC batching we won't get the id until after
       // the batch has been flushed explicitly or via commit
-      //assertNotNull(al.getId());
+      // assertNotNull(al.getId());
 
       tx.commit();
 
       assertNotNull(al.getId());
+    }
+  }
+  
+  @Test
+  @ForPlatform({Platform.H2, Platform.MARIADB, Platform.SQLSERVER, Platform.DB2})
+  public void testGeneratedKeys() throws SQLException {
+    assumeTrue(idType() == IdType.SEQUENCE);
+
+    SpiEbeanServer server = spiEbeanServer();
+
+    try (Transaction tx = server.beginTransaction()) {
+      // bigger than increment
+      for (int i = 1; i < 52; i++) {
+        GenKeySequence gks = new GenKeySequence();
+        gks.setDescription("my description " + i);
+        server.save(gks);
+        assertEquals(Long.valueOf(i), gks.getId());
+      }
     }
   }
 
