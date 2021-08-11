@@ -238,14 +238,11 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     builder.append("]");
   }
 
-  /**
-   * Return a hash for the actual bind values used.
-   */
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(list.size());
     for (SpiExpression expr : list) {
-      expr.queryBindHash(key);
+      expr.queryBindKey(key);
     }
   }
 

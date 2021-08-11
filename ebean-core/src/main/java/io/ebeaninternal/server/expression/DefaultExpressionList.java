@@ -675,14 +675,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     builder.append("]");
   }
 
-  /**
-   * Calculate a hash based on the expressions.
-   */
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(list.size());
     for (SpiExpression expr : list) {
-      expr.queryBindHash(key);
+      expr.queryBindKey(key);
     }
   }
 

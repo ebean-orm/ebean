@@ -123,7 +123,7 @@ class AllEqualsExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(propMap.size());
     for (Object value : propMap.values()) {
       key.add(value);

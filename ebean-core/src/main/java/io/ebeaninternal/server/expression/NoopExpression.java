@@ -75,7 +75,7 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     // no bind values
   }
 

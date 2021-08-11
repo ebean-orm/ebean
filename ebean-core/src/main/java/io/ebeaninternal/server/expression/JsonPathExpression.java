@@ -84,7 +84,7 @@ class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(value).add(upperValue);
   }
 

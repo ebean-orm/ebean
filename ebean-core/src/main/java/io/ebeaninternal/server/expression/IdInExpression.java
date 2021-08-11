@@ -134,7 +134,7 @@ public class IdInExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(idCollection.size());
     for (Object elem : idCollection) {
       key.add(elem);

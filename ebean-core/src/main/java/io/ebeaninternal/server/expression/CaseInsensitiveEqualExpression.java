@@ -70,7 +70,7 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(val());
   }
 

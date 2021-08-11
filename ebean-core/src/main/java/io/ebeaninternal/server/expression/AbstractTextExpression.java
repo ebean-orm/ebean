@@ -38,7 +38,7 @@ public abstract class AbstractTextExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     // do nothing, only execute against document store
   };
 

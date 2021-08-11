@@ -629,13 +629,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   CQueryPlanKey prepare(SpiOrmQueryRequest<T> request);
 
   /**
-   * Calculate a hash based on the bind values used in the query.
+   * Build the key for the bind values used in the query (for l2 query cache).
    * <p>
-   * Combined with queryPlanHash() to return getQueryHash (a unique hash for a
-   * query).
-   * </p>
+   * Combined with queryPlanHash() to return queryHash (a unique key for a query).
    */
-  void queryBindHash(BindValuesKey key);
+  void queryBindKey(BindValuesKey key);
 
   /**
    * Identifies queries that are exactly the same including bind variables.

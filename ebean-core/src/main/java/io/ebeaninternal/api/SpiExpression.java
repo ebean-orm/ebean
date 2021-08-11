@@ -54,9 +54,9 @@ public interface SpiExpression extends Expression {
   void queryPlanHash(StringBuilder builder);
 
   /**
-   * Return the hash value for the values that will be bound.
+   * Build the key for bind values of the query.
    */
-  void queryBindHash(BindValuesKey key);
+  void queryBindKey(BindValuesKey key);
 
   /**
    * Return true if the expression is the same with respect to bind values.

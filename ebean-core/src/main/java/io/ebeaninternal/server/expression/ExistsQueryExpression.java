@@ -92,8 +92,8 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
-    subQuery.queryBindHash(key);
+  public void queryBindKey(BindValuesKey key) {
+    subQuery.queryBindKey(key);
   }
 
   @Override

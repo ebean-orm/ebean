@@ -40,7 +40,7 @@ class BitwiseExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(flags).add(match);
   }
 

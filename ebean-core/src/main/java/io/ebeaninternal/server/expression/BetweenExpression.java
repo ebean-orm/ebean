@@ -50,7 +50,7 @@ class BetweenExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(low()).add(high());
   }
 

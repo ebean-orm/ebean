@@ -80,8 +80,8 @@ class NestedPathWrapperExpression implements SpiExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
-    delegate.queryBindHash(key);
+  public void queryBindKey(BindValuesKey key) {
+    delegate.queryBindKey(key);
   }
 
   @Override

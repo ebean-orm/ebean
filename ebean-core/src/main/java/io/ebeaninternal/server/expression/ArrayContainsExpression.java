@@ -50,7 +50,7 @@ public class ArrayContainsExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(values.length);
     for (Object value : values) {
       key.add(value);

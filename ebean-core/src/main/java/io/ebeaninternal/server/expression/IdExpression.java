@@ -78,7 +78,7 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(value);
   }
 

@@ -71,7 +71,7 @@ public class RawExpressionTest extends BaseExpressionTest {
 
   private BindValuesKey bindKey(RawExpression query) {
     BindValuesKey bindValuesKey = new BindValuesKey();
-    query.queryBindHash(bindValuesKey);
+    query.queryBindKey(bindValuesKey);
     return bindValuesKey;
   }
 }

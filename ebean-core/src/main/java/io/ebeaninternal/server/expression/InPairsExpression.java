@@ -125,7 +125,7 @@ class InPairsExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(entries.size());
     for (Pairs.Entry entry : entries) {
       key.add(entry.getA()).add(entry.getB());

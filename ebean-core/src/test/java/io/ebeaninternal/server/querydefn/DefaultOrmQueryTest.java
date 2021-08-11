@@ -114,7 +114,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
   private BindValuesKey bindKey(DefaultOrmQuery<Order> query) {
     BindValuesKey key = new BindValuesKey();
-    query.queryBindHash(key);
+    query.queryBindKey(key);
     return key;
   }
 }

@@ -216,9 +216,9 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     for (SpiExpression expr : exprList.internalList()) {
-      expr.queryBindHash(key);
+      expr.queryBindKey(key);
     }
   }
 

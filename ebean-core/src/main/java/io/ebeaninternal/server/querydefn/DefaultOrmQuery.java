@@ -1218,17 +1218,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     }
   }
 
-  /**
-   * Calculate a hash based on the bind values used in the query.
-   * <p>
-   * Used with queryPlanHash() to get a unique hash for a query.
-   * </p>
-   */
   @Override
-  public void queryBindHash(BindValuesKey key) {
+  public void queryBindKey(BindValuesKey key) {
     key.add(id);
-    if (whereExpressions != null) whereExpressions.queryBindHash(key);
-    if (havingExpressions != null) havingExpressions.queryBindHash(key);
+    if (whereExpressions != null) whereExpressions.queryBindKey(key);
+    if (havingExpressions != null) havingExpressions.queryBindKey(key);
     if (bindParams != null) bindParams.queryBindHash(key);
     key.add(asOf).add(versionsStart).add(versionsEnd);
   }
@@ -1245,7 +1239,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
     BindValuesKey bindKey = new BindValuesKey();
-    queryBindHash(bindKey);
+    queryBindKey(bindKey);
     return new HashQuery(queryPlanKey, bindKey);
   }
 

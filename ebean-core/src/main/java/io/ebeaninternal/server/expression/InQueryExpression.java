@@ -73,8 +73,8 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
-    subQuery.queryBindHash(key);
+  public void queryBindKey(BindValuesKey key) {
+    subQuery.queryBindKey(key);
   }
 
   @Override

@@ -100,8 +100,8 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
-  public void queryBindHash(BindValuesKey key) {
-    exp.queryBindHash(key);
+  public void queryBindKey(BindValuesKey key) {
+    exp.queryBindKey(key);
   }
 
   @Override
