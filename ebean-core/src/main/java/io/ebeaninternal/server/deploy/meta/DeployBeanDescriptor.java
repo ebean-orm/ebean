@@ -702,13 +702,11 @@ public class DeployBeanDescriptor<T> {
   }
 
   public void sortProperties() {
-
     ArrayList<DeployBeanProperty> list = new ArrayList<>(propMap.values());
     list.sort(PROP_ORDER);
-
     propMap = new LinkedHashMap<>(list.size());
-    for (DeployBeanProperty aList : list) {
-      addBeanProperty(aList);
+    for (DeployBeanProperty property : list) {
+      addBeanProperty(property);
     }
   }
 

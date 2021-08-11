@@ -207,9 +207,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append(type).append("[");
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      aList.queryPlanHash(builder);
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.queryPlanHash(builder);
       builder.append(",");
     }
     builder.append("]");

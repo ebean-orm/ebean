@@ -110,10 +110,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * @return A single SpiExpression that has the nestedPath set
    */
   SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
-
     DefaultExpressionList<T> wrapper = new DefaultExpressionList<>(query, expr, null, list, false);
     wrapper.setAllDocNested(nestedPath);
-
     if (type != null) {
       return new JunctionExpression<>(type, wrapper);
     } else {
@@ -122,15 +120,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   void simplifyEntries() {
-    for (SpiExpression element : list) {
-      element.simplify();
+    for (SpiExpression expr : list) {
+      expr.simplify();
     }
   }
 
   @Override
   public void prefixProperty(String path) {
-    for (SpiExpression exp : list) {
-      exp.prefixProperty(path);
+    for (SpiExpression expr : list) {
+      expr.prefixProperty(path);
     }
   }
 
@@ -175,7 +173,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
         context.startNested(allDocNestedPath);
       }
       int size = list.size();
-
       SpiExpression first = list.get(0);
       boolean explicitBool = first instanceof SpiJunction<?>;
       boolean implicitBool = !explicitBool && size > 1;
@@ -211,7 +208,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
-
     if (allDocNestedPath != null) {
       context.startNested(allDocNestedPath);
     }
@@ -228,8 +224,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (idEquals != null) {
         idEquals.writeDocQuery(context);
       }
-      for (SpiExpression aList : list) {
-        aList.writeDocQuery(context);
+      for (SpiExpression expr : list) {
+        expr.writeDocQuery(context);
       }
       context.endBool();
     }
@@ -279,16 +275,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
-
-    for (SpiExpression aList : list) {
-      aList.containsMany(desc, whereManyJoins);
+    for (SpiExpression expr : list) {
+      expr.containsMany(desc, whereManyJoins);
     }
   }
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (SpiExpression aList : list) {
-      aList.validate(validation);
+    for (SpiExpression expr : list) {
+      expr.validate(validation);
     }
   }
 
@@ -631,7 +626,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
       if (i > 0) {
@@ -643,15 +637,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    for (SpiExpression aList : list) {
-      aList.addBindValues(request);
+    for (SpiExpression expr : list) {
+      expr.addBindValues(request);
     }
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    for (SpiExpression aList : list) {
-      aList.prepareExpression(request);
+    for (SpiExpression expr : list) {
+      expr.prepareExpression(request);
     }
   }
 
@@ -668,8 +662,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     if (allDocNestedPath != null) {
       builder.append("path:").append(allDocNestedPath).append(" ");
     }
-    for (SpiExpression aList : list) {
-      aList.queryPlanHash(builder);
+    for (SpiExpression expr : list) {
+      expr.queryPlanHash(builder);
       builder.append(",");
     }
     builder.append("]");

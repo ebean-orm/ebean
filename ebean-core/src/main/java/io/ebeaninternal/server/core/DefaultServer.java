@@ -2055,17 +2055,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return transactionManager;
   }
 
-  public void register(BeanPersistController c) {
-    List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
-    for (BeanDescriptor<?> aList : list) {
-      aList.register(c);
+  public void register(BeanPersistController controller) {
+    for (BeanDescriptor<?> desc : beanDescriptorManager.getBeanDescriptorList()) {
+      desc.register(controller);
     }
   }
 
   public void deregister(BeanPersistController c) {
-    List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
-    for (BeanDescriptor<?> aList : list) {
-      aList.deregister(c);
+    for (BeanDescriptor<?> desc : beanDescriptorManager.getBeanDescriptorList()) {
+      desc.deregister(c);
     }
   }
 
