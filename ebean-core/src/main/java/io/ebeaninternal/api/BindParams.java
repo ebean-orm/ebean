@@ -410,8 +410,7 @@ public class BindParams implements Serializable {
     @Override
     public int hashCode() {
       int hc = getClass().hashCode();
-      hc = hc * 92821 + (encryptionKey ? 0 : 1);
-      hc = hc * 92821 + (isInParam ? 0 : 1);
+``      hc = hc * 92821 + (isInParam ? 0 : 1);
       hc = hc * 92821 + (isOutParam ? 0 : 1);
       hc = hc * 92821 + (type);
       hc = hc * 92821 + (inValue == null ? 0 : inValue.hashCode());
@@ -423,8 +422,7 @@ public class BindParams implements Serializable {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       Param param = (Param) o;
-      return encryptionKey == param.encryptionKey && isInParam == param.isInParam && isOutParam == param.isOutParam
-        && type == param.type && Objects.equals(inValue, param.inValue);
+      return isInParam == param.isInParam && isOutParam == param.isOutParam && type == param.type && Objects.equals(inValue, param.inValue);
     }
 
     void queryBindHash(BindHash hash) {
