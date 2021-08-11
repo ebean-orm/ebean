@@ -78,33 +78,6 @@ public class Binder {
   }
 
   /**
-   * Bind the values to the Prepared Statement.
-   */
-  public void bind(BindValues bindValues, DataBind dataBind, StringBuilder bindBuf) throws SQLException {
-    String logPrefix = "";
-    ArrayList<BindValues.Value> list = bindValues.values();
-    for (BindValues.Value bindValue : list) {
-      Object val = bindValue.getValue();
-      int dt = bindValue.getDbType();
-      bindObject(dataBind, val, dt);
-
-      if (bindBuf != null) {
-        bindBuf.append(logPrefix);
-        if (logPrefix.isEmpty()) {
-          logPrefix = ", ";
-        }
-        bindBuf.append(bindValue.getName());
-        bindBuf.append("=");
-        if (isLob(dt)) {
-          bindBuf.append("[LOB]");
-        } else {
-          bindBuf.append(val);
-        }
-      }
-    }
-  }
-
-  /**
    * Bind the parameters to the preparedStatement returning the bind log.
    */
   public String bind(BindParams bindParams, PreparedStatement statement, Connection connection) throws SQLException {

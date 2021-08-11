@@ -113,9 +113,8 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   }
 
   private int getHash(DefaultOrmQuery<Order> query) {
-    BindHash hash = new HashCodeBindHash();
+    BindHash hash = new BindHash();
     query.queryBindHash(hash);
-    hash.finish();
     return hash.hashCode();
   }
 }

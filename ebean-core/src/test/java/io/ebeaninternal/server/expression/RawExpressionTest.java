@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import io.ebeaninternal.api.BindHash;
-import io.ebeaninternal.server.querydefn.HashCodeBindHash;
 
 public class RawExpressionTest extends BaseExpressionTest {
 
@@ -71,9 +70,8 @@ public class RawExpressionTest extends BaseExpressionTest {
   }
 
   private int getHash(RawExpression query) {
-    BindHash hash = new HashCodeBindHash();
+    BindHash hash = new BindHash();
     query.queryBindHash(hash);
-    hash.finish();
     return hash.hashCode();
   }
 }

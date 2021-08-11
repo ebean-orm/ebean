@@ -1,37 +1,29 @@
 package io.ebeaninternal.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * BindHash implementation.
- *
- * @author Roland Praml, FOCONIS AG
- *
  */
-public interface BindHash {
+public class BindHash {
 
-  /**
-   * Update with boolean value.
-   */
-  BindHash update(boolean boolValue);
+  private final List<Object> values = new ArrayList<>();
 
-  /**
-   * Update with int value.
-   */
-  BindHash update(int intValue);
+  public BindHash update(Object value) {
+    values.add(value);
+    return this;
+  }
 
-  /**
-   * Update with long value.
-   */
-  BindHash update(long longValue);
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof BindHash && ((BindHash) obj).values.equals(values);
+  }
 
-  /**
-   * Update with object value.
-   */
-  BindHash update(Object value);
+  @Override
+  public int hashCode() {
+    return values.hashCode();
+  }
 
-  /**
-   * finishes the hash. May be used to compute internal state. After finish, no
-   * update method must be called
-   */
-  void finish();
 
 }
