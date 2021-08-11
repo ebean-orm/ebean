@@ -5,6 +5,7 @@ import io.ebean.LikeType;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -237,16 +238,12 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     builder.append("]");
   }
 
-  /**
-   * Return a hash for the actual bind values used.
-   */
   @Override
-  public int queryBindHash() {
-    int hc = DefaultExampleExpression.class.getName().hashCode();
-    for (SpiExpression aList : list) {
-      hc = hc * 92821 + aList.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(list.size());
+    for (SpiExpression expr : list) {
+      expr.queryBindKey(key);
     }
-    return hc;
   }
 
   @Override

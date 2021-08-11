@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -69,8 +70,8 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return val().hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(val());
   }
 
   @Override

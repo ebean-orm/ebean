@@ -4,11 +4,7 @@ import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -54,12 +50,11 @@ public class BindParams implements Serializable {
     positionedParameters.clear();
   }
 
-  public int queryBindHash() {
-    int hc = namedParameters.hashCode();
-    for (Param positionedParameter : positionedParameters) {
-      hc = hc * 92821 + positionedParameter.hashCode();
+  public void queryBindHash(BindValuesKey key) {
+    key.add(positionedParameters.size());
+    for (Param param : positionedParameters) {
+       param.queryBindHash(key);
     }
-    return hc;
   }
 
   /**
@@ -424,7 +419,14 @@ public class BindParams implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-      return o != null && (o == this || (o instanceof Param) && hashCode() == o.hashCode());
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      Param param = (Param) o;
+      return isInParam == param.isInParam && isOutParam == param.isOutParam && type == param.type && Objects.equals(inValue, param.inValue);
+    }
+
+    void queryBindHash(BindValuesKey key) {
+      key.add(isInParam).add(isOutParam).add(type).add(inValue);
     }
 
     /**

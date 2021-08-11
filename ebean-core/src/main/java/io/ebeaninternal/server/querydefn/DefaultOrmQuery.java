@@ -1,30 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.CacheMode;
-import io.ebean.CountDistinctOrder;
-import io.ebean.Database;
-import io.ebean.DtoQuery;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
-import io.ebean.FetchGroup;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.OrderBy;
+import io.ebean.*;
 import io.ebean.OrderBy.Property;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.QueryType;
-import io.ebean.RawSql;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -32,29 +9,10 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.CacheIdLookup;
-import io.ebeaninternal.api.CacheIdLookupMany;
-import io.ebeaninternal.api.CacheIdLookupSingle;
-import io.ebeaninternal.api.HashQuery;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionList;
-import io.ebeaninternal.api.SpiExpressionValidation;
-import io.ebeaninternal.api.SpiNamedParam;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiQuerySecondary;
-import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanNaturalKey;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.expression.IdInExpression;
@@ -66,14 +24,7 @@ import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -90,8 +41,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
 
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
-
-  private final ReentrantLock lock = new ReentrantLock();
 
   private final Class<T> beanType;
 
@@ -1269,22 +1218,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     }
   }
 
-  /**
-   * Calculate a hash based on the bind values used in the query.
-   * <p>
-   * Used with queryPlanHash() to get a unique hash for a query.
-   * </p>
-   */
   @Override
-  public int queryBindHash() {
-    int hc = (id == null ? 0 : id.hashCode());
-    hc = hc * 92821 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
-    hc = hc * 92821 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
-    hc = hc * 92821 + (bindParams == null ? 0 : bindParams.queryBindHash());
-    hc = hc * 92821 + (asOf == null ? 0 : asOf.hashCode());
-    hc = hc * 92821 + (versionsStart == null ? 0 : versionsStart.hashCode());
-    hc = hc * 92821 + (versionsEnd == null ? 0 : versionsEnd.hashCode());
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(id);
+    if (whereExpressions != null) whereExpressions.queryBindKey(key);
+    if (havingExpressions != null) havingExpressions.queryBindKey(key);
+    if (bindParams != null) bindParams.queryBindHash(key);
+    key.add(asOf).add(versionsStart).add(versionsEnd);
   }
 
   /**
@@ -1298,8 +1238,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    int hc = queryBindHash();
-    return new HashQuery(queryPlanKey, hc);
+    BindValuesKey bindKey = new BindValuesKey();
+    queryBindKey(bindKey);
+    return new HashQuery(queryPlanKey, bindKey);
   }
 
   @Override

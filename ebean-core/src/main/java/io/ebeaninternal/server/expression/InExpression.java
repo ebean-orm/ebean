@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -176,12 +177,11 @@ class InExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = 92821;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(bindValues.size());
     for (Object bindValue : bindValues) {
-      hc = 92821 * hc + bindValue.hashCode();
+      key.add(bindValue);
     }
-    return hc;
   }
 
   @Override

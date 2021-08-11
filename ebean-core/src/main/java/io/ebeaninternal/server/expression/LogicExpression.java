@@ -3,6 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.Expression;
 import io.ebean.Junction;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -168,10 +169,8 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = expOne.queryBindHash();
-    hc = hc * 92821 + expTwo.queryBindHash();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(expOne).add(expTwo);
   }
 
   @Override
