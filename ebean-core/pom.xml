@@ -20,22 +20,13 @@
 
   <profiles>
     <profile>
-      <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
-        After that, install it into your local maven repository:
-
-        mvn install:install-file \
-          -Dfile=db2jcc4.jar \
-          -DgroupId=com.ibm.jdbc \
-          -DartifactId=db2jcc4 \
-          -Dversion=4.23.42 \
-          -Dpackaging=jar
-      -->
       <id>db2</id>
       <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.ibm.db2/jcc -->
         <dependency>
-          <groupId>com.ibm.jdbc</groupId>
-          <artifactId>db2jcc4</artifactId>
-          <version>4.23.42</version>
+          <groupId>com.ibm.db2</groupId>
+          <artifactId>jcc</artifactId>
+          <version>11.5.5.0</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
