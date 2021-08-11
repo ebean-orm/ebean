@@ -80,11 +80,11 @@ class ScalarTypeJsonObjectMapper {
     @Override
     public Object read(DataReader reader) throws SQLException {
       String json = reader.getString();
+      // pushJson such that we MD5 and store on EntityBeanIntercept later
+      reader.pushJson(json);
       if (json == null || json.isEmpty()) {
         return null;
       }
-      // pushJson such that we MD5 and store on EntityBeanIntercept later
-      reader.pushJson(json);
       try {
         return objectReader.readValue(json, deserType);
       } catch (IOException e) {
