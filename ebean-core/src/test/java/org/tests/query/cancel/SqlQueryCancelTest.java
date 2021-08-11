@@ -113,8 +113,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelOrmAtBegin(Query::findOne);
     doCancelOrmAtBegin(q -> q.setMaxRows(1000).findPagedList().getList()); // untested
     doCancelOrmAtBegin(Query::findSet);
-    doCancelOrmAtBegin(Query::findSingleAttribute);
-    doCancelOrmAtBegin(Query::findSingleAttributeList);
+    doCancelOrmAtBegin(q -> q.select("name").findSingleAttribute());
+    doCancelOrmAtBegin(q -> q.select("name").findSingleAttributeList());
     doCancelOrmAtBegin(Query::findStream);
    //  testDuringRun(Query::findVersions);
     // EBasic has no history support, but it should work if @History is added
@@ -138,8 +138,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     // findOne cannot be tested, as H2 does the cancel check every 128 rows only
     doCancelOrmDuringRun(q -> q.setMaxRows(1000).findPagedList().getList()); // untested
     doCancelOrmDuringRun(Query::findSet);
-    doCancelOrmDuringRun(Query::findSingleAttribute);
-    doCancelOrmDuringRun(Query::findSingleAttributeList);
+    doCancelOrmDuringRun(q -> q.select("name").findSingleAttribute());
+    doCancelOrmDuringRun(q -> q.select("name").findSingleAttributeList());
     doCancelOrmDuringRun(Query::findStream);
    //  testDuringRun(Query::findVersions);
     // EBasic has no history support, but it should work if @History is added

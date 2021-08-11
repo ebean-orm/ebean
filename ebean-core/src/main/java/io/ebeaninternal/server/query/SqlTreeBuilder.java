@@ -102,7 +102,11 @@ public final class SqlTreeBuilder {
     this.query = request.getQuery();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
-    this.subQuery = Type.SUBQUERY == query.getType() || Type.ID_LIST == query.getType() || Type.DELETE == query.getType() || query.isCountDistinct();
+    this.subQuery = Type.SQ_EXISTS == query.getType()
+        || Type.SQ_IN == query.getType() 
+        || Type.ID_LIST == query.getType() 
+        || Type.DELETE == query.getType() 
+        || query.isCountDistinct();
     this.includeJoin = query.getM2mIncludeJoin();
     this.manyWhereJoins = query.getManyWhereJoins();
     this.queryDetail = query.getDetail();
@@ -145,6 +149,10 @@ public final class SqlTreeBuilder {
   private String buildSelectClause() {
     if (rawSql) {
       return "Not Used";
+    }
+    if (query.getType() ==Type.SQ_EXISTS) {
+      // effective query is "where exists (select 1 from ...)"
+      return "1";
     }
     rootNode.appendSelect(ctx, subQuery);
     return trimComma(ctx.getContent());

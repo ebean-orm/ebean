@@ -6,6 +6,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.query.CQuery;
 
 import java.io.IOException;
@@ -69,7 +70,7 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
 
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
-    return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
+    return ebeanServer.compileQuery(Type.SQ_IN, subQuery, queryRequest.getTransaction());
   }
 
   @Override
