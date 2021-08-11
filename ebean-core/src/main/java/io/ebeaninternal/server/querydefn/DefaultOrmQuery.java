@@ -1225,12 +1225,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * </p>
    */
   @Override
-  public void queryBindHash(BindHash hash) {
-    hash.update(id);
-    if (whereExpressions != null) whereExpressions.queryBindHash(hash);
-    if (havingExpressions != null) havingExpressions.queryBindHash(hash);
-    if (bindParams != null) bindParams.queryBindHash(hash);
-    hash.update(asOf).update(versionsStart).update(versionsEnd);
+  public void queryBindHash(BindValuesKey key) {
+    key.add(id);
+    if (whereExpressions != null) whereExpressions.queryBindHash(key);
+    if (havingExpressions != null) havingExpressions.queryBindHash(key);
+    if (bindParams != null) bindParams.queryBindHash(key);
+    key.add(asOf).add(versionsStart).add(versionsEnd);
   }
 
   /**
@@ -1244,9 +1244,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    BindHash hash = new BindHash();
-    queryBindHash(hash);
-    return new HashQuery(queryPlanKey, hash);
+    BindValuesKey bindKey = new BindValuesKey();
+    queryBindHash(bindKey);
+    return new HashQuery(queryPlanKey, bindKey);
   }
 
   @Override

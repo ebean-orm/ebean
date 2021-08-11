@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -38,7 +38,7 @@ public abstract class AbstractTextExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
+  public void queryBindHash(BindValuesKey key) {
     // do nothing, only execute against document store
   };
 

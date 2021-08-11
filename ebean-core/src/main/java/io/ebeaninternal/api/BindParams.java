@@ -50,10 +50,10 @@ public class BindParams implements Serializable {
     positionedParameters.clear();
   }
 
-  public void queryBindHash(BindHash hash) {
-    hash.update(positionedParameters.size());
-    for (Param positionedParameter : positionedParameters) {
-       positionedParameter.queryBindHash(hash);
+  public void queryBindHash(BindValuesKey key) {
+    key.add(positionedParameters.size());
+    for (Param param : positionedParameters) {
+       param.queryBindHash(key);
     }
   }
 
@@ -425,8 +425,8 @@ public class BindParams implements Serializable {
       return isInParam == param.isInParam && isOutParam == param.isOutParam && type == param.type && Objects.equals(inValue, param.inValue);
     }
 
-    void queryBindHash(BindHash hash) {
-      hash.update(isInParam).update(isOutParam).update(type).update(inValue);
+    void queryBindHash(BindValuesKey key) {
+      key.add(isInParam).add(isOutParam).add(type).add(inValue);
     }
 
     /**

@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -34,8 +34,8 @@ public class ArrayIsEmptyExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-    hash.update(empty);
+  public void queryBindHash(BindValuesKey key) {
+    key.add(empty);
   }
 
   @Override

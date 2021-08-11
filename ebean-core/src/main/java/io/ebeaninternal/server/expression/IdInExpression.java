@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -134,10 +134,10 @@ public class IdInExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-    hash.update(idCollection.size());
+  public void queryBindHash(BindValuesKey key) {
+    key.add(idCollection.size());
     for (Object elem : idCollection) {
-      hash.update(elem);
+      key.add(elem);
     }
   }
 

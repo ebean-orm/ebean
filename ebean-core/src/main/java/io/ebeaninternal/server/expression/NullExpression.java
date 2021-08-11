@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -95,7 +95,7 @@ class NullExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-    hash.update(notNull);
+  public void queryBindHash(BindValuesKey key) {
+    key.add(notNull);
   }
 }

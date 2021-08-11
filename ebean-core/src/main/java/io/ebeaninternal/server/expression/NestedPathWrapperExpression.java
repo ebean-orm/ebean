@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -80,8 +80,8 @@ class NestedPathWrapperExpression implements SpiExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-    delegate.queryBindHash(hash);
+  public void queryBindHash(BindValuesKey key) {
+    delegate.queryBindHash(key);
   }
 
   @Override

@@ -5,7 +5,7 @@ import io.ebean.plugin.ExpressionPath;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
@@ -122,8 +122,8 @@ public class SimpleExpression extends AbstractValueExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-    hash.update(value());
+  public void queryBindHash(BindValuesKey key) {
+    key.add(value());
   }
 
   @Override

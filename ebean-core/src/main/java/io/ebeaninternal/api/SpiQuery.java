@@ -635,7 +635,7 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * query).
    * </p>
    */
-  void queryBindHash(BindHash hash);
+  void queryBindHash(BindValuesKey key);
 
   /**
    * Identifies queries that are exactly the same including bind variables.

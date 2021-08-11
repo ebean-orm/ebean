@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -73,8 +73,8 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-    subQuery.queryBindHash(hash);
+  public void queryBindHash(BindValuesKey key) {
+    subQuery.queryBindHash(key);
   }
 
   @Override

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.expression;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 
 public class RawExpressionTest extends BaseExpressionTest {
 
@@ -62,16 +62,16 @@ public class RawExpressionTest extends BaseExpressionTest {
   }
 
   public void assert_queryBindHash_isDifferent(RawExpression exp0, RawExpression exp1) {
-    assertThat(getHash(exp0)).isNotEqualTo(getHash(exp1));
+    assertThat(bindKey(exp0)).isNotEqualTo(bindKey(exp1));
   }
 
   public void assert_queryBindHash_isSame(RawExpression exp0, RawExpression exp1) {
-    assertThat(getHash(exp0)).isEqualTo(getHash(exp1));
+    assertThat(bindKey(exp0)).isEqualTo(bindKey(exp1));
   }
 
-  private int getHash(RawExpression query) {
-    BindHash hash = new BindHash();
-    query.queryBindHash(hash);
-    return hash.hashCode();
+  private BindValuesKey bindKey(RawExpression query) {
+    BindValuesKey bindValuesKey = new BindValuesKey();
+    query.queryBindHash(bindValuesKey);
+    return bindValuesKey;
   }
 }

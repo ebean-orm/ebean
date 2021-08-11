@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.BindHash;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -123,13 +123,11 @@ class AllEqualsExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void queryBindHash(BindHash hash) {
-
-    hash.update(propMap.size());
+  public void queryBindHash(BindValuesKey key) {
+    key.add(propMap.size());
     for (Object value : propMap.values()) {
-      hash.update(value);
+      key.add(value);
     }
-
   }
 
   @Override
