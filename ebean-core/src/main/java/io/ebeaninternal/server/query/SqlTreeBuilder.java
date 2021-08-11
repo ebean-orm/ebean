@@ -150,7 +150,7 @@ public final class SqlTreeBuilder {
     if (rawSql) {
       return "Not Used";
     }
-    if (query.getType() ==Type.SQ_EXISTS) {
+    if (query.getType() == Type.SQ_EXISTS) {
       // effective query is "where exists (select 1 from ...)"
       return "1";
     }
