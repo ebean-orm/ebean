@@ -2,7 +2,6 @@ package io.ebean;
 
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.event.ShutdownManager;
 import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
 
@@ -46,7 +45,7 @@ public class DatabaseFactory {
   public static void initialiseContainer(ContainerConfig containerConfig) {
     lock.lock();
     try {
-      getContainer(containerConfig);
+      container(containerConfig);
     } finally {
       lock.unlock();
     }
@@ -58,7 +57,7 @@ public class DatabaseFactory {
   public static Database create(String name) {
     lock.lock();
     try {
-      return getContainer(null).createServer(name);
+      return container(null).createServer(name);
     } finally {
       lock.unlock();
     }
@@ -133,24 +132,16 @@ public class DatabaseFactory {
     }
   }
 
-  /**
-   * Removes the JVM shutdown hook and means the application must shut down ebean
-   * explicitly using {@link DatabaseFactory#shutdown()}.
-   */
-  public static void disableShutdownHook() {
-    ShutdownManager.deregisterShutdownHook();
-  }
-
   private static Database createInternal(DatabaseConfig config) {
-    return getContainer(config.getContainerConfig()).createServer(config);
+    return container(config.getContainerConfig()).createServer(config);
   }
 
   /**
-   * Get the EbeanContainer initialising it if necessary.
+   * Return the SpiContainer initialising it if necessary.
    *
    * @param containerConfig the configuration controlling clustering communication
    */
-  private static SpiContainer getContainer(ContainerConfig containerConfig) {
+  private static SpiContainer container(ContainerConfig containerConfig) {
     // thread safe in that all calling methods hold lock
     if (container != null) {
       return container;

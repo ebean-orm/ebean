@@ -17,12 +17,12 @@ public class ShutdownManagerTest extends BaseTestCase {
   @Test
   public void test_disableShutdownHook_shutdownManually() {
     // disable hook to make sure app code controls when shutdown is executed
-    DatabaseFactory.disableShutdownHook();
+    ShutdownManager.deregisterShutdownHook();
     DB.getDefault();
 
     System.out.println("shutdown manually ... ");
     // application code explicitly calls shutdown()
-    DatabaseFactory.shutdown();
+    ShutdownManager.shutdown();
   }
 
   /**
@@ -41,7 +41,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   @Test
   public void test_disableShutdownHook() {
     DB.getDefault();
-    DatabaseFactory.disableShutdownHook(); // no shutdown is run here (not great, don't do this)
+    ShutdownManager.deregisterShutdownHook(); // no shutdown is run here (not great, don't do this)
   }
 
   /**
