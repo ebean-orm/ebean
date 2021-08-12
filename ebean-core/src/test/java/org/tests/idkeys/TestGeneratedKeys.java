@@ -48,37 +48,34 @@ public class TestGeneratedKeys extends BaseTestCase {
   }
 
   private long readSequenceValue(Transaction tx, String sequence) throws SQLException {
+    String sql;
+    switch (spiEbeanServer().getDatabasePlatform().getPlatform().base()) {
+      case H2 :
+        sql = "select currval('" + sequence + "')";
+        break;
+
+      case DB2 :
+        sql = "values previous value for " + sequence;
+
+        break;
+      case SQLSERVER :
+        sql = "select current_value from sys.sequences where name = '" + sequence + "'";
+        break;
+
+      case MARIADB :
+        throw new UnsupportedOperationException("reading sequence value outside of the current connection is not supported. "
+            + "See https://mariadb.com/kb/en/previous-value-for-sequence_name/#description");
+        
+      default :
+        throw new UnsupportedOperationException("reading sequence value from "
+            + spiEbeanServer().getDatabasePlatform().getPlatform()
+            + " is not supported.");
+
+    }
     try (Statement stm = tx.getConnection().createStatement()) {
-      ResultSet rs;
-
-      switch (spiEbeanServer().getDatabasePlatform().getPlatform()) {
-        case H2 :
-          rs = stm.executeQuery("select currval('" + sequence + "')");
-          rs.next();
-          return rs.getLong(1);
-
-        case DB2 :
-          rs = stm.executeQuery("values previous value for " + sequence);
-          rs.next();
-          return rs.getLong(1);
-
-        case MARIADB :
-          rs = stm.executeQuery("select previous value for " + sequence);
-          rs.next();
-          return rs.getLong(1);
-
-        case SQLSERVER :
-          rs = stm.executeQuery(
-              "select current_value from sys.sequences where name = '"
-                  + sequence + "'");
-          rs.next();
-          return rs.getLong(1);
-
-        default :
-          throw new UnsupportedOperationException("reading sequence value from "
-              + spiEbeanServer().getDatabasePlatform().getPlatform()
-              + " is not supported.");
-      }
+      ResultSet rs = stm.executeQuery(sql);
+      rs.next();
+      return rs.getLong(1);
     }
   }
 
