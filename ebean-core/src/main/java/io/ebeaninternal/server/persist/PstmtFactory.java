@@ -56,7 +56,6 @@ class PstmtFactory {
     if (t.isLogSql()) {
       t.logSql(TrimLogSql.trim(sql));
     }
-
     Connection conn = t.getInternalConnection();
     PreparedStatement stmt = conn.prepareStatement(sql);
     BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
@@ -68,10 +67,8 @@ class PstmtFactory {
    * Return a callable statement taking into account batch requirements.
    */
   CallableStatement getCstmtBatch(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe) throws SQLException {
-
     BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
     CallableStatement stmt = (CallableStatement) batch.getStmt(sql, batchExe);
-
     if (stmt != null) {
       return stmt;
     }
@@ -79,10 +76,8 @@ class PstmtFactory {
     if (logSql) {
       t.logSql(sql);
     }
-
     Connection conn = t.getInternalConnection();
     stmt = conn.prepareCall(sql);
-
     BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
     batch.addStmt(bs, batchExe);
     return stmt;

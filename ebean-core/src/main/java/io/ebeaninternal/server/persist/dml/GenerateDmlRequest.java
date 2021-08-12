@@ -6,14 +6,10 @@ package io.ebeaninternal.server.persist.dml;
 public class GenerateDmlRequest {
 
   private final StringBuilder sb = new StringBuilder(100);
-
   private StringBuilder insertBindBuffer;
-
   private String prefix;
   private String prefix2;
-
   private int insertMode;
-
   private int bindColumnCount;
 
   /**
@@ -33,7 +29,6 @@ public class GenerateDmlRequest {
   }
 
   public void appendColumn(String column, String bind) {
-
     ++bindColumnCount;
 
     sb.append(prefix);

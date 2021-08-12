@@ -29,10 +29,8 @@ public class DeleteHandler extends DmlHandler {
    */
   @Override
   public void bind() throws SQLException {
-
     sql = meta.getSql(persistRequest);
     SpiTransaction t = persistRequest.getTransaction();
-
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
       pstmt = getPstmtBatch(t, sql, persistRequest, false);

@@ -14,7 +14,6 @@ import java.sql.SQLException;
 public class UpdateHandler extends DmlHandler {
 
   private final UpdateMeta meta;
-
   private boolean emptySetClause;
 
   UpdateHandler(PersistRequestBean<?> persist, UpdateMeta meta) {
@@ -32,18 +31,14 @@ public class UpdateHandler extends DmlHandler {
    */
   @Override
   public void bind() throws SQLException {
-
     SpiUpdatePlan updatePlan = meta.getUpdatePlan(persistRequest);
-
     if (updatePlan.isEmptySetClause()) {
       emptySetClause = true;
       return;
     }
 
     sql = updatePlan.getSql();
-
     SpiTransaction t = persistRequest.getTransaction();
-
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
       pstmt = getPstmtBatch(t, sql, persistRequest, false);

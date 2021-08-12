@@ -19,11 +19,8 @@ import java.sql.SQLException;
 public final class DmlBeanPersister implements BeanPersister {
 
   private final DatabasePlatform dbPlatform;
-
   private final UpdateMeta updateMeta;
-
   private final InsertMeta insertMeta;
-
   private final DeleteMeta deleteMeta;
 
   DmlBeanPersister(DatabasePlatform dbPlatform, UpdateMeta updateMeta, InsertMeta insertMeta, DeleteMeta deleteMeta) {
@@ -61,7 +58,6 @@ public final class DmlBeanPersister implements BeanPersister {
    * execute request taking batching into account.
    */
   private int execute(PersistRequestBean<?> request, PersistHandler handler) {
-
     boolean batched = request.isBatched();
     try {
       handler.bind();
@@ -72,7 +68,6 @@ public final class DmlBeanPersister implements BeanPersister {
       } else {
         return handler.executeNoBatch();
       }
-
     } catch (SQLException e) {
       // log the error to the transaction log
       String msg = "Error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
@@ -80,7 +75,6 @@ public final class DmlBeanPersister implements BeanPersister {
         request.getTransaction().logSummary(msg);
       }
       throw dbPlatform.translate(msg, e);
-
     } finally {
       if (!batched) {
         handler.close();

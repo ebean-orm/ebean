@@ -11,7 +11,6 @@ import io.ebeaninternal.server.persist.BeanPersisterFactory;
 public class DmlBeanPersisterFactory implements BeanPersisterFactory {
 
   private final DatabasePlatform dbPlatform;
-
   private final MetaFactory metaFactory;
 
   public DmlBeanPersisterFactory(DatabasePlatform dbPlatform) {
@@ -24,11 +23,9 @@ public class DmlBeanPersisterFactory implements BeanPersisterFactory {
    */
   @Override
   public BeanPersister create(BeanDescriptor<?> desc) {
-
     if (desc.isDocStoreOnly()) {
       return new DocStoreBeanPersister(GeneratedProperties.of(desc));
     }
-
     UpdateMeta updMeta = metaFactory.createUpdate(desc);
     DeleteMeta delMeta = metaFactory.createDelete(desc);
     InsertMeta insMeta = metaFactory.createInsert(desc);
