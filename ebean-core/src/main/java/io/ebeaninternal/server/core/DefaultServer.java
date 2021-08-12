@@ -490,6 +490,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public String toString() {
+    return "Database{" + serverName + "}";
+  }
+
   /**
    * Return the server name.
    */

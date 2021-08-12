@@ -1,16 +1,12 @@
 package io.ebeaninternal.api;
 
 import io.ebean.annotation.Platform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper to indicate that an EbeanServer should come up offline
  * typically for DDL generation purposes.
  */
 public class DbOffline {
-
-  private static final Logger logger = LoggerFactory.getLogger(DbOffline.class);
 
   private static final String KEY = "ebean.dboffline";
 
@@ -73,7 +69,6 @@ public class DbOffline {
   public static void reset() {
     generateMigration = false;
     System.clearProperty(KEY);
-    logger.debug("reset");
   }
 
 }
