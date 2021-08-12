@@ -8,6 +8,8 @@ import static org.junit.Assume.assumeTrue;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.tests.idkeys.db.GenKeyIdentity;
@@ -105,6 +107,7 @@ public class TestGeneratedKeys extends BaseTestCase {
     assumeTrue(idType() == IdType.SEQUENCE);
 
     SpiEbeanServer server = spiEbeanServer();
+    List<Long> idList = new ArrayList<>(52);
 
     try (Transaction tx = server.beginTransaction()) {
       // bigger than increment
@@ -112,7 +115,8 @@ public class TestGeneratedKeys extends BaseTestCase {
         GenKeySequence gks = new GenKeySequence();
         gks.setDescription("my description " + i);
         server.save(gks);
-        assertEquals(Long.valueOf(i), gks.getId());
+        assertFalse(idList.contains(gks.getId()));
+        idList.add(gks.getId());
       }
     }
   }
