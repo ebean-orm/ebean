@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
+import io.ebean.event.ShutdownManager;
 import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
 
@@ -16,18 +17,15 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This uses either DatabaseConfig or properties in the application.properties file to
  * configure and create a Database instance.
- * </p>
  * <p>
  * The Database instance can either be registered with the DB singleton or
  * not. The DB singleton effectively holds a map of Database by a name.
  * If the Database is registered with the DB singleton you can retrieve it
  * later via {@link DB#byName(String)}.
- * </p>
  * <p>
  * One Database can be nominated as the 'default/primary' Database. Many
  * methods on the DB singleton such as {@link DB#find(Class)} are just a
  * convenient way of using the 'default/primary' Database.
- * </p>
  */
 public class DatabaseFactory {
 
@@ -68,6 +66,16 @@ public class DatabaseFactory {
 
   /**
    * Create using the DatabaseConfig object to configure the database.
+   *
+   * <pre>{@code
+   *
+   *   DatabaseConfig config = new DatabaseConfig();
+   *   config.setName("db");
+   *   config.loadProperties();
+   *
+   *   Database database = DatabaseFactory.create(config);
+   *
+   * }</pre>
    */
   public static Database create(DatabaseConfig config) {
     lock.lock();
@@ -115,7 +123,6 @@ public class DatabaseFactory {
    * Shutdown gracefully all Database instances cleaning up any resources as required.
    * <p>
    * This is typically invoked via JVM shutdown hook and not explicitly called.
-   * </p>
    */
   public static void shutdown() {
     lock.lock();
@@ -124,6 +131,14 @@ public class DatabaseFactory {
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Removes the JVM shutdown hook and means the application must shut down ebean
+   * explicitly using {@link DatabaseFactory#shutdown()}.
+   */
+  public static void disableShutdownHook() {
+    ShutdownManager.deregisterShutdownHook();
   }
 
   private static Database createInternal(DatabaseConfig config) {
