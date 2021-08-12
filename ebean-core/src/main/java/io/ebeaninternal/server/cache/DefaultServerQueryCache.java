@@ -3,6 +3,8 @@ package io.ebeaninternal.server.cache;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.QueryCacheEntryValidate;
 
+import java.lang.ref.SoftReference;
+
 /**
  * Server cache for query caching.
  * <p>
@@ -27,7 +29,8 @@ public class DefaultServerQueryCache extends DefaultServerCache {
   @Override
   protected CacheEntry getCacheEntry(Object id) {
     Object key = key(id);
-    CacheEntry entry = map.get(key);
+    final SoftReference<CacheEntry> ref = map.get(key);
+    CacheEntry entry = ref != null ? ref.get() : null;
     if (entry == null) {
       return null;
     }
