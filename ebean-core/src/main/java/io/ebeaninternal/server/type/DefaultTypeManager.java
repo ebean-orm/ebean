@@ -364,7 +364,7 @@ public final class DefaultTypeManager implements TypeManager {
         return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
     }
-    if (objectMapperPresent) {
+    if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
       if (type.equals(JsonNode.class)) {
         switch (dbType) {
           case Types.VARCHAR:

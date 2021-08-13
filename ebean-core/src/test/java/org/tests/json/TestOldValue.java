@@ -3,31 +3,18 @@ package org.tests.json;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ValuePair;
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.Platform;
-import io.ebean.text.TextException;
 
 import org.assertj.core.api.SoftAssertions;
-import org.ebeantest.LoggedSqlCollector;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.EBasicOldValue;
-import org.tests.model.json.PlainBean;
 
-import javax.persistence.PersistenceException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class TestOldValue extends BaseTestCase {
 
@@ -37,6 +24,7 @@ public class TestOldValue extends BaseTestCase {
   @Test
   public void testDbJsonOldValue() throws Exception {
     EBasicOldValue bean = new EBasicOldValue();
+    JsonNodeFactory jnf = new JsonNodeFactory(false);
 
     bean.getStringList().add("sl1");
     bean.getStringSet().add("ss1");
@@ -47,7 +35,9 @@ public class TestOldValue extends BaseTestCase {
     bean.getIntList().add(2);
     bean.getIntSet().add(1002);
     bean.getIntMap().put("ik1",2002);
-
+    
+    bean.setJsonNode(jnf.arrayNode().add("Foo"));
+    
     DB.save(bean);
     bean = DB.find(EBasicOldValue.class, bean.getId());
 
@@ -60,11 +50,11 @@ public class TestOldValue extends BaseTestCase {
     bean.getIntList().add(6);
     bean.getIntSet().add(1006);
     bean.getIntMap().put("ik2",2006);
-
+    ((ArrayNode)bean.getJsonNode()).add("Bar");
     
     Map<String, ValuePair> dirty = DB.getBeanState(bean).getDirtyValues();
     SoftAssertions softly = new SoftAssertions();
-    softly.assertThat(dirty).hasSize(9);
+    softly.assertThat(dirty).hasSize(10);
 
     softly.assertThat((List)dirty.get("stringList").getOldValue()).containsExactly("sl1");
     softly.assertThat((List)dirty.get("stringList").getNewValue()).containsExactly("sl1", "sl2");
@@ -86,6 +76,9 @@ public class TestOldValue extends BaseTestCase {
     softly.assertThat((Map)dirty.get("longMap").getNewValue()).containsEntry("lk1",2001L).containsEntry("lk2",2005L).hasSize(2);
     softly.assertThat((Map)dirty.get("intMap").getOldValue()).containsEntry("ik1",2002).hasSize(1);
     softly.assertThat((Map)dirty.get("intMap").getNewValue()).containsEntry("ik1",2002).containsEntry("ik2",2006).hasSize(2);
+
+    softly.assertThat((ArrayNode)dirty.get("jsonNode").getOldValue()).hasToString("[\"Foo\"]");
+    softly.assertThat((ArrayNode)dirty.get("jsonNode").getNewValue()).hasToString("[\"Foo\",\"Bar\"]");
 
     softly.assertAll();
 
