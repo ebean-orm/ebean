@@ -289,7 +289,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> getDbMapScalarType() {
-    return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR);
+    return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
   }
 
   @Override
@@ -312,7 +312,7 @@ public final class DefaultTypeManager implements TypeManager {
       return arrayTypeSetFactory.typeFor(valueType, nullable);
     }
     // fallback to JSON storage in VARCHAR column
-    return new ScalarTypeJsonSet.Varchar(getDocType(valueType), nullable);
+    return new ScalarTypeJsonSet.Varchar(getDocType(valueType), nullable, false); // TODO: keepSource for @DbArray?
   }
 
   private ScalarType<?> getArrayScalarTypeList(Type valueType, boolean nullable) {
@@ -323,7 +323,7 @@ public final class DefaultTypeManager implements TypeManager {
       return arrayTypeListFactory.typeFor(valueType, nullable);
     }
     // fallback to JSON storage in VARCHAR column
-    return new ScalarTypeJsonList.Varchar(getDocType(valueType), nullable);
+    return new ScalarTypeJsonList.Varchar(getDocType(valueType), nullable, false); // TODO: keepSource for @DbArray?
   }
 
   private Class<? extends Enum<?>> asEnumClass(Type valueType) {
@@ -340,10 +340,11 @@ public final class DefaultTypeManager implements TypeManager {
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
+    boolean keepSource = prop.getMutationDetection() == MutationDetection.SOURCE;
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable());
+        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource);
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
@@ -351,14 +352,14 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable());
+        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource);
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
     if (type.equals(Map.class)) {
       if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
-        return ScalarTypeJsonMap.typeFor(postgres, dbType);
+        return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource);
       } else {
         return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
