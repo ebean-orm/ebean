@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.11.1</version>
+    <version>12.11.2-SNAPSHOT</version>
   </parent>
 
   <name>querybean generator</name>
