@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DefaultContainer implements SpiContainer {
 
-  private static final Logger logger = LoggerFactory.getLogger("io.ebean.internal.DefaultContainer");
+  private static final Logger logger = LoggerFactory.getLogger("io.ebean.DB");
 
   private final ReentrantLock lock = new ReentrantLock();
   private final ClusterManager clusterManager;
@@ -77,9 +77,10 @@ public class DefaultContainer implements SpiContainer {
   public SpiEbeanServer createServer(DatabaseConfig config) {
     lock.lock();
     try {
+      long start = System.currentTimeMillis();
       applyConfigServices(config);
       setNamingConvention(config);
-      BootupClasses bootupClasses = getBootupClasses(config);
+      BootupClasses bootupClasses = bootupClasses(config);
 
       boolean online = true;
       if (config.isDocStoreOnly()) {
@@ -101,22 +102,18 @@ public class DefaultContainer implements SpiContainer {
         // use a configured DbEncrypt rather than the platform default
         config.getDatabasePlatform().setDbEncrypt(config.getDbEncrypt());
       }
-
       // inform the NamingConvention of the associated DatabasePlatform
       config.getNamingConvention().setDatabasePlatform(config.getDatabasePlatform());
-
       // executor and l2 caching service setup early (used during server construction)
       SpiBackgroundExecutor executor = createBackgroundExecutor(config);
       InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, config, bootupClasses);
-
       DefaultServer server = new DefaultServer(c, c.cacheManager());
-
-      // generate and run DDL if required
-      // if there are any other tasks requiring action in their plugins, do them as well
+      // generate and run DDL if required plus other plugins
       if (!DbOffline.isGenerateMigration()) {
         startServer(online, server);
       }
       DbOffline.reset();
+      logger.info("started database[{}] platform[{}] in {}ms", config.getName(), config.getDatabasePlatform().getPlatform(), System.currentTimeMillis() - start);
       return server;
     } finally {
       lock.unlock();
@@ -161,9 +158,8 @@ public class DefaultContainer implements SpiContainer {
    * Get the entities, scalarTypes, Listeners etc combining the class registered
    * ones with the already created instances.
    */
-  private BootupClasses getBootupClasses(DatabaseConfig config) {
-
-    BootupClasses bootup = getBootupClasses1(config);
+  private BootupClasses bootupClasses(DatabaseConfig config) {
+    BootupClasses bootup = bootupClasses1(config);
     bootup.addIdGenerators(config.getIdGenerators());
     bootup.addPersistControllers(config.getPersistControllers());
     bootup.addPostLoaders(config.getPostLoaders());
@@ -173,7 +169,6 @@ public class DefaultContainer implements SpiContainer {
     bootup.addQueryAdapters(config.getQueryAdapters());
     bootup.addServerConfigStartup(config.getServerConfigStartupListeners());
     bootup.addChangeLogInstances(config);
-
     bootup.runServerConfigStartup(config);
     return bootup;
   }
@@ -181,14 +176,12 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Get the class based entities, scalarTypes, Listeners etc.
    */
-  private BootupClasses getBootupClasses1(DatabaseConfig config) {
-
+  private BootupClasses bootupClasses1(DatabaseConfig config) {
     List<Class<?>> entityClasses = config.getClasses();
     if (config.isDisableClasspathSearch() || (entityClasses != null && !entityClasses.isEmpty())) {
       // use classes we explicitly added via configuration
       return new BootupClasses(entityClasses);
     }
-
     return BootupClassPathSearch.search(config);
   }
 
@@ -205,7 +198,6 @@ public class DefaultContainer implements SpiContainer {
    * Set the DatabasePlatform if it has not already been set.
    */
   private void setDatabasePlatform(DatabaseConfig config) {
-
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
       if (config.getTenantMode().isDynamicDataSource()) {
@@ -215,7 +207,6 @@ public class DefaultContainer implements SpiContainer {
       platform = new DatabasePlatformFactory().create(config);
       config.setDatabasePlatform(platform);
     }
-    logger.info("DatabasePlatform name:{} platform:{}", config.getName(), platform.getName());
     platform.configure(config.getPlatformConfig());
   }
 
