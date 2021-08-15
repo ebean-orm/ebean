@@ -33,7 +33,7 @@ public final class BindPadding {
    * Extra padding on binding id's in order to get better hit ratio on DB prepared statements / query plans.
    */
   static int padding(int size) {
-    if (size == 1) {
+    if (size <= 1) {
       return 0;
     }
     if (size <= 5) {
