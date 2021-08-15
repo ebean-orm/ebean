@@ -19,12 +19,12 @@ import java.util.List;
 /**
  * Types for mapping List in JSON format to DB types VARCHAR, JSON and JSONB.
  */
-public class ScalarTypeJsonList {
+class ScalarTypeJsonList {
 
   /**
    * Return the appropriate ScalarType based requested dbType and if Postgres.
    */
-  public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
+  static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSONB:
@@ -39,8 +39,8 @@ public class ScalarTypeJsonList {
   /**
    * List mapped to DB VARCHAR.
    */
-  public static class Varchar extends ScalarTypeJsonList.Base {
-    public Varchar(DocPropertyType docType, boolean nullable, boolean keepSource) {
+  static final class Varchar extends ScalarTypeJsonList.Base {
+    Varchar(DocPropertyType docType, boolean nullable, boolean keepSource) {
       super(Types.VARCHAR, docType, nullable, keepSource);
     }
   }
@@ -48,8 +48,8 @@ public class ScalarTypeJsonList {
   /**
    * List mapped to Postgres JSON.
    */
-  private static class Json extends ScalarTypeJsonList.PgBase {
-    public Json(DocPropertyType docType, boolean nullable, boolean keepSource) {
+  private final static class Json extends ScalarTypeJsonList.PgBase {
+    Json(DocPropertyType docType, boolean nullable, boolean keepSource) {
       super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docType, nullable, keepSource);
     }
   }
@@ -57,8 +57,8 @@ public class ScalarTypeJsonList {
   /**
    * List mapped to Postgres JSONB.
    */
-  private static class JsonB extends ScalarTypeJsonList.PgBase {
-    public JsonB(DocPropertyType docType, boolean nullable, boolean keepSource) {
+  private static final class JsonB extends ScalarTypeJsonList.PgBase {
+    JsonB(DocPropertyType docType, boolean nullable, boolean keepSource) {
       super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docType, nullable, keepSource);
     }
   }
@@ -68,22 +68,22 @@ public class ScalarTypeJsonList {
    */
   @SuppressWarnings("rawtypes")
   private abstract static class Base extends ScalarTypeJsonCollection<List> {
-    private final boolean keepSource;
+    final boolean keepSource;
 
-    public Base(int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
+    private Base(int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
       super(List.class, dbType, docType, nullable);
       this.keepSource = keepSource;
     }
-    
+
     @Override
-    public boolean isJsonMapper() {
+    public final boolean isJsonMapper() {
       return keepSource;
     }
 
     @Override
-    public List read(DataReader reader) throws SQLException {
+    public final List read(DataReader reader) throws SQLException {
       String json = reader.getString();
-      if (isJsonMapper()) {
+      if (keepSource) {
         reader.pushJson(json);
       }
       try {
@@ -96,7 +96,7 @@ public class ScalarTypeJsonList {
 
     @Override
     public final void bind(DataBinder binder, List value) throws SQLException {
-      String rawJson = isJsonMapper() ? binder.popJson() : null;
+      String rawJson = keepSource ? binder.popJson() : null;
       if (rawJson == null && value != null) {
         rawJson = formatValue(value);
       }
@@ -115,15 +115,15 @@ public class ScalarTypeJsonList {
         binder.setString("[]");
       }
     }
-    
+
     protected void bindRawJson(DataBinder binder, String rawJson) throws SQLException {
       binder.setString(rawJson);
     }
 
     @Override
-    public String formatValue(List value) {
+    public final String formatValue(List value) {
       if (value.isEmpty()) {
-        return "[]"; 
+        return "[]";
       }
       try {
         return EJson.write(value);
@@ -133,7 +133,7 @@ public class ScalarTypeJsonList {
     }
 
     @Override
-    public List parse(String value) {
+    public final List parse(String value) {
       try {
         return EJson.parseList(value, false);
       } catch (IOException e) {
@@ -142,12 +142,12 @@ public class ScalarTypeJsonList {
     }
 
     @Override
-    public List jsonRead(JsonParser parser) throws IOException {
+    public final List jsonRead(JsonParser parser) throws IOException {
       return EJson.parseList(parser, parser.getCurrentToken());
     }
 
     @Override
-    public void jsonWrite(JsonGenerator writer, List value) throws IOException {
+    public final void jsonWrite(JsonGenerator writer, List value) throws IOException {
       EJson.write(value, writer);
     }
   }
@@ -165,12 +165,12 @@ public class ScalarTypeJsonList {
     }
 
     @Override
-    protected void bindRawJson(DataBinder binder, String rawJson) throws SQLException {
+    protected final void bindRawJson(DataBinder binder, String rawJson) throws SQLException {
       binder.setObject(PostgresHelper.asObject(pgType, rawJson));
     }
 
     @Override
-    protected void bindNull(DataBinder binder) throws SQLException {
+    protected final void bindNull(DataBinder binder) throws SQLException {
       binder.setObject(PostgresHelper.asObject(pgType, nullable ? null : "[]"));
     }
   }

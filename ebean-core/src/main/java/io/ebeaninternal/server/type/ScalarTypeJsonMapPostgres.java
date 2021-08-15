@@ -8,9 +8,9 @@ import java.sql.SQLException;
 /**
  * Support for the Postgres DB types JSON and JSONB.
  */
-public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
+abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
 
-  final String postgresType;
+  private final String postgresType;
 
   ScalarTypeJsonMapPostgres(int jdbcType, String postgresType, boolean keepSource) {
     super(jdbcType, keepSource);
@@ -18,21 +18,21 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
   }
 
   @Override
-  protected void bindNull(DataBinder binder) throws SQLException {
+  protected final void bindNull(DataBinder binder) throws SQLException {
     binder.setObject(PostgresHelper.asObject(postgresType, null));
   }
-  
+
   @Override
-  protected void bindJson(DataBinder binder, String rawJson) throws SQLException {
+  protected final void bindJson(DataBinder binder, String rawJson) throws SQLException {
     binder.setObject(PostgresHelper.asObject(postgresType, rawJson));
   }
 
   /**
    * ScalarType mapping java Map type to Postgres JSON database type.
    */
-  public static class JSON extends ScalarTypeJsonMapPostgres {
+  static final class JSON extends ScalarTypeJsonMapPostgres {
 
-    public JSON(boolean keepSource) {
+    JSON(boolean keepSource) {
       super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, keepSource);
     }
   }
@@ -40,9 +40,9 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
   /**
    * ScalarType mapping java Map type to Postgres JSONB database type.
    */
-  public static class JSONB extends ScalarTypeJsonMapPostgres {
+  static final class JSONB extends ScalarTypeJsonMapPostgres {
 
-    public JSONB(boolean keepSource) {
+    JSONB(boolean keepSource) {
       super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, keepSource);
     }
   }
