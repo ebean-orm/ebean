@@ -9,7 +9,6 @@ import javax.persistence.PersistenceException;
  */
 public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
-
   private final ThreadLocal<SpiTransaction> local = new ThreadLocal<>();
 
   @Override
@@ -18,7 +17,7 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public SpiTransaction getInScope() {
+  public final SpiTransaction getInScope() {
     return local.get();
   }
 
@@ -33,7 +32,7 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public void replace(SpiTransaction trans) {
+  public final void replace(SpiTransaction trans) {
     if (trans == null) {
       throw new IllegalStateException("Setting a null transaction?");
     }
@@ -41,7 +40,7 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public void set(SpiTransaction trans) {
+  public final void set(SpiTransaction trans) {
     if (trans == null) {
       throw new IllegalStateException("Setting a null transaction?");
     }
@@ -50,13 +49,13 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public void clear() {
+  public final void clear() {
     checkForActiveTransaction();
     local.remove();
   }
 
   @Override
-  public void clearExternal() {
+  public final void clearExternal() {
     local.remove();
   }
 

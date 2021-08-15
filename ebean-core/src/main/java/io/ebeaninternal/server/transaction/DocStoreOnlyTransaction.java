@@ -5,7 +5,7 @@ import java.sql.Connection;
 /**
  * Document store only transaction.
  */
-public class DocStoreOnlyTransaction extends JdbcTransaction {
+public final class DocStoreOnlyTransaction extends JdbcTransaction {
 
   /**
    * Create a new DocStore  only Transaction.

@@ -8,10 +8,9 @@ import java.util.Map;
 /**
  * Determines the properties on a given bean.
  */
-public class BeanPropertiesReader {
+public final class BeanPropertiesReader {
 
   private final Map<String, Integer> propertyIndexMap = new HashMap<>();
-
   private final String[] props;
 
   public BeanPropertiesReader(Class<?> clazz) {

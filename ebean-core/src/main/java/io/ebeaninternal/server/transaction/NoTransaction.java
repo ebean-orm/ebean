@@ -19,9 +19,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Place holder for use with SUPPORTS and NEVER transactional when there really isn't a transaction.
+ * Placeholder for use with SUPPORTS and NEVER transactional when there really isn't a transaction.
  */
-class NoTransaction implements SpiTransaction {
+final class NoTransaction implements SpiTransaction {
 
   static final NoTransaction INSTANCE = new NoTransaction();
 

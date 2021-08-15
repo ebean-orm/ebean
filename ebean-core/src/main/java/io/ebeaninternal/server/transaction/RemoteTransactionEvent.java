@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteTransactionEvent implements Runnable, BinaryWritable {
+public final class RemoteTransactionEvent implements Runnable, BinaryWritable {
 
   private final List<BeanPersistIds> beanPersistList = new ArrayList<>();
 

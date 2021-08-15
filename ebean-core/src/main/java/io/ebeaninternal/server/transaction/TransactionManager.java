@@ -201,14 +201,14 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the scope manager.
    */
-  public TransactionScopeManager scope() {
+  public final TransactionScopeManager scope() {
     return scopeManager;
   }
 
   /**
    * Set the transaction onto the scope.
    */
-  public void set(SpiTransaction txn) {
+  public final void set(SpiTransaction txn) {
     scopeManager.set(txn);
   }
 
@@ -216,7 +216,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Return the current active transaction.
    */
   @Override
-  public SpiTransaction getActive() {
+  public final SpiTransaction getActive() {
     return scopeManager.getActive();
   }
 
@@ -230,18 +230,18 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the current transaction from thread local scope. Note that it may be inactive.
    */
-  public SpiTransaction getInScope() {
+  public final SpiTransaction getInScope() {
     return scopeManager.getInScope();
   }
 
   /**
    * Translate the SQLException into a specific exception if possible based on the DB platform.
    */
-  public PersistenceException translate(String message, SQLException cause) {
+  public final PersistenceException translate(String message, SQLException cause) {
     return databasePlatform.translate(message, cause);
   }
 
-  public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
+  public final void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
     if (shutdownDataSource) {
       dataSourceSupplier.shutdown(deregisterDriver);
     }
@@ -250,39 +250,39 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return true if the DB platform supports SavepointId().
    */
-  boolean isSupportsSavepointId() {
+  final boolean isSupportsSavepointId() {
     return supportsSavepointId;
   }
 
-  boolean isDocStoreActive() {
+  final boolean isDocStoreActive() {
     return docStoreActive;
   }
 
-  DocStoreTransaction createDocStoreTransaction(int docStoreBatchSize) {
+  final DocStoreTransaction createDocStoreTransaction(int docStoreBatchSize) {
     return docStoreUpdateProcessor.createTransaction(docStoreBatchSize);
   }
 
-  boolean isSkipCacheAfterWrite() {
+  final boolean isSkipCacheAfterWrite() {
     return skipCacheAfterWrite;
   }
 
-  public BeanDescriptorManager getBeanDescriptorManager() {
+  public final BeanDescriptorManager getBeanDescriptorManager() {
     return beanDescriptorManager;
   }
 
-  BulkEventListenerMap getBulkEventListenerMap() {
+  final BulkEventListenerMap getBulkEventListenerMap() {
     return bulkEventListenerMap;
   }
 
-  boolean isAutoPersistUpdates() {
+  final boolean isAutoPersistUpdates() {
     return autoPersistUpdates;
   }
 
-  boolean isPersistBatch() {
+  final boolean isPersistBatch() {
     return persistBatch;
   }
 
-  boolean isPersistBatchOnCascade() {
+  final boolean isPersistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
@@ -296,7 +296,7 @@ public class TransactionManager implements SpiTransactionManager {
    * If the Isolation level is higher (say SERIALIZABLE) then Connections used
    * just for queries do need to be committed or rollback after the query.
    */
-  OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
+  final OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
     // first check for a system property 'override'
     String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
     if (systemPropertyValue != null) {
@@ -306,29 +306,29 @@ public class TransactionManager implements SpiTransactionManager {
     return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
 
-  public String getServerName() {
+  public final String getServerName() {
     return serverName;
   }
 
   @Override
-  public Connection getQueryPlanConnection() throws SQLException {
+  public final Connection getQueryPlanConnection() throws SQLException {
     return dataSourceSupplier.getConnection(null);
   }
 
   @Override
-  public DataSource getDataSource() {
+  public final DataSource getDataSource() {
     return dataSourceSupplier.getDataSource();
   }
 
   @Override
-  public DataSource getReadOnlyDataSource() {
+  public final DataSource getReadOnlyDataSource() {
     return dataSourceSupplier.getReadOnlyDataSource();
   }
 
   /**
    * Defines the type of behavior to use when closing a transaction that was used to query data only.
    */
-  OnQueryOnly getOnQueryOnly() {
+  final OnQueryOnly getOnQueryOnly() {
     return onQueryOnly;
   }
 
@@ -390,7 +390,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Process a local rolled back transaction.
    */
   @Override
-  public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
+  public final void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
     try {
       if (txnLogger.isDebug()) {
         String msg = transaction.getLogPrefix() + "Rollback";
@@ -408,7 +408,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Query only transaction in read committed isolation.
    */
   @Override
-  public void notifyOfQueryOnly(SpiTransaction transaction) {
+  public final void notifyOfQueryOnly(SpiTransaction transaction) {
     // Nothing that interesting here
     if (txnLogger.isTrace()) {
       txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
@@ -442,7 +442,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Process a local committed transaction.
    */
   @Override
-  public void notifyOfCommit(SpiTransaction transaction) {
+  public final void notifyOfCommit(SpiTransaction transaction) {
     try {
       if (txnLogger.isDebug()) {
         txnLogger.debug(transaction.getLogPrefix() + "Commit");
@@ -455,7 +455,7 @@ public class TransactionManager implements SpiTransactionManager {
     }
   }
 
-  public void externalModification(TransactionEventTable tableEvent) {
+  public final void externalModification(TransactionEventTable tableEvent) {
     SpiTransaction t = getActive();
     if (t != null) {
       t.getEvent().add(tableEvent);
@@ -476,7 +476,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Notify local BeanPersistListeners etc of events from another server in the cluster.
    */
-  public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
+  public final void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
     if (clusterLogger.isDebugEnabled()) {
       clusterLogger.debug("processing {}", remoteEvent);
     }
@@ -506,14 +506,14 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Process the docstore / ElasticSearch updates.
    */
-  void processDocStoreUpdates(DocStoreUpdates docStoreUpdates, int bulkBatchSize) {
+  final void processDocStoreUpdates(DocStoreUpdates docStoreUpdates, int bulkBatchSize) {
     docStoreUpdateProcessor.process(docStoreUpdates, bulkBatchSize);
   }
 
   /**
    * Prepare and then send/log the changeSet.
    */
-  void sendChangeLog(final ChangeSet changeSet) {
+  final void sendChangeLog(final ChangeSet changeSet) {
     // can set userId, userIpAddress & userContext if desired
     if (changeLogPrepare.prepare(changeSet)) {
       if (changeLogAsync) {
@@ -528,7 +528,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Invalidate the query caches for entities based on views.
    */
-  void processTouchedTables(Set<String> touchedTables) {
+  final void processTouchedTables(Set<String> touchedTables) {
     tableModState.touch(touchedTables);
     if (viewInvalidation) {
       beanDescriptorManager.processViewInvalidation(touchedTables);
@@ -539,32 +539,32 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Process the collected transaction profiling information.
    */
-  void profileCollect(TransactionProfile transactionProfile) {
+  final void profileCollect(TransactionProfile transactionProfile) {
     profileHandler.collectTransactionProfile(transactionProfile);
   }
 
   /**
    * Collect execution time for an explicit transaction.
    */
-  void collectMetric(long exeMicros) {
+  final void collectMetric(long exeMicros) {
     txnMain.add(exeMicros);
   }
 
   /**
    * Collect execution time for implicit read only transaction.
    */
-  void collectMetricReadOnly(long exeMicros) {
+  final void collectMetricReadOnly(long exeMicros) {
     txnReadOnly.add(exeMicros);
   }
 
   /**
    * Collect execution time for a named transaction.
    */
-  void collectMetricNamed(long exeMicros, String label) {
+  final void collectMetricNamed(long exeMicros, String label) {
     txnNamed.add(label, exeMicros);
   }
 
-  public void visitMetrics(MetricVisitor visitor) {
+  public final void visitMetrics(MetricVisitor visitor) {
     txnMain.visit(visitor);
     txnReadOnly.visit(visitor);
     txnNamed.visit(visitor);
@@ -576,14 +576,14 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Clear an implicit transaction from thread local scope.
    */
-  public void clearServerTransaction() {
+  public final void clearServerTransaction() {
     scopeManager.clear();
   }
 
   /**
    * Begin an implicit transaction.
    */
-  public SpiTransaction beginServerTransaction() {
+  public final SpiTransaction beginServerTransaction() {
     SpiTransaction t = createTransaction(false, -1);
     scopeManager.set(t);
     return t;
@@ -592,7 +592,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Exit a scoped transaction (that can be inactive - already committed etc).
    */
-  public void exitScopedTransaction(Object returnOrThrowable, int opCode) {
+  public final void exitScopedTransaction(Object returnOrThrowable, int opCode) {
     SpiTransaction st = getInScope();
     if (st instanceof ScopedTransaction) {
       // can be null for Supports as that can start as a 'No Transaction' and then
@@ -602,7 +602,7 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   @Override
-  public void externalRemoveTransaction() {
+  public final void externalRemoveTransaction() {
     scopeManager.clearExternal();
   }
 
@@ -611,7 +611,7 @@ public class TransactionManager implements SpiTransactionManager {
    * (e.g. Spring managed transaction).
    */
   @Override
-  public ScopedTransaction externalBeginTransaction(SpiTransaction transaction, TxScope txScope) {
+  public final ScopedTransaction externalBeginTransaction(SpiTransaction transaction, TxScope txScope) {
     ScopedTransaction scopedTxn = new ScopedTransaction(scopeManager);
     scopedTxn.push(new ScopeTrans(rollbackOnChecked, false, transaction, txScope));
     scopeManager.replace(scopedTxn);
@@ -621,7 +621,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Begin a scoped transaction.
    */
-  public ScopedTransaction beginScopedTransaction(TxScope txScope) {
+  public final ScopedTransaction beginScopedTransaction(TxScope txScope) {
     txScope = initTxScope(txScope);
     ScopedTransaction txnContainer = getActiveScoped();
 
@@ -742,26 +742,26 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return true if Transaction debug is on.
    */
-  public boolean isTxnDebug() {
+  public final boolean isTxnDebug() {
     return txnDebug;
   }
 
-  public SpiLogManager log() {
+  public final SpiLogManager log() {
     return logManager;
   }
 
-  public boolean isLogSql() {
+  public final boolean isLogSql() {
     return logManager.sql().isDebug();
   }
 
-  public boolean isLogSummary() {
+  public final boolean isLogSummary() {
     return logManager.sum().isDebug();
   }
 
   /**
    * Experimental - find dirty beans in the persistence context and persist them.
    */
-  public void flushTransparent(SpiPersistenceContext persistenceContext, SpiTransaction transaction) {
+  public final void flushTransparent(SpiPersistenceContext persistenceContext, SpiTransaction transaction) {
     List<Object> dirtyBeans = persistenceContext.dirtyBeans(beanDescriptorManager);
     if (!dirtyBeans.isEmpty()) {
       server.updateAll(dirtyBeans, transaction);
