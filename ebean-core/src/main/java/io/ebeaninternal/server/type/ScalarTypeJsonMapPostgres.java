@@ -4,7 +4,6 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * Support for the Postgres DB types JSON and JSONB.
@@ -13,15 +12,18 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
 
   final String postgresType;
 
-  ScalarTypeJsonMapPostgres(int jdbcType, String postgresType) {
-    super(jdbcType);
+  ScalarTypeJsonMapPostgres(int jdbcType, String postgresType, boolean keepSource) {
+    super(jdbcType, keepSource);
     this.postgresType = postgresType;
   }
 
-  @SuppressWarnings("rawtypes")
   @Override
-  public void bind(DataBinder binder, Map value) throws SQLException {
-    String rawJson = (value == null) ? null : formatValue(value);
+  protected void bindNull(DataBinder binder) throws SQLException {
+    binder.setObject(PostgresHelper.asObject(postgresType, null));
+  }
+  
+  @Override
+  protected void bindJson(DataBinder binder, String rawJson) throws SQLException {
     binder.setObject(PostgresHelper.asObject(postgresType, rawJson));
   }
 
@@ -30,8 +32,8 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
    */
   public static class JSON extends ScalarTypeJsonMapPostgres {
 
-    public JSON() {
-      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE);
+    public JSON(boolean keepSource) {
+      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, keepSource);
     }
   }
 
@@ -40,8 +42,8 @@ public abstract class ScalarTypeJsonMapPostgres extends ScalarTypeJsonMap {
    */
   public static class JSONB extends ScalarTypeJsonMapPostgres {
 
-    public JSONB() {
-      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE);
+    public JSONB(boolean keepSource) {
+      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, keepSource);
     }
   }
 }
