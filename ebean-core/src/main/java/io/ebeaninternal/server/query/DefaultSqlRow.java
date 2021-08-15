@@ -29,7 +29,7 @@ import java.util.UUID;
  * returning the type you expect.
  * </p>
  */
-public class DefaultSqlRow implements SqlRow {
+public final class DefaultSqlRow implements SqlRow {
 
   private static final long serialVersionUID = -3120927797041336242L;
 

@@ -37,74 +37,51 @@ import java.util.Set;
  * named parameters and expression values into the prepared statement.
  * </p>
  */
-public class CQueryPredicates {
+public final class CQueryPredicates {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPredicates.class);
 
   private final Binder binder;
-
   private final OrmQueryRequest<?> request;
-
   private final SpiQuery<?> query;
-
   private final Object idValue;
-
-  /**
-   * Named bind parameters.
-   */
   private final BindParams bindParams;
-
-  /**
-   * Bind values from the where expressions.
-   */
   private DefaultExpressionRequest filterMany;
-
   /**
    * SQL generated from the where expressions.
    */
   private String filterManyExprSql;
-
   /**
    * Bind values from the where expressions.
    */
   private DefaultExpressionRequest where;
-
   /**
    * SQL generated from the where expressions.
    */
   private String whereExprSql;
-
   /**
    * Bind values for having expression.
    */
   private DefaultExpressionRequest having;
-
   /**
    * SQL generated from the having expression.
    */
   private String havingExprSql;
-
   private String dbHaving;
-
   /**
    * logicalWhere with property names converted to db columns.
    */
   private String dbWhere;
-
   /**
    * Filter than can apply to a many fetch join.
    */
   private String dbFilterMany;
-
   private String dbOrderBy;
-
   private String dbUpdateClause;
-
   /**
    * Includes from where and order by clauses.
    */
   private Set<String> predicateIncludes;
-
   private Set<String> orderByIncludes;
 
   CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {

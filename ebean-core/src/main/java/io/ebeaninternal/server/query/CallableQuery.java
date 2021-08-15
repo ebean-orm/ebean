@@ -10,9 +10,7 @@ import io.ebeaninternal.api.SpiQuery;
 abstract class CallableQuery<T> {
 
   final SpiQuery<T> query;
-
   final SpiEbeanServer server;
-
   final Transaction transaction;
 
   CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {

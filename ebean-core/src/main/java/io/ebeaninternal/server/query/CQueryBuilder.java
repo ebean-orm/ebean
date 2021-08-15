@@ -40,7 +40,7 @@ import java.util.List;
  * Generates the SQL SELECT statements taking into account the physical
  * deployment properties.
  */
-class CQueryBuilder {
+final class CQueryBuilder {
 
   private final String columnAliasPrefix;
   private final SqlLimiter sqlLimiter;

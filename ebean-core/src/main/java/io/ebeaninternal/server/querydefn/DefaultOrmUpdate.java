@@ -14,41 +14,21 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
 
   private static final long serialVersionUID = -8791423602246515438L;
 
-
   private transient final EbeanServer server;
-
   private final Class<?> beanType;
-
-  /**
-   * The name of the update.
-   */
   private final String name;
-
   private String label;
-
-  /**
-   * The parameters used to bind to the sql.
-   */
   private final BindParams bindParams = new BindParams();
-
-  /**
-   * The sql update or delete statement.
-   */
   private final String updateStatement;
-
   /**
    * Automatically detect the table being modified by this sql. This will
    * register this information so that eBean invalidates cached objects if
    * required.
    */
   private boolean notifyCache = true;
-
   private int timeout;
-
   private String generatedSql;
-
   private final String baseTable;
-
   private final OrmUpdateType type;
 
   /**

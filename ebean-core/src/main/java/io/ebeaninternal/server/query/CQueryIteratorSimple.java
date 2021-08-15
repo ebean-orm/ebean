@@ -9,7 +9,7 @@ import java.sql.SQLException;
 /**
  * QueryIterator that does not require a buffer for secondary queries.
  */
-class CQueryIteratorSimple<T> implements QueryIterator<T> {
+final class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
   private final CQuery<T> cquery;
 

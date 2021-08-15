@@ -9,7 +9,7 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 /**
  * Default implementation of the FetchGroupBuilder.
  */
-class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
+final class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
   private static final FetchConfig DEFAULT_FETCH = FetchConfig.ofDefault();
 

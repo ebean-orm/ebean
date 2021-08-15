@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-public class ExtraJoin {
+public final class ExtraJoin {
 
   private final STreePropertyAssoc property;
   private final boolean containsMany;

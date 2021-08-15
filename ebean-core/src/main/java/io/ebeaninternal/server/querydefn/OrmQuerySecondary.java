@@ -7,10 +7,9 @@ import java.util.List;
 /**
  * The secondary query paths for 'query joins' and 'lazy loading'.
  */
-class OrmQuerySecondary implements SpiQuerySecondary {
+final class OrmQuerySecondary implements SpiQuerySecondary {
 
   private final List<OrmQueryProperties> queryJoins;
-
   private final List<OrmQueryProperties> lazyJoins;
 
   /**

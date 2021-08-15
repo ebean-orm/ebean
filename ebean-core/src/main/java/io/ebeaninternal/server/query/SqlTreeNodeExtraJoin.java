@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
@@ -22,7 +21,7 @@ import java.util.Set;
  * etc in this case we must add an extra join.
  * </p>
  */
-class SqlTreeNodeExtraJoin implements SqlTreeNode {
+final class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private final STreePropertyAssoc assocBeanProperty;
   private final SpiQuery.TemporalMode temporalMode;

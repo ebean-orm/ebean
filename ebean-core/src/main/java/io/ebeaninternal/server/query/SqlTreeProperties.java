@@ -10,24 +10,16 @@ import java.util.List;
 /**
  * The select properties for a node in the SqlTree.
  */
-public class SqlTreeProperties {
+public final class SqlTreeProperties {
 
-  /**
-   * The bean properties in order.
-   */
   private final List<STreeProperty> propsList = new ArrayList<>();
-
   /**
    * Maintain a list of property names to detect embedded bean additions.
    */
   private final LinkedHashSet<String> propNames = new LinkedHashSet<>();
-
   private boolean allProperties;
-
   private boolean aggregationManyToOne;
-
   private boolean aggregation;
-
   private String aggregationPath;
 
   SqlTreeProperties() {

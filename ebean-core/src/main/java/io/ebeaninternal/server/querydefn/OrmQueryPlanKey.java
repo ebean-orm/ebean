@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Query plan key for ORM queries.
  */
-class OrmQueryPlanKey implements CQueryPlanKey {
+final class OrmQueryPlanKey implements CQueryPlanKey {
 
   private final SpiRawSql.Key rawSqlKey;
   private final int maxRows;

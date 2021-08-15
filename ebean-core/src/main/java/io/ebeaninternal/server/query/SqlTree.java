@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Represents the SELECT clause part of the SQL query.
  */
-class SqlTree {
+final class SqlTree {
 
   private final SqlTreeNode rootNode;
 
