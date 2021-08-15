@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * Handle json property with MutationDetection of SOURCE or HASH only.
  */
-public class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
+public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
   private final boolean sourceDetection;
 
@@ -105,14 +105,15 @@ public class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
       throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
     }
   }
-  
+
   @Override
   public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     if (cacheData instanceof String) {
       // parse back from string to support optimisation of java object serialisation
-      final MutableValueInfo hash = createMutableInfo((String)cacheData);
+      final String jsonContent = (String) cacheData;
+      final MutableValueInfo hash = createMutableInfo(jsonContent);
       bean._ebean_getIntercept().mutableInfo(propertyIndex, hash);
-      cacheData = scalarType.parse((String) cacheData);
+      cacheData = scalarType.parse(jsonContent);
     }
     setValue(bean, cacheData);
   }
