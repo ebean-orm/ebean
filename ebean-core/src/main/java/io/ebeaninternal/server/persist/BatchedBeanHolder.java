@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * executed. The lowest depth is executed first.
  * </p>
  */
-class BatchedBeanHolder {
+final class BatchedBeanHolder {
 
   /**
    * The owning queue.

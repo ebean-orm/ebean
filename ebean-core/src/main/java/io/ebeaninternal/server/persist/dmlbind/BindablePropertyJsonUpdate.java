@@ -8,7 +8,7 @@ import java.sql.SQLException;
 /**
  * For JSON Jackson properties - dirty detection via MD5 of json content.
  */
-class BindablePropertyJsonUpdate extends BindableProperty {
+final class BindablePropertyJsonUpdate extends BindableProperty {
 
   private final int propertyIndex;
 

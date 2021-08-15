@@ -30,7 +30,6 @@ final class DeleteMeta extends BaseMeta {
       String draftTableName = desc.getDraftTable();
       this.sqlDraftNone = genSql(ConcurrencyMode.NONE, draftTableName);
       this.sqlDraftVersion = genSql(ConcurrencyMode.VERSION, draftTableName);
-
     } else {
       this.sqlDraftNone = sqlNone;
       this.sqlDraftVersion = sqlVersion;

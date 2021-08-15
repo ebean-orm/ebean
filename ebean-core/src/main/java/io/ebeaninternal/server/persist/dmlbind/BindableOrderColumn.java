@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Bindable for the synthetic order column.
  */
-public class BindableOrderColumn extends BindableProperty {
+public final class BindableOrderColumn extends BindableProperty {
 
   public BindableOrderColumn(BeanProperty prop) {
     super(prop);
@@ -29,7 +29,6 @@ public class BindableOrderColumn extends BindableProperty {
    */
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     int sortOrder = bean._ebean_getIntercept().getSortOrder();
     request.bind(sortOrder, prop);
   }

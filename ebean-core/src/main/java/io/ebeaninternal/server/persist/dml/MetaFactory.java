@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Factory for creating InsertMeta UpdateMeta and DeleteMeta.
  */
-class MetaFactory {
+final class MetaFactory {
 
   /**
    * Include Lobs in the base statement. Generally true. Oracle9 used to require

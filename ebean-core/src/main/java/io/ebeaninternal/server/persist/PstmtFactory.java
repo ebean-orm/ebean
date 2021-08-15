@@ -15,10 +15,7 @@ import java.sql.Statement;
  * getGeneratedKeys.
  * </p>
  */
-class PstmtFactory {
-
-  PstmtFactory() {
-  }
+final class PstmtFactory {
 
   /**
    * Get a callable statement without any batching.

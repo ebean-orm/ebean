@@ -16,7 +16,7 @@ import java.sql.SQLException;
  * a flat list of Bindable objects.
  * </p>
  */
-public final class DmlBeanPersister implements BeanPersister {
+final class DmlBeanPersister implements BeanPersister {
 
   private final DatabasePlatform dbPlatform;
   private final UpdateMeta updateMeta;

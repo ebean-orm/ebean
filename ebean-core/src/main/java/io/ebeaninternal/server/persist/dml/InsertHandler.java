@@ -18,7 +18,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Insert bean handler.
  */
-public class InsertHandler extends DmlHandler {
+public final class InsertHandler extends DmlHandler {
 
   private final InsertMeta meta;
   private final boolean concatenatedKey;

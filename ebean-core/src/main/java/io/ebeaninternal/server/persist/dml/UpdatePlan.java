@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Plan for executing bean updates for a given set of changed properties.
  */
-class UpdatePlan implements SpiUpdatePlan {
+final class UpdatePlan implements SpiUpdatePlan {
 
   private final String key;
   private final ConcurrencyMode mode;

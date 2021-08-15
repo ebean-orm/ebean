@@ -13,10 +13,9 @@ import java.sql.SQLException;
 /**
  * Handles the execution of CallableSql requests.
  */
-class ExeCallableSql {
+final class ExeCallableSql {
 
   private final Binder binder;
-
   private final PstmtFactory pstmtFactory;
 
   ExeCallableSql(Binder binder) {
@@ -28,9 +27,7 @@ class ExeCallableSql {
    * execute the CallableSql requests.
    */
   public int execute(PersistRequestCallableSql request) {
-
     boolean batchThisRequest = request.isBatchThisRequest();
-
     CallableStatement cstmt = null;
     try {
       cstmt = bindStmt(request, batchThisRequest);
@@ -58,18 +55,15 @@ class ExeCallableSql {
 
 
   private CallableStatement bindStmt(PersistRequestCallableSql request, boolean batchThisRequest) throws SQLException {
-
     request.startBind(batchThisRequest);
     SpiCallableSql callableSql = request.getCallableSql();
     SpiTransaction t = request.getTransaction();
 
     String sql = callableSql.getSql();
-
     BindParams bindParams = callableSql.getBindParams();
 
     // process named parameters if required
     sql = BindParamsParser.parse(bindParams, sql);
-
     boolean logSql = request.isLogSql();
 
     CallableStatement cstmt;
@@ -90,9 +84,7 @@ class ExeCallableSql {
     if (!bindParams.isEmpty()) {
       bindLog = binder.bind(bindParams, cstmt, t.getInternalConnection());
     }
-
     request.setBindLog(bindLog);
-
     // required to read OUT params later
     request.setBound(bindParams, cstmt);
     return cstmt;

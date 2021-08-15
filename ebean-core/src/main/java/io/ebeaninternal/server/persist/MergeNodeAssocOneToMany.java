@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Node for processing merge on ToMany properties.
  */
-class MergeNodeAssocOneToMany extends MergeNode {
+final class MergeNodeAssocOneToMany extends MergeNode {
 
   private final BeanPropertyAssocMany<?> many;
 
@@ -20,12 +20,10 @@ class MergeNodeAssocOneToMany extends MergeNode {
 
   @Override
   public void merge(MergeRequest request) {
-
     Collection beans = many.getRawCollection(request.getBean());
     Collection outlines = many.getRawCollection(request.getOutline());
 
     Map<Object, EntityBean> outlineIds = toMap(outlines);
-
     if (beans != null) {
       for (Object bean : beans) {
         EntityBean entityBean = (EntityBean) bean;
@@ -40,7 +38,6 @@ class MergeNodeAssocOneToMany extends MergeNode {
         }
       }
     }
-
     // any remaining are considered deletes
     for (EntityBean outlineBean : outlineIds.values()) {
       request.addDelete(outlineBean);

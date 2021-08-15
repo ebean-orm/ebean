@@ -11,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Update bean handler.
  */
-public class UpdateHandler extends DmlHandler {
+public final class UpdateHandler extends DmlHandler {
 
   private final UpdateMeta meta;
   private boolean emptySetClause;

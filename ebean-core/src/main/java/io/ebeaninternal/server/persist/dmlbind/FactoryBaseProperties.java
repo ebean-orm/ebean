@@ -12,10 +12,9 @@ import java.util.List;
  * This excludes unique embedded and associated properties.
  * </p>
  */
-public class FactoryBaseProperties {
+public final class FactoryBaseProperties {
 
   private final FactoryProperty factoryProperty;
-
 
   public FactoryBaseProperties(boolean bindEncryptDataFirst) {
     factoryProperty = new FactoryProperty(bindEncryptDataFirst);
@@ -25,7 +24,6 @@ public class FactoryBaseProperties {
    * Add Bindable for the base properties to the list.
    */
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
-
     for (BeanProperty prop : desc.propertiesBaseScalar()) {
       if (!prop.isImportedPrimaryKey()) {
         Bindable item = factoryProperty.create(prop, mode, withLobs, false);

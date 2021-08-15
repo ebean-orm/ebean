@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Delete bean handler.
  */
-public class DeleteHandler extends DmlHandler {
+final class DeleteHandler extends DmlHandler {
 
   private final DeleteMeta meta;
 

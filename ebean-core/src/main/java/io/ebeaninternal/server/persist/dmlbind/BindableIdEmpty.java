@@ -6,7 +6,7 @@ import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
 import java.util.List;
 
-public class BindableIdEmpty implements BindableId {
+final class BindableIdEmpty implements BindableId {
 
   @Override
   public boolean isEmpty() {

@@ -8,7 +8,7 @@ import io.ebeaninternal.server.persist.BeanPersisterFactory;
 /**
  * Factory for creating a DmlBeanPersister for a bean type.
  */
-public class DmlBeanPersisterFactory implements BeanPersisterFactory {
+public final class DmlBeanPersisterFactory implements BeanPersisterFactory {
 
   private final DatabasePlatform dbPlatform;
   private final MetaFactory metaFactory;
