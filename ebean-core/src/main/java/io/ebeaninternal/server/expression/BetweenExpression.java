@@ -6,12 +6,11 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
 
-class BetweenExpression extends AbstractExpression {
+final class BetweenExpression extends AbstractExpression {
 
   private static final String _BETWEEN = " between ? and ?";
 
   private final Object valueHigh;
-
   private final Object valueLow;
 
   BetweenExpression(String propertyName, Object valueLow, Object valueHigh) {

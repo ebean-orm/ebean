@@ -3,7 +3,7 @@ package io.ebeaninternal.server.expression;
 /**
  * Abstract expression that helps with named parameter use.
  */
-public abstract class AbstractValueExpression extends AbstractExpression {
+abstract class AbstractValueExpression extends AbstractExpression {
 
   protected final Object bindValue;
 

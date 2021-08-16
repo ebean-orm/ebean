@@ -13,26 +13,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultExpressionRequest implements SpiExpressionRequest {
+public final class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final SpiOrmQueryRequest<?> queryRequest;
-
   private final BeanDescriptor<?> beanDescriptor;
-
   private final StringBuilder sql = new StringBuilder();
-
   private final List<Object> bindValues = new ArrayList<>();
-
   private final DeployParser deployParser;
-
   private final Binder binder;
-
   private final SpiExpressionList<?> expressionList;
-
   private int paramIndex;
-
   private final boolean enableBindLog;
-
   private StringBuilder bindLog;
 
   public DefaultExpressionRequest(SpiOrmQueryRequest<?> queryRequest, DeployParser deployParser, Binder binder, SpiExpressionList<?> expressionList) {

@@ -39,7 +39,7 @@ import java.util.ArrayList;
  *
  * }</pre>
  */
-public class DefaultExampleExpression implements SpiExpression, ExampleExpression {
+final class DefaultExampleExpression implements SpiExpression, ExampleExpression {
 
   /**
    * The example bean containing the properties.
@@ -75,7 +75,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * @param caseInsensitive if true use case insensitive expressions
    * @param likeType        the type of Like wild card used
    */
-  public DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
+  DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
     this.entity = entity;
     this.caseInsensitive = caseInsensitive;
     this.likeType = likeType;

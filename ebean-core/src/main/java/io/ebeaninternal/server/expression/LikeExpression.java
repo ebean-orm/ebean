@@ -8,10 +8,9 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-class LikeExpression extends AbstractValueExpression {
+final class LikeExpression extends AbstractValueExpression {
 
   private final boolean caseInsensitive;
-
   private final LikeType type;
 
   LikeExpression(String propertyName, Object value, boolean caseInsensitive, LikeType type) {
@@ -27,7 +26,6 @@ class LikeExpression extends AbstractValueExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
@@ -40,7 +38,6 @@ class LikeExpression extends AbstractValueExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
@@ -98,7 +95,6 @@ class LikeExpression extends AbstractValueExpression {
         return "%" + value + "%";
       case EQUAL_TO:
         return value;
-
       default:
         throw new RuntimeException("LikeType " + type + " missed?");
     }

@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class InExpression extends AbstractExpression {
+final class InExpression extends AbstractExpression {
 
   private final boolean not;
 

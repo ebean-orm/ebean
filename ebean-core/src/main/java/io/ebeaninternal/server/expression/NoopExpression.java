@@ -14,9 +14,9 @@ import java.io.IOException;
 /**
  * Effectively an expression that has no effect.
  */
-class NoopExpression implements SpiExpression {
+final class NoopExpression implements SpiExpression {
 
-  protected static final NoopExpression INSTANCE = new NoopExpression();
+  static final NoopExpression INSTANCE = new NoopExpression();
 
   @Override
   public void prefixProperty(String path) {
