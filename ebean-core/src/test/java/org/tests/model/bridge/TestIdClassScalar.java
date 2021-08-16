@@ -132,7 +132,7 @@ public class TestIdClassScalar extends BaseTestCase {
     sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertSql(sql.get(0)).contains("select t0.site_id, t0.user_id, t0.site_id, t0.user_id, t0.access_level, t0.version from bsite_user_d t0 where t0.site_id = ?  and t0.user_id = ?");
+    assertSql(sql.get(0)).contains("select t0.site_id, t0.user_id, t0.site_id, t0.user_id, t0.access_level, t0.version from bsite_user_d t0 where t0.site_id=? and t0.user_id=?");
     assertSql(sql.get(1)).contains("update bsite_user_d set access_level=?, version=? where site_id=? and user_id=? and version=?");
   }
 
@@ -178,7 +178,7 @@ public class TestIdClassScalar extends BaseTestCase {
     sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(2);
-    assertSql(sql.get(0)).contains("select t0.site_id, t0.user_id, t0.access_level, t0.site_id, t0.user_id from bsite_user_e t0 where t0.site_id = ?  and t0.user_id = ?");
+    assertSql(sql.get(0)).contains("select t0.site_id, t0.user_id, t0.access_level, t0.site_id, t0.user_id from bsite_user_e t0 where t0.site_id=? and t0.user_id=?");
     assertSql(sql.get(1)).contains("update bsite_user_e set access_level=? where site_id=? and user_id=?");
 
   }
