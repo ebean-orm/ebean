@@ -18,12 +18,10 @@ import java.sql.SQLException;
 /**
  * Imported Embedded id.
  */
-public class ImportedIdEmbedded implements ImportedId {
+public final class ImportedIdEmbedded implements ImportedId {
 
   private final BeanPropertyAssoc<?> owner;
-
   private final BeanPropertyAssocOne<?> foreignAssocOne;
-
   private final ImportedIdSimple[] imported;
 
   public ImportedIdEmbedded(BeanPropertyAssoc<?> owner, BeanPropertyAssocOne<?> foreignAssocOne, ImportedIdSimple[] imported) {

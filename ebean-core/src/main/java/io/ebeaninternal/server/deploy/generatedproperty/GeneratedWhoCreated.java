@@ -7,7 +7,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 /**
  * Used to populate @WhoCreated bean properties.
  */
-public class GeneratedWhoCreated implements GeneratedProperty {
+final class GeneratedWhoCreated implements GeneratedProperty {
 
   private final CurrentUserProvider currentUserProvider;
 

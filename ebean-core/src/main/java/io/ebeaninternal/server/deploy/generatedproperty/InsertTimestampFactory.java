@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Helper for creating Insert timestamp GeneratedProperty objects.
  */
-class InsertTimestampFactory {
+final class InsertTimestampFactory {
 
   private final Map<Class<?>, GeneratedProperty> map = new HashMap<>();
 

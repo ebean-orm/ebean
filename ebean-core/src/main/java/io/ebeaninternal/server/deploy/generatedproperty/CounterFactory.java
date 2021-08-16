@@ -13,14 +13,13 @@ import java.sql.Types;
  * Aka, Integer, Long, Short etc.
  * </p>
  */
-class CounterFactory {
+final class CounterFactory {
 
   private final GeneratedCounterInteger integerCounter = new GeneratedCounterInteger();
 
   private final GeneratedCounterLong longCounter = new GeneratedCounterLong();
 
-  public void setCounter(DeployBeanProperty property) {
-
+   void setCounter(DeployBeanProperty property) {
     property.setGeneratedProperty(createCounter(property));
   }
 
@@ -28,7 +27,6 @@ class CounterFactory {
    * Create the GeneratedProperty based on the property type.
    */
   private GeneratedProperty createCounter(DeployBeanProperty property) {
-
     Class<?> propType = property.getPropertyType();
     if (propType.equals(Integer.class) || propType.equals(int.class)) {
       return integerCounter;
@@ -36,7 +34,6 @@ class CounterFactory {
     if (propType.equals(Long.class) || propType.equals(long.class)) {
       return longCounter;
     }
-
     int type = getType(propType);
     return new GeneratedCounter(type);
   }

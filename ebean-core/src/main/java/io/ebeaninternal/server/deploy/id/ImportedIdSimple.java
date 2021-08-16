@@ -36,23 +36,11 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   private static final EntryComparator COMPARATOR = new EntryComparator();
 
   final BeanPropertyAssoc<?> owner;
-
   final String localDbColumn;
-
   private final String localSqlFormula;
-
   final BeanProperty foreignProperty;
-
   private final int position;
-
-  /**
-   * If true include in insert.
-   */
   private final boolean insertable;
-
-  /**
-   * If true include in update.
-   */
   private final boolean updateable;
 
   public ImportedIdSimple(BeanPropertyAssoc<?> owner, String localDbColumn, String localSqlFormula, BeanProperty foreignProperty, int position,
