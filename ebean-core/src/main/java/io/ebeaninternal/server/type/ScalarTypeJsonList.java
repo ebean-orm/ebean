@@ -122,9 +122,6 @@ class ScalarTypeJsonList {
 
     @Override
     public final String formatValue(List value) {
-      if (value.isEmpty()) {
-        return "[]";
-      }
       try {
         return EJson.write(value);
       } catch (IOException e) {
