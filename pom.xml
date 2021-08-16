@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>2.3</version>
+    <version>3.2</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-spring-txn</artifactId>
-  <version>12.6.5-SNAPSHOT</version>
+  <version>12.11.0</version>
 
   <name>ebean-spring-txn</name>
   <packaging>jar</packaging>
@@ -39,8 +39,15 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>12.6.4</version>
+      <version>12.11.0</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-ddl-generator</artifactId>
+      <version>12.11.0</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -131,7 +138,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.6.1</tile>
+            <tile>io.ebean.tile:enhancement:12.11.0</tile>
           </tiles>
         </configuration>
       </plugin>
