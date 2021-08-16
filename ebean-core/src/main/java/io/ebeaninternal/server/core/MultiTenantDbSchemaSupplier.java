@@ -15,11 +15,10 @@ import java.util.logging.Logger;
 /**
  * DataSource supplier that changes DB schema based on current Tenant Id.
  */
-class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
+final class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
 
   private final DataSource dataSource;
   private final DataSource readOnlyDataSource;
-
   private final SchemaDataSource schemaDataSource;
   private final SchemaDataSource readOnly;
 

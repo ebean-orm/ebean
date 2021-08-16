@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Default Server side implementation of ServerFactory.
  */
-public class DefaultContainer implements SpiContainer {
+public final class DefaultContainer implements SpiContainer {
 
   private static final Logger logger = LoggerFactory.getLogger("io.ebean.DB");
 

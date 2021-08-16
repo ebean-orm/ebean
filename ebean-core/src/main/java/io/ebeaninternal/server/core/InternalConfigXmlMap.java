@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Reads the Xml deployment information.
  */
-class InternalConfigXmlMap {
+final class InternalConfigXmlMap {
 
   private static final Logger log = LoggerFactory.getLogger(InternalConfigXmlMap.class);
 

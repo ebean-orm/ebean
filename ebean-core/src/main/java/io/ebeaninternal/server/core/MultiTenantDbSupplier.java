@@ -11,10 +11,9 @@ import java.sql.SQLException;
 /**
  * DataSource supplier based on DataSource per Tenant.
  */
-class MultiTenantDbSupplier implements DataSourceSupplier {
+final class MultiTenantDbSupplier implements DataSourceSupplier {
 
   private final CurrentTenantProvider tenantProvider;
-
   private final TenantDataSourceProvider dataSourceProvider;
 
   MultiTenantDbSupplier(CurrentTenantProvider tenantProvider, TenantDataSourceProvider dataSourceProvider) {

@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Default implementation of BeanState.
  */
-public class DefaultBeanState implements BeanState {
+public final class DefaultBeanState implements BeanState {
 
   private final EntityBeanIntercept intercept;
 

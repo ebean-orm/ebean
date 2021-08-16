@@ -6,7 +6,7 @@ import io.ebean.meta.MetaQueryPlan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DefaultQueryPlanListener implements QueryPlanListener {
+final class DefaultQueryPlanListener implements QueryPlanListener {
 
   static final QueryPlanListener INSTANT = new DefaultQueryPlanListener();
 

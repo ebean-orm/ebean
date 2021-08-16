@@ -10,14 +10,12 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import java.util.Comparator;
 import java.util.List;
 
-class DumpMetrics {
+final class DumpMetrics {
 
   private final SpiEbeanServer server;
   private final String options;
-
   private final String nameFormat;
   private final String nameFormatTimed;
-
   private boolean dumpHash;
   private boolean dumpSql;
   private boolean dumpLoc;
