@@ -14,10 +14,9 @@ import java.util.Set;
 /**
  * Default implementation of ChangeLogRegister.
  */
-public class DefaultChangeLogRegister implements ChangeLogRegister {
+public final class DefaultChangeLogRegister implements ChangeLogRegister {
 
   private static final BasicFilter INCLUDE_INSERTS = new BasicFilter(true);
-
   private static final BasicFilter EXCLUDE_INSERTS = new BasicFilter(false);
 
   private final boolean defaultInsertsInclude;

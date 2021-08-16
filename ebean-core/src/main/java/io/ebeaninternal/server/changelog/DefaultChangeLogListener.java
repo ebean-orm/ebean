@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * Simply logs the change sets in JSON form to logger named <code>io.ebean.ChangeLog</code>.
  */
-public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
+public final class DefaultChangeLogListener implements ChangeLogListener, Plugin {
 
   /**
    * The usual application specific logger.
@@ -45,8 +45,7 @@ public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
    */
   @Override
   public void configure(SpiServer server) {
-    jsonBuilder = new ChangeJsonBuilder(server.json());
-
+    jsonBuilder = new ChangeJsonBuilder();
     Properties properties = server.getServerConfig().getProperties();
     if (properties != null) {
       String bufferSize = properties.getProperty("ebean.changeLog.bufferSize");
