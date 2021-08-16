@@ -42,6 +42,24 @@ public class TestIdClassScalar extends BaseTestCase {
   }
 
   @Test
+  public void fetchMany() {
+    UUID siteId = UUID.randomUUID();
+    UUID userId = UUID.randomUUID();
+
+    BSiteUserD access = new BSiteUserD(BAccessLevel.ONE, siteId, userId);
+    DB.save(access);
+
+    final List<BSiteUserD> found = DB.find(BSiteUserD.class)
+      .fetch("children")
+      .where().eq("siteId", siteId)
+      .findList();
+
+    assertThat(found).hasSize(1);
+
+    DB.delete(BSiteUserD.class, new BEmbId(siteId, userId));
+  }
+
+  @Test
   public void insertBatch() {
     UUID siteId = UUID.randomUUID();
     UUID userId = UUID.randomUUID();
