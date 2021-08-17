@@ -146,7 +146,8 @@ public class BaseQueryTuner {
       case ID_LIST:
       case UPDATE:
       case DELETE:
-      case SUBQUERY:
+      case SQ_EXISTS:
+      case SQ_IN:
         return false;
       default:
         // not using autoTune when explicitly loading the l2 bean cache

@@ -7,7 +7,7 @@ import javax.persistence.CascadeType;
 /**
  * Property mapped to a joined bean.
  */
-public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
+public final class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private boolean oneToOne;
 

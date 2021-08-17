@@ -7,7 +7,7 @@ import io.ebean.bean.EntityBean;
  * A NOOP based CQueryCollectionAdd for use with lazy loading many queries where the
  * beans loaded into the collection are added to the collection(s) of the parent(s).
  */
-class CQueryCollectionAddNoop<T> implements CQueryCollectionAdd<T> {
+final class CQueryCollectionAddNoop<T> implements CQueryCollectionAdd<T> {
 
   /**
    * Return null as we are not collecting the beans.

@@ -45,6 +45,7 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -54,7 +55,6 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.reflect.Type;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Collections;
@@ -256,7 +256,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> CQuery<T> compileQuery(Query<T> query, Transaction t) {
+  public <T> CQuery<T> compileQuery(Type type, Query<T> query, Transaction t) {
     return null;
   }
 
@@ -316,7 +316,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public boolean isSupportedType(Type genericType) {
+  public boolean isSupportedType(java.lang.reflect.Type genericType) {
     return false;
   }
 

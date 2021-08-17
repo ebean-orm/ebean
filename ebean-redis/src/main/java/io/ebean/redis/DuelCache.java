@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class DuelCache implements ServerCache, NearCacheInvalidate {
+public final class DuelCache implements ServerCache, NearCacheInvalidate {
 
   private final DefaultServerCache near;
   private final RedisCache remote;
@@ -46,10 +46,8 @@ public class DuelCache implements ServerCache, NearCacheInvalidate {
 
   @Override
   public Map<Object, Object> getAll(Set<Object> keys) {
-
     Map<Object, Object> resultMap = near.getAll(keys);
     Set<Object> localKeys = resultMap.keySet();
-
     Set<Object> remainingKeys = new HashSet<>();
     for (Object key : keys) {
       if (!localKeys.contains(key)) {
@@ -64,7 +62,6 @@ public class DuelCache implements ServerCache, NearCacheInvalidate {
         resultMap.putAll(remoteMap);
       }
     }
-
     return resultMap;
   }
 

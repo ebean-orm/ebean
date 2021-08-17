@@ -10,14 +10,12 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import java.util.Comparator;
 import java.util.List;
 
-class DumpMetrics {
+final class DumpMetrics {
 
   private final SpiEbeanServer server;
   private final String options;
-
   private final String nameFormat;
   private final String nameFormatTimed;
-
   private boolean dumpHash;
   private boolean dumpSql;
   private boolean dumpLoc;
@@ -78,11 +76,11 @@ class DumpMetrics {
     out("-- Dumping metrics for " + server.getName() + " -- ");
     ServerMetrics serverMetrics = server.getMetaInfoManager().collectMetrics();
 
-    for (MetaTimedMetric metric : serverMetrics.getTimedMetrics()) {
+    for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {
       log(metric);
     }
 
-    List<MetaCountMetric> countMetrics = serverMetrics.getCountMetrics();
+    List<MetaCountMetric> countMetrics = serverMetrics.countMetrics();
     if (!countMetrics.isEmpty()) {
       out("\n-- Counters --");
       countMetrics.sort(SortMetric.COUNT_NAME);
@@ -91,7 +89,7 @@ class DumpMetrics {
       }
     }
 
-    List<MetaQueryMetric> queryMetrics = serverMetrics.getQueryMetrics();
+    List<MetaQueryMetric> queryMetrics = serverMetrics.queryMetrics();
     if (!queryMetrics.isEmpty()) {
       out("\n-- Queries --");
       queryMetrics.sort(sortBy);
@@ -104,8 +102,8 @@ class DumpMetrics {
   private void logCount(MetaCountMetric metric) {
 
     StringBuilder sb = new StringBuilder();
-    sb.append(padNameTimed(metric.getName())).append(" ");
-    sb.append(" count:").append(pad(metric.getCount()));
+    sb.append(padNameTimed(metric.name())).append(" ");
+    sb.append(" count:").append(pad(metric.count()));
     out(sb.toString());
   }
 
@@ -120,38 +118,38 @@ class DumpMetrics {
     appendQueryName(metric, sb);
     appendCounters(metric, sb);
     if (dumpHash) {
-      sb.append("\n hash:").append(metric.getHash());
+      sb.append("\n hash:").append(metric.hash());
     }
     appendProfileAndSql(metric, sb);
     out(sb.toString());
   }
 
   private void appendQueryName(MetaQueryMetric metric, StringBuilder sb) {
-    sb.append("query:").append(padName(metric.getName())).append(" ");
+    sb.append("query:").append(padName(metric.name())).append(" ");
   }
 
   private void appendProfileAndSql(MetaQueryMetric metric, StringBuilder sb) {
-    String location = metric.getLocation();
+    String location = metric.location();
     if (dumpLoc && location != null) {
       sb.append("\n  loc:").append(location);
     }
     if (dumpSql) {
-      sb.append(" \n\n  sql:").append(metric.getSql()).append("\n\n");
+      sb.append(" \n\n  sql:").append(metric.sql()).append("\n\n");
     }
   }
 
   private void log(MetaTimedMetric metric) {
     StringBuilder sb = new StringBuilder();
-    sb.append(padNameTimed(metric.getName())).append(" ");
+    sb.append(padNameTimed(metric.name())).append(" ");
     appendCounters(metric, sb);
     out(sb.toString());
   }
 
   private void appendCounters(MetaTimedMetric timedMetric, StringBuilder sb) {
-    sb.append(" count:").append(pad(timedMetric.getCount()))
-      .append(" total:").append(pad(timedMetric.getTotal()))
-      .append(" mean:").append(pad(timedMetric.getMean()))
-      .append(" max:").append(pad(timedMetric.getMax()));
+    sb.append(" count:").append(pad(timedMetric.count()))
+      .append(" total:").append(pad(timedMetric.total()))
+      .append(" mean:").append(pad(timedMetric.mean()))
+      .append(" max:").append(pad(timedMetric.max()));
   }
 
   private String padName(String name) {

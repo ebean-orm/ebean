@@ -18,7 +18,7 @@ public class QueryPlanRequest {
    * have been around for a while (e.g. 5 mins) and so reasonably represent
    * bind values that match the slowest execution for this query plan.
    */
-  public long getSince() {
+  public long since() {
     return since;
   }
 
@@ -28,14 +28,14 @@ public class QueryPlanRequest {
    *
    * @param since The minimum age of the bind values capture.
    */
-  public void setSince(long since) {
+  public void since(long since) {
     this.since = since;
   }
 
   /**
    * Return the maximum number of plans to capture.
    */
-  public int getMaxCount() {
+  public int maxCount() {
     return maxCount;
   }
 
@@ -45,7 +45,7 @@ public class QueryPlanRequest {
    * Use this to limit how much query plan capturing is done as query
    * plan capture is actual database load.
    */
-  public void setMaxCount(int maxCount) {
+  public void maxCount(int maxCount) {
     this.maxCount = maxCount;
   }
 
@@ -54,7 +54,7 @@ public class QueryPlanRequest {
    * <p>
    * Query plan collection will stop once this time is exceeded.
    */
-  public long getMaxTimeMillis() {
+  public long maxTimeMillis() {
     return maxTimeMillis;
   }
 
@@ -65,7 +65,7 @@ public class QueryPlanRequest {
    * this to ensure the query plan capture does not use excessive amount
    * of time - put too much load on the database.
    */
-  public void setMaxTimeMillis(long maxTimeMillis) {
+  public void maxTimeMillis(long maxTimeMillis) {
     this.maxTimeMillis = maxTimeMillis;
   }
 }

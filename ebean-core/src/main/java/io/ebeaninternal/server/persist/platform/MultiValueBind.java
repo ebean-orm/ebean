@@ -11,7 +11,6 @@ import java.util.Collection;
  */
 public class MultiValueBind {
 
-
   @FunctionalInterface
   public interface BindOne {
     void bind(Object value) throws SQLException;

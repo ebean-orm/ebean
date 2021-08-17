@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Default implementation for BeanFinderFactory.
  */
-class BeanFinderManager {
+final class BeanFinderManager {
 
   private final Logger logger = LoggerFactory.getLogger(BeanFinderManager.class);
 

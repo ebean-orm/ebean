@@ -12,7 +12,7 @@ import java.util.Calendar;
 /**
  * Special PreparedStatement used to capture bind values used to obtain explain plans.
  */
-public class BindCaptureStatement extends BindCaptureStatementBase implements PreparedStatement {
+public final class BindCaptureStatement extends BindCaptureStatementBase implements PreparedStatement {
 
   private final BindCapture capture = new BindCapture();
 

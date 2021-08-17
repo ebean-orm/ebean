@@ -6,7 +6,7 @@ package io.ebean.typequery;
  * @param <E> the enum specific type
  * @param <R> the root query bean type
  */
-public class PEnum<R,E> extends PBaseValueEqual<R,E> {
+public final class PEnum<R,E> extends PBaseValueEqual<R,E> {
 
   /**
    * Construct with a property name and root instance.

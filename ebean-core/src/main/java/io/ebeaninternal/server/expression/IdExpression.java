@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -11,7 +12,7 @@ import java.io.IOException;
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
-class IdExpression extends NonPrepareExpression implements SpiExpression {
+final class IdExpression extends NonPrepareExpression implements SpiExpression {
 
   private final Object value;
 
@@ -77,8 +78,8 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return value.hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(value);
   }
 
   @Override

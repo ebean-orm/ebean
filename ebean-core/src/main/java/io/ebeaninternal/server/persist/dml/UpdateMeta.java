@@ -30,16 +30,12 @@ final class UpdateMeta extends BaseMeta {
    * Bind the request based on the concurrency mode.
    */
   public void bind(PersistRequestBean<?> persist, DmlHandler bind, SpiUpdatePlan updatePlan) throws SQLException {
-
     EntityBean bean = persist.getEntityBean();
-
     updatePlan.bindSet(bind, bean);
-
     id.dmlBind(bind, bean);
     if (tenantId != null) {
       tenantId.dmlBind(bind, bean);
     }
-
     if (persist.getConcurrencyMode() == ConcurrencyMode.VERSION) {
       version.dmlBind(bind, bean);
     }
@@ -53,9 +49,7 @@ final class UpdateMeta extends BaseMeta {
   }
 
   private SpiUpdatePlan getDynamicUpdatePlan(PersistRequestBean<?> persistRequest) {
-
     String key = persistRequest.getUpdatePlanHash();
-
     // check if we can use a cached UpdatePlan
     BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
     SpiUpdatePlan updatePlan = beanDescriptor.getUpdatePlan(key);
@@ -71,20 +65,16 @@ final class UpdateMeta extends BaseMeta {
     BindableList bindableList = new BindableList(list);
 
     ConcurrencyMode mode = persistRequest.getConcurrencyMode();
-
     // build the SQL for this update statement
     String sql = genSql(mode, bindableList, persistRequest.getUpdateTable());
 
     updatePlan = new UpdatePlan(key, mode, sql, bindableList);
-
     // add the UpdatePlan to the cache
     beanDescriptor.putUpdatePlan(key, updatePlan);
-
     return updatePlan;
   }
 
   private String genSql(ConcurrencyMode conMode, BindableList bindableList, String tableName) {
-
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.append("update ").append(tableName).append(" set ");
     request.setUpdateSetMode();
@@ -95,7 +85,6 @@ final class UpdateMeta extends BaseMeta {
       // with the result that nothing is in the set clause
       return null;
     }
-
     request.append(" where ");
     return appendWhere(request, conMode);
   }

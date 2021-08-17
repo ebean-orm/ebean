@@ -8,10 +8,9 @@ import java.util.List;
 /**
  * Handles multiple BeanPostLoad's for a given entity type.
  */
-public class ChainedBeanPostLoad implements BeanPostLoad {
+public final class ChainedBeanPostLoad implements BeanPostLoad {
 
   private final List<BeanPostLoad> list;
-
   private final BeanPostLoad[] chain;
 
   /**

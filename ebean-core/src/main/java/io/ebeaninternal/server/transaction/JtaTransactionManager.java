@@ -18,7 +18,7 @@ import javax.transaction.UserTransaction;
 /**
  * Hook into external JTA transaction manager.
  */
-public class JtaTransactionManager implements ExternalTransactionManager {
+public final class JtaTransactionManager implements ExternalTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(JtaTransactionManager.class);
 

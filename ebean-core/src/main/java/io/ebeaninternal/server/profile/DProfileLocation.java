@@ -8,17 +8,12 @@ import io.ebean.ProfileLocation;
 class DProfileLocation implements ProfileLocation {
 
   private static final String IO_EBEAN = "io.ebean";
-
   private static final String UNKNOWN = "unknown";
 
   private String fullLocation;
-
   private String location;
-
   private String label;
-
   private final int lineNumber;
-
   private int traceCount;
 
   DProfileLocation() {
@@ -49,10 +44,10 @@ class DProfileLocation implements ProfileLocation {
       return false;
     }
     final String loc = create();
-    final String shortDesc = shortDesc(loc);
-    label = UtilLocation.label(shortDesc);
-    location = shortDesc;
-    fullLocation = loc;
+    final String location = UtilLocation.loc(loc);
+    this.label = UtilLocation.label(location);
+    this.location = location;
+    this.fullLocation = loc;
     initWith(label);
     return true;
   }
@@ -112,21 +107,5 @@ class DProfileLocation implements ProfileLocation {
     } else {
       return traceLine.substring(0, traceLine.length() - 1) + ":" + lineNumber + ")";
     }
-  }
-
-  private String shortDesc(String location) {
-    int pos = location.lastIndexOf('(');
-    if (pos == -1) {
-      pos = location.length();
-    }
-
-    pos = location.lastIndexOf('.', pos);
-    if (pos > -1) {
-      pos = location.lastIndexOf('.', pos - 1);
-      if (pos > -1) {
-        return location.substring(pos + 1);
-      }
-    }
-    return location;
   }
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
  * Holder of the changes handling the case when we send the changes
  * prior to commit or rollback as we hit the allowed 'batch size'.
  */
-public class TChangeLogHolder {
+public final class TChangeLogHolder {
 
   /**
    * The owning transaction.

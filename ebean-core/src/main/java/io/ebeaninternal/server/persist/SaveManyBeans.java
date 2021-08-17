@@ -26,7 +26,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
-public class SaveManyBeans extends SaveManyBase {
+public final class SaveManyBeans extends SaveManyBase {
 
   private static final Logger log = LoggerFactory.getLogger(SaveManyBeans.class);
 

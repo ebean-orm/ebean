@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * QueryPlanKey for RawSql queries.
  */
-class RawSqlQueryPlanKey implements CQueryPlanKey {
+final class RawSqlQueryPlanKey implements CQueryPlanKey {
 
   private final String sql;
   private final boolean rawSql;

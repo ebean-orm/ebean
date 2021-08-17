@@ -1,9 +1,12 @@
-package io.ebean.server.type;
+package io.ebeaninternal.server.type;
 
 import io.ebean.BaseTestCase;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.core.type.ScalarType;
+import io.ebean.server.type.MyDayOfWeek;
+import io.ebean.server.type.MyEnum;
+import io.ebean.server.type.MySex;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.RsetDataReader;

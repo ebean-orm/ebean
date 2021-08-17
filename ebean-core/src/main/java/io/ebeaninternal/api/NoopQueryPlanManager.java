@@ -6,7 +6,7 @@ import io.ebean.meta.QueryPlanRequest;
 import java.util.Collections;
 import java.util.List;
 
-class NoopQueryPlanManager implements QueryPlanManager {
+final class NoopQueryPlanManager implements QueryPlanManager {
 
   @Override
   public void setDefaultThreshold(long thresholdMicros) {

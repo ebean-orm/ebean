@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * DocumentStore that barfs it is used.
  */
-public class NoneDocStore implements DocumentStore {
+public final class NoneDocStore implements DocumentStore {
 
   public static IllegalStateException implementationNotInClassPath() {
     throw new IllegalStateException("DocStore implementation not included in the classPath. You need to add the maven dependency for io.ebean:ebean-elastic");

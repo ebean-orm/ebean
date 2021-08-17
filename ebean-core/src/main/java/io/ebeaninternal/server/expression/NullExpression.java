@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -16,14 +17,11 @@ import java.io.IOException;
  * Note that for OneToMany/ManyToMany this effectively gets translated into isEmpty()/isNotEmpty().
  * </p>
  */
-class NullExpression extends AbstractExpression {
+final class NullExpression extends AbstractExpression {
 
   private final boolean notNull;
-
   private ElPropertyValue elProperty;
-
   private boolean assocMany;
-
   private String propertyPath;
 
   NullExpression(String propertyName, boolean notNull) {
@@ -94,7 +92,7 @@ class NullExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return (notNull ? 1 : 0);
+  public void queryBindKey(BindValuesKey key) {
+    key.add(notNull);
   }
 }

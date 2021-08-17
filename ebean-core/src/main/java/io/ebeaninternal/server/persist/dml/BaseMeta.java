@@ -16,19 +16,17 @@ class BaseMeta {
     this.tenantId = tenantId;
   }
 
-  String appendWhere(GenerateDmlRequest request, ConcurrencyMode conMode) {
+  final String appendWhere(GenerateDmlRequest request, ConcurrencyMode conMode) {
     request.setWhereIdMode();
     id.dmlAppend(request);
     if (tenantId != null) {
       tenantId.dmlAppend(request);
     }
-
     if (ConcurrencyMode.VERSION == conMode) {
       if (version != null) {
         version.dmlAppend(request);
       }
     }
-
     return request.toString();
   }
 }

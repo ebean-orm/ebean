@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * This information is used to validate entries in the L2 query caches.
  * </p>
  */
-public class TableModState implements QueryCacheEntryValidate, ServerCacheNotify {
+public final class TableModState implements QueryCacheEntryValidate, ServerCacheNotify {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.TABLEMOD");
 

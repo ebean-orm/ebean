@@ -15,9 +15,9 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 /**
  * ScalarType for java.sql.Timestamp.
  */
-public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
+final class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
-  public ScalarTypeTimestamp(JsonConfig.DateTime mode) {
+  ScalarTypeTimestamp(JsonConfig.DateTime mode) {
     super(mode, Timestamp.class, true, Types.TIMESTAMP);
   }
 

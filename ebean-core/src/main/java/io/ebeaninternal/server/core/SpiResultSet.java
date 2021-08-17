@@ -8,7 +8,7 @@ import java.sql.ResultSet;
  *
  * These both must be closed properly when done.
  */
-public class SpiResultSet {
+public final class SpiResultSet {
 
   private final PreparedStatement statement;
 

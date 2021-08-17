@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Context used for merge processing.
  */
-class MergeContext {
+final class MergeContext {
 
   private final SpiEbeanServer server;
 

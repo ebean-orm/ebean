@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * Bindable for a single scalar id property.
  */
-public final class BindableIdScalar implements BindableId {
+final class BindableIdScalar implements BindableId {
 
   private final BeanProperty uidProp;
 
-  public BindableIdScalar(BeanProperty uidProp) {
+  BindableIdScalar(BeanProperty uidProp) {
     this.uidProp = uidProp;
   }
 

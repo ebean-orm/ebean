@@ -113,7 +113,7 @@ import java.util.ServiceLoader;
  * Used to extend the DatabaseConfig with additional objects used to configure and
  * construct an Database.
  */
-public class InternalConfiguration {
+public final class InternalConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
 

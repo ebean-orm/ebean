@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -13,7 +14,7 @@ import java.io.IOException;
 /**
  * Between expression where a value is between two properties.
  */
-class BetweenPropertyExpression extends NonPrepareExpression {
+final class BetweenPropertyExpression extends NonPrepareExpression {
 
   private static final String BETWEEN = " between ";
 
@@ -33,7 +34,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
     this.highProperty = path + "." + highProperty;
   }
 
-  protected String name(String propName) {
+  String name(String propName) {
     return propName;
   }
 
@@ -61,12 +62,10 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-
     ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(lowProperty));
     if (elProp != null && elProp.containsMany()) {
       manyWhereJoin.add(elProp);
     }
-
     elProp = desc.getElPropertyDeploy(name(highProperty));
     if (elProp != null && elProp.containsMany()) {
       manyWhereJoin.add(elProp);
@@ -95,8 +94,8 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return val().hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(val());
   }
 
   @Override

@@ -15,19 +15,16 @@ import java.util.Collection;
  * This is a thread safe implementation.
  * </p>
  */
-public class BindParamsParser {
+public final class BindParamsParser {
 
   private static final String ENCRYPTKEY_PREFIX = "encryptkey_";
   private static final String ENCRYPTKEY_GAP = "___";
-
   private static final int ENCRYPTKEY_PREFIX_LEN = ENCRYPTKEY_PREFIX.length();
   private static final int ENCRYPTKEY_GAP_LEN = ENCRYPTKEY_GAP.length();
-
   /**
    * Used to parse sql looking for named parameters.
    */
   private static final String quote = "'";
-
   /**
    * Used to parse sql looking for named parameters.
    */
@@ -35,7 +32,6 @@ public class BindParamsParser {
 
   private final BindParams params;
   private final String sql;
-
   private final BeanDescriptor<?> beanDescriptor;
 
   public static String parse(BindParams params, String sql) {

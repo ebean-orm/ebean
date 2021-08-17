@@ -8,7 +8,7 @@ import java.util.concurrent.FutureTask;
 /**
  * Future implementation for the row count query.
  */
-public class QueryFutureRowCount<T> extends BaseFuture<Integer> implements FutureRowCount<T> {
+public final class QueryFutureRowCount<T> extends BaseFuture<Integer> implements FutureRowCount<T> {
 
   private final CallableQueryCount<T> call;
 

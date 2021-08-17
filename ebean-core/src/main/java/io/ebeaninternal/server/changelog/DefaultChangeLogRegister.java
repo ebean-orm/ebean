@@ -14,10 +14,9 @@ import java.util.Set;
 /**
  * Default implementation of ChangeLogRegister.
  */
-public class DefaultChangeLogRegister implements ChangeLogRegister {
+public final class DefaultChangeLogRegister implements ChangeLogRegister {
 
   private static final BasicFilter INCLUDE_INSERTS = new BasicFilter(true);
-
   private static final BasicFilter EXCLUDE_INSERTS = new BasicFilter(false);
 
   private final boolean defaultInsertsInclude;
@@ -31,20 +30,16 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
 
   @Override
   public ChangeLogFilter getChangeFilter(Class<?> beanType) {
-
     ChangeLog changeLog = getChangeLog(beanType);
     if (changeLog == null) {
       return null;
     }
-
     String[] updatesThatInclude = changeLog.updatesThatInclude();
     if (updatesThatInclude.length == 0) {
       return insertModeInclude(changeLog.inserts()) ? INCLUDE_INSERTS : EXCLUDE_INSERTS;
     }
-
     Set<String> updateProps = new HashSet<>();
     Collections.addAll(updateProps, updatesThatInclude);
-
     return new UpdateFilter(insertModeInclude(changeLog.inserts()), updateProps);
   }
 

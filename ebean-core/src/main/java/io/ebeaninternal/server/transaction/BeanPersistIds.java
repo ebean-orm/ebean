@@ -28,12 +28,10 @@ import java.util.List;
  * size of data sent around the network.
  * </p>
  */
-public class BeanPersistIds implements BinaryWritable {
+public final class BeanPersistIds implements BinaryWritable {
 
   private final BeanDescriptor<?> beanDescriptor;
-
   private final String descriptorId;
-
   /**
    * The ids to invalidate from the cache (updates and deletes).
    */

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class RawExpressionBuilder {
+final class RawExpressionBuilder {
 
   private static final String BP_1 = "?1";
 

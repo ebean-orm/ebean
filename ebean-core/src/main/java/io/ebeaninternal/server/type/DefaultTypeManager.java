@@ -2,7 +2,6 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
@@ -72,7 +71,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final ScalarType<?> varbinaryType = new ScalarTypeBytesVarbinary();
   private final ScalarType<?> longVarbinaryType = new ScalarTypeBytesLongVarbinary();
   private final ScalarType<?> shortType = new ScalarTypeShort();
-  private final ScalarType<?> integerType = ScalarTypeInteger.INSTANCE;
+  private final ScalarType<?> integerType = new ScalarTypeInteger();
   private final ScalarType<?> longType = new ScalarTypeLong();
   private final ScalarType<?> doubleType = new ScalarTypeDouble();
   private final ScalarType<?> floatType = new ScalarTypeFloat();
@@ -135,7 +134,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.postgres = isPostgres(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
-    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.isJsonDirtyByDefault()) : null;
+    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.getJsonMutationDetection()) : null;
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
@@ -290,7 +289,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> getDbMapScalarType() {
-    return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR);
+    return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
   }
 
   @Override
@@ -313,7 +312,7 @@ public final class DefaultTypeManager implements TypeManager {
       return arrayTypeSetFactory.typeFor(valueType, nullable);
     }
     // fallback to JSON storage in VARCHAR column
-    return new ScalarTypeJsonSet.Varchar(getDocType(valueType), nullable);
+    return new ScalarTypeJsonSet.Varchar(getDocType(valueType), nullable, false); // TODO: keepSource for @DbArray?
   }
 
   private ScalarType<?> getArrayScalarTypeList(Type valueType, boolean nullable) {
@@ -324,7 +323,7 @@ public final class DefaultTypeManager implements TypeManager {
       return arrayTypeListFactory.typeFor(valueType, nullable);
     }
     // fallback to JSON storage in VARCHAR column
-    return new ScalarTypeJsonList.Varchar(getDocType(valueType), nullable);
+    return new ScalarTypeJsonList.Varchar(getDocType(valueType), nullable, false); // TODO: keepSource for @DbArray?
   }
 
   private Class<? extends Enum<?>> asEnumClass(Type valueType) {
@@ -341,10 +340,11 @@ public final class DefaultTypeManager implements TypeManager {
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
+    boolean keepSource = prop.getMutationDetection() == MutationDetection.SOURCE;
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable());
+        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource);
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
@@ -352,19 +352,19 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable());
+        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource);
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
     if (type.equals(Map.class)) {
       if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
-        return ScalarTypeJsonMap.typeFor(postgres, dbType);
+        return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource);
       } else {
         return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
     }
-    if (objectMapperPresent) {
+    if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
       if (type.equals(JsonNode.class)) {
         switch (dbType) {
           case Types.VARCHAR:
@@ -426,7 +426,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, (AnnotatedField) prop.getJacksonField(), dbType, docType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(jsonManager, prop, dbType, docType);
   }
 
   /**
@@ -557,7 +557,7 @@ public final class DefaultTypeManager implements TypeManager {
       // no override or further mapping required
       return scalarType;
     }
-    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>)scalarType;
+    ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>) scalarType;
     if (scalarEnum != null && !scalarEnum.isOverrideBy(type)) {
       if (type != null && !scalarEnum.isCompatible(type)) {
         throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
@@ -674,7 +674,7 @@ public final class DefaultTypeManager implements TypeManager {
   private Object initObjectMapper(DatabaseConfig config) {
     Object objectMapper = config.getObjectMapper();
     if (objectMapper == null) {
-      objectMapper = new ObjectMapper();
+      objectMapper = InitObjectMapper.init();
       config.setObjectMapper(objectMapper);
     }
     return objectMapper;

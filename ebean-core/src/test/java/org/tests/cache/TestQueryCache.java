@@ -3,7 +3,7 @@ package org.tests.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import org.ebeantest.LoggedSqlCollector;
@@ -14,6 +14,7 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.model.cache.EColAB;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,8 +27,7 @@ public class TestQueryCache extends BaseTestCase {
     new EColAB("02", "10").save();
 
     List<EColAB> list1 =
-      Ebean.getServer(null)
-        .find(EColAB.class)
+      DB.find(EColAB.class)
         .setUseQueryCache(true)
         .where()
         .eq("columnA", "01")
@@ -35,8 +35,7 @@ public class TestQueryCache extends BaseTestCase {
         .findList();
 
     List<EColAB> list2 =
-      Ebean.getServer(null)
-        .find(EColAB.class)
+      DB.find(EColAB.class)
         .setUseQueryCache(true)
         .where()
         .eq("columnA", "02")
@@ -57,7 +56,7 @@ public class TestQueryCache extends BaseTestCase {
     new EColAB("03", "SingleAttribute").save();
     new EColAB("03", "SingleAttribute").save();
 
-    List<String> colA_first = Ebean.getServer(null)
+    List<String> colA_first = DB
       .find(EColAB.class)
       .setUseQueryCache(true)
       .setDistinct(true)
@@ -66,7 +65,7 @@ public class TestQueryCache extends BaseTestCase {
       .eq("columnB", "SingleAttribute")
       .findSingleAttributeList();
 
-    List<String> colA_Second = Ebean.getServer(null)
+    List<String> colA_Second = DB
       .find(EColAB.class)
       .setUseQueryCache(true)
       .setDistinct(true)
@@ -77,7 +76,7 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(colA_Second).isSameAs(colA_first);
 
-    List<String> colA_NotDistinct = Ebean.getServer(null)
+    List<String> colA_NotDistinct = DB
       .find(EColAB.class)
       .setUseQueryCache(true)
       .select("columnA")
@@ -89,7 +88,7 @@ public class TestQueryCache extends BaseTestCase {
 
     // ensure that findCount & findSingleAttribute use different
     // slots in cache. If not a "Cannot cast List to int" should happen.
-    int count = Ebean.getServer(null)
+    int count = DB
         .find(EColAB.class)
         .setUseQueryCache(true)
         .select("columnA")
@@ -107,13 +106,13 @@ public class TestQueryCache extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    int count0 = Ebean.find(EColAB.class)
+    int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "count")
       .findCount();
 
-    int count1 = Ebean.find(EColAB.class)
+    int count1 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "count")
@@ -126,7 +125,7 @@ public class TestQueryCache extends BaseTestCase {
 
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
-    int count2 = Ebean.find(EColAB.class)
+    int count2 = DB.find(EColAB.class)
         .setUseQueryCache(CacheMode.OFF)
         .where()
         .eq("columnB", "count")
@@ -142,13 +141,13 @@ public class TestQueryCache extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    int count0 = Ebean.find(EColAB.class)
+    int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "abc")
       .findCount();
 
-    int count1 = Ebean.find(EColAB.class)
+    int count1 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "def")
@@ -167,13 +166,13 @@ public class TestQueryCache extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    int count0 = Ebean.find(EColAB.class)
+    int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "uvw")
       .findCount();
 
-    int count1 = Ebean.find(EColAB.class)
+    int count1 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.PUT)
       .where()
       .eq("columnB", "uvw")
@@ -193,13 +192,13 @@ public class TestQueryCache extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    int count0 = Ebean.find(EColAB.class)
+    int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.PUT)
       .where()
       .eq("columnB", "xyz")
       .findCount();
 
-    int count1 = Ebean.find(EColAB.class)
+    int count1 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "xyz")
@@ -214,26 +213,26 @@ public class TestQueryCache extends BaseTestCase {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void test() {
+  public void testReadOnlyFind() {
 
     ResetBasicData.reset();
 
-    ServerCache customerCache = Ebean.getServerCacheManager().getQueryCache(Customer.class);
+    ServerCache customerCache = DB.getServerCacheManager().getQueryCache(Customer.class);
     customerCache.clear();
 
-    List<Customer> list = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
+    List<Customer> list = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
       .ilike("name", "Rob").findList();
 
     BeanCollection<Customer> bc = (BeanCollection<Customer>) list;
     Assert.assertTrue(bc.isReadOnly());
     Assert.assertFalse(bc.isEmpty());
     Assert.assertTrue(!list.isEmpty());
-    Assert.assertTrue(Ebean.getBeanState(list.get(0)).isReadOnly());
+    Assert.assertTrue(DB.getBeanState(list.get(0)).isReadOnly());
 
-    List<Customer> list2 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
+    List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
       .ilike("name", "Rob").findList();
 
-    List<Customer> list2B = Ebean.find(Customer.class).setUseQueryCache(true)
+    List<Customer> list2B = DB.find(Customer.class).setUseQueryCache(true)
       // .setReadOnly(true)
       .where().ilike("name", "Rob").findList();
 
@@ -245,7 +244,7 @@ public class TestQueryCache extends BaseTestCase {
 
 
 
-    List<Customer> list3 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
+    List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
         .ilike("name", "Rob").findList();
 
     Assert.assertNotSame(list, list3);
@@ -269,13 +268,13 @@ public class TestQueryCache extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Integer> colA_first = Ebean.find(EColAB.class)
+    List<Integer> colA_first = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "someId")
       .findIds();
 
-    List<Integer> colA_second = Ebean.find(EColAB.class)
+    List<Integer> colA_second = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
       .where()
       .eq("columnB", "someId")
@@ -289,7 +288,7 @@ public class TestQueryCache extends BaseTestCase {
 
     // and now, ensure that we hit the database
     LoggedSqlCollector.start();
-    colA_second = Ebean.find(EColAB.class)
+    colA_second = DB.find(EColAB.class)
         .setUseQueryCache(CacheMode.PUT)
         .where()
         .eq("columnB", "someId")
@@ -297,6 +296,37 @@ public class TestQueryCache extends BaseTestCase {
     sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
+  }
+
+  @Test
+  public void findCountDifferentQueriesBit() {
+    DB.getDefault().getPluginApi().getServerCacheManager().clearAll();
+    differentFindCount(q->q.bitwiseAny("id",1), q->q.bitwiseAny("id",0));
+    differentFindCount(q->q.bitwiseAll("id",1), q->q.bitwiseAll("id",0));
+    // differentFindCount(q->q.bitwiseNot("id",1), q->q.bitwiseNot("id",0)); NOT 1 == AND 1 = 0
+    differentFindCount(q->q.bitwiseAnd("id",1, 0), q->q.bitwiseAnd("id",1, 1));
+
+    differentFindCount(q->q.bitwiseAnd("id",2, 0), q->q.bitwiseAnd("id",4, 0));
+    differentFindCount(q->q.bitwiseAnd("id",2, 1), q->q.bitwiseAnd("id",4, 1));
+    // Will produce hash collision
+    differentFindCount(q->q.bitwiseAnd("id",10, 0), q->q.bitwiseAnd("id",0, 928210));
+
+  }
+
+  void differentFindCount(Consumer<ExpressionList<EColAB>> q0, Consumer<ExpressionList<EColAB>> q1) {
+    LoggedSqlCollector.start();
+
+    ExpressionList<EColAB> el0 = DB.find(EColAB.class).setUseQueryCache(CacheMode.ON).where();
+    q0.accept(el0);
+    el0.findCount();
+
+    ExpressionList<EColAB> el1 = DB.find(EColAB.class).setUseQueryCache(CacheMode.ON).where();
+    q1.accept(el1);
+    el1.findCount();
+
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql).hasSize(2); // different queries
   }
 
 }

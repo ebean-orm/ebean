@@ -8,7 +8,7 @@ import javax.persistence.JoinColumn;
 /**
  * A join pair of local and foreign properties.
  */
-public class DeployTableJoinColumn {
+public final class DeployTableJoinColumn {
 
   /**
    * The local database column name.

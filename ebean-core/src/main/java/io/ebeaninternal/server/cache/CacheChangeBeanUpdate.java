@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Put a new bean entry into the cache.
  */
-class CacheChangeBeanUpdate implements CacheChange {
+final class CacheChangeBeanUpdate implements CacheChange {
 
   private final BeanDescriptor<?> desc;
   private final String key;

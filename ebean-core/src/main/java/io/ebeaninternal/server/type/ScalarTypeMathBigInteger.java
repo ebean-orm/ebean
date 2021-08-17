@@ -17,9 +17,9 @@ import java.sql.Types;
 /**
  * ScalarType for java.math.BigInteger.
  */
-public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
+final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
 
-  public ScalarTypeMathBigInteger() {
+  ScalarTypeMathBigInteger() {
     super(BigInteger.class, false, Types.BIGINT);
   }
 

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -10,10 +11,9 @@ import io.ebeaninternal.server.persist.MultiValueWrapper;
 import java.io.IOException;
 import java.util.Collection;
 
-class RawExpression extends NonPrepareExpression {
+final class RawExpression extends NonPrepareExpression {
 
   final String sql;
-
   final Object[] values;
 
   RawExpression(String sql, Object[] values) {
@@ -73,12 +73,11 @@ class RawExpression extends NonPrepareExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = sql.hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(values.length);
     for (Object value : values) {
-      hc = hc * 92821 + value.hashCode();
+      key.add(value);
     }
-    return hc;
   }
 
   @Override

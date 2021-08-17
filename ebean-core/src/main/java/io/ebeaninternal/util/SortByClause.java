@@ -10,22 +10,18 @@ import java.util.List;
  * Primarily used to support sorting of Lists.
  * </p>
  */
-public class SortByClause {
+public final class SortByClause {
 
   static final String NULLSHIGH = "nullshigh";
-
   static final String NULLSLOW = "nullslow";
-
   /**
    * The ascending keyword.
    */
   static final String ASC = "asc";
-
   /**
    * The descending keyword.
    */
   static final String DESC = "desc";
-
 
   private final List<Property> properties = new ArrayList<>();
 

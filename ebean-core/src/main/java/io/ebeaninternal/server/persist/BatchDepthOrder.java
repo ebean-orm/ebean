@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Helper to determine batch execution order for BatchedBeanHolders.
  */
-class BatchDepthOrder {
+final class BatchDepthOrder {
 
   private final Map<Integer, Counter> map = new HashMap<>();
 
@@ -22,7 +22,7 @@ class BatchDepthOrder {
     map.clear();
   }
 
-  private static class Counter {
+  private static final class Counter {
 
     int count;
 

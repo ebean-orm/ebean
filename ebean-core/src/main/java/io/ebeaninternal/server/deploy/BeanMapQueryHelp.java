@@ -6,7 +6,7 @@ import io.ebean.common.BeanMap;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.CQueryCollectionAdd;
 
-class BeanMapQueryHelp<T> implements CQueryCollectionAdd<T> {
+final class BeanMapQueryHelp<T> implements CQueryCollectionAdd<T> {
 
   private final ElPropertyValue elGetValue;
 

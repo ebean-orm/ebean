@@ -7,7 +7,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
 
 import java.io.IOException;
 
-public class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
+public final class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
 
   public BeanPropertySimpleCollection(BeanDescriptor<?> descriptor, DeployBeanPropertySimpleCollection<T> deploy) {
     super(descriptor, deploy);

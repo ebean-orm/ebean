@@ -16,10 +16,9 @@ import java.sql.SQLException;
 /**
  * Encrypted ScalarType that wraps a byte[] types.
  */
-public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
+public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
   private final ScalarTypeBytesBase baseType;
-
   private final DataEncryptSupport dataEncryptSupport;
 
   public ScalarTypeBytesEncrypted(ScalarTypeBytesBase baseType, DataEncryptSupport dataEncryptSupport) {

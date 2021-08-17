@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * DocStoreBeanBaseAdapter that barfs if it is used.
  */
-public class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
+public final class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T> {
 
   public NoneDocStoreBeanAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
     super(desc, deploy);

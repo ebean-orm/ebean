@@ -14,11 +14,8 @@ import java.util.regex.Pattern;
 public final class ElFilter<T> implements Filter<T> {
 
   private final BeanDescriptor<T> beanDescriptor;
-
   private final ArrayList<ElMatcher<T>> matches = new ArrayList<>();
-
   private int maxRows;
-
   private String sortByClause;
 
   public ElFilter(BeanDescriptor<T> beanDescriptor) {

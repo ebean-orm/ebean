@@ -9,10 +9,9 @@ import java.util.Set;
 /**
  * Handles multiple BeanPersistListener's for a given entity type.
  */
-public class ChainedBeanPersistListener implements BeanPersistListener {
+public final class ChainedBeanPersistListener implements BeanPersistListener {
 
   private final List<BeanPersistListener> list;
-
   private final BeanPersistListener[] chain;
 
   /**

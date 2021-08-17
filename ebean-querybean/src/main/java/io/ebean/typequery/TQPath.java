@@ -3,7 +3,7 @@ package io.ebean.typequery;
 /**
  * Helper for adding a path prefix to a property.
  */
-public class TQPath {
+public final class TQPath {
 
   /**
    * Return the full path by adding the prefix to the property name (null safe).

@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 /**
  * Perform native sql fetches.
  */
-public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
+public final class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
   private final Binder binder;
 

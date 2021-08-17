@@ -8,10 +8,9 @@ import java.util.List;
 /**
  * Handles multiple BeanPostLoad's for a given entity type.
  */
-public class ChainedBeanPostConstructListener implements BeanPostConstructListener {
+public final class ChainedBeanPostConstructListener implements BeanPostConstructListener {
 
   private final List<BeanPostConstructListener> list;
-
   private final BeanPostConstructListener[] chain;
 
   /**

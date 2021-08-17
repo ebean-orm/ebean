@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * RawSql based query plan.
  */
-class CQueryPlanRawSql extends CQueryPlan {
+final class CQueryPlanRawSql extends CQueryPlan {
 
   private final int[] rsetIndexPositions;
 
@@ -27,7 +27,6 @@ class CQueryPlanRawSql extends CQueryPlan {
   }
 
   private int[] createIndexPositions(OrmQueryRequest<?> request, SqlTree sqlTree) {
-
     List<String> chain = sqlTree.buildRawSqlSelectChain();
     ColumnMapping columnMapping = request.getQuery().getRawSql().getColumnMapping();
 

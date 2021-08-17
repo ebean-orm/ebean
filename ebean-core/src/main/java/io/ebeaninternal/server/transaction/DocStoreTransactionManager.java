@@ -9,7 +9,7 @@ import java.sql.Connection;
  * <p>
  * There is no underlying JDBC DataSource etc
  */
-public class DocStoreTransactionManager extends TransactionManager {
+public final class DocStoreTransactionManager extends TransactionManager {
 
   /**
    * Create the TransactionManager

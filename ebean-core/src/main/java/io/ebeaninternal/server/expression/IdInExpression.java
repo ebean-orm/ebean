@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -19,10 +20,9 @@ import java.util.Set;
 /**
  * In a collection of Id values.
  */
-public class IdInExpression extends NonPrepareExpression {
+public final class IdInExpression extends NonPrepareExpression {
 
   private final List<Object> idCollection;
-
   private boolean multiValueIdSupported;
 
   public IdInExpression(Collection<?> idCollection) {
@@ -133,8 +133,11 @@ public class IdInExpression extends NonPrepareExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return idCollection.hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(idCollection.size());
+    for (Object elem : idCollection) {
+      key.add(elem);
+    }
   }
 
   @Override

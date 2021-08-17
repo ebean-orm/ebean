@@ -26,11 +26,8 @@ import java.sql.SQLException;
 public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
 
   private final ScalarType<S> scalarType;
-
   private final ScalarTypeConverter<B, S> converter;
-
   private final Class<B> wrapperType;
-
   private final B nullValue;
 
   public ScalarTypeWrapper(Class<B> wrapperType, ScalarType<S> scalarType, ScalarTypeConverter<B, S> converter) {

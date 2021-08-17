@@ -5,9 +5,9 @@ import java.util.TimeZone;
 /**
  * ScalarType for java.util.TimeZone which converts to and from a VARCHAR database column.
  */
-public class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
+final class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
 
-  public ScalarTypeTimeZone() {
+  ScalarTypeTimeZone() {
     super(TimeZone.class);
   }
 

@@ -4,7 +4,7 @@ import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 import io.ebean.config.Encryptor;
 
-public class DataEncryptSupport {
+public final class DataEncryptSupport {
 
   private final EncryptKeyManager encryptKeyManager;
   private final Encryptor encryptor;

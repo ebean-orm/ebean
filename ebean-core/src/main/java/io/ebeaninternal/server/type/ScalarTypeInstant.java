@@ -9,9 +9,9 @@ import java.time.Instant;
 /**
  * ScalarType for java.sql.Timestamp.
  */
-public class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
+final class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
 
-  public ScalarTypeInstant(JsonConfig.DateTime mode) {
+  ScalarTypeInstant(JsonConfig.DateTime mode) {
     super(mode, Instant.class, false, Types.TIMESTAMP);
   }
 

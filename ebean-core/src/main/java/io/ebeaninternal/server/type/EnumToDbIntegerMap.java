@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * Used to map enum values to database integer values.
  */
-public class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
+final class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
 
   @Override
   public int getDbType() {

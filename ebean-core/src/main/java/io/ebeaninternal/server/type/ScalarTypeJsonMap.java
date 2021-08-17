@@ -9,12 +9,7 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -24,97 +19,110 @@ import java.util.Map;
  * Type which maps Map<String,Object> to various DB types (Clob, Varchar, Blob) in JSON format.
  */
 @SuppressWarnings("rawtypes")
-public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
-
-  private static final ScalarTypeJsonMap CLOB = new ScalarTypeJsonMap.Clob();
-  private static final ScalarTypeJsonMap BLOB = new ScalarTypeJsonMap.Blob();
-  private static final ScalarTypeJsonMap VARCHAR = new ScalarTypeJsonMap.Varchar();
-  private static final ScalarTypeJsonMap JSON = new ScalarTypeJsonMapPostgres.JSON();
-  private static final ScalarTypeJsonMap JSONB = new ScalarTypeJsonMapPostgres.JSONB();
+abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
 
   /**
    * Return the ScalarType for the requested dbType and postgres.
    */
-  public static ScalarTypeJsonMap typeFor(boolean postgres, int dbType) {
+  static ScalarTypeJsonMap typeFor(boolean postgres, int dbType, boolean keepSource) {
     switch (dbType) {
       case Types.VARCHAR:
-        return VARCHAR;
+        return new ScalarTypeJsonMap.Varchar(keepSource);
       case Types.BLOB:
-        return BLOB;
+        return new ScalarTypeJsonMap.Blob(keepSource);
       case Types.CLOB:
-        return CLOB;
+        return new ScalarTypeJsonMap.Clob(keepSource);
       case DbPlatformType.JSONB:
-        return postgres ? JSONB : CLOB;
+        return postgres ? new ScalarTypeJsonMapPostgres.JSONB(keepSource) : new ScalarTypeJsonMap.Clob(keepSource);
       case DbPlatformType.JSON:
-        return postgres ? JSON : CLOB;
+        return postgres ? new ScalarTypeJsonMapPostgres.JSON(keepSource) : new ScalarTypeJsonMap.Clob(keepSource);
       default:
         throw new IllegalStateException("Unknown dbType " + dbType);
     }
   }
 
-  public static class Clob extends ScalarTypeJsonMap {
-
-    public Clob() {
-      super(Types.CLOB);
+  private static final class Clob extends ScalarTypeJsonMap {
+    Clob(boolean keepSource) {
+      super(Types.CLOB, keepSource);
     }
 
     @Override
-    public Map read(DataReader reader) throws SQLException {
-      String content = reader.getStringFromStream();
-      if (content == null) {
-        return null;
-      }
-      return parse(content);
+    protected String readJson(DataReader reader) throws SQLException {
+      return reader.getStringFromStream();
     }
   }
 
-  public static class Varchar extends ScalarTypeJsonMap {
-
-    public Varchar() {
-      super(Types.VARCHAR);
+  private static final class Varchar extends ScalarTypeJsonMap {
+    Varchar(boolean keepSource) {
+      super(Types.VARCHAR, keepSource);
     }
   }
 
-  public static class Blob extends ScalarTypeJsonMap {
-    public Blob() {
-      super(Types.BLOB);
+  private static final class Blob extends ScalarTypeJsonMap {
+    Blob(boolean keepSource) {
+      super(Types.BLOB, keepSource);
     }
 
     @Override
     public Map read(DataReader reader) throws SQLException {
       InputStream is = reader.getBinaryStream();
       if (is == null) {
+        if (keepSource) {
+          reader.pushJson(null);
+        }
         return null;
       }
       try {
-        try (InputStreamReader inputStreamReader = new InputStreamReader(is)) {
-          return parse(inputStreamReader);
+        if (keepSource) {
+          StringWriter jsonBuffer = new StringWriter();
+          try (InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            transferTo(streamReader, jsonBuffer);
+          }
+          String rawJson = jsonBuffer.toString();
+          reader.pushJson(rawJson);
+          return parse(rawJson);
+        } else {
+          try (InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            return parse(streamReader);
+          }
         }
       } catch (IOException e) {
         throw new SQLException("Error reading Blob stream from DB", e);
       }
     }
 
-    @Override
-    public void bind(DataBinder binder, Map value) throws SQLException {
-      if (value == null) {
-        binder.setNull(Types.BLOB);
-      } else {
-        String rawJson = formatValue(value);
-        binder.setBytes(rawJson.getBytes(StandardCharsets.UTF_8));
+    private static void transferTo(Reader reader, Writer out) throws IOException {
+      char[] buffer = new char[2048];
+      int nRead;
+      while ((nRead = reader.read(buffer, 0, 2048)) >= 0) {
+        out.write(buffer, 0, nRead);
       }
     }
+
+    @Override
+    protected void bindNull(DataBinder binder) throws SQLException {
+      binder.setNull(Types.BLOB);
+    }
+
+    @Override
+    protected void bindJson(DataBinder binder, String rawJson) throws SQLException {
+      binder.setBytes(rawJson.getBytes(StandardCharsets.UTF_8));
+    }
+
   }
 
-  public ScalarTypeJsonMap(int jdbcType) {
+  final boolean keepSource;
+
+  ScalarTypeJsonMap(int jdbcType, boolean keepSource) {
     super(Map.class, false, jdbcType);
+    this.keepSource = keepSource;
   }
 
   /**
    * Map is a mutable type. Use the isDirty() method to check for dirty state.
    */
   @Override
-  public boolean isMutable() {
+  public final boolean isMutable() {
     return true;
   }
 
@@ -127,36 +135,59 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
+  public final boolean isJsonMapper() {
+    return keepSource;
+  }
+
+  @Override
   public Map read(DataReader reader) throws SQLException {
-    String rawJson = reader.getString();
+    String rawJson = readJson(reader);
+    if (keepSource) {
+      reader.pushJson(rawJson);
+    }
     if (rawJson == null) {
       return null;
     }
     return parse(rawJson);
   }
 
-  @Override
-  public void bind(DataBinder binder, Map value) throws SQLException {
-    if (value == null) {
-      binder.setNull(Types.VARCHAR);
-    } else {
-      String rawJson = formatValue(value);
-      binder.setString(rawJson);
-    }
+  protected String readJson(DataReader reader) throws SQLException {
+    return reader.getString();
   }
 
   @Override
-  public Object toJdbcType(Object value) {
+  public final void bind(DataBinder binder, Map value) throws SQLException {
+    String rawJson = keepSource ? binder.popJson() : null;
+    if (rawJson == null && value != null) {
+      rawJson = formatValue(value);
+    }
+    if (value == null) {
+      bindNull(binder);
+    } else {
+      bindJson(binder, rawJson);
+    }
+  }
+
+  protected void bindNull(DataBinder binder) throws SQLException {
+    binder.setNull(Types.VARCHAR);
+  }
+
+  protected void bindJson(DataBinder binder, String rawJson) throws SQLException {
+    binder.setString(rawJson);
+  }
+
+  @Override
+  public final Object toJdbcType(Object value) {
     return value;
   }
 
   @Override
-  public Map toBeanType(Object value) {
+  public final Map toBeanType(Object value) {
     return (Map) value;
   }
 
   @Override
-  public String formatValue(Map v) {
+  public final String formatValue(Map v) {
     try {
       return EJson.write(v);
     } catch (IOException e) {
@@ -165,7 +196,7 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map parse(String value) {
+  public final Map parse(String value) {
     try {
       // return a modify aware map
       return EJson.parseObject(value, true);
@@ -174,7 +205,7 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
     }
   }
 
-  public Map parse(Reader reader) {
+  public final Map parse(Reader reader) {
     try {
       // return a modify aware map
       return EJson.parseObject(reader, true);
@@ -184,17 +215,17 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map convertFromMillis(long dateTime) {
+  public final Map convertFromMillis(long dateTime) {
     throw new RuntimeException("Should never be called");
   }
 
   @Override
-  public boolean isDateTimeCapable() {
+  public final boolean isDateTimeCapable() {
     return false;
   }
 
   @Override
-  public Map readData(DataInput dataInput) throws IOException {
+  public final Map readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -203,7 +234,7 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Map map) throws IOException {
+  public final void writeData(DataOutput dataOutput, Map map) throws IOException {
     if (map == null) {
       dataOutput.writeBoolean(false);
     } else {
@@ -212,17 +243,17 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Map value) throws IOException {
+  public final void jsonWrite(JsonGenerator writer, Map value) throws IOException {
     EJson.write(value, writer);
   }
 
   @Override
-  public Map jsonRead(JsonParser parser) throws IOException {
+  public final Map jsonRead(JsonParser parser) throws IOException {
     return EJson.parseObject(parser, parser.getCurrentToken());
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public final DocPropertyType getDocType() {
     return DocPropertyType.OBJECT;
   }
 

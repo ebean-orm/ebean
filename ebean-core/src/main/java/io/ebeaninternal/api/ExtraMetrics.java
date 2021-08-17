@@ -8,7 +8,7 @@ import io.ebean.metric.TimedMetric;
 /**
  * Extra metrics collected to measure internal behaviour.
  */
-public class ExtraMetrics {
+public final class ExtraMetrics {
 
   private final TimedMetric bindCapture;
   private final TimedMetric planCollect;

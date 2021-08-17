@@ -17,9 +17,9 @@ import java.sql.Types;
 /**
  * ScalarType for Short and short.
  */
-public class ScalarTypeShort extends ScalarTypeBase<Short> {
+final class ScalarTypeShort extends ScalarTypeBase<Short> {
 
-  public ScalarTypeShort() {
+  ScalarTypeShort() {
     super(Short.class, true, Types.SMALLINT);
   }
 

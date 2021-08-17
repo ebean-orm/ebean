@@ -8,7 +8,7 @@ package io.ebean.typequery;
  * @param <R> the root query bean type
  * @param <D> the scalar type
  */
-public class PScalarComparable<R, D extends Comparable<D>> extends PBaseCompareable<R, D> {
+public final class PScalarComparable<R, D extends Comparable<D>> extends PBaseCompareable<R, D> {
 
   /**
    * Construct with a property name and root instance.

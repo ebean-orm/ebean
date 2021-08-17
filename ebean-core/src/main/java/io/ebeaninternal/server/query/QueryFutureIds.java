@@ -10,7 +10,7 @@ import java.util.concurrent.FutureTask;
 /**
  * Default implementation of FutureIds.
  */
-public class QueryFutureIds<T> extends BaseFuture<List<Object>> implements FutureIds<T> {
+public final class QueryFutureIds<T> extends BaseFuture<List<Object>> implements FutureIds<T> {
 
   private final CallableQueryIds<T> call;
 

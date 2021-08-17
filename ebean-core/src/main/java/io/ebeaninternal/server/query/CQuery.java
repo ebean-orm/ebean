@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * The tree structure is flattened into a SqlSelectChain. The SqlSelectChain is
  * the key object used in reading the flat resultSet back into Objects.
  */
-public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
+public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
@@ -541,9 +541,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     updateStatistics();
   }
 
+  long micros() {
+    return (System.nanoTime() - startNano) / 1000L;
+  }
+
   private void updateStatistics() {
     try {
-      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      executionTimeMicros = micros();
       if (autoTuneProfiling) {
         profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }

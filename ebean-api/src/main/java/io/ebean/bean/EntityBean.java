@@ -28,17 +28,6 @@ public interface EntityBean extends Serializable {
   }
 
   /**
-   * Return the enhancement marker value.
-   * <p>
-   * This is the class name of the enhanced class and used to check that all
-   * entity classes are enhanced (specifically not just a super class).
-   * </p>
-   */
-  default String _ebean_getMarker() {
-    throw new NotEnhancedException();
-  }
-
-  /**
    * Create and return a new entity bean instance.
    */
   default Object _ebean_newInstance() {

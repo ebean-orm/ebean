@@ -30,44 +30,28 @@ public final class SqlTreeBuilder {
   private static final Logger logger = LoggerFactory.getLogger(SqlTreeBuilder.class);
 
   private final SpiQuery<?> query;
-
   private final STreeType desc;
-
   private final OrmQueryDetail queryDetail;
-
   private final CQueryPredicates predicates;
-
   private final boolean subQuery;
-
   private final boolean distinctOnPlatform;
   /**
    * Property if resultSet contains master and detail rows.
    */
   private STreePropertyAssocMany manyProperty;
-
   private final SqlTreeAlias alias;
-
   private final DefaultDbSqlContext ctx;
-
   private final HashSet<String> selectIncludes = new HashSet<>();
-
   private final ManyWhereJoins manyWhereJoins;
-
   private final TableJoin includeJoin;
-
   private final boolean rawSql;
-
   /**
    * rawNoId true if the RawSql does not include the @Id property
    */
   private final boolean rawNoId;
-
   private final boolean disableLazyLoad;
-
   private final SpiQuery.TemporalMode temporalMode;
-
   private SqlTreeNode rootNode;
-
   private boolean sqlDistinct;
 
   /**
@@ -102,7 +86,11 @@ public final class SqlTreeBuilder {
     this.query = request.getQuery();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
-    this.subQuery = Type.SUBQUERY == query.getType() || Type.ID_LIST == query.getType() || Type.DELETE == query.getType() || query.isCountDistinct();
+    this.subQuery = Type.SQ_EXISTS == query.getType()
+        || Type.SQ_IN == query.getType()
+        || Type.ID_LIST == query.getType()
+        || Type.DELETE == query.getType()
+        || query.isCountDistinct();
     this.includeJoin = query.getM2mIncludeJoin();
     this.manyWhereJoins = query.getManyWhereJoins();
     this.queryDetail = query.getDetail();
@@ -145,6 +133,10 @@ public final class SqlTreeBuilder {
   private String buildSelectClause() {
     if (rawSql) {
       return "Not Used";
+    }
+    if (query.getType() == Type.SQ_EXISTS) {
+      // effective query is "where exists (select 1 from ...)"
+      return "1";
     }
     rootNode.appendSelect(ctx, subQuery);
     return trimComma(ctx.getContent());
@@ -311,7 +303,7 @@ public final class SqlTreeBuilder {
 
     } else {
       // do not read Id on child beans (e.g. when used with fetch())
-      boolean withId = isNotSingleAttribute();
+      boolean withId = isNotSingleAttribute() && !subQuery;
       return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     }
   }
@@ -365,11 +357,11 @@ public final class SqlTreeBuilder {
    * This means it can included individual properties of an embedded bean.
    * </p>
    */
-  private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName) {
-    STreeProperty p = desc.findProperty(propName);
+  private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName, String path) {
+    STreeProperty p = desc.findPropertyWithDynamic(propName, path);
     if (p == null) {
       logger.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
-
+      return;
     } else if (p instanceof STreePropertyAssoc && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
       int pos = propName.indexOf('.');
@@ -383,7 +375,7 @@ public final class SqlTreeBuilder {
 
   private void addProperty(SqlTreeProperties selectProps, STreeType desc, OrmQueryProperties queryProps, String propName) {
     if (subQuery) {
-      addPropertyToSubQuery(selectProps, desc, propName);
+      addPropertyToSubQuery(selectProps, desc, propName, queryProps.getPath());
       return;
     }
 

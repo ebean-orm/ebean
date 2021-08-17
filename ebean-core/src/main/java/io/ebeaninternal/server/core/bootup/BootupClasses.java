@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.core.bootup;
 
-import io.avaje.classpath.scanner.ClassFilter;
 import io.ebean.annotation.DocStore;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.IdGenerator;
@@ -27,27 +26,23 @@ import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
  * ScalarTypes, Finders, Listeners and Controllers.
  */
-public class BootupClasses implements ClassFilter {
+public class BootupClasses implements Predicate<Class<?>> {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
 
   private final List<Class<?>> embeddableList = new ArrayList<>();
-
   private final List<Class<?>> entityList = new ArrayList<>();
-
   private final List<Class<? extends ScalarType<?>>> scalarTypeList = new ArrayList<>();
-
   private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList = new ArrayList<>();
-
   private final List<Class<? extends AttributeConverter<?, ?>>> attributeConverterList = new ArrayList<>();
 
   // The following objects are instantiated on first request
@@ -55,19 +50,12 @@ public class BootupClasses implements ClassFilter {
   // instance list, that holds the instance. Once a class is instantiated
   // (or added) it will get removed from the candidate list
   private final List<Class<? extends IdGenerator>> idGeneratorCandidates = new ArrayList<>();
-
   private final List<Class<? extends BeanPersistController>> beanPersistControllerCandidates = new ArrayList<>();
-
   private final List<Class<? extends BeanPostLoad>> beanPostLoadCandidates = new ArrayList<>();
-
   private final List<Class<? extends BeanPostConstructListener>> beanPostConstructListenerCandidates = new ArrayList<>();
-
   private final List<Class<? extends BeanFindController>> beanFindControllerCandidates = new ArrayList<>();
-
   private final List<Class<? extends BeanPersistListener>> beanPersistListenerCandidates = new ArrayList<>();
-
   private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates = new ArrayList<>();
-
   private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates = new ArrayList<>();
 
   private final List<IdGenerator> idGeneratorInstances = new ArrayList<>();
@@ -98,7 +86,7 @@ public class BootupClasses implements ClassFilter {
   public BootupClasses(List<Class<?>> list) {
     if (list != null) {
       for (Class<?> cls : list) {
-        isMatch(cls);
+        test(cls);
       }
     }
   }
@@ -188,13 +176,11 @@ public class BootupClasses implements ClassFilter {
   }
 
   public void addChangeLogInstances(DatabaseConfig config) {
-
     readAuditPrepare = config.getReadAuditPrepare();
     readAuditLogger = config.getReadAuditLogger();
     changeLogPrepare = config.getChangeLogPrepare();
     changeLogListener = config.getChangeLogListener();
     changeLogRegister = config.getChangeLogRegister();
-
     // if not already set create the implementations found
     // via classpath scanning
     if (readAuditPrepare == null && readAuditPrepareClass != null) {
@@ -341,18 +327,14 @@ public class BootupClasses implements ClassFilter {
   }
 
   @Override
-  public boolean isMatch(Class<?> cls) {
-
+  public boolean test(Class<?> cls) {
     if (isEmbeddable(cls)) {
       embeddableList.add(cls);
-
     } else if (isEntity(cls)) {
       entityList.add(cls);
-
     } else {
       return isInterestingInterface(cls);
     }
-
     return true;
   }
 
@@ -364,7 +346,6 @@ public class BootupClasses implements ClassFilter {
    */
   @SuppressWarnings("unchecked")
   private boolean isInterestingInterface(Class<?> cls) {
-
     if (Modifier.isAbstract(cls.getModifiers())) {
       // do not include abstract classes as we can
       // not instantiate them

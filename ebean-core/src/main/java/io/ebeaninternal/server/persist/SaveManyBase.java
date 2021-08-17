@@ -46,20 +46,20 @@ abstract class SaveManyBase implements SaveMany {
    */
   abstract void save();
 
-  void preElementCollectionUpdate() {
+  final void preElementCollectionUpdate() {
     if (!insertedParent) {
       request.preElementCollectionUpdate();
       persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 1);
     }
   }
 
-  void resetModifyState() {
+  final void resetModifyState() {
     if (value instanceof BeanCollection<?>) {
       modifyListenReset((BeanCollection<?>) value);
     }
   }
 
-  void modifyListenReset(BeanCollection<?> c) {
+  final void modifyListenReset(BeanCollection<?> c) {
     if (insertedParent) {
       // after insert set the modify listening mode for private owned etc
       c.setModifyListening(many.getModifyListenMode());
@@ -67,7 +67,7 @@ abstract class SaveManyBase implements SaveMany {
     c.modifyReset();
   }
 
-  void postElementCollectionUpdate() {
+  final void postElementCollectionUpdate() {
     if (!insertedParent) {
       if (request.isNotifyCache()) {
         try {

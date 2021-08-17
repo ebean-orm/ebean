@@ -16,10 +16,9 @@ import java.util.Map;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 
-class BeanDescriptorJsonHelp<T> {
+final class BeanDescriptorJsonHelp<T> {
 
   private final BeanDescriptor<T> desc;
-
   private final InheritInfo inheritInfo;
 
   BeanDescriptorJsonHelp(BeanDescriptor<T> desc) {
@@ -28,21 +27,16 @@ class BeanDescriptorJsonHelp<T> {
   }
 
   void jsonWrite(SpiJsonWriter writeJson, EntityBean bean, String key) throws IOException {
-
     writeJson.writeStartObject(key);
-
     if (inheritInfo == null) {
       jsonWriteProperties(writeJson, bean);
-
     } else {
       InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
       String discValue = localInheritInfo.getDiscriminatorStringValue();
       String discColumn = localInheritInfo.getDiscriminatorColumn();
       writeJson.gen().writeStringField(discColumn, discValue);
-
       localInheritInfo.desc().jsonWriteProperties(writeJson, bean);
     }
-
     writeJson.writeEndObject();
   }
 
@@ -59,7 +53,6 @@ class BeanDescriptorJsonHelp<T> {
   }
 
   void jsonWriteDirtyProperties(SpiJsonWriter writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
-
     writeJson.writeStartObject(null);
     // render the dirty properties
     BeanProperty[] props = desc.propertiesNonTransient();
@@ -73,7 +66,6 @@ class BeanDescriptorJsonHelp<T> {
 
   @SuppressWarnings("unchecked")
   T jsonRead(SpiJsonReader jsonRead, String path, boolean withInheritance) throws IOException {
-
     JsonParser parser = jsonRead.getParser();
     //noinspection StatementWithEmptyBody
     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
@@ -115,21 +107,17 @@ class BeanDescriptorJsonHelp<T> {
   }
 
   private T jsonReadObject(SpiJsonReader readJson, String path) throws IOException {
-
     EntityBean bean = desc.createEntityBeanForJson();
     return jsonReadProperties(readJson, bean, path);
   }
 
   @SuppressWarnings("unchecked")
   private T jsonReadProperties(SpiJsonReader readJson, EntityBean bean, String path) throws IOException {
-
     if (path != null) {
       readJson.pushPath(path);
     }
-
     // unmapped properties, send to JsonReadBeanVisitor later
     Map<String, Object> unmappedProperties = null;
-
     do {
       JsonParser parser = readJson.getParser();
       JsonToken event = parser.nextToken();

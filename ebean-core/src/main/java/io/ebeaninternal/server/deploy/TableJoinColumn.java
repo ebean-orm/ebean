@@ -6,7 +6,7 @@ import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 /**
  * A join pair of local and foreign properties.
  */
-public class TableJoinColumn {
+public final class TableJoinColumn {
 
   /**
    * The local database column name.

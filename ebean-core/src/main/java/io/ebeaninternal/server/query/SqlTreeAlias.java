@@ -12,7 +12,7 @@ import java.util.TreeSet;
 /**
  * Special Map of the logical property joins to table alias.
  */
-class SqlTreeAlias {
+final class SqlTreeAlias {
 
   private final SpiQuery.TemporalMode temporalMode;
 

@@ -35,7 +35,7 @@ import java.lang.reflect.WildcardType;
  * one or normal scalar property.
  * </p>
  */
-public class DeployCreateProperties {
+public final class DeployCreateProperties {
 
   private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
 

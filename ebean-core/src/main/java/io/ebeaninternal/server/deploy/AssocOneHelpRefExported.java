@@ -5,7 +5,7 @@ import io.ebeaninternal.server.query.SqlJoinType;
 /**
  * Helper for BeanPropertyAssocOne for OneToOne exported reference - not so common.
  */
-class AssocOneHelpRefExported extends AssocOneHelp {
+final class AssocOneHelpRefExported extends AssocOneHelp {
 
   private final boolean softDelete;
 

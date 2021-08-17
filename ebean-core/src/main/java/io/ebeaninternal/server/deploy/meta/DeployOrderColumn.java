@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy.meta;
 
 import javax.persistence.OrderColumn;
 
-public class DeployOrderColumn {
+public final class DeployOrderColumn {
 
   /**
    * Logical property name used for order by and available for expression language.

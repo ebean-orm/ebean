@@ -27,12 +27,12 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
   @AfterClass
   public static void reportStats() {
     ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
-    for (MetaQueryMetric metric : metrics.getQueryMetrics()) {
+    for (MetaQueryMetric metric : metrics.queryMetrics()) {
       System.out.println(metric);
     }
 
     System.out.println("-- transaction metrics --");
-    for (MetaTimedMetric metric : metrics.getTimedMetrics()) {
+    for (MetaTimedMetric metric : metrics.timedMetrics()) {
       System.out.println(metric);
     }
   }
@@ -59,15 +59,15 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ServerMetrics metrics = collectMetrics();
 
-    List<MetaQueryMetric> stats = metrics.getQueryMetrics();
+    List<MetaQueryMetric> stats = metrics.queryMetrics();
     for (MetaQueryMetric stat : stats) {
-      long meanMicros = stat.getMean();
+      long meanMicros = stat.mean();
       assertThat(meanMicros).isLessThan(900_000);
-      assertThat(stat.getLocation()).isSameAs(loc0.location());
+      assertThat(stat.location()).isSameAs(loc0.location());
     }
 
     assertThat(stats).hasSize(1);
-    assertThat(stats.get(0).getCount()).isEqualTo(4);
+    assertThat(stats.get(0).count()).isEqualTo(4);
   }
 
   @ForPlatform(Platform.H2)

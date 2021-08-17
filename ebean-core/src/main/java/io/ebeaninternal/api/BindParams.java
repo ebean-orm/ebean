@@ -4,11 +4,7 @@ import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -17,34 +13,27 @@ import java.util.Map.Entry;
  * Supports ordered or named parameters.
  * </p>
  */
-public class BindParams implements Serializable {
+public final class BindParams implements Serializable {
 
   private static final long serialVersionUID = 4541081933302086285L;
 
   private final List<Param> positionedParameters = new ArrayList<>();
-
   private final Map<String, Param> namedParameters = new LinkedHashMap<>();
-
   /**
    * This is the sql. For named parameters this is the sql after the named
    * parameters have been replaced with question mark place holders and the
    * parameters have been ordered by addNamedParamInOrder().
    */
   private String preparedSql;
-
   /**
    * Bind hash and count used to detect when the bind values have changed such
    * that the generated SQL (with named parameters) needs to be recalculated.
    */
   private String bindHash;
-
   /**
    * Helper to add positioned parameters in order.
    */
   private int addPos;
-
-  public BindParams() {
-  }
 
   /**
    * Reset positioned parameters (usually due to bind parameter expansion).
@@ -54,12 +43,11 @@ public class BindParams implements Serializable {
     positionedParameters.clear();
   }
 
-  public int queryBindHash() {
-    int hc = namedParameters.hashCode();
-    for (Param positionedParameter : positionedParameters) {
-      hc = hc * 92821 + positionedParameter.hashCode();
+  public void queryBindHash(BindValuesKey key) {
+    key.add(positionedParameters.size());
+    for (Param param : positionedParameters) {
+       param.queryBindHash(key);
     }
-    return hc;
   }
 
   /**
@@ -424,7 +412,14 @@ public class BindParams implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-      return o != null && (o == this || (o instanceof Param) && hashCode() == o.hashCode());
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      Param param = (Param) o;
+      return isInParam == param.isInParam && isOutParam == param.isOutParam && type == param.type && Objects.equals(inValue, param.inValue);
+    }
+
+    void queryBindHash(BindValuesKey key) {
+      key.add(isInParam).add(isOutParam).add(type).add(inValue);
     }
 
     /**

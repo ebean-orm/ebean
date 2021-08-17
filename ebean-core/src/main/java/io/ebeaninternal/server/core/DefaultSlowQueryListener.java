@@ -9,13 +9,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Default slow query listener implementation that logs a warning message.
  */
-class DefaultSlowQueryListener implements SlowQueryListener {
+final class DefaultSlowQueryListener implements SlowQueryListener {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.SlowQuery");
 
   @Override
   public void process(SlowQueryEvent event) {
-
     String firstStack = "";
     ObjectGraphNode node = event.getOriginNode();
     if (node != null) {

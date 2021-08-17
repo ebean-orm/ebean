@@ -8,7 +8,7 @@ import io.ebeaninternal.server.util.ArrayStack;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-class DefaultDbSqlContext implements DbSqlContext {
+final class DefaultDbSqlContext implements DbSqlContext {
 
   private static final String COMMA = ", ";
   private static final String PERIOD = ".";

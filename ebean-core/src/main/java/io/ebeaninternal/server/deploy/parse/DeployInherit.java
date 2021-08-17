@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Builds the InheritInfo deployment information.
  */
-public class DeployInherit {
+public final class DeployInherit {
 
   private final Map<Class<?>, DeployInheritInfo> deployMap = new LinkedHashMap<>();
 

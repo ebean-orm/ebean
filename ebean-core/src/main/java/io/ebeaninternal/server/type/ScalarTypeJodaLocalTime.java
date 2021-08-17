@@ -20,9 +20,9 @@ import java.sql.Types;
 /**
  * ScalarType for Joda LocalTime. This maps to a JDBC Time.
  */
-public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
+class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 
-  public ScalarTypeJodaLocalTime() {
+  ScalarTypeJodaLocalTime() {
     super(LocalTime.class, false, Types.TIME);
   }
 

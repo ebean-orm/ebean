@@ -16,39 +16,21 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Executes the update query.
  */
-class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
+final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
-
   private final OrmQueryRequest<?> request;
-
   private final BeanDescriptor<?> desc;
-
   private final SpiQuery<?> query;
-
-  /**
-   * Where clause predicates.
-   */
   private final CQueryPredicates predicates;
-
-  /**
-   * The final sql that is generated.
-   */
   private final String sql;
-
-  /**
-   * The statement used to create the resultSet.
-   */
   private PreparedStatement pstmt;
-
   private String bindLog;
-
   private int rowCount;
-
   private long profileOffset;
-
+  private long executionTimeMicros;
   private final ReentrantLock lock = new ReentrantLock();
-  
+
   /**
    * Create the Sql select based on the request.
    */
@@ -80,7 +62,6 @@ class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
    * Execute the update or delete statement returning the row count.
    */
   public int execute() throws SQLException {
-
     long startNano = System.nanoTime();
     try {
       SpiTransaction t = getTransaction();
@@ -90,19 +71,16 @@ class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
       try {
         query.checkCancelled();
         pstmt = conn.prepareStatement(sql);
-
         if (query.getTimeout() > 0) {
           pstmt.setQueryTimeout(query.getTimeout());
         }
-
         bindLog = predicates.bind(pstmt, conn);
       } finally {
         lock.unlock();
       }
       rowCount = pstmt.executeUpdate();
       query.checkCancelled();
-      
-      long executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
@@ -113,6 +91,10 @@ class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
     } finally {
       close();
     }
+  }
+
+  long micros() {
+    return executionTimeMicros;
   }
 
   private SpiTransaction getTransaction() {

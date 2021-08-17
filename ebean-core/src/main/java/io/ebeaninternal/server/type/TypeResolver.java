@@ -15,7 +15,7 @@ import java.util.Map;
  *
  * It is a cut down version removing the lambda support and related sun.misc.Unsafe use etc.
  */
-class TypeResolver {
+final class TypeResolver {
 
   /** An unknown type. */
   private static final class Unknown {
@@ -137,9 +137,7 @@ class TypeResolver {
   }
 
   private static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> targetType) {
-
     Map<TypeVariable<?>, Type> map = new HashMap<>();
-
     // Populate interfaces
     populateSuperTypeArgs(targetType.getGenericInterfaces(), map);
 
@@ -173,7 +171,6 @@ class TypeResolver {
    * Populates the {@code map} with with variable/argument pairs for the given {@code types}.
    */
   private static void populateSuperTypeArgs(final Type[] types, final Map<TypeVariable<?>, Type> map) {
-
     for (Type type : types) {
       if (type instanceof ParameterizedType) {
         ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -195,7 +192,6 @@ class TypeResolver {
     if (type.getRawType() instanceof Class) {
       TypeVariable<?>[] typeVariables = ((Class<?>) type.getRawType()).getTypeParameters();
       Type[] typeArguments = type.getActualTypeArguments();
-
       if (type.getOwnerType() != null) {
         Type owner = type.getOwnerType();
         if (owner instanceof ParameterizedType) {

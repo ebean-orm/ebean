@@ -8,7 +8,7 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory
 /**
  * Read the deployment annotations for the bean.
  */
-public class ReadAnnotations {
+public final class ReadAnnotations {
 
   private final ReadAnnotationConfig readConfig;
 

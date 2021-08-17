@@ -26,13 +26,9 @@ import java.util.List;
 public final class IdBinderSimple implements IdBinder {
 
   private final BeanProperty idProperty;
-
   private final String bindIdSql;
-
   private final Class<?> expectedType;
-
   private final MultiValueBind multiValueBind;
-
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 

@@ -28,7 +28,7 @@ import static java.util.Collections.EMPTY_LIST;
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
 @SuppressWarnings("rawtypes")
-public class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTypeArray {
+class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTypeArray {
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();

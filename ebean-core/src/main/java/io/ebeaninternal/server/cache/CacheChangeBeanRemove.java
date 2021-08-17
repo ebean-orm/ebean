@@ -8,10 +8,9 @@ import java.util.Collection;
 /**
  * Change to remove bean from L2 cache.
  */
-class CacheChangeBeanRemove implements CacheChange {
+final class CacheChangeBeanRemove implements CacheChange {
 
   private final BeanDescriptor<?> descriptor;
-
   private final Collection<Object> ids;
 
   CacheChangeBeanRemove(Object id, BeanDescriptor<?> descriptor) {

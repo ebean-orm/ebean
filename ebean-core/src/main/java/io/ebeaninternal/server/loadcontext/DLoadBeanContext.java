@@ -23,12 +23,10 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * ToOne bean load context.
  */
-class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
+final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
   private final boolean cache;
-
   private List<LoadBuffer> bufferList;
-
   private LoadBuffer currentBuffer;
 
   DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, OrmQueryProperties queryProps) {

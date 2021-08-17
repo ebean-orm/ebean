@@ -8,7 +8,7 @@ import javax.persistence.PersistenceException;
 /**
  * Document store based BeanPersister.
  */
-class DocStoreBeanPersister implements BeanPersister {
+final class DocStoreBeanPersister implements BeanPersister {
 
   private final GeneratedProperties generatedProperties;
 

@@ -5,9 +5,9 @@ import java.time.ZoneOffset;
 /**
  * ScalarType for java.time.OffsetTime stored as DB VARCHAR
  */
-public class ScalarTypeZoneOffset extends ScalarTypeBaseVarchar<ZoneOffset> {
+final class ScalarTypeZoneOffset extends ScalarTypeBaseVarchar<ZoneOffset> {
 
-  public ScalarTypeZoneOffset() {
+  ScalarTypeZoneOffset() {
     super(ZoneOffset.class);
   }
 

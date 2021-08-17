@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 /**
  * Drives the merge processing.
  */
-class MergeHandler {
+final class MergeHandler {
 
   private static final Pattern PATH_SPLIT = Pattern.compile("\\.");
 
@@ -33,9 +33,7 @@ class MergeHandler {
   private final EntityBean bean;
   private final MergeOptions options;
   private final SpiTransaction transaction;
-
   private final Map<String, MergeNode> nodes = new LinkedHashMap<>();
-
 
   MergeHandler(SpiEbeanServer server, BeanDescriptor<?> desc, EntityBean bean, MergeOptions options, SpiTransaction transaction) {
     this.server = server;
@@ -49,7 +47,6 @@ class MergeHandler {
    * Fetch the Ids for the graph and use them to determine inserts, updates and deletes for the merge paths.
    */
   List<EntityBean> merge() {
-
     Set<String> paths = options.paths();
     if (desc.isIdGeneratedValue() && paths.isEmpty() && !options.isClientGeneratedIds()) {
       // just do a single insert or update based on Id value present
@@ -76,7 +73,6 @@ class MergeHandler {
     for (MergeNode value : nodes.values()) {
       value.merge(request);
     }
-
     return context.getDeletedBeans();
   }
 
@@ -86,9 +82,7 @@ class MergeHandler {
    * We use the Id values to determine what are inserts, updates and deletes as part of the merge.
    */
   private EntityBean fetchOutline(Set<String> paths) {
-
     Query<?> query = server.find(desc.getBeanType());
-
     query.setBeanCacheMode(CacheMode.OFF);
     query.setPersistenceContextScope(PersistenceContextScope.QUERY);
     query.setId(desc.getId(bean));
@@ -126,14 +120,12 @@ class MergeHandler {
   }
 
   private MergeNode addRootLevelNode(String rootPath) {
-
     MergeNode node = createMergeNode(rootPath, desc, rootPath);
     nodes.put(rootPath, node);
     return node;
   }
 
   static MergeNode createMergeNode(String fullPath, BeanDescriptor<?> targetDesc, String path) {
-
     BeanProperty prop = targetDesc.getBeanProperty(path);
     if (!(prop instanceof BeanPropertyAssoc)) {
       throw new PersistenceException("merge path [" + path + "] is not a ToMany or ToOne property of " + targetDesc.getFullName());

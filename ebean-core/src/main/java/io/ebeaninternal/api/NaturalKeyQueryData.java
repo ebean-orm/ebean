@@ -11,28 +11,22 @@ import java.util.Set;
 /**
  * Collects the data for processing the natural key cache processing.
  */
-public class NaturalKeyQueryData<T> {
+public final class NaturalKeyQueryData<T> {
 
   private final BeanNaturalKey naturalKey;
-
   /**
    * Only one of IN or IN PAIRS is allowed.
    */
   private boolean hasIn;
-
   // IN Pairs clause - only one allowed
   private String inProperty0, inProperty1;
   private List<Pairs.Entry> inPairs;
-
   // IN clause - only one allowed
   private List<Object> inValues;
   private String inProperty;
-
   // normal EQ expressions
   private List<NaturalKeyEq> eqList;
-
   private NaturalKeySet set;
-
   private int hitCount;
 
   public NaturalKeyQueryData(BeanNaturalKey naturalKey) {

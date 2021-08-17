@@ -2,7 +2,7 @@ package io.ebeaninternal.server.query;
 
 import java.util.regex.Pattern;
 
-class DbOrderByTrim {
+final class DbOrderByTrim {
 
   private static final Pattern orderByTrim = Pattern.compile("(?i) asc\\b| desc\\b|\\b nulls first\\b|\\b nulls last\\b");
 

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Javax validation annotations reader.
  */
-class ReadValidationAnnotationsJavax implements ReadValidationAnnotations {
+final class ReadValidationAnnotationsJavax implements ReadValidationAnnotations {
 
   ReadValidationAnnotationsJavax(ReadAnnotationConfig readConfig) {
       readConfig.addMetaAnnotation(Size.class);

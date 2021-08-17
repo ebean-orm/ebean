@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.10.1-SNAPSHOT</version>
+    <version>12.11.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -20,22 +20,13 @@
 
   <profiles>
     <profile>
-      <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
-        After that, install it into your local maven repository:
-
-        mvn install:install-file \
-          -Dfile=db2jcc4.jar \
-          -DgroupId=com.ibm.jdbc \
-          -DartifactId=db2jcc4 \
-          -Dversion=4.23.42 \
-          -Dpackaging=jar
-      -->
       <id>db2</id>
       <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.ibm.db2/jcc -->
         <dependency>
-          <groupId>com.ibm.jdbc</groupId>
-          <artifactId>db2jcc4</artifactId>
-          <version>4.23.42</version>
+          <groupId>com.ibm.db2</groupId>
+          <artifactId>jcc</artifactId>
+          <version>11.5.5.0</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -52,13 +43,13 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>classpath-scanner</artifactId>
-      <version>4.2</version>
+      <version>6.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration-auto</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
     </dependency>
 
     <!-- keep testing in core using ebean-ddl-generator & ebean-migration -->
@@ -72,7 +63,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.9.4-RC1</version>
+      <version>12.11.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -87,19 +78,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.10.1-SNAPSHOT</version>
+      <version>12.11.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>12.10.1-SNAPSHOT</version>
+      <version>12.11.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.10.1-SNAPSHOT</version>
+      <version>12.11.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>

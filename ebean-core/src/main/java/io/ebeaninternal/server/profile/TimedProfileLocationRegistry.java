@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Global registry of the TimedProfileLocation instances created.
  */
-public class TimedProfileLocationRegistry {
+public final class TimedProfileLocationRegistry {
 
   private static final List<TimedProfileLocation> list = Collections.synchronizedList(new ArrayList<>());
 

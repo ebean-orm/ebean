@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The default implementation of the BackgroundExecutor.
  */
-public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
+public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   private final ScheduledExecutorService executor;
 

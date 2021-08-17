@@ -23,11 +23,11 @@ public class BeanIudMetricsTest {
     BasicMetricVisitor basic = new BasicMetricVisitor();
     iudMetrics.visit(basic);
 
-    List<MetaTimedMetric> timed = basic.getTimedMetrics();
+    List<MetaTimedMetric> timed = basic.timedMetrics();
     assertThat(timed).hasSize(1);
 
-    assertThat(timed.get(0).getCount()).isEqualTo(4);
-    assertThat(timed.get(0).getName()).isEqualTo("iud.one.insertBatch");
+    assertThat(timed.get(0).count()).isEqualTo(4);
+    assertThat(timed.get(0).name()).isEqualTo("iud.one.insertBatch");
 
     iudMetrics.addBatch(PersistRequest.Type.UPDATE, startNanos, 1);
     iudMetrics.addBatch(PersistRequest.Type.DELETE_SOFT, startNanos, 2);
@@ -37,15 +37,15 @@ public class BeanIudMetricsTest {
 
     basic = new BasicMetricVisitor();
     iudMetrics.visit(basic);
-    timed = basic.getTimedMetrics();
+    timed = basic.timedMetrics();
     assertThat(timed).hasSize(3);
 
-    assertThat(timed.get(0).getCount()).isEqualTo(16);
-    assertThat(timed.get(0).getName()).isEqualTo("iud.one.insertBatch");
-    assertThat(timed.get(1).getCount()).isEqualTo(3);
-    assertThat(timed.get(1).getName()).isEqualTo("iud.one.updateBatch");
-    assertThat(timed.get(2).getCount()).isEqualTo(12);
-    assertThat(timed.get(2).getName()).isEqualTo("iud.one.deleteBatch");
+    assertThat(timed.get(0).count()).isEqualTo(16);
+    assertThat(timed.get(0).name()).isEqualTo("iud.one.insertBatch");
+    assertThat(timed.get(1).count()).isEqualTo(3);
+    assertThat(timed.get(1).name()).isEqualTo("iud.one.updateBatch");
+    assertThat(timed.get(2).count()).isEqualTo(12);
+    assertThat(timed.get(2).name()).isEqualTo("iud.one.deleteBatch");
   }
 
   @Test
@@ -63,15 +63,15 @@ public class BeanIudMetricsTest {
     BasicMetricVisitor basic = new BasicMetricVisitor();
     iudMetrics.visit(basic);
 
-    List<MetaTimedMetric> timed = basic.getTimedMetrics();
+    List<MetaTimedMetric> timed = basic.timedMetrics();
     assertThat(timed).hasSize(3);
 
-    assertThat(timed.get(0).getCount()).isEqualTo(1);
-    assertThat(timed.get(0).getName()).isEqualTo("iud.one.insert");
-    assertThat(timed.get(1).getCount()).isEqualTo(2);
-    assertThat(timed.get(1).getName()).isEqualTo("iud.one.update");
-    assertThat(timed.get(2).getCount()).isEqualTo(2);
-    assertThat(timed.get(2).getName()).isEqualTo("iud.one.delete");
+    assertThat(timed.get(0).count()).isEqualTo(1);
+    assertThat(timed.get(0).name()).isEqualTo("iud.one.insert");
+    assertThat(timed.get(1).count()).isEqualTo(2);
+    assertThat(timed.get(1).name()).isEqualTo("iud.one.update");
+    assertThat(timed.get(2).count()).isEqualTo(2);
+    assertThat(timed.get(2).name()).isEqualTo("iud.one.delete");
   }
 
 }

@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 
-public class TypeReflectHelper {
+public final class TypeReflectHelper {
 
   public static Class<?>[] getParams(Class<?> cls, Class<?> matchRawType) {
     return TypeResolver.resolveRawArgs(matchRawType, cls);
@@ -46,7 +46,6 @@ public class TypeReflectHelper {
   }
 
   private static Class<?> getClass(Type type) {
-
     while (true) {
       if (type instanceof ParameterizedType) {
         type = ((ParameterizedType) type).getRawType();

@@ -6,16 +6,8 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
-import io.ebean.config.BeanNotEnhancedException;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.EncryptKey;
-import io.ebean.config.EncryptKeyManager;
-import io.ebean.config.NamingConvention;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.config.dbplatform.DbIdentity;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.config.*;
+import io.ebean.config.dbplatform.*;
 import io.ebean.core.type.ScalarType;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
@@ -36,26 +28,12 @@ import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.IdBinderEmbedded;
 import io.ebeaninternal.server.deploy.id.IdBinderFactory;
-import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
-import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
-import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
-import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
-import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
-import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
-import io.ebeaninternal.server.deploy.parse.DeployInherit;
-import io.ebeaninternal.server.deploy.parse.DeployUtil;
-import io.ebeaninternal.server.deploy.parse.ReadAnnotations;
-import io.ebeaninternal.server.deploy.parse.TransientProperties;
+import io.ebeaninternal.server.deploy.meta.*;
+import io.ebeaninternal.server.deploy.parse.*;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
-import io.ebeaninternal.server.type.ScalarTypeInteger;
 import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.xmapping.api.XmapEbean;
 import io.ebeaninternal.xmapping.api.XmapEntity;
@@ -73,20 +51,13 @@ import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Creates BeanDescriptors.
  */
-public class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeManager {
+public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeManager {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorManager.class);
 
@@ -905,7 +876,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeMana
   private void makeOrderColumn(DeployBeanPropertyAssocMany<?> oneToMany) {
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
     DeployOrderColumn orderColumn = oneToMany.getOrderColumn();
-    DeployBeanProperty orderProperty = new DeployBeanProperty(targetDesc, Integer.class, ScalarTypeInteger.INSTANCE, null);
+    final ScalarType<?> scalarType = typeManager.getScalarType(Integer.class);
+    DeployBeanProperty orderProperty = new DeployBeanProperty(targetDesc, Integer.class, scalarType, null);
     orderProperty.setName(DeployOrderColumn.LOGICAL_NAME);
     orderProperty.setDbColumn(orderColumn.getName());
     orderProperty.setNullable(orderColumn.isNullable());

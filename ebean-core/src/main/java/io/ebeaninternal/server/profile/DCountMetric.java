@@ -9,10 +9,9 @@ import java.util.concurrent.atomic.LongAdder;
 /**
  * Used to collect counter metrics.
  */
-class DCountMetric implements CountMetric {
+final class DCountMetric implements CountMetric {
 
   private final String name;
-
   private final LongAdder count = new LongAdder();
 
   DCountMetric(String name) {
@@ -49,7 +48,7 @@ class DCountMetric implements CountMetric {
   @Override
   public void visit(MetricVisitor visitor) {
 
-    long val = visitor.isReset() ? count.sumThenReset() : count.sum();
+    long val = visitor.reset() ? count.sumThenReset() : count.sum();
     if (val > 0) {
       visitor.visitCount(new DCountMetricStats(name, val));
     }
@@ -66,12 +65,12 @@ class DCountMetric implements CountMetric {
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return name;
     }
 
     @Override
-    public long getCount() {
+    public long count() {
       return count;
     }
   }

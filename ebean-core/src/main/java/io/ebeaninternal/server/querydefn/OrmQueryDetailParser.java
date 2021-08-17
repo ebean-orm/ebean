@@ -9,10 +9,9 @@ import javax.persistence.PersistenceException;
  * replace the OrmQueryDetail leaving the attributes unchanged.
  * </p>
  */
-public class OrmQueryDetailParser {
+public final class OrmQueryDetailParser {
 
   private final OrmQueryDetail detail = new OrmQueryDetail();
-
   private final SimpleTextParser parser;
 
   public OrmQueryDetailParser(String oql) {
@@ -20,7 +19,6 @@ public class OrmQueryDetailParser {
   }
 
   public OrmQueryDetail parse() throws PersistenceException {
-
     if (parser.isEmpty()) return detail;
 
     parser.nextWord();
@@ -68,7 +66,6 @@ public class OrmQueryDetailParser {
   }
 
   private OrmQueryProperties readFindFetch() {
-
     boolean readAlias = false;
 
     String props = null;

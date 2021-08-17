@@ -12,7 +12,7 @@ import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 /**
  * A stub implementation of DocStoreFactory that will barf if the docStore features are used.
  */
-public class NoneDocStoreFactory implements DocStoreFactory {
+public final class NoneDocStoreFactory implements DocStoreFactory {
 
   @Override
   public DocStoreIntegration create(SpiServer server) {
@@ -24,7 +24,7 @@ public class NoneDocStoreFactory implements DocStoreFactory {
     return new NoneDocStoreBeanAdapter<>(desc, deploy);
   }
 
-  static class NoneIntegration implements DocStoreIntegration {
+  static final class NoneIntegration implements DocStoreIntegration {
 
     @Override
     public DocStoreUpdateProcessor updateProcessor() {

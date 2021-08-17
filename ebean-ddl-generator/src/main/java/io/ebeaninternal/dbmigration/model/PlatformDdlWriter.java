@@ -27,9 +27,7 @@ public class PlatformDdlWriter {
   private static final Logger logger = LoggerFactory.getLogger(PlatformDdlWriter.class);
 
   private final DatabaseConfig databaseConfig;
-
   private final PlatformDdl platformDdl;
-
   private final int lockTimeoutSeconds;
 
   public PlatformDdlWriter(DatabasePlatform platform, DatabaseConfig dbConfig, int lockTimeoutSeconds) {
@@ -42,7 +40,6 @@ public class PlatformDdlWriter {
    * Write the migration as platform specific ddl.
    */
   public void processMigration(Migration dbMigration, DdlWrite write, File writePath, String fullVersion) throws IOException {
-
     DdlHandler handler = handler();
     handler.generateProlog(write);
     if (lockTimeoutSeconds > 0) {
@@ -51,7 +48,6 @@ public class PlatformDdlWriter {
         write.apply().append(lockSql).endOfStatement().newLine();
       }
     }
-
     List<ChangeSet> changeSets = dbMigration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
       if (isApply(changeSet)) {
@@ -59,7 +55,6 @@ public class PlatformDdlWriter {
       }
     }
     handler.generateEpilog(write);
-
     writePlatformDdl(write, writePath, fullVersion);
   }
 

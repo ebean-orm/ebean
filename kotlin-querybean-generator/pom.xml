@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.10.1-SNAPSHOT</version>
+    <version>12.11.2-SNAPSHOT</version>
   </parent>
 
   <name>kotlin querybean generator</name>
@@ -12,7 +12,7 @@
   <artifactId>kotlin-querybean-generator</artifactId>
 
   <properties>
-    <kotlin.version>1.5.0</kotlin.version>
+    <kotlin.version>1.5.30-M1</kotlin.version>
   </properties>
 
   <dependencies>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>12.10.1-SNAPSHOT</version>
+      <version>12.11.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.10.1-SNAPSHOT</version>
+      <version>12.11.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -51,7 +51,7 @@
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib-jdk8</artifactId>
       <version>${kotlin.version}</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.10.1-SNAPSHOT</version>
+      <version>12.11.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -111,10 +111,23 @@
               </annotationProcessorPaths>
             </configuration>
           </execution>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <sourceDirs>
+                <source>src/main/java</source>
+                <source>target/generated-sources/kapt/test</source>
+                <source>target/generated-sources/kaptKotlin/test</source>
+              </sourceDirs>
+            </configuration>
+          </execution>
         </executions>
         <configuration>
           <jvmTarget>1.8</jvmTarget>
-<!--          <args></args>-->
         </configuration>
       </plugin>
       <plugin>
@@ -131,6 +144,13 @@
             <phase>test-compile</phase>
             <goals>
               <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
             </goals>
           </execution>
         </executions>

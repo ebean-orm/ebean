@@ -17,27 +17,17 @@ import java.util.function.Predicate;
 /**
  * Default implementation of SQuery - SQL Query.
  */
-public class DefaultRelationalQuery extends AbstractQuery implements SpiSqlQuery {
+public final class DefaultRelationalQuery extends AbstractQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
 
   private final transient SpiEbeanServer server;
-
   private final String query;
-
   private String label;
-
   private int firstRow;
-
   private int maxRows;
-
   private int timeout;
-
   private int bufferFetchSizeHint;
-
-  /**
-   * Bind parameters when using the query language.
-   */
   private final BindParams bindParams = new BindParams();
 
   /**

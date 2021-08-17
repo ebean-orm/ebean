@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -13,9 +14,9 @@ import java.io.IOException;
 /**
  * Effectively an expression that has no effect.
  */
-class NoopExpression implements SpiExpression {
+final class NoopExpression implements SpiExpression {
 
-  protected static final NoopExpression INSTANCE = new NoopExpression();
+  static final NoopExpression INSTANCE = new NoopExpression();
 
   @Override
   public void prefixProperty(String path) {
@@ -74,9 +75,8 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
+  public void queryBindKey(BindValuesKey key) {
     // no bind values
-    return 0;
   }
 
   @Override

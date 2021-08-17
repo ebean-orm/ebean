@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Represents the Properties of an Object Relational query.
  */
-public class OrmQueryProperties implements Serializable {
+public final class OrmQueryProperties implements Serializable {
 
   private static final long serialVersionUID = -8785582703966455658L;
 
@@ -35,30 +35,24 @@ public class OrmQueryProperties implements Serializable {
   private final Set<String> included;
   private final FetchConfig fetchConfig;
   private final boolean cache;
-
   /**
    * Flag set when this fetch path needs to be a query join.
    */
   private boolean markForQueryJoin;
-
   /**
    * Included bean joins.
    */
   private Set<String> includedBeanJoin;
-
   /**
    * Add these properties to the select so that the foreign key columns are included in the query.
    */
   private Set<String> secondaryQueryJoins;
-
   private List<OrmQueryProperties> secondaryChildren;
-
   /**
    * OrderBy properties that where on the main query but moved here as they relate to this (query join).
    */
   @SuppressWarnings("rawtypes")
   private OrderBy orderBy;
-
   /**
    * A filter that can be applied to the fetch of this path in the object graph.
    */

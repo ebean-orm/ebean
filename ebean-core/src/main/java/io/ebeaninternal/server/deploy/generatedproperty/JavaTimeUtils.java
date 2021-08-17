@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 /**
  * Helper methods for Java time conversion.
  */
-class JavaTimeUtils {
+final class JavaTimeUtils {
 
   /**
    * Return the system millis time as a LocalDateTime.

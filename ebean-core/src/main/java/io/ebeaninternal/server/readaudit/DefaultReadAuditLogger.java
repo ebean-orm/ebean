@@ -19,15 +19,11 @@ import java.util.Map;
 public class DefaultReadAuditLogger implements ReadAuditLogger {
 
   private static final Logger appLogger = LoggerFactory.getLogger(DefaultReadAuditLogger.class);
-
   private static final Logger queryLogger = LoggerFactory.getLogger("io.ebean.ReadAuditQuery");
-
   private static final Logger auditLogger = LoggerFactory.getLogger("io.ebean.ReadAudit");
 
   protected final JsonFactory jsonFactory = new JsonFactory();
-
   protected int defaultQueryBuffer = 500;
-
   protected int defaultReadBuffer = 150;
 
   /**
@@ -37,7 +33,6 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
   public void queryPlan(ReadAuditQueryPlan queryPlan) {
     StringWriter writer = new StringWriter(defaultQueryBuffer);
     try (JsonGenerator gen = jsonFactory.createGenerator(writer)) {
-
       gen.writeStartObject();
       String beanType = queryPlan.getBeanType();
       if (beanType != null) {
@@ -53,9 +48,7 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       }
       gen.writeEndObject();
       gen.flush();
-
       queryLogger.info(writer.toString());
-
     } catch (IOException e) {
       appLogger.error("Error writing Read audit event", e);
     }
@@ -66,7 +59,6 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
    */
   @Override
   public void auditBean(ReadEvent beanEvent) {
-
     writeEvent(beanEvent);
   }
 
@@ -79,14 +71,11 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
   }
 
   protected void writeEvent(ReadEvent event) {
-
     try {
       StringWriter writer = new StringWriter(defaultReadBuffer);
       JsonGenerator gen = jsonFactory.createGenerator(writer);
       writeDetails(gen, event);
-
       auditLogger.info(writer.toString());
-
     } catch (IOException e) {
       appLogger.error("Error writing Read audit event", e);
     }
@@ -96,7 +85,6 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
    * Write the details for the read bean or read many beans event.
    */
   protected void writeDetails(JsonGenerator gen, ReadEvent event) throws IOException {
-
     gen.writeStartObject();
     String source = event.getSource();
     if (source != null) {
@@ -130,7 +118,6 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       gen.writeFieldName("ids");
       EJson.writeCollection(event.getIds(), gen);
     }
-
     gen.writeEndObject();
     gen.flush();
     gen.close();

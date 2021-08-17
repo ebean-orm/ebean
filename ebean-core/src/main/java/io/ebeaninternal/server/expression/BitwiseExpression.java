@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -8,14 +9,11 @@ import java.io.IOException;
 /**
  * Bitwise expression.
  */
-class BitwiseExpression extends AbstractExpression {
+final class BitwiseExpression extends AbstractExpression {
 
-  protected final BitwiseOp operator;
-
+  private final BitwiseOp operator;
   private final String compare;
-
-  protected final long flags;
-
+  private final long flags;
   private final long match;
 
   BitwiseExpression(String propertyName, BitwiseOp operator, long flags, String compare, long match) {
@@ -39,8 +37,8 @@ class BitwiseExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return Long.hashCode(flags);
+  public void queryBindKey(BindValuesKey key) {
+    key.add(flags).add(match);
   }
 
   @Override

@@ -6,7 +6,7 @@ import io.ebean.TxScope;
 /**
  * Helper object to make AOP generated code simpler.
  */
-public class HelpScopeTrans {
+public final class HelpScopeTrans {
   private static boolean enabled = true;
 
   /**

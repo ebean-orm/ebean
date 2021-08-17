@@ -14,9 +14,9 @@ import java.time.ZoneId;
 /**
  * ScalarType for java.sql.Timestamp.
  */
-public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
+final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
 
-  public ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
+  ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
     super(mode, LocalDateTime.class, false, Types.TIMESTAMP);
   }
 

@@ -10,15 +10,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Bindable for a Embedded bean.
+ * Bindable for an Embedded bean.
  */
-public class BindableEmbedded implements Bindable {
+final class BindableEmbedded implements Bindable {
 
   private final Bindable[] items;
 
   private final BeanPropertyAssocOne<?> embProp;
 
-  public BindableEmbedded(BeanPropertyAssocOne<?> embProp, List<Bindable> bindList) {
+  BindableEmbedded(BeanPropertyAssocOne<?> embProp, List<Bindable> bindList) {
     this.embProp = embProp;
     this.items = bindList.toArray(new Bindable[0]);
   }

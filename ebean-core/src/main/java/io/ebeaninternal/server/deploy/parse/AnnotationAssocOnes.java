@@ -30,7 +30,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 /**
  * Read the deployment annotations for Associated One beans.
  */
-public class AnnotationAssocOnes extends AnnotationAssoc {
+final class AnnotationAssocOnes extends AnnotationAssoc {
 
   private static final Logger log = LoggerFactory.getLogger(AnnotationAssocOnes.class);
 

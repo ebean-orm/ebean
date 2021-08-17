@@ -16,7 +16,7 @@ import java.sql.SQLException;
  * - Skip explicit commit (as we use AutoCommit instead)
  * </p>
  */
-class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
+final class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
 
   private final DataSource readOnlyDataSource;
 
@@ -27,16 +27,13 @@ class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
 
   @Override
   public SpiTransaction createReadOnlyTransaction(Object tenantId) {
-
     Connection connection = null;
     try {
       connection = readOnlyDataSource.getConnection();
       return new ImplicitReadOnlyTransaction(manager, connection);
-
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
       throw ex;
-
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
     }

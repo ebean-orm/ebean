@@ -27,7 +27,7 @@ import java.time.Instant;
  * @author Nick Williams
  * @since 2.2.0
  */
-public final class DecimalUtils {
+final class DecimalUtils {
 
   private static final char[] ZEROES = new char[]{'0', '0', '0', '0', '0', '0', '0', '0', '0'};
 
@@ -37,53 +37,48 @@ public final class DecimalUtils {
     throw new RuntimeException("DecimalUtils cannot be instantiated.");
   }
 
-  public static Duration toDuration(BigDecimal value) {
-
+  static Duration toDuration(BigDecimal value) {
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
-
     return Duration.ofSeconds(seconds, nanoseconds);
   }
 
-  public static BigDecimal toDecimal(Duration instant) {
+  static BigDecimal toDecimal(Duration instant) {
     return new BigDecimal(toDecimal(instant.getSeconds(), instant.getNano()));
   }
 
-  public static Timestamp toTimestamp(BigDecimal value) {
-
+  static Timestamp toTimestamp(BigDecimal value) {
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
-
     Timestamp ts = new Timestamp(seconds * 1000);
     ts.setNanos(nanoseconds);
     return ts;
   }
 
-  public static BigDecimal toDecimal(Timestamp instant) {
+  static BigDecimal toDecimal(Timestamp instant) {
     long millis = instant.getTime();
     long secs = millis / 1000;
     return new BigDecimal(toDecimal(secs, instant.getNanos()));
   }
 
-  public static Instant toInstant(BigDecimal value) {
-
+  static Instant toInstant(BigDecimal value) {
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
     return Instant.ofEpochSecond(seconds, nanoseconds);
   }
 
-  public static BigDecimal toDecimal(Instant instant) {
+  static BigDecimal toDecimal(Instant instant) {
     return new BigDecimal(toDecimal(instant.getEpochSecond(), instant.getNano()));
   }
 
-  public static String toDecimal(long seconds, int nanoseconds) {
+  static String toDecimal(long seconds, int nanoseconds) {
     StringBuilder string = new StringBuilder(Integer.toString(nanoseconds));
     if (string.length() < 9)
       string.insert(0, ZEROES, 0, 9 - string.length());
     return seconds + "." + string;
   }
 
-  public static int extractNanosecondDecimal(BigDecimal value, long integer) {
+  static int extractNanosecondDecimal(BigDecimal value, long integer) {
     return value.subtract(new BigDecimal(integer)).multiply(ONE_BILLION).intValue();
   }
 }

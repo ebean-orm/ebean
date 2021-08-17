@@ -5,7 +5,7 @@ import io.ebean.core.type.DataReader;
 /**
  * Placeholder to skip reading a column that isn't mapped to a bean property.
  */
-class DtoReadSetColumnSkip implements DtoReadSet {
+final class DtoReadSetColumnSkip implements DtoReadSet {
 
   static final DtoReadSet INSTANCE = new DtoReadSetColumnSkip();
 

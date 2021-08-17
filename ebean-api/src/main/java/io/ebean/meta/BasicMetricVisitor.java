@@ -27,17 +27,17 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
   }
 
   @Override
-  public List<MetaTimedMetric> getTimedMetrics() {
+  public List<MetaTimedMetric> timedMetrics() {
     return timed;
   }
 
   @Override
-  public List<MetaQueryMetric> getQueryMetrics() {
+  public List<MetaQueryMetric> queryMetrics() {
     return query;
   }
 
   @Override
-  public List<MetaCountMetric> getCountMetrics() {
+  public List<MetaCountMetric> countMetrics() {
     return count;
   }
 

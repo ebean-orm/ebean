@@ -13,9 +13,9 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
 
-class BindCaptureTypes {
+final class BindCaptureTypes {
 
-  static class Null implements BindCaptureEntry {
+  static final class Null implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final int sqlType;
@@ -36,7 +36,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class Boolean implements BindCaptureEntry {
+  static final class Boolean implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final boolean x;
@@ -57,7 +57,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class Byte implements BindCaptureEntry {
+  static final class Byte implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final byte x;
@@ -78,7 +78,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class Bytes implements BindCaptureEntry {
+  static final class Bytes implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final byte[] x;
@@ -99,7 +99,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TShort implements BindCaptureEntry {
+  static final class TShort implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final short value;
@@ -120,7 +120,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TInt implements BindCaptureEntry {
+  static final class TInt implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final int value;
@@ -141,7 +141,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TLong implements BindCaptureEntry {
+  static final class TLong implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final long value;
@@ -162,7 +162,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TFloat implements BindCaptureEntry {
+  static final class TFloat implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final float value;
@@ -183,7 +183,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TDouble implements BindCaptureEntry {
+  static final class TDouble implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final double value;
@@ -204,7 +204,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TBigDecimal implements BindCaptureEntry {
+  static final class TBigDecimal implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final BigDecimal value;
@@ -226,7 +226,7 @@ class BindCaptureTypes {
   }
 
 
-  static class TString implements BindCaptureEntry {
+  static final class TString implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final String value;
@@ -247,7 +247,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TDate implements BindCaptureEntry {
+  static final class TDate implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final Date value;
@@ -268,7 +268,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TTime implements BindCaptureEntry {
+  static final class TTime implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final Time value;
@@ -289,7 +289,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TTimestamp implements BindCaptureEntry {
+  static final class TTimestamp implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final Timestamp value;
@@ -316,7 +316,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class TObject implements BindCaptureEntry {
+  static final class TObject implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final Object value;
@@ -337,12 +337,11 @@ class BindCaptureTypes {
     }
   }
 
-  static class TArray implements BindCaptureEntry {
+  static final class TArray implements BindCaptureEntry {
 
     private final int parameterIndex;
     private final String arrayType;
     private final Object[] elements;
-
 
     TArray(int parameterIndex, String arrayType, Object[] elements) {
       this.parameterIndex = parameterIndex;
@@ -362,7 +361,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class CharacterStream implements BindCaptureEntry {
+  static final class CharacterStream implements BindCaptureEntry {
 
     private static final String dummy = "hi";
 
@@ -383,7 +382,7 @@ class BindCaptureTypes {
     }
   }
 
-  static class BinaryStream implements BindCaptureEntry {
+  static final class BinaryStream implements BindCaptureEntry {
 
     private static final byte[] dummy = "hi".getBytes(Charset.defaultCharset());
 

@@ -17,24 +17,16 @@ import java.util.Map;
 /**
  * Default implementation of GeneratedPropertyFactory.
  */
-public class GeneratedPropertyFactory {
+public final class GeneratedPropertyFactory {
 
   private final CounterFactory counterFactory = new CounterFactory();
-
   private final InsertTimestampFactory insertFactory;
-
   private final UpdateTimestampFactory updateFactory;
-
   private final HashSet<String> numberTypes = new HashSet<>();
-
   private final UuidGeneratedProperty generatedUuid = new UuidGeneratedProperty();
-
   private final GeneratedWhoModified generatedWhoModified;
-
   private final GeneratedWhoCreated generatedWhoCreated;
-
   private final ClassLoadConfig classLoadConfig;
-
   private final Map<String, PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
   public GeneratedPropertyFactory(boolean offlineMode, DatabaseConfig config, List<IdGenerator> idGenerators) {

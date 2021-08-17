@@ -8,7 +8,7 @@ import java.time.Instant;
  *
  * @param <R> the root query bean type
  */
-public class PInstant<R> extends PBaseDate<R,Instant> {
+public final class PInstant<R> extends PBaseDate<R,Instant> {
 
   /**
    * Construct with a property name and root instance.

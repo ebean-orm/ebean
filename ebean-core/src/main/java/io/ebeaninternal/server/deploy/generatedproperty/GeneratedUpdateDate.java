@@ -9,7 +9,7 @@ import java.util.Date;
  * Generate a (java.util.Date) Timestamp whenever the bean is inserted or
  * updated.
  */
-public class GeneratedUpdateDate implements GeneratedProperty {
+final class GeneratedUpdateDate implements GeneratedProperty {
 
   /**
    * Return now as a Timestamp.

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Default implementation for creating BeanControllers.
  */
-class BeanQueryAdapterManager {
+final class BeanQueryAdapterManager {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanQueryAdapterManager.class);
 

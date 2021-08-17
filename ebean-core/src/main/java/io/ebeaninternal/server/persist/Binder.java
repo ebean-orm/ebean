@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Binds bean values to a PreparedStatement.
  */
-public class Binder {
+public final class Binder {
 
   private static final Logger logger = LoggerFactory.getLogger(Binder.class);
 
@@ -75,33 +75,6 @@ public class Binder {
    */
   public boolean isAsOfStandardsBased() {
     return asOfStandardsBased;
-  }
-
-  /**
-   * Bind the values to the Prepared Statement.
-   */
-  public void bind(BindValues bindValues, DataBind dataBind, StringBuilder bindBuf) throws SQLException {
-    String logPrefix = "";
-    ArrayList<BindValues.Value> list = bindValues.values();
-    for (BindValues.Value bindValue : list) {
-      Object val = bindValue.getValue();
-      int dt = bindValue.getDbType();
-      bindObject(dataBind, val, dt);
-
-      if (bindBuf != null) {
-        bindBuf.append(logPrefix);
-        if (logPrefix.isEmpty()) {
-          logPrefix = ", ";
-        }
-        bindBuf.append(bindValue.getName());
-        bindBuf.append("=");
-        if (isLob(dt)) {
-          bindBuf.append("[LOB]");
-        } else {
-          bindBuf.append(val);
-        }
-      }
-    }
   }
 
   /**

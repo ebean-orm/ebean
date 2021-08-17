@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * Save details for a simple scalar element collection.
  */
-class SaveManyElementCollection extends SaveManyBase {
+final class SaveManyElementCollection extends SaveManyBase {
 
   private Collection<?> collection;
 

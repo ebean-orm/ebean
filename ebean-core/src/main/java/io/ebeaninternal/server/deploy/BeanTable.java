@@ -17,19 +17,13 @@ import org.slf4j.LoggerFactory;
  * in a BeanDescriptor.
  * </p>
  */
-public class BeanTable {
+public final class BeanTable {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
 
   private final BeanDescriptorMap owner;
-
   private final Class<?> beanType;
-
-  /**
-   * The base table.
-   */
   private final String baseTable;
-
   private final BeanProperty idProperty;
 
   /**

@@ -8,12 +8,10 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
  * Matches local embedded id properties to 'matching' properties from a
  * ManyToOne associated bean that is a 'imported primary key'.
  */
-class MatchedImportedEmbedded implements MatchedImportedProperty {
+final class MatchedImportedEmbedded implements MatchedImportedProperty {
 
   private final BeanProperty localProp;
-
   private final BeanPropertyAssocOne<?> assocOne;
-
   private final BeanProperty foreignProp;
 
   MatchedImportedEmbedded(BeanProperty localProp, BeanPropertyAssocOne<?> assocOne, BeanProperty foreignProp) {

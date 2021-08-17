@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * DefaultServer based implementation of MetaInfoManager.
  */
-public class DefaultMetaInfoManager implements MetaInfoManager {
+final class DefaultMetaInfoManager implements MetaInfoManager {
 
   private final DefaultServer server;
 

@@ -15,7 +15,7 @@ import java.util.Map;
  * statements of a single 'depth' at any given time.
  * </p>
  */
-public class BatchedPstmtHolder {
+public final class BatchedPstmtHolder {
 
   /**
    * A Map of the statements using a String key. This is used so that the same

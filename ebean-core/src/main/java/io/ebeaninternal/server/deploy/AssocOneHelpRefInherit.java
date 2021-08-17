@@ -9,7 +9,7 @@ import java.sql.SQLException;
 /**
  * Helper for BeanPropertyAssocOne imported reference but with inheritance.
  */
-class AssocOneHelpRefInherit extends AssocOneHelp {
+final class AssocOneHelpRefInherit extends AssocOneHelp {
 
   private final InheritInfo inherit;
 

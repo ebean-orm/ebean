@@ -21,9 +21,9 @@ import java.sql.Types;
  * This may or may not be a native jdbc type depending on the database and jdbc driver.
  * </p>
  */
-public class ScalarTypeBoolean {
+public final class ScalarTypeBoolean {
 
-  public static class Native extends BooleanBase {
+  public static final class Native extends BooleanBase {
 
     /**
      * Native Boolean database type.
@@ -75,7 +75,7 @@ public class ScalarTypeBoolean {
    * type.boolean.dbtype="bit" in the ebean configuration
    * </p>
    */
-  static class BitBoolean extends BooleanBase {
+  static final class BitBoolean extends BooleanBase {
 
     /**
      * Native Boolean database type.
@@ -124,7 +124,7 @@ public class ScalarTypeBoolean {
   /**
    * Converted to/from an Integer in the Database.
    */
-  static class IntBoolean extends BooleanBase {
+  static final class IntBoolean extends BooleanBase {
 
     private final Integer trueValue;
     private final Integer falseValue;
@@ -211,7 +211,7 @@ public class ScalarTypeBoolean {
   /**
    * Converted to/from an Integer in the Database.
    */
-  static class StringBoolean extends BooleanBase {
+  static final class StringBoolean extends BooleanBase {
 
     private final String trueValue;
     private final String falseValue;

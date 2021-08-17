@@ -1,14 +1,14 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
 
-class InRangeExpression extends AbstractExpression {
+final class InRangeExpression extends AbstractExpression {
 
   private final Object valueHigh;
-
   private final Object valueLow;
 
   InRangeExpression(String propertyName, Object valueLow, Object valueHigh) {
@@ -47,10 +47,8 @@ class InRangeExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = low().hashCode();
-    hc = hc * 92821 + high().hashCode();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(low()).add(high());
   }
 
   @Override

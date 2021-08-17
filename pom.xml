@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.10.1-SNAPSHOT</version>
+  <version>12.11.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -38,7 +38,7 @@
   </developers>
 
   <properties>
-    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+    <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <ebean-datasource.version>7.0</ebean-datasource.version>
     <jackson.version>2.12.1</jackson.version>
   </properties>
