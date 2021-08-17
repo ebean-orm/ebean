@@ -39,7 +39,6 @@ public class DefaultServerCache implements ServerCache {
    * The underlying map (ConcurrentHashMap or similar)
    */
   protected final Map<Object, SoftReference<CacheEntry>> map;
-
   protected final CountMetric hitCount;
   protected final CountMetric missCount;
   protected final CountMetric putCount;
@@ -49,16 +48,11 @@ public class DefaultServerCache implements ServerCache {
 
   protected final String name;
   protected final String shortName;
-
-  private int maxSize;
-
+  private final int maxSize;
   private final int trimFrequency;
-
-  private int maxIdleSecs;
-
-  private int maxSecsToLive;
-
-  private TenantAwareKey tenantAwareKey;
+  private final int maxIdleSecs;
+  private final int maxSecsToLive;
+  private final TenantAwareKey tenantAwareKey;
 
   public DefaultServerCache(DefaultServerCacheConfig config) {
     this.name = config.getName();
@@ -71,7 +65,6 @@ public class DefaultServerCache implements ServerCache {
     this.trimFrequency = config.determineTrimFrequency();
 
     MetricFactory factory = MetricFactory.get();
-
     String prefix = "l2n.";
     this.hitCount = factory.createCountMetric(prefix + shortName + ".hit");
     this.missCount = factory.createCountMetric(prefix + shortName + ".miss");
@@ -82,9 +75,7 @@ public class DefaultServerCache implements ServerCache {
   }
 
   public void periodicTrim(BackgroundExecutor executor) {
-
     EvictionRunnable trim = new EvictionRunnable();
-
     // default to trimming the cache every 60 seconds
     long trimFreqSecs = (trimFrequency == 0) ? 60 : trimFrequency;
     executor.scheduleWithFixedDelay(trim, trimFreqSecs, trimFreqSecs, TimeUnit.SECONDS);
@@ -102,11 +93,9 @@ public class DefaultServerCache implements ServerCache {
 
   @Override
   public ServerCacheStatistics getStatistics(boolean reset) {
-
     ServerCacheStatistics cacheStats = new ServerCacheStatistics();
     cacheStats.setCacheName(name);
     cacheStats.setMaxSize(maxSize);
-
     cacheStats.setSize(size());
     cacheStats.setHitCount(hitCount.get(reset));
     cacheStats.setMissCount(missCount.get(reset));
@@ -114,7 +103,6 @@ public class DefaultServerCache implements ServerCache {
     cacheStats.setRemoveCount(removeCount.get(reset));
     cacheStats.setClearCount(clearCount.get(reset));
     cacheStats.setEvictCount(evictCount.get(reset));
-
     return cacheStats;
   }
 
@@ -134,10 +122,8 @@ public class DefaultServerCache implements ServerCache {
 
   @Override
   public int getHitRatio() {
-
     long mc = missCount.get(false);
     long hc = hitCount.get(false);
-
     long totalCount = hc + mc;
     if (totalCount == 0) {
       return 0;
@@ -178,7 +164,6 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public Object get(Object id) {
-
     CacheEntry entry = getCacheEntry(id);
     if (entry == null) {
       missCount.increment();
@@ -252,31 +237,25 @@ public class DefaultServerCache implements ServerCache {
    * Run the eviction based on Idle time, Time to live and LRU last access.
    */
   public void runEviction() {
-
     long trimForMaxSize;
     if (maxSize == 0) {
       trimForMaxSize = 0;
     } else {
       trimForMaxSize = size() - maxSize;
     }
-
     if (maxIdleSecs == 0 && maxSecsToLive == 0 && trimForMaxSize < 0) {
       // nothing to trim on this cache
       return;
     }
-
     long startNanos = System.nanoTime();
-
     long trimmedByIdle = 0;
     long trimmedByGC = 0;
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
     List<CacheEntry> activeList = new ArrayList<>(map.size());
-
     long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
     long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
-
     Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
     while (it.hasNext()) {
       SoftReference<CacheEntry> ref = it.next();
@@ -287,16 +266,13 @@ public class DefaultServerCache implements ServerCache {
       } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
         it.remove();
         trimmedByIdle++;
-
       } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
         it.remove();
         trimmedByTTL++;
-
       } else if (trimForMaxSize > 0) {
         activeList.add(cacheEntry);
       }
     }
-
     if (trimForMaxSize > 0 && activeList.size() > maxSize) {
       // sort into last access time ascending
       activeList.sort(BY_LAST_ACCESS);
@@ -313,7 +289,6 @@ public class DefaultServerCache implements ServerCache {
     evictCount.add(trimmedByGC);
     evictCount.add(trimmedByTTL);
     evictCount.add(trimmedByLRU);
-
     if (logger.isTraceEnabled()) {
       long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
       logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
@@ -324,7 +299,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Runnable that calls the eviction routine.
    */
-  public class EvictionRunnable implements Runnable {
+  public final class EvictionRunnable implements Runnable {
 
     @Override
     public void run() {
@@ -335,7 +310,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Comparator for sorting by last access time.
    */
-  public static class CompareByLastAccess implements Comparator<CacheEntry>, Serializable {
+  public static final class CompareByLastAccess implements Comparator<CacheEntry>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -348,7 +323,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Wraps the value to additionally hold createTime and lastAccessTime and hit counter.
    */
-  public static class CacheEntry {
+  public static final class CacheEntry {
 
     private final Object key;
     private final Object value;

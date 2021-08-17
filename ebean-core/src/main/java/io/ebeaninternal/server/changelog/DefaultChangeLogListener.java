@@ -20,7 +20,7 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
   /**
    * The usual application specific logger.
    */
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultChangeLogListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultChangeLogListener.class);
 
   /**
    * The named logger we send the change set payload to. Can be externally configured as desired.

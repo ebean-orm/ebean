@@ -10,16 +10,14 @@ import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultServerCacheConfig {
+public final class DefaultServerCacheConfig {
 
   private final ServerCacheConfig config;
-
-  private int maxSize;
-  private int maxIdleSecs;
-  private int maxSecsToLive;
-  private int trimFrequency;
-
-  private Map<Object, SoftReference<CacheEntry>> map;
+  private final int maxSize;
+  private final int maxIdleSecs;
+  private final int maxSecsToLive;
+  private final int trimFrequency;
+  private final Map<Object, SoftReference<CacheEntry>> map;
 
   public DefaultServerCacheConfig(ServerCacheConfig config) {
     this(config,  new ConcurrentHashMap<>());

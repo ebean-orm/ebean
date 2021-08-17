@@ -30,20 +30,16 @@ public final class DefaultChangeLogRegister implements ChangeLogRegister {
 
   @Override
   public ChangeLogFilter getChangeFilter(Class<?> beanType) {
-
     ChangeLog changeLog = getChangeLog(beanType);
     if (changeLog == null) {
       return null;
     }
-
     String[] updatesThatInclude = changeLog.updatesThatInclude();
     if (updatesThatInclude.length == 0) {
       return insertModeInclude(changeLog.inserts()) ? INCLUDE_INSERTS : EXCLUDE_INSERTS;
     }
-
     Set<String> updateProps = new HashSet<>();
     Collections.addAll(updateProps, updatesThatInclude);
-
     return new UpdateFilter(insertModeInclude(changeLog.inserts()), updateProps);
   }
 

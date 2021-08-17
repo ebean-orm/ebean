@@ -10,7 +10,7 @@ import io.ebean.event.readaudit.ReadEvent;
  * the user context information on the readEvent bean (like user id).
  * </p>
  */
-public class DefaultReadAuditPrepare implements ReadAuditPrepare {
+public final class DefaultReadAuditPrepare implements ReadAuditPrepare {
 
   @Override
   public void prepare(ReadEvent readEvent) {
