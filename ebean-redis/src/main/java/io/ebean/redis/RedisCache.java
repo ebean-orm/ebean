@@ -2,6 +2,7 @@ package io.ebean.redis;
 
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheConfig;
+import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
@@ -11,10 +12,8 @@ import io.ebean.redis.encode.Encode;
 import io.ebean.redis.encode.EncodePrefixKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.*;
+import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.util.SafeEncoder;
 
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ final class RedisCache implements ServerCache {
   private final String cacheKey;
   private final Encode keyEncode;
   private final Encode valueEncode;
+  private final SetParams expiration;
   private final TimedMetric metricGet;
   private final TimedMetric metricGetAll;
   private final TimedMetric metricPut;
@@ -50,7 +50,7 @@ final class RedisCache implements ServerCache {
     this.cacheKey = config.getCacheKey();
     this.keyEncode = new EncodePrefixKey(config.getCacheKey());
     this.valueEncode = valueEncode;
-
+    this.expiration = expiration(config);
     String pre = "l2r.";
     String shortName = config.getShortName();
     MetricFactory factory = MetricFactory.get();
@@ -64,6 +64,17 @@ final class RedisCache implements ServerCache {
     metricRemove = factory.createTimedMetric(pre + shortName + ".remove");
     metricRemoveAll = factory.createTimedMetric(pre + shortName + ".removeMany");
     metricClear = factory.createTimedMetric(pre + shortName + ".clear");
+  }
+
+  private SetParams expiration(ServerCacheConfig config) {
+    final ServerCacheOptions cacheOptions = config.getCacheOptions();
+    if (cacheOptions != null) {
+      final int maxSecsToLive = cacheOptions.getMaxSecsToLive();
+      if (maxSecsToLive > 0) {
+        return new SetParams().ex((long)maxSecsToLive);
+      }
+    }
+    return null;
   }
 
   @Override
@@ -147,7 +158,11 @@ final class RedisCache implements ServerCache {
   public void put(Object id, Object value) {
     long start = System.nanoTime();
     try (Jedis resource = jedisPool.getResource()) {
-      resource.set(key(id), value(value));
+      if (expiration == null) {
+        resource.set(key(id), value(value));
+      } else {
+        resource.set(key(id), value(value), expiration);
+      }
       metricPut.addSinceNanos(start);
     }
   }
@@ -156,13 +171,15 @@ final class RedisCache implements ServerCache {
   public void putAll(Map<Object, Object> keyValues) {
     long start = System.nanoTime();
     try (Jedis resource = jedisPool.getResource()) {
-      byte[][] raw = new byte[keyValues.size() * 2][];
-      int pos = 0;
-      for (Map.Entry<Object, Object> entry : keyValues.entrySet()) {
-        raw[pos++] = key(entry.getKey());
-        raw[pos++] = value(entry.getValue());
+      try (final Transaction multi = resource.multi()) {
+        for (Map.Entry<Object, Object> entry : keyValues.entrySet()) {
+          if (expiration == null) {
+            multi.set(key(entry.getKey()), value(entry.getValue()));
+          } else {
+            multi.set(key(entry.getKey()), value(entry.getValue()), expiration);
+          }
+        }
       }
-      resource.mset(raw);
       metricPutAll.addSinceNanos(start);
     }
   }
