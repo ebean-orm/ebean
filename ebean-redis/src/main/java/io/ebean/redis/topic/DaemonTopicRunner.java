@@ -31,8 +31,7 @@ public final class DaemonTopicRunner {
   }
 
   public void run() {
-    Thread t = new Thread(() -> attemptConnections(), "redis-sub");
-    t.start();
+    new Thread(this::attemptConnections, "redis-sub").start();
   }
 
   private void attemptConnections() {
@@ -55,6 +54,7 @@ public final class DaemonTopicRunner {
           // wait a little before retrying
           Thread.sleep(reconnectWaitMillis);
         } catch (InterruptedException e1) {
+          Thread.currentThread().interrupt();
           log.warn("Interrupted redis re-connection wait", e1);
         }
       }
