@@ -6,10 +6,8 @@ import java.util.List;
 
 /**
  * Stack based on ArrayList.
- *
- * @author rbygrave
  */
-public class ArrayStack<E> {
+public final class ArrayStack<E> {
 
   private final List<E> list;
 

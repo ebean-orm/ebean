@@ -17,7 +17,6 @@ final class DRawSqlColumnsParser {
   private static final Pattern COLINFO_SPLIT = Pattern.compile("\\s(?=[^\\)]*(?:\\(|$))");
 
   private final String sqlSelect;
-
   private int indexPos;
 
   public static ColumnMapping parse(String sqlSelect) {

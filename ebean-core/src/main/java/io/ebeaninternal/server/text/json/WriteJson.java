@@ -21,22 +21,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public class WriteJson implements SpiJsonWriter {
+public final class WriteJson implements SpiJsonWriter {
 
   private final SpiEbeanServer server;
-
   private final JsonGenerator generator;
-
   private final FetchPath fetchPath;
-
   private final Map<String, JsonWriteBeanVisitor<?>> visitors;
-
   private final PathStack pathStack;
-
   private final ArrayStack<Object> parentBeans;
-
   private final Object objectMapper;
-
   private final JsonConfig.Include include;
 
   /**

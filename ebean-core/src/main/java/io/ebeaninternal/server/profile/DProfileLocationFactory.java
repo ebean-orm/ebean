@@ -8,7 +8,7 @@ import io.ebean.service.SpiProfileLocationFactory;
 /**
  * Default implementation of the profile location factory.
  */
-public class DProfileLocationFactory implements SpiProfileLocationFactory {
+public final class DProfileLocationFactory implements SpiProfileLocationFactory {
 
   @Override
   public ProfileLocation create() {

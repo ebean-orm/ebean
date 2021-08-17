@@ -37,7 +37,6 @@ public final class BeanPropertiesReader {
     try {
       Field field = clazz.getField("_ebean_props");
       return (String[]) field.get(null);
-
     } catch (Exception e) {
       throw new IllegalStateException("Error getting _ebean_props field on type " + clazz, e);
     }

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.logger;
 import io.ebeaninternal.api.SpiLogger;
 import org.slf4j.Logger;
 
-public class DSpiLogger implements SpiLogger {
+public final class DSpiLogger implements SpiLogger {
 
   private final Logger logger;
 

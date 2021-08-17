@@ -11,7 +11,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class DRawSqlService implements SpiRawSqlService {
+final class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public RawSql resultSet(ResultSet resultSet, String... propertyNames) {
@@ -20,10 +20,8 @@ public class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public RawSqlBuilder parsed(String sql) {
-
     SpiRawSql.Sql sql2 = DRawSqlParser.parse(sql);
     String select = sql2.getPreFrom();
-
     SpiRawSql.ColumnMapping mapping = DRawSqlColumnsParser.parse(select);
     return new DRawSqlBuilder(sql2, mapping);
   }
@@ -36,7 +34,6 @@ public class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException {
-
     ResultSetMetaData meta = resultSet.getMetaData();
     int estCap = (int) (meta.getColumnCount() / 0.7f) + 1;
     DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue, binaryOptimizedUUID);
@@ -77,7 +74,6 @@ public class DRawSqlService implements SpiRawSqlService {
    * Combine schema table and column names allowing for null schema and table.
    */
   String combine(String schemaName, String tableName, String name) {
-
     StringBuilder sb = new StringBuilder();
     if (schemaName != null) {
       sb.append(schemaName).append(".");

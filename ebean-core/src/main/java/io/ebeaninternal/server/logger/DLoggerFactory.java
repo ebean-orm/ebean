@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default SpiLoggerFactory implementation.
  */
-public class DLoggerFactory implements SpiLoggerFactory {
+public final class DLoggerFactory implements SpiLoggerFactory {
 
   /**
    * Just use a standard slf4j Logger.
