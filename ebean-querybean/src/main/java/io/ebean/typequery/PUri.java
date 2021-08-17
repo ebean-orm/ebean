@@ -7,7 +7,7 @@ import java.net.URI;
  *
  * @param <R> the root query bean type
  */
-public class PUri<R> extends PBaseString<R,URI> {
+public final class PUri<R> extends PBaseString<R,URI> {
 
   /**
    * Construct with a property name and root instance.

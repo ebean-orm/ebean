@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public class PFloat<R> extends PBaseNumber<R,Float> {
+public final class PFloat<R> extends PBaseNumber<R,Float> {
 
   /**
    * Construct with a property name and root instance.

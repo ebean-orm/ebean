@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public class PInteger<R> extends PBaseNumber<R,Integer> {
+public final class PInteger<R> extends PBaseNumber<R,Integer> {
 
   /**
    * Construct with a property name and root instance.

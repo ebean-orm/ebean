@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
  *
  * @param <R> the root query bean type
  */
-public class POffsetDateTime<R> extends PBaseNumber<R,OffsetDateTime> {
+public final class POffsetDateTime<R> extends PBaseNumber<R,OffsetDateTime> {
 
   /**
    * Construct with a property name and root instance.
