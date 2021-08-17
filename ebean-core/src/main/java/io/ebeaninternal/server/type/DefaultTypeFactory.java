@@ -14,7 +14,7 @@ import java.util.Date;
  * Helper to create some default ScalarType objects for Booleans,
  * java.util.Date, java.util.Calendar etc.
  */
-public final class DefaultTypeFactory {
+final class DefaultTypeFactory {
 
   private final DatabaseConfig config;
 

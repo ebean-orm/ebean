@@ -5,9 +5,9 @@ import java.util.Currency;
 /**
  * ScalarType for java.util.Currency which converts to and from a VARCHAR database column.
  */
-public final class ScalarTypeCurrency extends ScalarTypeBaseVarchar<Currency> {
+final class ScalarTypeCurrency extends ScalarTypeBaseVarchar<Currency> {
 
-  public ScalarTypeCurrency() {
+  ScalarTypeCurrency() {
     super(Currency.class);
   }
 

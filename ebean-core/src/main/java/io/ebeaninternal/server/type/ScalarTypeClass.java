@@ -6,7 +6,7 @@ import javax.persistence.PersistenceException;
  * ScalarType for Class that persists it to VARCHAR column.
  */
 @SuppressWarnings({"rawtypes"})
-public final class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
+final class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
 
   public ScalarTypeClass() {
     super(Class.class);

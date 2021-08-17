@@ -7,9 +7,9 @@ import java.net.InetAddress;
 /**
  * ScalarType for java.net.URI which converts to and from a VARCHAR database column.
  */
-public final class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
+final class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
 
-  public ScalarTypeInetAddress() {
+  ScalarTypeInetAddress() {
     super(InetAddress.class);
   }
 

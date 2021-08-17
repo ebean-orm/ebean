@@ -17,7 +17,7 @@ import java.sql.SQLException;
  */
 public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
 
-  protected ScalarTypeBytesBase(boolean jdbcNative, int jdbcType) {
+  ScalarTypeBytesBase(boolean jdbcNative, int jdbcType) {
     super(byte[].class, jdbcNative, jdbcType);
   }
 

@@ -8,9 +8,9 @@ import java.sql.Types;
 /**
  * ScalarType for Types.BINARY to byte[].
  */
-public final class ScalarTypeBytesBinary extends ScalarTypeBytesBase {
+final class ScalarTypeBytesBinary extends ScalarTypeBytesBase {
 
-  public ScalarTypeBytesBinary() {
+  ScalarTypeBytesBinary() {
     super(true, Types.BINARY);
   }
 

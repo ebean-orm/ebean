@@ -11,7 +11,7 @@ import java.time.DayOfWeek;
 /**
  * ScalarType mapping for Month enum.
  */
-public final class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
+final class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
 
   static final EnumToDbIntegerMap beanDbMap = new EnumToDbIntegerMap();
 
@@ -22,7 +22,7 @@ public final class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
     }
   }
 
-  public ScalarTypeDayOfWeek() {
+  ScalarTypeDayOfWeek() {
     super(beanDbMap, DayOfWeek.class, 1);
   }
 

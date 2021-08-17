@@ -5,9 +5,9 @@ import org.joda.time.Period;
 /**
  * ScalarType for Joda Period stored as DB VARCHAR
  */
-public final class ScalarTypeJodaPeriod extends ScalarTypeBaseVarchar<Period> {
+final class ScalarTypeJodaPeriod extends ScalarTypeBaseVarchar<Period> {
 
-  public ScalarTypeJodaPeriod() {
+  ScalarTypeJodaPeriod() {
     super(Period.class);
   }
 

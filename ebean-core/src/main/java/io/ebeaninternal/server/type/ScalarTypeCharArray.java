@@ -13,9 +13,9 @@ import java.sql.Types;
 /**
  * ScalarType for char[].
  */
-public final class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
+final class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
 
-  public ScalarTypeCharArray() {
+  ScalarTypeCharArray() {
     super(char[].class, false, Types.VARCHAR);
   }
 

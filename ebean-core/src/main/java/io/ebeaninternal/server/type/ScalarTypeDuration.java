@@ -19,21 +19,21 @@ import java.time.Duration;
 /**
  * ScalarType for java.time.Duration (with seconds precision).
  */
-public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
+class ScalarTypeDuration extends ScalarTypeBase<Duration> {
 
-  public ScalarTypeDuration() {
+  ScalarTypeDuration() {
     super(Duration.class, false, Types.BIGINT);
   }
 
-  protected ScalarTypeDuration(int jdbcType) {
+  ScalarTypeDuration(int jdbcType) {
     super(Duration.class, false, jdbcType);
   }
 
-  public BigDecimal convertToBigDecimal(Duration value) {
+  BigDecimal convertToBigDecimal(Duration value) {
     return (value == null) ? null : DecimalUtils.toDecimal(value);
   }
 
-  public Duration convertFromBigDecimal(BigDecimal value) {
+  Duration convertFromBigDecimal(BigDecimal value) {
     return (value == null) ? null : DecimalUtils.toDuration(value);
   }
 

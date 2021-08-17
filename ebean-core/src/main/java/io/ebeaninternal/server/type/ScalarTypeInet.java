@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * ScalarType for Inet to Varchar or Postgres INET.
  */
-public abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
+abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
 
   ScalarTypeInet(int jdbcType) {
     super(Inet.class, false, jdbcType);

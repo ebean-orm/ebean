@@ -11,9 +11,9 @@ import java.sql.Types;
 /**
  * ScalarType for InetAddress to Postgres INET.
  */
-public final class ScalarTypeInetAddressPostgres extends ScalarTypeBaseVarchar<InetAddress> {
+final class ScalarTypeInetAddressPostgres extends ScalarTypeBaseVarchar<InetAddress> {
 
-  public ScalarTypeInetAddressPostgres() {
+  ScalarTypeInetAddressPostgres() {
     super(InetAddress.class, false, ExtraDbTypes.INET);
   }
 

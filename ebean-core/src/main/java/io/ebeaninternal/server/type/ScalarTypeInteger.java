@@ -17,11 +17,9 @@ import java.sql.Types;
 /**
  * ScalarType for Integer and int.
  */
-public final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
+final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
 
-  public static ScalarTypeInteger INSTANCE = new ScalarTypeInteger();
-
-  private ScalarTypeInteger() {
+  ScalarTypeInteger() {
     super(Integer.class, true, Types.INTEGER);
   }
 

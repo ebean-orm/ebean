@@ -29,7 +29,7 @@ import static java.util.Collections.EMPTY_SET;
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeArray {
+class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeArray {
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();

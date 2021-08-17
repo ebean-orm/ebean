@@ -11,12 +11,12 @@ import java.sql.Types;
  * ScalarType for Joda DateMidnight. This maps to a JDBC Date.
  */
 @SuppressWarnings("deprecation")
-public final class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<org.joda.time.DateMidnight> {
+final class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<org.joda.time.DateMidnight> {
 
   /**
    * Instantiates a new scalar type joda date midnight.
    */
-  public ScalarTypeJodaDateMidnight(JsonConfig.Date mode) {
+  ScalarTypeJodaDateMidnight(JsonConfig.Date mode) {
     super(mode, org.joda.time.DateMidnight.class, false, Types.DATE);
   }
 

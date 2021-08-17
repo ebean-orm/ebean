@@ -25,7 +25,7 @@ import java.sql.Types;
 /**
  * ScalarType for streaming between a File and the database.
  */
-public final class ScalarTypeFile extends ScalarTypeBase<File> {
+final class ScalarTypeFile extends ScalarTypeBase<File> {
 
   private static final Logger logger = LoggerFactory.getLogger(ScalarTypeFile.class);
 
@@ -37,14 +37,14 @@ public final class ScalarTypeFile extends ScalarTypeBase<File> {
   /**
    * Construct with reasonable defaults of Blob and 8096 buffer size.
    */
-  public ScalarTypeFile() {
+  ScalarTypeFile() {
     this(Types.LONGVARBINARY, "db-", null, null, 8096);
   }
 
   /**
    * Create the ScalarTypeFile.
    */
-  public ScalarTypeFile(int jdbcType, String prefix, String suffix, File directory, int bufferSize) {
+  ScalarTypeFile(int jdbcType, String prefix, String suffix, File directory, int bufferSize) {
     super(File.class, false, jdbcType);
     this.prefix = prefix;
     this.suffix = suffix;
@@ -73,15 +73,12 @@ public final class ScalarTypeFile extends ScalarTypeBase<File> {
     if (is == null) {
       return null;
     }
-
     try {
       // stream from db into our temp file
       File tempFile = File.createTempFile(prefix, suffix, directory);
       OutputStream os = getOutputStream(tempFile);
       pump(is, os);
-
       return tempFile;
-
     } catch (IOException e) {
       throw new SQLException("Error reading db file inputStream", e);
     }

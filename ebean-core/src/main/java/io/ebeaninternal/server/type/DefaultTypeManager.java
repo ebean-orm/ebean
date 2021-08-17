@@ -71,7 +71,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final ScalarType<?> varbinaryType = new ScalarTypeBytesVarbinary();
   private final ScalarType<?> longVarbinaryType = new ScalarTypeBytesLongVarbinary();
   private final ScalarType<?> shortType = new ScalarTypeShort();
-  private final ScalarType<?> integerType = ScalarTypeInteger.INSTANCE;
+  private final ScalarType<?> integerType = new ScalarTypeInteger();
   private final ScalarType<?> longType = new ScalarTypeLong();
   private final ScalarType<?> doubleType = new ScalarTypeDouble();
   private final ScalarType<?> floatType = new ScalarTypeFloat();

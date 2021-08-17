@@ -9,7 +9,7 @@ import java.sql.Types;
 /**
  * Used to map Enum values to database string/varchar values.
  */
-public final class EnumToDbStringMap extends EnumToDbValueMap<String> {
+final class EnumToDbStringMap extends EnumToDbValueMap<String> {
 
   @Override
   public int getDbType() {

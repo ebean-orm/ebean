@@ -22,14 +22,14 @@ import java.sql.Types;
 /**
  * Type which maps Jackson's JsonNode to various DB types (Clob, Varchar, Blob) in JSON format.
  */
-public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
+abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
 
   /**
    * Clob storage based implementation.
    */
-  public static final class Clob extends ScalarTypeJsonNode {
+  static final class Clob extends ScalarTypeJsonNode {
 
-    public Clob(ObjectMapper objectMapper) {
+    Clob(ObjectMapper objectMapper) {
       super(objectMapper, Types.CLOB);
     }
 
@@ -46,7 +46,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   /**
    * Varchar storage based implementation.
    */
-  public static final class Varchar extends ScalarTypeJsonNode {
+  static final class Varchar extends ScalarTypeJsonNode {
 
     public Varchar(ObjectMapper objectMapper) {
       super(objectMapper, Types.VARCHAR);
@@ -56,9 +56,9 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   /**
    * Blob storage based implementation.
    */
-  public static class Blob extends ScalarTypeJsonNode {
+  static class Blob extends ScalarTypeJsonNode {
 
-    public Blob(ObjectMapper objectMapper) {
+    Blob(ObjectMapper objectMapper) {
       super(objectMapper, Types.BLOB);
     }
 
@@ -91,7 +91,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
    */
   final ObjectMapper objectMapper;
 
-  public ScalarTypeJsonNode(ObjectMapper objectMapper, int jdbcType) {
+  ScalarTypeJsonNode(ObjectMapper objectMapper, int jdbcType) {
     super(JsonNode.class, false, jdbcType);
     this.objectMapper = objectMapper;
   }

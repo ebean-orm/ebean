@@ -15,9 +15,9 @@ import java.util.LinkedHashMap;
  * Enum gets converter to.
  * </p>
  */
-public abstract class EnumToDbValueMap<T> {
+abstract class EnumToDbValueMap<T> {
 
-  public static EnumToDbValueMap<?> create(boolean integerType) {
+  static EnumToDbValueMap<?> create(boolean integerType) {
     return integerType ? new EnumToDbIntegerMap() : new EnumToDbStringMap();
   }
 
@@ -30,7 +30,7 @@ public abstract class EnumToDbValueMap<T> {
   /**
    * Construct with allowNulls defaulting to false.
    */
-  public EnumToDbValueMap() {
+  EnumToDbValueMap() {
     this(false, false);
   }
 
@@ -42,7 +42,7 @@ public abstract class EnumToDbValueMap<T> {
    * value is found.
    * </p>
    */
-  public EnumToDbValueMap(boolean allowNulls, boolean isIntegerType) {
+  EnumToDbValueMap(boolean allowNulls, boolean isIntegerType) {
     this.allowNulls = allowNulls;
     this.isIntegerType = isIntegerType;
     this.keyMap = new LinkedHashMap<>();
@@ -54,7 +54,7 @@ public abstract class EnumToDbValueMap<T> {
    * Return true if this is mapping to integers, false
    * if mapping to Strings.
    */
-  public boolean isIntegerType() {
+  boolean isIntegerType() {
     return isIntegerType;
   }
 
