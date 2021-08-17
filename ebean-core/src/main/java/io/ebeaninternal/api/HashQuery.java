@@ -3,7 +3,7 @@ package io.ebeaninternal.api;
 /**
  * A hash key for a query including both the query plan and bind values.
  */
-public class HashQuery {
+public final class HashQuery {
 
   private final CQueryPlanKey planHash;
   private final BindValuesKey bindValuesKey;

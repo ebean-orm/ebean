@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Natural key entry with name value pairs for each of the properties making up the key.
  */
-class NaturalKeyEntryBasic implements NaturalKeyEntry {
+final class NaturalKeyEntryBasic implements NaturalKeyEntry {
 
   private final Map<String,Object> map = new HashMap<>();
   private final String key;

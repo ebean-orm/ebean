@@ -17,16 +17,13 @@ import java.util.TreeSet;
  * Holds the joins needs to support the many where predicates.
  * These joins are independent of any 'fetch' joins on the many.
  */
-public class ManyWhereJoins implements Serializable {
+public final class ManyWhereJoins implements Serializable {
 
   private static final long serialVersionUID = -6490181101871795417L;
 
   private final TreeMap<String, PropertyJoin> joins = new TreeMap<>();
-
   private List<String> formulaJoinProperties;
-
   private boolean aggregation;
-
   /**
    * 'Mode' indicating that joins added while this is true are required to be outer joins.
    */

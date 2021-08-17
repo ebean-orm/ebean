@@ -13,12 +13,11 @@ import java.util.Objects;
 /**
  * Modify aware wrapper of a list.
  */
-public class ModifyAwareList<E> implements List<E>, ModifyAwareType, Serializable {
+public final class ModifyAwareList<E> implements List<E>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
 
   final List<E> list;
-
   final ModifyAwareType owner;
 
   public ModifyAwareList(List<E> list) {

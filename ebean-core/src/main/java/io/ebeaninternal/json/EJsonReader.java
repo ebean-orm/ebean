@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-class EJsonReader {
+final class EJsonReader {
 
   static final JsonFactory json = new JsonFactory();
 

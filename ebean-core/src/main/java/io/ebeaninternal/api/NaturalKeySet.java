@@ -4,8 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class NaturalKeySet {
-
+public final class NaturalKeySet {
 
   private final Map<Object, NaturalKeyEntry> map = new LinkedHashMap<>();
 

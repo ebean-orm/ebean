@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Used internally to handle the scoping of transactions for methods.
  */
-public class ScopeTrans {
+public final class ScopeTrans {
 
   private static final int OPCODE_ATHROW = 191;
 
@@ -15,43 +15,32 @@ public class ScopeTrans {
    * The transaction in scope (can be null).
    */
   private final SpiTransaction transaction;
-
   /**
    * If true by default rollback on Checked exceptions.
    */
   private final boolean rollbackOnChecked;
-
   /**
    * True if the transaction was created and hence should be committed
    * on finally if it hasn't already been rolled back.
    */
   private final boolean created;
-
   /**
    * Explicit set of Exceptions that DO NOT cause a rollback to occur.
    */
   private final ArrayList<Class<? extends Throwable>> noRollbackFor;
-
   /**
    * Explicit set of Exceptions that DO cause a rollback to occur.
    */
   private final ArrayList<Class<? extends Throwable>> rollbackFor;
-
   private Boolean restoreBatch;
-
   private Boolean restoreBatchOnCascade;
-
   private int restoreBatchSize;
-
   private Boolean restoreBatchGeneratedKeys;
-
   private boolean restoreBatchFlushOnQuery;
-
   /**
    * Flag set when a rollback has occurred.
    */
   private boolean rolledBack;
-
   /**
    * Flag set when nested commit has occurred.
    */
