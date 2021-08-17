@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class EncodeBeanData implements Encode {
+public final class EncodeBeanData implements Encode {
 
   @Override
   public byte[] encode(Object value) {

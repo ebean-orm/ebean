@@ -16,7 +16,7 @@ import java.util.TimerTask;
  * notification of when reconnection takes place.
  * </p>
  */
-public class DaemonTopicRunner {
+public final class DaemonTopicRunner {
 
   private static final Logger log = LoggerFactory.getLogger(DaemonTopicRunner.class);
 

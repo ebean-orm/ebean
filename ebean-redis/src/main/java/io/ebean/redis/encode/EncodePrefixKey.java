@@ -4,7 +4,7 @@ import io.ebean.cache.TenantAwareKey;
 
 import java.nio.charset.StandardCharsets;
 
-public class EncodePrefixKey implements Encode {
+public final class EncodePrefixKey implements Encode {
 
   private final String prefix;
 
