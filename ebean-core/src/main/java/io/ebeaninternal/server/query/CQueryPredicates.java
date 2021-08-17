@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -388,7 +389,7 @@ public final class CQueryPredicates {
    * Return the bind values for the where expression.
    */
   public List<Object> getWhereExprBindValues() {
-    return where.getBindValues();
+    return where == null ? Collections.emptyList() : where.getBindValues();
   }
 
   /**
