@@ -15,9 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClusterTest {
 
-
   private Database createOther(DataSource dataSource) {
-
     DatabaseConfig config = new DatabaseConfig();
     config.setDataSource(dataSource);
     config.loadFromProperties();
@@ -25,7 +23,6 @@ public class ClusterTest {
     config.setName("other");
     config.setDdlGenerate(false);
     config.setDdlRun(false);
-
     return DatabaseFactory.create(config);
   }
 
@@ -47,22 +44,23 @@ public class ClusterTest {
 
     Person fooA = DB.find(Person.class, foo.getId());
     Person fooB = other.find(Person.class, foo.getId());
+
+    DuelCache dualCacheA = (DuelCache) DB.getServerCacheManager().getBeanCache(Person.class);
+    assertCounts(dualCacheA, 0, 1, 1, 0);
     fooA = DB.find(Person.class, foo.getId());
+    assertCounts(dualCacheA, 1, 1, 1, 0);
     fooB = other.find(Person.class, foo.getId());
     fooA = DB.find(Person.class, foo.getId());
+    assertCounts(dualCacheA, 2, 1, 1, 0);
     fooB = other.find(Person.class, foo.getId());
-
-    DuelCache dualCache = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
-    assertCounts(dualCache, 2, 1, 1, 0);
-
+    DuelCache dualCacheB = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
+    assertCounts(dualCacheB, 2, 1, 1, 0);
   }
 
   @Test
   public void test() throws InterruptedException {
-
     // ensure the default server exists first
     final Database db = DB.getDefault();
-
     Database other = createOther(db.getPluginApi().getDataSource());
 
     for (int i = 0; i < 10; i++) {
@@ -90,7 +88,6 @@ public class ClusterTest {
     other.find(Person.class, 2);
     assertCounts(dualCache, 3, 2, 0, 2);
 
-
     foo0.setName("name2");
     foo0.save();
     allowAsyncMessaging();
@@ -98,7 +95,6 @@ public class ClusterTest {
     Person foo3 = other.find(Person.class, 1);
     assertThat(foo3.getName()).isEqualTo("name2");
     assertCounts(dualCache, 3, 3, 1, 2);
-
 
     foo0.setName("name3");
     foo0.save();
@@ -110,7 +106,6 @@ public class ClusterTest {
   }
 
   private void assertCounts(DuelCache dualCache, int nearHits, int nearMiss, int remoteHit, int remoteMiss) {
-
     assertThat(dualCache.getNearHitCount()).isEqualTo(nearHits);
     assertThat(dualCache.getNearMissCount()).isEqualTo(nearMiss);
     assertThat(dualCache.getRemoteHitCount()).isEqualTo(remoteHit);

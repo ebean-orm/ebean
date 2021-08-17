@@ -72,7 +72,6 @@ final class RedisCacheFactory implements ServerCacheFactory {
 
   private final BackgroundExecutor executor;
   private final JedisPool jedisPool;
-  private final DaemonTopicRunner daemonTopicRunner;
   private final NearCacheNotify nearCacheNotify;
   private final TimedMetric metricOutNearCache;
   private final TimedMetric metricOutTableMod;
@@ -96,11 +95,9 @@ final class RedisCacheFactory implements ServerCacheFactory {
     this.metricInNearCache = factory.createTimedMetric("l2a.inNearKeys");
     if (config.isDisableL2Cache()) {
       this.jedisPool = null;
-      this.daemonTopicRunner = null;
     } else {
       this.jedisPool = getJedisPool(config);
-      this.daemonTopicRunner = new DaemonTopicRunner(jedisPool, new CacheDaemonTopic());
-      daemonTopicRunner.run();
+      new DaemonTopicRunner(jedisPool, new CacheDaemonTopic()).run();
     }
   }
 
