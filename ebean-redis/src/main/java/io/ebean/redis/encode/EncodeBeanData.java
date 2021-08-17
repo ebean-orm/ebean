@@ -12,16 +12,13 @@ public class EncodeBeanData implements Encode {
 
   @Override
   public byte[] encode(Object value) {
-
     try {
       CachedBeanData data = (CachedBeanData) value;
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(os);
-
       data.writeExternal(oos);
       oos.flush();
       oos.close();
-
       return os.toByteArray();
 
     } catch (IOException e) {
@@ -31,11 +28,9 @@ public class EncodeBeanData implements Encode {
 
   @Override
   public Object decode(byte[] data) {
-
     try {
       ByteArrayInputStream is = new ByteArrayInputStream(data);
       ObjectInputStream ois = new ObjectInputStream(is);
-
       CachedBeanData read = new CachedBeanData();
       read.readExternal(ois);
       return read;

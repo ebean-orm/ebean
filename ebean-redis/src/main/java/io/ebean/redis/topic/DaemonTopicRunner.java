@@ -23,7 +23,6 @@ public class DaemonTopicRunner {
   private static final long reconnectWaitMillis = 1000;
 
   private final JedisPool jedisPool;
-
   private final DaemonTopic daemonTopic;
 
   public DaemonTopicRunner(JedisPool jedisPool, DaemonTopic daemonTopic) {
@@ -37,11 +36,9 @@ public class DaemonTopicRunner {
   }
 
   private void attemptConnections() {
-
     Timer reloadTimer = new Timer("redis-sub-notify");
     ReloadNotifyTask notifyTask = null;
     int attempts = 1;
-
     while (true) {
       if (notifyTask != null) {
         // we didn't successfully re-connect to redis
@@ -72,11 +69,9 @@ public class DaemonTopicRunner {
     jedis.echo("hi");
     try {
       daemonTopic.subscribe(jedis);
-
     } catch (Exception e) {
       log.error("Lost connection to topic, starting re-connection loop", e);
       attemptConnections();
-
     } finally {
       try {
         jedis.close();

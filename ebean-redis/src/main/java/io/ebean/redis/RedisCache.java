@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class RedisCache implements ServerCache {
+final class RedisCache implements ServerCache {
 
   private static final Logger log = LoggerFactory.getLogger(RedisCache.class);
 
@@ -35,7 +35,6 @@ class RedisCache implements ServerCache {
   private final String cacheKey;
   private final Encode keyEncode;
   private final Encode valueEncode;
-
   private final TimedMetric metricGet;
   private final TimedMetric metricGetAll;
   private final TimedMetric metricPut;
@@ -47,7 +46,6 @@ class RedisCache implements ServerCache {
   private final CountMetric missCount;
 
   RedisCache(JedisPool jedisPool, ServerCacheConfig config, Encode valueEncode) {
-
     this.jedisPool = jedisPool;
     this.cacheKey = config.getCacheKey();
     this.keyEncode = new EncodePrefixKey(config.getCacheKey());
@@ -106,10 +104,8 @@ class RedisCache implements ServerCache {
 
   @Override
   public Map<Object, Object> getAll(Set<Object> keys) {
-
     long start = System.nanoTime();
     Map<Object, Object> map = new LinkedHashMap<>();
-
     List<Object> keyList = new ArrayList<>(keys);
     try (Jedis resource = jedisPool.getResource()) {
       List<byte[]> valsAsBytes = resource.mget(keysAsBytes(keyList));
@@ -146,7 +142,6 @@ class RedisCache implements ServerCache {
       return val;
     }
   }
-
 
   @Override
   public void put(Object id, Object value) {
@@ -203,7 +198,6 @@ class RedisCache implements ServerCache {
   public void clear() {
     long start = System.nanoTime();
     try (Jedis resource = jedisPool.getResource()) {
-
       ScanParams params = new ScanParams();
       params.match(cacheKey + ":*");
 
@@ -224,7 +218,6 @@ class RedisCache implements ServerCache {
 
         next = SafeEncoder.encode(nextCursor);
       } while (!next.equals("0"));
-
       metricClear.addSinceNanos(start);
     }
   }

@@ -11,25 +11,15 @@ import java.util.Properties;
 public class RedisConfig {
 
   private String server = "localhost";
-
   private int port = 6379;
-
   private int maxTotal = 200;
-
   private int maxIdle = 200;
-
   private int minIdle = 1;
-
   private long maxWaitMillis = -1L;
-
   private boolean blockWhenExhausted = true;
-
   private int timeout = 2000;
-
   private String username;
-
   private String password;
-
   private boolean ssl;
 
   /**

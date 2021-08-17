@@ -38,14 +38,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.asList;
 
-class RedisCacheFactory implements ServerCacheFactory {
+final class RedisCacheFactory implements ServerCacheFactory {
 
   private static final Logger log = LoggerFactory.getLogger(RedisCacheFactory.class);
 
   private static final Logger queryLogger = LoggerFactory.getLogger("io.ebean.cache.QUERY");
-
   private static final Logger logger = LoggerFactory.getLogger("io.ebean.cache.CACHE");
-
   private static final Logger tableModLogger = LoggerFactory.getLogger("io.ebean.cache.TABLEMODS");
 
   private static final int MSG_NEARCACHE_CLEAR = 1;
@@ -66,30 +64,22 @@ class RedisCacheFactory implements ServerCacheFactory {
   private static final byte[] CHANNEL_NEAR_BYTES = SafeEncoder.encode(CHANNEL_NEAR);
 
   private final ConcurrentHashMap<String, RQueryCache> queryCaches = new ConcurrentHashMap<>();
-
   private final Map<String, NearCacheInvalidate> nearCacheMap = new ConcurrentHashMap<>();
-
   private final EncodeManyIdsData encodeManyIdsData = new EncodeManyIdsData();
   private final EncodeBeanData encodeBeanData = new EncodeBeanData();
   private final EncodeSerializable encodeSerializable = new EncodeSerializable();
 
   private final BackgroundExecutor executor;
-
   private final JedisPool jedisPool;
-
   private final DaemonTopicRunner daemonTopicRunner;
-
   private final NearCacheNotify nearCacheNotify;
-
   private final TimedMetric metricOutNearCache;
   private final TimedMetric metricOutTableMod;
   private final TimedMetric metricOutQueryCache;
   private final TimedMetric metricInNearCache;
   private final TimedMetric metricInTableMod;
   private final TimedMetric metricInQueryCache;
-
   private final String serverId = ModId.id();
-
   private ServerCacheNotify listener;
 
   RedisCacheFactory(DatabaseConfig config, BackgroundExecutor executor) {
@@ -148,7 +138,6 @@ class RedisCacheFactory implements ServerCacheFactory {
   }
 
   private ServerCache createNormalCache(ServerCacheConfig config) {
-
     RedisCache redisCache = createRedisCache(config);
     boolean nearCache = config.getCacheOptions().isNearCache();
     if (!nearCache) {
@@ -156,17 +145,14 @@ class RedisCacheFactory implements ServerCacheFactory {
     }
 
     String cacheKey = config.getCacheKey();
-
     DefaultServerCache near = new DefaultServerCache(new DefaultServerCacheConfig(config));
     near.periodicTrim(executor);
     DuelCache duelCache = new DuelCache(near, redisCache, cacheKey, nearCacheNotify);
     nearCacheMap.put(cacheKey, duelCache);
-
     return duelCache;
   }
 
   private RedisCache createRedisCache(ServerCacheConfig config) {
-
     switch (config.getType()) {
       case NATURAL_KEY:
         return new RedisCache(jedisPool, config, encodeSerializable);
@@ -247,15 +233,12 @@ class RedisCacheFactory implements ServerCacheFactory {
 
     @Override
     public void notify(ServerCacheNotification tableModifications) {
-
       Set<String> dependentTables = tableModifications.getDependentTables();
       if (dependentTables != null && !dependentTables.isEmpty()) {
-
         StringBuilder msg = new StringBuilder(50);
         for (String table : dependentTables) {
           msg.append(table).append(",");
         }
-
         String formattedMsg = msg.toString();
         if (tableModLogger.isDebugEnabled()) {
           tableModLogger.debug("Publish TableMods - {}", formattedMsg);
