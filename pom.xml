@@ -39,7 +39,7 @@
 
   <properties>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
-    <ebean-datasource.version>7.0</ebean-datasource.version>
+    <ebean-datasource.version>7.2</ebean-datasource.version>
     <jackson.version>2.12.1</jackson.version>
   </properties>
 
