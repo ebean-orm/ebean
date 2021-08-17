@@ -10,7 +10,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
-class DtoMetaProperty implements DtoReadSet {
+final class DtoMetaProperty implements DtoReadSet {
 
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 

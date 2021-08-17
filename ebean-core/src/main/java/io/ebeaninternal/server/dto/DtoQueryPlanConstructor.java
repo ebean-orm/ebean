@@ -7,7 +7,7 @@ import java.sql.SQLException;
 /**
  * Plan based on mapping via single constructor only.
  */
-class DtoQueryPlanConstructor extends DtoQueryPlanBase {
+final class DtoQueryPlanConstructor extends DtoQueryPlanBase {
 
   private final DtoMetaConstructor constructor;
 

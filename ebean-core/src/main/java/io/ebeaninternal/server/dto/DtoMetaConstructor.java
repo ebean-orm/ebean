@@ -10,22 +10,19 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
 
-class DtoMetaConstructor {
+final class DtoMetaConstructor {
 
   private final Class<?>[] types;
   private final MethodHandle handle;
-
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private final ScalarType<?>[] scalarTypes;
 
   DtoMetaConstructor(TypeManager typeManager, Constructor<?> constructor, Class<?> someClass) throws NoSuchMethodException, IllegalAccessException {
-
     this.types = constructor.getParameterTypes();
     this.scalarTypes = new ScalarType[types.length];
     for (int i = 0; i < types.length; i++) {
       scalarTypes[i] = typeManager.getScalarType(types[i]);
     }
-
     this.handle = LOOKUP.findConstructor(someClass, typeFor(types));
   }
 

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.dto;
 /**
  * A column in the resultSet that we want to map to a bean property.
  */
-public class DtoColumn {
+public final class DtoColumn {
 
   private final String label;
 
