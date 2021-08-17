@@ -8,7 +8,7 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 /**
  * The options for document property collected when reading deployment mapping.
  */
-public class DeployDocPropertyOptions {
+public final class DeployDocPropertyOptions {
 
   private static final DocPropertyOptions EMPTY = new DocPropertyOptions();
 
@@ -24,7 +24,6 @@ public class DeployDocPropertyOptions {
    * Read the DocProperty deployment options.
    */
   public void setDocProperty(DocProperty doc) {
-
     createOptions();
     mapping.apply(doc);
   }
@@ -33,7 +32,6 @@ public class DeployDocPropertyOptions {
    * Read the DocSortable deployment options.
    */
   public void setDocSortable(DocSortable doc) {
-
     createOptions();
     mapping.setSortable(true);
     setStore(doc.store());
@@ -45,7 +43,6 @@ public class DeployDocPropertyOptions {
    * Read the DocCode deployment options.
    */
   public void setDocCode(DocCode doc) {
-
     createOptions();
     mapping.setCode(true);
     setStore(doc.store());

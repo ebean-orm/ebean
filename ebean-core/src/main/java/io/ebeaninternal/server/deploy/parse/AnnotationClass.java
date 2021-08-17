@@ -36,7 +36,7 @@ import static io.ebean.util.AnnotationUtil.typeGet;
 /**
  * Read the class level deployment annotations.
  */
-public class AnnotationClass extends AnnotationParser {
+final class AnnotationClass extends AnnotationParser {
 
   private static final Logger logger = LoggerFactory.getLogger(AnnotationClass.class);
 

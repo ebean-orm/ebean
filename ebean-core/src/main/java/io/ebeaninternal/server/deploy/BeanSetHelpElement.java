@@ -7,7 +7,7 @@ import io.ebeaninternal.api.json.SpiJsonWriter;
 /**
  * Helper for element collection List.
  */
-public class BeanSetHelpElement<T> extends BeanSetHelp<T> {
+public final class BeanSetHelpElement<T> extends BeanSetHelp<T> {
 
   BeanSetHelpElement(BeanPropertyAssocMany<T> many) {
     super(many);

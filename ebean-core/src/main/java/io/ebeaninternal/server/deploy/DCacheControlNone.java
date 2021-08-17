@@ -5,7 +5,7 @@ import io.ebeaninternal.api.SpiCacheControl;
 /**
  * Cache control used when no caching is on the bean type.
  */
-class DCacheControlNone implements SpiCacheControl {
+final class DCacheControlNone implements SpiCacheControl {
 
   static final SpiCacheControl INSTANCE = new DCacheControlNone();
 

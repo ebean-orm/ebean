@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
-class DetermineAggPath {
+final class DetermineAggPath {
 
   /**
    * Return the many path for the given aggregation formula.

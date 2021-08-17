@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * Read the deployment annotation for Assoc Many beans.
  */
-class AnnotationAssocManys extends AnnotationAssoc {
+final class AnnotationAssocManys extends AnnotationAssoc {
 
   AnnotationAssocManys(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
     super(info, readConfig, factory);

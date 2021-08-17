@@ -5,10 +5,9 @@ import io.ebeaninternal.server.persist.BeanPersister;
 /**
  * Holds the BeanDescriptor and its associated BeanPersister.
  */
-public class BeanManager<T> {
+public final class BeanManager<T> {
 
   private final BeanPersister persister;
-
   private final BeanDescriptor<T> descriptor;
 
   public BeanManager(BeanDescriptor<T> descriptor, BeanPersister persister) {

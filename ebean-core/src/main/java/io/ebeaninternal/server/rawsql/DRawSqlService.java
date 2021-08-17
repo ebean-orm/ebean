@@ -11,7 +11,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-final class DRawSqlService implements SpiRawSqlService {
+public final class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public RawSql resultSet(ResultSet resultSet, String... propertyNames) {

@@ -11,12 +11,11 @@ import java.util.List;
 /**
  * Handles multiple BeanQueryAdapter for a given entity type.
  */
-public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
+public final class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 
   private static final Sorter SORTER = new Sorter();
 
   private final List<BeanQueryAdapter> list;
-
   private final BeanQueryAdapter[] chain;
 
   /**

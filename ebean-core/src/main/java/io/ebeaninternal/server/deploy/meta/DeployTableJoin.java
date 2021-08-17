@@ -15,7 +15,7 @@ import java.util.Set;
  * This gets converted into a immutable TableJoin when complete.
  * </p>
  */
-public class DeployTableJoin {
+public final class DeployTableJoin {
 
   /**
    * The joined table.
@@ -33,7 +33,7 @@ public class DeployTableJoin {
   private ArrayList<DeployTableJoinColumn> columns = new ArrayList<>(4);
 
   private InheritInfo inheritInfo;
-  
+
   private String extraWhere;
 
   /**
@@ -146,11 +146,11 @@ public class DeployTableJoin {
   public String getExtraWhere() {
     return extraWhere;
   }
-  
+
   public void setExtraWhere(String extraWhere) {
     this.extraWhere = extraWhere;
   }
-  
+
   public DeployTableJoin createInverse(String tableName) {
 
     DeployTableJoin inverse = new DeployTableJoin();

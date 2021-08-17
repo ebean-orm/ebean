@@ -8,7 +8,7 @@ import javax.persistence.CascadeType;
  * This is set to associated Beans, Table joins and List.
  * </p>
  */
-public class BeanCascadeInfo {
+public final class BeanCascadeInfo {
 
   private boolean delete;
 

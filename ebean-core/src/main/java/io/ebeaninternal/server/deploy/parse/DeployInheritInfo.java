@@ -12,7 +12,7 @@ import java.util.List;
  * Represents a node in the Inheritance tree.
  * Holds information regarding Super Subclass support.
  */
-public class DeployInheritInfo {
+public final class DeployInheritInfo {
 
   /**
    * the default discriminator column according to the JPA 1.0 spec.

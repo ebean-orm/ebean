@@ -14,7 +14,7 @@ import java.util.List;
  * <p>
  * Used when multiple BeanPersistController register for the same bean type.
  */
-public class ChainedBeanPersistController implements BeanPersistController {
+public final class ChainedBeanPersistController implements BeanPersistController {
 
   private static final Sorter SORTER = new Sorter();
 

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Stack based on ArrayList.
  */
-public final class ArrayStack<E> {
+public class ArrayStack<E> {
 
   private final List<E> list;
 

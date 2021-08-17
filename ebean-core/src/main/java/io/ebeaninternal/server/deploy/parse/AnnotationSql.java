@@ -7,7 +7,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 /**
  * Read the class level deployment annotations.
  */
-class AnnotationSql extends AnnotationParser {
+final class AnnotationSql extends AnnotationParser {
 
   AnnotationSql(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info, readConfig);

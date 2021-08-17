@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 /**
  * Utility to find the root bean type.
  */
-public class PersistenceContextUtil {
+public final class PersistenceContextUtil {
 
   /**
    * Find and return the root bean type for the given class.

@@ -76,7 +76,7 @@ import java.util.UUID;
 /**
  * Read the field level deployment annotations.
  */
-public class AnnotationFields extends AnnotationParser {
+final class AnnotationFields extends AnnotationParser {
 
   /**
    * If present read Jackson JsonIgnore.

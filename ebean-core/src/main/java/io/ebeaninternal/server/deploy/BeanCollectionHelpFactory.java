@@ -9,7 +9,7 @@ import io.ebeaninternal.server.query.CQueryCollectionAdd;
 /**
  * Creates Helpers specific to the type of the property (List Set or Map).
  */
-public class BeanCollectionHelpFactory {
+public final class BeanCollectionHelpFactory {
 
   @SuppressWarnings("rawtypes")
   private static final BeanListHelp LIST_HELP = new BeanListHelp();
@@ -21,7 +21,6 @@ public class BeanCollectionHelpFactory {
    * Create the helper based on the many property.
    */
   public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> many) {
-
     boolean elementCollection = many.isElementCollection();
     ManyType manyType = many.getManyType();
     switch (manyType) {
@@ -30,7 +29,7 @@ public class BeanCollectionHelpFactory {
       case SET:
         return elementCollection ? new BeanSetHelpElement<>(many) : new BeanSetHelp<>(many);
       case MAP:
-        return elementCollection ? new BeanMapHelpElement<>(many) :new BeanMapHelp<>(many);
+        return elementCollection ? new BeanMapHelpElement<>(many) : new BeanMapHelp<>(many);
       default:
         throw new RuntimeException("Invalid type " + manyType);
     }
@@ -39,7 +38,6 @@ public class BeanCollectionHelpFactory {
 
   @SuppressWarnings("unchecked")
   public static <T> CQueryCollectionAdd<T> create(SpiQuery.Type manyType, OrmQueryRequest<T> request) {
-
     if (manyType == SpiQuery.Type.LIST) {
       return LIST_HELP;
 
@@ -55,6 +53,5 @@ public class BeanCollectionHelpFactory {
       return null;
     }
   }
-
 
 }

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebeaninternal.server.deploy.ManyType;
 
-public class DeployBeanPropertySimpleCollection<T> extends DeployBeanPropertyAssocMany<T> {
+public final class DeployBeanPropertySimpleCollection<T> extends DeployBeanPropertyAssocMany<T> {
 
   public DeployBeanPropertySimpleCollection(DeployBeanDescriptor<?> desc, Class<T> targetType, ManyType manyType) {
     super(desc, targetType, manyType);

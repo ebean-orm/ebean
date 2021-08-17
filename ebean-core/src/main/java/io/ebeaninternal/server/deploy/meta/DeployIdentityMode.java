@@ -5,7 +5,7 @@ import io.ebean.annotation.IdentityGenerated;
 import io.ebean.annotation.IdentityType;
 import io.ebean.config.dbplatform.IdType;
 
-public class DeployIdentityMode {
+public final class DeployIdentityMode {
 
   public static DeployIdentityMode auto() {
     return new DeployIdentityMode(IdType.AUTO);

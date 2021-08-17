@@ -26,7 +26,7 @@ import java.sql.Types;
 /**
  * Utility object to help processing deployment information.
  */
-public class DeployUtil {
+public final class DeployUtil {
 
   /**
    * Assumes CLOB rather than LONGVARCHAR.

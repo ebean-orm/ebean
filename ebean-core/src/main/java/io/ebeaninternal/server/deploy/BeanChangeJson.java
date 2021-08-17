@@ -11,16 +11,13 @@ import java.io.StringWriter;
 /**
  * Builds the 'new values' and 'old values' in JSON form for ChangeLog.
  */
-class BeanChangeJson implements BeanDiffVisitor {
+final class BeanChangeJson implements BeanDiffVisitor {
 
   private final StringWriter newData;
   private final StringWriter oldData;
-
   private final SpiJsonWriter newJson;
   private final SpiJsonWriter oldJson;
-
   private final ArrayStack<BeanDescriptor<?>> stack = new ArrayStack<>();
-
   private BeanDescriptor<?> descriptor;
 
   BeanChangeJson(BeanDescriptor<?> descriptor, boolean statelessUpdate) {

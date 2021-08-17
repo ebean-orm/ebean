@@ -86,7 +86,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Creates BeanDescriptors.
  */
-public class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeManager {
+public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeManager {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorManager.class);
 

@@ -9,12 +9,10 @@ import io.ebeaninternal.server.core.InternString;
  * Used to for Assoc Manys to create references etc.
  * </p>
  */
-class ExportedProperty {
+final class ExportedProperty {
 
   private final String foreignDbColumn;
-
   private final BeanProperty property;
-
   private final boolean embedded;
 
   ExportedProperty(boolean embedded, String foreignDbColumn, BeanProperty property) {
