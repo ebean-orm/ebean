@@ -22,13 +22,9 @@ public abstract class EnumToDbValueMap<T> {
   }
 
   final LinkedHashMap<Object, T> keyMap;
-
   final LinkedHashMap<T, Object> valueMap;
-
   final HashMap<Object, Object> nameMap;
-
   final boolean allowNulls;
-
   final boolean isIntegerType;
 
   /**

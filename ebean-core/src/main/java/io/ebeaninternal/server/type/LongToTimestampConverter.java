@@ -4,7 +4,7 @@ import io.ebean.config.ScalarTypeConverter;
 
 import java.sql.Timestamp;
 
-public class LongToTimestampConverter implements ScalarTypeConverter<Long, Timestamp> {
+public final class LongToTimestampConverter implements ScalarTypeConverter<Long, Timestamp> {
 
   @Override
   public Long getNullValue() {
@@ -13,15 +13,12 @@ public class LongToTimestampConverter implements ScalarTypeConverter<Long, Times
 
   @Override
   public Timestamp unwrapValue(Long beanType) {
-
     return new Timestamp(beanType);
   }
 
   @Override
   public Long wrapValue(Timestamp scalarType) {
-
     return scalarType.getTime();
   }
-
 
 }

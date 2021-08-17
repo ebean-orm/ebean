@@ -38,10 +38,8 @@ public final class DecimalUtils {
   }
 
   public static Duration toDuration(BigDecimal value) {
-
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
-
     return Duration.ofSeconds(seconds, nanoseconds);
   }
 
@@ -50,10 +48,8 @@ public final class DecimalUtils {
   }
 
   public static Timestamp toTimestamp(BigDecimal value) {
-
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
-
     Timestamp ts = new Timestamp(seconds * 1000);
     ts.setNanos(nanoseconds);
     return ts;
@@ -66,7 +62,6 @@ public final class DecimalUtils {
   }
 
   public static Instant toInstant(BigDecimal value) {
-
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
     return Instant.ofEpochSecond(seconds, nanoseconds);

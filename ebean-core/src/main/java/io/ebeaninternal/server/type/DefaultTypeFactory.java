@@ -14,7 +14,7 @@ import java.util.Date;
  * Helper to create some default ScalarType objects for Booleans,
  * java.util.Date, java.util.Calendar etc.
  */
-public class DefaultTypeFactory {
+public final class DefaultTypeFactory {
 
   private final DatabaseConfig config;
 
@@ -22,7 +22,7 @@ public class DefaultTypeFactory {
     this.config = config;
   }
 
-  protected ScalarTypeBool createBoolean(String trueValue, String falseValue) {
+  ScalarTypeBool createBoolean(String trueValue, String falseValue) {
     try {
       // first try Integer based boolean
       Integer intTrue = BasicTypeConverter.toInteger(trueValue);
