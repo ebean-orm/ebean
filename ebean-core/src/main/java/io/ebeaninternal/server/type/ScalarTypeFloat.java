@@ -16,7 +16,7 @@ import java.sql.Types;
 /**
  * ScalarType for Float and float.
  */
-public class ScalarTypeFloat extends ScalarTypeBase<Float> {
+public final class ScalarTypeFloat extends ScalarTypeBase<Float> {
 
   public ScalarTypeFloat() {
     super(Float.class, true, Types.REAL);

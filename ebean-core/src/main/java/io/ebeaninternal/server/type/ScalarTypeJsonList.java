@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Types for mapping List in JSON format to DB types VARCHAR, JSON and JSONB.
  */
-class ScalarTypeJsonList {
+final class ScalarTypeJsonList {
 
   /**
    * Return the appropriate ScalarType based requested dbType and if Postgres.

@@ -25,16 +25,13 @@ import java.sql.Types;
 /**
  * ScalarType for streaming between a File and the database.
  */
-public class ScalarTypeFile extends ScalarTypeBase<File> {
+public final class ScalarTypeFile extends ScalarTypeBase<File> {
 
   private static final Logger logger = LoggerFactory.getLogger(ScalarTypeFile.class);
 
   private final String prefix;
-
   private final String suffix;
-
   private final File directory;
-
   private final int bufferSize;
 
   /**

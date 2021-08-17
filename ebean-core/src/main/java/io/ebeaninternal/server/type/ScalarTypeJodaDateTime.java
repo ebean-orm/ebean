@@ -11,7 +11,7 @@ import java.time.Instant;
 /**
  * ScalarType for Joda DateTime. This maps to a JDBC Timestamp.
  */
-public class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
+public final class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
 
   public ScalarTypeJodaDateTime(JsonConfig.DateTime mode) {
     super(mode, DateTime.class, false, Types.TIMESTAMP);

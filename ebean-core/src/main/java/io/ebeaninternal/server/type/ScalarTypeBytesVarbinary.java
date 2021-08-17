@@ -8,7 +8,7 @@ import java.sql.Types;
 /**
  * ScalarType for Types.VARBINARY to byte[].
  */
-public class ScalarTypeBytesVarbinary extends ScalarTypeBytesBase {
+public final class ScalarTypeBytesVarbinary extends ScalarTypeBytesBase {
 
   public ScalarTypeBytesVarbinary() {
     super(true, Types.VARBINARY);

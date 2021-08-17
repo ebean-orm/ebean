@@ -5,7 +5,7 @@ import java.sql.Types;
 /**
  * ScalarType for String.
  */
-public class ScalarTypeLongVarchar extends ScalarTypeClob {
+public final class ScalarTypeLongVarchar extends ScalarTypeClob {
 
   public ScalarTypeLongVarchar() {
     super(true, Types.LONGVARCHAR);

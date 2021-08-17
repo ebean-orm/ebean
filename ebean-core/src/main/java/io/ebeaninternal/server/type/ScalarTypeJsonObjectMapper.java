@@ -25,7 +25,7 @@ import java.sql.Types;
 /**
  * Supports @DbJson properties using Jackson ObjectMapper.
  */
-class ScalarTypeJsonObjectMapper {
+final class ScalarTypeJsonObjectMapper {
 
   /**
    * Create and return the appropriate ScalarType.

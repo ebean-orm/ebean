@@ -14,21 +14,22 @@ import java.time.ZonedDateTime;
 /**
  * ScalarType for java.time.LocalDate. This maps to a JDBC Date.
  */
-public class ScalarTypeYearMonthDate extends ScalarTypeBaseDate<YearMonth> {
+final class ScalarTypeYearMonthDate extends ScalarTypeBaseDate<YearMonth> {
 
-  public ScalarTypeYearMonthDate(JsonConfig.Date mode) {
+  ScalarTypeYearMonthDate(JsonConfig.Date mode) {
     super(mode, YearMonth.class, false, Types.DATE);
   }
 
+  @Override
   protected String toIsoFormat(YearMonth value) {
     return value.atDay(1).toString();
   }
 
-  protected LocalDate toLocalDate(YearMonth yearMonth) {
+  LocalDate toLocalDate(YearMonth yearMonth) {
     return yearMonth.atDay(1);
   }
 
-  protected YearMonth fromLocalDate(LocalDate localDate) {
+  YearMonth fromLocalDate(LocalDate localDate) {
     return YearMonth.of(localDate.getYear(), localDate.getMonth());
   }
 

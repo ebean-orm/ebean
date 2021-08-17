@@ -31,7 +31,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   /**
    * ScalarType mapping JsonNode to Postgres JSON database type.
    */
-  public static class JSON extends ScalarTypeJsonNodePostgres {
+  public static final class JSON extends ScalarTypeJsonNodePostgres {
 
     public JSON(ObjectMapper objectMapper) {
       super(objectMapper, DbPlatformType.JSON, PostgresHelper.JSON_TYPE);
@@ -41,7 +41,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   /**
    * ScalarType mapping JsonNode to Postgres JSONB database type.
    */
-  public static class JSONB extends ScalarTypeJsonNodePostgres {
+  public static final class JSONB extends ScalarTypeJsonNodePostgres {
 
     public JSONB(ObjectMapper objectMapper) {
       super(objectMapper, DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE);

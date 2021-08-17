@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 /**
  * ScalarType for java.time.LocalDate. This maps to a JDBC Date.
  */
-public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
+public final class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   public ScalarTypeLocalDate(JsonConfig.Date mode) {
     super(mode, LocalDate.class, false, Types.DATE);

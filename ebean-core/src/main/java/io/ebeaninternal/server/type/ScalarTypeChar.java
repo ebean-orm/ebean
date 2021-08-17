@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * ScalarType for char.
  */
-public class ScalarTypeChar extends ScalarTypeBaseVarchar<Character> {
+public final class ScalarTypeChar extends ScalarTypeBaseVarchar<Character> {
 
   public ScalarTypeChar() {
     super(char.class, false, Types.VARCHAR);

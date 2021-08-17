@@ -5,9 +5,9 @@ import java.time.ZoneId;
 /**
  * ScalarType for java.time.OffsetTime stored as DB VARCHAR
  */
-public class ScalarTypeZoneId extends ScalarTypeBaseVarchar<ZoneId> {
+final class ScalarTypeZoneId extends ScalarTypeBaseVarchar<ZoneId> {
 
-  public ScalarTypeZoneId() {
+  ScalarTypeZoneId() {
     super(ZoneId.class);
   }
 

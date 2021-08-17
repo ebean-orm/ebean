@@ -42,7 +42,7 @@ public abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
   /**
    * Inet to Varchar.
    */
-  public static class Varchar extends ScalarTypeInet {
+  public static final class Varchar extends ScalarTypeInet {
 
     Varchar() {
       super(Types.VARCHAR);
@@ -61,7 +61,7 @@ public abstract class ScalarTypeInet extends ScalarTypeBaseVarchar<Inet> {
   /**
    * Inet to Postgres INET.
    */
-  public static class Postgres extends ScalarTypeInet {
+  public static final class Postgres extends ScalarTypeInet {
 
     Postgres() {
       super(ExtraDbTypes.INET);

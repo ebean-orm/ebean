@@ -42,7 +42,7 @@ public abstract class ScalarTypeCidr extends ScalarTypeBaseVarchar<Cidr> {
   /**
    * Cidr to Varchar.
    */
-  public static class Varchar extends ScalarTypeCidr {
+  public static final class Varchar extends ScalarTypeCidr {
 
     @Override
     public void bind(DataBinder binder, Cidr value) throws SQLException {
@@ -57,7 +57,7 @@ public abstract class ScalarTypeCidr extends ScalarTypeBaseVarchar<Cidr> {
   /**
    * Cidr to Postgres CIDR.
    */
-  public static class Postgres extends ScalarTypeCidr {
+  public static final class Postgres extends ScalarTypeCidr {
 
     @Override
     public void bind(DataBinder binder, Cidr value) throws SQLException {

@@ -11,7 +11,7 @@ import java.time.Month;
 /**
  * ScalarType mapping for Month enum.
  */
-public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
+public final class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
 
   static final EnumToDbIntegerMap beanDbMap = new EnumToDbIntegerMap();
 

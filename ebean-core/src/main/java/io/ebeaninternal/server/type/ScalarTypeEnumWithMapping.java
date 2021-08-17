@@ -17,9 +17,7 @@ import java.util.Set;
 public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implements ScalarType, ScalarTypeEnum {
 
   private final EnumToDbValueMap beanDbMap;
-
   private final int length;
-
   private final boolean withConstraint;
 
   /**

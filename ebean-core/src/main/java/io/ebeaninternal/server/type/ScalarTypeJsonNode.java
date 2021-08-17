@@ -27,7 +27,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   /**
    * Clob storage based implementation.
    */
-  public static class Clob extends ScalarTypeJsonNode {
+  public static final class Clob extends ScalarTypeJsonNode {
 
     public Clob(ObjectMapper objectMapper) {
       super(objectMapper, Types.CLOB);
@@ -46,7 +46,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   /**
    * Varchar storage based implementation.
    */
-  public static class Varchar extends ScalarTypeJsonNode {
+  public static final class Varchar extends ScalarTypeJsonNode {
 
     public Varchar(ObjectMapper objectMapper) {
       super(objectMapper, Types.VARCHAR);

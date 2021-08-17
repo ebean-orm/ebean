@@ -28,10 +28,10 @@ import java.util.Set;
  * Ebean specific @EnumMapping.
  * </p>
  */
-public class ScalarTypeEnumStandard {
+public final class ScalarTypeEnumStandard {
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static class StringEnum extends EnumBase implements ScalarTypeEnum {
+  public static final class StringEnum extends EnumBase implements ScalarTypeEnum {
 
     private final int length;
 
@@ -63,15 +63,12 @@ public class ScalarTypeEnumStandard {
     }
 
     private int maxValueLength(Class<?> enumType) {
-
       int maxLen = 0;
-
       Object[] ea = enumType.getEnumConstants();
       for (Object anEa : ea) {
         Enum<?> e = (Enum<?>) anEa;
         maxLen = Math.max(maxLen, e.name().length());
       }
-
       return maxLen;
     }
 
@@ -120,7 +117,7 @@ public class ScalarTypeEnumStandard {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
+  public static final class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
 
     private final Object[] enumArray;
 

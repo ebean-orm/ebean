@@ -18,9 +18,9 @@ import java.time.Year;
 /**
  * ScalarType for java.time.Year
  */
-public class ScalarTypeYear extends ScalarTypeBase<Year> {
+final class ScalarTypeYear extends ScalarTypeBase<Year> {
 
-  public ScalarTypeYear() {
+  ScalarTypeYear() {
     super(Year.class, false, Types.INTEGER);
   }
 

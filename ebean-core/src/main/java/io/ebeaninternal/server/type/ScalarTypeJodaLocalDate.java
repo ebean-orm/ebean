@@ -11,7 +11,7 @@ import java.sql.Types;
 /**
  * ScalarType for Joda LocalDate. This maps to a JDBC Date.
  */
-public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
+public final class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   public ScalarTypeJodaLocalDate(JsonConfig.Date mode) {
     super(mode, LocalDate.class, false, Types.DATE);

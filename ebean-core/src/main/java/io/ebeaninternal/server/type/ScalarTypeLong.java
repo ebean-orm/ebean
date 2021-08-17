@@ -16,7 +16,7 @@ import java.sql.Types;
 /**
  * ScalarType for Long and long.
  */
-public class ScalarTypeLong extends ScalarTypeBase<Long> {
+public final class ScalarTypeLong extends ScalarTypeBase<Long> {
 
   public ScalarTypeLong() {
     super(Long.class, true, Types.BIGINT);

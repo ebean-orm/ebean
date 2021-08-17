@@ -8,7 +8,7 @@ import java.sql.Types;
 /**
  * ScalarType for BLOB.
  */
-public class ScalarTypeBytesBlob extends ScalarTypeBytesBase {
+public final class ScalarTypeBytesBlob extends ScalarTypeBytesBase {
 
   public ScalarTypeBytesBlob() {
     super(true, Types.BLOB);

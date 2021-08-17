@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
 
-public class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
+public final class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
 
   private final boolean optimized;
 
-  protected ScalarTypeUUIDBinary(boolean optimized) {
+  ScalarTypeUUIDBinary(boolean optimized) {
     super(false, Types.BINARY);
     this.optimized = optimized;
   }
