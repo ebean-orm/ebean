@@ -4,13 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.Test;
-import org.tests.model.basic.CKeyParent;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.OrderShipment;
-import org.tests.model.basic.ResetBasicData;
-import org.tests.model.basic.Vehicle;
-import org.tests.model.basic.VehicleDriver;
+import org.tests.model.basic.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +121,7 @@ public class TestSubQuery extends BaseTestCase {
     assertThat(query.getGeneratedSql())
         .isEqualTo("select t0.ship_time from or_order_ship t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
   }
-  
+
   public void testCompositeKey() {
     ResetBasicData.reset();
 

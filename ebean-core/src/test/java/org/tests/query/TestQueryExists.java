@@ -115,12 +115,12 @@ public class TestQueryExists extends BaseTestCase {
   public void testExistsNoWhere() {
     ResetBasicData.reset();
 
-    Query<Order> subQuery = Ebean.find(Order.class).alias("sq").select("id");
-    Query<Customer> query = Ebean.find(Customer.class).alias("qt").where().notExists(subQuery).query();
+    Query<Order> subQuery = DB.find(Order.class).alias("sq").select("id");
+    Query<Customer> query = DB.find(Customer.class).alias("qt").where().notExists(subQuery).query();
 
     query.findList();
     String sql = query.getGeneratedSql();
 
-    assertThat(sql).contains("not exists (select sq.id from o_order sq)");
+    assertThat(sql).contains("not exists (select 1 from o_order sq)");
   }
 }
