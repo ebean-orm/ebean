@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Arrays.asList;
 
@@ -81,6 +82,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private final TimedMetric metricInQueryCache;
   private final String serverId = ModId.id();
   private ServerCacheNotify listener;
+  private final ReentrantLock lock = new ReentrantLock();
 
   RedisCacheFactory(DatabaseConfig config, BackgroundExecutor executor) {
     this.executor = executor;
@@ -166,7 +168,8 @@ final class RedisCacheFactory implements ServerCacheFactory {
   }
 
   private ServerCache createQueryCache(ServerCacheConfig config) {
-    synchronized (this) {
+    lock.lock();
+    try {
       RQueryCache cache = queryCaches.get(config.getCacheKey());
       if (cache == null) {
         logger.debug("create query cache [{}]", config.getCacheKey());
@@ -175,6 +178,8 @@ final class RedisCacheFactory implements ServerCacheFactory {
         queryCaches.put(config.getCacheKey(), cache);
       }
       return cache;
+    } finally {
+      lock.unlock();
     }
   }
 
