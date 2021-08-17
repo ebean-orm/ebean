@@ -13,14 +13,11 @@ import java.util.List;
  * order.customer.name.
  * </p>
  */
-public class ElPropertyChainBuilder {
+public final class ElPropertyChainBuilder {
 
   private final String expression;
-
   private final List<ElPropertyValue> chain = new ArrayList<>();
-
   private boolean embedded;
-
   private boolean containsMany;
 
   /**

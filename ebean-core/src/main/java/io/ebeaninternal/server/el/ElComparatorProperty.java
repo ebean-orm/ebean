@@ -12,9 +12,7 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
   private static final long serialVersionUID = -2735738237263956073L;
 
   private final ElPropertyValue elGetValue;
-
   private final int nullOrder;
-
   private final int asc;
 
   public ElComparatorProperty(ElPropertyValue elGetValue, boolean ascending, boolean nullsHigh) {
