@@ -46,12 +46,12 @@ public class ClusterTest {
     Person fooB = other.find(Person.class, foo.getId());
 
     DuelCache dualCacheA = (DuelCache) DB.getServerCacheManager().getBeanCache(Person.class);
-    assertCounts(dualCacheA, 0, 1, 1, 0);
+    assertCounts(dualCacheA, 0, 1, 0, 1);
     fooA = DB.find(Person.class, foo.getId());
-    assertCounts(dualCacheA, 1, 1, 1, 0);
+    assertCounts(dualCacheA, 1, 1, 0, 1);
     fooB = other.find(Person.class, foo.getId());
     fooA = DB.find(Person.class, foo.getId());
-    assertCounts(dualCacheA, 2, 1, 1, 0);
+    assertCounts(dualCacheA, 2, 1, 0, 1);
     fooB = other.find(Person.class, foo.getId());
     DuelCache dualCacheB = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
     assertCounts(dualCacheB, 2, 1, 1, 0);
