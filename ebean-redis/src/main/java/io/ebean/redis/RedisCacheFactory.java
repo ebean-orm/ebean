@@ -69,7 +69,6 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private final EncodeManyIdsData encodeManyIdsData = new EncodeManyIdsData();
   private final EncodeBeanData encodeBeanData = new EncodeBeanData();
   private final EncodeSerializable encodeSerializable = new EncodeSerializable();
-
   private final BackgroundExecutor executor;
   private final JedisPool jedisPool;
   private final NearCacheNotify nearCacheNotify;
@@ -80,8 +79,8 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private final TimedMetric metricInTableMod;
   private final TimedMetric metricInQueryCache;
   private final String serverId = ModId.id();
-  private ServerCacheNotify listener;
   private final ReentrantLock lock = new ReentrantLock();
+  private ServerCacheNotify listener;
 
   RedisCacheFactory(DatabaseConfig config, BackgroundExecutor executor) {
     this.executor = executor;
