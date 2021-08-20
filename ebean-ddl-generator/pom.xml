@@ -76,7 +76,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>12.10.0</version>
+        <version>${ebean-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>test</id>
