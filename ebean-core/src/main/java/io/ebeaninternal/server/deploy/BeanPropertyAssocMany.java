@@ -471,7 +471,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
     }
 
-    
+
     if (softDelete) {
       String alias = hasJoinTable() ? "x2" : "x";
       sb.append(" and ").append(targetDescriptor.getSoftDeletePredicate(alias));
@@ -606,7 +606,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (!manyToMany && childMasterProperty != null) {
       // bidirectional in the sense that the 'master' property
       // exists on the 'detail' bean
-      childMasterProperty.setValue(child, parent);
+      childMasterProperty.setValueIntercept(child, parent);
     }
   }
 
@@ -1072,7 +1072,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void bindElementValue(SqlUpdate insert, Object value) {
     targetDescriptor.bindElementValue(insert, value);
   }
-  
+
   /**
    * Returns true, if we must create a m2m join table.
    */

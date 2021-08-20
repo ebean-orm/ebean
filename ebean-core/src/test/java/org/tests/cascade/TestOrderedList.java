@@ -1,7 +1,7 @@
 package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class TestOrderedList extends BaseTestCase {
     }
 
     LoggedSqlCollector.start();
-    Ebean.save(master);
+    DB.save(master);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql.size()).isGreaterThan(1);
@@ -35,7 +35,7 @@ public class TestOrderedList extends BaseTestCase {
     }
 
     // update without any changes
-    Ebean.save(master);
+    DB.save(master);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty();
@@ -43,7 +43,7 @@ public class TestOrderedList extends BaseTestCase {
 
     // update just changing master
     master.setName("m1-mod");
-    Ebean.save(master);
+    DB.save(master);
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
@@ -53,14 +53,14 @@ public class TestOrderedList extends BaseTestCase {
 
   private void fetchAndReorder(Long id) {
 
-    OmOrderedMaster fresh = Ebean.find(OmOrderedMaster.class).setId(id).fetch("details").findOne();
+    OmOrderedMaster fresh = DB.find(OmOrderedMaster.class).setId(id).fetch("details").findOne();
     List<OmOrderedDetail> details1 = fresh.getDetails();
 
     List<String> sql = LoggedSqlCollector.current();
     assertSql(sql.get(0)).contains("order by t0.id, t1.sort_order");
 
     // fetched, not dirty
-    Ebean.save(fresh);
+    DB.save(fresh);
     sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty();
 
@@ -73,7 +73,7 @@ public class TestOrderedList extends BaseTestCase {
 
     fresh.setName("m1-reorder");
 
-    Ebean.save(fresh);
+    DB.save(fresh);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(7);
@@ -82,7 +82,7 @@ public class TestOrderedList extends BaseTestCase {
 
     details1.get(1).setName("was 1");
     fresh.setName("m1-mod3");
-    Ebean.save(fresh);
+    DB.save(fresh);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(3);
@@ -90,12 +90,27 @@ public class TestOrderedList extends BaseTestCase {
     assertSql(sql.get(1)).contains("update om_ordered_detail set name=?, version=?, sort_order=? where id=? and version=?");
     assertThat(sql.get(2)).contains("bind(was 1,3,2,");
 
-    Ebean.delete(fresh);
+    DB.delete(fresh);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
     assertSqlBind(sql.get(1));
     assertSql(sql.get(2)).contains("delete from om_ordered_master where id=? and version=?");
+  }
+
+  @Test
+  public void testAddSavedDetailToMaster() {
+    final OmOrderedMaster master = new OmOrderedMaster("Master");
+    final OmOrderedDetail detail = new OmOrderedDetail("Detail");
+
+    DB.save(master);
+    DB.save(detail);
+
+    master.getDetails().add(detail);
+    DB.save(master);
+
+    final OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).hasSize(1);
   }
 }
