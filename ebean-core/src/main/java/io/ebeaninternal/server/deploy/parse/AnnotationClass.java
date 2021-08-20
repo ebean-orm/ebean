@@ -41,9 +41,7 @@ final class AnnotationClass extends AnnotationParser {
   private static final Logger logger = LoggerFactory.getLogger(AnnotationClass.class);
 
   private final String asOfViewSuffix;
-
   private final String versionsBetweenSuffix;
-
   private final boolean disableL2Cache;
 
   /**
@@ -88,7 +86,6 @@ final class AnnotationClass extends AnnotationParser {
    * Set the table name if it has not already been set.
    */
   private void setTableName() {
-
     if (descriptor.isBaseTableType()) {
       Class<?> beanType = descriptor.getBeanType();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
@@ -109,7 +106,6 @@ final class AnnotationClass extends AnnotationParser {
       descriptor.setEntityType(EntityType.DOC);
       descriptor.setName(cls.getSimpleName());
     }
-
     Entity entity = typeGet(cls, Entity.class);
     if (entity != null) {
       descriptor.setEntityType(EntityType.ORM);
@@ -119,12 +115,10 @@ final class AnnotationClass extends AnnotationParser {
         descriptor.setName(entity.name());
       }
     }
-
     Identity identity = typeGet(cls, Identity.class);
     if (identity != null) {
       descriptor.setIdentityMode(identity);
     }
-
     IdClass idClass = typeGet(cls, IdClass.class);
     if (idClass != null) {
       descriptor.setIdClass(idClass.value());
@@ -135,7 +129,6 @@ final class AnnotationClass extends AnnotationParser {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
-
     for (Index index : annotationClassIndexes(cls)) {
       descriptor.addIndex(new IndexDefinition(convertColumnNames(index.columnNames()), index.name(),
         index.unique(), index.platforms(), index.concurrent(), index.definition()));
@@ -145,7 +138,6 @@ final class AnnotationClass extends AnnotationParser {
     if (uc != null) {
       descriptor.addIndex(new IndexDefinition(convertColumnNames(uc.columnNames())));
     }
-
     View view = typeGet(cls, View.class);
     if (view != null) {
       descriptor.setView(view.name(), view.dependentTables());
@@ -157,42 +149,34 @@ final class AnnotationClass extends AnnotationParser {
         descriptor.addIndex(new IndexDefinition(convertColumnNames(c.columnNames())));
       }
     }
-
     StorageEngine storage = typeGet(cls, StorageEngine.class);
     if (storage != null) {
       descriptor.setStorageEngine(storage.value());
     }
-
     DbPartition partition = typeGet(cls, DbPartition.class);
     if (partition != null) {
       descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
     }
-
     Draftable draftable = typeGet(cls, Draftable.class);
     if (draftable != null) {
       descriptor.setDraftable();
     }
-
     DraftableElement draftableElement = typeGet(cls, DraftableElement.class);
     if (draftableElement != null) {
       descriptor.setDraftableElement();
     }
-
     ReadAudit readAudit = typeGet(cls, ReadAudit.class);
     if (readAudit != null) {
       descriptor.setReadAuditing();
     }
-
     History history = typeGet(cls, History.class);
     if (history != null) {
       descriptor.setHistorySupport();
     }
-
     DbComment comment = typeGet(cls, DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
     }
-
     if (!disableL2Cache) {
       Cache cache = typeGet(cls, Cache.class);
       if (cache != null) {
@@ -204,7 +188,6 @@ final class AnnotationClass extends AnnotationParser {
         }
       }
     }
-
     for (NamedQuery namedQuery : annotationClassNamedQuery(cls)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }

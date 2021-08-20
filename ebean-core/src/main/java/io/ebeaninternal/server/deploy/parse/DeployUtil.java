@@ -42,17 +42,11 @@ public final class DeployUtil {
   private static final int DEFAULT_JSON_VARCHAR_LENGTH = 3000;
 
   private final NamingConvention namingConvention;
-
   private final TypeManager typeManager;
-
   private final DatabasePlatform dbPlatform;
-
   private final EncryptDeployManager encryptDeployManager;
-
   private final EncryptKeyManager encryptKeyManager;
-
   private final Encryptor bytesEncryptor;
-
   private final boolean useValidationNotNull;
 
   public DeployUtil(TypeManager typeMgr, DatabaseConfig config) {
@@ -101,7 +95,6 @@ public final class DeployUtil {
 
   @SuppressWarnings("unchecked")
   void setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
-
     Class<?> enumType = prop.getPropertyType();
     if (!enumType.isEnum()) {
       throw new IllegalArgumentException("Class [" + enumType + "] is Not a Enum?");
@@ -112,7 +105,6 @@ public final class DeployUtil {
       ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
       prop.setScalarType(scalarType);
       prop.setDbType(scalarType.getJdbcType());
-
     } catch (IllegalStateException e) {
       throw new PersistenceException("Error mapping property " + prop.getFullBeanName() + " - " + e.getMessage());
     }
@@ -126,13 +118,11 @@ public final class DeployUtil {
    * </p>
    */
   public void setScalarType(DeployBeanProperty property) {
-
     if (property.getScalarType() != null) {
       // already has a ScalarType assigned.
       // this will be an Enum type...
       return;
     }
-
     ScalarType<?> scalarType = getScalarType(property);
     if (scalarType != null) {
       // set the jdbc type this maps to
@@ -143,7 +133,6 @@ public final class DeployUtil {
   }
 
   private ScalarType<?> getScalarType(DeployBeanProperty property) {
-
     // Note that Temporal types already have dbType
     // set via annotations
     Class<?> propType = property.getPropertyType();
@@ -166,7 +155,6 @@ public final class DeployUtil {
    * Map to Postgres HSTORE type (with fallback to JSON storage in VARCHAR).
    */
   void setDbMap(DeployBeanProperty prop, DbMap dbMap) {
-
     ScalarType<?> scalarType = typeManager.getDbMapScalarType();
     int dbType = scalarType.getJdbcType();
     prop.setDbType(dbType);
@@ -183,7 +171,6 @@ public final class DeployUtil {
    * Set the DbArray type (effectively Postgres only).
    */
   void setDbArray(DeployBeanProperty prop, DbArray dbArray) {
-
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType(), prop.isNullable());
     if (scalarType == null) {
@@ -233,7 +220,6 @@ public final class DeployUtil {
    * Return the JDBC type for the JSON storage type.
    */
   private int getDbJsonStorage(DbJsonType dbJsonType) {
-
     switch (dbJsonType) {
       case JSONB:
         return DbPlatformType.JSONB;
@@ -252,9 +238,7 @@ public final class DeployUtil {
    * This property is marked as a Lob object.
    */
   void setLobType(DeployBeanProperty prop) {
-
     ScalarType<?> scalarType = prop.getScalarType();
-
     if (scalarType instanceof ScalarTypeWrapper) {
       int lobType = scalarType.getJdbcType() == Types.VARCHAR ? dbCLOBType : dbBLOBType;
       prop.setDbType(lobType);

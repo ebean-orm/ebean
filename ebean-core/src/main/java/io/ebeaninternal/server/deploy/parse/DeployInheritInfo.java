@@ -21,16 +21,12 @@ public final class DeployInheritInfo {
 
   private String discriminatorStringValue;
   private Object discriminatorObjectValue;
-
   private int columnType;
   private String columnName;
   private int columnLength;
   private String columnDefn;
-
   private final Class<?> type;
-
   private Class<?> parent;
-
   private final ArrayList<DeployInheritInfo> children = new ArrayList<>();
 
   /**
@@ -207,7 +203,6 @@ public final class DeployInheritInfo {
   }
 
   public String getWhere() {
-
     List<Object> discList = new ArrayList<>();
     appendDiscriminator(discList);
     return buildWhereLiteral(discList);

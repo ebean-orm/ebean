@@ -10,15 +10,10 @@ import javax.persistence.CascadeType;
 public final class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private boolean oneToOne;
-
   private boolean oneToOneExported;
-
   private boolean primaryKeyJoin;
-
   private boolean primaryKeyExport;
-
   private DeployBeanEmbedded deployEmbedded;
-
   private String columnPrefix;
 
   /**

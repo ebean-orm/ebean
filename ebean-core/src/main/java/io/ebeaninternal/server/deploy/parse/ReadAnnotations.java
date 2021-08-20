@@ -43,19 +43,14 @@ public final class ReadAnnotations {
    * </p>
    */
   public void readAssociations(DeployBeanInfo<?> info, BeanDescriptorManager factory) {
-
     try {
-
       new AnnotationAssocOnes(info, readConfig, factory).parse();
       new AnnotationAssocManys(info, readConfig, factory).parse();
-
       // read the Sql annotations last because they may be
       // dependent on field level annotations
       new AnnotationSql(info, readConfig).parse();
-
       new AnnotationClass(info, readConfig).parseAttributeOverride();
       info.getDescriptor().postAnnotations();
-
     } catch (RuntimeException e) {
       throw new RuntimeException("Error reading annotations for " + info, e);
     }

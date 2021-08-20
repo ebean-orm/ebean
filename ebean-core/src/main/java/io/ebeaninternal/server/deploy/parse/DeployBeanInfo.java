@@ -12,9 +12,7 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 public final class DeployBeanInfo<T> {
 
   private final DeployUtil util;
-
   private final DeployBeanDescriptor<T> descriptor;
-
   private DeployBeanPropertyAssoc<?> embeddedId;
 
   /**
