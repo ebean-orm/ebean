@@ -133,10 +133,8 @@ final class BeanDescriptorJsonHelp<T> {
           }
           unmappedProperties.put(key, EJson.parse(parser));
         }
-
       } else if (JsonToken.END_OBJECT == event) {
         break;
-
       } else {
         throw new RuntimeException("Unexpected token " + event + " - expecting key or end_object at: " + parser.getCurrentLocation());
       }

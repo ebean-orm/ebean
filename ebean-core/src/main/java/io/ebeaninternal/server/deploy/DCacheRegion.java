@@ -5,7 +5,6 @@ import io.ebeaninternal.api.SpiCacheRegion;
 public final class DCacheRegion implements SpiCacheRegion {
 
   private boolean enabled = true;
-
   private final String name;
 
   public DCacheRegion(String name) {

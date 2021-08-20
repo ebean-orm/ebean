@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.server.query.SqlBeanLoad;
 
+@SuppressWarnings("rawtypes")
 public final class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyAggregationFormula {
 
   private final BeanPropertyAssocOne prop;

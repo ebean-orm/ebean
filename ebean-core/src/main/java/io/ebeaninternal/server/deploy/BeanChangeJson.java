@@ -25,7 +25,6 @@ final class BeanChangeJson implements BeanDiffVisitor {
     this.newData = new StringWriter(200);
     this.newJson = descriptor.createJsonWriter(newData);
     newJson.writeStartObject();
-
     if (statelessUpdate) {
       this.oldJson = null;
       this.oldData = null;
@@ -38,7 +37,6 @@ final class BeanChangeJson implements BeanDiffVisitor {
 
   @Override
   public void visit(int position, Object newVal, Object oldVal) {
-
     try {
       BeanProperty prop = descriptor.propertiesIndex[position];
       if (prop.isDbUpdatable()) {
@@ -55,7 +53,6 @@ final class BeanChangeJson implements BeanDiffVisitor {
   @Override
   public void visitPush(int position) {
     stack.push(descriptor);
-
     BeanPropertyAssocOne<?> embedded = (BeanPropertyAssocOne<?>)descriptor.propertiesIndex[position];
     descriptor = embedded.getTargetDescriptor();
     newJson.writeStartObject(embedded.getName());

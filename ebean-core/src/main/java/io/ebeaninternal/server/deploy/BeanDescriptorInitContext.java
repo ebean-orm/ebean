@@ -7,7 +7,6 @@ class BeanDescriptorInitContext {
   private final Map<String, String> withHistoryTables;
   private final Map<String, String> draftTables;
   private final String asOfViewSuffix;
-
   private String embeddedPrefix;
 
   BeanDescriptorInitContext(Map<String, String> withHistoryTables, Map<String, String> draftTables, String asOfViewSuffix) {

@@ -80,29 +80,29 @@ public final class ChainedBeanPersistListener implements BeanPersistListener {
 
   @Override
   public void deleted(Object bean) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.deleted(bean);
+    for (BeanPersistListener listener : chain) {
+      listener.deleted(bean);
     }
   }
 
   @Override
   public void softDeleted(Object bean) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.softDeleted(bean);
+    for (BeanPersistListener listener : chain) {
+      listener.softDeleted(bean);
     }
   }
 
   @Override
   public void inserted(Object bean) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.inserted(bean);
+    for (BeanPersistListener listener : chain) {
+      listener.inserted(bean);
     }
   }
 
   @Override
   public void updated(Object bean, Set<String> updatedProperties) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.updated(bean, updatedProperties);
+    for (BeanPersistListener listener : chain) {
+      listener.updated(bean, updatedProperties);
     }
   }
 }

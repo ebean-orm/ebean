@@ -8,7 +8,6 @@ import io.ebeaninternal.server.query.SqlJoinType;
 final class AssocOneHelpRefExported extends AssocOneHelp {
 
   private final boolean softDelete;
-
   private final String softDeletePredicate;
 
   AssocOneHelpRefExported(BeanPropertyAssocOne<?> property) {
@@ -22,7 +21,6 @@ final class AssocOneHelpRefExported extends AssocOneHelp {
    */
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
     // set appropriate tableAlias for the exported id columns
     String relativePrefix = ctx.getRelativePrefix(property.getName());
     ctx.pushTableAlias(relativePrefix);
@@ -32,7 +30,6 @@ final class AssocOneHelpRefExported extends AssocOneHelp {
 
   @Override
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
     String relativePrefix = ctx.getRelativePrefix(property.getName());
     if (softDelete && !ctx.isIncludeSoftDelete()) {
       property.tableJoin.addJoin(joinType, relativePrefix, ctx, softDeletePredicate);

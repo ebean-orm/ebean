@@ -28,7 +28,6 @@ final class DetermineAggPath {
    * Parse and return the full path for the aggregation.
    */
   static String path(String aggregation) {
-
     // aggregations always have a form of sum(), avg(), max(), count() etc
     // so find the first open bracket
     int start = aggregation.indexOf('(');
@@ -48,7 +47,6 @@ final class DetermineAggPath {
   private static boolean isNamePart(char ch) {
     return ch == '.' || Character.isJavaIdentifierPart(ch);
   }
-
 
   /**
    * Helper class holding aggregation path segments.

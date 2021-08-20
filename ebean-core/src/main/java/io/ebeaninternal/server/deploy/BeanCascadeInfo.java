@@ -11,9 +11,7 @@ import javax.persistence.CascadeType;
 public final class BeanCascadeInfo {
 
   private boolean delete;
-
   private boolean save;
-
   private boolean refresh;
 
   public void setTypes(CascadeType[] types) {

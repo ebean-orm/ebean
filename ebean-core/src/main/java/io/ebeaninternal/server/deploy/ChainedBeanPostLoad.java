@@ -47,13 +47,6 @@ public final class ChainedBeanPostLoad implements BeanPostLoad {
     }
   }
 
-//  /**
-//   * Return the size of the chain.
-//   */
-//  int size() {
-//    return chain.length;
-//  }
-
   @Override
   public boolean isRegisterFor(Class<?> cls) {
     // never called
@@ -65,8 +58,8 @@ public final class ChainedBeanPostLoad implements BeanPostLoad {
    */
   @Override
   public void postLoad(Object bean) {
-    for (BeanPostLoad aChain : chain) {
-      aChain.postLoad(bean);
+    for (BeanPostLoad postLoad : chain) {
+      postLoad.postLoad(bean);
     }
   }
 }

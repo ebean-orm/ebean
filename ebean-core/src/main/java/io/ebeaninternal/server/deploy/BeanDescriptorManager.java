@@ -107,19 +107,16 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final int queryPlanTTLSeconds;
   private int entityBeanCount;
   private List<BeanDescriptor<?>> immutableDescriptorList;
-
   /**
    * Map of base tables to 'with history views' used to support 'as of' queries.
    */
   private final Map<String, String> asOfTableMap = new HashMap<>();
-
   /**
    * Map of base tables to 'draft' tables.
    */
   private final Map<String, String> draftTableMap = new HashMap<>();
 
   // temporary collections used during startup and then cleared
-
   private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
   private Set<Class<?>> embeddedIdTypes = new HashSet<>();
   private List<DeployBeanInfo<?>> embeddedBeans = new ArrayList<>();
@@ -297,11 +294,9 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       readInheritedIdGenerators();
       // creates the BeanDescriptors
       readEntityRelationships();
-
       List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());
       list.sort(beanDescComparator);
       immutableDescriptorList = Collections.unmodifiableList(list);
-
       initialiseAll();
       readForeignKeys();
       readTableToDescriptor();
@@ -311,12 +306,9 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       embeddedIdTypes = null;
       embeddedBeans = null;
       deployInfoMap = null;
-
       return asOfTableMap;
-
     } catch (BeanNotEnhancedException e) {
       throw e;
-
     } catch (RuntimeException e) {
       logger.error("Error in deployment", e);
       throw e;

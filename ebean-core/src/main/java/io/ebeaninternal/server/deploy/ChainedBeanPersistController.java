@@ -51,7 +51,7 @@ public final class ChainedBeanPersistController implements BeanPersistController
   /**
    * Return the size of the chain.
    */
-  protected int size() {
+  int size() {
     return chain.length;
   }
 
@@ -64,7 +64,6 @@ public final class ChainedBeanPersistController implements BeanPersistController
     } else {
       List<BeanPersistController> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPersistController(newList);
     }
   }
@@ -78,7 +77,6 @@ public final class ChainedBeanPersistController implements BeanPersistController
     } else {
       List<BeanPersistController> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPersistController(newList);
     }
   }
@@ -101,36 +99,36 @@ public final class ChainedBeanPersistController implements BeanPersistController
 
   @Override
   public void postDelete(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      aChain.postDelete(request);
+    for (BeanPersistController controller : chain) {
+      controller.postDelete(request);
     }
   }
 
   @Override
   public void postInsert(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      aChain.postInsert(request);
+    for (BeanPersistController controller : chain) {
+      controller.postInsert(request);
     }
   }
 
   @Override
   public void postUpdate(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      aChain.postUpdate(request);
+    for (BeanPersistController controller : chain) {
+      controller.postUpdate(request);
     }
   }
 
   @Override
   public void postSoftDelete(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      aChain.postSoftDelete(request);
+    for (BeanPersistController controller : chain) {
+      controller.postSoftDelete(request);
     }
   }
 
   @Override
   public boolean preDelete(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      if (!aChain.preDelete(request)) {
+    for (BeanPersistController controller : chain) {
+      if (!controller.preDelete(request)) {
         return false;
       }
     }
@@ -139,8 +137,8 @@ public final class ChainedBeanPersistController implements BeanPersistController
 
   @Override
   public boolean preSoftDelete(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      if (!aChain.preSoftDelete(request)) {
+    for (BeanPersistController controller : chain) {
+      if (!controller.preSoftDelete(request)) {
         return false;
       }
     }
@@ -149,15 +147,15 @@ public final class ChainedBeanPersistController implements BeanPersistController
 
   @Override
   public void preDelete(BeanDeleteIdRequest request) {
-    for (BeanPersistController aChain : chain) {
-      aChain.preDelete(request);
+    for (BeanPersistController controller : chain) {
+      controller.preDelete(request);
     }
   }
 
   @Override
   public boolean preInsert(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      if (!aChain.preInsert(request)) {
+    for (BeanPersistController controller : chain) {
+      if (!controller.preInsert(request)) {
         return false;
       }
     }
@@ -166,8 +164,8 @@ public final class ChainedBeanPersistController implements BeanPersistController
 
   @Override
   public boolean preUpdate(BeanPersistRequest<?> request) {
-    for (BeanPersistController aChain : chain) {
-      if (!aChain.preUpdate(request)) {
+    for (BeanPersistController controller : chain) {
+      if (!controller.preUpdate(request)) {
         return false;
       }
     }

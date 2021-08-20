@@ -7,7 +7,6 @@ import io.ebeaninternal.server.core.InternString;
  * The Exported foreign key and property.
  * <p>
  * Used to for Assoc Manys to create references etc.
- * </p>
  */
 final class ExportedProperty {
 
@@ -42,7 +41,6 @@ final class ExportedProperty {
    * in preference to a parentProperty.idProperty = value.
    * Just using the foreign database column avoids triggering
    * a join to the 'parent' table.
-   * </p>
    */
   public String getForeignDbColumn() {
     return foreignDbColumn;

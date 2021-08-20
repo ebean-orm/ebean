@@ -33,7 +33,6 @@ public final class BeanCollectionHelpFactory {
       default:
         throw new RuntimeException("Invalid type " + manyType);
     }
-
   }
 
   @SuppressWarnings("unchecked")

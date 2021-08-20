@@ -15,7 +15,6 @@ import java.util.Arrays;
 abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
 
   private final String simpleName;
-
   final ElementHelp elementHelp;
 
   BeanDescriptorElement(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {

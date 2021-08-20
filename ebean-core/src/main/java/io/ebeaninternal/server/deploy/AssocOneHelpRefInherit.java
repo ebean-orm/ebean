@@ -29,7 +29,6 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
    */
   @Override
   Object read(DbReadContext ctx) throws SQLException {
-
     // read discriminator to determine the type
     InheritInfo rowInheritInfo = inherit.readType(ctx);
     if (rowInheritInfo == null) {
@@ -37,12 +36,10 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
       property.targetIdBinder.loadIgnore(ctx);
       return null;
     }
-
     Object id = property.targetIdBinder.read(ctx);
     if (id == null) {
       return null;
     }
-
     // check transaction context to see if it already exists
     PersistenceContext pc = ctx.getPersistenceContext();
     BeanDescriptor<?> desc = rowInheritInfo.desc();
@@ -50,7 +47,6 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
     if (existing != null) {
       return existing;
     }
-
     // for inheritance hierarchy create the correct type for this row...
     boolean disableLazyLoading = ctx.isDisableLazyLoading();
     Object ref = desc.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
@@ -72,7 +68,6 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
    */
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
     if (!subQuery) {
       // add discriminator column
       String relativePrefix = ctx.getRelativePrefix(property.getName());

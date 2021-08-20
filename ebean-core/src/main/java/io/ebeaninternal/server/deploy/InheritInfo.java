@@ -46,19 +46,16 @@ public final class InheritInfo {
     this.discriminatorColumn = InternString.intern(deploy.getColumnName(parent));
     this.discriminatorValue = deploy.getDiscriminatorObjectValue();
     this.discriminatorStringValue = deploy.getDiscriminatorStringValue();
-
     this.discriminatorType = deploy.getDiscriminatorType(parent);
     this.discriminatorLength = deploy.getColumnLength(parent);
     this.columnDefn = deploy.getColumnDefn();
     this.where = InternString.intern(deploy.getWhere());
-
     if (r == null) {
       // this is a root node
       root = this;
       discMap = new HashMap<>();
       typeMap = new HashMap<>();
       registerWithRoot(this);
-
     } else {
       this.root = r;
       // register with the root node...

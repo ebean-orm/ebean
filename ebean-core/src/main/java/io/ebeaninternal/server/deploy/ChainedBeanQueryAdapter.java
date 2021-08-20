@@ -72,8 +72,8 @@ public final class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 
   @Override
   public void preQuery(BeanQueryRequest<?> request) {
-    for (BeanQueryAdapter aChain : chain) {
-      aChain.preQuery(request);
+    for (BeanQueryAdapter adapter : chain) {
+      adapter.preQuery(request);
     }
   }
 

@@ -47,13 +47,6 @@ public final class ChainedBeanPostConstructListener implements BeanPostConstruct
     }
   }
 
-//  /**
-//   * Return the size of the chain.
-//   */
-//  int size() {
-//    return chain.length;
-//  }
-
   @Override
   public boolean isRegisterFor(Class<?> cls) {
     // never called
@@ -65,22 +58,22 @@ public final class ChainedBeanPostConstructListener implements BeanPostConstruct
    */
   @Override
   public void postConstruct(Object bean) {
-    for (BeanPostConstructListener aChain : chain) {
-      aChain.postConstruct(bean);
+    for (BeanPostConstructListener listener : chain) {
+      listener.postConstruct(bean);
     }
   }
 
   @Override
   public void autowire(Object bean) {
-    for (BeanPostConstructListener aChain : chain) {
-      aChain.autowire(bean);
+    for (BeanPostConstructListener listener : chain) {
+      listener.autowire(bean);
     }
   }
 
   @Override
   public void postCreate(Object bean) {
-    for (BeanPostConstructListener aChain : chain) {
-      aChain.postCreate(bean);
+    for (BeanPostConstructListener listener : chain) {
+      listener.postCreate(bean);
     }
   }
 }

@@ -12,20 +12,14 @@ public final class TableJoinColumn {
    * The local database column name.
    */
   private final String localDbColumn;
-
   private final String localSqlFormula;
-
   /**
    * The foreign database column name.
    */
   private final String foreignDbColumn;
-
   private final String foreignSqlFormula;
-
   private final boolean insertable;
-
   private final boolean updateable;
-
   /**
    * Hash for including in a query plan
    */
