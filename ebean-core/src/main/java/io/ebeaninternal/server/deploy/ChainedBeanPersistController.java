@@ -19,7 +19,6 @@ public final class ChainedBeanPersistController implements BeanPersistController
   private static final Sorter SORTER = new Sorter();
 
   private final List<BeanPersistController> list;
-
   private final BeanPersistController[] chain;
 
   /**
@@ -178,15 +177,10 @@ public final class ChainedBeanPersistController implements BeanPersistController
   /**
    * Helper to order the BeanPersistController's in a chain.
    */
-  private static class Sorter implements Comparator<BeanPersistController> {
-
+  private static final class Sorter implements Comparator<BeanPersistController> {
     @Override
     public int compare(BeanPersistController o1, BeanPersistController o2) {
-
-      int i1 = o1.getExecutionOrder();
-      int i2 = o2.getExecutionOrder();
-      return Integer.compare(i1, i2);
+      return Integer.compare(o1.getExecutionOrder(), o2.getExecutionOrder());
     }
-
   }
 }

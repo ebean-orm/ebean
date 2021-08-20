@@ -30,7 +30,6 @@ public final class ChainedBeanPostLoad implements BeanPostLoad {
     } else {
       List<BeanPostLoad> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPostLoad(newList);
     }
   }
@@ -44,17 +43,16 @@ public final class ChainedBeanPostLoad implements BeanPostLoad {
     } else {
       List<BeanPostLoad> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPostLoad(newList);
     }
   }
 
-  /**
-   * Return the size of the chain.
-   */
-  protected int size() {
-    return chain.length;
-  }
+//  /**
+//   * Return the size of the chain.
+//   */
+//  int size() {
+//    return chain.length;
+//  }
 
   @Override
   public boolean isRegisterFor(Class<?> cls) {

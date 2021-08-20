@@ -37,7 +37,6 @@ public final class ChainedBeanQueryAdapter implements BeanQueryAdapter {
     } else {
       List<BeanQueryAdapter> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanQueryAdapter(newList);
     }
   }
@@ -51,11 +50,9 @@ public final class ChainedBeanQueryAdapter implements BeanQueryAdapter {
     } else {
       List<BeanQueryAdapter> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanQueryAdapter(newList);
     }
   }
-
 
   /**
    * Return 0 as not used by this Chained adapter.
@@ -75,7 +72,6 @@ public final class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 
   @Override
   public void preQuery(BeanQueryRequest<?> request) {
-
     for (BeanQueryAdapter aChain : chain) {
       aChain.preQuery(request);
     }
@@ -85,11 +81,9 @@ public final class ChainedBeanQueryAdapter implements BeanQueryAdapter {
    * Helper to order the BeanQueryAdapter's in a chain.
    */
   private static class Sorter implements Comparator<BeanQueryAdapter> {
-
     @Override
     public int compare(BeanQueryAdapter o1, BeanQueryAdapter o2) {
       return Integer.compare(o1.getExecutionOrder(), o2.getExecutionOrder());
     }
-
   }
 }

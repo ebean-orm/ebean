@@ -18,8 +18,7 @@ final class BeanQueryAdapterManager {
   private final List<BeanQueryAdapter> list;
 
   BeanQueryAdapterManager(BootupClasses bootupClasses) {
-
-    list = bootupClasses.getBeanQueryAdapters();
+    this.list = bootupClasses.getBeanQueryAdapters();
   }
 
   int getRegisterCount() {
@@ -30,7 +29,6 @@ final class BeanQueryAdapterManager {
    * Return the BeanPersistController for a given entity type.
    */
   void addQueryAdapter(DeployBeanDescriptor<?> deployDesc) {
-
     for (BeanQueryAdapter c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
         logger.debug("BeanQueryAdapter on[{}] {}", deployDesc.getFullName(), c.getClass().getName());

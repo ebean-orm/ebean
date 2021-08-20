@@ -24,7 +24,7 @@ public final class ChainedBeanPersistListener implements BeanPersistListener {
   /**
    * Return the size of the chain.
    */
-  protected int size() {
+  int size() {
     return chain.length;
   }
 
@@ -61,7 +61,6 @@ public final class ChainedBeanPersistListener implements BeanPersistListener {
     } else {
       List<BeanPersistListener> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPersistListener(newList);
     }
   }
@@ -75,7 +74,6 @@ public final class ChainedBeanPersistListener implements BeanPersistListener {
     } else {
       List<BeanPersistListener> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPersistListener(newList);
     }
   }

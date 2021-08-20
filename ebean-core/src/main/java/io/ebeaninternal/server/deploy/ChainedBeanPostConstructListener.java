@@ -30,7 +30,6 @@ public final class ChainedBeanPostConstructListener implements BeanPostConstruct
     } else {
       List<BeanPostConstructListener> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPostConstructListener(newList);
     }
   }
@@ -44,17 +43,16 @@ public final class ChainedBeanPostConstructListener implements BeanPostConstruct
     } else {
       ArrayList<BeanPostConstructListener> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPostConstructListener(newList);
     }
   }
 
-  /**
-   * Return the size of the chain.
-   */
-  protected int size() {
-    return chain.length;
-  }
+//  /**
+//   * Return the size of the chain.
+//   */
+//  int size() {
+//    return chain.length;
+//  }
 
   @Override
   public boolean isRegisterFor(Class<?> cls) {

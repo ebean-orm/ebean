@@ -85,11 +85,9 @@ public final class BeanTable {
   }
 
   public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
-
     if (idProperty == null) {
       return;
     }
-
     if (idProperty instanceof BeanPropertyAssocOne<?>) {
       BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) idProperty;
       BeanProperty[] props = assocOne.getProperties();
@@ -102,13 +100,11 @@ public final class BeanTable {
   }
 
   private void addToJoin(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect, boolean complexKey, BeanProperty prop) {
-
     String lc = prop.getDbColumn();
     String fk = lc;
     if (foreignKeyPrefix != null) {
       fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);
     }
-
     if (complexKey) {
       // just to copy the column name rather than prefix with the foreignKeyPrefix.
       // I think that with complex keys this is the more common approach.
@@ -118,7 +114,6 @@ public final class BeanTable {
     if (sqlFormulaSelect != null) {
       fk = sqlFormulaSelect;
     }
-
     DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
     joinCol.setForeignSqlFormula(sqlFormulaSelect);
     if (reverse) {
