@@ -62,9 +62,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
    * Return the list as an array sorted into the same order as the Bean Properties.
    */
   public static ImportedIdSimple[] sort(List<ImportedIdSimple> list) {
-
     ImportedIdSimple[] importedIds = list.toArray(new ImportedIdSimple[0]);
-
     // sort into the same order as the BeanProperties
     Arrays.sort(importedIds, COMPARATOR);
     return importedIds;
@@ -124,13 +122,11 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public void buildImport(IntersectionRow row, EntityBean other) {
-
     Object value = getIdValue(other);
     if (value == null) {
       String msg = "Foreign Key value null?";
       throw new PersistenceException(msg);
     }
-
     row.put(localDbColumn, value);
   }
 
@@ -162,7 +158,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
-
     Object value = null;
     if (bean != null) {
       value = getIdValue(bean);
@@ -173,7 +168,6 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public BeanProperty findMatchImport(String matchDbColumn) {
-
     if (matchDbColumn.equals(localDbColumn)) {
       return foreignProperty;
     }

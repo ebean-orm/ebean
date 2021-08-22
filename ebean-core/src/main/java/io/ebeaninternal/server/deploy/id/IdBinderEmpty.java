@@ -16,17 +16,15 @@ import java.util.List;
 /**
  * For beans with no id properties AKA report type beans.
  */
-public final class IdBinderEmpty implements IdBinder {
+final class IdBinderEmpty implements IdBinder {
 
   private static final String bindIdSql = "";
 
   public IdBinderEmpty() {
-
   }
 
   @Override
   public void initialise() {
-
   }
 
   @Override
@@ -121,22 +119,18 @@ public final class IdBinderEmpty implements IdBinder {
 
   @Override
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
-
   }
 
   @Override
   public void bindId(DataBind dataBind, Object value) {
-
   }
 
   @Override
   public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
-
   }
 
   @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids) {
-
   }
 
   @Override
@@ -174,7 +168,6 @@ public final class IdBinderEmpty implements IdBinder {
 
   @Override
   public void writeData(DataOutput dataOutput, Object idValue) {
-
   }
 
   @Override

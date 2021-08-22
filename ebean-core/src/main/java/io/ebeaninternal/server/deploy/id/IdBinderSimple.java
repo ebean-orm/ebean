@@ -52,7 +52,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getOrderBy(String pathPrefix, boolean ascending) {
-
     StringBuilder sb = new StringBuilder();
     if (pathPrefix != null) {
       sb.append(pathPrefix).append(".");

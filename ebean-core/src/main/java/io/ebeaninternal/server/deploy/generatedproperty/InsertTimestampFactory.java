@@ -25,7 +25,6 @@ final class InsertTimestampFactory {
     GeneratedInsertLong longTime = new GeneratedInsertLong();
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
-
     map.put(Instant.class, new GeneratedInsertJavaTime.InstantDT());
     map.put(LocalDateTime.class, new GeneratedInsertJavaTime.LocalDT());
     map.put(OffsetDateTime.class, new GeneratedInsertJavaTime.OffsetDT());
@@ -37,7 +36,6 @@ final class InsertTimestampFactory {
   }
 
   void setInsertTimestamp(DeployBeanProperty property) {
-
     property.setGeneratedProperty(createInsertTimestamp(property));
   }
 
@@ -45,13 +43,11 @@ final class InsertTimestampFactory {
    * Create the insert GeneratedProperty depending on the property type.
    */
   GeneratedProperty createInsertTimestamp(DeployBeanProperty property) {
-
     Class<?> propType = property.getPropertyType();
     GeneratedProperty generatedProperty = map.get(propType);
     if (generatedProperty != null) {
       return generatedProperty;
     }
-
     throw new PersistenceException("Generated Insert Timestamp not supported on " + propType.getName());
   }
 

@@ -16,7 +16,6 @@ import java.sql.Types;
 final class CounterFactory {
 
   private final GeneratedCounterInteger integerCounter = new GeneratedCounterInteger();
-
   private final GeneratedCounterLong longCounter = new GeneratedCounterLong();
 
    void setCounter(DeployBeanProperty property) {
