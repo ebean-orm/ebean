@@ -76,7 +76,9 @@ public class SqlQueryCancelTest extends BaseTestCase {
       EBasic model = new EBasic("Basic " + i);
       DB.save(model);
     }
-    SlowDownEBasic.setSelectWaitMillis(0);
+    if (Platform.H2.equals(DB.getDefault().getPlatform())) {
+      SlowDownEBasic.setSelectWaitMillis(0);
+    }
   }
 
   @Test

@@ -220,7 +220,12 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(1, sqlList.size());
-    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where t1.status in (?) order by t0.id");
+    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where t1.status ");
+    if (isPostgres()) {
+      assertThat(sqlList.get(0)).contains("where t1.status = any(?) order by t0.id");
+    } else {
+      assertThat(sqlList.get(0)).contains("where t1.status in (?) order by t0.id");
+    }
   }
 
   @Test
@@ -239,8 +244,13 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0");
-    assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) in ");
-    assertThat(sqlList.get(1)).contains(" and t0.status in ");
+    if (isPostgres()) {
+      assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any(?)");
+      assertThat(sqlList.get(1)).contains(" and t0.status = any(?)");
+    } else {
+      assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any");
+      assertThat(sqlList.get(1)).contains(" and t0.status in ");
+    }
   }
 
   @Test

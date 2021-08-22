@@ -113,7 +113,7 @@ public class TestDbJson_List extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
-    // plain_bean=?, no longer included with MD5 dirty detection
+    // plain_bean=?, no longer included with dirty detection
     assertSql(sql.get(0)).contains("update ebasic_json_list set name=?, version=? where");
   }
 

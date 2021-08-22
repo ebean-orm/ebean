@@ -69,14 +69,20 @@ public class TestSubQuery extends BaseTestCase {
     // execute the subQuery as copy (generatedSQL must be part of original query)
     Query<OrderDetail> debugSq = sq.copy();
     debugSq.findSingleAttribute();
-    assertThat(debugSq.getGeneratedSql()).isEqualTo(
-        "select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id in (?)");
+    if (isPostgres()) {
+      assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id = any(?)");
+    } else {
+      assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id in (?)");
+    }
 
     Query<Order> query = DB.find(Order.class).select("shipDate").where().isIn("id", sq).query();
     query.findSingleAttribute();
 
-    assertThat(query.getGeneratedSql())
-        .isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+    if (isPostgres()) {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+    } else {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+    }
   }
 
   /**
@@ -108,7 +114,7 @@ public class TestSubQuery extends BaseTestCase {
     List<Integer> productIds = new ArrayList<>();
     productIds.add(3);
 
-    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).fetch("order.shipments", "id").where()
+    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).alias("a").fetch("order.shipments", "id").where()
         .isIn("product.id", productIds).query();
 
     // execute the subQuery as copy (generatedSQL must be part of original query)
