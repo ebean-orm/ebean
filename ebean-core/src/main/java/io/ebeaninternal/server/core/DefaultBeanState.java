@@ -94,4 +94,8 @@ public final class DefaultBeanState implements BeanState {
     return intercept.getLoadErrors();
   }
 
+  @Override
+  public int getSortOrder() {
+    return intercept.getSortOrder();
+  }
 }

@@ -118,4 +118,9 @@ public interface BeanState {
    */
   @Nullable
   Map<String, Exception> getLoadErrors();
+
+  /**
+   * Return the sort order value for an order column.
+   */
+  int getSortOrder();
 }
