@@ -2,9 +2,7 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -28,21 +26,22 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Customer customer = Ebean.find(Customer.class)
+    Customer customer = DB.find(Customer.class)
       .fetchLazy("orders")
       .filterMany("orders").eq("status", Order.Status.NEW)
       .where().ieq("name", "Rob")
       .order().asc("id").setMaxRows(1)
       .findList().get(0);
 
-    customer.getOrders().size();
+    final int size = customer.getOrders().size();
+    assertThat(size).isGreaterThan(0);
 
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(1)).contains("status = ?");
 
     // Currently this does not include the query filter
-    Ebean.refreshMany(customer, "orders");
+    DB.refreshMany(customer, "orders");
 
   }
 
@@ -139,7 +138,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Customer customer = Ebean.find(Customer.class)
+    Customer customer = DB.find(Customer.class)
       .setMaxRows(1)
       .order().asc("id")
       .fetch("orders")
@@ -154,7 +153,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Optional<Customer> customer = Ebean.find(Customer.class)
+    Optional<Customer> customer = DB.find(Customer.class)
       .setMaxRows(1)
       .order().asc("id")
       .fetch("orders")
@@ -171,7 +170,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .filterMany("orders").raw("1=0")
       .where().isNotEmpty("orders")
       .query();
@@ -193,7 +192,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").in("status", Order.Status.NEW)
       .order().asc("id");
@@ -211,7 +210,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").in("status", Order.Status.NEW)
       .order().asc("id");
@@ -234,7 +233,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetchQuery("orders") // explicitly fetch orders separately
       .filterMany("orders").in("status", Order.Status.NEW)
       .order().asc("id");
@@ -248,7 +247,7 @@ public class TestQueryFilterMany extends BaseTestCase {
       assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any(?)");
       assertThat(sqlList.get(1)).contains(" and t0.status = any(?)");
     } else {
-      assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any");
+      assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) in ");
       assertThat(sqlList.get(1)).contains(" and t0.status in ");
     }
   }
@@ -259,7 +258,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .filterMany("orders")
       .or()
       .eq("status", Order.Status.NEW)
@@ -276,7 +275,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
     LoggedSqlCollector.start();
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .filterMany("contacts").isNotNull("firstName")
       .filterMany("contacts.notes").istartsWith("title", "foo")
       .findList();
@@ -295,7 +294,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .where()
       .filterMany("contacts", "firstName isNotNull and email istartsWith ?", "rob")
       .findList();
