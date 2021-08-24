@@ -299,10 +299,10 @@ public final class SqlTreeBuilder {
       return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
-      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, temporalMode, disableLazyLoad);
+      boolean withId = isNotSingleAttribute() && !subQuery;
+      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId, temporalMode, disableLazyLoad);
 
     } else {
-      // do not read Id on child beans (e.g. when used with fetch())
       boolean withId = isNotSingleAttribute() && !subQuery;
       return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     }

@@ -114,12 +114,13 @@ public class TestSubQuery extends BaseTestCase {
     List<Integer> productIds = new ArrayList<>();
     productIds.add(3);
 
-    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).alias("a").fetch("order.shipments", "id").where()
+    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).fetch("order.shipments", "id").where()
         .isIn("product.id", productIds).query();
 
     // execute the subQuery as copy (generatedSQL must be part of original query)
     Query<OrderDetail> debugSq = sq.copy();
     debugSq.findSingleAttribute();
+    assertThat(debugSq.getGeneratedSql()).contains("select t2.id from o_order_detail a join o_order t1 on t1.id = a.order_id left join or_order_ship t2");
 
     Query<OrderShipment> query = DB.find(OrderShipment.class).select("shipTime").where().isIn("id", sq).query();
     query.findSingleAttribute();
