@@ -39,7 +39,11 @@ final class ScalarTypeJsonObjectMapper {
       return new GenericObject(jsonManager, field, dbType, docType);
     }
     // using the global default MutationDetection mode (defaults to HASH)
-    prop.setMutationDetection(jsonManager.mutationDetection());
+    final MutationDetection defaultMode = jsonManager.mutationDetection();
+    prop.setMutationDetection(defaultMode);
+    if (MutationDetection.NONE == defaultMode) {
+      return new NoMutationDetection(jsonManager, field, dbType, docType);
+    }
     return new GenericObject(jsonManager, field, dbType, docType);
   }
 
@@ -68,8 +72,11 @@ final class ScalarTypeJsonObjectMapper {
    */
   private static final class GenericObject extends Base<Object> {
 
+    private final boolean jsonb;
+
     GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
       super(Object.class, jsonManager, field, dbType, docType);
+      this.jsonb = "jsonb".equals(pgType);
     }
 
     @Override
@@ -80,6 +87,9 @@ final class ScalarTypeJsonObjectMapper {
     @Override
     public Object read(DataReader reader) throws SQLException {
       String json = reader.getString();
+      if (jsonb) {
+        json = JsonTrim.trim(json);
+      }
       // pushJson such that we MD5 and store on EntityBeanIntercept later
       reader.pushJson(json);
       if (json == null || json.isEmpty()) {
