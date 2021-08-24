@@ -294,8 +294,13 @@ final class BeanDescriptorCacheHelp<T> {
 
     List<Object> idList = entry.getIdList();
     bc.checkEmptyLazyLoad();
+    int i = 0;
     for (Object id : idList) {
-      many.add(bc, targetDescriptor.createReference(readOnly, id, persistenceContext));
+      final EntityBean ref = targetDescriptor.createReference(readOnly, id, persistenceContext);
+      if (many.hasOrderColumn()) {
+        ref._ebean_getIntercept().setSortOrder(++i);
+      }
+      many.add(bc, ref);
     }
     return true;
   }

@@ -5,6 +5,7 @@ import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -112,5 +113,79 @@ public class TestOrderedList extends BaseTestCase {
 
     final OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
     assertThat(masterDb.getDetails()).hasSize(1);
+  }
+
+  @Test
+  public void testModifyList() {
+    final OmOrderedMaster master = new OmOrderedMaster("Master");
+    final OmOrderedDetail detail1 = new OmOrderedDetail("Detail1");
+    final OmOrderedDetail detail2 = new OmOrderedDetail("Detail2");
+    final OmOrderedDetail detail3 = new OmOrderedDetail("Detail3");
+    DB.save(detail1);
+    DB.save(detail2);
+    DB.save(detail3);
+    master.getDetails().add(detail1);
+    master.getDetails().add(detail2);
+    master.getDetails().add(detail3);
+
+    DB.save(master);
+
+    OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3);
+
+    Collections.reverse(masterDb.getDetails());
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail2, detail1);
+
+    masterDb.getDetails().remove(1);
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+
+  }
+
+  @Test
+  public void testModifyListWithCache() {
+    final OmCacheOrderedMaster master = new OmCacheOrderedMaster("Master");
+    final OmCacheOrderedDetail detail1 = new OmCacheOrderedDetail("Detail1");
+    final OmCacheOrderedDetail detail2 = new OmCacheOrderedDetail("Detail2");
+    final OmCacheOrderedDetail detail3 = new OmCacheOrderedDetail("Detail3");
+    DB.save(detail1);
+    DB.save(detail2);
+    DB.save(detail3);
+    master.getDetails().add(detail1);
+    master.getDetails().add(detail2);
+    master.getDetails().add(detail3);
+
+    DB.save(master);
+
+    OmCacheOrderedMaster masterDb = DB.find(OmCacheOrderedMaster.class, master.getId()); // load cache
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3); // hit cache
+
+    Collections.reverse(masterDb.getDetails());
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail2, detail1); // load cache
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail2, detail1); // hit cache
+
+    masterDb.getDetails().remove(1);
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+
   }
 }
