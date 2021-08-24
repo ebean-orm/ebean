@@ -299,13 +299,29 @@ public final class SqlTreeBuilder {
       return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
-      boolean withId = isNotSingleAttribute() && !subQuery;
-      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId, temporalMode, disableLazyLoad);
+      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId(), temporalMode, disableLazyLoad);
 
     } else {
-      boolean withId = isNotSingleAttribute() && !subQuery;
-      return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, withId(), temporalMode, disableLazyLoad);
     }
+  }
+
+  boolean withId() {
+    return isNotSingleAttribute() && !subQuery;
+  }
+
+  /**
+   * Return true if the Id property should be excluded (as it is automatically included).
+   */
+  private boolean excludeIdProperty() {
+    return query == null || !query.isSingleAttribute() && !query.isManualId();
+  }
+
+  /**
+   * Return true if the query is not a single attribute query.
+   */
+  private boolean isNotSingleAttribute() {
+    return query == null || !query.isSingleAttribute();
   }
 
   /**
@@ -666,20 +682,6 @@ public final class SqlTreeBuilder {
       }
       return extras.toArray(new String[0]);
     }
-
   }
 
-  /**
-   * Return true if the Id property should be excluded (as it is automatically included).
-   */
-  private boolean excludeIdProperty() {
-    return query == null || !query.isSingleAttribute() && !query.isManualId();
-  }
-
-  /**
-   * Return true if the query is not a single attribute query.
-   */
-  private boolean isNotSingleAttribute() {
-    return query == null || !query.isSingleAttribute();
-  }
 }
