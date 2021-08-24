@@ -231,7 +231,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .where().query();
     query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
-      + " from (select t1.id, t1.name as attribute_ from om_basic_parent t0 left join om_basic_child t1 on t1.parent_id = t0.id) r1 "
+      + " from (select t1.name as attribute_ from om_basic_parent t0 left join om_basic_child t1 on t1.parent_id = t0.id) r1 "
       + "group by r1.attribute_ order by count(*) desc, r1.attribute_"); // sub-query select clause includes t1.id,
   }
 
