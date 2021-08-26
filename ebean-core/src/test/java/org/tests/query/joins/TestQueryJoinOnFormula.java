@@ -2,7 +2,9 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import io.ebean.Query;
 import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.family.ChildPerson;
 import org.tests.model.family.ParentPerson;
@@ -68,6 +70,92 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("join (select order_id, count(*) as total_items,");
     assertSql(sql.get(0)).contains("select count(*) from ( select t0.id from o_order t0  left join (select order_id,");
+  }
+
+  @Test
+  public void testOrderOnChainedFormulaProperty() {
+    // test that join to order.details is not included
+
+    // Tests if SqlTreeBuilder.IncludesDistiller.createExtraJoin appends formulaJoinProperties
+    Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
+      .select("id")
+      .order().asc("order.totalAmount");
+
+    shipQuery.findList();
+    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
+      + "from or_order_ship t0 "
+      + "left join o_order t1 on t1.id = t0.order_id  "
+      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+      + "order by z_bt1.total_amount");
+  }
+
+  @Test
+  public void testWhereOnChainedFormulaProperty() {
+    // test that join to order.details is not included
+
+    // Tests if SqlTreeBuilder.IncludesDistiller.createExtraJoin appends formulaJoinProperties
+    Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
+      .select("id")
+      .where().isNotNull("order.totalAmount").query();
+
+    shipQuery.findList();
+    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
+      + "from or_order_ship t0 "
+      + "left join o_order t1 on t1.id = t0.order_id  "
+      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+      + "where z_bt1.total_amount is not null");
+  }
+
+  @Test
+  public void testWhereOnChainedFormulaManyWhere() {
+    // test that join to order.details is not included
+
+    // Tests if SqlTreeBuilder.IncludesDistiller.createExtraJoin appends formulaJoinProperties
+    Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
+      .select("id")
+      .where().isNotNull("order.shipments.order.totalAmount").query();
+
+    shipQuery.findList();
+    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
+      + "from or_order_ship t0 "
+      + "join o_order u1 on u1.id = t0.order_id "
+      + "join or_order_ship u2 on u2.order_id = u1.id "
+      + "join o_order u3 on u3.id = u2.order_id  "
+      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bu3 on z_bu3.order_id = u3.id "
+      + "where z_bu3.total_amount is not null");
+  }
+  @Test
+  public void testOrderOnChainedFormulaPropertyWithFetch() {
+
+    // Tests if SqlTreeBuilder.buildSelectChain appends formulaJoinProperties
+    Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
+      .select("id")
+      .fetch("order", "totalAmount")
+      .order().asc("order.totalAmount");
+
+    shipQuery.findList();
+    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
+      + "from or_order_ship t0 "
+      + "left join o_order t1 on t1.id = t0.order_id  "
+      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+      + "order by z_bt1.total_amount");
+
+  }
+  @Test
+  public void testWhereOnChainedFormulaPropertyWithFetch() {
+    // Tests if SqlTreeBuilder.buildSelectChain appends formulaJoinProperties
+    Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
+      .select("id")
+      .fetch("order", "totalAmount")
+      .where().isNotNull("order.totalAmount").query();
+
+    shipQuery.findList();
+    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
+      + "from or_order_ship t0 "
+      + "left join o_order t1 on t1.id = t0.order_id  "
+      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+      + "where z_bt1.total_amount is not null");
+
   }
 
   @Test
@@ -217,8 +305,10 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select t0.identifier from child_person t0 left join (select i2.parent_identifier");
-    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
+    assertThat(loggedSql.get(0))
+      .contains("select t0.identifier from child_person t0")
+      .contains("left join (select i2.parent_identifier")
+      .contains("where coalesce(f2.child_age, 0) = ?");
   }
 
   @Test
@@ -232,7 +322,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.identifier");
+    assertThat(loggedSql.get(0)).contains("select count(*) from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
   }
 }

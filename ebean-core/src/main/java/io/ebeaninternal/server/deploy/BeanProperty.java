@@ -457,9 +457,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * operation except for a OneToOne exported.
    */
   @Override
-  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (formula && sqlFormulaJoin != null) {
-      ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
     } else if (secondaryTableJoin != null) {
       String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
       secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);

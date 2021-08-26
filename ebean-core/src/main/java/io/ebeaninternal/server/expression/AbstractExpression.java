@@ -78,7 +78,7 @@ abstract class AbstractExpression implements SpiExpression {
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findCount query select clause
-          manyWhereJoin.addFormulaWithJoin(propertyName);
+          manyWhereJoin.addFormulaWithJoin(elProp.getElPrefix(), elProp.getName());
         }
         if (elProp.containsMany()) {
           // for findCount we join to a many property

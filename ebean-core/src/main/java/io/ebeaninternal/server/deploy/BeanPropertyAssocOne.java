@@ -402,6 +402,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   /**
    * Return the bean cache value for this property using original values.
    */
+  @Override
   public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
     return cacheDataConvert(ebi.getOrigValue(propertyIndex));
   }
@@ -602,11 +603,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
-  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
-        ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
       }
     }
   }
