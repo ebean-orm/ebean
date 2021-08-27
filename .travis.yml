@@ -34,7 +34,7 @@ env:
 install: true
 
 script:
-  - mvn clean test
+  - mvn -T 1C clean test
 
 after_failure:
   - ./.travis/print_surefire_reports
