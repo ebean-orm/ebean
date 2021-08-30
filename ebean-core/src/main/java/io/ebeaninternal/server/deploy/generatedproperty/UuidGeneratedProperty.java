@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 
 import java.util.UUID;
 
-public class UuidGeneratedProperty implements GeneratedProperty {
+final class UuidGeneratedProperty implements GeneratedProperty {
 
   @Override
   public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {

@@ -56,15 +56,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   private static final String AND = " and ";
 
   protected List<SpiExpression> list;
-
   protected final Query<T> query;
-
   private final ExpressionList<T> parentExprList;
-
   protected final ExpressionFactory expr;
-
   String allDocNestedPath;
-
   /**
    * Set to true for the "Text" root expression list.
    */

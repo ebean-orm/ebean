@@ -8,7 +8,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-class NativeILikeExpression extends AbstractExpression {
+final class NativeILikeExpression extends AbstractExpression {
 
   private final String val;
 

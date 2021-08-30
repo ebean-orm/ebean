@@ -19,18 +19,14 @@ import java.util.Map;
 /**
  * Manages the bean and query caches.
  */
-public class DefaultServerCacheManager implements SpiCacheManager {
+public final class DefaultServerCacheManager implements SpiCacheManager {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.REGION");
 
   private final Map<String, SpiCacheRegion> regionMap = new HashMap<>();
-
   private final ClusterManager clusterManager;
-
   private final DefaultCacheHolder cacheHolder;
-
   private final boolean localL2Caching;
-
   private final String serverName;
 
   /**

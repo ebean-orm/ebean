@@ -13,34 +13,27 @@ import java.util.Map.Entry;
  * Supports ordered or named parameters.
  * </p>
  */
-public class BindParams implements Serializable {
+public final class BindParams implements Serializable {
 
   private static final long serialVersionUID = 4541081933302086285L;
 
   private final List<Param> positionedParameters = new ArrayList<>();
-
   private final Map<String, Param> namedParameters = new LinkedHashMap<>();
-
   /**
    * This is the sql. For named parameters this is the sql after the named
    * parameters have been replaced with question mark place holders and the
    * parameters have been ordered by addNamedParamInOrder().
    */
   private String preparedSql;
-
   /**
    * Bind hash and count used to detect when the bind values have changed such
    * that the generated SQL (with named parameters) needs to be recalculated.
    */
   private String bindHash;
-
   /**
    * Helper to add positioned parameters in order.
    */
   private int addPos;
-
-  public BindParams() {
-  }
 
   /**
    * Reset positioned parameters (usually due to bind parameter expansion).

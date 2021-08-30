@@ -13,10 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * on shutdown or register with the JVM shutdown hook to perform a nice shutdown
  * of the daemon threads etc.
  */
-public class DaemonThreadFactory implements ThreadFactory {
+public final class DaemonThreadFactory implements ThreadFactory {
 
   private final AtomicInteger threadNumber = new AtomicInteger(1);
-
   private final String namePrefix;
 
   public DaemonThreadFactory(String namePrefix) {

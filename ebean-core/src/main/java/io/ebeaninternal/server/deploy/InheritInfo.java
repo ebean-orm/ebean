@@ -17,61 +17,45 @@ import java.util.Set;
 /**
  * Represents a node in the Inheritance tree. Holds information regarding Super Subclass support.
  */
-public class InheritInfo {
+public final class InheritInfo {
 
   private final String discriminatorStringValue;
   private final Object discriminatorValue;
-
   private final String discriminatorColumn;
-
   private final int discriminatorType;
-
   private final int discriminatorLength;
-
   private final String columnDefn;
-
   private final String where;
-
   private final Class<?> type;
-
   private final List<InheritInfo> children = new ArrayList<>();
-
   /**
    * Map of discriminator values to InheritInfo.
    */
   private final HashMap<String, InheritInfo> discMap;
-
   /**
    * Map of class types to InheritInfo (taking into account subclass proxy classes).
    */
   private final HashMap<String, InheritInfo> typeMap;
-
   private final InheritInfo parent;
-
   private final InheritInfo root;
-
   private BeanDescriptor<?> descriptor;
 
   public InheritInfo(InheritInfo r, InheritInfo parent, DeployInheritInfo deploy) {
-
     this.parent = parent;
     this.type = deploy.getType();
     this.discriminatorColumn = InternString.intern(deploy.getColumnName(parent));
     this.discriminatorValue = deploy.getDiscriminatorObjectValue();
     this.discriminatorStringValue = deploy.getDiscriminatorStringValue();
-
     this.discriminatorType = deploy.getDiscriminatorType(parent);
     this.discriminatorLength = deploy.getColumnLength(parent);
     this.columnDefn = deploy.getColumnDefn();
     this.where = InternString.intern(deploy.getWhere());
-
     if (r == null) {
       // this is a root node
       root = this;
       discMap = new HashMap<>();
       typeMap = new HashMap<>();
       registerWithRoot(this);
-
     } else {
       this.root = r;
       // register with the root node...
@@ -85,7 +69,6 @@ public class InheritInfo {
    * Visit all the children in the inheritance tree.
    */
   public void visitChildren(InheritInfoVisitor visitor) {
-
     for (InheritInfo child : children) {
       visitor.visit(child);
       child.visitChildren(visitor);
@@ -96,7 +79,6 @@ public class InheritInfo {
    * Append check constraint values for the entire inheritance hierarchy.
    */
   public void appendCheckConstraintValues(final String propertyName, final Set<String> checkConstraintValues) {
-
     visitChildren(inheritInfo -> {
       BeanProperty prop = inheritInfo.desc().getBeanProperty(propertyName);
       if (prop != null) {
@@ -190,9 +172,7 @@ public class InheritInfo {
    * Get the bean property additionally looking in the sub types.
    */
   BeanProperty findSubTypeProperty(String propertyName) {
-
     BeanProperty prop;
-
     for (InheritInfo childInfo : children) {
       // recursively search this child bean descriptor
       prop = childInfo.desc().findProperty(propertyName);
@@ -200,7 +180,6 @@ public class InheritInfo {
         return prop;
       }
     }
-
     return null;
   }
 
@@ -208,7 +187,6 @@ public class InheritInfo {
    * Add the local properties for each sub class below this one.
    */
   public void addChildrenProperties(SqlTreeProperties selectProps) {
-
     for (InheritInfo childInfo : children) {
       selectProps.add(childInfo.descriptor.propertiesLocal());
       childInfo.addChildrenProperties(selectProps);
@@ -226,11 +204,9 @@ public class InheritInfo {
    * Return the associated InheritInfo for this discriminator value.
    */
   InheritInfo readType(String discValue) {
-
     if (discValue == null) {
       return null;
     }
-
     InheritInfo typeInfo = root.getType(discValue);
     if (typeInfo == null) {
       throw new PersistenceException("Inheritance type for discriminator value [" + discValue + "] was not found?");
@@ -242,7 +218,6 @@ public class InheritInfo {
    * Return the associated InheritInfo for this bean type.
    */
   public InheritInfo readType(Class<?> beanType) {
-
     InheritInfo typeInfo = root.getTypeByClass(beanType);
     if (typeInfo == null) {
       throw new PersistenceException("Inheritance type for bean type [" + beanType.getName() + "] was not found?");

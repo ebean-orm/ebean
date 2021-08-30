@@ -19,13 +19,13 @@ import java.time.LocalTime;
 /**
  * ScalarType for java.time.LocalTime stored as JDBC Time.
  */
-public class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
+class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
 
-  public ScalarTypeLocalTime() {
+  ScalarTypeLocalTime() {
     super(LocalTime.class, false, Types.TIME);
   }
 
-  protected ScalarTypeLocalTime(int jdbcTtype) {
+  ScalarTypeLocalTime(int jdbcTtype) {
     super(LocalTime.class, false, jdbcTtype);
   }
 

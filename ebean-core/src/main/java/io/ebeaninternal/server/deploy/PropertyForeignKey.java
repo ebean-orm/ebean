@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.annotation.DbForeignKey;
 
-public class PropertyForeignKey {
+public final class PropertyForeignKey {
 
   private final boolean noIndex;
   private final boolean noConstraint;

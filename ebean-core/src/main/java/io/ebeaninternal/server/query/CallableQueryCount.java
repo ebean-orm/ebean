@@ -8,10 +8,8 @@ import java.util.concurrent.Callable;
 
 /**
  * Represent the findCount query as a Callable.
- *
- * @param <T> the entity bean type
  */
-public class CallableQueryCount<T> extends CallableQuery<T> implements Callable<Integer> {
+public final class CallableQueryCount<T> extends CallableQuery<T> implements Callable<Integer> {
 
   /**
    * Note that the transaction passed in is always a new transaction solely to

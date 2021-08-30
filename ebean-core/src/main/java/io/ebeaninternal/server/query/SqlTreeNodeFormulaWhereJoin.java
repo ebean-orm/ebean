@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.SpiQuery;
@@ -13,7 +12,7 @@ import java.util.Set;
 /**
  * Join to Many (or child of a many) to support where clause predicates on many properties.
  */
-class SqlTreeNodeFormulaWhereJoin implements SqlTreeNode {
+final class SqlTreeNodeFormulaWhereJoin implements SqlTreeNode {
 
   private final STreeProperty nodeBeanProp;
 

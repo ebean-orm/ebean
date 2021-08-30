@@ -11,7 +11,7 @@ import io.ebean.event.changelog.ChangeSet;
  * on the changeSet.
  * </p>
  */
-public class DefaultChangeLogPrepare implements ChangeLogPrepare {
+public final class DefaultChangeLogPrepare implements ChangeLogPrepare {
 
   /**
    * Just return true to send change set through to the logger.

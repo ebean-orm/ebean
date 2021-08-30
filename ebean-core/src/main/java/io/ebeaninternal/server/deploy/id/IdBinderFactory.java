@@ -7,12 +7,11 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 /**
  * Creates the appropriate IdConvertSet depending on the type of Id property(s).
  */
-public class IdBinderFactory {
+public final class IdBinderFactory {
 
   private static final IdBinderEmpty EMPTY = new IdBinderEmpty();
 
   private final boolean idInExpandedForm;
-
   private final MultiValueBind multiValueBind;
 
   public IdBinderFactory(boolean idInExpandedForm, MultiValueBind multiValueBind) {

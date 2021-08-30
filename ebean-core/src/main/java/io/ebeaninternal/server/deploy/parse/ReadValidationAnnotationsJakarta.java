@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Jakarta validation annotations reader.
  */
-class ReadValidationAnnotationsJakarta implements ReadValidationAnnotations {
+final class ReadValidationAnnotationsJakarta implements ReadValidationAnnotations {
 
   ReadValidationAnnotationsJakarta(ReadAnnotationConfig readConfig) {
     readConfig.addMetaAnnotation(Size.class);

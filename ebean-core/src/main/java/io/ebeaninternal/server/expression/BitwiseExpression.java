@@ -9,14 +9,11 @@ import java.io.IOException;
 /**
  * Bitwise expression.
  */
-class BitwiseExpression extends AbstractExpression {
+final class BitwiseExpression extends AbstractExpression {
 
-  protected final BitwiseOp operator;
-
+  private final BitwiseOp operator;
   private final String compare;
-
-  protected final long flags;
-
+  private final long flags;
   private final long match;
 
   BitwiseExpression(String propertyName, BitwiseOp operator, long flags, String compare, long match) {

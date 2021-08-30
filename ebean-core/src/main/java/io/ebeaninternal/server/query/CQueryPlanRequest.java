@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Captures database query plans.
  */
-class CQueryPlanRequest {
+final class CQueryPlanRequest {
 
   private final List<MetaQueryPlan> plans = new ArrayList<>();
 
@@ -19,7 +19,7 @@ class CQueryPlanRequest {
   private final long since;
   private final int maxCount;
   private final long maxTime;
-  private Iterator<CQueryBindCapture> iterator;
+  private final Iterator<CQueryBindCapture> iterator;
 
   CQueryPlanRequest(Connection connection, QueryPlanRequest req, Iterator<CQueryBindCapture> iterator) {
     this.connection = connection;

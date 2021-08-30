@@ -7,7 +7,7 @@ import io.ebeaninternal.api.SpiDbQueryPlan;
 /**
  * Captured query plan details.
  */
-class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
+final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
 
   private final Class<?> beanType;
   private final String label;

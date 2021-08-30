@@ -11,7 +11,7 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
  * Deferred update of a relationship where an Id value is not initially available
  * so instead we execute this later as a SqlUpdate statement.
  */
-public class PersistDeferredRelationship {
+public final class PersistDeferredRelationship {
 
   private final SpiEbeanServer ebeanServer;
   private final BeanDescriptor<?> beanDescriptor;

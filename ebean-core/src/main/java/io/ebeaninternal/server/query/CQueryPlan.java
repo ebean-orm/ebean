@@ -164,49 +164,49 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   @Override
-  public Class<?> getBeanType() {
+  public final Class<?> getBeanType() {
     return beanType;
   }
 
   @Override
-  public String getName() {
+  public final String getName() {
     return name;
   }
 
   @Override
-  public String getHash() {
+  public final String getHash() {
     return hash;
   }
 
   @Override
-  public String getSql() {
+  public final String getSql() {
     return sql;
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public final ProfileLocation getProfileLocation() {
     return profileLocation;
   }
 
-  public String getLabel() {
+  public final String getLabel() {
     return label;
   }
 
-  public Set<String> getDependentTables() {
+  public final Set<String> getDependentTables() {
     return dependentTables;
   }
 
-  public String getLocation() {
+  public final String getLocation() {
     return location;
   }
 
   @Override
-  public void queryPlanInit(long thresholdMicros) {
+  public final void queryPlanInit(long thresholdMicros) {
     bindCapture.queryPlanInit(thresholdMicros);
   }
 
   @Override
-  public DQueryPlanOutput createMeta(String bind, String planString) {
+  public final DQueryPlanOutput createMeta(String bind, String planString) {
     return new DQueryPlanOutput(getBeanType(), name, hash, sql, profileLocation, bind, planString);
   }
 
@@ -217,7 +217,7 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Bind keys for encrypted properties if necessary returning the DataBind.
    */
-  DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
+  final DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
@@ -237,14 +237,14 @@ public class CQueryPlan implements SpiQueryPlan {
     return dataBind;
   }
 
-  int getAsOfTableCount() {
+  final int getAsOfTableCount() {
     return asOfTableCount;
   }
 
   /**
    * Return a key used in audit logging to identify the query.
    */
-  String getAuditQueryKey() {
+  final String getAuditQueryKey() {
     if (auditQueryHash == null) {
       // volatile object assignment (so happy for multithreaded access)
       auditQueryHash = calcAuditQueryKey();
@@ -257,29 +257,29 @@ public class CQueryPlan implements SpiQueryPlan {
     return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
   }
 
-  SqlTree getSqlTree() {
+  final SqlTree getSqlTree() {
     return sqlTree;
   }
 
-  public boolean isRawSql() {
+  public final boolean isRawSql() {
     return rawSql;
   }
 
-  String getLogWhereSql() {
+  final String getLogWhereSql() {
     return logWhereSql;
   }
 
   /**
    * Reset the query statistics.
    */
-  public void resetStatistics() {
+  public final void resetStatistics() {
     stats.reset();
   }
 
   /**
    * Register an execution time against this query plan;
    */
-  boolean executionTime(long timeMicros) {
+  final boolean executionTime(long timeMicros) {
     stats.add(timeMicros);
     return bindCapture != null && bindCapture.collectFor(timeMicros);
   }
@@ -287,33 +287,33 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Return a copy of the current query statistics.
    */
-  public Snapshot getSnapshot(boolean reset) {
+  public final Snapshot getSnapshot(boolean reset) {
     return stats.getSnapshot(reset);
   }
 
   /**
    * Return the time this query plan was last used.
    */
-  public long getLastQueryTime() {
+  public final long getLastQueryTime() {
     return stats.getLastQueryTime();
   }
 
-  ScalarDataReader<?> getSingleAttributeScalarType() {
+  final ScalarDataReader<?> getSingleAttributeScalarType() {
     return sqlTree.getRootNode().getSingleAttributeReader();
   }
 
   /**
    * Return true if there are no statistics collected since the last reset.
    */
-  public boolean isEmptyStats() {
+  public final boolean isEmptyStats() {
     return stats.isEmpty();
   }
 
-  TimedMetric createTimedMetric() {
+  final TimedMetric createTimedMetric() {
     return MetricFactory.get().createTimedMetric(label);
   }
 
-  void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
+  final void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
     final long startNanos = System.nanoTime();
     try {
       DataBindCapture capture = bindCapture();

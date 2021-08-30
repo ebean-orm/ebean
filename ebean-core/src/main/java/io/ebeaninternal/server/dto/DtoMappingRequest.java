@@ -8,18 +8,13 @@ import io.ebeaninternal.api.SpiDtoQuery;
 /**
  * Request to map a resultSet columns for a query into a DTO bean.
  */
-public class DtoMappingRequest {
+public final class DtoMappingRequest {
 
   private final Class type;
-
   private final String label;
-
   private final ProfileLocation profileLocation;
-
   private final String sql;
-
   private final boolean relaxedMode;
-
   private final DtoColumn[] columnMeta;
 
   public DtoMappingRequest(SpiDtoQuery query, String sql, DtoColumn[] columnMeta) {

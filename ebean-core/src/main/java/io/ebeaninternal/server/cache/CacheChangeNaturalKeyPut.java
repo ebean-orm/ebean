@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 /**
  * Change the natural key mapping for a bean.
  */
-class CacheChangeNaturalKeyPut implements CacheChange {
+final class CacheChangeNaturalKeyPut implements CacheChange {
 
   private final BeanDescriptor<?> descriptor;
   private final String key;

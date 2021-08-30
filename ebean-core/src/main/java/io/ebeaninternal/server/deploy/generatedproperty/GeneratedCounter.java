@@ -7,7 +7,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 /**
  * A general number counter for various number types.
  */
-public class GeneratedCounter implements GeneratedProperty {
+final class GeneratedCounter implements GeneratedProperty {
 
   private final int numberType;
 

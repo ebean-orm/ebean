@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * DocStoreUpdateProcessor that barfs if it is used.
  */
-class NoneDocStoreUpdateProcessor implements DocStoreUpdateProcessor {
+final class NoneDocStoreUpdateProcessor implements DocStoreUpdateProcessor {
 
   @Override
   public <T> DocStoreQueryUpdate<T> createQueryUpdate(BeanType<T> beanType, int bulkBatchSize) throws IOException {

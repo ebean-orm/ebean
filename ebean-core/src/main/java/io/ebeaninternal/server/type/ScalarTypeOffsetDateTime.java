@@ -13,11 +13,11 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 /**
  * ScalarType for java.sql.Timestamp.
  */
-public class ScalarTypeOffsetDateTime extends ScalarTypeBaseDateTime<OffsetDateTime> {
+final class ScalarTypeOffsetDateTime extends ScalarTypeBaseDateTime<OffsetDateTime> {
 
   private final ZoneId zoneId;
 
-  public ScalarTypeOffsetDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
+  ScalarTypeOffsetDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
     super(mode, OffsetDateTime.class, false, Types.TIMESTAMP);
     this.zoneId = zoneId;
   }

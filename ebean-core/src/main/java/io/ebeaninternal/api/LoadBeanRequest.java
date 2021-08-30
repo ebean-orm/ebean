@@ -13,16 +13,12 @@ import java.util.Set;
 /**
  * Request for loading ManyToOne and OneToOne relationships.
  */
-public class LoadBeanRequest extends LoadRequest {
+public final class LoadBeanRequest extends LoadRequest {
 
   private final List<EntityBeanIntercept> batch;
-
   private final LoadBeanBuffer loadBuffer;
-
   private final String lazyLoadProperty;
-
   private final boolean loadCache;
-
   private boolean loadedFromCache;
 
   /**

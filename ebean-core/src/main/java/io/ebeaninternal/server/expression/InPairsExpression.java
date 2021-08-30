@@ -13,20 +13,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-class InPairsExpression extends AbstractExpression {
+final class InPairsExpression extends AbstractExpression {
 
   private final boolean not;
-
   private final String property0, property1;
-
   private List<Pairs.Entry> entries;
-
   private boolean multiValueSupported;
-
   private final String separator;
-
   private final String suffix;
-
   private List<Object> concatBindValues;
 
   InPairsExpression(Pairs pairs, boolean not) {

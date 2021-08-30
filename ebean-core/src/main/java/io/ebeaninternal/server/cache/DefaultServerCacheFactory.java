@@ -11,7 +11,7 @@ import io.ebean.cache.ServerCacheNotify;
 /**
  * Default implementation of ServerCacheFactory.
  */
-class DefaultServerCacheFactory implements ServerCacheFactory {
+final class DefaultServerCacheFactory implements ServerCacheFactory {
 
   private final BackgroundExecutor executor;
 
@@ -31,7 +31,6 @@ class DefaultServerCacheFactory implements ServerCacheFactory {
 
   @Override
   public ServerCache createCache(ServerCacheConfig config) {
-
     DefaultServerCache cache;
     if (config.isQueryCache()) {
       // use a server cache aware of extra validation and QueryCacheEntry

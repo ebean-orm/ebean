@@ -5,7 +5,7 @@ import io.ebean.ProfileLocation;
 /**
  * Default transaction profiling event collection.
  */
-public class DefaultProfileStream implements ProfileStream {
+public final class DefaultProfileStream implements ProfileStream {
 
   private final long startNanos;
   private final StringBuilder buffer;

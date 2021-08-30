@@ -11,11 +11,11 @@ import java.time.ZonedDateTime;
 /**
  * ScalarType for ZonedDateTime.
  */
-public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTime> {
+final class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTime> {
 
   private final ZoneId zoneId;
 
-  public ScalarTypeZonedDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
+  ScalarTypeZonedDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
     super(mode, ZonedDateTime.class, false, Types.TIMESTAMP);
     this.zoneId = zoneId;
   }

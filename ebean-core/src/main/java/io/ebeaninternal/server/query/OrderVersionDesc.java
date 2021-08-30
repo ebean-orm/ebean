@@ -9,7 +9,7 @@ import java.util.Comparator;
 /**
  * Compare Version beans in descending order with nulls last.
  */
-class OrderVersionDesc implements Comparator<Version<?>>, Serializable {
+final class OrderVersionDesc implements Comparator<Version<?>>, Serializable {
 
   static final OrderVersionDesc INSTANCE = new OrderVersionDesc();
 

@@ -7,7 +7,7 @@ import java.util.Currency;
  *
  * @param <R> the root query bean type
  */
-public class PCurrency<R> extends PBaseValueEqual<R,Currency> {
+public final class PCurrency<R> extends PBaseValueEqual<R,Currency> {
 
   /**
    * Construct with a property name and root instance.

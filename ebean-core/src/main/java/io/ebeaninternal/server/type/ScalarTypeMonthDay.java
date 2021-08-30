@@ -21,24 +21,14 @@ import java.time.MonthDay;
  * Note that the year used should be a leap year.
  * </p>
  */
-public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
-
-  protected final int year;
-
-  /**
-   * Construct with a year of 2000 (which is a leap year).
-   */
-  public ScalarTypeMonthDay() {
-    this(2000); // Year 2000 is a leap year
-  }
+final class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
 
   /**
    * Construct with a base year. The year should be a leap year to
    * allow the 29th Feb value.
    */
-  public ScalarTypeMonthDay(int year) {
+  ScalarTypeMonthDay() {
     super(MonthDay.class, false, Types.DATE);
-    this.year = year;
   }
 
   private MonthDay convertFromDate(Date ts) {

@@ -21,35 +21,20 @@ import java.util.stream.Stream;
 /**
  * Default implementation of DtoQuery.
  */
-public class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
+public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
 
   private final SpiEbeanServer server;
-
   private final DtoBeanDescriptor<T> descriptor;
-
   private final SpiQuery<?> ormQuery;
-
   private String sql;
-
   private int firstRow;
-
   private int maxRows;
-
   private int timeout;
-
   private int bufferFetchSizeHint;
-
   private boolean relaxedMode;
-
   private String label;
-
   private ProfileLocation profileLocation;
-
-  /**
-   * Bind parameters when using the query language.
-   */
   private final BindParams bindParams = new BindParams();
-
   private Transaction transaction;
 
   /**

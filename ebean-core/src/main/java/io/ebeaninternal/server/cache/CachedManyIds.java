@@ -13,7 +13,7 @@ import java.util.List;
  * This is effectively just the Id values for each of the beans in the collection.
  * </p>
  */
-public class CachedManyIds implements Externalizable {
+public final class CachedManyIds implements Externalizable {
 
   private List<Object> idList;
 

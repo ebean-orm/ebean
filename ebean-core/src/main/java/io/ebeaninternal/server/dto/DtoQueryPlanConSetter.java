@@ -7,10 +7,9 @@ import java.sql.SQLException;
 /**
  * Plan based on default constructor and setter methods.
  */
-class DtoQueryPlanConSetter extends DtoQueryPlanBase {
+final class DtoQueryPlanConSetter extends DtoQueryPlanBase {
 
   private final DtoMetaConstructor defaultConstructor;
-
   private final DtoReadSet[] setterProps;
 
   DtoQueryPlanConSetter(DtoMappingRequest request, DtoMetaConstructor defaultConstructor, DtoReadSet[] setterProps) {
@@ -21,7 +20,6 @@ class DtoQueryPlanConSetter extends DtoQueryPlanBase {
 
   @Override
   public Object readRow(DataReader dataReader) throws SQLException {
-
     Object bean = defaultConstructor.defaultConstructor();
     for (DtoReadSet setterProp : setterProps) {
       setterProp.readSet(bean, dataReader);

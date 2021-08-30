@@ -12,7 +12,7 @@ import java.sql.SQLException;
 /**
  * A QueryPlanLogger for Postgres that prefixes "EXPLAIN ANALYZE" to the query.
  */
-public class QueryPlanLoggerPostgres extends QueryPlanLogger {
+public final class QueryPlanLoggerPostgres extends QueryPlanLogger {
 
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {

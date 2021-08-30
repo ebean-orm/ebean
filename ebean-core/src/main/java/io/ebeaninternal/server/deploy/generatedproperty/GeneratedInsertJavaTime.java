@@ -6,9 +6,9 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 /**
  * Support java.time types as GeneratedProperty.
  */
-public class GeneratedInsertJavaTime {
+final class GeneratedInsertJavaTime {
 
-  public static abstract class Base implements GeneratedProperty, GeneratedWhenCreated {
+  static abstract class Base implements GeneratedProperty, GeneratedWhenCreated {
 
     @Override
     public boolean includeInUpdate() {
@@ -39,7 +39,7 @@ public class GeneratedInsertJavaTime {
   /**
    * Instant support.
    */
-  public static class InstantDT extends Base {
+  static final class InstantDT extends Base {
 
     @Override
     public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
@@ -50,7 +50,7 @@ public class GeneratedInsertJavaTime {
   /**
    * LocalDateTime support.
    */
-  public static class LocalDT extends Base {
+  static final class LocalDT extends Base {
 
     @Override
     public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
@@ -61,7 +61,7 @@ public class GeneratedInsertJavaTime {
   /**
    * OffsetDateTime support.
    */
-  public static class OffsetDT extends Base {
+  static final class OffsetDT extends Base {
 
     @Override
     public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
@@ -73,7 +73,7 @@ public class GeneratedInsertJavaTime {
   /**
    * ZonedDateTime support.
    */
-  public static class ZonedDT extends Base {
+  static final class ZonedDT extends Base {
 
     @Override
     public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {

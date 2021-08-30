@@ -3,7 +3,7 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 
-class JacksonTypeHelper {
+final class JacksonTypeHelper {
 
   private final AnnotatedField field;
   private final ObjectMapper objectMapper;

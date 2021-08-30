@@ -5,7 +5,7 @@ package io.ebeaninternal.server.util;
  * <p>
  * Predicts a decent buffer size to append the strings into.
  */
-public class Str {
+public final class Str {
 
   /**
    * Append strings together.

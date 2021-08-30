@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * PagedList implementation based on limit offset types of queries.
  */
-public class LimitOffsetPagedList<T> implements PagedList<T> {
+public final class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final transient SpiEbeanServer server;
 

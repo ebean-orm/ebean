@@ -5,9 +5,9 @@ import java.util.Locale;
 /**
  * ScalarType for java.util.Currency which converts to and from a VARCHAR database column.
  */
-public class ScalarTypeLocale extends ScalarTypeBaseVarchar<Locale> {
+final class ScalarTypeLocale extends ScalarTypeBaseVarchar<Locale> {
 
-  public ScalarTypeLocale() {
+  ScalarTypeLocale() {
     super(Locale.class);
   }
 

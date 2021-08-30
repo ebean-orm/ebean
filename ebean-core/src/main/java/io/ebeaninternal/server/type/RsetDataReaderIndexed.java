@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 /**
  * A DataReader with indexed positions for the properties to read specifically for RawSql use.
  */
-public class RsetDataReaderIndexed extends RsetDataReader {
+public final class RsetDataReaderIndexed extends RsetDataReader {
 
   private final int[] rsetIndexPositions;
 

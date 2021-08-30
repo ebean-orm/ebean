@@ -13,10 +13,9 @@ import java.util.Set;
 /**
  * Set properties for a UpdateQuery.
  */
-public class OrmUpdateProperties {
+public final class OrmUpdateProperties {
 
   private static final NullValue NULL_VALUE = new NullValue();
-
   private static final NoneValue NONE_VALUE = new NoneValue();
 
   /**
@@ -41,7 +40,7 @@ public class OrmUpdateProperties {
   /**
    * Set property to null.
    */
-  private static class NullValue extends Value {
+  private static final class NullValue extends Value {
     @Override
     public String bindClause() {
       return "=null";
@@ -51,7 +50,7 @@ public class OrmUpdateProperties {
   /**
    * Set property to a simple value.
    */
-  private static class SimpleValue extends Value {
+  private static final class SimpleValue extends Value {
 
     final Object value;
     final ScalarType<Object> scalarType;
@@ -85,7 +84,7 @@ public class OrmUpdateProperties {
   /**
    * Set using an expression with no bind value.
    */
-  private static class NoneValue extends Value {
+  private static final class NoneValue extends Value {
     @Override
     public String bindClause() {
       return "";
@@ -95,7 +94,7 @@ public class OrmUpdateProperties {
   /**
    * Set using an expression with many bind values.
    */
-  private static class RawArrayValue extends Value {
+  private static final class RawArrayValue extends Value {
 
     final Object[] bindValues;
 

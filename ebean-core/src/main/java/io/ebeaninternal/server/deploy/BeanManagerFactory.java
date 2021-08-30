@@ -7,7 +7,7 @@ import io.ebeaninternal.server.persist.dml.DmlBeanPersisterFactory;
 /**
  * Creates BeanManagers.
  */
-class BeanManagerFactory {
+final class BeanManagerFactory {
 
   private final BeanPersisterFactory persisterFactory;
 

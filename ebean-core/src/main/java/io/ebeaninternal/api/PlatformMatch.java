@@ -3,7 +3,7 @@ package io.ebeaninternal.api;
 import io.ebean.annotation.Platform;
 import io.ebean.util.StringHelper;
 
-public class PlatformMatch {
+public final class PlatformMatch {
 
   /**
    * Return true if the script platforms is a match/supported for the given platform.
@@ -15,7 +15,6 @@ public class PlatformMatch {
     if (platforms == null || platforms.trim().isEmpty()) {
       return true;
     }
-
     // match on base platform name and platform name
     for (String name : StringHelper.splitNames(platforms)) {
       if (name.equalsIgnoreCase(platform.base().name()) || name.equalsIgnoreCase(platform.name())) {

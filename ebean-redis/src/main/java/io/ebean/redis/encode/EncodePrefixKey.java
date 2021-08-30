@@ -4,7 +4,7 @@ import io.ebean.cache.TenantAwareKey;
 
 import java.nio.charset.StandardCharsets;
 
-public class EncodePrefixKey implements Encode {
+public final class EncodePrefixKey implements Encode {
 
   private final String prefix;
 
@@ -18,10 +18,8 @@ public class EncodePrefixKey implements Encode {
       if (!(value instanceof String) && !(value instanceof TenantAwareKey.CacheKey)) {
         throw new IllegalStateException("Expecting String keys but got type:" + value.getClass());
       }
-
-      String key = prefix + value.toString();
+      String key = prefix + value;
       return key.getBytes(StandardCharsets.UTF_8);
-
     } catch (Exception e) {
       throw new RuntimeException("Failed to decode cache data", e);
     }

@@ -7,10 +7,9 @@ import java.sql.SQLException;
 /**
  * Plan based on Constructor plus some setter methods.
  */
-class DtoQueryPlanConPlus extends DtoQueryPlanBase {
+final class DtoQueryPlanConPlus extends DtoQueryPlanBase {
 
   private final DtoMetaConstructor maxArgConstructor;
-
   private final DtoReadSet[] setterProps;
 
   DtoQueryPlanConPlus(DtoMappingRequest request, DtoMetaConstructor maxArgConstructor, DtoReadSet[] setterProps) {
@@ -21,7 +20,6 @@ class DtoQueryPlanConPlus extends DtoQueryPlanBase {
 
   @Override
   public Object readRow(DataReader dataReader) throws SQLException {
-
     Object bean = maxArgConstructor.process(dataReader);
     for (DtoReadSet setterProp : setterProps) {
       setterProp.readSet(bean, dataReader);

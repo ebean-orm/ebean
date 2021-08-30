@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
-class IdExpression extends NonPrepareExpression implements SpiExpression {
+final class IdExpression extends NonPrepareExpression implements SpiExpression {
 
   private final Object value;
 

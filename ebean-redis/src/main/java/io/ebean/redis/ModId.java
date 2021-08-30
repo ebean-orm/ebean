@@ -20,7 +20,7 @@ import java.util.Base64;
  * Note that this now internally uses java.util.Base64 to encode the values.
  * </p>
  */
-public class ModId {
+public final class ModId {
 
   private static final SecureRandom shortIdSecureRandom = new SecureRandom();
 
@@ -35,7 +35,6 @@ public class ModId {
    * </p>
    */
   public static String id() {
-
     // Random 72 bits
     byte[] randomBytes = new byte[9];
     shortIdSecureRandom.nextBytes(randomBytes);

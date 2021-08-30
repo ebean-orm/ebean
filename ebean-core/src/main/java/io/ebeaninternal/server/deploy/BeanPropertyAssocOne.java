@@ -47,16 +47,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private final boolean primaryKeyJoin;
 
   private AssocOneHelp localHelp;
-
   final BeanProperty[] embeddedProps;
-
   private final HashMap<String, BeanProperty> embeddedPropsMap;
-
   ImportedId importedId;
-
   private String deleteByParentIdSql;
   private String deleteByParentIdInSql;
-
   private BeanPropertyAssocMany<?> relationshipProperty;
   private boolean cacheNotifyRelationship;
 
@@ -72,14 +67,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   public BeanPropertyAssocOne(BeanDescriptorMap owner, BeanDescriptor<?> descriptor,
                               DeployBeanPropertyAssocOne<T> deploy) {
-
     super(descriptor, deploy);
     primaryKeyExport = deploy.isPrimaryKeyExport();
     primaryKeyJoin = deploy.isPrimaryKeyJoin();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
-
     if (embedded) {
       // Overriding of the columns and use table alias of owning BeanDescriptor
       BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy);
@@ -126,7 +119,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   private void initialiseAssocOne(String embeddedPrefix) {
     localHelp = createHelp(embedded, oneToOneExported, embeddedPrefix);
-
     if (!isTransient) {
       //noinspection StatementWithEmptyBody
       if (embedded || descriptor.isDocStoreOnly()) {
@@ -143,10 +135,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
               + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
           }
         }
-
       } else {
         exportedProperties = createExported();
-
         String delStmt = "delete from " + targetDescriptor.getBaseTable() + " where ";
         deleteByParentIdSql = delStmt + deriveWhereParentIdSql(false);
         deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true);
@@ -198,7 +188,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Clear part of the L2 relationship cache for this property.
    */
   void cacheDelete(boolean clear, EntityBean bean, CacheChangeSet changeSet) {
-
     if (cacheNotifyRelationship) {
       if (clear) {
         changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
@@ -224,7 +213,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
-
     if (embedded) {
       BeanProperty embProp = embeddedPropsMap.get(remainder);
       if (embProp == null) {
@@ -236,10 +224,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       }
       chain.add(this);
       chain.setEmbedded(true);
-
       return chain.add(embProp).build();
     }
-
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }
 
@@ -264,7 +250,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private SqlUpdate deleteByParentId(Object parentId) {
-
     DefaultSqlUpdate delete = new DefaultSqlUpdate(deleteByParentIdSql);
     bindParentId(delete, parentId);
     return delete;
@@ -279,9 +264,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private List<Object> findIdsByParentId(Object parentId, Transaction t) {
-
     String rawWhere = deriveWhereParentIdSql(false);
-
     SpiEbeanServer server = server();
     Query<?> q = server.find(getPropertyType());
     bindParentIdEq(rawWhere, parentId, q);
@@ -289,15 +272,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t) {
-
     String rawWhere = deriveWhereParentIdSql(true);
     String inClause = getIdBinder().getIdInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
-
     SpiEbeanServer server = server();
     Query<?> q = server.find(getPropertyType());
     bindParentIdsIn(expr, parentIds, q);
-
     return server.findIds(q, t);
   }
 
@@ -321,7 +301,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
           BeanProperty idProperty = target.getIdProperty();
           desc.registerColumn(dbColumn, SplitName.add(basePath, idProperty.getName()));
         }
-
         desc.registerTable(target.getBaseTable(), this);
       }
     }
@@ -337,9 +316,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
-
     prefix = SplitName.add(prefix, name);
-
     if (!embedded) {
       InheritInfo inheritInfo = targetDescriptor.getInheritInfo();
       if (inheritInfo != null) {
@@ -355,7 +332,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
           + ". Probably a missing @OneToOne mapping annotation on this relationship?");
       }
       targetIdBinder.buildRawSqlSelectChain(prefix, selectChain);
-
     } else {
       for (BeanProperty embeddedProp : embeddedProps) {
         embeddedProp.buildRawSqlSelectChain(prefix, selectChain);
@@ -387,7 +363,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
-
     Object newEmb = (newBean == null) ? null : getValue(newBean);
     Object oldEmb = (oldBean == null) ? null : getValue(oldBean);
     if (newEmb == null && oldEmb == null) {
@@ -395,7 +370,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
 
     String nextPrefix = (prefix == null) ? name : prefix + "." + name;
-
     if (embedded) {
       BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
       targetDescriptor.diff(nextPrefix, map, (EntityBean) newEmb, (EntityBean) oldEmb);
@@ -545,7 +519,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return !embedded;
   }
 
-
   /**
    * Create a bean of the target type to be used as an embeddedId
    * value.
@@ -569,9 +542,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private String deriveWhereParentIdSql(boolean inClause) {
-
     StringBuilder sb = new StringBuilder();
-
     for (int i = 0; i < exportedProperties.length; i++) {
       String fkColumn = exportedProperties[i].getForeignDbColumn();
       if (i > 0) {
@@ -590,13 +561,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Create the array of ExportedProperty used to build reference objects.
    */
   private ExportedProperty[] createExported() {
-
     BeanProperty idProp = descriptor.getIdProperty();
-
     ArrayList<ExportedProperty> list = new ArrayList<>();
-
     if (idProp != null && idProp.isEmbedded()) {
-
       BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) idProp;
       BeanDescriptor<?> targetDesc = one.getTargetDescriptor();
       BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
@@ -608,13 +575,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         // not found as individual scalar properties
         e.printStackTrace();
       }
-
     } else {
       if (idProp != null) {
         list.add(findMatch(false, idProp));
       }
     }
-
     return list.toArray(new ExportedProperty[0]);
   }
 
@@ -622,10 +587,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Find the matching foreignDbColumn for a given local property.
    */
   private ExportedProperty findMatch(boolean embeddedProp, BeanProperty prop) {
-
     return findMatch(embeddedProp, prop, prop.getDbColumn(), tableJoin);
   }
-
 
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
@@ -744,7 +707,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public void jsonWriteForInsert(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
-
     if (!jsonSerialize) {
       return;
     }
@@ -763,13 +725,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private void jsonWriteBean(SpiJsonWriter writeJson, Object value) throws IOException {
-
     if (value instanceof EntityBean) {
       if (embedded) {
         writeJson.writeFieldName(name);
         BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
         refDesc.jsonWriteForInsert(writeJson, (EntityBean) value);
-
       } else {
         jsonWriteTargetId(writeJson, (EntityBean) value);
       }
@@ -790,15 +750,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public void jsonWrite(SpiJsonWriter writeJson, EntityBean bean) throws IOException {
-
     if (!jsonSerialize) {
       return;
     }
-
     Object value = getValueIntercept(bean);
     if (value == null) {
       writeJson.writeNullField(name);
-
     } else {
       if (!writeJson.isParentBean(value)) {
         // Hmmm, not writing complex non-entity bean
@@ -829,12 +786,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Set the parent bean to the child bean if it has not already been set.
    */
   public void setParentBeanToChild(EntityBean parent, EntityBean child) {
-
     if (primaryKeyExport) {
       Object parentId = descriptor.getId(parent);
       targetDescriptor.convertSetId(parentId, child);
     }
-
     if (mappedBy != null) {
       BeanProperty beanProperty = targetDescriptor.getBeanProperty(mappedBy);
       if (beanProperty != null && beanProperty.getValue(child) == null) {

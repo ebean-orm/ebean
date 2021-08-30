@@ -9,7 +9,7 @@ import io.ebeaninternal.server.core.InternString;
  * Typically this is for Embedded Beans.
  * </p>
  */
-class BeanPropertyOverride {
+final class BeanPropertyOverride {
 
   private final String dbColumn;
   private final boolean dbNullable;

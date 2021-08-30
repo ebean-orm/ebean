@@ -13,7 +13,7 @@ import io.ebeaninternal.server.deploy.DbReadContext;
  * partial objects.
  * </p>
  */
-public class SqlBeanLoad {
+public final class SqlBeanLoad {
 
   private final DbReadContext ctx;
   private final EntityBean bean;

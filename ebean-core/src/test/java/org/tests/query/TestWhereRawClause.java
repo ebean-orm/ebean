@@ -169,9 +169,9 @@ public class TestWhereRawClause extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertThat(sql.get(0)).isEqualTo("select t0.id, t0.name from o_customer t0 where t0.name = any(?); --bind(Array[3]={Rob,Fiona,Jack})");
-    assertThat(sql.get(1)).isEqualTo("select t0.id, t0.name from o_customer t0; --bind()");
-    assertThat(sql.get(2)).isEqualTo("select t0.id, t0.name from o_customer t0; --bind()");
+    assertThat(sql.get(0)).contains("select t0.id, t0.name from o_customer t0 where t0.name = any(?);");
+    assertThat(sql.get(1)).contains("select t0.id, t0.name from o_customer t0; --bind()");
+    assertThat(sql.get(2)).contains("select t0.id, t0.name from o_customer t0; --bind()");
   }
 
   @Test

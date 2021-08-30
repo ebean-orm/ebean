@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Bindable for inserting a discriminator value.
  */
-public class BindableDiscriminator implements Bindable {
+public final class BindableDiscriminator implements Bindable {
 
   private final String columnName;
   private final Object discValue;

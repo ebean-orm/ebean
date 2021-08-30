@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Default implementation for FutureList.
  */
-public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureList<T> {
+public final class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureList<T> {
 
   private final CallableQueryList<T> call;
 

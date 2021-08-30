@@ -10,7 +10,7 @@ import java.util.Map;
  * Typically collects the overridden column names mapped
  * to the Embedded bean.
  */
-public class DeployBeanEmbedded {
+public final class DeployBeanEmbedded {
 
   /**
    * A map of property names to dbColumns.

@@ -14,7 +14,7 @@ import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 /**
  * Objects supplied for constructing the TransactionManager.
  */
-public class TransactionManagerOptions {
+public final class TransactionManagerOptions {
 
   final SpiServer server;
   final boolean notifyL2CacheInForeground;

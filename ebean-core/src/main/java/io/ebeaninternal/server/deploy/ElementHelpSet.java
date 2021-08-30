@@ -6,7 +6,7 @@ import io.ebean.common.BeanSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-class ElementHelpSet implements ElementHelp {
+final class ElementHelpSet implements ElementHelp {
 
   @Override
   public ElementCollector createCollector() {

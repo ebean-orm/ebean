@@ -12,7 +12,7 @@ import java.sql.CallableStatement;
 import java.sql.SQLException;
 
 
-public class DefaultCallableSql implements Serializable, SpiCallableSql {
+public final class DefaultCallableSql implements Serializable, SpiCallableSql {
 
   private static final long serialVersionUID = 8984272253185424701L;
 

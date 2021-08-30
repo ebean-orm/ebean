@@ -6,7 +6,7 @@ import io.ebean.common.BeanList;
 import java.util.ArrayList;
 import java.util.List;
 
-class ElementHelpList implements ElementHelp {
+final class ElementHelpList implements ElementHelp {
 
   @Override
   public ElementCollector createCollector() {

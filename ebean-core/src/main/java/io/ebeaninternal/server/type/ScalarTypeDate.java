@@ -12,9 +12,9 @@ import java.sql.Types;
 /**
  * ScalarType for java.sql.Date.
  */
-public class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
+final class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
 
-  public ScalarTypeDate(JsonConfig.Date mode) {
+  ScalarTypeDate(JsonConfig.Date mode) {
     super(mode, Date.class, true, Types.DATE);
   }
 

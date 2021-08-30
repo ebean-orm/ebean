@@ -12,7 +12,7 @@ import java.sql.Savepoint;
 /**
  * A nested transaction that represents a Savepoint.
  */
-class SavepointTransaction extends SpiTransactionProxy {
+final class SavepointTransaction extends SpiTransactionProxy {
 
   private static final int STATE_COMMITTED = 1;
   private static final int STATE_ROLLED_BACK = 2;

@@ -6,10 +6,9 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
 
-class InRangeExpression extends AbstractExpression {
+final class InRangeExpression extends AbstractExpression {
 
   private final Object valueHigh;
-
   private final Object valueLow;
 
   InRangeExpression(String propertyName, Object valueLow, Object valueHigh) {

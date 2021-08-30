@@ -18,7 +18,6 @@ import java.util.Map;
 class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<T> {
 
   private final ScalarType scalarTypeKey;
-
   private final boolean stringKey;
 
   BeanDescriptorElementEmbeddedMap(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {
@@ -50,7 +49,6 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-
     JsonParser parser = readJson.getParser();
     ElementCollector add = elementHelp.createCollector();
     do {
@@ -70,7 +68,6 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
         add.addKeyValue(key, val);
       }
     } while (true);
-
     return add.collection();
   }
 

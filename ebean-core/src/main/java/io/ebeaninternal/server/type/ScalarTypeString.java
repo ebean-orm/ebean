@@ -5,7 +5,7 @@ import java.sql.Types;
 /**
  * ScalarType for String.
  */
-public class ScalarTypeString extends ScalarTypeStringBase {
+public final class ScalarTypeString extends ScalarTypeStringBase {
 
   public static final ScalarTypeString INSTANCE = new ScalarTypeString();
 

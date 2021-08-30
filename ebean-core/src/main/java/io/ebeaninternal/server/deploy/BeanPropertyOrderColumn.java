@@ -8,7 +8,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
  *
  * The value of which is held on the entity bean intercept.
  */
-public class BeanPropertyOrderColumn extends BeanProperty {
+public final class BeanPropertyOrderColumn extends BeanProperty {
 
   public BeanPropertyOrderColumn(BeanDescriptor<?> descriptor, DeployBeanProperty deploy) {
     super(descriptor, deploy);

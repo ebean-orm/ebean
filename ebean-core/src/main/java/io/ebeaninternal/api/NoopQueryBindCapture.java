@@ -2,7 +2,7 @@ package io.ebeaninternal.api;
 
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
-class NoopQueryBindCapture implements SpiQueryBindCapture {
+final class NoopQueryBindCapture implements SpiQueryBindCapture {
 
   @Override
   public boolean collectFor(long timeMicros) {

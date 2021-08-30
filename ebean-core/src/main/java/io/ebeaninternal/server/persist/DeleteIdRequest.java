@@ -5,7 +5,7 @@ import io.ebean.Transaction;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebeaninternal.api.SpiEbeanServer;
 
-class DeleteIdRequest implements BeanDeleteIdRequest {
+final class DeleteIdRequest implements BeanDeleteIdRequest {
 
   private final EbeanServer server;
   private final Transaction transaction;

@@ -24,30 +24,29 @@ class BindableAssocOne implements Bindable {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return "BindableAssocOne " + assocOne;
   }
 
   @Override
-  public boolean isDraftOnly() {
+  public final boolean isDraftOnly() {
     return assocOne.isDraftOnly();
   }
 
   @Override
-  public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
+  public final void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(assocOne)) {
       list.add(this);
     }
   }
 
   @Override
-  public void dmlAppend(GenerateDmlRequest request) {
+  public final void dmlAppend(GenerateDmlRequest request) {
     importedId.dmlAppend(request);
   }
 
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     EntityBean assocBean = (EntityBean) assocOne.getValue(bean);
     registerDeferred(request, bean, assocBean);
   }

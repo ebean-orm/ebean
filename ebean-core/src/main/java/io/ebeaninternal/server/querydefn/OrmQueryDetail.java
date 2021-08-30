@@ -21,7 +21,7 @@ import java.util.*;
  * Tuning a query is a matter of replacing an instance of this class with one that has been tuned
  * with select() and join() set.
  */
-public class OrmQueryDetail implements Serializable {
+public final class OrmQueryDetail implements Serializable {
 
   private static final long serialVersionUID = -2510486880141461807L;
 

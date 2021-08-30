@@ -20,8 +20,7 @@ public class ChangeJsonBuilderTest extends BaseTestCase {
   @Test
   public void testToJson() throws Exception {
 
-    JsonContext jsonContext = Ebean.getDefaultServer().json();
-    ChangeJsonBuilder builder = new ChangeJsonBuilder(jsonContext);
+    ChangeJsonBuilder builder = new ChangeJsonBuilder();
 
     ChangeSet changeSet = helper.createChangeSet("ABCD", 10);
     changeSet.getUserContext().put("altUser", "role user");

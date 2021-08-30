@@ -26,15 +26,10 @@ public class DataBind implements DataBinder {
   private static final Logger log = LoggerFactory.getLogger(DataBind.class);
 
   private final DataTimeZone dataTimeZone;
-
   private final PreparedStatement pstmt;
-
   private final Connection connection;
-
   private final StringBuilder bindLog = new StringBuilder();
-
   private List<InputStream> inputStreams;
-
   protected int pos;
   private String json;
 
@@ -45,35 +40,35 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public void pushJson(String json) {
+  public final void pushJson(String json) {
     assert this.json == null; // we can only push one value
     this.json = json;
   }
 
   @Override
-  public String popJson() {
+  public final String popJson() {
     String ret = json;
     json = null;
     return ret;
   }
 
   @Override
-  public StringBuilder append(Object entry) {
+  public final StringBuilder append(Object entry) {
     return bindLog.append(entry);
   }
 
   @Override
-  public StringBuilder log() {
+  public final StringBuilder log() {
     return bindLog;
   }
 
   @Override
-  public void close() throws SQLException {
+  public final void close() throws SQLException {
     pstmt.close();
   }
 
   @Override
-  public int currentPos() {
+  public final int currentPos() {
     return pos;
   }
 
@@ -83,7 +78,7 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public void setObject(Object value, int sqlType) throws SQLException {
+  public final void setObject(Object value, int sqlType) throws SQLException {
     pstmt.setObject(++pos, value, sqlType);
   }
 
@@ -93,17 +88,17 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public int nextPos() {
+  public final int nextPos() {
     return ++pos;
   }
 
   @Override
-  public void decrementPos() {
+  public final void decrementPos() {
     --pos;
   }
 
   @Override
-  public int executeUpdate() throws SQLException {
+  public final int executeUpdate() throws SQLException {
     try {
       return pstmt.executeUpdate();
     } finally {
@@ -125,7 +120,7 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public PreparedStatement getPstmt() {
+  public final PreparedStatement getPstmt() {
     return pstmt;
   }
 
@@ -135,37 +130,37 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public void setInt(int i) throws SQLException {
+  public final void setInt(int i) throws SQLException {
     pstmt.setInt(++pos, i);
   }
 
   @Override
-  public void setLong(long i) throws SQLException {
+  public final void setLong(long i) throws SQLException {
     pstmt.setLong(++pos, i);
   }
 
   @Override
-  public void setShort(short i) throws SQLException {
+  public final void setShort(short i) throws SQLException {
     pstmt.setShort(++pos, i);
   }
 
   @Override
-  public void setFloat(float i) throws SQLException {
+  public final void setFloat(float i) throws SQLException {
     pstmt.setFloat(++pos, i);
   }
 
   @Override
-  public void setDouble(double i) throws SQLException {
+  public final void setDouble(double i) throws SQLException {
     pstmt.setDouble(++pos, i);
   }
 
   @Override
-  public void setBigDecimal(BigDecimal v) throws SQLException {
+  public final void setBigDecimal(BigDecimal v) throws SQLException {
     pstmt.setBigDecimal(++pos, v);
   }
 
   @Override
-  public void setDate(java.sql.Date v) throws SQLException {
+  public final void setDate(java.sql.Date v) throws SQLException {
     Calendar timeZone = dataTimeZone.getDateTimeZone();
     if (timeZone != null) {
       pstmt.setDate(++pos, v, timeZone);
@@ -175,7 +170,7 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public void setTimestamp(Timestamp v) throws SQLException {
+  public final void setTimestamp(Timestamp v) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeZone();
     if (timeZone != null) {
       pstmt.setTimestamp(++pos, v, timeZone);
@@ -185,7 +180,7 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public void setTime(Time v) throws SQLException {
+  public final void setTime(Time v) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeZone();
     if (timeZone != null) {
       pstmt.setTime(++pos, v, timeZone);

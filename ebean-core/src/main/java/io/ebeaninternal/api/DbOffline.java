@@ -6,7 +6,7 @@ import io.ebean.annotation.Platform;
  * Helper to indicate that an EbeanServer should come up offline
  * typically for DDL generation purposes.
  */
-public class DbOffline {
+public final class DbOffline {
 
   private static final String KEY = "ebean.dboffline";
 

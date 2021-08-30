@@ -7,7 +7,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-class CaseInsensitiveEqualExpression extends AbstractValueExpression {
+final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
   private final boolean not;
 
@@ -34,7 +34,6 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
@@ -47,7 +46,6 @@ class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {

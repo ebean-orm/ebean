@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.11.1-SNAPSHOT</version>
+  <version>12.11.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -38,9 +38,15 @@
   </developers>
 
   <properties>
-    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
-    <ebean-datasource.version>7.0</ebean-datasource.version>
+    <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.12.1</jackson.version>
+    <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
+    <ebean-migration-auto.version>1.1</ebean-migration-auto.version>
+    <ebean-migration.version>12.11.0</ebean-migration.version>
+    <ebean-test-docker.version>4.1</ebean-test-docker.version>
+    <ebean-datasource.version>7.2</ebean-datasource.version>
+    <ebean-agent.version>12.11.2</ebean-agent.version>
+    <ebean-maven-plugin.version>12.11.2</ebean-maven-plugin.version>
   </properties>
 
   <dependencies>

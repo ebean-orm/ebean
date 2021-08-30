@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Helper object to classify BeanProperties into appropriate lists.
  */
-public class DeployBeanPropertyLists {
+public final class DeployBeanPropertyLists {
 
   private static final Logger logger = LoggerFactory.getLogger(DeployBeanPropertyLists.class);
 

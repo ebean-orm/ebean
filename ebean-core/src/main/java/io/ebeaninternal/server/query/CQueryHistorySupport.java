@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Helper to support history functions.
  */
-class CQueryHistorySupport {
+final class CQueryHistorySupport {
 
   /**
    * The DB specific support.

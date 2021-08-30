@@ -273,7 +273,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
 
-    if (p.isId()) {
+    if (p.isId() || p.isImportedPrimaryKey()) {
       col.setPrimaryKey(true);
       if (p.getBeanDescriptor().isUseIdGenerator()) {
         col.setIdentity(true);

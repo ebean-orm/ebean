@@ -6,7 +6,7 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Postgres JSON and ARRAY expression handler
  */
-public class PostgresDbExpression extends BaseDbExpression {
+final class PostgresDbExpression extends BaseDbExpression {
 
   @Override
   public String concat(String property0, String separator, String property1, String suffix) {
@@ -15,7 +15,6 @@ public class PostgresDbExpression extends BaseDbExpression {
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
-
     StringBuilder sb = new StringBuilder(50);
     String[] paths = path.split("\\.");
     if (paths.length == 1) {
@@ -41,7 +40,6 @@ public class PostgresDbExpression extends BaseDbExpression {
 
   @Override
   public void arrayContains(SpiExpressionRequest request, String propName, boolean contains, Object... values) {
-
     if (!contains) {
       request.append("not (");
     }
@@ -58,7 +56,6 @@ public class PostgresDbExpression extends BaseDbExpression {
 
   @Override
   public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
-
     request.append("coalesce(cardinality(").append(propName).append("),0)");
     if (empty) {
       request.append(" = 0");

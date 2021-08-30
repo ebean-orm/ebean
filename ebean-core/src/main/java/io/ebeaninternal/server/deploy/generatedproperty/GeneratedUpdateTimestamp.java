@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 /**
  * Generate a Timestamp whenever the bean is inserted or updated.
  */
-public class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhenModified {
+final class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhenModified {
 
   /**
    * Return now as a Timestamp.

@@ -11,10 +11,9 @@ import java.util.Set;
 /**
  * Used for bean cache lookup with where ids in expression.
  */
-public class CacheIdLookupMany<T> implements CacheIdLookup<T> {
+public final class CacheIdLookupMany<T> implements CacheIdLookup<T> {
 
   private final IdInExpression idInExpression;
-
   private int remaining;
 
   public CacheIdLookupMany(IdInExpression idInExpression) {

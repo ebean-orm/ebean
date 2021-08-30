@@ -10,7 +10,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
  * This means they can not be part of a SQL query nor do they use the built in query plan cache etc.
  * </p>
  */
-public abstract class AbstractTextExpression extends AbstractExpression {
+abstract class AbstractTextExpression extends AbstractExpression {
 
   AbstractTextExpression(String propName) {
     super(propName);

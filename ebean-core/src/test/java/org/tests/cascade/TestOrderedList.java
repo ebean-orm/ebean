@@ -1,10 +1,11 @@
 package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +23,7 @@ public class TestOrderedList extends BaseTestCase {
     }
 
     LoggedSqlCollector.start();
-    Ebean.save(master);
+    DB.save(master);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql.size()).isGreaterThan(1);
@@ -35,7 +36,7 @@ public class TestOrderedList extends BaseTestCase {
     }
 
     // update without any changes
-    Ebean.save(master);
+    DB.save(master);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty();
@@ -43,7 +44,7 @@ public class TestOrderedList extends BaseTestCase {
 
     // update just changing master
     master.setName("m1-mod");
-    Ebean.save(master);
+    DB.save(master);
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
@@ -53,14 +54,14 @@ public class TestOrderedList extends BaseTestCase {
 
   private void fetchAndReorder(Long id) {
 
-    OmOrderedMaster fresh = Ebean.find(OmOrderedMaster.class).setId(id).fetch("details").findOne();
+    OmOrderedMaster fresh = DB.find(OmOrderedMaster.class).setId(id).fetch("details").findOne();
     List<OmOrderedDetail> details1 = fresh.getDetails();
 
     List<String> sql = LoggedSqlCollector.current();
     assertSql(sql.get(0)).contains("order by t0.id, t1.sort_order");
 
     // fetched, not dirty
-    Ebean.save(fresh);
+    DB.save(fresh);
     sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty();
 
@@ -73,7 +74,7 @@ public class TestOrderedList extends BaseTestCase {
 
     fresh.setName("m1-reorder");
 
-    Ebean.save(fresh);
+    DB.save(fresh);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(7);
@@ -82,7 +83,7 @@ public class TestOrderedList extends BaseTestCase {
 
     details1.get(1).setName("was 1");
     fresh.setName("m1-mod3");
-    Ebean.save(fresh);
+    DB.save(fresh);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(3);
@@ -90,12 +91,101 @@ public class TestOrderedList extends BaseTestCase {
     assertSql(sql.get(1)).contains("update om_ordered_detail set name=?, version=?, sort_order=? where id=? and version=?");
     assertThat(sql.get(2)).contains("bind(was 1,3,2,");
 
-    Ebean.delete(fresh);
+    DB.delete(fresh);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
     assertSqlBind(sql.get(1));
     assertSql(sql.get(2)).contains("delete from om_ordered_master where id=? and version=?");
+  }
+
+  @Test
+  public void testAddSavedDetailToMaster() {
+    final OmOrderedMaster master = new OmOrderedMaster("Master");
+    final OmOrderedDetail detail = new OmOrderedDetail("Detail");
+
+    DB.save(master);
+    DB.save(detail);
+
+    master.getDetails().add(detail);
+    DB.save(master);
+
+    final OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).hasSize(1);
+  }
+
+  @Test
+  public void testModifyList() {
+    final OmOrderedMaster master = new OmOrderedMaster("Master");
+    final OmOrderedDetail detail1 = new OmOrderedDetail("Detail1");
+    final OmOrderedDetail detail2 = new OmOrderedDetail("Detail2");
+    final OmOrderedDetail detail3 = new OmOrderedDetail("Detail3");
+    DB.save(detail1);
+    DB.save(detail2);
+    DB.save(detail3);
+    master.getDetails().add(detail1);
+    master.getDetails().add(detail2);
+    master.getDetails().add(detail3);
+
+    DB.save(master);
+
+    OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3);
+
+    Collections.reverse(masterDb.getDetails());
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail2, detail1);
+
+    masterDb.getDetails().remove(1);
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+
+  }
+
+  @Test
+  public void testModifyListWithCache() {
+    final OmCacheOrderedMaster master = new OmCacheOrderedMaster("Master");
+    final OmCacheOrderedDetail detail1 = new OmCacheOrderedDetail("Detail1");
+    final OmCacheOrderedDetail detail2 = new OmCacheOrderedDetail("Detail2");
+    final OmCacheOrderedDetail detail3 = new OmCacheOrderedDetail("Detail3");
+    DB.save(detail1);
+    DB.save(detail2);
+    DB.save(detail3);
+    master.getDetails().add(detail1);
+    master.getDetails().add(detail2);
+    master.getDetails().add(detail3);
+
+    DB.save(master);
+
+    OmCacheOrderedMaster masterDb = DB.find(OmCacheOrderedMaster.class, master.getId()); // load cache
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3); // hit cache
+
+    Collections.reverse(masterDb.getDetails());
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail2, detail1); // load cache
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail2, detail1); // hit cache
+
+    masterDb.getDetails().remove(1);
+
+    DB.save(masterDb);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+
   }
 }

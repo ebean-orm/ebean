@@ -15,16 +15,13 @@ import java.util.List;
 /**
  * Request for loading Associated Many Beans.
  */
-public class LoadManyRequest extends LoadRequest {
+public final class LoadManyRequest extends LoadRequest {
 
   private static final Logger logger = LoggerFactory.getLogger(LoadManyRequest.class);
 
   private final List<BeanCollection<?>> batch;
-
   private final LoadManyBuffer loadContext;
-
   private final boolean onlyIds;
-
   private final boolean loadCache;
 
   /**

@@ -8,7 +8,7 @@ import java.time.DayOfWeek;
  *
  * @param <R> the root query bean type
  */
-public class PDayOfWeek<R> extends PBaseNumber<R,DayOfWeek> {
+public final class PDayOfWeek<R> extends PBaseNumber<R,DayOfWeek> {
 
   /**
    * Construct with a property name and root instance.

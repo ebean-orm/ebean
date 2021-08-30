@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class TestChangeLog extends BaseTestCase {
 
@@ -158,6 +158,25 @@ public class TestChangeLog extends BaseTestCase {
     assertThat(change.getData()).contains("\"plainBean\":{\"name\":\"B\"");
     assertThat(change.getOldData()).contains("\"plainBean\":{\"name\":\"A\"");
   }
+  
+  @Test
+  public void testMutationWithCache() throws Exception {
+    EBasicChangeLog bean = new EBasicChangeLog();
+    bean.setName("Name1");
+    bean.setPlainBean(new PlainBean("foo", 42));
+    server.save(bean);
+    BeanChange change = firstChange();
+    assertThat(change.getData()).contains("\"plainBean\"");
+
+    server.find(EBasicChangeLog.class, bean.getId()); // load cache
+    bean = server.find(EBasicChangeLog.class, bean.getId()); // hit cache
+    bean.setShortDescription("Desc");
+    server.save(bean);
+
+    change = firstChange();
+    assertThat(change.getData()).doesNotContain("\"plainBean\"");
+  }
+
   private Database createServer() {
 
     DatabaseConfig config = new DatabaseConfig();

@@ -21,7 +21,7 @@ import java.util.List;
  * helps fetch the foreign keys and delete the appropriate rows.
  * </p>
  */
-class DeleteUnloadedForeignKeys {
+final class DeleteUnloadedForeignKeys {
 
   private final List<BeanPropertyAssocOne<?>> propList = new ArrayList<>(4);
 

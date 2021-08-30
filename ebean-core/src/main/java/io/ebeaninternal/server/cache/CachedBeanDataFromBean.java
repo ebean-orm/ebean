@@ -9,10 +9,9 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CachedBeanDataFromBean {
+public final class CachedBeanDataFromBean {
 
   public static CachedBeanData extract(BeanDescriptor<?> desc, EntityBean bean) {
-
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
     Map<String, Object> data = new LinkedHashMap<>();
 
@@ -46,7 +45,6 @@ public class CachedBeanDataFromBean {
   }
 
   private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {
-
     if (!desc.isCacheSharableBeans() || !beanEbi.isFullyLoadedBean()) {
       return null;
     }

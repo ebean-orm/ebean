@@ -12,12 +12,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, LocalEncryptedType {
+public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, LocalEncryptedType {
 
   private final ScalarType<T> wrapped;
-
   private final DataEncryptSupport dataEncryptSupport;
-
   private final ScalarTypeBytesBase byteArrayType;
 
   public ScalarTypeEncryptedWrapper(ScalarType<T> wrapped, ScalarTypeBytesBase byteArrayType, DataEncryptSupport dataEncryptSupport) {

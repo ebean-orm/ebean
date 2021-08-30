@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
@@ -26,7 +25,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
-public class SaveManyBeans extends SaveManyBase {
+public final class SaveManyBeans extends SaveManyBase {
 
   private static final Logger log = LoggerFactory.getLogger(SaveManyBeans.class);
 
@@ -165,11 +164,15 @@ public class SaveManyBeans extends SaveManyBase {
         if (many.hasJoinTable()) {
           skipSavingThisBean = targetDescriptor.isReference(ebi);
         } else {
-          if (orderColumn != null && !Objects.equals(sortOrder, orderColumn.getValue(detail))) {
-            orderColumn.setValue(detail, sortOrder);
-            ebi.setDirty(true);
+          int originalOrder = 0;
+          if (orderColumn != null) {
+            originalOrder = detail._ebean_getIntercept().getSortOrder();
+            if (sortOrder != originalOrder) {
+              detail._ebean_intercept().setSortOrder(sortOrder);
+              ebi.setDirty(true);
+            }
           }
-          if (targetDescriptor.isReference(ebi)) {
+          if (targetDescriptor.isReference(ebi) && originalOrder == 0) {
             // we can skip this one
             skipSavingThisBean = true;
           } else if (ebi.isNewOrDirty()) {

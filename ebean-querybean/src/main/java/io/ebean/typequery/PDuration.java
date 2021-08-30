@@ -8,7 +8,7 @@ import java.time.Duration;
  *
  * @param <R> the root query bean type
  */
-public class PDuration<R> extends PBaseNumber<R,Duration> {
+public final class PDuration<R> extends PBaseNumber<R,Duration> {
 
   /**
    * Construct with a property name and root instance.

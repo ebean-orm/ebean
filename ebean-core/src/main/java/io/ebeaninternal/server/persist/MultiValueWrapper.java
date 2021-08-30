@@ -6,7 +6,7 @@ import java.util.Collection;
  * Wraps the multi values that are used for "property in (...)" queries
  * @author Roland Praml, FOCONIS AG
  */
-public class MultiValueWrapper {
+public final class MultiValueWrapper {
   private final Collection<?> values;
   private final Class<?> type;
 

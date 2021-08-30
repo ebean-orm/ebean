@@ -7,13 +7,12 @@ import java.io.IOException;
 /**
  * Full text query string expression.
  */
-class TextQueryStringExpression extends AbstractTextExpression {
+final class TextQueryStringExpression extends AbstractTextExpression {
 
   private final String search;
-
   private final TextQueryString options;
 
-  public TextQueryStringExpression(String search, TextQueryString options) {
+  TextQueryStringExpression(String search, TextQueryString options) {
     super(null);
     this.search = search;
     this.options = options;

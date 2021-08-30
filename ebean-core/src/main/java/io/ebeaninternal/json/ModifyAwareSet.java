@@ -11,13 +11,12 @@ import java.util.Set;
 /**
  * Wraps a Set for the purposes of detecting modifications.
  */
-public class ModifyAwareSet<E> implements Set<E>, ModifyAwareType, Serializable {
+public final class ModifyAwareSet<E> implements Set<E>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
 
-  protected final ModifyAwareType owner;
-
-  protected final Set<E> set;
+  private final ModifyAwareType owner;
+  private final Set<E> set;
 
   /**
    * Create as top level with it's own ModifyAwareOwner instance wrapping the given Set.
