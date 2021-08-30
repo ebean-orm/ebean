@@ -9,10 +9,9 @@ import java.io.IOException;
 /**
  * Contains expression for ARRAY type.
  */
-public class ArrayContainsExpression extends AbstractExpression {
+final class ArrayContainsExpression extends AbstractExpression {
 
   private final boolean contains;
-
   private final Object[] values;
 
   ArrayContainsExpression(String propName, boolean contains, Object... values) {
@@ -26,7 +25,6 @@ public class ArrayContainsExpression extends AbstractExpression {
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-
     if (values.length == 1) {
       context.writeEqualTo(propName, values[0]);
     } else {

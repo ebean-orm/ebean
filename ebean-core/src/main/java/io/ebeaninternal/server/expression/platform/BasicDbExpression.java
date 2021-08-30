@@ -6,7 +6,7 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Not supported JSON or ARRAY expression handler.
  */
-public class BasicDbExpression extends BaseDbExpression {
+class BasicDbExpression extends BaseDbExpression {
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {

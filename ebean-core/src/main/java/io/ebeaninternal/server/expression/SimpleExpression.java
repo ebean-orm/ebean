@@ -11,7 +11,7 @@ import io.ebeaninternal.api.NaturalKeyQueryData;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class SimpleExpression extends AbstractValueExpression {
+public final class SimpleExpression extends AbstractValueExpression {
 
   private final Op type;
 

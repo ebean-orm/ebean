@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * Natural key for a bean type.
  */
-public class BeanNaturalKey {
+public final class BeanNaturalKey {
 
   private final String[] naturalKey;
   private final BeanProperty[] props;

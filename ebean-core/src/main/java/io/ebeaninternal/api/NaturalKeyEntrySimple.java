@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-class NaturalKeyEntrySimple implements NaturalKeyEntry {
+final class NaturalKeyEntrySimple implements NaturalKeyEntry {
 
   private final String key;
   private final Object val;

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Default implementation of JsonScalar.
  */
-public class DJsonScalar {
+public final class DJsonScalar {
 
   private final TypeManager typeManager;
 
@@ -20,7 +20,6 @@ public class DJsonScalar {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void write(JsonGenerator gen, Object value) throws IOException {
-
     if (value instanceof String) {
       gen.writeString((String) value);
 

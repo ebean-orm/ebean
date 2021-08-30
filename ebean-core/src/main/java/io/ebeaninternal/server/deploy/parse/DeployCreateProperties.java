@@ -35,12 +35,11 @@ import java.lang.reflect.WildcardType;
  * one or normal scalar property.
  * </p>
  */
-public class DeployCreateProperties {
+public final class DeployCreateProperties {
 
   private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
 
   private final DetermineManyType determineManyType;
-
   private final TypeManager typeManager;
 
   public DeployCreateProperties(TypeManager typeManager) {
@@ -82,15 +81,12 @@ public class DeployCreateProperties {
    * columns.
    */
   private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level) {
-
     if (beanType.equals(Model.class)) {
       // ignore all fields on model (_$dbName)
       return;
     }
-
     try {
       Field[] fields = beanType.getDeclaredFields();
-
       for (int i = 0; i < fields.length; i++) {
         Field field = fields[i];
         if (!ignoreField(field)) {
@@ -112,16 +108,13 @@ public class DeployCreateProperties {
       }
 
       Class<?> superClass = beanType.getSuperclass();
-
       if (!superClass.equals(Object.class)) {
         // recursively add any properties in the inheritance hierarchy
         // up to the Object.class level...
         createProperties(desc, superClass, level + 1);
       }
-
     } catch (PersistenceException ex) {
       throw ex;
-
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -129,7 +122,6 @@ public class DeployCreateProperties {
 
   @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
-
     try {
       ScalarType<?> scalarType = typeManager.getScalarType(targetType);
       if (scalarType != null) {
@@ -143,12 +135,10 @@ public class DeployCreateProperties {
 
   @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
-
     Class<?> propertyType = field.getType();
     if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
-
     // check for Collection type (list, set or map)
     ManyType manyType = determineManyType.getManyType(propertyType);
     if (manyType != null) {
@@ -163,16 +153,13 @@ public class DeployCreateProperties {
       }
       return createManyType(desc, targetType, manyType);
     }
-
     if (propertyType.isEnum() || propertyType.isPrimitive()) {
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
-
     ScalarType<?> scalarType = typeManager.getScalarType(propertyType);
     if (scalarType != null) {
       return new DeployBeanProperty(desc, propertyType, scalarType, null);
     }
-
     if (isTransientField(field)) {
       // return with no ScalarType (still support JSON features)
       return new DeployBeanProperty(desc, propertyType, null, null);
@@ -219,11 +206,9 @@ public class DeployCreateProperties {
    * ParameterizedType.
    */
   private Class<?> determineTargetType(Field field) {
-
     Type genType = field.getGenericType();
     if (genType instanceof ParameterizedType) {
       ParameterizedType ptype = (ParameterizedType) genType;
-
       Type[] typeArgs = ptype.getActualTypeArguments();
       if (typeArgs.length == 1) {
         // expecting set or list

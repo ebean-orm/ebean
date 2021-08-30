@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
-class DetermineAggPath {
+final class DetermineAggPath {
 
   /**
    * Return the many path for the given aggregation formula.
@@ -28,7 +28,6 @@ class DetermineAggPath {
    * Parse and return the full path for the aggregation.
    */
   static String path(String aggregation) {
-
     // aggregations always have a form of sum(), avg(), max(), count() etc
     // so find the first open bracket
     int start = aggregation.indexOf('(');
@@ -48,7 +47,6 @@ class DetermineAggPath {
   private static boolean isNamePart(char ch) {
     return ch == '.' || Character.isJavaIdentifierPart(ch);
   }
-
 
   /**
    * Helper class holding aggregation path segments.

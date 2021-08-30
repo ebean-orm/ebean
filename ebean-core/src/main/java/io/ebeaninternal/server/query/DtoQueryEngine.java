@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class DtoQueryEngine {
+public final class DtoQueryEngine {
 
   private final Binder binder;
 

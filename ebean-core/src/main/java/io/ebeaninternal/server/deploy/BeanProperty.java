@@ -69,150 +69,76 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Flag to mark this is the id property.
    */
   private final boolean id;
-
   private final boolean importedPrimaryKey;
-
   /**
    * Flag to make this as a dummy property for unidirecitonal relationships.
    */
   private final boolean unidirectionalShadow;
-
   /**
    * Flag set if this maps to the inheritance discriminator column
    */
   private final boolean discriminator;
-
   /**
    * Flag to mark the property as embedded. This could be on
    * BeanPropertyAssocOne rather than here. Put it here for checking Id type
    * (embedded or not).
    */
   final boolean embedded;
-
-  /**
-   * Flag indicating if this the version property.
-   */
   private final boolean version;
-
   private final boolean naturalKey;
-
-  /**
-   * Set if this property is nullable.
-   */
   private final boolean nullable;
-
   private final boolean unique;
-
   /**
    * Is this property include in database resultSet.
    */
   private final boolean dbRead;
-
   /**
    * Include in DB insert.
    */
   private final boolean dbInsertable;
-
   /**
    * Include in DB update.
    */
   private final boolean dbUpdatable;
 
-  /**
-   * True if the property is based on a SECONDARY table.
-   */
   private final boolean secondaryTable;
-
   private final TableJoin secondaryTableJoin;
   private final String secondaryTableJoinPrefix;
-
-  /**
-   * The property is inherited from a super class.
-   */
   private final boolean inherited;
-
   private final Class<?> owningType;
-
   private final boolean local;
-
-  /**
-   * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
-   */
   private final boolean lob;
-
   private final boolean fetchEager;
-
   final boolean isTransient;
 
   /**
    * The logical bean property name.
    */
   final String name;
-
   final int propertyIndex;
-
-  /**
-   * The reflected field.
-   */
   private final Field field;
-
-  /**
-   * The bean type.
-   */
   private final Class<?> propertyType;
-
   private final String dbBind;
-
-  /**
-   * The database column. This can include quoted identifiers.
-   */
   final String dbColumn;
-
   private final String elPrefix;
   final String elPlaceHolder;
   final String elPlaceHolderEncrypted;
-
-  /**
-   * Select part of a SQL Formula used to populate this property.
-   */
   private final String sqlFormulaSelect;
-
-  /**
-   * Join part of a SQL Formula.
-   */
   final String sqlFormulaJoin;
-
   private final String aggregation;
-
   private final boolean formula;
-
-  /**
-   * Set to true if stored encrypted.
-   */
   private final boolean dbEncrypted;
-
   private final boolean localEncrypted;
-
   private final int dbEncryptedType;
-
-  /**
-   * The jdbc data type this maps to.
-   */
   private final int dbType;
-
   final boolean excludedFromHistory;
-
   /**
    * Generator for insert or update timestamp etc.
    */
   private final GeneratedProperty generatedProperty;
-
   private final BeanPropertyGetter getter;
-
   private final BeanPropertySetter setter;
-
   final BeanDescriptor<?> descriptor;
-
   /**
    * Used for non-jdbc native types (java.util.Date Enums etc). Converts from
    * logical to jdbc types.
@@ -221,54 +147,39 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   final ScalarType scalarType;
 
   private final DocPropertyOptions docOptions;
-
   /**
    * The length or precision for DB column.
    */
   private final int dbLength;
-
   /**
    * The scale for DB column (decimal).
    */
   private final int dbScale;
-
   /**
    * Deployment defined DB column definition.
    */
   private final String dbColumnDefn;
-
   /**
    * DB Column default value for DDL definition (FALSE, NOW etc).
    */
   private final String dbColumnDefault;
   private final List<DbMigrationInfo> dbMigrationInfos;
-
   /**
    * Database DDL column comment.
    */
   private final String dbComment;
-
   private final DbEncryptFunction dbEncryptFunction;
-
   private int deployOrder;
-
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
   private final boolean unmappedJson;
   private final boolean tenantId;
-
   private final boolean draft;
-
   private final boolean draftOnly;
-
   private final boolean draftDirty;
-
   private final boolean draftReset;
-
   private final boolean softDelete;
-
   private final String softDeleteDbSet;
-
   private final String softDeleteDbPredicate;
 
   public BeanProperty(DeployBeanProperty deploy) {
@@ -574,9 +485,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       ctx.appendFormulaSelect(aggregation);
     } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
-
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
-
       if (secondaryTableJoin != null) {
         ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
       }

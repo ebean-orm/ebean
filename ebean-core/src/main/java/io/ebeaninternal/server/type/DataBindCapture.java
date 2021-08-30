@@ -7,7 +7,7 @@ import io.ebeaninternal.server.type.bindcapture.BindCaptureStatement;
 /**
  * Special DataBind used to capture bind values for obtaining explain plans.
  */
-public class DataBindCapture extends DataBind {
+public final class DataBindCapture extends DataBind {
 
   private final BindCaptureStatement captureStatement;
 

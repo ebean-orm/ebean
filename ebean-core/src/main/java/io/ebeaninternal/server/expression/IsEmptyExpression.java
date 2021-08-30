@@ -10,12 +10,10 @@ import io.ebean.util.SplitName;
 
 import java.io.IOException;
 
-class IsEmptyExpression extends AbstractExpression {
+final class IsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
-
   private final String propertyPath;
-
   private String nestedPath;
 
   IsEmptyExpression(String propertyName, boolean empty) {

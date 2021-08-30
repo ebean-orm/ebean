@@ -16,15 +16,11 @@ import java.sql.SQLException;
 /**
  * Executes the UpdateSql requests.
  */
-class ExeUpdateSql {
+final class ExeUpdateSql {
 
   private final Binder binder;
-
   private final PstmtFactory pstmtFactory;
 
-  /**
-   * Create with a given binder.
-   */
   ExeUpdateSql(Binder binder) {
     this.binder = binder;
     this.pstmtFactory = new PstmtFactory();
@@ -34,14 +30,10 @@ class ExeUpdateSql {
    * Execute the UpdateSql request.
    */
   public int execute(PersistRequestUpdateSql request) {
-
     boolean batchThisRequest = request.isBatchThisRequest();
-
     PreparedStatement pstmt = null;
     try {
-
       pstmt = bindStmt(request, batchThisRequest);
-
       if (batchThisRequest) {
         pstmt.addBatch();
         // return -1 to indicate batch mode
@@ -66,7 +58,6 @@ class ExeUpdateSql {
   }
 
   private void readGeneratedKeys(PreparedStatement stmt, PersistRequestUpdateSql request) {
-
     ResultSet resultSet = null;
       try {
         resultSet = stmt.getGeneratedKeys();
@@ -82,7 +73,6 @@ class ExeUpdateSql {
   }
 
   private PreparedStatement bindStmt(PersistRequestUpdateSql request, boolean batchThisRequest) throws SQLException {
-
     request.startBind(batchThisRequest);
     SpiSqlUpdate updateSql = request.getUpdateSql();
     SpiTransaction t = request.getTransaction();
@@ -121,7 +111,6 @@ class ExeUpdateSql {
 
 
   private void determineType(String word1, String word2, String word3, PersistRequestUpdateSql request) {
-
     if (word1.equalsIgnoreCase("UPDATE")) {
       request.setType(SqlType.SQL_UPDATE, word2);
 
@@ -137,7 +126,6 @@ class ExeUpdateSql {
   }
 
   private void parseUpdate(String sql, PersistRequestUpdateSql request) {
-
     int[] pos = new int[3];
     int spaceCount = 0;
 

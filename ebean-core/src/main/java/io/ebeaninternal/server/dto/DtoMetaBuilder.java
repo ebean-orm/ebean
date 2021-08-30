@@ -15,16 +15,13 @@ import java.util.List;
  * <p>
  * Use TypeManager to map bean property types to ScalarTypes.
  */
-class DtoMetaBuilder {
+final class DtoMetaBuilder {
 
   private static final Logger log = LoggerFactory.getLogger(DtoMetaBuilder.class);
 
   private final TypeManager typeManager;
-
   private final Class<?> dtoType;
-
   private final List<DtoMetaProperty> properties = new ArrayList<>();
-
   private final List<DtoMetaConstructor> constructorList = new ArrayList<>();
 
   DtoMetaBuilder(Class<?> dtoType, TypeManager typeManager) {

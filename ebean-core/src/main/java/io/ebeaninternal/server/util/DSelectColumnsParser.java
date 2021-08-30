@@ -9,9 +9,7 @@ import java.util.Set;
 public final class DSelectColumnsParser {
 
   private final int end;
-
   private final String selectClause;
-
   private int pos;
 
   public static Set<String> parse(String sqlSelect) {

@@ -8,10 +8,9 @@ import java.util.Map;
 /**
  * Determines the properties on a given bean.
  */
-public class BeanPropertiesReader {
+public final class BeanPropertiesReader {
 
   private final Map<String, Integer> propertyIndexMap = new HashMap<>();
-
   private final String[] props;
 
   public BeanPropertiesReader(Class<?> clazz) {
@@ -38,7 +37,6 @@ public class BeanPropertiesReader {
     try {
       Field field = clazz.getField("_ebean_props");
       return (String[]) field.get(null);
-
     } catch (Exception e) {
       throw new IllegalStateException("Error getting _ebean_props field on type " + clazz, e);
     }

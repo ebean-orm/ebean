@@ -13,7 +13,6 @@ class DProfileLocation implements ProfileLocation {
   private String fullLocation;
   private String location;
   private String label;
-
   private final int lineNumber;
   private int traceCount;
 

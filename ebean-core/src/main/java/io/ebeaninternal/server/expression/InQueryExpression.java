@@ -15,14 +15,11 @@ import java.util.List;
 /**
  * In expression using a sub query.
  */
-class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
+final class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
 
   private final boolean not;
-
   private final SpiQuery<?> subQuery;
-
   private List<Object> bindParams;
-
   private String sql;
 
   InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {

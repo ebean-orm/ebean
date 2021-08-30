@@ -25,19 +25,15 @@ public class VisitProperties {
     if (idProp != null) {
       visit(propertyVisitor, idProp);
     }
-
     BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
     if (unidirectional != null) {
       visit(propertyVisitor, unidirectional);
     }
-
-    BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-    for (BeanProperty p : propertiesNonTransient) {
+    for (BeanProperty p : desc.propertiesNonTransient()) {
       if (p.isDDLColumn()) {
         visit(propertyVisitor, p);
       }
     }
-
     visitInheritanceProperties(desc, propertyVisitor);
     propertyVisitor.visitEnd();
   }
@@ -46,7 +42,6 @@ public class VisitProperties {
    * Visit the property.
    */
   protected void visit(BeanPropertyVisitor pv, BeanProperty p) {
-
     if (p instanceof BeanPropertyAssocMany<?>) {
       // oneToMany or manyToMany
       pv.visitMany((BeanPropertyAssocMany<?>) p);
@@ -60,16 +55,13 @@ public class VisitProperties {
         for (BeanProperty embProp : embProps) {
           pv.visitEmbeddedScalar(embProp, assocOne);
         }
-
       } else if (assocOne.isOneToOneExported()) {
         // associated one exported
         pv.visitOneExported(assocOne);
-
       } else {
         // associated one imported
         pv.visitOneImported(assocOne);
       }
-
     } else {
       // simple scalar type
       pv.visitScalar(p, true);
@@ -81,7 +73,6 @@ public class VisitProperties {
    * Visit all the other inheritance properties that are not on the root.
    */
   protected void visitInheritanceProperties(BeanDescriptor<?> descriptor, BeanPropertyVisitor pv) {
-
     InheritInfo inheritInfo = descriptor.getInheritInfo();
     if (inheritInfo != null && inheritInfo.isRoot()) {
       // add all properties on the children objects

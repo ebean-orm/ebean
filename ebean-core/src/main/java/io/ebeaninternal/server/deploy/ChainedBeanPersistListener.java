@@ -9,10 +9,9 @@ import java.util.Set;
 /**
  * Handles multiple BeanPersistListener's for a given entity type.
  */
-public class ChainedBeanPersistListener implements BeanPersistListener {
+public final class ChainedBeanPersistListener implements BeanPersistListener {
 
   private final List<BeanPersistListener> list;
-
   private final BeanPersistListener[] chain;
 
   /**
@@ -25,7 +24,7 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
   /**
    * Return the size of the chain.
    */
-  protected int size() {
+  int size() {
     return chain.length;
   }
 
@@ -62,7 +61,6 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
     } else {
       List<BeanPersistListener> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPersistListener(newList);
     }
   }
@@ -76,36 +74,35 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
     } else {
       List<BeanPersistListener> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPersistListener(newList);
     }
   }
 
   @Override
   public void deleted(Object bean) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.deleted(bean);
+    for (BeanPersistListener listener : chain) {
+      listener.deleted(bean);
     }
   }
 
   @Override
   public void softDeleted(Object bean) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.softDeleted(bean);
+    for (BeanPersistListener listener : chain) {
+      listener.softDeleted(bean);
     }
   }
 
   @Override
   public void inserted(Object bean) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.inserted(bean);
+    for (BeanPersistListener listener : chain) {
+      listener.inserted(bean);
     }
   }
 
   @Override
   public void updated(Object bean, Set<String> updatedProperties) {
-    for (BeanPersistListener aChain : chain) {
-      aChain.updated(bean, updatedProperties);
+    for (BeanPersistListener listener : chain) {
+      listener.updated(bean, updatedProperties);
     }
   }
 }

@@ -8,7 +8,7 @@ import io.ebean.config.DatabaseConfig;
 /**
  * Used to obtain the Jackson AnnotatedClass for a given bean type utlimately to obtain field level Jackson annotations.
  */
-class DeployBeanObtainJackson<T> {
+final class DeployBeanObtainJackson<T> {
 
   private final DatabaseConfig config;
   private final Class<T> beanType;

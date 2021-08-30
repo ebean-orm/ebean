@@ -8,30 +8,25 @@ import javax.persistence.JoinColumn;
 /**
  * A join pair of local and foreign properties.
  */
-public class DeployTableJoinColumn {
+public final class DeployTableJoinColumn {
 
   /**
    * The local database column name.
    */
   private String localDbColumn;
-
   /**
    * SQL formula used for local column
    */
   private String localSqlFormula;
-
   /**
    * The foreign database column name.
    */
   private String foreignDbColumn;
-
   /**
    * SQL formula used for foreign column
    */
   private String foreignSqlFormula;
-
   private boolean insertable;
-
   private boolean updateable;
 
   /**

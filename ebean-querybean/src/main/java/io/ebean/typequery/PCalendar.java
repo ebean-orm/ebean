@@ -7,7 +7,7 @@ import java.util.Calendar;
  *
  * @param <R> the root query bean type
  */
-public class PCalendar<R> extends PBaseDate<R,Calendar> {
+public final class PCalendar<R> extends PBaseDate<R,Calendar> {
 
   /**
    * Construct with a property name and root instance.

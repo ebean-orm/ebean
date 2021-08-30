@@ -6,9 +6,9 @@ import java.util.Map;
 /**
  * Collection of named queries for a single Dto bean type.
  */
-public class DtoNamedQueries {
+public final class DtoNamedQueries {
 
-  private Map<String, String> namedRawSql = new HashMap<>();
+  private final Map<String, String> namedRawSql = new HashMap<>();
 
   /**
    * Add the named query from deployment XML.

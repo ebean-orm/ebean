@@ -6,7 +6,7 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Microsoft SQL Server JSON. ARRAY expressions not supported.
  */
-public class SqlServerDbExpression extends BaseDbExpression {
+final class SqlServerDbExpression extends BaseDbExpression {
 
   @Override
   public void json(final SpiExpressionRequest request, final String propName,

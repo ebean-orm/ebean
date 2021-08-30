@@ -6,7 +6,7 @@ import io.ebeaninternal.api.SpiCacheRegion;
 /**
  * Default implementation of SpiCacheControl.
  */
-class DCacheControl implements SpiCacheControl {
+final class DCacheControl implements SpiCacheControl {
 
   private final SpiCacheRegion region;
   private final boolean bean;

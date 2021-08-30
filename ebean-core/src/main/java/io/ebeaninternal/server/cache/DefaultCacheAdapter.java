@@ -13,7 +13,7 @@ import java.util.List;
  * Used to hide the Supplier part of the SpiCacheManager API from public use.
  * </p>
  */
-public class DefaultCacheAdapter implements ServerCacheManager {
+public final class DefaultCacheAdapter implements ServerCacheManager {
 
   private final SpiCacheManager cacheManager;
 

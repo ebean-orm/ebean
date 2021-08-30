@@ -12,11 +12,8 @@ import javax.persistence.PersistenceException;
 class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   private final String parsedFormula;
-
   private final boolean aggregate;
-
   final BeanProperty asTarget;
-
   private final String alias;
 
   DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {

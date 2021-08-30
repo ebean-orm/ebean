@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Initialise the Jackson ObjectMapper.
  */
-class InitObjectMapper {
+final class InitObjectMapper {
 
   /**
    * Create and return the default ObjectMapper.

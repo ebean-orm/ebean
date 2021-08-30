@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Used for bean cache lookup with a single id value.
  */
-public class CacheIdLookupSingle<T> implements CacheIdLookup<T> {
+public final class CacheIdLookupSingle<T> implements CacheIdLookup<T> {
 
   private final Object idValue;
   private boolean found;

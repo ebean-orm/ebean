@@ -8,13 +8,13 @@ import java.sql.Types;
 /**
  * ScalarType for String.
  */
-public class ScalarTypeClob extends ScalarTypeStringBase {
+class ScalarTypeClob extends ScalarTypeStringBase {
 
   ScalarTypeClob(boolean jdbcNative, int jdbcType) {
     super(jdbcNative, jdbcType);
   }
 
-  public ScalarTypeClob() {
+  ScalarTypeClob() {
     super(true, Types.CLOB);
   }
 

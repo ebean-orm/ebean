@@ -10,7 +10,7 @@ import io.ebean.annotation.Platform;
  *
  * @author Roland Praml, FOCONIS AG
  */
-public class DbMigrationInfo {
+public final class DbMigrationInfo {
 
   private final List<String> preAdd;
   private final List<String> postAdd;
@@ -64,6 +64,5 @@ public class DbMigrationInfo {
       return sb.toString();
     }
   }
-
 
 }

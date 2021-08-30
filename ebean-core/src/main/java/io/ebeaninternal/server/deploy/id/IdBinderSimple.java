@@ -26,13 +26,9 @@ import java.util.List;
 public final class IdBinderSimple implements IdBinder {
 
   private final BeanProperty idProperty;
-
   private final String bindIdSql;
-
   private final Class<?> expectedType;
-
   private final MultiValueBind multiValueBind;
-
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
@@ -56,7 +52,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getOrderBy(String pathPrefix, boolean ascending) {
-
     StringBuilder sb = new StringBuilder();
     if (pathPrefix != null) {
       sb.append(pathPrefix).append(".");

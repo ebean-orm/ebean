@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * IsEmpty expression for ARRAY type.
  */
-public class ArrayIsEmptyExpression extends AbstractExpression {
+final class ArrayIsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
 

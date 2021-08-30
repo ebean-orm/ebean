@@ -28,58 +28,40 @@ class SqlTreeNodeBean implements SqlTreeNode {
   private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
   final STreeType desc;
-
   final IdBinder idBinder;
-
   /**
    * The children which will be other SelectBean or SelectProxyBean.
    */
   final SqlTreeNode[] children;
-
   /**
    * Set to true if this is a partial object fetch.
    */
   private final boolean partialObject;
-
   private final STreeProperty[] properties;
-
   /**
    * Extra where clause added by Where annotation on associated many.
    */
   private final String extraWhere;
-
   private final STreePropertyAssoc nodeBeanProp;
-
   /**
    * False if report bean and has no id property.
    */
   final boolean readId;
   private final boolean readIdNormal;
-
   private final boolean disableLazyLoad;
-
   private final InheritInfo inheritInfo;
-
   final String prefix;
-
   private final Map<String, String> pathMap;
-
   final STreePropertyAssocMany lazyLoadParent;
-
   private final SpiQuery.TemporalMode temporalMode;
-
   private final boolean temporalVersions;
-
   private final IdBinder lazyLoadParentIdBinder;
-
   String baseTableAlias;
-
   /**
    * Table alias set if this bean node includes a join to a intersection
    * table and that table has history support.
    */
   private boolean intersectionAsOfTableAlias;
-
   private final boolean aggregation;
 
   /**
@@ -131,12 +113,12 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public boolean isSingleProperty() {
+  public final boolean isSingleProperty() {
     return properties != null && properties.length == 1 && children.length == 0;
   }
 
   @Override
-  public ScalarDataReader<?> getSingleAttributeReader() {
+  public final ScalarDataReader<?> getSingleAttributeReader() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)
       if (children.length == 0) {
@@ -172,7 +154,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public void buildRawSqlSelectChain(List<String> selectChain) {
+  public final void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
       if (inheritInfo != null) {
         // discriminator column always proceeds id column
@@ -194,7 +176,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Load that takes into account inheritance.
    */
-  private class LoadInherit extends Load {
+  private final class LoadInherit extends Load {
 
     private LoadInherit(DbReadContext ctx, EntityBean parentBean) {
       super(ctx, parentBean);
@@ -437,7 +419,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     /**
      * Perform the load returning the loaded bean.
      */
-    EntityBean perform() throws SQLException {
+    final EntityBean perform() throws SQLException {
       initialise();
       if (isLazyLoadManyRoot()) {
         return getContextBean();
@@ -451,7 +433,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
      * Return true if this bean was already in the context. If already in the
      * context we need to check if it is already contained in the collection.
      */
-    boolean isContextBean() {
+    final boolean isContextBean() {
       return localBean == null;
     }
   }
@@ -467,12 +449,12 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Create the loader with or without inheritance.
    */
-  Load createLoad(DbReadContext ctx, EntityBean parentBean) {
+  final Load createLoad(DbReadContext ctx, EntityBean parentBean) {
     return (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
   }
 
   @Override
-  public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+  public final void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
     if (lazyLoadParent != null) {
@@ -507,7 +489,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Append the property columns to the buffer.
    */
   @Override
-  public void appendSelect(DbSqlContext ctx, boolean subQuery) {
+  public final void appendSelect(DbSqlContext ctx, boolean subQuery) {
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
     if (temporalVersions) {
@@ -532,7 +514,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public boolean isAggregation() {
+  public final boolean isAggregation() {
     if (aggregation) {
       return true;
     }
@@ -553,14 +535,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  void appendSelectId(DbSqlContext ctx, STreeProperty prop) {
+  final void appendSelectId(DbSqlContext ctx, STreeProperty prop) {
     if (prop != null) {
       prop.appendSelect(ctx, false);
     }
   }
 
   @Override
-  public void appendWhere(DbSqlContext ctx) {
+  public final void appendWhere(DbSqlContext ctx) {
     // Only apply inheritance to root node as any join will already have the inheritance join include - see TableJoin
     if (inheritInfo != null && nodeBeanProp == null) {
       if (!inheritInfo.isRoot()) {
@@ -618,7 +600,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
-  public void addSoftDeletePredicate(SpiQuery<?> query) {
+  public final void addSoftDeletePredicate(SpiQuery<?> query) {
     if (desc.isSoftDelete()) {
       query.addSoftDeletePredicate(desc.getSoftDeletePredicate(baseTableAlias));
     }

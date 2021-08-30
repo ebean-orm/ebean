@@ -10,7 +10,7 @@ import java.util.Map;
  * Creates BeanProperties for Embedded beans that have deployment information
  * such as the actual DB column name and table alias.
  */
-class BeanEmbeddedMetaFactory {
+final class BeanEmbeddedMetaFactory {
 
   /**
    * Create BeanProperties for embedded beans using the deployment specific DB column name and table alias.

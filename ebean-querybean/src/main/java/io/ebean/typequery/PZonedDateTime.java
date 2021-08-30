@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
  *
  * @param <R> the root query bean type
  */
-public class PZonedDateTime<R> extends PBaseCompareable<R, ZonedDateTime> {
+public final class PZonedDateTime<R> extends PBaseCompareable<R, ZonedDateTime> {
 
   /**
    * Construct with a property name and root instance.

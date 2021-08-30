@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Holds bind values that can be used to obtain an explain plan.
  */
-public class BindCapture {
+public final class BindCapture {
 
   private final List<BindCaptureEntry> entries = new ArrayList<>();
 

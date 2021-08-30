@@ -1,4 +1,4 @@
-package org.tests.unitinternal;
+package io.ebeaninternal.server.type;
 
 import io.ebeaninternal.server.type.ScalarTypeLocale;
 import org.junit.Assert;

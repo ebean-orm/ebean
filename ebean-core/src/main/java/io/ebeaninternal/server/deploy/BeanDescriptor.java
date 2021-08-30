@@ -115,37 +115,23 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
-  private final ConcurrentHashMap<String, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
-
-  private final Map<String, SpiRawSql> namedRawSql;
-
-  private final Map<String, String> namedQuery;
-
-  private final boolean multiValueSupported;
-  private boolean batchEscalateOnCascadeInsert;
-  private boolean batchEscalateOnCascadeDelete;
-
-  private final BeanIudMetrics iudMetrics;
-
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
 
-  /**
-   * The nature/type of this bean.
-   */
+  private final ConcurrentHashMap<String, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
+  private final Map<String, SpiRawSql> namedRawSql;
+  private final Map<String, String> namedQuery;
+  private final boolean multiValueSupported;
+  private boolean batchEscalateOnCascadeInsert;
+  private boolean batchEscalateOnCascadeDelete;
+  private final BeanIudMetrics iudMetrics;
   private final EntityType entityType;
-
   /**
    * Set when Id property is marked with GeneratedValue annotation.
    */
@@ -153,71 +139,39 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final PlatformIdGenerator idGenerator;
   private final IdentityMode identityMode;
   private final IdType idType;
-
   /**
    * SQL used to return last inserted id. Used for Identity columns where
    * getGeneratedKeys is not supported.
    */
   private final String selectLastInsertedId;
   private final String selectLastInsertedIdDraft;
-
   private final boolean autoTunable;
-
-  /**
-   * The concurrency mode for beans of this type.
-   */
   private final ConcurrencyMode concurrencyMode;
-
   private final IndexDefinition[] indexDefinitions;
-
   private final String[] dependentTables;
-
-  /**
-   * The base database table.
-   */
   private final String baseTable;
   private final String baseTableAsOf;
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
   private final TableJoin primaryKeyJoin;
-
   private final BeanProperty softDeleteProperty;
   private final boolean softDelete;
-
   private final String draftTable;
-
   private final PartitionMeta partitionMeta;
   private final String storageEngine;
-
-  /**
-   * DB table comment.
-   */
   private final String dbComment;
-
-  /**
-   * Set to true if read auditing is on for this bean type.
-   */
   private final boolean readAuditing;
-
   private final boolean draftable;
-
   private final boolean draftableElement;
-
   private final BeanProperty unmappedJson;
-
   private final BeanProperty tenant;
-
   private final BeanProperty draft;
-
   private final BeanProperty draftDirty;
-
   private final LinkedHashMap<String, BeanProperty> propMap;
-
   /**
    * Map of DB column to property path (for nativeSql mapping).
    */
   private final Map<String, String> columnPath = new HashMap<>();
-
   /**
    * Map of related table to assoc property (for nativeSql mapping).
    */
@@ -235,46 +189,34 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final BeanQueryAdapter queryAdapter;
   private final BeanFindController beanFinder;
   private final ChangeLogFilter changeLogFilter;
-
-  /**
-   * Inheritance information. Server side only.
-   */
   final InheritInfo inheritInfo;
-
   private final boolean abstractType;
-
   private final BeanProperty idProperty;
   private final int idPropertyIndex;
-
   private final BeanProperty versionProperty;
   private final int versionPropertyIndex;
   private final BeanProperty whenModifiedProperty;
   private final BeanProperty whenCreatedProperty;
-
   /**
    * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
    */
   private final int[] unloadProperties;
-
   /**
    * Properties local to this type (not from a super type).
    */
   private final BeanProperty[] propertiesLocal;
-
   /**
    * Scalar mutable properties (need to dirty check on update).
    */
   private final BeanProperty[] propertiesMutable;
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
-
   private final BeanProperty[] propertiesNonMany;
   private final BeanProperty[] propertiesAggregate;
   private final BeanPropertyAssocMany<?>[] propertiesMany;
   private final BeanPropertyAssocMany<?>[] propertiesManySave;
   private final BeanPropertyAssocMany<?>[] propertiesManyDelete;
   private final BeanPropertyAssocMany<?>[] propertiesManyToMany;
-
   /**
    * list of properties that are associated beans and not embedded (Derived).
    */
@@ -285,10 +227,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedSave;
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedDelete;
   private final BeanPropertyAssocOne<?>[] propertiesEmbedded;
-
   private final BeanProperty[] propertiesBaseScalar;
   private final BeanProperty[] propertiesTransient;
-
   /**
    * All non transient properties excluding the id properties.
    */
@@ -300,21 +240,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final boolean idOnlyReference;
   private BeanNaturalKey beanNaturalKey;
 
-  /**
-   * The bean class name or the table name for MapBeans.
-   */
+
   private final String fullName;
-
-  /**
-   * Flag used to determine if saves can be skipped.
-   */
   private boolean saveRecurseSkippable;
-
-  /**
-   * Flag used to determine if deletes can be skipped.
-   */
   private boolean deleteRecurseSkippable;
-
   private final EntityBean prototypeEntityBean;
 
   private final IdBinder idBinder;
@@ -629,11 +558,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       }
       prop.registerColumn(this, null);
     }
-
     if (unidirectional != null) {
       unidirectional.initialise(initContext);
     }
-
     idBinder.initialise();
     idBinderInLHSSql = idBinder.getBindIdInSql(baseTableAlias);
     idBinderIdSql = idBinder.getBindIdSql(baseTableAlias);

@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Base compiled query request for single attribute queries.
  */
-class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, CancelableQuery {
+final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryFetchSingleAttribute.class);
 

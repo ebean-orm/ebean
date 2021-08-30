@@ -6,11 +6,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import io.ebean.annotation.Identity;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Where;
 
 import java.util.List;
 
+@Identity(start = 1000)
 @Entity
 public class MnyNode {
 

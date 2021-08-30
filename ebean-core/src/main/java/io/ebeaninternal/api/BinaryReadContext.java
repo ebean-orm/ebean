@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Context used to read binary format messages.
  */
-public class BinaryReadContext {
+public final class BinaryReadContext {
 
   private final DataInputStream in;
 

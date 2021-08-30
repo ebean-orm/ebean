@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Node for processing merge on ToOne properties.
  */
-class MergeNodeAssocOne extends MergeNode {
+final class MergeNodeAssocOne extends MergeNode {
 
   private final BeanPropertyAssocOne<?> one;
 
@@ -19,7 +19,6 @@ class MergeNodeAssocOne extends MergeNode {
 
   @Override
   public void merge(MergeRequest request) {
-
     EntityBean entityBean = getEntityBean(request.getBean());
     if (entityBean == null) {
       checkOrphanRemoval(request);

@@ -40,7 +40,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
         beanSet.setActualSet(new LinkedHashSet<>());
       }
       return beanSet;
-
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
@@ -62,7 +61,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public BeanCollection<T> createReference(EntityBean parentBean) {
-
     BeanSet<T> beanSet = new BeanSet<>(loader, parentBean, propertyName);
     beanSet.setModifyListening(many.getModifyListenMode());
     return beanSet;
@@ -70,18 +68,14 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
-
     BeanSet<?> newBeanSet = (BeanSet<?>) server.findSet(query, t);
     refresh(newBeanSet, parentBean);
   }
 
   @Override
   public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-
     BeanSet<?> newBeanSet = (BeanSet<?>) bc;
-
     Set<?> current = (Set<?>) many.getValue(parentBean);
-
     newBeanSet.setModifyListening(many.getModifyListenMode());
     if (current == null) {
       // the currentList is null?  Not really expecting this...
@@ -101,7 +95,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
-
     Set<?> set;
     if (collection instanceof BeanCollection<?>) {
       BeanSet<?> bc = (BeanSet<?>) collection;

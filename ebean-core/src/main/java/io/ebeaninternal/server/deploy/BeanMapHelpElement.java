@@ -5,7 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
-public class BeanMapHelpElement<T> extends BeanMapHelp<T> {
+public final class BeanMapHelpElement<T> extends BeanMapHelp<T> {
 
   BeanMapHelpElement(BeanPropertyAssocMany<T> many) {
     super(many);

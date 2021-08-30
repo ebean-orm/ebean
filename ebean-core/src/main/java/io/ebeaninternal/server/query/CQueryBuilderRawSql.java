@@ -11,7 +11,7 @@ import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.util.BindParamsParser;
 
-class CQueryBuilderRawSql {
+final class CQueryBuilderRawSql {
 
   private final SqlLimiter sqlLimiter;
   private final DatabasePlatform dbPlatform;

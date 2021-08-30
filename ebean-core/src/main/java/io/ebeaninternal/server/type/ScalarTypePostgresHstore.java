@@ -20,9 +20,9 @@ import java.util.Map;
  * Postgres Hstore type which maps Map<String,String> to a single 'HStore column' in the DB.
  */
 @SuppressWarnings("rawtypes")
-public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
+final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
-  public ScalarTypePostgresHstore() {
+  ScalarTypePostgresHstore() {
     super(Map.class, false, DbPlatformType.HSTORE);
   }
 

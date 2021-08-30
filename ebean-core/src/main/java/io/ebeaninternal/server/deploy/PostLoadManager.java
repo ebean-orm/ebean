@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Default implementation for creating BeanControllers.
  */
-class PostLoadManager {
+final class PostLoadManager {
 
   private static final Logger logger = LoggerFactory.getLogger(PostLoadManager.class);
 

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Collections.emptyList;
 
-public class CQueryPlanManager implements QueryPlanManager {
+public final class CQueryPlanManager implements QueryPlanManager {
 
   private static final Logger log = LoggerFactory.getLogger(CQueryPlanManager.class);
 

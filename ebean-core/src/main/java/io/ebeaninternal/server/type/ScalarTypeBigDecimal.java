@@ -17,9 +17,9 @@ import java.sql.Types;
 /**
  * ScalarType for BigDecimal.
  */
-public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
+class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 
-  public ScalarTypeBigDecimal() {
+  ScalarTypeBigDecimal() {
     super(BigDecimal.class, true, Types.DECIMAL);
   }
 

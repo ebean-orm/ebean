@@ -12,7 +12,7 @@ import java.sql.SQLException;
 /**
  * A QueryPlanLogger that prefixes "EXPLAIN " to the query. This works for Postgres, H2 and MySql.
  */
-public class QueryPlanLoggerExplain extends QueryPlanLogger {
+public final class QueryPlanLoggerExplain extends QueryPlanLogger {
 
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {

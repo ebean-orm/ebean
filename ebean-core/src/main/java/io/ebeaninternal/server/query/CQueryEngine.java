@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Handles the Object Relational fetching.
  */
-public class CQueryEngine {
+public final class CQueryEngine {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryEngine.class);
 

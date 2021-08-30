@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Executes the update query.
  */
-class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
+final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
   private final OrmQueryRequest<?> request;

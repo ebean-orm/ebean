@@ -29,7 +29,7 @@ public class BindPaddingTest {
 
   @Test
   public void padding() {
-
+    assertEquals(0, BindPadding.padding(0));
     assertEquals(0, BindPadding.padding(1));
     assertEquals(3, BindPadding.padding(2));
     assertEquals(2, BindPadding.padding(3));

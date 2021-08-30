@@ -31,17 +31,13 @@ import java.util.Map;
 /**
  * Default implementation of LoadContext.
  */
-public class DLoadContext implements LoadContext {
+public final class DLoadContext implements LoadContext {
 
   private final SpiEbeanServer ebeanServer;
-
   private final BeanDescriptor<?> rootDescriptor;
-
   private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
-
   private final DLoadBeanContext rootBeanContext;
-
   private final boolean asDraft;
   private final Timestamp asOf;
   private final Boolean readOnly;
@@ -60,13 +56,9 @@ public class DLoadContext implements LoadContext {
   private final String planLabel;
   private final ProfileLocation profileLocation;
   private final ProfilingListener profilingListener;
-
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
-
   private PersistenceContext persistenceContext;
-
   private List<OrmQueryProperties> secQuery;
-
   private Object tenantId;
 
   /**

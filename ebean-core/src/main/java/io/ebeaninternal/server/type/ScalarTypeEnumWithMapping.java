@@ -14,25 +14,23 @@ import java.util.Set;
  * Additional control over mapping to DB values.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implements ScalarType, ScalarTypeEnum {
+class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implements ScalarType, ScalarTypeEnum {
 
   private final EnumToDbValueMap beanDbMap;
-
   private final int length;
-
   private final boolean withConstraint;
 
   /**
    * Create with an explicit mapping of bean to database values.
    */
-  public ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length, boolean withConstraint) {
+  ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length, boolean withConstraint) {
     super(enumType, false, beanDbMap.getDbType());
     this.beanDbMap = beanDbMap;
     this.length = length;
     this.withConstraint = withConstraint;
   }
 
-  public ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length) {
+  ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length) {
     this(beanDbMap, enumType, length, true);
   }
 

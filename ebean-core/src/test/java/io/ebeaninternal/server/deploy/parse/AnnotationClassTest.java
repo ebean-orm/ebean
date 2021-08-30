@@ -1,11 +1,15 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -46,9 +50,8 @@ public class AnnotationClassTest {
 
     DeployUtil deployUtil = new DeployUtil(new DefaultTypeManager(config, new BootupClasses()), config);
 
-    DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, mock(DeployBeanDescriptor.class));
-    ReadAnnotationConfig readAnnotationConfig = mock(ReadAnnotationConfig.class);
-
+    DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, null, null));
+    ReadAnnotationConfig readAnnotationConfig = new ReadAnnotationConfig(new GeneratedPropertyFactory(true, new DatabaseConfig(), Collections.emptyList()), "","", new DatabaseConfig());
     return new AnnotationClass(deployBeanInfo, readAnnotationConfig);
   }
 

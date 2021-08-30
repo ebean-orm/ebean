@@ -20,10 +20,9 @@ import java.util.Set;
 /**
  * In a collection of Id values.
  */
-public class IdInExpression extends NonPrepareExpression {
+public final class IdInExpression extends NonPrepareExpression {
 
   private final List<Object> idCollection;
-
   private boolean multiValueIdSupported;
 
   public IdInExpression(Collection<?> idCollection) {

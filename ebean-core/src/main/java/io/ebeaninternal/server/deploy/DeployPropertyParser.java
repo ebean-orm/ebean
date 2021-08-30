@@ -15,15 +15,11 @@ import java.util.Set;
 public final class DeployPropertyParser extends DeployParser {
 
   private static final String JOIN = "join";
-
   private static final String FROM = "from";
 
   private final BeanDescriptor<?> beanDescriptor;
-
   private final Set<String> includes = new HashSet<>();
-
   private boolean catchFirst;
-
   private ElPropertyDeploy firstProp;
 
   DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {

@@ -21,14 +21,11 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * ToMany bean load context.
  */
-class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
+final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
-  protected final BeanPropertyAssocMany<?> property;
-
+  private final BeanPropertyAssocMany<?> property;
   private final boolean docStoreMapped;
-
   private List<LoadBuffer> bufferList;
-
   private LoadBuffer currentBuffer;
 
   DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property, String path, OrmQueryProperties queryProps) {

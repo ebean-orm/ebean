@@ -17,24 +17,16 @@ import java.util.Map;
 /**
  * Default implementation of GeneratedPropertyFactory.
  */
-public class GeneratedPropertyFactory {
+public final class GeneratedPropertyFactory {
 
   private final CounterFactory counterFactory = new CounterFactory();
-
   private final InsertTimestampFactory insertFactory;
-
   private final UpdateTimestampFactory updateFactory;
-
   private final HashSet<String> numberTypes = new HashSet<>();
-
   private final UuidGeneratedProperty generatedUuid = new UuidGeneratedProperty();
-
   private final GeneratedWhoModified generatedWhoModified;
-
   private final GeneratedWhoCreated generatedWhoCreated;
-
   private final ClassLoadConfig classLoadConfig;
-
   private final Map<String, PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
   public GeneratedPropertyFactory(boolean offlineMode, DatabaseConfig config, List<IdGenerator> idGenerators) {
@@ -53,7 +45,6 @@ public class GeneratedPropertyFactory {
       generatedWhoCreated = null;
       generatedWhoModified = null;
     }
-
     numberTypes.add(Integer.class.getName());
     numberTypes.add(int.class.getName());
     numberTypes.add(Long.class.getName());
@@ -63,7 +54,6 @@ public class GeneratedPropertyFactory {
     numberTypes.add(Double.class.getName());
     numberTypes.add(double.class.getName());
     numberTypes.add(BigDecimal.class.getName());
-
     if (idGenerators != null) {
       for (IdGenerator idGenerator : idGenerators) {
         idGeneratorMap.put(idGenerator.getName(), new CustomIdGenerator(idGenerator));
@@ -88,17 +78,14 @@ public class GeneratedPropertyFactory {
   }
 
   private void setCounter(DeployBeanProperty property) {
-
     counterFactory.setCounter(property);
   }
 
   public void setInsertTimestamp(DeployBeanProperty property) {
-
     insertFactory.setInsertTimestamp(property);
   }
 
   public void setUpdateTimestamp(DeployBeanProperty property) {
-
     updateFactory.setUpdateTimestamp(property);
   }
 
@@ -130,7 +117,7 @@ public class GeneratedPropertyFactory {
   /**
    * Wraps the custom IdGenerator to implement PlatformIdGenerator.
    */
-  private static class CustomIdGenerator implements PlatformIdGenerator {
+  private static final class CustomIdGenerator implements PlatformIdGenerator {
 
     private final IdGenerator generator;
 
@@ -159,7 +146,7 @@ public class GeneratedPropertyFactory {
     }
   }
 
-  private static class DummyCurrentUser implements CurrentUserProvider {
+  private static final class DummyCurrentUser implements CurrentUserProvider {
     @Override
     public Object currentUser() {
       throw new RuntimeException("never called");

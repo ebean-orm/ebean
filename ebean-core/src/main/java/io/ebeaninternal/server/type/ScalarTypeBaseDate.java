@@ -18,7 +18,7 @@ import java.sql.Types;
 /**
  * Base class for Date types.
  */
-public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
+abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   protected final JsonConfig.Date mode;
 

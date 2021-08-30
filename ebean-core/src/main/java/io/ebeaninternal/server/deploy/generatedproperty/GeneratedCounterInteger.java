@@ -6,11 +6,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 /**
  * Used to create a counter version column for Integer.
  */
-public class GeneratedCounterInteger implements GeneratedProperty {
-
-  public GeneratedCounterInteger() {
-
-  }
+final class GeneratedCounterInteger implements GeneratedProperty {
 
   /**
    * Always returns a 1.

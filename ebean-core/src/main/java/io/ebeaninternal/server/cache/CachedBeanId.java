@@ -10,7 +10,7 @@ import java.io.ObjectOutput;
  * <p>
  * Put into L2 cache such that we know the type of a bean with inheritance.
  */
-public class CachedBeanId implements Externalizable {
+public final class CachedBeanId implements Externalizable {
 
   private String discValue;
   private Object id;

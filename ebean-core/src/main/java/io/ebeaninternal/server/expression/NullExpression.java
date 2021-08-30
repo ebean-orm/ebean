@@ -17,14 +17,11 @@ import java.io.IOException;
  * Note that for OneToMany/ManyToMany this effectively gets translated into isEmpty()/isNotEmpty().
  * </p>
  */
-class NullExpression extends AbstractExpression {
+final class NullExpression extends AbstractExpression {
 
   private final boolean notNull;
-
   private ElPropertyValue elProperty;
-
   private boolean assocMany;
-
   private String propertyPath;
 
   NullExpression(String propertyName, boolean notNull) {

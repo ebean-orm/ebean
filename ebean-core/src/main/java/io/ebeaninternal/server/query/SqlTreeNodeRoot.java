@@ -18,9 +18,7 @@ import java.util.Set;
 final class SqlTreeNodeRoot extends SqlTreeNodeBean implements SqlTreeRoot {
 
   private final TableJoin includeJoin;
-
   private final boolean sqlDistinct;
-
   private final String baseTable;
 
   /**

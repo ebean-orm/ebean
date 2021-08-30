@@ -12,7 +12,7 @@ import io.ebeaninternal.server.persist.dml.DmlMode;
  * and BindablePropertyUpdateGenerated as required.
  * </p>
  */
-class FactoryProperty {
+final class FactoryProperty {
 
   private final boolean bindEncryptDataFirst;
 

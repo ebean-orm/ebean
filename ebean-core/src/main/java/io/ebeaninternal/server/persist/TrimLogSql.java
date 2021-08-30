@@ -3,7 +3,7 @@ package io.ebeaninternal.server.persist;
 /**
  * Utility to improve logging of raw SQL that contains new line characters.
  */
-public class TrimLogSql {
+public final class TrimLogSql {
 
   /**
    * Replace new line chars for nicer logging of multi-line sql strings.

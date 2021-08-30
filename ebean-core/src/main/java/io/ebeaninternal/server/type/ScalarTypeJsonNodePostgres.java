@@ -10,10 +10,9 @@ import java.sql.SQLException;
 /**
  * Support for mapping JsonNode to Postgres DB types JSON and JSONB.
  */
-public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
+abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
 
   final ObjectMapper objectMapper;
-
   final String postgresType;
 
   ScalarTypeJsonNodePostgres(ObjectMapper objectMapper, int jdbcType, String postgresType) {
@@ -31,7 +30,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   /**
    * ScalarType mapping JsonNode to Postgres JSON database type.
    */
-  public static class JSON extends ScalarTypeJsonNodePostgres {
+  static final class JSON extends ScalarTypeJsonNodePostgres {
 
     public JSON(ObjectMapper objectMapper) {
       super(objectMapper, DbPlatformType.JSON, PostgresHelper.JSON_TYPE);
@@ -41,7 +40,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   /**
    * ScalarType mapping JsonNode to Postgres JSONB database type.
    */
-  public static class JSONB extends ScalarTypeJsonNodePostgres {
+  static final class JSONB extends ScalarTypeJsonNodePostgres {
 
     public JSONB(ObjectMapper objectMapper) {
       super(objectMapper, DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE);

@@ -12,7 +12,7 @@ import java.util.Map;
  * This intentionally does not include any OneToMany or ManyToMany properties.
  * </p>
  */
-public class DiffHelp {
+public final class DiffHelp {
 
   private DiffHelp() {
   }
@@ -28,11 +28,9 @@ public class DiffHelp {
    * </p>
    */
   public static Map<String, ValuePair> diff(Object newBean, Object oldBean, BeanDescriptor<?> desc) {
-
     if (!(newBean instanceof EntityBean)) {
       throw new IllegalArgumentException("First bean expected to be an enhanced EntityBean? bean:" + newBean);
     }
-
     if (oldBean != null) {
       if (!(oldBean instanceof EntityBean)) {
         throw new IllegalArgumentException("Second bean expected to be an enhanced EntityBean? bean:" + oldBean);
@@ -41,11 +39,9 @@ public class DiffHelp {
         throw new IllegalArgumentException("Second bean not assignable to the first bean?");
       }
     }
-
     if (oldBean == null) {
       return ((EntityBean) newBean)._ebean_getIntercept().getDirtyValues();
     }
-
     return desc.diff((EntityBean) newBean, (EntityBean) oldBean);
   }
 

@@ -20,7 +20,7 @@ import java.util.List;
  * to the TransactionEventManager.
  * </p>
  */
-public class TransactionEvent implements Serializable {
+public final class TransactionEvent implements Serializable {
 
   private static final long serialVersionUID = 7230903304106097120L;
 
@@ -29,13 +29,9 @@ public class TransactionEvent implements Serializable {
    * the cluster).
    */
   private final transient boolean local;
-
   private TransactionEventTable eventTables;
-
   private transient List<PersistRequestBean<?>> listenerNotify;
-
   private transient DeleteByIdMap deleteByIdMap;
-
   private transient CacheChangeSet changeSet;
 
   /**
@@ -110,11 +106,9 @@ public class TransactionEvent implements Serializable {
    * Build and return the cache changeSet.
    */
   public CacheChangeSet buildCacheChanges(TransactionManager manager) {
-
     if (changeSet == null && deleteByIdMap == null && eventTables == null) {
       return null;
     }
-
     if (changeSet == null) {
       changeSet = new CacheChangeSet();
     }

@@ -7,7 +7,7 @@ import java.math.BigInteger;
  *
  * @param <R> the root query bean type
  */
-public class PBigInteger<R> extends PBaseNumber<R, BigInteger> {
+public final class PBigInteger<R> extends PBaseNumber<R, BigInteger> {
 
   /**
    * Construct with a property name and root instance.

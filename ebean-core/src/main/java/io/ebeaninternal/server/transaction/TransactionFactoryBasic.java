@@ -22,7 +22,6 @@ class TransactionFactoryBasic extends TransactionFactory {
 
   @Override
   public SpiTransaction createReadOnlyTransaction(Object tenantId) {
-
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
@@ -37,7 +36,7 @@ class TransactionFactoryBasic extends TransactionFactory {
   }
 
   @Override
-  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
+  public final SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();

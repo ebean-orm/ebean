@@ -14,9 +14,7 @@ import java.util.List;
 final class BeanDescriptorDraftHelp<T> {
 
   private final BeanDescriptor<T> desc;
-
   private final BeanProperty draftDirty;
-
   private final BeanProperty[] resetProperties;
 
   BeanDescriptorDraftHelp(BeanDescriptor<T> desc) {
@@ -29,16 +27,12 @@ final class BeanDescriptorDraftHelp<T> {
    * Return the properties that are reset on draft beans after publish.
    */
   private BeanProperty[] resetProperties() {
-
     List<BeanProperty> list = new ArrayList<>();
-
-    BeanProperty[] props = desc.propertiesNonMany();
-    for (BeanProperty prop : props) {
+    for (BeanProperty prop : desc.propertiesNonMany()) {
       if (prop.isDraftReset()) {
         list.add(prop);
       }
     }
-
     return list.toArray(new BeanProperty[0]);
   }
 
@@ -46,19 +40,15 @@ final class BeanDescriptorDraftHelp<T> {
    * Set the value of all the 'reset properties' to null on the draft bean.
    */
   boolean draftReset(T draftBean) {
-
     EntityBean draftEntityBean = (EntityBean) draftBean;
-
     if (draftDirty != null) {
       // set @DraftDirty property to false
       draftDirty.setValueIntercept(draftEntityBean, false);
     }
-
     // set to null on all @DraftReset properties
     for (BeanProperty resetProperty : resetProperties) {
       resetProperty.setValueIntercept(draftEntityBean, null);
     }
-
     // return true if the bean is dirty (and should be persisted)
     return draftEntityBean._ebean_getIntercept().isDirty();
   }
@@ -71,31 +61,23 @@ final class BeanDescriptorDraftHelp<T> {
    */
   @SuppressWarnings("unchecked")
   public T publish(T draftBean, T liveBean) {
-
     if (liveBean == null) {
       liveBean = (T) desc.createEntityBean();
     }
-
     EntityBean draft = (EntityBean) draftBean;
     EntityBean live = (EntityBean) liveBean;
-
     BeanProperty idProperty = desc.getIdProperty();
     if (idProperty != null) {
       idProperty.publish(draft, live);
     }
-
-    BeanProperty[] props = desc.propertiesNonMany();
-    for (BeanProperty prop : props) {
+    for (BeanProperty prop : desc.propertiesNonMany()) {
       prop.publish(draft, live);
     }
-
-    BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
-    for (BeanPropertyAssocMany<?> aMany : many) {
-      if (aMany.getTargetDescriptor().isDraftable()) {
-        aMany.publishMany(draft, live);
+    for (BeanPropertyAssocMany<?> many : desc.propertiesMany()) {
+      if (many.getTargetDescriptor().isDraftable()) {
+        many.publishMany(draft, live);
       }
     }
-
     return liveBean;
   }
 
@@ -103,20 +85,15 @@ final class BeanDescriptorDraftHelp<T> {
    * Fetch draftable element relationships.
    */
   void draftQueryOptimise(Query<T> query) {
-
-    BeanPropertyAssocOne<?>[] one = desc.propertiesOne();
-    for (BeanPropertyAssocOne<?> anOne : one) {
+    for (BeanPropertyAssocOne<?> anOne : desc.propertiesOne()) {
       if (anOne.getTargetDescriptor().isDraftableElement()) {
         query.fetch(anOne.getName());
       }
     }
-
-    BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
-    for (BeanPropertyAssocMany<?> aMany : many) {
+    for (BeanPropertyAssocMany<?> aMany : desc.propertiesMany()) {
       if (aMany.getTargetDescriptor().isDraftableElement()) {
         query.fetch(aMany.getName());
       }
     }
-
   }
 }

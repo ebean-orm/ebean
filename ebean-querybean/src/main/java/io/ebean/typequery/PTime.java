@@ -8,7 +8,7 @@ import java.sql.Time;
  *
  * @param <R> the root query bean type
  */
-public class PTime<R> extends PBaseNumber<R,Time> {
+public final class PTime<R> extends PBaseNumber<R,Time> {
 
   /**
    * Construct with a property name and root instance.

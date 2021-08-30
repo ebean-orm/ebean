@@ -25,7 +25,7 @@ import java.sql.Types;
 /**
  * Supports @DbJson properties using Jackson ObjectMapper.
  */
-class ScalarTypeJsonObjectMapper {
+final class ScalarTypeJsonObjectMapper {
 
   /**
    * Create and return the appropriate ScalarType.
@@ -39,14 +39,18 @@ class ScalarTypeJsonObjectMapper {
       return new GenericObject(jsonManager, field, dbType, docType);
     }
     // using the global default MutationDetection mode (defaults to HASH)
-    prop.setMutationDetection(jsonManager.mutationDetection());
+    final MutationDetection defaultMode = jsonManager.mutationDetection();
+    prop.setMutationDetection(defaultMode);
+    if (MutationDetection.NONE == defaultMode) {
+      return new NoMutationDetection(jsonManager, field, dbType, docType);
+    }
     return new GenericObject(jsonManager, field, dbType, docType);
   }
 
   /**
    * No mutation detection on this json property.
    */
-  private static class NoMutationDetection extends Base<Object> {
+  private static final class NoMutationDetection extends Base<Object> {
 
     NoMutationDetection(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
       super(Object.class, jsonManager, field, dbType, docType);
@@ -66,10 +70,13 @@ class ScalarTypeJsonObjectMapper {
   /**
    * Supports HASH and SOURCE dirty detection modes.
    */
-  private static class GenericObject extends Base<Object> {
+  private static final class GenericObject extends Base<Object> {
+
+    private final boolean jsonb;
 
     GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
       super(Object.class, jsonManager, field, dbType, docType);
+      this.jsonb = "jsonb".equals(pgType);
     }
 
     @Override
@@ -80,6 +87,9 @@ class ScalarTypeJsonObjectMapper {
     @Override
     public Object read(DataReader reader) throws SQLException {
       String json = reader.getString();
+      if (jsonb) {
+        json = JsonTrim.trim(json);
+      }
       // pushJson such that we MD5 and store on EntityBeanIntercept later
       reader.pushJson(json);
       if (json == null || json.isEmpty()) {
@@ -167,20 +177,20 @@ class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public Object toJdbcType(Object value) {
+    public final Object toJdbcType(Object value) {
       // no type conversion supported
       return value;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public T toBeanType(Object value) {
+    public final T toBeanType(Object value) {
       // no type conversion supported
       return (T) value;
     }
 
     @Override
-    public String formatValue(T value) {
+    public final String formatValue(T value) {
       try {
         return objectWriter.writeValueAsString(value);
       } catch (JsonProcessingException e) {
@@ -189,7 +199,7 @@ class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public T parse(String value) {
+    public final T parse(String value) {
       try {
         return objectReader.readValue(value, deserType);
       } catch (IOException e) {
@@ -198,32 +208,32 @@ class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public DocPropertyType getDocType() {
+    public final DocPropertyType getDocType() {
       return docType;
     }
 
     @Override
-    public boolean isDateTimeCapable() {
+    public final boolean isDateTimeCapable() {
       return false;
     }
 
     @Override
-    public T convertFromMillis(long dateTime) {
+    public final T convertFromMillis(long dateTime) {
       throw new IllegalStateException("Not supported");
     }
 
     @Override
-    public T jsonRead(JsonParser parser) throws IOException {
+    public final T jsonRead(JsonParser parser) throws IOException {
       return objectReader.readValue(parser, deserType);
     }
 
     @Override
-    public void jsonWrite(JsonGenerator writer, T value) throws IOException {
+    public final void jsonWrite(JsonGenerator writer, T value) throws IOException {
       objectWriter.writeValue(writer, value);
     }
 
     @Override
-    public T readData(DataInput dataInput) throws IOException {
+    public final T readData(DataInput dataInput) throws IOException {
       if (!dataInput.readBoolean()) {
         return null;
       } else {
@@ -232,7 +242,7 @@ class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public void writeData(DataOutput dataOutput, T value) throws IOException {
+    public final void writeData(DataOutput dataOutput, T value) throws IOException {
       if (value == null) {
         dataOutput.writeBoolean(false);
       } else {

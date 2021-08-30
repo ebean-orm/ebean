@@ -18,26 +18,13 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Insert bean handler.
  */
-public class InsertHandler extends DmlHandler {
+public final class InsertHandler extends DmlHandler {
 
-  /**
-   * The associated InsertMeta data.
-   */
   private final InsertMeta meta;
-
-  /**
-   * Set to true when the key is concatenated.
-   */
-  private final boolean concatinatedKey;
-
-  /**
-   * Flag set when using getGeneratedKeys.
-   */
+  private final boolean concatenatedKey;
   private boolean useGeneratedKeys;
-
   /**
-   * A SQL Select used to fetch back the Id where generatedKeys is not
-   * supported.
+   * SQL Select used to fetch back the Id where generatedKeys is not supported.
    */
   private boolean useSelectLastInsertedId;
 
@@ -47,7 +34,7 @@ public class InsertHandler extends DmlHandler {
   public InsertHandler(PersistRequestBean<?> persist, InsertMeta meta) {
     super(persist);
     this.meta = meta;
-    this.concatinatedKey = meta.isConcatenatedKey();
+    this.concatenatedKey = meta.isConcatenatedKey();
   }
 
   @Override
@@ -60,17 +47,14 @@ public class InsertHandler extends DmlHandler {
    */
   @Override
   public void bind() throws SQLException {
-
     BeanDescriptor<?> desc = persistRequest.getBeanDescriptor();
     EntityBean bean = persistRequest.getEntityBean();
-
     Object idValue = desc.getId(bean);
-
     boolean withId = !isNullOrZero(idValue);
 
     // check to see if we are going to use generated keys
     if (!withId) {
-      if (concatinatedKey) {
+      if (concatenatedKey) {
         // expecting a concatenated key that can
         // be built from supplied AssocOne beans
         withId = meta.deriveConcatenatedId(persistRequest);
@@ -84,10 +68,8 @@ public class InsertHandler extends DmlHandler {
     }
 
     SpiTransaction t = persistRequest.getTransaction();
-
     // get the appropriate sql
     sql = meta.getSql(withId, persistRequest.isPublish());
-
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
       pstmt = getPstmtBatch(t, sql, persistRequest, useGeneratedKeys);
@@ -139,7 +121,6 @@ public class InsertHandler extends DmlHandler {
    * For non batch insert with generated keys.
    */
   private void getGeneratedKeys() throws SQLException {
-
     ResultSet rset = dataBind.getPstmt().getGeneratedKeys();
     try {
       setGeneratedKey(rset);
@@ -164,7 +145,6 @@ public class InsertHandler extends DmlHandler {
    * SQL select to fetch back the Id value.
    */
   private void fetchGeneratedKeyUsingSelect() throws SQLException {
-
     PreparedStatement stmt = null;
     ResultSet rset = null;
     try {

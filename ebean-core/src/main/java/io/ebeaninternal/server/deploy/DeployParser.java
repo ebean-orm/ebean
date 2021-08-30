@@ -35,21 +35,13 @@ public abstract class DeployParser {
   private static final char OPEN_BRACKET = '(';
 
   boolean encrypted;
-
   private String source;
-
   private StringBuilder sb;
-
   private int sourceLength;
-
   private int pos;
-
   String priorWord;
-
   String word;
-
   private char wordTerminator;
-
   private StringBuilder wordBuffer;
 
   protected abstract String convertWord();
@@ -66,16 +58,13 @@ public abstract class DeployParser {
   }
 
   public String parse(String source) {
-
     if (source == null) {
       return null;
     }
-
     pos = -1;
     this.source = source;
     this.sourceLength = source.length();
     this.sb = new StringBuilder(source.length() + 20);
-
     while (nextWord()) {
       if (skipWordConvert()) {
         sb.append(word);
@@ -94,7 +83,6 @@ public abstract class DeployParser {
         }
       }
     }
-
     return sb.toString();
   }
 
@@ -103,11 +91,9 @@ public abstract class DeployParser {
   }
 
   private boolean nextWord() {
-
     if (!findWordStart()) {
       return false;
     }
-
     wordBuffer = new StringBuilder();
     wordBuffer.append(source.charAt(pos));
     while (++pos < sourceLength) {
@@ -119,9 +105,7 @@ public abstract class DeployParser {
         break;
       }
     }
-
     word = wordBuffer.toString();
-
     return true;
   }
 

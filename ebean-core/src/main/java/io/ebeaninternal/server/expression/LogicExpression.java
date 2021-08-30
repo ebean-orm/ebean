@@ -21,7 +21,7 @@ abstract class LogicExpression implements SpiExpression {
   static final String AND = " and ";
   static final String OR = " or ";
 
-  static class And extends LogicExpression {
+  static final class And extends LogicExpression {
 
     And(Expression expOne, Expression expTwo) {
       super(true, expOne, expTwo);
@@ -34,7 +34,7 @@ abstract class LogicExpression implements SpiExpression {
 
   }
 
-  static class Or extends LogicExpression {
+  static final class Or extends LogicExpression {
 
     Or(Expression expOne, Expression expTwo) {
       super(false, expOne, expTwo);
@@ -47,9 +47,7 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   SpiExpression expOne;
-
   SpiExpression expTwo;
-
   private final boolean conjunction;
 
   LogicExpression(boolean conjunction, Expression expOne, Expression expTwo) {

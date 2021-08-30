@@ -7,7 +7,7 @@ import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-class CQueryBindCapture implements SpiQueryBindCapture {
+final class CQueryBindCapture implements SpiQueryBindCapture {
 
   private static final double multiplier = 1.5d;
 

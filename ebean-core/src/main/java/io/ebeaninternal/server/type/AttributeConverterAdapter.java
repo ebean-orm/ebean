@@ -7,7 +7,7 @@ import javax.persistence.AttributeConverter;
 /**
  * Adapter from ScalarTypeConverter to AttributeConverter.
  */
-class AttributeConverterAdapter<B,S> implements ScalarTypeConverter<B, S> {
+final class AttributeConverterAdapter<B,S> implements ScalarTypeConverter<B, S> {
 
   private final AttributeConverter<B,S> converter;
   private final B nullValue;

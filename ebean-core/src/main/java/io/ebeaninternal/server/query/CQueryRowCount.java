@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Executes the select row count query.
  */
-class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuery {
+final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
   private final OrmQueryRequest<?> request;

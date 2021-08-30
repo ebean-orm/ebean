@@ -5,12 +5,10 @@ import io.ebean.RawSqlBuilder;
 
 import java.sql.ResultSet;
 
-public class DRawSqlBuilder implements RawSqlBuilder {
+public final class DRawSqlBuilder implements RawSqlBuilder {
 
   private final ResultSet resultSet;
-
   private final SpiRawSql.Sql sql;
-
   private final SpiRawSql.ColumnMapping columnMapping;
 
   DRawSqlBuilder(SpiRawSql.Sql sql, SpiRawSql.ColumnMapping columnMapping) {

@@ -7,13 +7,12 @@ import java.io.IOException;
 /**
  * Full text Multi-Match expression.
  */
-class TextSimpleExpression extends AbstractTextExpression {
+final class TextSimpleExpression extends AbstractTextExpression {
 
   private final String search;
-
   private final TextSimple options;
 
-  public TextSimpleExpression(String search, TextSimple options) {
+  TextSimpleExpression(String search, TextSimple options) {
     super(null);
     this.search = search;
     this.options = options;

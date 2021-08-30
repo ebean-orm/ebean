@@ -8,9 +8,9 @@ import java.sql.Types;
 /**
  * ScalarType for Longvarbinary.
  */
-public class ScalarTypeBytesLongVarbinary extends ScalarTypeBytesBase {
+final class ScalarTypeBytesLongVarbinary extends ScalarTypeBytesBase {
 
-  public ScalarTypeBytesLongVarbinary() {
+  ScalarTypeBytesLongVarbinary() {
     super(true, Types.LONGVARBINARY);
   }
 

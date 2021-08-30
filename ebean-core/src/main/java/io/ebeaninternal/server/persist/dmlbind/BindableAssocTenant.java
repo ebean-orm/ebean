@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 import java.sql.SQLException;
 
-class BindableAssocTenant extends BindableAssocOne {
+final class BindableAssocTenant extends BindableAssocOne {
 
   BindableAssocTenant(BeanPropertyAssocOne<?> assocOne) {
     super(assocOne);
@@ -13,7 +13,6 @@ class BindableAssocTenant extends BindableAssocOne {
 
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     EntityBean assocBean = (EntityBean) assocOne.getValue(bean);
     importedId.bind(request, assocBean);
   }

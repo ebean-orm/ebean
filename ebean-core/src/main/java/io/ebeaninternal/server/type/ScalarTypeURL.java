@@ -8,9 +8,9 @@ import java.net.URL;
 /**
  * ScalarType for java.net.URL which converts to and from a VARCHAR database column.
  */
-public class ScalarTypeURL extends ScalarTypeBaseVarchar<URL> {
+final class ScalarTypeURL extends ScalarTypeBaseVarchar<URL> {
 
-  public ScalarTypeURL() {
+  ScalarTypeURL() {
     super(URL.class);
   }
 

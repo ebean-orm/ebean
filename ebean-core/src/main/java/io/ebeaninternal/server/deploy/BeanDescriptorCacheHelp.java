@@ -50,38 +50,27 @@ final class BeanDescriptorCacheHelp<T> {
   private static final Logger natLog = LoggerFactory.getLogger("io.ebean.cache.NATKEY");
 
   private final BeanDescriptor<T> desc;
-
   private final SpiCacheManager cacheManager;
-
   private final CacheOptions cacheOptions;
-
   /**
    * Flag indicating this bean has no relationships.
    */
   private final boolean cacheSharableBeans;
   private final boolean invalidateQueryCache;
-
   private final Class<?> beanType;
-
   private final String cacheName;
-
   private final BeanPropertyAssocOne<?>[] propertiesOneImported;
   private final String[] naturalKey;
-
   private final ServerCache beanCache;
   private final ServerCache naturalKeyCache;
   private final ServerCache queryCache;
-
   private final boolean noCaching;
-
   private final SpiCacheControl cacheControl;
   private final SpiCacheRegion cacheRegion;
-
   /**
    * Set to true if all persist changes need to notify the cache.
    */
   private boolean cacheNotifyOnAll;
-
   /**
    * Set to true if delete changes need to notify cache.
    */
@@ -293,13 +282,11 @@ final class BeanDescriptorCacheHelp<T> {
       // held as part of the bean cache so skip
       return false;
     }
-
     CachedManyIds entry = manyPropGet(parentId, many.getName());
     if (entry == null) {
       // not in cache so return unsuccessful
       return false;
     }
-
     EntityBean ownerBean = bc.getOwnerBean();
     EntityBeanIntercept ebi = ownerBean._ebean_getIntercept();
     PersistenceContext persistenceContext = ebi.getPersistenceContext();
@@ -307,8 +294,13 @@ final class BeanDescriptorCacheHelp<T> {
 
     List<Object> idList = entry.getIdList();
     bc.checkEmptyLazyLoad();
+    int i = 0;
     for (Object id : idList) {
-      many.add(bc, targetDescriptor.createReference(readOnly, id, persistenceContext));
+      final EntityBean ref = targetDescriptor.createReference(readOnly, id, persistenceContext);
+      if (many.hasOrderColumn()) {
+        ref._ebean_getIntercept().setSortOrder(++i);
+      }
+      many.add(bc, ref);
     }
     return true;
   }

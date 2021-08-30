@@ -8,10 +8,9 @@ import java.util.Set;
 /**
  * Property expression validation request for a given root bean type.
  */
-public class SpiExpressionValidation {
+public final class SpiExpressionValidation {
 
   private final BeanType<?> desc;
-
   private final LinkedHashSet<String> unknown = new LinkedHashSet<>();
 
   public SpiExpressionValidation(BeanType<?> desc) {

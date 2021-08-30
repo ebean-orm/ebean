@@ -12,7 +12,7 @@ import java.util.List;
  * Manages the assignment/registration of BeanPersistListener with their
  * respective DeployBeanDescriptor's.
  */
-class PersistListenerManager {
+final class PersistListenerManager {
 
   private static final Logger logger = LoggerFactory.getLogger(PersistListenerManager.class);
 

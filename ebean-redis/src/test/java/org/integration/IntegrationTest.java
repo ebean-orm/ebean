@@ -68,15 +68,12 @@ public class IntegrationTest {
     System.out.println("done");
   }
 
-  private List<Person> insertSomePeople() {
-
+  private void insertSomePeople() {
     List<Person> people = new ArrayList<>();
     for (String name : new String[]{"Jack", "John", "Rob", "Moby", "Fiona"}) {
       people.add(new Person(name));
     }
-
     DB.saveAll(people);
-    return people;
   }
 
   private Person findByName(String name) {

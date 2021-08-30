@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ParamTypeHelper {
+public final class ParamTypeHelper {
 
   public enum ManyType {
     LIST, SET, MAP, NONE
   }
 
-  public static class TypeInfo {
+  public static final class TypeInfo {
 
     private final ManyType manyType;
     private final Class<?> beanType;
@@ -46,11 +46,9 @@ public class ParamTypeHelper {
   }
 
   public static TypeInfo getTypeInfo(Type genericType) {
-
     if (genericType instanceof ParameterizedType) {
       return getParamTypeInfo((ParameterizedType) genericType);
     }
-
     Class<?> entityType = getBeanType(genericType);
     if (entityType != null) {
       return new TypeInfo(ManyType.NONE, entityType);
@@ -62,16 +60,12 @@ public class ParamTypeHelper {
    * For Lists Sets and Maps of beans.
    */
   private static TypeInfo getParamTypeInfo(ParameterizedType paramType) {
-
     Type rawType = paramType.getRawType();
-
     ManyType manyType = getManyType(rawType);
     if (ManyType.NONE == manyType) {
       return null;
     }
-
     Type[] typeArguments = paramType.getActualTypeArguments();
-
     if (typeArguments.length == 1) {
       Type argType = typeArguments[0];
       Class<?> beanType = getBeanType(argType);
@@ -79,7 +73,6 @@ public class ParamTypeHelper {
         return new TypeInfo(manyType, beanType);
       }
     }
-
     return null;
   }
 

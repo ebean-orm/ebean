@@ -8,10 +8,9 @@ import java.util.List;
 /**
  * Handles multiple BeanPostLoad's for a given entity type.
  */
-public class ChainedBeanPostLoad implements BeanPostLoad {
+public final class ChainedBeanPostLoad implements BeanPostLoad {
 
   private final List<BeanPostLoad> list;
-
   private final BeanPostLoad[] chain;
 
   /**
@@ -31,7 +30,6 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
     } else {
       List<BeanPostLoad> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPostLoad(newList);
     }
   }
@@ -45,16 +43,8 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
     } else {
       List<BeanPostLoad> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPostLoad(newList);
     }
-  }
-
-  /**
-   * Return the size of the chain.
-   */
-  protected int size() {
-    return chain.length;
   }
 
   @Override
@@ -68,8 +58,8 @@ public class ChainedBeanPostLoad implements BeanPostLoad {
    */
   @Override
   public void postLoad(Object bean) {
-    for (BeanPostLoad aChain : chain) {
-      aChain.postLoad(bean);
+    for (BeanPostLoad postLoad : chain) {
+      postLoad.postLoad(bean);
     }
   }
 }

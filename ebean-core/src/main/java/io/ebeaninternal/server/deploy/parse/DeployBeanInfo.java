@@ -9,12 +9,10 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 /**
  * Wraps information about a bean during deployment parsing.
  */
-public class DeployBeanInfo<T> {
+public final class DeployBeanInfo<T> {
 
   private final DeployUtil util;
-
   private final DeployBeanDescriptor<T> descriptor;
-
   private DeployBeanPropertyAssoc<?> embeddedId;
 
   /**

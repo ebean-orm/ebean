@@ -9,10 +9,7 @@ import javax.sql.DataSource;
 /**
  * Helper to lookup a DataSource from JNDI.
  */
-public class JndiDataSourceLookup {
-
-  public JndiDataSourceLookup() {
-  }
+class JndiDataSourceLookup {
 
   /**
    * Return the DataSource by JNDI lookup.
@@ -21,7 +18,6 @@ public class JndiDataSourceLookup {
    * </p>
    */
   public DataSource lookup(String jndiName) {
-
     try {
       Context ctx = new InitialContext();
       DataSource ds = (DataSource) ctx.lookup(jndiName);

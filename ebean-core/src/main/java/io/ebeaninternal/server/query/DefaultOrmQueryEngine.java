@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Main Finder implementation.
  */
-public class DefaultOrmQueryEngine implements OrmQueryEngine {
+public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
   /**
    * Find using predicates

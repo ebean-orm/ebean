@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Configuration used when reading the deployment annotations.
  */
-class ReadAnnotationConfig {
+final class ReadAnnotationConfig {
 
   private final GeneratedPropertyFactory generatedPropFactory;
   private final String asOfViewSuffix;

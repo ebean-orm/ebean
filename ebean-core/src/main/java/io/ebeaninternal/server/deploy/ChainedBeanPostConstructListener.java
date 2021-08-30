@@ -8,10 +8,9 @@ import java.util.List;
 /**
  * Handles multiple BeanPostLoad's for a given entity type.
  */
-public class ChainedBeanPostConstructListener implements BeanPostConstructListener {
+public final class ChainedBeanPostConstructListener implements BeanPostConstructListener {
 
   private final List<BeanPostConstructListener> list;
-
   private final BeanPostConstructListener[] chain;
 
   /**
@@ -31,7 +30,6 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
     } else {
       List<BeanPostConstructListener> newList = new ArrayList<>(list);
       newList.add(c);
-
       return new ChainedBeanPostConstructListener(newList);
     }
   }
@@ -45,16 +43,8 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
     } else {
       ArrayList<BeanPostConstructListener> newList = new ArrayList<>(list);
       newList.remove(c);
-
       return new ChainedBeanPostConstructListener(newList);
     }
-  }
-
-  /**
-   * Return the size of the chain.
-   */
-  protected int size() {
-    return chain.length;
   }
 
   @Override
@@ -68,22 +58,22 @@ public class ChainedBeanPostConstructListener implements BeanPostConstructListen
    */
   @Override
   public void postConstruct(Object bean) {
-    for (BeanPostConstructListener aChain : chain) {
-      aChain.postConstruct(bean);
+    for (BeanPostConstructListener listener : chain) {
+      listener.postConstruct(bean);
     }
   }
 
   @Override
   public void autowire(Object bean) {
-    for (BeanPostConstructListener aChain : chain) {
-      aChain.autowire(bean);
+    for (BeanPostConstructListener listener : chain) {
+      listener.autowire(bean);
     }
   }
 
   @Override
   public void postCreate(Object bean) {
-    for (BeanPostConstructListener aChain : chain) {
-      aChain.postCreate(bean);
+    for (BeanPostConstructListener listener : chain) {
+      listener.postCreate(bean);
     }
   }
 }

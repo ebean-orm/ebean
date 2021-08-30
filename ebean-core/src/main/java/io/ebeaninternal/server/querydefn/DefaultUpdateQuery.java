@@ -10,7 +10,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 /**
  * Default implementation of UpdateQuery.
  */
-public class DefaultUpdateQuery<T> implements UpdateQuery<T> {
+public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
 
   private final OrmUpdateProperties values = new OrmUpdateProperties();
   private final DefaultOrmQuery<T> query;

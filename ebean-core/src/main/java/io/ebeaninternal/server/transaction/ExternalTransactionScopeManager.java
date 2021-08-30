@@ -6,7 +6,7 @@ import io.ebeaninternal.api.SpiTransaction;
 /**
  * A TransactionScopeManager aware of external transaction managers.
  */
-public class ExternalTransactionScopeManager extends DefaultTransactionScopeManager {
+public final class ExternalTransactionScopeManager extends DefaultTransactionScopeManager {
 
   private final ExternalTransactionManager externalManager;
 

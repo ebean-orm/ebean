@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Save details for a simple scalar map element collection.
  */
-class SaveManyElementCollectionMap extends SaveManyBase {
+final class SaveManyElementCollectionMap extends SaveManyBase {
 
   private Set<Map.Entry<?, ?>> entries;
 

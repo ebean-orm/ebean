@@ -7,7 +7,7 @@ import java.util.TimeZone;
  *
  * @param <R> the root query bean type
  */
-public class PTimeZone<R> extends PBaseValueEqual<R,TimeZone> {
+public final class PTimeZone<R> extends PBaseValueEqual<R,TimeZone> {
 
   /**
    * Construct with a property name and root instance.
