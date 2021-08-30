@@ -40,6 +40,7 @@ public class ClusterTest {
     foo.save();
 
     DB.getServerCacheManager().clearAll();
+    DB.getDefault().getMetaInfoManager().resetAllMetrics();
     other.getMetaInfoManager().resetAllMetrics();
 
     Person fooA = DB.find(Person.class, foo.getId());
