@@ -241,7 +241,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
                                          .query();
 
     List<EBasicSoftDelete> list = query.findList();
-    if (isMySql() || isMariaDB()) {
+    if (isMySql() || isMariaDB() || isSqlServer()) {
       assertSql(query).contains("t0.deleted = 0");
       assertSql(query).contains("u1.deleted = 0");
     } else {
@@ -277,7 +277,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     List<EBasicNoSDChild> list = query.findList();
     // Make sure that query includes that the child mustn't've been deleted
-    if (isMySql() || isMariaDB()) {
+    if (isMySql() || isMariaDB() || isSqlServer()) {
       assertSql(query).contains("u1.deleted = 0");
       assertSql(query).contains("u2.deleted = 0");
     } else {

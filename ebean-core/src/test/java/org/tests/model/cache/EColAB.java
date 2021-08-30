@@ -13,7 +13,7 @@ import javax.persistence.Table;
 public class EColAB extends Model {
 
   @Id
-  private Long id;
+  private Integer id;
 
   private String columnA;
 
@@ -24,11 +24,11 @@ public class EColAB extends Model {
     this.columnB = columnB;
   }
 
-  public Long getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

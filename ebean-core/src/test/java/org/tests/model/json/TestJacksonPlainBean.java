@@ -1,12 +1,13 @@
 package org.tests.model.json;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebeantest.LoggedSql;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestJacksonPlainBean {
+public class TestJacksonPlainBean extends BaseTestCase {
 
   @Test
   public void insertNullStayNull() {
@@ -46,7 +47,11 @@ public class TestJacksonPlainBean {
     bean.setPlainBean2(new PlainBean("bar", 27));
 
     DB.save(bean);
-    expectedSql(0, "insert into ebasic_plain (attr, plain_bean, plain_bean2, version) values (?,?,?,?)");
+    if (isSqlServer()) {
+      expectedSql(0, "insert into ebasic_plain (id, attr, plain_bean, plain_bean2, version) values (?,?,?,?,?)");
+    } else {
+      expectedSql(0, "insert into ebasic_plain (attr, plain_bean, plain_bean2, version) values (?,?,?,?)");
+    }
 
     // inserted plainBean has not been mutated
     bean.setAttr("attr1");
