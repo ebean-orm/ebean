@@ -268,11 +268,12 @@ public class TestDbArray_basic extends BaseTestCase {
 
     DB.save(bean);
     // load cache
-    DB.find(EArrayBean.class, bean.getId());
+    final EArrayBean entry = DB.find(EArrayBean.class, bean.getId());
+    assertThat(entry.getUids()).hasSameElementsAs(uids);
+    assertThat(entry.getStatuses()).hasSameElementsAs(statuses);
     // hit cache
     EArrayBean found = DB.find(EArrayBean.class, bean.getId());
-
-    assertThat(found.getUids()).isEqualTo(uids);
-    assertThat(found.getStatuses()).isEqualTo(statuses);
+    assertThat(found.getUids()).hasSameElementsAs(uids);
+    assertThat(found.getStatuses()).hasSameElementsAs(statuses);
   }
 }

@@ -179,11 +179,13 @@ public class TestDbArray_asSet extends BaseTestCase {
 
     Ebean.save(bean);
     // load cache
-    Ebean.find(EArraySetBean.class, bean.getId());
+    final EArraySetBean entry = Ebean.find(EArraySetBean.class, bean.getId());
+    assertThat(entry.getUids()).hasSameElementsAs(uids);
+    assertThat(entry.getStatus()).hasSameElementsAs(statuses);
+
     // hit cache
     EArraySetBean found = Ebean.find(EArraySetBean.class, bean.getId());
-
-    assertThat(found.getUids()).isEqualTo(uids);
-    assertThat(found.getStatus()).isEqualTo(statuses);
+    assertThat(found.getUids()).hasSameElementsAs(uids);
+    assertThat(found.getStatus()).hasSameElementsAs(statuses);
   }
 }
