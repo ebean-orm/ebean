@@ -14,18 +14,13 @@ import java.util.Set;
 /**
  * List of changes to be applied to L2 cache.
  */
-public class CacheChangeSet {
+public final class CacheChangeSet {
 
   private final List<CacheChange> entries = new ArrayList<>();
-
   private final Set<String> touchedTables = new HashSet<>();
-
   private final Set<BeanDescriptor<?>> queryCaches = new HashSet<>();
-
   private final Set<BeanDescriptor<?>> beanCaches = new HashSet<>();
-
   private final Map<BeanDescriptor<?>, CacheChangeBeanRemove> beanRemoveMap = new HashMap<>();
-
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<>();
 
   /**
@@ -173,14 +168,11 @@ public class CacheChangeSet {
   /**
    * Changes for a specific many property.
    */
-  private static class ManyChange implements CacheChange {
+  private static final class ManyChange implements CacheChange {
 
     final ManyKey key;
-
     final Set<Object> removes = new HashSet<>();
-
     final Map<Object, CachedManyIds> puts = new LinkedHashMap<>();
-
     boolean clear;
 
     ManyChange(ManyKey key) {
@@ -229,10 +221,9 @@ public class CacheChangeSet {
   /**
    * Key for changes on a many property.
    */
-  private static class ManyKey {
+  private static final class ManyKey {
 
     private final BeanDescriptor<?> desc;
-
     private final String manyProperty;
 
     ManyKey(BeanDescriptor<?> desc, String manyProperty) {

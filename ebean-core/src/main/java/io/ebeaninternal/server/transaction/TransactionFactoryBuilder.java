@@ -5,7 +5,7 @@ import io.ebean.config.CurrentTenantProvider;
 /**
  * Helper to build and return the appropriate TransactionFactory.
  */
-class TransactionFactoryBuilder {
+final class TransactionFactoryBuilder {
 
   /**
    * Build and return based on multi-tenancy and read only DataSource.

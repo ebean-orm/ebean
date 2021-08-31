@@ -12,6 +12,7 @@ import org.tests.model.softdelete.EBasicNoSDChild;
 import org.tests.model.softdelete.EBasicSDChild;
 import org.tests.model.softdelete.EBasicSoftDelete;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -55,6 +56,52 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 //    assertThat(loggedSql.get(1)).contains(
 //      "update ebasic_soft_delete set version=?, deleted=? where id=? and version=?");
 
+  }
+
+  @Test
+  public void findSingleAttribute() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("findSingleAttribute");
+    DB.save(bean);
+
+    LoggedSqlCollector.start();
+
+    final String name0 = DB.find(EBasicSoftDelete.class)
+      .select("name")
+      .where().eq("name", "findSingleAttribute")
+      .findSingleAttribute();
+
+    List<String> sql0 = LoggedSqlCollector.current();
+    assertThat(sql0.get(0)).contains("where t0.name = ? and t0.deleted =");
+    assertThat(name0).isEqualTo("findSingleAttribute");
+
+    // now soft delete the bean
+    DB.delete(bean);
+    List<String> sqlUpdate = LoggedSqlCollector.current();
+    assertThat(sqlUpdate.get(0)).contains("update ebasic_sdchild set");
+
+    // use setIncludeSoftDeletes
+    final String name1 = DB.find(EBasicSoftDelete.class)
+      .select("name")
+      .where().eq("name", "findSingleAttribute")
+      .setIncludeSoftDeletes()
+      .findSingleAttribute();
+
+    List<String> sql1 = LoggedSqlCollector.current();
+    assertThat(sql1.get(0)).doesNotContain(" and t0.deleted =");
+    assertThat(name1).isEqualTo("findSingleAttribute");
+
+
+    // not using setIncludeSoftDeletes, so don't find it
+    final String name2 = DB.find(EBasicSoftDelete.class)
+      .select("name")
+      .where().eq("name", "findSingleAttribute")
+      .findSingleAttribute();
+
+    List<String> sql2 = LoggedSqlCollector.stop();
+    assertThat(sql2.get(0)).contains(" and t0.deleted =");
+    assertThat(name2).isNull();
   }
 
   @Test
@@ -137,6 +184,27 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
+  public void testFindChild_joinParent() {
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelParent_withChild");
+    bean.addChild("child1", 10);
+
+    DB.save(bean);
+
+    Query<EBasicSDChild> query = DB.find(EBasicSDChild.class)
+      .where()
+      .eq("owner.name", "softDelParent_withChild")
+      .query();
+
+    List<EBasicSDChild> list = query.findList();
+    assertSql(query).contains("join ebasic_soft_delete t1 on t1.id = t0.owner_id and t1.deleted =");
+    assertThat(list).hasSize(1);
+
+    // Cleanup created entity
+    DB.deletePermanent(bean);
+  }
+
+  @Test
   public void testFindSoftDeletedList() {
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("softDelFetch");
@@ -173,13 +241,17 @@ public class TestSoftDeleteBasic extends BaseTestCase {
                                          .query();
 
     List<EBasicSoftDelete> list = query.findList();
-    assertSql(query).contains("t0.deleted = false");
-    // Make sure that query includes that the child mustn't've been deleted
-    assertSql(query).contains("u1.deleted = false");
+    if (isMySql() || isMariaDB() || isSqlServer()) {
+      assertSql(query).contains("t0.deleted = 0");
+      assertSql(query).contains("u1.deleted = 0");
+    } else {
+      assertSql(query).contains("t0.deleted = false");
+      // Make sure that query includes that the child mustn't've been deleted
+      assertSql(query).contains("u1.deleted = false");
+    }
     assertThat(list).hasSize(0);
 
     // Cleanup created entity
-    query.delete();
     DB.deleteAllPermanent(singletonList(child));
     DB.deleteAllPermanent(singletonList(bean));
   }
@@ -205,13 +277,17 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     List<EBasicNoSDChild> list = query.findList();
     // Make sure that query includes that the child mustn't've been deleted
-    assertSql(query).contains("u1.deleted = false");
-    assertSql(query).contains("u2.deleted = false");
+    if (isMySql() || isMariaDB() || isSqlServer()) {
+      assertSql(query).contains("u1.deleted = 0");
+      assertSql(query).contains("u2.deleted = 0");
+    } else {
+      assertSql(query).contains("u1.deleted = false");
+      assertSql(query).contains("u2.deleted = false");
+    }
     assertThat(list).hasSize(0);
 
     // Cleanup created entity
-    query.delete();
-    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(Arrays.asList(child, secondChild));
     DB.deleteAllPermanent(singletonList(bean));
   }
 
@@ -242,8 +318,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     assertThat(list).hasSize(1);
 
     // Cleanup created entity
-    query.delete();
-    DB.deleteAllPermanent(singletonList(child));
+    DB.deleteAllPermanent(Arrays.asList(child, secondChild));
     DB.deleteAllPermanent(singletonList(bean));
   }
 

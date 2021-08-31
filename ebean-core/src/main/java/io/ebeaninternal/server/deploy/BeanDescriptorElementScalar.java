@@ -40,7 +40,6 @@ class BeanDescriptorElementScalar<T> extends BeanDescriptorElement<T> {
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-
     JsonParser parser = readJson.getParser();
     ElementCollector add = elementHelp.createCollector();
     do {
@@ -50,7 +49,6 @@ class BeanDescriptorElementScalar<T> extends BeanDescriptorElement<T> {
       }
       add.addElement(scalarType.jsonRead(parser));
     } while (true);
-
     return add.collection();
   }
 

@@ -18,7 +18,7 @@ import javax.transaction.UserTransaction;
 /**
  * Hook into external JTA transaction manager.
  */
-public class JtaTransactionManager implements ExternalTransactionManager {
+public final class JtaTransactionManager implements ExternalTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(JtaTransactionManager.class);
 
@@ -190,19 +190,17 @@ public class JtaTransactionManager implements ExternalTransactionManager {
 
     @Override
     public void beforeCompletion() {
-      // Future note: for JPA2 locking we will
-      // have beforeCommit events to fire
+      transaction.preCommit();
     }
 
     @Override
     public void afterCompletion(int status) {
-
       switch (status) {
         case Status.STATUS_COMMITTED:
           if (logger.isDebugEnabled()) {
             logger.debug("Jta Txn [" + transaction.getId() + "] committed");
           }
-          transactionManager.notifyOfCommit(transaction);
+          transaction.postCommit();
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
@@ -211,7 +209,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
           if (logger.isDebugEnabled()) {
             logger.debug("Jta Txn [" + transaction.getId() + "] rollback");
           }
-          transactionManager.notifyOfRollback(transaction, null);
+          transaction.postRollback(null);
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;

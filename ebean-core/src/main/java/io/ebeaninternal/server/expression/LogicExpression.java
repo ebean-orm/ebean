@@ -3,6 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.Expression;
 import io.ebean.Junction;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -20,7 +21,7 @@ abstract class LogicExpression implements SpiExpression {
   static final String AND = " and ";
   static final String OR = " or ";
 
-  static class And extends LogicExpression {
+  static final class And extends LogicExpression {
 
     And(Expression expOne, Expression expTwo) {
       super(true, expOne, expTwo);
@@ -33,7 +34,7 @@ abstract class LogicExpression implements SpiExpression {
 
   }
 
-  static class Or extends LogicExpression {
+  static final class Or extends LogicExpression {
 
     Or(Expression expOne, Expression expTwo) {
       super(false, expOne, expTwo);
@@ -46,15 +47,19 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   SpiExpression expOne;
-
   SpiExpression expTwo;
-
   private final boolean conjunction;
 
   LogicExpression(boolean conjunction, Expression expOne, Expression expTwo) {
     this.conjunction = conjunction;
     this.expOne = (SpiExpression) expOne;
     this.expTwo = (SpiExpression) expTwo;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    expOne.prefixProperty(path);
+    expTwo.prefixProperty(path);
   }
 
   @Override
@@ -162,10 +167,8 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = expOne.queryBindHash();
-    hc = hc * 92821 + expTwo.queryBindHash();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(expOne).add(expTwo);
   }
 
   @Override

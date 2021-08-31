@@ -28,7 +28,7 @@ public class EBasicEncrypt {
   @Encrypted(dbLength = 80)
   String description;
 
-  @Encrypted(dbLength = 20)
+  @Encrypted(dbLength = 80)
   Date dob;
 
   @Enumerated(EnumType.ORDINAL)

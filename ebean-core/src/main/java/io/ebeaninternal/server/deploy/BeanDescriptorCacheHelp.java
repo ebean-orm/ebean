@@ -50,38 +50,27 @@ final class BeanDescriptorCacheHelp<T> {
   private static final Logger natLog = LoggerFactory.getLogger("io.ebean.cache.NATKEY");
 
   private final BeanDescriptor<T> desc;
-
   private final SpiCacheManager cacheManager;
-
   private final CacheOptions cacheOptions;
-
   /**
    * Flag indicating this bean has no relationships.
    */
   private final boolean cacheSharableBeans;
   private final boolean invalidateQueryCache;
-
   private final Class<?> beanType;
-
   private final String cacheName;
-
   private final BeanPropertyAssocOne<?>[] propertiesOneImported;
   private final String[] naturalKey;
-
   private final ServerCache beanCache;
   private final ServerCache naturalKeyCache;
   private final ServerCache queryCache;
-
   private final boolean noCaching;
-
   private final SpiCacheControl cacheControl;
   private final SpiCacheRegion cacheRegion;
-
   /**
    * Set to true if all persist changes need to notify the cache.
    */
   private boolean cacheNotifyOnAll;
-
   /**
    * Set to true if delete changes need to notify cache.
    */
@@ -89,7 +78,6 @@ final class BeanDescriptorCacheHelp<T> {
 
   BeanDescriptorCacheHelp(BeanDescriptor<T> desc, SpiCacheManager cacheManager, CacheOptions cacheOptions,
                           boolean cacheSharableBeans, BeanPropertyAssocOne<?>[] propertiesOneImported) {
-
     this.desc = desc;
     this.beanType = desc.rootBeanType;
     this.cacheName = beanType.getSimpleName();
@@ -99,7 +87,6 @@ final class BeanDescriptorCacheHelp<T> {
     this.cacheSharableBeans = cacheSharableBeans;
     this.propertiesOneImported = propertiesOneImported;
     this.naturalKey = cacheOptions.getNaturalKey();
-
     if (!cacheOptions.isEnableQueryCache()) {
       this.queryCache = null;
     } else {
@@ -133,7 +120,6 @@ final class BeanDescriptorCacheHelp<T> {
   void deriveNotifyFlags() {
     cacheNotifyOnAll = (invalidateQueryCache || beanCache != null || queryCache != null);
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
-
     if (logger.isDebugEnabled()) {
       if (cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
@@ -292,29 +278,29 @@ final class BeanDescriptorCacheHelp<T> {
    * Try to load the bean collection from cache return true if successful.
    */
   boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
-
     if (many.isElementCollection()) {
       // held as part of the bean cache so skip
       return false;
     }
-
     CachedManyIds entry = manyPropGet(parentId, many.getName());
     if (entry == null) {
       // not in cache so return unsuccessful
       return false;
     }
-
     EntityBean ownerBean = bc.getOwnerBean();
     EntityBeanIntercept ebi = ownerBean._ebean_getIntercept();
     PersistenceContext persistenceContext = ebi.getPersistenceContext();
-
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
 
     List<Object> idList = entry.getIdList();
     bc.checkEmptyLazyLoad();
+    int i = 0;
     for (Object id : idList) {
-      Object refBean = targetDescriptor.createReference(readOnly, false, id, persistenceContext);
-      many.add(bc, (EntityBean) refBean);
+      final EntityBean ref = targetDescriptor.createReference(readOnly, id, persistenceContext);
+      if (many.hasOrderColumn()) {
+        ref._ebean_getIntercept().setSortOrder(++i);
+      }
+      many.add(bc, ref);
     }
     return true;
   }
@@ -323,7 +309,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Put the beanCollection into the cache.
    */
   void manyPropPut(BeanPropertyAssocMany<?> many, Object details, Object parentId) {
-
     if (many.isElementCollection()) {
       CachedBeanData data = (CachedBeanData) beanCache.get(parentId);
       if (data != null) {
@@ -351,7 +336,6 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   void cachePutManyIds(Object parentId, String manyName, CachedManyIds entry) {
-
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, manyName);
     if (manyLog.isDebugEnabled()) {
       manyLog.debug("   PUT {}({}).{} - ids:{}", cacheName, parentId, manyName, entry);
@@ -360,7 +344,6 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   private CachedManyIds createManyIds(BeanPropertyAssocMany<?> many, Object details) {
-
     Collection<?> actualDetails = BeanCollectionUtil.getActualDetails(details);
     if (actualDetails == null) {
       return null;
@@ -378,7 +361,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Hit the bean cache with the given ids returning the hits.
    */
   BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
-
     Set<Object> keys = new HashSet<>(ids.size());
     for (Object id : ids) {
       keys.add(desc.cacheKey(id));
@@ -395,7 +377,6 @@ final class BeanDescriptorCacheHelp<T> {
       T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
       result.add(bean, desc.getBeanId(bean));
     }
-
     return result;
   }
 
@@ -403,14 +384,12 @@ final class BeanDescriptorCacheHelp<T> {
    * Use natural keys to hit the bean cache and return resulting hits.
    */
   BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, Set<Object> keys) {
-
     if (context == null) {
       context = new DefaultPersistenceContext();
     }
 
     // naturalKey -> Id map
     Map<Object, Object> naturalKeyMap = naturalKeyCache.getAll(keys);
-
     if (natLog.isTraceEnabled()) {
       natLog.trace(" MLOOKUP {}({}) - hits:{}", cacheName, keys, naturalKeyMap);
     }
@@ -433,15 +412,12 @@ final class BeanDescriptorCacheHelp<T> {
     }
     // process the hits into beans etc
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
-
       Object id = entry.getKey();
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
-
       T bean = convertToBean(id, false, context, cachedBeanData);
       Object naturalKey = reverseMap.get(id);
       result.add(bean, naturalKey);
     }
-
     return result;
   }
 
@@ -452,7 +428,6 @@ final class BeanDescriptorCacheHelp<T> {
     if (context == null) {
       context = new DefaultPersistenceContext();
     }
-
     // Not using a loadContext for beans coming out of L2 cache
     // so that means no batch lazy loading for these beans
     EntityBean entityBean = (EntityBean) bean;
@@ -522,7 +497,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Put a bean into the bean cache.
    */
   void beanCachePut(EntityBean bean) {
-
     if (desc.inheritInfo != null) {
       desc.descOf(bean.getClass()).cacheBeanPutDirect(bean);
     } else {
@@ -531,7 +505,6 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   void beanCachePutAllDirect(Collection<EntityBean> beans) {
-
     Map<Object, Object> natKeys = null;
     if (naturalKey != null) {
       natKeys = new LinkedHashMap<>();
@@ -566,15 +539,12 @@ final class BeanDescriptorCacheHelp<T> {
    * Put the bean into the bean cache.
    */
   void beanCachePutDirect(EntityBean bean) {
-
     CachedBeanData beanData = beanExtractData(desc, bean);
-
     String key = desc.cacheKeyForBean(bean);
     if (beanLog.isDebugEnabled()) {
       beanLog.debug("   PUT {}({}) data:{}", cacheName, key, beanData);
     }
     getBeanCache().put(key, beanData);
-
     if (naturalKey != null) {
       String naturalKey = calculateNaturalKey(beanData);
       if (naturalKey != null) {
@@ -618,7 +588,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Return a bean from the bean cache.
    */
   private T beanCacheGetInternal(String key, Boolean readOnly, PersistenceContext context) {
-
     CachedBeanData data = (CachedBeanData) getBeanCache().get(key);
     if (data == null) {
       if (beanLog.isTraceEnabled()) {
@@ -646,7 +615,6 @@ final class BeanDescriptorCacheHelp<T> {
         return (T) bean;
       }
     }
-
     return (T) loadBean(id, readOnly, data, context);
   }
 
@@ -654,7 +622,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Load the entity bean taking into account inheritance.
    */
   private EntityBean loadBean(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
-
     String discValue = data.getDiscValue();
     if (discValue == null) {
       return loadBeanDirect(id, readOnly, data, context);
@@ -674,7 +641,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Load the entity bean from cache data given this is the root bean type.
    */
   EntityBean loadBeanDirect(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
-
     id = desc.convertId(id);
     EntityBean bean = null;
     if (context == null) {
@@ -682,7 +648,6 @@ final class BeanDescriptorCacheHelp<T> {
     } else {
       bean = (EntityBean) desc.contextGet(context, id);
     }
-
     if (bean == null) {
       bean = desc.createEntityBean();
       desc.setId(id, bean);
@@ -698,7 +663,6 @@ final class BeanDescriptorCacheHelp<T> {
     }
 
     CachedBeanDataToBean.load(desc, bean, data, context);
-
     if (desc.isReadAuditing()) {
       desc.readAuditBean("l2", "", bean);
     }
@@ -709,7 +673,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Load the embedded bean checking for inheritance.
    */
   EntityBean embeddedBeanLoad(CachedBeanData data, PersistenceContext context) {
-
     String discValue = data.getDiscValue();
     if (discValue == null) {
       return embeddedBeanLoadDirect(data, context);
@@ -746,25 +709,20 @@ final class BeanDescriptorCacheHelp<T> {
    * Load a batch of entities from L2 bean cache checking the lazy loaded property is loaded.
    */
   Set<EntityBeanIntercept> beanCacheLoadAll(List<EntityBeanIntercept> list, PersistenceContext context, int lazyLoadProperty, String propertyName) {
-
     Map<Object, EntityBeanIntercept> ebis = new HashMap<>();
     for (EntityBeanIntercept ebi : list) {
       ebis.put(desc.cacheKeyForBean(ebi.getOwner()), ebi);
     }
 
-
     Map<Object, Object> hits = getBeanCache().getAll(ebis.keySet());
-
     if (beanLog.isTraceEnabled()) {
       beanLog.trace("   MLOAD {}({}) - got hits ({})", cacheName, ebis.keySet(), hits.size());
     }
 
     Set<EntityBeanIntercept> loaded = new HashSet<>();
-
     Iterator<Map.Entry<Object, Object>> iterator = hits.entrySet().iterator();
     while (iterator.hasNext()) {
       Map.Entry<Object, Object> hit = iterator.next();
-
       Object key = hit.getKey();
       EntityBeanIntercept ebi = ebis.remove(key);
       CachedBeanData cacheData = (CachedBeanData) hit.getValue();
@@ -774,7 +732,6 @@ final class BeanDescriptorCacheHelp<T> {
           beanLog.trace("   load {}({}) - cache miss on property({})", cacheName, key, propertyName);
         }
         iterator.remove();
-
       } else {
         CachedBeanDataToBean.load(desc, ebi.getOwner(), cacheData, context);
         loaded.add(ebi);
@@ -783,11 +740,9 @@ final class BeanDescriptorCacheHelp<T> {
         }
       }
     }
-
     if (!ebis.isEmpty() && beanLog.isTraceEnabled()) {
       beanLog.trace("   load {}({}) - cache miss", cacheName, ebis.keySet());
     }
-
     return loaded;
   }
 
@@ -795,7 +750,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Returns true if it managed to populate/load the single bean from the cache.
    */
   boolean beanCacheLoad(EntityBean bean, EntityBeanIntercept ebi, String key, PersistenceContext context) {
-
     CachedBeanData cacheData = (CachedBeanData) getBeanCache().get(key);
     if (cacheData == null) {
       if (beanLog.isTraceEnabled()) {
@@ -810,7 +764,6 @@ final class BeanDescriptorCacheHelp<T> {
       }
       return false;
     }
-
     CachedBeanDataToBean.load(desc, bean, cacheData, context);
     if (beanLog.isDebugEnabled()) {
       beanLog.debug("   LOAD {}({}) - hit", cacheName, key);
@@ -932,7 +885,6 @@ final class BeanDescriptorCacheHelp<T> {
    * Apply changes to the bean cache entry.
    */
   void cacheBeanUpdate(String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
-
     ServerCache cache = getBeanCache();
     CachedBeanData existingData = (CachedBeanData) cache.get(key);
     if (existingData != null) {
@@ -952,7 +904,6 @@ final class BeanDescriptorCacheHelp<T> {
         }
         cache.put(key, newData);
       }
-
       if (updateNaturalKey) {
         Object oldKey = calculateNaturalKey(existingData);
         if (oldKey != null) {

@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Save details for a simple scalar map element collection.
  */
-class SaveManyElementCollectionMap extends SaveManyBase {
+final class SaveManyElementCollectionMap extends SaveManyBase {
 
   private Set<Map.Entry<?, ?>> entries;
 
@@ -51,7 +51,7 @@ class SaveManyElementCollectionMap extends SaveManyBase {
       sqlInsert.setParameter(parentId);
       sqlInsert.setParameter(entry.getKey());
       many.bindElementValue(sqlInsert, entry.getValue());
-      persister.addToFlushQueueLast(sqlInsert, transaction);
+      persister.addToFlushQueue(sqlInsert, transaction, 2);
     }
     resetModifyState();
     postElementCollectionUpdate();

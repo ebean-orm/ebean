@@ -16,16 +16,16 @@ public class TEventMany {
   @ManyToOne
   TEventOne event;
 
-  int units;
+  int myUnits;
 
   double amount;
 
   @Version
   Long version;
 
-  public TEventMany(String description, int units, double amount) {
+  public TEventMany(String description, int myUnits, double amount) {
     this.description = description;
-    this.units = units;
+    this.myUnits = myUnits;
     this.amount = amount;
   }
 
@@ -53,12 +53,12 @@ public class TEventMany {
     this.event = event;
   }
 
-  public int getUnits() {
-    return units;
+  public int getMyUnits() {
+    return myUnits;
   }
 
-  public void setUnits(int units) {
-    this.units = units;
+  public void setMyUnits(int myUnits) {
+    this.myUnits = myUnits;
   }
 
   public double getAmount() {

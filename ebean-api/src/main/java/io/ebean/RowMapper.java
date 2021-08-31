@@ -22,7 +22,7 @@ import java.sql.SQLException;
  *    //
  *    class CustomerMapper implements RowMapper<CustomerDto> {
  *
- *     ＠Override
+ *     @Override
  *     public CustomerDto map(ResultSet rset, int rowNum) throws SQLException {
  *
  *       long id = rset.getLong(1);

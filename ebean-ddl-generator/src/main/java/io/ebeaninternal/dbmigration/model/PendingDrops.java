@@ -24,7 +24,6 @@ public class PendingDrops {
    * Add a 'pending drops' changeSet for the given version.
    */
   public void add(MigrationVersion version, ChangeSet changeSet) {
-
     Entry entry = map.computeIfAbsent(version.normalised(), k -> new Entry(version));
     entry.add(changeSet);
   }
@@ -33,7 +32,6 @@ public class PendingDrops {
    * Return the list of versions with pending drops.
    */
   public List<String> pendingDrops() {
-
     List<String> versions = new ArrayList<>();
     for (Entry value : map.values()) {
       if (value.hasPendingDrops()) {
@@ -48,7 +46,6 @@ public class PendingDrops {
    * to remove the (unsuppressed) pending drops for this version.
    */
   public boolean appliedDropsFor(ChangeSet changeSet) {
-
     MigrationVersion version = MigrationVersion.parse(changeSet.getDropsFor());
 
     Entry entry = map.get(version.normalised());
@@ -68,7 +65,6 @@ public class PendingDrops {
    * </p>
    */
   public Migration migrationForVersion(String pendingVersion) {
-
     Entry entry = getEntry(pendingVersion);
 
     Migration migration = new Migration();
@@ -96,7 +92,6 @@ public class PendingDrops {
   }
 
   private Entry getEntry(String pendingVersion) {
-
     if ("next".equalsIgnoreCase(pendingVersion)) {
       Iterator<Entry> it = map.values().iterator();
       if (it.hasNext()) {
@@ -115,7 +110,6 @@ public class PendingDrops {
    * Register pending drop columns on history tables to the new model.
    */
   public void registerPendingHistoryDropColumns(ModelContainer newModel) {
-
     for (Entry entry : map.values()) {
       for (ChangeSet changeSet : entry.list) {
         newModel.registerPendingHistoryDropColumns(changeSet);
@@ -140,7 +134,6 @@ public class PendingDrops {
   static class Entry {
 
     final MigrationVersion version;
-
     final List<ChangeSet> list = new ArrayList<>();
 
     Entry(MigrationVersion version) {
@@ -180,7 +173,6 @@ public class PendingDrops {
      * removed all the changeSets (and there are no suppressForever ones).
      */
     boolean removeDrops(ChangeSet appliedDrops) {
-
       Iterator<ChangeSet> iterator = list.iterator();
       while (iterator.hasNext()) {
         ChangeSet next = iterator.next();
@@ -199,20 +191,16 @@ public class PendingDrops {
      * Remove the applied drops from the pending ones matching by table name and column name.
      */
     private void removeMatchingChanges(ChangeSet pendingDrops, ChangeSet appliedDrops) {
-
       List<Object> pending = pendingDrops.getChangeSetChildren();
       Iterator<Object> iterator = pending.iterator();
       while (iterator.hasNext()) {
         Object pendingDrop = iterator.next();
         if (pendingDrop instanceof DropColumn && dropColumnIn((DropColumn) pendingDrop, appliedDrops)) {
           iterator.remove();
-
         } else if (pendingDrop instanceof DropTable && dropTableIn((DropTable) pendingDrop, appliedDrops)) {
           iterator.remove();
-
         } else if (pendingDrop instanceof DropHistoryTable && dropHistoryTableIn((DropHistoryTable) pendingDrop, appliedDrops)) {
           iterator.remove();
-
         }
       }
     }

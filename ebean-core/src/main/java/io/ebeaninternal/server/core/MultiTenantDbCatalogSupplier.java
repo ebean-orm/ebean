@@ -15,11 +15,10 @@ import java.util.logging.Logger;
 /**
  * DataSource supplier that changes DB catalog based on current Tenant Id.
  */
-public class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
+final class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
 
   private final DataSource dataSource;
   private final DataSource readOnlyDataSource;
-
   private final CatalogDataSource catalogDataSource;
   private final CatalogDataSource readOnly;
 

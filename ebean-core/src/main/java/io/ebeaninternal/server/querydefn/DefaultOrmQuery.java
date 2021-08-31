@@ -1,30 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.CacheMode;
-import io.ebean.CountDistinctOrder;
-import io.ebean.Database;
-import io.ebean.DtoQuery;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
-import io.ebean.FetchGroup;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.OrderBy;
+import io.ebean.*;
 import io.ebean.OrderBy.Property;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.QueryType;
-import io.ebean.RawSql;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -32,31 +9,14 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.CacheIdLookup;
-import io.ebeaninternal.api.HashQuery;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionList;
-import io.ebeaninternal.api.SpiExpressionValidation;
-import io.ebeaninternal.api.SpiNamedParam;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiQuerySecondary;
-import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanNaturalKey;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.deploy.*;
+import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.expression.IdInExpression;
 import io.ebeaninternal.server.expression.SimpleExpression;
-import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
@@ -64,14 +24,7 @@ import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -79,83 +32,47 @@ import java.util.stream.Stream;
 /**
  * Default implementation of an Object Relational query.
  */
-public class DefaultOrmQuery<T> implements SpiQuery<T> {
+public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
-
-  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
-
-  private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
-
-  private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
-
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
+  private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
+  private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private final Class<T> beanType;
-
   private final ExpressionFactory expressionFactory;
-
   private final BeanDescriptor<T> rootBeanDescriptor;
-
   private BeanDescriptor<T> beanDescriptor;
-
   private SpiEbeanServer server;
-
   private SpiTransaction transaction;
-
   /**
    * For lazy loading of ManyToMany we need to add a join to the intersection table. This is that
    * join to the intersection table.
    */
   private TableJoin m2mIncludeJoin;
-
   private ProfilingListener profilingListener;
-
-  private boolean cancelled;
-
-  private CancelableQuery cancelableQuery;
-
   private Type type;
-
   private String label;
-
   private Mode mode = Mode.NORMAL;
-
   private Object tenantId;
-
   /**
    * Holds query in structured form.
    */
   private OrmQueryDetail detail;
-
   private int maxRows;
-
   private int firstRow;
-
-  /**
-   * Set to true to disable lazy loading on the object graph returned.
-   */
   private boolean disableLazyLoading;
-
   /**
    * Lazy loading batch size (can override server wide default).
    */
   private int lazyLoadBatchSize;
-
   private OrderBy<T> orderBy;
-
   private String loadMode;
-
   private String loadDescription;
-
   private String generatedSql;
-
   private String lazyLoadProperty;
-
   private String lazyLoadManyPath;
-
   private boolean allowLoadErrors;
-
   /**
    * Flag set for report/DTO beans when we may choose to explicitly include the Id property.
    */
@@ -194,97 +111,55 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Bind parameters when using the query language.
    */
   private BindParams bindParams;
-
   private DefaultExpressionList<T> textExpressions;
-
   private DefaultExpressionList<T> whereExpressions;
-
   private DefaultExpressionList<T> havingExpressions;
-
   private boolean asOfBaseTable;
-
   private int asOfTableCount;
 
   /**
    * Set for flashback style 'as of' query.
    */
   private Timestamp asOf;
-
   private TemporalMode temporalMode = TemporalMode.CURRENT;
-
   private Timestamp versionsStart;
   private Timestamp versionsEnd;
-
   private List<String> softDeletePredicates;
-
   private boolean disableReadAudit;
-
   private int bufferFetchSizeHint;
-
   private boolean usageProfiling = true;
-
   private CacheMode useBeanCache = CacheMode.AUTO;
-
   private CacheMode useQueryCache = CacheMode.OFF;
-
   private Boolean readOnly;
-
   private PersistenceContextScope persistenceContextScope;
 
   /**
    * Allow for explicit on off or null for default.
    */
   private Boolean autoTune;
-
   private LockWait forUpdate;
   private LockType lockType;
-
   private boolean singleAttribute;
-
   private CountDistinctOrder countDistinctOrder;
-
-  /**
-   * Set to true if this query has been tuned by autoTune.
-   */
   private boolean autoTuned;
-
-  /**
-   * Root table alias. For {@link Query#alias(String)} command.
-   */
   private String rootTableAlias;
-
   private String baseTable;
-
   /**
    * The node of the bean or collection that fired lazy loading. Not null if profiling is on and
    * this query is for lazy loading. Used to hook back a lazy loading query to the "original" query
    * point.
    */
   private ObjectGraphNode parentNode;
-
   private BeanPropertyAssocMany<?> lazyLoadForParentsProperty;
-
-  /**
-   * Hash of final query after AutoTune tuning.
-   */
   private CQueryPlanKey queryPlanKey;
-
   private PersistenceContext persistenceContext;
-
   private ManyWhereJoins manyWhereJoins;
-
   private SpiRawSql rawSql;
-
   private boolean useDocStore;
-
   private String docIndexName;
-
   private OrmUpdateProperties updateProperties;
-
   private String nativeSql;
-
   private boolean orderById;
-
   private ProfileLocation profileLocation;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
@@ -391,7 +266,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setUseDocStore(boolean useDocStore) {
+  public Query<T> setUseDocStore(boolean useDocStore) {
     this.useDocStore = useDocStore;
     return this;
   }
@@ -431,7 +306,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setAllowLoadErrors() {
+  public Query<T> setAllowLoadErrors() {
     this.allowLoadErrors = true;
     return this;
   }
@@ -452,21 +327,21 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> asOf(Timestamp asOfDateTime) {
+  public Query<T> asOf(Timestamp asOfDateTime) {
     this.temporalMode = (asOfDateTime != null) ? TemporalMode.AS_OF : TemporalMode.CURRENT;
     this.asOf = asOfDateTime;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> asDraft() {
+  public Query<T> asDraft() {
     this.temporalMode = TemporalMode.DRAFT;
     this.useBeanCache = CacheMode.OFF;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> setIncludeSoftDeletes() {
+  public Query<T> setIncludeSoftDeletes() {
     this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
   }
@@ -489,7 +364,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setRawSql(RawSql rawSql) {
+  public Query<T> setRawSql(RawSql rawSql) {
     this.rawSql = (SpiRawSql) rawSql;
     return this;
   }
@@ -536,6 +411,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     if (havingExpressions != null) {
       havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
+    }
+    if (orderBy != null) {
+      for (Property orderProperty : orderBy.getProperties()) {
+        ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(orderProperty.getProperty());
+        if (elProp != null && elProp.containsFormulaWithJoin()) {
+          manyWhereJoins.addFormulaWithJoin(orderProperty.getProperty());
+        }
+      }
     }
   }
 
@@ -610,7 +493,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
    */
   private void markQueryJoins() {
-    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type != Type.ATTRIBUTE);
+    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
   }
 
   private boolean isAllowOneManyFetch() {
@@ -623,7 +506,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public void setDefaultSelectClause() {
-    if (type != Type.ATTRIBUTE) {
+    if (type.defaultSelect()) {
       detail.setDefaultSelectClause(beanDescriptor);
     } else if (!detail.hasSelectClause()) {
       // explicit empty select when single attribute query on non-root fetch path
@@ -740,10 +623,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       return null;
     }
     List<SpiExpression> underlyingList = whereExpressions.getUnderlyingList();
-    if (underlyingList.size() == 1) {
+    if (underlyingList.isEmpty()) {
+      if (id != null) {
+        return new CacheIdLookupSingle<>(id);
+      }
+    } else if (underlyingList.size() == 1) {
       SpiExpression singleExpression = underlyingList.get(0);
       if (singleExpression instanceof IdInExpression) {
-        return new CacheIdLookup<>((IdInExpression) singleExpression);
+        return new CacheIdLookupMany<>((IdInExpression) singleExpression);
       }
     }
     return null;
@@ -751,7 +638,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public NaturalKeyQueryData<T> naturalKey() {
-
     if (whereExpressions == null) {
       return null;
     }
@@ -767,7 +653,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         return null;
       }
     }
-
     return data;
   }
 
@@ -804,18 +689,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> copy() {
+  public SpiQuery<T> copy() {
     return copy(server);
   }
 
   @Override
-  public DefaultOrmQuery<T> copy(SpiEbeanServer server) {
+  public SpiQuery<T> copy(SpiEbeanServer server) {
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.transaction = transaction;
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
     copy.profileLocation = profileLocation;
-
     copy.baseTable = baseTable;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
@@ -853,6 +737,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.parentNode = parentNode;
     copy.forUpdate = forUpdate;
     copy.rawSql = rawSql;
+    setCancelableQuery(copy); // required to cancel findId query
     return copy;
   }
 
@@ -958,42 +843,37 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setAutoTune(boolean autoTune) {
+  public Query<T> setAutoTune(boolean autoTune) {
     this.autoTune = autoTune;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> forUpdate() {
-    return setForUpdateWithMode(LockWait.WAIT, LockType.DEFAULT);
-  }
-
-  @Override
-  public Query<T> forUpdate(LockType lockType) {
+  public Query<T> withLock(LockType lockType) {
     return setForUpdateWithMode(LockWait.WAIT, lockType);
   }
 
   @Override
-  public Query<T> forUpdateNoWait(LockType lockType) {
-    return setForUpdateWithMode(LockWait.NOWAIT, lockType);
+  public Query<T> withLock(LockType lockType, LockWait lockWait) {
+    return setForUpdateWithMode(lockWait, lockType);
   }
 
   @Override
-  public Query<T> forUpdateSkipLocked(LockType lockType) {
-    return setForUpdateWithMode(LockWait.SKIPLOCKED, lockType);
+  public Query<T> forUpdate() {
+    return setForUpdateWithMode(LockWait.WAIT, LockType.DEFAULT);
   }
 
   @Override
-  public DefaultOrmQuery<T> forUpdateNoWait() {
+  public Query<T> forUpdateNoWait() {
     return setForUpdateWithMode(LockWait.NOWAIT, LockType.DEFAULT);
   }
 
   @Override
-  public DefaultOrmQuery<T> forUpdateSkipLocked() {
+  public Query<T> forUpdateSkipLocked() {
     return setForUpdateWithMode(LockWait.SKIPLOCKED, LockType.DEFAULT);
   }
 
-  private DefaultOrmQuery<T> setForUpdateWithMode(LockWait mode, LockType lockType) {
+  private Query<T> setForUpdateWithMode(LockWait mode, LockType lockType) {
     this.forUpdate = mode;
     this.lockType = lockType;
     this.useBeanCache = CacheMode.OFF;
@@ -1090,7 +970,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public ObjectGraphNode setOrigin(CallOrigin callOrigin) {
-
     // create a 'origin' which links this query to the profiling information
     ObjectGraphOrigin o = new ObjectGraphOrigin(calculateOriginQueryHash(), callOrigin, beanType.getName());
     parentNode = new ObjectGraphNode(o, null);
@@ -1130,81 +1009,81 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private String planDescription() {
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {
-      sb.append("t:").append(type.ordinal());
+      sb.append(type.ordinal());
     }
     if (useDocStore) {
-      sb.append(",ds:");
+      sb.append("/ds");
     }
     if (beanDescriptor.getDiscValue() != null) {
-      sb.append(",disc:").append(beanDescriptor.getDiscValue());
+      sb.append("/dv").append(beanDescriptor.getDiscValue());
     }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
-      sb.append(",temp:").append(temporalMode.ordinal());
+      sb.append("/tm").append(temporalMode.ordinal());
       if (versionsStart != null) {
-        sb.append(",vb:");
+        sb.append("v");
       }
     }
     if (forUpdate != null) {
-      sb.append(",forUpd:").append(forUpdate.ordinal());
+      sb.append("/fu").append(forUpdate.ordinal());
       if (lockType != null) {
-        sb.append(",lt:").append(lockType.ordinal());
+        sb.append("t").append(lockType.ordinal());
       }
     }
     if (id != null) {
-      sb.append(",id:");
+      sb.append("/id");
     }
     if (manualId) {
-      sb.append(",manId:");
+      sb.append("/md");
     }
     if (distinct) {
-      sb.append(",dist:");
+      sb.append("/dt");
     }
     if (allowLoadErrors) {
-      sb.append(",allowLoadErrors:");
+      sb.append("/ae");
     }
     if (disableLazyLoading) {
-      sb.append(",disLazy:");
+      sb.append("/dl");
     }
     if (baseTable != null) {
-      sb.append(",baseTable:").append(baseTable);
+      sb.append("/bt").append(baseTable);
     }
     if (rootTableAlias != null) {
-      sb.append(",root:").append(rootTableAlias);
+      sb.append("/ra").append(rootTableAlias);
     }
     if (orderBy != null) {
-      sb.append(",orderBy:").append(orderBy.toStringFormat());
+      sb.append("/ob").append(orderBy.toStringFormat());
     }
     if (m2mIncludeJoin != null) {
-      sb.append(",m2m:").append(m2mIncludeJoin.getTable());
+      sb.append("/m2").append(m2mIncludeJoin.getTable());
     }
     if (mapKey != null) {
-      sb.append(",mapKey:").append(mapKey);
+      sb.append("/mk").append(mapKey);
     }
     if (countDistinctOrder != null) {
-      sb.append(",countDistOrd:").append(countDistinctOrder.name());
+      sb.append("/cd").append(countDistinctOrder.name());
     }
     if (detail != null) {
-      sb.append(" detail[");
+      sb.append("/d[");
       detail.queryPlanHash(sb);
       sb.append("]");
     }
     if (bindParams != null) {
-      sb.append(" bindParams[");
+      sb.append("/b[");
       bindParams.buildQueryPlanHash(sb);
       sb.append("]");
     }
     if (whereExpressions != null) {
-      sb.append(" where[");
+      sb.append("/w[");
       whereExpressions.queryPlanHash(sb);
       sb.append("]");
     }
     if (havingExpressions != null) {
-      sb.append(" having[");
+      sb.append("/h[");
       havingExpressions.queryPlanHash(sb);
       sb.append("]");
     }
     if (updateProperties != null) {
-      sb.append(" update[");
+      sb.append("/u[");
       updateProperties.buildQueryPlanHash(sb);
       sb.append("]");
     }
@@ -1231,7 +1110,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public CQueryPlanKey prepare(SpiOrmQueryRequest<T> request) {
-
     prepareExpressions(request);
     prepareForPaging();
     queryPlanKey = createQueryPlanKey();
@@ -1242,7 +1120,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Prepare the expressions (compile sub-queries etc).
    */
   private void prepareExpressions(BeanQueryRequest<?> request) {
-
+    detail.prepareExpressions(request);
     if (whereExpressions != null) {
       whereExpressions.prepareExpression(request);
     }
@@ -1257,7 +1135,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * case, this is not a distinct query
    */
   private void prepareForPaging() {
-
     // add the rawSql statement - if any
     if (orderByIsEmpty()) {
       if (rawSql != null && rawSql.getSql() != null) {
@@ -1269,22 +1146,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
-  /**
-   * Calculate a hash based on the bind values used in the query.
-   * <p>
-   * Used with queryPlanHash() to get a unique hash for a query.
-   * </p>
-   */
   @Override
-  public int queryBindHash() {
-    int hc = (id == null ? 0 : id.hashCode());
-    hc = hc * 92821 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
-    hc = hc * 92821 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
-    hc = hc * 92821 + (bindParams == null ? 0 : bindParams.queryBindHash());
-    hc = hc * 92821 + (asOf == null ? 0 : asOf.hashCode());
-    hc = hc * 92821 + (versionsStart == null ? 0 : versionsStart.hashCode());
-    hc = hc * 92821 + (versionsEnd == null ? 0 : versionsEnd.hashCode());
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(id);
+    if (whereExpressions != null) whereExpressions.queryBindKey(key);
+    if (havingExpressions != null) havingExpressions.queryBindKey(key);
+    if (bindParams != null) bindParams.queryBindHash(key);
+    key.add(asOf).add(versionsStart).add(versionsEnd);
   }
 
   /**
@@ -1298,8 +1166,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    int hc = queryBindHash();
-    return new HashQuery(queryPlanKey, hc);
+    BindValuesKey bindKey = new BindValuesKey();
+    queryBindKey(bindKey);
+    return new HashQuery(queryPlanKey, bindKey);
   }
 
   @Override
@@ -1341,7 +1210,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setReadOnly(boolean readOnly) {
+  public Query<T> setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     return this;
   }
@@ -1387,82 +1256,115 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setUseQueryCache(CacheMode useQueryCache) {
+  public Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> setLoadBeanCache(boolean loadBeanCache) {
+  public Query<T> setLoadBeanCache(boolean loadBeanCache) {
     this.useBeanCache = CacheMode.PUT;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> setTimeout(int secs) {
+  public Query<T> setTimeout(int secs) {
     this.timeout = secs;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> select(String columns) {
+  public void selectProperties(Set<String> props) {
+    detail.selectProperties(props);
+  }
+
+  @Override
+  public void fetchProperties(String property, Set<String> columns, FetchConfig config) {
+    detail.fetchProperties(property, columns, config);
+  }
+
+  @Override
+  public void selectProperties(OrmQueryProperties properties) {
+    detail.selectProperties(properties);
+  }
+
+  @Override
+  public void fetchProperties(String path, OrmQueryProperties other) {
+    detail.fetchProperties(path, other);
+  }
+
+  @Override
+  public void addNested(String name, OrmQueryDetail nestedDetail, FetchConfig config) {
+    detail.addNested(name, nestedDetail, config);
+  }
+
+  @Override
+  public Query<T> select(String columns) {
     detail.select(columns);
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> select(FetchGroup<T> fetchGroup) {
+  public Query<T> select(FetchGroup<T> fetchGroup) {
     this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> fetch(String property) {
-    return fetch(property, null, null);
+  public Query<T> fetch(String path) {
+    return fetch(path, null, null);
   }
 
   @Override
-  public Query<T> fetchQuery(String property) {
-    return fetch(property, null, FETCH_QUERY);
-  }
-
-  public Query<T> fetchCache(String property) {
-    return fetch(property, null, FETCH_CACHE);
+  public Query<T> fetch(String path, FetchConfig joinConfig) {
+    return fetch(path, null, joinConfig);
   }
 
   @Override
-  public Query<T> fetchLazy(String property) {
-    return fetch(property, null, FETCH_LAZY);
+  public Query<T> fetch(String path, String properties) {
+    return fetch(path, properties, null);
   }
 
   @Override
-  public DefaultOrmQuery<T> fetch(String property, FetchConfig joinConfig) {
-    return fetch(property, null, joinConfig);
+  public Query<T> fetch(String path, String properties, FetchConfig config) {
+    if (nativeSql != null && (config == null || config.isJoin())) {
+      // can't use fetch join with nativeSql (as the root query)
+      config = FETCH_QUERY;
+    }
+    return fetchInternal(path, properties, config);
   }
 
   @Override
-  public DefaultOrmQuery<T> fetch(String property, String columns) {
-    return fetch(property, columns, null);
+  public Query<T> fetchQuery(String path) {
+    return fetchInternal(path, null, FETCH_QUERY);
+  }
+
+  public Query<T> fetchCache(String path) {
+    return fetchInternal(path, null, FETCH_CACHE);
   }
 
   @Override
-  public Query<T> fetchQuery(String property, String columns) {
-    return fetch(property, columns, FETCH_QUERY);
+  public Query<T> fetchLazy(String path) {
+    return fetchInternal(path, null, FETCH_LAZY);
   }
 
   @Override
-  public Query<T> fetchCache(String property, String columns) {
-    return fetch(property, columns, FETCH_CACHE);
+  public Query<T> fetchQuery(String path, String properties) {
+    return fetchInternal(path, properties, FETCH_QUERY);
   }
 
   @Override
-  public Query<T> fetchLazy(String property, String columns) {
-    return fetch(property, columns, FETCH_LAZY);
+  public Query<T> fetchCache(String path, String properties) {
+    return fetchInternal(path, properties, FETCH_CACHE);
   }
 
   @Override
-  public DefaultOrmQuery<T> fetch(String property, String columns, FetchConfig config) {
-    detail.fetch(property, columns, config);
+  public Query<T> fetchLazy(String path, String properties) {
+    return fetchInternal(path, properties, FETCH_LAZY);
+  }
+
+  private Query<T> fetchInternal(String path, String properties, FetchConfig config) {
+    detail.fetch(path, properties, config);
     return this;
   }
 
@@ -1533,6 +1435,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void findEach(Consumer<T> consumer) {
     server.findEach(this, consumer, transaction);
+  }
+
+  @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    server.findEach(this, batch, consumer, transaction);
   }
 
   @Override
@@ -1625,7 +1532,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setParameter(Object value) {
+  public Query<T> setParameter(Object value) {
     if (bindParams == null) {
       bindParams = new BindParams();
     }
@@ -1634,7 +1541,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setParameters(Object... values) {
+  public Query<T> setParameters(Object... values) {
     if (bindParams == null) {
       bindParams = new BindParams();
     }
@@ -1648,7 +1555,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * have in the query.
    */
   @Override
-  public DefaultOrmQuery<T> setParameter(int position, Object value) {
+  public Query<T> setParameter(int position, Object value) {
     if (bindParams == null) {
       bindParams = new BindParams();
     }
@@ -1660,7 +1567,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Set a named bind parameter. Named parameters have a colon to prefix the name.
    */
   @Override
-  public DefaultOrmQuery<T> setParameter(String name, Object value) {
+  public Query<T> setParameter(String name, Object value) {
     if (namedParams != null) {
       ONamedParam param = namedParams.get(name);
       if (param != null) {
@@ -1668,7 +1575,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         return this;
       }
     }
-
     if (bindParams == null) {
       bindParams = new BindParams();
     }
@@ -1707,12 +1613,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   @Deprecated
-  public DefaultOrmQuery<T> orderBy(String orderByClause) {
+  public Query<T> orderBy(String orderByClause) {
     return order(orderByClause);
   }
 
   @Override
-  public DefaultOrmQuery<T> order(String orderByClause) {
+  public Query<T> order(String orderByClause) {
     if (orderByClause == null || orderByClause.trim().isEmpty()) {
       this.orderBy = null;
     } else {
@@ -1723,12 +1629,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   @Deprecated
-  public DefaultOrmQuery<T> setOrderBy(OrderBy<T> orderBy) {
+  public Query<T> setOrderBy(OrderBy<T> orderBy) {
     return setOrder(orderBy);
   }
 
   @Override
-  public DefaultOrmQuery<T> setOrder(OrderBy<T> orderBy) {
+  public Query<T> setOrder(OrderBy<T> orderBy) {
     this.orderBy = orderBy;
     if (orderBy != null) {
       orderBy.setQuery(this);
@@ -1760,13 +1666,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Internally set to use SQL DISTINCT on the query but still have id property included.
    */
   @Override
-  public DefaultOrmQuery<T> setDistinct(boolean distinct) {
+  public Query<T> setDistinct(boolean distinct) {
     this.distinct = distinct;
     return this;
   }
 
   @Override
-  public DefaultOrmQuery<T> setCountDistinct(CountDistinctOrder countDistinctOrder) {
+  public Query<T> setCountDistinct(CountDistinctOrder countDistinctOrder) {
     this.countDistinctOrder = countDistinctOrder;
     return this;
   }
@@ -1817,7 +1723,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setDisableLazyLoading(boolean disableLazyLoading) {
+  public Query<T> setDisableLazyLoading(boolean disableLazyLoading) {
     this.disableLazyLoading = disableLazyLoading;
     return this;
   }
@@ -1833,7 +1739,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setFirstRow(int firstRow) {
+  public Query<T> setFirstRow(int firstRow) {
     this.firstRow = firstRow;
     return this;
   }
@@ -1844,7 +1750,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setMaxRows(int maxRows) {
+  public Query<T> setMaxRows(int maxRows) {
     this.maxRows = maxRows;
     return this;
   }
@@ -1855,7 +1761,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setMapKey(String mapKey) {
+  public Query<T> setMapKey(String mapKey) {
     this.mapKey = mapKey;
     return this;
   }
@@ -1866,7 +1772,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> setId(Object id) {
+  public Query<T> setId(Object id) {
     if (id == null) {
       throw new NullPointerException("The id is null");
     }
@@ -1880,7 +1786,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> where(Expression expression) {
+  public Query<T> where(Expression expression) {
     where().add(expression);
     return this;
   }
@@ -1910,7 +1816,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> having(Expression expression) {
+  public Query<T> having(Expression expression) {
     having().add(expression);
     return this;
   }
@@ -1962,7 +1868,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (namedParams == null) {
       namedParams = new HashMap<>();
     }
-
     return namedParams.computeIfAbsent(name, ONamedParam::new);
   }
 
@@ -2016,16 +1921,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void setCancelableQuery(CancelableQuery cancelableQuery) {
-    lock.lock();
-    try {
-      this.cancelableQuery = cancelableQuery;
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
   public Query<T> setBaseTable(String baseTable) {
     this.baseTable = baseTable;
     return this;
@@ -2037,7 +1932,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> alias(String alias) {
+  public Query<T> alias(String alias) {
     this.rootTableAlias = alias;
     return this;
   }
@@ -2052,28 +1947,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return rootTableAlias != null ? rootTableAlias : defaultAlias;
   }
 
-  @Override
-  public void cancel() {
-    lock.lock();
-    try {
-      cancelled = true;
-      if (cancelableQuery != null) {
-        cancelableQuery.cancel();
-      }
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
-  public boolean isCancelled() {
-    lock.lock();
-    try {
-      return cancelled;
-    } finally {
-      lock.unlock();
-    }
-  }
 
   @Override
   public Set<String> validate() {
@@ -2085,7 +1958,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public Set<String> validate(BeanType<T> desc) {
-
     SpiExpressionValidation validation = new SpiExpressionValidation(desc);
     if (whereExpressions != null) {
       whereExpressions.validate(validation);

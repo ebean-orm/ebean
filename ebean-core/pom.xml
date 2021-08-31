@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.6.2-SNAPSHOT</version>
+    <version>12.11.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -15,32 +15,18 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>ebean-parent-12.8.0</tag>
   </scm>
-
-  <properties>
-    <jackson-core.version>2.11.3</jackson-core.version>
-    <jackson-databind.version>2.11.3</jackson-databind.version>
-  </properties>
 
   <profiles>
     <profile>
-      <!-- Note: to use this profile, you need to download manually the db2jcc4 driver.
-        After that, install it into your local maven repository:
-
-        mvn install:install-file \
-          -Dfile=db2jcc4.jar \
-          -DgroupId=com.ibm.jdbc \
-          -DartifactId=db2jcc4 \
-          -Dversion=4.23.42 \
-          -Dpackaging=jar
-      -->
       <id>db2</id>
       <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.ibm.db2/jcc -->
         <dependency>
-          <groupId>com.ibm.jdbc</groupId>
-          <artifactId>db2jcc4</artifactId>
-          <version>4.23.42</version>
+          <groupId>com.ibm.db2</groupId>
+          <artifactId>jcc</artifactId>
+          <version>11.5.5.0</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -57,27 +43,27 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>classpath-scanner</artifactId>
-      <version>4.2</version>
+      <version>6.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration-auto</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
     </dependency>
 
     <!-- keep testing in core using ebean-ddl-generator & ebean-migration -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>12.2.0</version>
+      <version>12.4.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.1</version>
+      <version>12.11.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -92,19 +78,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
+      <version>12.11.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
+      <version>12.11.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
+      <version>12.11.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -124,6 +110,15 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
+         and not require a separate module for it -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.199</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>jta</artifactId>
@@ -136,6 +131,12 @@
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
       <version>1.1.0.Final</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.0</version>
       <optional>true</optional>
     </dependency>
 
@@ -157,14 +158,14 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson-core.version}</version>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson-databind.version}</version>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 
@@ -172,7 +173,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.2.10</version>
+      <version>42.2.20</version>
       <optional>true</optional>
     </dependency>
 
@@ -202,7 +203,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test-docker</artifactId>
-      <version>4.0</version>
+      <version>4.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -211,15 +212,6 @@
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
       <scope>test</scope>
-    </dependency>
-
-    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
-         and not require a separate module for it -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>1.4.199</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -281,7 +273,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.5</version>
+      <version>2.7</version>
       <scope>test</scope>
     </dependency>
 
@@ -301,7 +293,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>12.5.0</version>
+        <version>${ebean-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>test</id>

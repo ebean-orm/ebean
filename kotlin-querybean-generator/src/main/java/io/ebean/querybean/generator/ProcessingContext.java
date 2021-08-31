@@ -50,7 +50,6 @@ class ProcessingContext implements Constants {
   private final Filer filer;
   private final Messager messager;
   private final Elements elementUtils;
-  private final String generatedAnnotation;
 
   private final PropertyTypeMap propertyTypeMap = new PropertyTypeMap();
 
@@ -99,9 +98,6 @@ class ProcessingContext implements Constants {
     this.filer = processingEnv.getFiler();
     this.messager = processingEnv.getMessager();
     this.elementUtils = processingEnv.getElementUtils();
-
-    boolean jdk8 = processingEnv.getSourceVersion().compareTo(SourceVersion.RELEASE_8) <= 0;
-    this.generatedAnnotation = generatedAnnotation(jdk8);
     this.generatedSources = initGeneratedSources(processingEnv);
     this.readModuleInfo = new ReadModuleInfo(this);
   }
@@ -120,13 +116,6 @@ class ProcessingContext implements Constants {
 
   TypeElement componentAnnotation() {
     return elementUtils.getTypeElement(EBEAN_COMPONENT);
-  }
-
-  private String generatedAnnotation(boolean jdk8) {
-    if (jdk8) {
-      return isTypeAvailable(GENERATED_8) ? GENERATED_8 : null;
-    }
-    return isTypeAvailable(GENERATED_9) ? GENERATED_9 : null;
   }
 
   private String initGeneratedSources(ProcessingEnvironment processingEnv) {
@@ -200,7 +189,11 @@ class ProcessingContext implements Constants {
 
   private boolean isStaticOrTransient(VariableElement field) {
     Set<Modifier> modifiers = field.getModifiers();
-    return (modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.TRANSIENT));
+    return (
+      modifiers.contains(Modifier.STATIC) ||
+      modifiers.contains(Modifier.TRANSIENT) ||
+      hasAnnotations(field, "javax.persistence.Transient")
+    );
   }
 
   private static boolean hasAnnotations(Element element, String... annotations) {
@@ -299,45 +292,49 @@ class ProcessingContext implements Constants {
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
     }
 
+    // look for targetEntity annotation attribute
+    final String targetEntity = readTargetEntity(field);
+    if (targetEntity != null) {
+      final TypeElement element = elementUtils.getTypeElement(targetEntity);
+      if (isEntityOrEmbedded(element)) {
+        return createPropertyTypeAssoc(typeDef(element.asType()));
+      }
+    }
     if (isEntityOrEmbedded(fieldType)) {
       //  public QAssocContact<QCustomer> contacts;
       return createPropertyTypeAssoc(typeDef(typeMirror));
     }
 
-    PropertyType result = null;
     if (typeMirror.getKind() == TypeKind.DECLARED) {
       DeclaredType declaredType = (DeclaredType) typeMirror;
       List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
       if (typeArguments.size() == 1) {
         TypeMirror argType = typeArguments.get(0);
-        if (argType.getKind() == TypeKind.WILDCARD) {
-          argType = ((WildcardType) argType).getExtendsBound();
-        }
-        Element argElement = typeUtils.asElement(argType);
+        Element argElement = asElement(argType);
         if (isEntityOrEmbedded(argElement)) {
-          result = createPropertyTypeAssoc(typeDef(argElement.asType()));
-        } else {
-          // look for targetEntity annotation attribute
-          final String targetEntity = readTargetEntity(field);
-          if (targetEntity != null) {
-            final TypeElement element = elementUtils.getTypeElement(targetEntity);
-            if (isEntityOrEmbedded(element)) {
-              result = createPropertyTypeAssoc(typeDef(element.asType()));
-            }
-          }
+          return createPropertyTypeAssoc(typeDef(argElement.asType()));
+        }
+      } else if (typeArguments.size() == 2) {
+        TypeMirror argType = typeArguments.get(1);
+        Element argElement = asElement(argType);
+        if (isEntityOrEmbedded(argElement)) {
+          return createPropertyTypeAssoc(typeDef(argElement.asType()));
         }
       }
     }
 
-    if (result != null) {
-      return result;
+    if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
+      return new PropertyTypeScalarComparable(typeMirror.toString());
     } else {
-      if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-        return new PropertyTypeScalarComparable(typeMirror.toString());
-      } else {
-        return new PropertyTypeScalar(typeMirror.toString());
-      }
+      return new PropertyTypeScalar(typeMirror.toString());
     }
+  }
+
+  private Element asElement(TypeMirror argType) {
+    if (argType.getKind() == TypeKind.WILDCARD) {
+      argType = ((WildcardType) argType).getExtendsBound();
+    }
+    return typeUtils.asElement(argType);
   }
 
   private boolean typeInstanceOf(final TypeMirror typeMirror, final CharSequence desiredInterface) {
@@ -420,14 +417,6 @@ class ProcessingContext implements Constants {
    */
   void logNote(String msg, Object... args) {
     messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
-  }
-
-  boolean isGeneratedAvailable() {
-    return generatedAnnotation != null;
-  }
-
-  String getGeneratedAnnotation() {
-    return generatedAnnotation;
   }
 
   void readModuleInfo() {

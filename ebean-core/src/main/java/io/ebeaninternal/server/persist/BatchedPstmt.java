@@ -20,7 +20,7 @@ import java.util.List;
  * This can hold CallableStatements as well.
  * </p>
  */
-public class BatchedPstmt implements SpiProfileTransactionEvent {
+public final class BatchedPstmt implements SpiProfileTransactionEvent {
 
   private static final Logger log = LoggerFactory.getLogger(BatchedPstmt.class);
 

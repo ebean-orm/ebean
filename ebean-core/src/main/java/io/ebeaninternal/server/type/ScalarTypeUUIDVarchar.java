@@ -10,9 +10,9 @@ import java.util.UUID;
 /**
  * ScalarType for java.util.UUID which converts to and from a VARCHAR database column.
  */
-public class ScalarTypeUUIDVarchar extends ScalarTypeUUIDBase {
+final class ScalarTypeUUIDVarchar extends ScalarTypeUUIDBase {
 
-  protected ScalarTypeUUIDVarchar() {
+  ScalarTypeUUIDVarchar() {
     super(false, Types.VARCHAR);
   }
 

@@ -12,13 +12,13 @@ import java.util.List;
 /**
  * Bindable for a DB encrypted BeanProperty.
  */
-public class BindableEncryptedProperty implements Bindable {
+final class BindableEncryptedProperty implements Bindable {
 
   private final BeanProperty prop;
 
   private final boolean bindEncryptDataFirst;
 
-  public BindableEncryptedProperty(BeanProperty prop, boolean bindEncryptDataFirst) {
+  BindableEncryptedProperty(BeanProperty prop, boolean bindEncryptDataFirst) {
     this.prop = prop;
     this.bindEncryptDataFirst = bindEncryptDataFirst;
   }

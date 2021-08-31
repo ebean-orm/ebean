@@ -18,7 +18,7 @@ public class ClusterManager implements ServerLookup {
 
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<>();
 

@@ -6,7 +6,7 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * MariaDB specific handling of platform specific expressions.
  */
-class MariaDbExpression extends BasicDbExpression {
+final class MariaDbExpression extends BasicDbExpression {
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {

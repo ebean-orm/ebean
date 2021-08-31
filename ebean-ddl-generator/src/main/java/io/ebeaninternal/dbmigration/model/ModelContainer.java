@@ -37,19 +37,16 @@ import java.util.TreeSet;
 public class ModelContainer {
 
   private final Set<String> schemas = new TreeSet<>();
-
   /**
    * All the tables in the model.
    */
   private final Map<String, MTable> tables = new LinkedHashMap<>();
 
   /**
-   * All the non unique non foreign key indexes.
+   * All the non-unique non-foreign key indexes.
    */
   private final Map<String, MIndex> indexes = new LinkedHashMap<>();
-
   private final PendingDrops pendingDrops = new PendingDrops();
-
   private final List<MTable> partitionedTables = new ArrayList<>();
 
   public ModelContainer() {

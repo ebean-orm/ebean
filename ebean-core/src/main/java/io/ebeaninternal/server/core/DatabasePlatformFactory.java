@@ -36,9 +36,8 @@ import java.sql.SQLException;
 /**
  * Create a DatabasePlatform from the configuration.
  * <p>
- * Will used platform name or use the meta data from the JDBC driver to
+ * Will used platform name or use the metadata from the JDBC driver to
  * determine the platform automatically.
- * </p>
  */
 public class DatabasePlatformFactory {
 
@@ -54,14 +53,12 @@ public class DatabasePlatformFactory {
         logger.info("offline platform [{}]", offlinePlatform);
         return byDatabaseName(offlinePlatform);
       }
-
       if (config.getDatabasePlatformName() != null) {
         // choose based on dbName
         return byDatabaseName(config.getDatabasePlatformName());
       }
-
       if (config.getDataSourceConfig().isOffline()) {
-        throw new PersistenceException("You must specify a DatabasePlatformName when you are offline");
+        throw new PersistenceException("DatabasePlatformName must be specified with offline mode");
       }
       // guess using meta data from driver
       return byDataSource(config.getDataSource());
@@ -131,19 +128,10 @@ public class DatabasePlatformFactory {
    * Use JDBC DatabaseMetaData to determine the platform.
    */
   private DatabasePlatform byDataSource(DataSource dataSource) {
-
-    Connection connection = null;
-    try {
-      connection = dataSource.getConnection();
-      DatabaseMetaData metaData = connection.getMetaData();
-
-      return byDatabaseMeta(metaData, connection);
-
+    try (Connection connection = dataSource.getConnection()) {
+      return byDatabaseMeta(connection.getMetaData(), connection);
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
-
-    } finally {
-      JdbcClose.close(connection);
     }
   }
 
@@ -151,13 +139,13 @@ public class DatabasePlatformFactory {
    * Find the platform by the metaData.getDatabaseProductName().
    */
   private DatabasePlatform byDatabaseMeta(DatabaseMetaData metaData, Connection connection) throws SQLException {
-
     String dbProductName = metaData.getDatabaseProductName().toLowerCase();
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
+    logger.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
 
     if (dbProductName.contains("oracle")) {
-      return new OraclePlatform();
+      return oracleVersion(majorVersion);
     } else if (dbProductName.contains("microsoft")) {
       throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
     } else if (dbProductName.contains("h2")) {
@@ -188,6 +176,10 @@ public class DatabasePlatformFactory {
     return new DatabasePlatform();
   }
 
+  private DatabasePlatform oracleVersion(int majorVersion) {
+    return majorVersion < 12 ? new Oracle11Platform() : new OraclePlatform();
+  }
+
   private DatabasePlatform mysqlVersion(int majorVersion, int minorVersion) {
     if (majorVersion <= 5 && minorVersion <= 5) {
       return new MySql55Platform();
@@ -211,7 +203,6 @@ public class DatabasePlatformFactory {
     } catch (SQLException e) {
       logger.warn("Error running detection query on Postgres", e);
     }
-
     if (majorVersion <= 9) {
       return new Postgres9Platform();
     }

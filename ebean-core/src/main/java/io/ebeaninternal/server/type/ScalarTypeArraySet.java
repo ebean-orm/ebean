@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -28,7 +29,7 @@ import static java.util.Collections.EMPTY_SET;
  * Type mapped for DB ARRAY type (Postgres only effectively).
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeArray {
+class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeArray {
 
   static PlatformArrayTypeFactory factory() {
     return new Factory();
@@ -36,7 +37,7 @@ public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements Scal
 
   static class Factory implements PlatformArrayTypeFactory {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final Map<String, ScalarTypeArraySet> cache = new HashMap<>();
 
     /**
@@ -101,7 +102,7 @@ public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements Scal
   protected Set fromArray(Object[] array1) {
     Set set = new LinkedHashSet();
     for (Object element : array1) {
-      set.add(converter.toElement(element));
+      set.add(converter.fromDbArray(element));
     }
     return new ModifyAwareSet(set);
   }
@@ -140,15 +141,26 @@ public class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements Scal
   @Override
   public Set parse(String value) {
     try {
-      return EJson.parseSet(value, false);
+      return convert(EJson.parseList(value, false));
     } catch (IOException e) {
       throw new TextException("Failed to parse JSON [{}] as Set", value, e);
     }
   }
 
+  /**
+   * Convert from the json types to the proper scalar types (uuid, enum, double etc)
+   */
+  private Set convert(List<Object> rawList) {
+    Set asSet = new LinkedHashSet();
+    for (Object rawVal : rawList) {
+        asSet.add(converter.fromSerialized(rawVal));
+    }
+    return new ModifyAwareSet(asSet);
+  }
+
   @Override
   public Set jsonRead(JsonParser parser) throws IOException {
-    return EJson.parseSet(parser, parser.getCurrentToken());
+    return convert(EJson.parseList(parser, parser.getCurrentToken()));
   }
 
   @Override

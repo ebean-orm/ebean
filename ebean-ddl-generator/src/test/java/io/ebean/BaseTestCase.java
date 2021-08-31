@@ -8,9 +8,7 @@ import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
@@ -88,14 +86,14 @@ public abstract class BaseTestCase {
   }
 
   protected List<MetaTimedMetric> visitTimedMetrics() {
-    return collectMetrics().getTimedMetrics();
+    return collectMetrics().timedMetrics();
   }
 
   protected List<MetaTimedMetric> sqlMetrics() {
     List<MetaTimedMetric> timedMetrics = visitTimedMetrics();
 
     return timedMetrics.stream()
-      .filter((it) -> it.getName().startsWith("sql.") || it.getName().startsWith("orm."))
+      .filter((it) -> it.name().startsWith("sql.") || it.name().startsWith("orm."))
       .collect(Collectors.toList());
   }
 

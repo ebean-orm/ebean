@@ -16,23 +16,21 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This uses either DatabaseConfig or properties in the application.properties file to
  * configure and create a Database instance.
- * </p>
  * <p>
  * The Database instance can either be registered with the DB singleton or
  * not. The DB singleton effectively holds a map of Database by a name.
  * If the Database is registered with the DB singleton you can retrieve it
  * later via {@link DB#byName(String)}.
- * </p>
  * <p>
  * One Database can be nominated as the 'default/primary' Database. Many
  * methods on the DB singleton such as {@link DB#find(Class)} are just a
  * convenient way of using the 'default/primary' Database.
- * </p>
  */
 public class DatabaseFactory {
 
-  private static final ReentrantLock lock = new ReentrantLock(false);
+  private static final ReentrantLock lock = new ReentrantLock();
   private static SpiContainer container;
+  private static String defaultServerName;
 
   static {
     EbeanVersion.getVersion();
@@ -47,7 +45,7 @@ public class DatabaseFactory {
   public static void initialiseContainer(ContainerConfig containerConfig) {
     lock.lock();
     try {
-      getContainer(containerConfig);
+      container(containerConfig);
     } finally {
       lock.unlock();
     }
@@ -59,7 +57,7 @@ public class DatabaseFactory {
   public static Database create(String name) {
     lock.lock();
     try {
-      return getContainer(null).createServer(name);
+      return container(null).createServer(name);
     } finally {
       lock.unlock();
     }
@@ -67,6 +65,16 @@ public class DatabaseFactory {
 
   /**
    * Create using the DatabaseConfig object to configure the database.
+   *
+   * <pre>{@code
+   *
+   *   DatabaseConfig config = new DatabaseConfig();
+   *   config.setName("db");
+   *   config.loadProperties();
+   *
+   *   Database database = DatabaseFactory.create(config);
+   *
+   * }</pre>
    */
   public static Database create(DatabaseConfig config) {
     lock.lock();
@@ -76,6 +84,12 @@ public class DatabaseFactory {
       }
       Database server = createInternal(config);
       if (config.isRegister()) {
+        if (config.isDefaultServer()) {
+          if (defaultServerName != null && !defaultServerName.equals(config.getName())) {
+            throw new IllegalStateException("Registering [" + config.getName() + "] as the default server but [" + defaultServerName + "] is already registered as the default");
+          }
+          defaultServerName = config.getName();
+        }
         DbPrimary.setSkip(true);
         DbContext.getInstance().register(server, config.isDefaultServer());
       }
@@ -108,7 +122,6 @@ public class DatabaseFactory {
    * Shutdown gracefully all Database instances cleaning up any resources as required.
    * <p>
    * This is typically invoked via JVM shutdown hook and not explicitly called.
-   * </p>
    */
   public static void shutdown() {
     lock.lock();
@@ -120,15 +133,15 @@ public class DatabaseFactory {
   }
 
   private static Database createInternal(DatabaseConfig config) {
-    return getContainer(config.getContainerConfig()).createServer(config);
+    return container(config.getContainerConfig()).createServer(config);
   }
 
   /**
-   * Get the EbeanContainer initialising it if necessary.
+   * Return the SpiContainer initialising it if necessary.
    *
    * @param containerConfig the configuration controlling clustering communication
    */
-  private static SpiContainer getContainer(ContainerConfig containerConfig) {
+  private static SpiContainer container(ContainerConfig containerConfig) {
     // thread safe in that all calling methods hold lock
     if (container != null) {
       return container;

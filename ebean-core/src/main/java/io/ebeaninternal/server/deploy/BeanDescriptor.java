@@ -38,15 +38,7 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.Property;
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.ConcurrencyMode;
-import io.ebeaninternal.api.LoadBeanContext;
-import io.ebeaninternal.api.LoadContext;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiUpdatePlan;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
@@ -119,41 +111,27 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements BeanType<T>, STreeType {
+public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
-
-  private final ConcurrentHashMap<String, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
-
-  private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
-
-  private final Map<String, SpiRawSql> namedRawSql;
-
-  private final Map<String, String> namedQuery;
-
-  private final boolean multiValueSupported;
-  private boolean batchEscalateOnCascadeInsert;
-  private boolean batchEscalateOnCascadeDelete;
-
-  private final BeanIudMetrics iudMetrics;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
   }
 
-  /**
-   * The nature/type of this bean.
-   */
+  private final ConcurrentHashMap<String, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
+  private final Map<String, SpiRawSql> namedRawSql;
+  private final Map<String, String> namedQuery;
+  private final boolean multiValueSupported;
+  private boolean batchEscalateOnCascadeInsert;
+  private boolean batchEscalateOnCascadeDelete;
+  private final BeanIudMetrics iudMetrics;
   private final EntityType entityType;
-
   /**
    * Set when Id property is marked with GeneratedValue annotation.
    */
@@ -161,71 +139,39 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final PlatformIdGenerator idGenerator;
   private final IdentityMode identityMode;
   private final IdType idType;
-
   /**
    * SQL used to return last inserted id. Used for Identity columns where
    * getGeneratedKeys is not supported.
    */
   private final String selectLastInsertedId;
   private final String selectLastInsertedIdDraft;
-
   private final boolean autoTunable;
-
-  /**
-   * The concurrency mode for beans of this type.
-   */
   private final ConcurrencyMode concurrencyMode;
-
   private final IndexDefinition[] indexDefinitions;
-
   private final String[] dependentTables;
-
-  /**
-   * The base database table.
-   */
   private final String baseTable;
   private final String baseTableAsOf;
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
   private final TableJoin primaryKeyJoin;
-
   private final BeanProperty softDeleteProperty;
   private final boolean softDelete;
-
   private final String draftTable;
-
   private final PartitionMeta partitionMeta;
   private final String storageEngine;
-
-  /**
-   * DB table comment.
-   */
   private final String dbComment;
-
-  /**
-   * Set to true if read auditing is on for this bean type.
-   */
   private final boolean readAuditing;
-
   private final boolean draftable;
-
   private final boolean draftableElement;
-
   private final BeanProperty unmappedJson;
-
   private final BeanProperty tenant;
-
   private final BeanProperty draft;
-
   private final BeanProperty draftDirty;
-
   private final LinkedHashMap<String, BeanProperty> propMap;
-
   /**
    * Map of DB column to property path (for nativeSql mapping).
    */
   private final Map<String, String> columnPath = new HashMap<>();
-
   /**
    * Map of related table to assoc property (for nativeSql mapping).
    */
@@ -243,46 +189,34 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final BeanQueryAdapter queryAdapter;
   private final BeanFindController beanFinder;
   private final ChangeLogFilter changeLogFilter;
-
-  /**
-   * Inheritance information. Server side only.
-   */
   final InheritInfo inheritInfo;
-
   private final boolean abstractType;
-
   private final BeanProperty idProperty;
   private final int idPropertyIndex;
-
   private final BeanProperty versionProperty;
   private final int versionPropertyIndex;
   private final BeanProperty whenModifiedProperty;
   private final BeanProperty whenCreatedProperty;
-
   /**
    * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
    */
   private final int[] unloadProperties;
-
   /**
    * Properties local to this type (not from a super type).
    */
   private final BeanProperty[] propertiesLocal;
-
   /**
    * Scalar mutable properties (need to dirty check on update).
    */
   private final BeanProperty[] propertiesMutable;
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
-
   private final BeanProperty[] propertiesNonMany;
   private final BeanProperty[] propertiesAggregate;
   private final BeanPropertyAssocMany<?>[] propertiesMany;
   private final BeanPropertyAssocMany<?>[] propertiesManySave;
   private final BeanPropertyAssocMany<?>[] propertiesManyDelete;
   private final BeanPropertyAssocMany<?>[] propertiesManyToMany;
-
   /**
    * list of properties that are associated beans and not embedded (Derived).
    */
@@ -293,10 +227,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedSave;
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedDelete;
   private final BeanPropertyAssocOne<?>[] propertiesEmbedded;
-
   private final BeanProperty[] propertiesBaseScalar;
   private final BeanProperty[] propertiesTransient;
-
   /**
    * All non transient properties excluding the id properties.
    */
@@ -308,21 +240,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   private final boolean idOnlyReference;
   private BeanNaturalKey beanNaturalKey;
 
-  /**
-   * The bean class name or the table name for MapBeans.
-   */
+
   private final String fullName;
-
-  /**
-   * Flag used to determine if saves can be skipped.
-   */
   private boolean saveRecurseSkippable;
-
-  /**
-   * Flag used to determine if deletes can be skipped.
-   */
   private boolean deleteRecurseSkippable;
-
   private final EntityBean prototypeEntityBean;
 
   private final IdBinder idBinder;
@@ -522,7 +443,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       return null;
     }
     try {
-      return (EntityBean) beanType.newInstance();
+      return (EntityBean) beanType.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
@@ -637,11 +558,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
       }
       prop.registerColumn(this, null);
     }
-
     if (unidirectional != null) {
       unidirectional.initialise(initContext);
     }
-
     idBinder.initialise();
     idBinderInLHSSql = idBinder.getBindIdInSql(baseTableAlias);
     idBinderIdSql = idBinder.getBindIdSql(baseTableAlias);
@@ -727,7 +646,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     String[] cols = indexDef.getColumns();
     BeanProperty[] props = new BeanProperty[cols.length];
     for (int i = 0; i < cols.length; i++) {
-      String propName = findBeanPath("", cols[i]);
+      String propName = findBeanPath("", "", cols[i]);
       if (propName == null) {
         return;
       }
@@ -814,7 +733,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     int propertyLength = toEbi.getPropertyLength();
     String[] names = getProperties();
     for (int i = 0; i < propertyLength; i++) {
-
       if (fromEbi.isLoadedProperty(i)) {
         BeanProperty property = getBeanProperty(names[i]);
         if (!toEbi.isLoadedProperty(i)) {
@@ -1568,7 +1486,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (request.includeHash(queryPlan.getHash())) {
-        queryPlan.queryPlanInit(request.getThresholdMicros());
+        queryPlan.queryPlanInit(request.thresholdMicros());
         list.add(queryPlan.createMeta(null, null));
       }
     }
@@ -1581,7 +1499,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        visitor.visitQuery(queryPlan.getSnapshot(visitor.isReset()));
+        visitor.visitQuery(queryPlan.getSnapshot(visitor.reset()));
       }
     }
   }
@@ -1757,6 +1675,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Return false for IdClass case with multiple @Id properties.
+   */
+  public boolean hasSingleIdProperty() {
+    return idPropertyIndex != -1;
+  }
+
+  /**
    * Return true if this type has a simple Id and the platform supports mutli-value binding.
    */
   public boolean isMultiValueIdSupported() {
@@ -1865,17 +1790,23 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
-   * We actually need to do a query because we don't know the type without the discriminator
-   * value, just select the id property and discriminator column (auto added)
+   * We actually need to do a query because we don't know the type without the discriminator value.
    */
   private T findReferenceBean(Object id, PersistenceContext pc) {
     DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
     query.setPersistenceContext(pc);
-    return query
-      // .select(getIdProperty().getName())
-      // we do not select the id because we
-      // probably have to load the entire bean
-      .setId(id).findOne();
+    return query.setId(id).findOne();
+  }
+
+  /**
+   * Create a reference with a check for the bean in the persistence context.
+   */
+  public EntityBean createReference(Boolean readOnly, Object id, PersistenceContext pc) {
+    Object refBean = contextGet(pc, id);
+    if (refBean == null) {
+      refBean = createReference(readOnly, false, id, pc);
+    }
+    return (EntityBean) refBean;
   }
 
   /**
@@ -2013,6 +1944,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   }
 
   /**
+   * Returns true, if the table is managed (i.e. an existing m2m relation).
+   */
+  public boolean isTableManaged(String tableName) {
+    return owner.isTableManaged(tableName);
+  }
+
+  /**
    * Return the order column property.
    */
   public BeanProperty getOrderColumn() {
@@ -2085,6 +2023,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   @Nonnull
   public String getName() {
     return name;
+  }
+
+  /**
+   * Return the simple name of the entity bean.
+   */
+  public String getSimpleName() {
+    return beanType.getSimpleName();
   }
 
   /**
@@ -2271,8 +2216,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
    */
   public void lazyLoadRegister(String prefix, EntityBeanIntercept ebi, EntityBean bean, LoadContext loadContext) {
     // load the List/Set/Map proxy objects (deferred fetching of lists)
-    BeanPropertyAssocMany<?>[] manys = propertiesMany();
-    for (BeanPropertyAssocMany<?> many : manys) {
+    for (BeanPropertyAssocMany<?> many : propertiesMany()) {
       if (!ebi.isLoadedProperty(many.getPropertyIndex())) {
         BeanCollection<?> ref = many.createReferenceIfNull(bean);
         if (ref != null && !ref.isRegisteredWithLoadContext()) {
@@ -2461,18 +2405,27 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   /**
    * Return the property path given the db table and column.
    */
-  public String findBeanPath(String tableName, String columnName) {
-    if (tableName.isEmpty() || tableName.equalsIgnoreCase(baseTable)) {
+  public String findBeanPath(String schemaName, String tableName, String columnName) {
+    if (matchBaseTable(tableName)) {
       return columnPath.get(columnName);
     }
     BeanPropertyAssoc<?> assocProperty = tablePath.get(tableName);
+    if (assocProperty == null) {
+      assocProperty = tablePath.get(schemaName + "." + tableName);
+    }
     if (assocProperty != null) {
-      String relativePath = assocProperty.getTargetDescriptor().findBeanPath(tableName, columnName);
+      String relativePath = assocProperty.getTargetDescriptor().findBeanPath(schemaName, tableName, columnName);
       if (relativePath != null) {
         return SplitName.add(assocProperty.getName(), relativePath);
       }
     }
     return null;
+  }
+
+  boolean matchBaseTable(String tableName) {
+    return tableName.isEmpty()
+      || baseTable.equalsIgnoreCase(tableName)
+      || baseTable.endsWith("." + tableName);
   }
 
   /**
@@ -2493,7 +2446,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     if (propName.indexOf('(') > -1) {
       return findSqlTreeFormula(propName, path);
     }
-    return _findBeanProperty(propName);
+    return findProperty(propName);
   }
 
   /**
@@ -2917,6 +2870,20 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return false;
   }
 
+  @Override
+  public boolean isToManyDirty(EntityBean bean) {
+    final EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    for (BeanPropertyAssocMany<?> many : propertiesManySave) {
+      if (ebi.isLoadedProperty(many.getPropertyIndex())) {
+        final BeanCollection<?> value = (BeanCollection<?>) many.getValue(bean);
+        if (value != null && value.hasModifications()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Return true if the bean is draftable and considered a 'live' instance.
    */
@@ -3114,12 +3081,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
     return ebi.isReference() || referenceIdPropertyOnly(ebi);
   }
 
-  boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
+  public boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
     return idOnlyReference && ebi.hasIdOnly(idPropertyIndex);
   }
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
-    return ebi.isLoadedProperty(idPropertyIndex);
+    // assume id loaded for IdClass case with idPropertyIndex == -1
+    return idPropertyIndex == -1 ? true : ebi.isLoadedProperty(idPropertyIndex);
   }
 
   boolean hasIdValue(EntityBean bean) {
@@ -3157,9 +3125,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType {
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.getPropertyIndex();
-      if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
+      if (ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
-        if (value == null || beanProperty.isDirtyValue(value)) {
+        if (beanProperty.checkMutable(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);

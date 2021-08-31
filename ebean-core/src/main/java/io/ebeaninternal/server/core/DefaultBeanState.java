@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Default implementation of BeanState.
  */
-public class DefaultBeanState implements BeanState {
+public final class DefaultBeanState implements BeanState {
 
   private final EntityBeanIntercept intercept;
 
@@ -94,4 +94,8 @@ public class DefaultBeanState implements BeanState {
     return intercept.getLoadErrors();
   }
 
+  @Override
+  public int getSortOrder() {
+    return intercept.getSortOrder();
+  }
 }

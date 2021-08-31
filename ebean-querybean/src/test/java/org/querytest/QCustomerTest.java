@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,6 +71,7 @@ public class QCustomerTest {
       // not found using other transaction
       final Customer foundNot = new QCustomer()
         .name.eq("explicitTransaction")
+        .withLock(Query.LockType.SHARE)
         .findOne();
       assertThat(foundNot).isNull();
 
@@ -82,12 +84,65 @@ public class QCustomerTest {
   public void findSingleAttribute() {
 
     List<String> names = new QCustomer()
-        .setDistinct(true)
-        .select(QCustomer.alias().name)
-        .status.equalTo(Customer.Status.BAD)
-        .findSingleAttributeList();
+      .setDistinct(true)
+      .select(QCustomer.alias().name)
+      .status.equalTo(Customer.Status.BAD)
+      .findSingleAttributeList();
 
     assertThat(names).isNotNull();
+  }
+
+  @Test
+  public void findEachBatch() {
+
+    for (int i = 0; i < 22; i++) {
+      Customer customer = new Customer();
+      customer.setStatus(Customer.Status.MIDDLING);
+      customer.setName("findEachBatch_a_" + i);
+      customer.save();
+    }
+
+    final List<Integer> batchSizes = new ArrayList<>();
+
+    final AtomicInteger counter = new AtomicInteger();
+    new QCustomer()
+      .status.eq(Customer.Status.MIDDLING)
+      .name.startsWith("findEachBatch_a_")
+      .findEach(10, customers -> {
+        batchSizes.add(customers.size());
+        System.out.println("Batch " + counter.incrementAndGet() + " size:" + customers.size());
+      });
+
+    assertThat(batchSizes).hasSize(3);
+    assertThat(batchSizes.get(0)).isEqualTo(10);
+    assertThat(batchSizes.get(1)).isEqualTo(10);
+    assertThat(batchSizes.get(2)).isEqualTo(2);
+  }
+
+  @Test
+  public void findEachBatch_when_lastBatchEmpty() {
+
+    for (int i = 0; i < 18; i++) {
+      Customer customer = new Customer();
+      customer.setStatus(Customer.Status.MIDDLING);
+      customer.setName("findEachBatch_b_" + i);
+      customer.save();
+    }
+
+    final List<Integer> batchSizes = new ArrayList<>();
+
+    final AtomicInteger counter = new AtomicInteger();
+    new QCustomer()
+      .status.eq(Customer.Status.MIDDLING)
+      .name.startsWith("findEachBatch_b_")
+      .findEach(9, customers -> {
+        batchSizes.add(customers.size());
+        System.out.println("Batch " + counter.incrementAndGet() + " size:" + customers.size());
+      });
+
+    assertThat(batchSizes).hasSize(2);
+    assertThat(batchSizes.get(0)).isEqualTo(9);
+    assertThat(batchSizes.get(1)).isEqualTo(9);
   }
 
   @Test
@@ -99,21 +154,21 @@ public class QCustomerTest {
     cust.save();
 
     List<Long> ids = new QCustomer()
-        .status.equalTo(Customer.Status.GOOD)
-        .findIds();
+      .status.equalTo(Customer.Status.GOOD)
+      .findIds();
 
     assertThat(ids).isNotEmpty();
 
 
     Map<List, Customer> map = new QCustomer()
-        .status.equalTo(Customer.Status.GOOD)
-        .findMap();
+      .status.equalTo(Customer.Status.GOOD)
+      .findMap();
 
     assertThat(map.size()).isEqualTo(ids.size());
 
     QueryIterator<Customer> iterate = new QCustomer()
-        .status.equalTo(Customer.Status.GOOD)
-        .findIterate();
+      .status.equalTo(Customer.Status.GOOD)
+      .findIterate();
 
     try {
       while (iterate.hasNext()) {
@@ -130,12 +185,12 @@ public class QCustomerTest {
   public void isEmpty() {
 
     new QCustomer()
-        .contacts.isEmpty()
-        .findList();
+      .contacts.isEmpty()
+      .findList();
 
     new QCustomer()
-        .contacts.isNotEmpty()
-        .findList();
+      .contacts.isNotEmpty()
+      .findList();
   }
 
   @Transactional
@@ -143,19 +198,19 @@ public class QCustomerTest {
   public void forUpdate() {
 
     new QCustomer()
-        .id.eq(42)
-        .forUpdate()
-        .findOne();
+      .id.eq(42)
+      .forUpdate()
+      .findOne();
 
     new QCustomer()
-        .id.eq(42)
-        .forUpdateNoWait()
-        .findOne();
+      .id.eq(42)
+      .forUpdateNoWait()
+      .findOne();
 
     new QCustomer()
-        .id.eq(42)
-        .forUpdateSkipLocked()
-        .findOne();
+      .id.eq(42)
+      .forUpdateSkipLocked()
+      .findOne();
   }
 
 
@@ -164,42 +219,42 @@ public class QCustomerTest {
   public void arrayContains() {
 
     new QContact()
-        .phoneNumbers.contains("4312")
-        .findList();
+      .phoneNumbers.contains("4312")
+      .findList();
 
     new QCustomer()
-        .contacts.phoneNumbers.contains("4312")
-        .findList();
+      .contacts.phoneNumbers.contains("4312")
+      .findList();
   }
 
   @Test
   public void setIncludeSoftDeletes() {
 
     new QCustomer()
-        .setIdIn(42L)
-        .setIncludeSoftDeletes()
-        .findList();
+      .setIdIn(42L)
+      .setIncludeSoftDeletes()
+      .findList();
   }
 
   @Test
   public void testIdIn() {
 
     new QCustomer()
-        .setIdIn("1", "2")
-        .findList();
+      .setIdIn("1", "2")
+      .findList();
 
     new QCustomer()
-        .id.in(1L, 2L, 3L)
-        .findList();
+      .id.in(1L, 2L, 3L)
+      .findList();
   }
 
   @Test
   public void testIn() {
     new QCustomer()
-        .id.in(34L, 33L)
-        .name.in("asd", "foo", "bar")
-        .registered.in(new Date())
-        .findList();
+      .id.in(34L, 33L)
+      .name.in("asd", "foo", "bar")
+      .registered.in(new Date())
+      .findList();
   }
 
   @Test
@@ -284,24 +339,24 @@ public class QCustomerTest {
   @Test
   public void testNotIn() {
     new QCustomer()
-        .id.isIn(34L, 33L)
-        .name.notIn("asd", "foo", "bar")
-        .registered.in(new Date())
-        .findList();
+      .id.isIn(34L, 33L)
+      .name.notIn("asd", "foo", "bar")
+      .registered.in(new Date())
+      .findList();
   }
 
   @Test
   public void testQueryBoolean() {
 
     new QCustomer()
-        .name.contains("rob")
-        //.setUseDocStore(true)
-        .setMaxRows(10)
-        .findPagedList();
+      .name.contains("rob")
+      //.setUseDocStore(true)
+      .setMaxRows(10)
+      .findPagedList();
 
     new QCustomer()
-        .inactive.isFalse()
-        .findList();
+      .inactive.isFalse()
+      .findList();
   }
 
   @Test
@@ -484,7 +539,7 @@ public class QCustomerTest {
     assertThat(billingAddressIds).hasSize(2);
 
 
-    Map<Long,Customer> map
+    Map<Long, Customer> map
       = new QCustomer()
       .billingAddress.id.asMapKey()
       .name.startsWith("asdBilling")
@@ -515,21 +570,21 @@ public class QCustomerTest {
       .findList();
 
     new QCustomer()
-      .currentInet.in(Inet.setOf("129.1.1.4","129.1.1.5"))
+      .currentInet.in(Inet.setOf("129.1.1.4", "129.1.1.5"))
       .findList();
 
     new QCustomer()
       .contacts.fetch("email")
       .orderBy()
-        .name.asc()
-        .contacts.email.asc()
+      .name.asc()
+      .contacts.email.asc()
       .findList();
 
     new QCustomer()
       .contacts.fetchQuery("email")
       .orderBy()
-        .name.asc()
-        .contacts.email.asc()
+      .name.asc()
+      .contacts.email.asc()
       .findList();
   }
 
@@ -608,8 +663,8 @@ public class QCustomerTest {
 
     boolean customerExists =
       new QCustomer()
-      .name.equalTo("DoesNotExistReally")
-      .exists();
+        .name.equalTo("DoesNotExistReally")
+        .exists();
 
     assertThat(customerExists).isFalse();
   }
@@ -621,37 +676,37 @@ public class QCustomerTest {
     QCustomer cust = QCustomer.alias();
 
     new QCustomer()
-        // tune query
-        .select(cust.name)
-        .status.isIn(Customer.Status.BAD, Customer.Status.BAD)
-        .contacts.fetch()
-        // predicates
-        .findList();
+      // tune query
+      .select(cust.name)
+      .status.isIn(Customer.Status.BAD, Customer.Status.BAD)
+      .contacts.fetch()
+      // predicates
+      .findList();
 
     new QCustomer()
-        // tune query
-        .select(cust.name)
-        .contacts.fetch()
-        // predicates
-        .findList();
+      // tune query
+      .select(cust.name)
+      .contacts.fetch()
+      // predicates
+      .findList();
 
     new QCustomer()
-        // tune query
-        .select(cust.id, cust.name)
-        .contacts.fetch(contact.firstName, contact.lastName, contact.email)
-        // predicates
-        .id.greaterThan(1)
-        .findList();
+      // tune query
+      .select(cust.id, cust.name)
+      .contacts.fetch(contact.firstName, contact.lastName, contact.email)
+      // predicates
+      .id.greaterThan(1)
+      .findList();
 
     PagedList<Customer> pagedList = new QCustomer()
-        // tune query
-        .select(cust.id, cust.name)
-        .contacts.fetch(contact.firstName, contact.lastName, contact.email)
-        // predicates
-        .id.greaterThan(1)
-        .setFirstRow(20)
-        .setMaxRows(10)
-        .findPagedList();
+      // tune query
+      .select(cust.id, cust.name)
+      .contacts.fetch(contact.firstName, contact.lastName, contact.email)
+      // predicates
+      .id.greaterThan(1)
+      .setFirstRow(20)
+      .setMaxRows(10)
+      .findPagedList();
 
     pagedList.getList();
     pagedList.getList();
@@ -765,7 +820,7 @@ public class QCustomerTest {
     cust.setRegistered(new Date());
     cust.save();
 
-    java.util.Date maxDate =  new QCustomer()
+    java.util.Date maxDate = new QCustomer()
       .select("max(registered)")
       .findSingleAttribute();
 
@@ -799,15 +854,15 @@ public class QCustomerTest {
     assertThat(new QCustomer()
       .name.eq(testName.getMethodName())
       .email.gt(new ValidEmail("foo2@example.org"))
-            .findOne()).isNull();
+      .findOne()).isNull();
     assertThat(new QCustomer()
       .name.eq(testName.getMethodName())
       .email.gt(new ValidEmail("foo1@example.org"))
-            .findOne()).isNotNull();
+      .findOne()).isNotNull();
     assertThat(new QCustomer()
       .name.eq(testName.getMethodName())
       .email.greaterOrEqualTo(new ValidEmail("foo2@example.org"))
-            .findOne()).isNotNull();
+      .findOne()).isNotNull();
   }
 
 

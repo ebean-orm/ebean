@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -9,12 +10,10 @@ import io.ebean.util.SplitName;
 
 import java.io.IOException;
 
-class IsEmptyExpression extends AbstractExpression {
+final class IsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
-
   private final String propertyPath;
-
   private String nestedPath;
 
   IsEmptyExpression(String propertyName, boolean empty) {
@@ -103,8 +102,8 @@ class IsEmptyExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return 1;
+  public void queryBindKey(BindValuesKey key) {
+    // no bind values
   }
 
   @Override

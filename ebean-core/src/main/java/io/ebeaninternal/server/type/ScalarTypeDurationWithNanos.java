@@ -15,9 +15,9 @@ import java.time.Duration;
  * Stored in the DB as DECIMAL value.
  * </p>
  */
-public class ScalarTypeDurationWithNanos extends ScalarTypeDuration {
+final class ScalarTypeDurationWithNanos extends ScalarTypeDuration {
 
-  public ScalarTypeDurationWithNanos() {
+  ScalarTypeDurationWithNanos() {
     super(Types.DECIMAL);
   }
 

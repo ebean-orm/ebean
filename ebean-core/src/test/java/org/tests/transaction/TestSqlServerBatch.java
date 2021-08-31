@@ -11,7 +11,7 @@ import org.tests.model.basic.ESimple;
 /**
  * This test tests a strange bug in the 6.2.0. sqlserver JDBC driver.
  * (Version 6.1.7.jre8-preview works)
- *
+ * <p>
  * https://github.com/Microsoft/mssql-jdbc/pull/374
  *
  * @author Roland Praml, FOCONIS AG
@@ -29,7 +29,7 @@ public class TestSqlServerBatch extends BaseTestCase {
 
       for (int i = 0; i < 10; i++) {
         ESimple model = new ESimple();
-        model.setName("baz "+i);
+        model.setName("baz " + i);
         Ebean.save(model);
       }
 
@@ -56,13 +56,13 @@ public class TestSqlServerBatch extends BaseTestCase {
       txn.setGetGeneratedKeys(false);
 
       // explicitly flush the JDBC batch buffer
-      txn.flushBatch();
+      txn.flush();
 
-        for (int i = 0; i < 10; i++) {
-          ESimple model = new ESimple();
-          model.setName(i % 2 == 0 ? null:"foobar");
-          Ebean.save(model);
-        }
+      for (int i = 0; i < 10; i++) {
+        ESimple model = new ESimple();
+        model.setName(i % 2 == 0 ? null : "foobar");
+        Ebean.save(model);
+      }
 
       // do not commit
     } finally {

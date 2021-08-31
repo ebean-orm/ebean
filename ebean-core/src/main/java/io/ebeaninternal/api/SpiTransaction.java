@@ -3,7 +3,6 @@ package io.ebeaninternal.api;
 import io.ebean.ProfileLocation;
 import io.ebean.Transaction;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
@@ -148,6 +147,11 @@ public interface SpiTransaction extends Transaction {
   int depth();
 
   /**
+   * Return true if dirty beans are automatically persisted.
+   */
+  boolean isAutoPersistUpdates();
+
+  /**
    * Return true if this transaction was created explicitly via
    * <code>Ebean.beginTransaction()</code>.
    */
@@ -191,7 +195,7 @@ public interface SpiTransaction extends Transaction {
    * later. This is along the lines of 'extended persistence context'
    * behaviour.
    */
-  PersistenceContext getPersistenceContext();
+  SpiPersistenceContext getPersistenceContext();
 
   /**
    * Set the persistence context to this transaction.
@@ -203,7 +207,7 @@ public interface SpiTransaction extends Transaction {
    * and setPersistenceContext() enable a developer to reuse a single
    * PersistenceContext with multiple transactions.
    */
-  void setPersistenceContext(PersistenceContext context);
+  void setPersistenceContext(SpiPersistenceContext context);
 
   /**
    * Return the underlying Connection for internal use.
@@ -318,4 +322,20 @@ public interface SpiTransaction extends Transaction {
    * Return true if explicitly set to skip cache (ignores skipOnWrite).
    */
   boolean isSkipCacheExplicit();
+
+  /**
+   * Fire pre commit processing/listeners.
+   */
+  void preCommit();
+
+  /**
+   * Fire post commit events and listeners.
+   */
+  void postCommit();
+
+  /**
+   * Fire post rollback events and listeners.
+   */
+  void postRollback(Throwable cause);
+
 }

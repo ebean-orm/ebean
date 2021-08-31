@@ -1,6 +1,4 @@
 *.autofetch
-*create-all.sql
-*drop-all.sql
 *.orig
 .classpath
 .project
@@ -12,7 +10,6 @@ ebean-autotune.xml
 ebean-profiling*.xml
 /db
 /mydb.db
-!src/test/ddl-review/*.sql
 profiling/
 
 # Intellij project files

@@ -9,9 +9,6 @@ import java.sql.Types;
  * functions for varchar, date and timestamp. If they are left null then that is
  * treated as though that data type can not be encrypted in the DB and will
  * instead use java client encryption.
- * </p>
- *
- * @author rbygrave
  */
 public abstract class AbstractDbEncrypt implements DbEncrypt {
 
@@ -47,13 +44,10 @@ public abstract class AbstractDbEncrypt implements DbEncrypt {
       case Types.CHAR:
       case Types.LONGVARCHAR:
         return varcharEncryptFunction;
-
       case Types.DATE:
         return dateEncryptFunction;
-
       case Types.TIMESTAMP:
         return timestampEncryptFunction;
-
       default:
         return null;
     }

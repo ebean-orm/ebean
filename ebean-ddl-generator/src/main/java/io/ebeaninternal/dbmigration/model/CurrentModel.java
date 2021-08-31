@@ -27,24 +27,16 @@ import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 public class CurrentModel {
 
   private final SpiEbeanServer server;
-
   private final DatabasePlatform databasePlatform;
-
   private final DbConstraintNaming constraintNaming;
-
   private final boolean platformTypes;
-
   private final boolean jaxbPresent;
-
   private final String ddlHeader;
+  private final DdlOptions ddlOptions = new DdlOptions();
 
   private ModelContainer model;
-
   private ChangeSet changeSet;
-
   private DdlWrite write;
-
-  private DdlOptions ddlOptions = new DdlOptions();
 
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.

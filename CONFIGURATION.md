@@ -293,6 +293,6 @@ ebean.tenant.schemaProvider
 ebean.updateAllPropertiesInBatch
 ebean.updateChangesOnly
 ebean.updatesDeleteMissingChildren
-ebean.useJavaxValidationNotNull
+ebean.useValidationNotNull
 ebean.useJtaTransactionManager
 

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CancelableQuery;
 import io.ebean.CountedValue;
 import io.ebean.core.type.ScalarDataReader;
 import io.ebean.util.JdbcClose;
@@ -18,53 +19,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Base compiled query request for single attribute queries.
  */
-class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
+final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryFetchSingleAttribute.class);
 
   private final CQueryPlan queryPlan;
-
-  /**
-   * The overall find request wrapper object.
-   */
   private final OrmQueryRequest<?> request;
-
   private final BeanDescriptor<?> desc;
-
   private final SpiQuery<?> query;
-
-  /**
-   * Where clause predicates.
-   */
   private final CQueryPredicates predicates;
-
-  /**
-   * The final sql that is generated.
-   */
   private final String sql;
-
   private RsetDataReader dataReader;
-
-  /**
-   * The statement used to create the resultSet.
-   */
   private PreparedStatement pstmt;
-
   private String bindLog;
-
   private long executionTimeMicros;
-
   private int rowCount;
-
   private final ScalarDataReader<?> reader;
-
   private final boolean containsCounts;
-
   private long profileOffset;
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Create the Sql select based on the request.
@@ -91,19 +69,20 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
       .append("] type[").append(desc.getName())
       .append("] predicates[").append(predicates.getLogWhereSql())
       .append("] bind[").append(bindLog).append("]");
-
     return sb.toString();
+  }
+
+  long micros() {
+    return executionTimeMicros;
   }
 
   /**
    * Execute the query returning the row count.
    */
   List<Object> findList() throws SQLException {
-
     long startNano = System.nanoTime();
     try {
       prepareExecute();
-
       List<Object> result = new ArrayList<>();
       while (dataReader.next()) {
         Object value = reader.read(dataReader);
@@ -111,19 +90,15 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
           value = new CountedValue<>(value, dataReader.getLong());
         }
         result.add(value);
-        dataReader.resetColumnPosition();
         rowCount++;
       }
-
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
       getTransaction().profileEvent(this);
-
       return result;
-
     } finally {
       close();
     }
@@ -148,21 +123,25 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
   }
 
   private void prepareExecute() throws SQLException {
-
-    SpiTransaction t = getTransaction();
-    profileOffset = t.profileOffset();
-    Connection conn = t.getInternalConnection();
-    pstmt = conn.prepareStatement(sql);
-
-    if (query.getBufferFetchSizeHint() > 0) {
-      pstmt.setFetchSize(query.getBufferFetchSizeHint());
+    lock.lock();
+    try {
+      query.checkCancelled();
+      SpiTransaction t = getTransaction();
+      profileOffset = t.profileOffset();
+      Connection conn = t.getInternalConnection();
+      pstmt = conn.prepareStatement(sql);
+      if (query.getBufferFetchSizeHint() > 0) {
+        pstmt.setFetchSize(query.getBufferFetchSizeHint());
+      }
+      if (query.getTimeout() > 0) {
+        pstmt.setQueryTimeout(query.getTimeout());
+      }
+      bindLog = predicates.bind(pstmt, conn);
+    } finally {
+      lock.unlock();
     }
-    if (query.getTimeout() > 0) {
-      pstmt.setQueryTimeout(query.getTimeout());
-    }
-
-    bindLog = predicates.bind(pstmt, conn);
     dataReader = new RsetDataReader(request.getDataTimeZone(), pstmt.executeQuery());
+    query.checkCancelled();
   }
 
   /**
@@ -194,5 +173,15 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent {
 
   Set<String> getDependentTables() {
     return queryPlan.getDependentTables();
+  }
+
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
   }
 }

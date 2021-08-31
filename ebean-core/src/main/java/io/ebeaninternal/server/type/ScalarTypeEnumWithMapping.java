@@ -14,19 +14,24 @@ import java.util.Set;
  * Additional control over mapping to DB values.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implements ScalarType, ScalarTypeEnum {
+class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implements ScalarType, ScalarTypeEnum {
 
   private final EnumToDbValueMap beanDbMap;
-
   private final int length;
+  private final boolean withConstraint;
 
   /**
    * Create with an explicit mapping of bean to database values.
    */
-  public ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length) {
+  ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length, boolean withConstraint) {
     super(enumType, false, beanDbMap.getDbType());
     this.beanDbMap = beanDbMap;
     this.length = length;
+    this.withConstraint = withConstraint;
+  }
+
+  ScalarTypeEnumWithMapping(EnumToDbValueMap<?> beanDbMap, Class<?> enumType, int length) {
+    this(beanDbMap, enumType, length, true);
   }
 
   @Override
@@ -49,6 +54,9 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
    */
   @Override
   public Set<String> getDbCheckConstraintValues() {
+    if (!withConstraint) {
+      return null;
+    }
     LinkedHashSet values = new LinkedHashSet();
     Iterator<?> it = beanDbMap.dbValues();
     while (it.hasNext()) {
@@ -64,9 +72,6 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
 
   /**
    * Return the DB column length for storing the enum value.
-   * <p>
-   * This is for enum's mapped to strings.
-   * </p>
    */
   @Override
   public int getLength() {

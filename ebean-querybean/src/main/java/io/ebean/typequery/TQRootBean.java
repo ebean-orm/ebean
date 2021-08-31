@@ -25,6 +25,7 @@ import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebean.text.PathProperties;
+import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
 import javax.annotation.Nonnull;
@@ -32,6 +33,7 @@ import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,55 +43,39 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Base root query bean.
+ * Base root query bean providing common features for all root query beans.
  * <p>
- * With code generation for each entity bean type a query bean is created that extends this.
+ * For each entity bean querybean-generator generates a query bean that extends TQRootBean.
  * <p>
- * Provides common features for all root query beans
+ *
  * </p>
- * <p>
- * <h2>Example - QCustomer extends TQRootBean</h2>
- * <p>
- * These 'query beans' like QCustomer are generated using the <code>avaje-ebeanorm-typequery-generator</code>.
- * </p>
- * <pre>{@code
- *
- *   public class QCustomer extends TQRootBean<Customer,QCustomer> {
- *
- *     // properties
- *     public PLong<QCustomer> id;
- *
- *     public PString<QCustomer> name;
- *     ...
- *
- * }</pre>
- * <p>
  * <h2>Example - usage of QCustomer</h2>
  * <pre>{@code
  *
- *    Date fiveDaysAgo = ...
+ *  Date fiveDaysAgo = ...
  *
- *    List<Customer> customers =
- *        new QCustomer()
- *          .name.ilike("rob")
- *          .status.equalTo(Customer.Status.GOOD)
- *          .registered.after(fiveDaysAgo)
- *          .contacts.email.endsWith("@foo.com")
- *          .orderBy()
- *            .name.asc()
- *            .registered.desc()
- *          .findList();
+ *  List<Customer> customers =
+ *      new QCustomer()
+ *        .name.ilike("rob")
+ *        .status.equalTo(Customer.Status.GOOD)
+ *        .registered.after(fiveDaysAgo)
+ *        .contacts.email.endsWith("@foo.com")
+ *        .orderBy()
+ *          .name.asc()
+ *          .registered.desc()
+ *        .findList();
  *
  * }</pre>
  * <p>
  * <h2>Resulting SQL where</h2>
  * <p>
- * <pre>{@code sql
+ * <pre>{@code
  *
- *     where lower(t0.name) like ?  and t0.status = ?  and t0.registered > ?  and u1.email like ?
- *     order by t0.name, t0.registered desc;
+ *   where lower(t0.name) like ?  and t0.status = ?  and t0.registered > ?  and u1.email like ?
+ *   order by t0.name, t0.registered desc;
  *
- *     --bind(rob,GOOD,Mon Jul 27 12:05:37 NZST 2015,%@foo.com)
+ *   --bind(rob,GOOD,Mon Jul 27 12:05:37 NZST 2015,%@foo.com)
+ *
  * }</pre>
  *
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
@@ -227,20 +213,38 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set a FetchGroup to control what part of the object graph is loaded.
    * <p>
-   * This is an alternative to using select() and fetch() providing a nice clean separation
-   * between what a query should load and the query predicates.
-   * </p>
+   * FetchGroup is immutable and threadsafe. We expect to create and store
+   * FetchGroup to a static final field and reuse the instance.
+   * <p>
+   * FetchGroup is an alternative to using select() and fetch() providing a nice
+   * clean separation between what a query should load and the query predicates.
    *
    * <pre>{@code
    *
-   * FetchGroup<Customer> fetchGroup = FetchGroup.of(Customer.class)
-   *   .select("name, status")
-   *   .fetch("contacts", "firstName, lastName, email")
-   *   .build();
+   * // immutable threadsafe
    *
-   * List<Customer> customers =
+   * static final FetchGroup<Customer> fetchGroup =
+   *   QCustomer.forFetchGroup()
+   *     .shippingAddress.fetch()
+   *     .contacts.fetch()
+   *     .buildFetchGroup();
    *
-   *   new QCustomer()
+   * List<Customer> customers = new QCustomer()
+   *   .select(fetchGroup)
+   *   .findList();
+   *
+   * }</pre>
+   *
+   *
+   * <pre>{@code
+   *
+   * static final FetchGroup<Customer> fetchGroup =
+   *   FetchGroup.of(Customer.class)
+   *     .select("name, status")
+   *     .fetch("contacts", "firstName, lastName, email")
+   *     .build();
+   *
+   * List<Customer> customers = new QCustomer()
    *   .select(fetchGroup)
    *   .findList();
    *
@@ -278,22 +282,21 @@ public abstract class TQRootBean<T, R> {
    */
   @SafeVarargs
   public final R select(TQProperty<R>... properties) {
-    StringBuilder selectProps = new StringBuilder(50);
-    for (int i = 0; i < properties.length; i++) {
-      if (i > 0) {
-        selectProps.append(",");
-      }
-      selectProps.append(properties[i].propertyName());
-    }
-    query.select(selectProps.toString());
+    ((SpiQueryFetch) query).selectProperties(properties(properties));
     return root;
+  }
+
+  private Set<String> properties(TQProperty<R>[] properties) {
+    Set<String> props = new LinkedHashSet<>();
+    for (TQProperty<R> property : properties) {
+      props.add(property.propertyName());
+    }
+    return props;
   }
 
   /**
    * Specify a path to load including all its properties.
-   * <p>
-   * The same as {@link #fetch(String, String)} with the fetchProperties as "*".
-   * </p>
+   *
    * <pre>{@code
    *
    * List<Customer> customers =
@@ -686,18 +689,38 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Execute using "for update" clause which results in the DB locking the record.
+   * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  public R forUpdate() {
-    query.forUpdate();
+  public R withLock(Query.LockType lockType) {
+    query.withLock(lockType);
     return root;
   }
 
   /**
-   * Execute using "for update" with given lock type (currently Postgres only).
+   * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  public R forUpdate(Query.LockType lockType) {
-    query.forUpdate(lockType);
+  public R withLock(Query.LockType lockType, Query.LockWait lockWait) {
+    query.withLock(lockType, lockWait);
+    return root;
+  }
+
+  /**
+   * Execute using "for update" clause which results in the DB locking the record.
+   */
+  public R forUpdate() {
+    query.forUpdate();
     return root;
   }
 
@@ -712,14 +735,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Execute using "for update nowait" with given lock type (currently Postgres only).
-   */
-  public R forUpdateNoWait(Query.LockType lockType) {
-    query.forUpdateNoWait(lockType);
-    return root;
-  }
-
-  /**
    * Execute using "for update" clause with "skip locked" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
@@ -727,14 +742,6 @@ public abstract class TQRootBean<T, R> {
    */
   public R forUpdateSkipLocked() {
     query.forUpdateSkipLocked();
-    return root;
-  }
-
-  /**
-   * Execute using "for update skip locked" with given lock type (currently Postgres only).
-   */
-  public R forUpdateSkipLocked(Query.LockType lockType) {
-    query.forUpdateSkipLocked(lockType);
     return root;
   }
 
@@ -1805,24 +1812,19 @@ public abstract class TQRootBean<T, R> {
    * This method is appropriate to process very large query results as the
    * beans are consumed one at a time and do not need to be held in memory
    * (unlike #findList #findSet etc)
-   * </p>
    * <p>
    * Note that internally Ebean can inform the JDBC driver that it is expecting larger
    * resultSet and specifically for MySQL this hint is required to stop it's JDBC driver
    * from buffering the entire resultSet. As such, for smaller resultSets findList() is
    * generally preferable.
-   * </p>
    * <p>
    * Compared with #findEachWhile this will always process all the beans where as
    * #findEachWhile provides a way to stop processing the query result early before
    * all the beans have been read.
-   * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the QueryEachConsumer (SAM) interface which is better suited to use
-   * with Java8 closures.
-   * </p>
-   * <p>
+   * iterator uses the Consumer interface which is better suited to use with closures.
+   *
    * <pre>{@code
    *
    *  new QCustomer()
@@ -1843,15 +1845,29 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Execute findEach streaming query batching the results for consuming.
+   * <p>
+   * This query execution will stream the results and is suited to consuming
+   * large numbers of results from the database.
+   * <p>
+   * Typically we use this batch consumer when we want to do further processing on
+   * the beans and want to do that processing in batch form, for example - 100 at
+   * a time.
+   *
+   * @param batch    The number of beans processed in the batch
+   * @param consumer Process the batch of beans
+   */
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    query.findEach(batch, consumer);
+  }
+
+  /**
    * Execute the query using callbacks to a visitor to process the resulting
    * beans one at a time.
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the QueryEachWhileConsumer (SAM) interface which is better suited to use
-   * with Java8 closures.
-   * </p>
-   * <p>
-   * <p>
+   * iterator uses the Predicate interface which is better suited to use with closures.
+   *
    * <pre>{@code
    *
    *  new QCustomer()

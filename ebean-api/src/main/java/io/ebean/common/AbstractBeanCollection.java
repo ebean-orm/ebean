@@ -16,7 +16,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   private static final long serialVersionUID = 3365725236140187588L;
 
-  protected final ReentrantLock lock = new ReentrantLock(false);
+  protected final ReentrantLock lock = new ReentrantLock();
 
   protected boolean readOnly;
 
@@ -136,6 +136,11 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   // ---------------------------------------------------------
 
   @Override
+  public boolean hasModifications() {
+    return modifyHolder != null && modifyHolder.hasModifications();
+  }
+
+  @Override
   public ModifyListenMode getModifyListening() {
     return modifyListenMode;
   }
@@ -145,7 +150,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
    */
   @Override
   public void setModifyListening(ModifyListenMode mode) {
-
     this.modifyListenMode = mode;
     this.modifyListening = mode != null && ModifyListenMode.NONE != mode;
     if (modifyListening) {

@@ -38,7 +38,7 @@ import static java.time.temporal.ChronoField.YEAR;
  * <p>
  * Uses a sleep backoff on the single threaded consumer that reads the profiles and writes them to files.
  */
-public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
+public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultProfileHandler.class);
 
@@ -66,7 +66,7 @@ public class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
   private final ExecutorService executor;
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final File dir;
 

@@ -17,7 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
-class DScriptRunner implements ScriptRunner {
+final class DScriptRunner implements ScriptRunner {
 
   private static final String NEWLINE = "\n";
 

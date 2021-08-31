@@ -2,7 +2,6 @@ package org.tests.model.array;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.SqlRow;
 import io.ebean.annotation.ForPlatform;
@@ -24,14 +23,14 @@ import static org.junit.Assert.assertNull;
 
 public class TestDbArray_basic extends BaseTestCase {
 
-  private EArrayBean bean = new EArrayBean();
+  private final EArrayBean bean = new EArrayBean();
 
   private EArrayBean found;
 
   @Test
   @IgnorePlatform(Platform.HANA)
   public void insert() throws SQLException {
-
+    DB.find(EArrayBean.class).delete();
     bean.setName("some stuff");
     assertThat(bean.getStatuses()).as("DbArray is auto initialised").isNotNull();
 
@@ -62,14 +61,14 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.getStatus2().add(EArrayBean.Status.TWO);
     bean.getStatus2().add(EArrayBean.Status.ONE);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    found = Ebean.find(EArrayBean.class, bean.getId());
+    found = DB.find(EArrayBean.class, bean.getId());
 
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
 
     if (isPostgres()) {
-      Query<EArrayBean> query = Ebean.find(EArrayBean.class)
+      Query<EArrayBean> query = DB.find(EArrayBean.class)
         .where()
         .arrayContains("otherIds", 96L, 97L)
         .arrayContains("uids", bean.getUids().get(0))
@@ -100,7 +99,7 @@ public class TestDbArray_basic extends BaseTestCase {
       assertSql(query).contains(" coalesce(cardinality(t0.phone_numbers),0) <> 0");
       assertThat(list).hasSize(1);
 
-      query = Ebean.find(EArrayBean.class)
+      query = DB.find(EArrayBean.class)
         .where()
         .arrayIsEmpty("otherIds")
         .arrayNotContains("uids", bean.getUids().get(0))
@@ -128,11 +127,11 @@ public class TestDbArray_basic extends BaseTestCase {
   //@Test//(dependsOnMethods = "insert")
   public void json_parse_format() {
 
-    String asJson = Ebean.json().toJson(found);
+    String asJson = DB.json().toJson(found);
     assertThat(asJson).contains("\"phoneNumbers\":[\"4321\",\"9823\"]");
     assertThat(asJson).contains("\"id\":");
 
-    EArrayBean fromJson = Ebean.json().toBean(EArrayBean.class, asJson);
+    EArrayBean fromJson = DB.json().toBean(EArrayBean.class, asJson);
     assertEquals(found.getId(), fromJson.getId());
     assertEquals(found.getId(), fromJson.getId());
     assertEquals(found.getName(), fromJson.getName());
@@ -144,7 +143,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
     found.setName("jack");
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
@@ -158,7 +157,7 @@ public class TestDbArray_basic extends BaseTestCase {
     found.getUids().add(UUID.randomUUID());
 
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     assertSql(sql.get(0)).contains("update earray_bean set phone_numbers=?, uids=?, version=? where");
@@ -173,8 +172,8 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.setPhoneNumbers(null);
     bean.setOtherIds(null);
 
-    Ebean.save(bean);
-    Ebean.delete(bean);
+    DB.save(bean);
+    DB.delete(bean);
   }
 
   @Test
@@ -190,8 +189,8 @@ public class TestDbArray_basic extends BaseTestCase {
     List<EArrayBean> all = new ArrayList<>();
     all.add(bean);
 
-    Ebean.saveAll(all);
-    Ebean.deleteAll(all);
+    DB.saveAll(all);
+    DB.deleteAll(all);
   }
 
   /**
@@ -237,9 +236,9 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.getIntEnums().add(null);
     bean.getIntEnums().add(IntEnum.TWO);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    found = Ebean.find(EArrayBean.class, bean.getId());
+    found = DB.find(EArrayBean.class, bean.getId());
     assertThat(found.getPhoneNumbers()).containsExactly("111222333", null, "333222111");
     assertThat(found.getOtherIds()).containsExactly(15L, null, 30L, null);
     assertNull(found.getUids().get(1));
@@ -247,6 +246,34 @@ public class TestDbArray_basic extends BaseTestCase {
     assertThat(found.getStatuses()).containsExactly(EArrayBean.Status.ONE, null, EArrayBean.Status.THREE);
     assertThat(found.getVcEnums()).containsExactly(VarcharEnum.ONE, null, VarcharEnum.TWO);
     assertThat(found.getIntEnums()).containsExactly(null, IntEnum.ZERO, null, IntEnum.TWO);
-    Ebean.delete(bean);
+    DB.delete(bean);
+  }
+
+  @Test
+  @IgnorePlatform(Platform.HANA)
+  public void hitCache() {
+
+    List<UUID> uids = new ArrayList<>();
+    uids.add(UUID.randomUUID());
+    uids.add(UUID.randomUUID());
+
+    List<EArrayBean.Status> statuses = new ArrayList<>();
+    statuses.add(EArrayBean.Status.ONE);
+    statuses.add(EArrayBean.Status.THREE);
+
+    EArrayBean bean = new EArrayBean();
+    bean.setName("hitCache");
+    bean.setUids(uids);
+    bean.setStatuses(statuses);
+
+    DB.save(bean);
+    // load cache
+    final EArrayBean entry = DB.find(EArrayBean.class, bean.getId());
+    assertThat(entry.getUids()).hasSameElementsAs(uids);
+    assertThat(entry.getStatuses()).hasSameElementsAs(statuses);
+    // hit cache
+    EArrayBean found = DB.find(EArrayBean.class, bean.getId());
+    assertThat(found.getUids()).hasSameElementsAs(uids);
+    assertThat(found.getStatuses()).hasSameElementsAs(statuses);
   }
 }

@@ -16,9 +16,9 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 /**
  * ScalarType for java.util.Calendar.
  */
-public class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
+final class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
 
-  public ScalarTypeCalendar(JsonConfig.DateTime mode, int jdbcType) {
+  ScalarTypeCalendar(JsonConfig.DateTime mode, int jdbcType) {
     super(mode, Calendar.class, false, jdbcType);
   }
 

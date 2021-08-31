@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
@@ -26,7 +25,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
-public class SaveManyBeans extends SaveManyBase {
+public final class SaveManyBeans extends SaveManyBase {
 
   private static final Logger log = LoggerFactory.getLogger(SaveManyBeans.class);
 
@@ -37,7 +36,7 @@ public class SaveManyBeans extends SaveManyBase {
   private final boolean saveRecurseSkippable;
   private final DeleteMode deleteMode;
   private final boolean untouchedBeanCollection;
-  private Collection<?> collection;
+  private final Collection<?> collection;
   private int sortOrder;
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
@@ -49,6 +48,7 @@ public class SaveManyBeans extends SaveManyBase {
     this.saveRecurseSkippable = many.isSaveRecurseSkippable();
     this.deleteMode = targetDescriptor.isSoftDelete() ? DeleteMode.SOFT : DeleteMode.HARD;
     this.untouchedBeanCollection = untouchedBeanCollection();
+    this.collection = cascade ? BeanCollectionUtil.getActualEntries(value) : null;
   }
 
   /**
@@ -108,7 +108,6 @@ public class SaveManyBeans extends SaveManyBase {
   private void saveAssocManyDetails() {
     // check that the list is not null and if it is a BeanCollection
     // check that is has been populated (don't trigger lazy loading)
-    collection = BeanCollectionUtil.getActualEntries(value);
     if (collection != null) {
       processDetails();
     }
@@ -165,11 +164,15 @@ public class SaveManyBeans extends SaveManyBase {
         if (many.hasJoinTable()) {
           skipSavingThisBean = targetDescriptor.isReference(ebi);
         } else {
-          if (orderColumn != null && !Objects.equals(sortOrder, orderColumn.getValue(detail))) {
-            orderColumn.setValue(detail, sortOrder);
-            ebi.setDirty(true);
+          int originalOrder = 0;
+          if (orderColumn != null) {
+            originalOrder = detail._ebean_getIntercept().getSortOrder();
+            if (sortOrder != originalOrder) {
+              detail._ebean_intercept().setSortOrder(sortOrder);
+              ebi.setDirty(true);
+            }
           }
-          if (targetDescriptor.isReference(ebi)) {
+          if (targetDescriptor.isReference(ebi) && originalOrder == 0) {
             // we can skip this one
             skipSavingThisBean = true;
           } else if (ebi.isNewOrDirty()) {
@@ -235,9 +238,6 @@ public class SaveManyBeans extends SaveManyBase {
   /**
    * Save the additions and removals from a ManyToMany collection as inserts
    * and deletes from the intersection table.
-   * <p>
-   * This is done via MapBeans.
-   * </p>
    */
   private void saveAssocManyIntersection() {
     if (value == null) {
@@ -298,7 +298,16 @@ public class SaveManyBeans extends SaveManyBase {
     }
 
     transaction.depth(+1);
-
+    if (deletions != null && !deletions.isEmpty()) {
+      for (Object other : deletions) {
+        EntityBean otherDelete = (EntityBean) other;
+        // the object from the 'other' side of the ManyToMany
+        // build a intersection row for 'delete'
+        IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
+        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
+        persister.executeOrQueue(sqlDelete, transaction, queue);
+      }
+    }
     if (additions != null && !additions.isEmpty()) {
       for (Object other : additions) {
         EntityBean otherBean = (EntityBean) other;
@@ -321,24 +330,23 @@ public class SaveManyBeans extends SaveManyBase {
         }
       }
     }
-    if (deletions != null && !deletions.isEmpty()) {
-      for (Object other : deletions) {
-        EntityBean otherDelete = (EntityBean) other;
-        // the object from the 'other' side of the ManyToMany
-        // build a intersection row for 'delete'
-        IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
-        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
-        persister.executeOrQueue(sqlDelete, transaction, queue);
-      }
-    }
     // decrease the depth back to what it was
     transaction.depth(-1);
   }
 
+  private boolean isChangedProperty() {
+    return parentBean._ebean_getIntercept().isChangedProperty(many.getPropertyIndex());
+  }
+
   private void removeAssocManyOrphans() {
-    // check that the list is not null and if it is a BeanCollection
-    // check that is has been populated (don't trigger lazy loading)
-    if (value instanceof BeanCollection<?>) {
+    if (value == null) {
+      return;
+    }
+    if (!(value instanceof BeanCollection<?>)) {
+      if (!insertedParent && cascade && isChangedProperty()) {
+        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
+      }
+    } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();
       if (insertedParent) {

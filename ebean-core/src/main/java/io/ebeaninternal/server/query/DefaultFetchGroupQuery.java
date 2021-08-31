@@ -25,6 +25,7 @@ import io.ebean.Transaction;
 import io.ebean.UpdateQuery;
 import io.ebean.Version;
 import io.ebean.service.SpiFetchGroupQuery;
+import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
@@ -43,13 +44,13 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
-class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
+final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
-  private static final FetchConfig FETCH_CACHE = new FetchConfig().cache();
+  private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
 
-  private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
+  private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
 
-  private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
+  private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private OrmQueryDetail detail = new OrmQueryDetail();
 
@@ -259,6 +260,11 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
 
   @Override
   public void findEach(Consumer<T> consumer) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -545,6 +551,16 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   }
 
   @Override
+  public Query<T> withLock(LockType lockType) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public Query<T> withLock(LockType lockType, LockWait lockWait) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
   public Query<T> forUpdate() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
@@ -556,21 +572,6 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
 
   @Override
   public Query<T> forUpdateSkipLocked() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> forUpdate(LockType lockType) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> forUpdateNoWait(LockType lockType) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> forUpdateSkipLocked(LockType lockType) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -632,5 +633,20 @@ class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T> {
   @Override
   public Query<T> orderById(boolean orderById) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public void selectProperties(Set<String> props) {
+    detail.selectProperties(props);
+  }
+
+  @Override
+  public void fetchProperties(String property, Set<String> columns, FetchConfig config) {
+    detail.fetchProperties(property, columns, config);
+  }
+
+  @Override
+  public void addNested(String name, OrmQueryDetail nestedDetail, FetchConfig config) {
+    detail.addNested(name, nestedDetail, config);
   }
 }

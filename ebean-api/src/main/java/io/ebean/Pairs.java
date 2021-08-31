@@ -18,7 +18,7 @@ import java.util.List;
  *
  *   // where a bean is annotated with a complex
  *   // natural key made of several properties
- *   ＠Cache(naturalKey = {"store","code","sku"})
+ *   @Cache(naturalKey = {"store","code","sku"})
  *
  *
  *   Pairs pairs = new Pairs("sku", "code");

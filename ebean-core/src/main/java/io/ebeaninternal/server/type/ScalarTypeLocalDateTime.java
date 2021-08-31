@@ -1,7 +1,10 @@
 package io.ebeaninternal.server.type;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.JsonConfig;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
@@ -11,9 +14,9 @@ import java.time.ZoneId;
 /**
  * ScalarType for java.sql.Timestamp.
  */
-public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
+final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
 
-  public ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
+  ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
     super(mode, LocalDateTime.class, false, Types.TIMESTAMP);
   }
 
@@ -29,12 +32,37 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
 
   @Override
   protected String toJsonNanos(LocalDateTime value) {
-    return String.valueOf(convertToMillis(value));
+    return value.toString();
   }
 
   @Override
-  protected String toJsonISO8601(LocalDateTime dateTime) {
-    return dateTime.atZone(ZoneId.systemDefault()).toInstant().toString();
+  protected String toJsonISO8601(LocalDateTime value) {
+    return value.toString();
+  }
+
+  @Override
+  protected LocalDateTime fromJsonISO8601(String value) {
+    return LocalDateTime.parse(value);
+  }
+
+  @Override
+  public LocalDateTime jsonRead(JsonParser parser) throws IOException {
+    return LocalDateTime.parse(parser.getText());
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator writer, LocalDateTime value) throws IOException {
+    writer.writeString(value.toString());
+  }
+
+  @Override
+  public String formatValue(LocalDateTime value) {
+    return value.toString();
+  }
+
+  @Override
+  public LocalDateTime parse(String value) {
+    return LocalDateTime.parse(value);
   }
 
   @Override

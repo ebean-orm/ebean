@@ -25,7 +25,7 @@ public class TestSecondQueryNoRows extends BaseTestCase {
     Customer c = Ebean.find(Customer.class)
       .setAutoTune(false)
       .setId(cnew.getId())
-      .fetch("contacts", new FetchConfig().query())
+      .fetchQuery("contacts")
       .findOne();
 
     assertNotNull(c);

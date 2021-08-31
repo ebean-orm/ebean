@@ -14,9 +14,7 @@ import java.sql.SQLException;
 abstract class AssocOneHelp {
 
   final BeanPropertyAssocOne<?> property;
-
   private final BeanDescriptor<?> target;
-
   private final String path;
 
   AssocOneHelp(BeanPropertyAssocOne<?> property) {
@@ -58,19 +56,16 @@ abstract class AssocOneHelp {
    * Read and return the bean.
    */
   Object read(DbReadContext ctx) throws SQLException {
-
     // Support for Inheritance hierarchy on exported OneToOne ?
     Object id = property.targetIdBinder.read(ctx);
     if (id == null) {
       return null;
     }
-
     PersistenceContext pc = ctx.getPersistenceContext();
     Object existing = target.contextGet(pc, id);
     if (existing != null) {
       return existing;
     }
-
     boolean disableLazyLoading = ctx.isDisableLazyLoading();
     Object ref = target.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
     if (!disableLazyLoading) {
@@ -78,7 +73,6 @@ abstract class AssocOneHelp {
     }
     return ref;
   }
-
 
   /**
    * Read setting values into the bean.

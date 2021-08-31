@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Utility that converts between JSON content and simple java Maps/Lists.
  */
-public class DJsonService implements SpiJsonService {
+public final class DJsonService implements SpiJsonService {
 
   /**
    * Write the nested Map/List as json.

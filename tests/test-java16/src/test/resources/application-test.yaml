@@ -1,0 +1,6 @@
+ebean:
+  test:
+    platform: h2
+    ddlMode: dropCreate
+    dbName: foo
+

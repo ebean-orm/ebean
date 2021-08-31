@@ -7,18 +7,13 @@ import javax.persistence.CascadeType;
 /**
  * Property mapped to a joined bean.
  */
-public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
+public final class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
   private boolean oneToOne;
-
   private boolean oneToOneExported;
-
   private boolean primaryKeyJoin;
-
   private boolean primaryKeyExport;
-
   private DeployBeanEmbedded deployEmbedded;
-
   private String columnPrefix;
 
   /**

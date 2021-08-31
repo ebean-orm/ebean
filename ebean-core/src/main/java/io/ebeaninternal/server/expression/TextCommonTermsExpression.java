@@ -7,10 +7,9 @@ import java.io.IOException;
 /**
  * Full text common terms expression.
  */
-class TextCommonTermsExpression extends AbstractTextExpression {
+final class TextCommonTermsExpression extends AbstractTextExpression {
 
   private final String search;
-
   private final TextCommonTerms options;
 
   public TextCommonTermsExpression(String search, TextCommonTerms options) {

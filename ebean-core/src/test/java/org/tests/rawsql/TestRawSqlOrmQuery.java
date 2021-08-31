@@ -37,7 +37,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
-    query.fetch("contacts", new FetchConfig().query());
+    query.fetchQuery("contacts");
     query.filterMany("contacts").gt("lastName", "b");
 
     List<Customer> list = query.findList();

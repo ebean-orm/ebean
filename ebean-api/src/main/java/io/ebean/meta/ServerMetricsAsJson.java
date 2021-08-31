@@ -8,12 +8,12 @@ import java.util.Comparator;
 public interface ServerMetricsAsJson {
 
   /**
-   * Set to false to exclude profile location and sql.
+   * Set to false in order to exclude profile location and sql.
    */
   ServerMetricsAsJson withExtraAttributes(boolean withLocation);
 
   /**
-   * Set to false to exclude SQL hash.
+   * Set to false in order to exclude SQL hash.
    */
   ServerMetricsAsJson withHash(boolean withHash);
 

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
@@ -15,21 +14,16 @@ import java.util.Set;
 /**
  * Join to Many (or child of a many) to support where clause predicates on many properties.
  */
-class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
+final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   private final String parentPrefix;
-
   private final String prefix;
-
   private final STreePropertyAssoc nodeBeanProp;
-
   private final STreeType target;
-
   /**
    * The many where join which is either INNER or OUTER.
    */
   private final SqlJoinType manyJoinType;
-
   private final boolean softDelete;
 
   SqlTreeNodeManyWhereJoin(String prefix, STreePropertyAssoc prop, SqlJoinType manyJoinType, SpiQuery.TemporalMode temporalMode) {
@@ -140,12 +134,6 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   @Override
   public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) {
-    // nothing to do here
-    return null;
-  }
-
-  @Override
-  public <T> Version<T> loadVersion(DbReadContext ctx) {
     // nothing to do here
     return null;
   }

@@ -2,9 +2,7 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
@@ -28,21 +26,22 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Customer customer = Ebean.find(Customer.class)
-      .fetch("orders", new FetchConfig().lazy())
+    Customer customer = DB.find(Customer.class)
+      .fetchLazy("orders")
       .filterMany("orders").eq("status", Order.Status.NEW)
       .where().ieq("name", "Rob")
       .order().asc("id").setMaxRows(1)
       .findList().get(0);
 
-    customer.getOrders().size();
+    final int size = customer.getOrders().size();
+    assertThat(size).isGreaterThan(0);
 
     List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(1)).contains("status = ?");
 
     // Currently this does not include the query filter
-    Ebean.refreshMany(customer, "orders");
+    DB.refreshMany(customer, "orders");
 
   }
 
@@ -139,7 +138,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Customer customer = Ebean.find(Customer.class)
+    Customer customer = DB.find(Customer.class)
       .setMaxRows(1)
       .order().asc("id")
       .fetch("orders")
@@ -154,7 +153,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Optional<Customer> customer = Ebean.find(Customer.class)
+    Optional<Customer> customer = DB.find(Customer.class)
       .setMaxRows(1)
       .order().asc("id")
       .fetch("orders")
@@ -171,8 +170,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
-      .fetch("orders")
+    Query<Customer> query = DB.find(Customer.class)
       .filterMany("orders").raw("1=0")
       .where().isNotEmpty("orders")
       .query();
@@ -183,11 +181,9 @@ public class TestQueryFilterMany extends BaseTestCase {
     }
 
     List<String> sqlList = LoggedSqlCollector.stop();
-    assertEquals(2, sqlList.size());
-    assertThat(sqlList.get(0)).contains("where exists (select 1 from o_order x where x.kcustomer_id = t0.id)");
-    assertThat(sqlList.get(1)).contains("and 1=0");
+    assertEquals(1, sqlList.size());
+    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where exists (select 1 from o_order x where x.kcustomer_id = t0.id and x.order_date is not null) and 1=0 order by t0.id");
   }
-
 
   @Test
   public void test_filterMany_in_findCount() {
@@ -196,7 +192,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").in("status", Order.Status.NEW)
       .order().asc("id");
@@ -212,10 +208,9 @@ public class TestQueryFilterMany extends BaseTestCase {
   public void test_filterMany_copy_findList() {
 
     ResetBasicData.reset();
-
     LoggedSqlCollector.start();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").in("status", Order.Status.NEW)
       .order().asc("id");
@@ -223,19 +218,47 @@ public class TestQueryFilterMany extends BaseTestCase {
     query.copy().findList();
 
     List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(1, sqlList.size());
+    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where t1.status ");
+    if (isPostgres()) {
+      assertThat(sqlList.get(0)).contains("where t1.status = any(?) order by t0.id");
+    } else {
+      assertThat(sqlList.get(0)).contains("where t1.status in (?) order by t0.id");
+    }
+  }
+
+  @Test
+  public void test_filterMany_fetchQuery() {
+
+    ResetBasicData.reset();
+    LoggedSqlCollector.start();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .fetchQuery("orders") // explicitly fetch orders separately
+      .filterMany("orders").in("status", Order.Status.NEW)
+      .order().asc("id");
+
+    query.findList();
+
+    List<String> sqlList = LoggedSqlCollector.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0");
-    assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1");
+    if (isPostgres()) {
+      assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any(?)");
+      assertThat(sqlList.get(1)).contains(" and t0.status = any(?)");
+    } else {
+      assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) in ");
+      assertThat(sqlList.get(1)).contains(" and t0.status in ");
+    }
   }
 
   @Test
   public void testDisjunction() {
 
     ResetBasicData.reset();
-
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .filterMany("orders")
       .or()
       .eq("status", Order.Status.NEW)
@@ -243,8 +266,8 @@ public class TestQueryFilterMany extends BaseTestCase {
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
-    assertEquals(2, sql.size());
-    assertSql(sql.get(1)).contains("and (t0.status = ? or t0.order_date = ?");
+    assertEquals(1, sql.size());
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where (t1.status = ? or t1.order_date = ?) order by t0.id");
   }
 
   @Test
@@ -252,19 +275,17 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
     LoggedSqlCollector.start();
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .filterMany("contacts").isNotNull("firstName")
       .filterMany("contacts.notes").istartsWith("title", "foo")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertThat(sql).hasSize(3);
-    assertSql(sql.get(0)).contains(" from o_customer t0; --bind()");
-    platformAssertIn(sql.get(1), " from contact t0 where (t0.customer_id)");
-    assertSql(sql.get(1)).contains(" and t0.first_name is not null");
-    platformAssertIn(sql.get(2), " from contact_note t0 where (t0.contact_id)");
-    assertSql(sql.get(2)).contains(" and lower(t0.title) like");
+    assertThat(sql).hasSize(2);
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where t1.first_name is not null order by t0.id; --bind()");
+    platformAssertIn(sql.get(1), " from contact_note t0 where (t0.contact_id)");
+    assertSql(sql.get(1)).contains(" and lower(t0.title) like");
   }
 
   @Test
@@ -273,16 +294,18 @@ public class TestQueryFilterMany extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .where()
       .filterMany("contacts", "firstName isNotNull and email istartsWith ?", "rob")
       .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertThat(sql).hasSize(2);
-    assertSql(sql.get(0)).contains(" from o_customer t0");
-    assertSql(sql.get(1)).contains("from contact t0 where ");
-    assertSql(sql.get(1)).contains("and (t0.first_name is not null and lower(t0.email) like ?");
+    assertThat(sql).hasSize(1);
+    if (isSqlServer()) {
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? ) order by t0.id; --bind(rob%)");
+    } else {
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? escape'|' ) order by t0.id; --bind(rob%)");
+    }
   }
 }

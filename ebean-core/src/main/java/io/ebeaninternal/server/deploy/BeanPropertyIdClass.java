@@ -6,7 +6,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 /**
  * Bean property for an IdClass embeddedId.
  */
-public class BeanPropertyIdClass extends BeanPropertyAssocOne {
+public final class BeanPropertyIdClass extends BeanPropertyAssocOne {
 
   @SuppressWarnings("unchecked")
   public BeanPropertyIdClass(BeanDescriptorMap owner, BeanDescriptor descriptor, DeployBeanPropertyAssocOne deploy) {

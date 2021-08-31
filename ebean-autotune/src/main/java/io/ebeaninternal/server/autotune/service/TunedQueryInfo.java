@@ -65,7 +65,7 @@ public class TunedQueryInfo implements Serializable {
 
   @Override
   public String toString() {
-    return tunedDetail.toString();
+    return tunedDetail.asString();
   }
 
 }

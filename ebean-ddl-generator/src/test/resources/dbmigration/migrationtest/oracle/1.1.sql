@@ -17,11 +17,11 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
-alter table migtest_ckey_detail add column one_key number(10);
-alter table migtest_ckey_detail add column two_key varchar2(127);
+alter table migtest_ckey_detail add one_key number(10);
+alter table migtest_ckey_detail add two_key varchar2(127);
 
 alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key);
-alter table migtest_ckey_parent add column assoc_id number(10);
+alter table migtest_ckey_parent add assoc_id number(10);
 
 alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id);
@@ -46,14 +46,14 @@ alter table migtest_e_basic modify status2 null;
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_e_basic modify user_id null;
-alter table migtest_e_basic add column new_string_field varchar2(255) default 'foo''bar' not null;
-alter table migtest_e_basic add column new_boolean_field number(1) default 1 not null;
+alter table migtest_e_basic add new_string_field varchar2(255) default 'foo''bar' not null;
+alter table migtest_e_basic add new_boolean_field number(1) default 1 not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add column new_boolean_field2 number(1) default 1 not null;
-alter table migtest_e_basic add column progress number(10) default 0 not null;
+alter table migtest_e_basic add new_boolean_field2 number(1) default 1 not null;
+alter table migtest_e_basic add progress number(10) default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
-alter table migtest_e_basic add column new_integer number(10) default 42 not null;
+alter table migtest_e_basic add new_integer number(10) default 42 not null;
 
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
@@ -70,12 +70,12 @@ comment on table migtest_e_history is 'We have history now';
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 modify test_string default 'unknown';
 alter table migtest_e_history2 modify test_string not null;
-alter table migtest_e_history2 add column test_string2 varchar2(255);
-alter table migtest_e_history2 add column test_string3 varchar2(255) default 'unknown' not null;
-alter table migtest_e_history2 add column new_column varchar2(20);
+alter table migtest_e_history2 add test_string2 varchar2(255);
+alter table migtest_e_history2 add test_string3 varchar2(255) default 'unknown' not null;
+alter table migtest_e_history2 add new_column varchar2(20);
 
 alter table migtest_e_history4 modify test_number number(19);
-alter table migtest_e_history5 add column test_boolean number(1) default 0 not null;
+alter table migtest_e_history5 add test_boolean number(1) default 0 not null;
 
 
 -- NOTE: table has @History - special migration may be necessary
@@ -83,9 +83,9 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 modify test_number1 default 42;
 alter table migtest_e_history6 modify test_number1 not null;
 alter table migtest_e_history6 modify test_number2 null;
-alter table migtest_e_softdelete add column deleted number(1) default 0 not null;
+alter table migtest_e_softdelete add deleted number(1) default 0 not null;
 
-alter table migtest_oto_child add column master_id number(19);
+alter table migtest_oto_child add master_id number(19);
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);

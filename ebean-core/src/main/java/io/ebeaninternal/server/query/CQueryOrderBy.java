@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Creates the order by expression clause.
  */
-class CQueryOrderBy {
+final class CQueryOrderBy {
 
   private final BeanDescriptor<?> desc;
 

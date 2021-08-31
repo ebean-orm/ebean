@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -15,27 +16,27 @@ import java.util.Objects;
  * The value passed in is expected to be a valid JSON type so string, number, boolean.
  * </p>
  */
-class JsonPathExpression extends AbstractExpression {
+final class JsonPathExpression extends AbstractExpression {
 
   /**
    * The path in the JSON document in dot notation form.
    */
-  protected final String path;
+  private final String path;
 
   /**
    * The expression operator.
    */
-  protected final Op operator;
+  private final Op operator;
 
   /**
    * The bind value used to compare against the document path value.
    */
-  protected final Object value;
+  private final Object value;
 
   /**
    * For Between this is the upper bind value.
    */
-  protected final Object upperValue;
+  private final Object upperValue;
 
   /**
    * Construct for Operator (not BETWEEN though).
@@ -83,10 +84,8 @@ class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = (value == null) ? 0 : value.hashCode();
-    hc = (upperValue == null) ? hc : hc * 92821 + upperValue.hashCode();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(value).add(upperValue);
   }
 
   @Override

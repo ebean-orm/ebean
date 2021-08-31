@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.MutableValueInfo;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -13,11 +14,13 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
+import io.ebean.text.TextException;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.core.EncryptAlias;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -30,11 +33,7 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.query.STreeProperty;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.LocalEncryptedType;
-import io.ebeaninternal.server.type.ScalarTypeBoolean;
-import io.ebeaninternal.server.type.ScalarTypeEnum;
-import io.ebeaninternal.server.type.ScalarTypeLogicalType;
+import io.ebeaninternal.server.type.*;
 import io.ebeaninternal.util.ValueUtil;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -51,11 +50,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static io.ebean.util.StringHelper.replace;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -65,154 +63,82 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
+  private static final String ENC_PREFIX = " " + EncryptAlias.PREFIX;
+
   /**
    * Flag to mark this is the id property.
    */
   private final boolean id;
-
   private final boolean importedPrimaryKey;
-
   /**
    * Flag to make this as a dummy property for unidirecitonal relationships.
    */
   private final boolean unidirectionalShadow;
-
   /**
    * Flag set if this maps to the inheritance discriminator column
    */
   private final boolean discriminator;
-
   /**
    * Flag to mark the property as embedded. This could be on
    * BeanPropertyAssocOne rather than here. Put it here for checking Id type
    * (embedded or not).
    */
   final boolean embedded;
-
-  /**
-   * Flag indicating if this the version property.
-   */
   private final boolean version;
-
   private final boolean naturalKey;
-
-  /**
-   * Set if this property is nullable.
-   */
   private final boolean nullable;
-
   private final boolean unique;
-
   /**
    * Is this property include in database resultSet.
    */
   private final boolean dbRead;
-
   /**
    * Include in DB insert.
    */
   private final boolean dbInsertable;
-
   /**
    * Include in DB update.
    */
   private final boolean dbUpdatable;
 
-  /**
-   * True if the property is based on a SECONDARY table.
-   */
   private final boolean secondaryTable;
-
   private final TableJoin secondaryTableJoin;
   private final String secondaryTableJoinPrefix;
-
-  /**
-   * The property is inherited from a super class.
-   */
   private final boolean inherited;
-
   private final Class<?> owningType;
-
   private final boolean local;
-
-  /**
-   * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
-   */
   private final boolean lob;
-
   private final boolean fetchEager;
-
   final boolean isTransient;
 
   /**
    * The logical bean property name.
    */
   final String name;
-
   final int propertyIndex;
-
-  /**
-   * The reflected field.
-   */
   private final Field field;
-
-  /**
-   * The bean type.
-   */
   private final Class<?> propertyType;
-
   private final String dbBind;
-
-  /**
-   * The database column. This can include quoted identifiers.
-   */
   final String dbColumn;
-
   private final String elPrefix;
   final String elPlaceHolder;
   final String elPlaceHolderEncrypted;
-
-  /**
-   * Select part of a SQL Formula used to populate this property.
-   */
   private final String sqlFormulaSelect;
-
-  /**
-   * Join part of a SQL Formula.
-   */
   final String sqlFormulaJoin;
-
   private final String aggregation;
-
   private final boolean formula;
-
-  /**
-   * Set to true if stored encrypted.
-   */
   private final boolean dbEncrypted;
-
   private final boolean localEncrypted;
-
   private final int dbEncryptedType;
-
-  /**
-   * The jdbc data type this maps to.
-   */
   private final int dbType;
-
   final boolean excludedFromHistory;
-
   /**
    * Generator for insert or update timestamp etc.
    */
   private final GeneratedProperty generatedProperty;
-
   private final BeanPropertyGetter getter;
-
   private final BeanPropertySetter setter;
-
   final BeanDescriptor<?> descriptor;
-
   /**
    * Used for non-jdbc native types (java.util.Date Enums etc). Converts from
    * logical to jdbc types.
@@ -221,54 +147,39 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   final ScalarType scalarType;
 
   private final DocPropertyOptions docOptions;
-
   /**
    * The length or precision for DB column.
    */
   private final int dbLength;
-
   /**
    * The scale for DB column (decimal).
    */
   private final int dbScale;
-
   /**
    * Deployment defined DB column definition.
    */
   private final String dbColumnDefn;
-
   /**
    * DB Column default value for DDL definition (FALSE, NOW etc).
    */
   private final String dbColumnDefault;
   private final List<DbMigrationInfo> dbMigrationInfos;
-
   /**
    * Database DDL column comment.
    */
   private final String dbComment;
-
   private final DbEncryptFunction dbEncryptFunction;
-
   private int deployOrder;
-
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
   private final boolean unmappedJson;
   private final boolean tenantId;
-
   private final boolean draft;
-
   private final boolean draftOnly;
-
   private final boolean draftDirty;
-
   private final boolean draftReset;
-
   private final boolean softDelete;
-
   private final String softDeleteDbSet;
-
   private final String softDeleteDbPredicate;
 
   public BeanProperty(DeployBeanProperty deploy) {
@@ -324,9 +235,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.generatedProperty = deploy.getGeneratedProperty();
     this.getter = deploy.getGetter();
     this.setter = deploy.getSetter();
+    this.aggregation = deploy.parseAggregation();
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
     this.dbComment = deploy.getDbComment();
-    this.aggregation = deploy.parseAggregation();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
@@ -353,25 +264,26 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
-    if (descriptor != null) {
-      s = replace(s, "${ta}.", "${}");
-      s = replace(s, "${ta}", "${}");
+    if (s != null && descriptor != null) {
+      s = s.replace("${ta}.", "${}");
+      s = s.replace("${ta}", "${}");
       if (dbEncrypted) {
         s = dbEncryptFunction.getDecryptSql(s);
         String namedParam = ":encryptkey_" + descriptor.getBaseTable() + "___" + dbColumn;
-        s = replace(s, "?", namedParam);
+        s = s.replace("?", namedParam);
       }
     }
     return InternString.intern(s);
   }
 
+  public BeanProperty override(BeanPropertyOverride override) {
+    return new BeanProperty(this, override);
+  }
+
   /**
-   * Create a Matching BeanProperty with some attributes overridden.
-   * <p>
-   * Primarily for supporting Embedded beans with overridden dbColumn
-   * mappings.
+   * Create a Matching BeanProperty with some attributes overridden for Embedded beans.
    */
-  public BeanProperty(BeanProperty source, BeanPropertyOverride override) {
+  protected BeanProperty(BeanProperty source, BeanPropertyOverride override) {
     this.descriptor = source.descriptor;
     this.propertyIndex = source.propertyIndex;
     this.name = source.getName();
@@ -531,7 +443,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the SQL for the column including decryption function and column alias.
    */
   private String getDecryptSqlWithColumnAlias(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + " _e_" + tableAlias + "_" + this.getDbColumn();
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + ENC_PREFIX + tableAlias + "_" + this.getDbColumn();
   }
 
   @Override
@@ -573,9 +485,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       ctx.appendFormulaSelect(aggregation);
     } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
-
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
-
       if (secondaryTableJoin != null) {
         ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
       }
@@ -641,15 +551,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-    try {
-      Object value = scalarType.read(ctx.getDataReader());
-      if (bean != null) {
-        setValue(bean, value);
-      }
-      return value;
-    } catch (Exception e) {
-      throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
-    }
+    return readSet(ctx.getDataReader(), bean);
   }
 
   @SuppressWarnings("unchecked")
@@ -828,6 +730,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * creates a mutableHash for the given JSON value.
+   */
+  public MutableValueInfo createMutableInfo(String json) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * Read the value for this property from L2 cache entry and set it to the bean.
    * <p>
    * This uses parse() as per the comment in getCacheDataValue().
@@ -908,7 +817,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the name of the property.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public String getName() {
     return name;
   }
@@ -1017,8 +927,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if the mutable value is considered dirty.
    * This is only used for 'mutable' scalar types like hstore etc.
    */
-  boolean isDirtyValue(Object value) {
-    return scalarType.isDirty(value);
+  boolean checkMutable(Object value, boolean alreadyDirty, EntityBeanIntercept ebi) {
+    return alreadyDirty || value != null && scalarType.isDirty(value);
   }
 
   /**
@@ -1280,7 +1190,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public Object localEncrypt(Object value) {
-    return ((LocalEncryptedType)scalarType).localEncrypt(value);
+    return ((LocalEncryptedType) scalarType).localEncrypt(value);
   }
 
   /**
@@ -1393,7 +1303,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the property type.
    */
-  @Override @Nonnull
+  @Override
+  @Nonnull
   public Class<?> getPropertyType() {
     return propertyType;
   }

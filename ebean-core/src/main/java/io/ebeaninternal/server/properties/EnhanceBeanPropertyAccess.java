@@ -9,23 +9,20 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
 
   private static final int CACHE_SIZE = 30;
 
-  private final BeanPropertyGetter[] getters = initGetters(CACHE_SIZE);
-  private final BeanPropertySetter[] setters = initSetters(CACHE_SIZE);
+  private final BeanPropertyGetter[] getters = initGetters();
+  private final BeanPropertySetter[] setters = initSetters();
 
-  public EnhanceBeanPropertyAccess() {
-  }
-
-  private BeanPropertyGetter[] initGetters(int count) {
-    BeanPropertyGetter[] getters = new BeanPropertyGetter[count];
-    for (int i = 0; i < count; i++) {
+  private BeanPropertyGetter[] initGetters() {
+    BeanPropertyGetter[] getters = new BeanPropertyGetter[CACHE_SIZE];
+    for (int i = 0; i < CACHE_SIZE; i++) {
       getters[i] = new Getter(i);
     }
     return getters;
   }
 
-  private BeanPropertySetter[] initSetters(int count) {
-    BeanPropertySetter[] setters = new BeanPropertySetter[count];
-    for (int i = 0; i < count; i++) {
+  private BeanPropertySetter[] initSetters() {
+    BeanPropertySetter[] setters = new BeanPropertySetter[CACHE_SIZE];
+    for (int i = 0; i < CACHE_SIZE; i++) {
       setters[i] = new Setter(i);
     }
     return setters;

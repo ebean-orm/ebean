@@ -10,9 +10,9 @@ import java.util.UUID;
 /**
  * Postgres Hstore type which maps Map<String,String> to a single 'HStore column' in the DB.
  */
-public class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
+final class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
 
-  public ScalarTypeUUIDNative() {
+  ScalarTypeUUIDNative() {
     super(false, DbPlatformType.UUID);
   }
 

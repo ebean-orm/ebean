@@ -9,7 +9,6 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.validation.groups.Default;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,19 +20,13 @@ import java.util.UUID;
 public abstract class AnnotationParser extends AnnotationBase {
 
   final DeployBeanInfo<?> info;
-
   final DeployBeanDescriptor<?> descriptor;
-
   final Class<?> beanType;
-
-  final boolean validationAnnotations;
-
   final ReadAnnotationConfig readConfig;
 
   AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
     super(info.getUtil());
     this.readConfig = readConfig;
-    this.validationAnnotations = readConfig.isJavaxValidationAnnotations();
     this.info = info;
     this.beanType = info.getDescriptor().getBeanType();
     this.descriptor = info.getDescriptor();
@@ -87,7 +80,6 @@ public abstract class AnnotationParser extends AnnotationBase {
    * Read an AttributeOverrides if they exist for this embedded bean.
    */
   void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
-
     Set<AttributeOverride> attrOverrides = annotationAttributeOverrides(prop);
     if (!attrOverrides.isEmpty()) {
       Map<String, Column> propMap = new HashMap<>(attrOverrides.size());
@@ -99,11 +91,7 @@ public abstract class AnnotationParser extends AnnotationBase {
   }
 
   void readColumn(Column columnAnn, DeployBeanProperty prop) {
-
-    if (!isEmpty(columnAnn.name())) {
-      prop.setDbColumn(databasePlatform.convertQuotedIdentifiers(columnAnn.name()));
-    }
-
+    setColumnName(prop, columnAnn.name());
     prop.setDbInsertable(columnAnn.insertable());
     prop.setDbUpdateable(columnAnn.updatable());
     prop.setNullable(columnAnn.nullable());
@@ -125,15 +113,10 @@ public abstract class AnnotationParser extends AnnotationBase {
     }
   }
 
-  /**
-   * Return true if the validation groups are {@link Default} (respectively empty)
-   * can be applied to DDL generation.
-   */
-  boolean isEbeanValidationGroups(Class<?>[] groups) {
-    if (!util.isUseJavaxValidationNotNull()) {
-      return false;
+  protected void setColumnName(DeployBeanProperty prop, String name) {
+    if (!isEmpty(name)) {
+      prop.setDbColumn(databasePlatform.convertQuotedIdentifiers(name));
     }
-    return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
   }
 
   String[] convertColumnNames(String[] columnNames) {
@@ -141,5 +124,12 @@ public abstract class AnnotationParser extends AnnotationBase {
       columnNames[i] = databasePlatform.convertQuotedIdentifiers(columnNames[i]);
     }
     return columnNames;
+  }
+
+  /**
+   * Process any formula from &#64;Formula or &#64;Where.
+   */
+  protected String processFormula(String source) {
+    return source == null ? null : source.replace("${dbTableName}", descriptor.getBaseTable());
   }
 }

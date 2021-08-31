@@ -3,7 +3,6 @@ package io.ebeaninternal.api;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
@@ -41,6 +40,16 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public String getLabel() {
     return transaction.getLabel();
+  }
+
+  @Override
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    transaction.setAutoPersistUpdates(autoPersistUpdates);
+  }
+
+  @Override
+  public boolean isAutoPersistUpdates() {
+    return transaction.isAutoPersistUpdates();
   }
 
   @Override
@@ -369,12 +378,12 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext getPersistenceContext() {
     return transaction.getPersistenceContext();
   }
 
   @Override
-  public void setPersistenceContext(PersistenceContext context) {
+  public void setPersistenceContext(SpiPersistenceContext context) {
     transaction.setPersistenceContext(context);
   }
 
@@ -418,4 +427,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
     transaction.flushBatchOnCollection();
   }
 
+  @Override
+  public void preCommit() {
+    transaction.preCommit();
+  }
+
+  @Override
+  public void postCommit() {
+    transaction.postCommit();
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    transaction.postRollback(cause);
+  }
 }

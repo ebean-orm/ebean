@@ -5,7 +5,6 @@ import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.Where;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
-import io.ebean.config.BeanNotRegisteredException;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
 import io.ebean.core.type.ScalarType;
@@ -39,21 +38,13 @@ import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import java.util.Set;
 
-import static io.ebean.util.StringHelper.isNull;
-
 /**
  * Read the deployment annotation for Assoc Many beans.
  */
-class AnnotationAssocManys extends AnnotationParser {
+final class AnnotationAssocManys extends AnnotationAssoc {
 
-  private final BeanDescriptorManager factory;
-
-  /**
-   * Create with the DeployInfo.
-   */
   AnnotationAssocManys(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
-    super(info, readConfig);
-    this.factory = factory;
+    super(info, readConfig, factory);
   }
 
   /**
@@ -78,7 +69,6 @@ class AnnotationAssocManys extends AnnotationParser {
   }
 
   private void read(DeployBeanPropertyAssocMany<?> prop) {
-
     OneToMany oneToMany = get(prop, OneToMany.class);
     if (oneToMany != null) {
       readToOne(oneToMany, prop);
@@ -114,27 +104,22 @@ class AnnotationAssocManys extends AnnotationParser {
     if (get(prop, HistoryExclude.class) != null) {
       prop.setExcludedFromHistory();
     }
-
     OrderBy orderBy = get(prop, OrderBy.class);
     if (orderBy != null) {
       prop.setFetchOrderBy(orderBy.value());
     }
-
     MapKey mapKey = get(prop, MapKey.class);
     if (mapKey != null) {
       prop.setMapKey(mapKey.name());
     }
-
     Where where = prop.getMetaAnnotationWhere(platform);
     if (where != null) {
-      prop.setExtraWhere(where.clause());
+      prop.setExtraWhere(processFormula(where.clause()));
     }
-
     FetchPreference fetchPreference = get(prop, FetchPreference.class);
     if (fetchPreference != null) {
       prop.setFetchPreference(fetchPreference.value());
     }
-
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
 
@@ -146,50 +131,48 @@ class AnnotationAssocManys extends AnnotationParser {
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       if (prop.isManyToMany()) {
-        // expected this
         readJoinTable(joinTable, prop);
-
       } else {
         // OneToMany with @JoinTable
         prop.setO2mJoinTable();
         readJoinTable(joinTable, prop);
         manyToManyDefaultJoins(prop);
       }
+    } else if (prop.isManyToMany()) {
+      checkSelfManyToMany(prop);
     }
-
     if (prop.getMappedBy() != null) {
       // the join is derived by reversing the join information
       // from the mapped by property.
       // Refer BeanDescriptorManager.readEntityRelationships()
       return;
     }
-
     if (prop.isManyToMany()) {
       manyToManyDefaultJoins(prop);
       return;
     }
-
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
-
       // use naming convention to define join (based on the bean name for this side of relationship)
       // A unidirectional OneToMany or OneToMany with no mappedBy property
-
       NamingConvention nc = factory.getNamingConvention();
-
       String fkeyPrefix = null;
       if (nc.isUseForeignKeyPrefix()) {
         fkeyPrefix = nc.getColumnFromProperty(descriptor.getBeanType(), descriptor.getName());
       }
-
       // Use the owning bean table to define the join
       BeanTable owningBeanTable = factory.getBeanTable(descriptor.getBeanType());
       owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
     }
   }
 
+  private void checkSelfManyToMany(DeployBeanPropertyAssocMany<?> prop) {
+    if (prop.getTargetType().equals(descriptor.getBeanType())) {
+      throw new IllegalStateException("@ManyToMany mapping for " + prop.getFullBeanName() + " requires explicit @JoinTable with joinColumns & inverseJoinColumns. Refer issue #2157");
+    }
+  }
+
   @SuppressWarnings("unchecked")
   private void readElementCollection(DeployBeanPropertyAssocMany<?> prop, ElementCollection elementCollection) {
-
     prop.setElementCollection();
     if (!elementCollection.targetClass().equals(void.class)) {
       prop.setTargetType(elementCollection.targetClass());
@@ -202,7 +185,6 @@ class AnnotationAssocManys extends AnnotationParser {
     }
 
     CollectionTable collectionTable = get(prop, CollectionTable.class);
-
     String fullTableName = getFullTableName(collectionTable);
     if (fullTableName == null) {
       fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.getName());
@@ -291,7 +273,6 @@ class AnnotationAssocManys extends AnnotationParser {
   }
 
   private void setElementProperty(DeployBeanProperty elementProp, String name, String dbColumn, int sortOrder) {
-
     if (dbColumn == null) {
       dbColumn = "value";
     }
@@ -313,7 +294,6 @@ class AnnotationAssocManys extends AnnotationParser {
    * </p>
    */
   private void readJoinTable(JoinTable joinTable, DeployBeanPropertyAssocMany<?> prop) {
-
     String intTableName = getFullTableName(joinTable);
     if (intTableName.isEmpty()) {
       BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
@@ -347,18 +327,6 @@ class AnnotationAssocManys extends AnnotationParser {
     return append(joinTable.catalog(), joinTable.schema(), joinTable.name());
   }
 
-  private String append(String catalog, String schema, String name) {
-    StringBuilder sb = new StringBuilder();
-    if (!isNull(catalog)) {
-      sb.append(catalog).append(".");
-    }
-    if (!isNull(schema)) {
-      sb.append(schema).append(".");
-    }
-    sb.append(name);
-    return sb.toString();
-  }
-
   /**
    * Return the full table name
    */
@@ -370,6 +338,13 @@ class AnnotationAssocManys extends AnnotationParser {
   }
 
   /**
+   * Return the full table name taking into account quoted identifiers.
+   */
+  private String append(String catalog, String schema, String name) {
+    return namingConvention.getTableName(catalog, schema, name);
+  }
+
+  /**
    * Define intersection table and foreign key columns for ManyToMany.
    * <p>
    * Some of these (maybe all) have been already defined via @JoinTable
@@ -377,9 +352,7 @@ class AnnotationAssocManys extends AnnotationParser {
    * </p>
    */
   private void manyToManyDefaultJoins(DeployBeanPropertyAssocMany<?> prop) {
-
     String intTableName = null;
-
     DeployTableJoin intJoin = prop.getIntersectionJoin();
     if (intJoin == null) {
       intJoin = new DeployTableJoin();
@@ -404,8 +377,6 @@ class AnnotationAssocManys extends AnnotationParser {
     }
 
     DeployTableJoin destJoin = prop.getTableJoin();
-
-
     if (intJoin.hasJoinColumns() && destJoin.hasJoinColumns()) {
       // already defined the foreign key columns etc
       return;
@@ -415,8 +386,8 @@ class AnnotationAssocManys extends AnnotationParser {
       BeanProperty localId = localTable.getIdProperty();
       if (localId != null) {
         // add the source to intersection join columns
-        String fkCol = localTableName + "_" + localId.getDbColumn();
-        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), namingConvention.getColumnFromProperty(null, fkCol)));
+        String fkCol = namingConvention.deriveM2MColumn(localTableName, localId.getDbColumn());
+        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkCol));
       }
     }
 
@@ -425,8 +396,8 @@ class AnnotationAssocManys extends AnnotationParser {
       BeanProperty otherId = otherTable.getIdProperty();
       if (otherId != null) {
         // set the intersection to dest table join columns
-        final String fkCol = otherTableName + "_" + otherId.getDbColumn();
-        destJoin.addJoinColumn(new DeployTableJoinColumn(namingConvention.getColumnFromProperty(null, fkCol), otherId.getDbColumn()));
+        String fkCol = namingConvention.deriveM2MColumn(otherTableName, otherId.getDbColumn());
+        destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherId.getDbColumn()));
       }
     }
 
@@ -435,13 +406,7 @@ class AnnotationAssocManys extends AnnotationParser {
     prop.setInverseJoin(inverseDest);
   }
 
-
-  private String errorMsgMissingBeanTable(Class<?> type, String from) {
-    return "Error with association to [" + type + "] from [" + from + "]. Is " + type + " registered? See https://ebean.io/docs/trouble-shooting#not-registered";
-  }
-
   private void readToMany(ManyToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
-
     manyProp.setMappedBy(propAnn.mappedBy());
     manyProp.setFetchType(propAnn.fetch());
     setCascadeTypes(propAnn.cascade(), manyProp.getCascadeInfo());
@@ -453,7 +418,6 @@ class AnnotationAssocManys extends AnnotationParser {
   }
 
   private void readToOne(OneToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
-
     manyProp.setMappedBy(propAnn.mappedBy());
     manyProp.setFetchType(propAnn.fetch());
     setCascadeTypes(propAnn.cascade(), manyProp.getCascadeInfo());
@@ -462,22 +426,7 @@ class AnnotationAssocManys extends AnnotationParser {
     manyProp.getTableJoin().setType(SqlJoinType.OUTER);
   }
 
-  private void setTargetType(Class<?> targetType, DeployBeanPropertyAssocMany<?> prop) {
-    if (!targetType.equals(void.class)) {
-      prop.setTargetType(targetType);
-    }
-  }
-
-  private void setBeanTable(DeployBeanPropertyAssocMany<?> manyProp) {
-    BeanTable assoc = factory.getBeanTable(manyProp.getTargetType());
-    if (assoc == null) {
-      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(manyProp.getTargetType(), manyProp.getFullBeanName()));
-    }
-    manyProp.setBeanTable(assoc);
-  }
-
   private String getM2MJoinTableName(BeanTable lhsTable, BeanTable rhsTable) {
-
     TableName lhs = new TableName(lhsTable.getBaseTable());
     TableName rhs = new TableName(rhsTable.getBaseTable());
     TableName joinTable = namingConvention.getM2MJoinTableName(lhs, rhs);

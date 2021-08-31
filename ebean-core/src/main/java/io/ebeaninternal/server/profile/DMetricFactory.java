@@ -10,7 +10,7 @@ import io.ebean.metric.TimedMetricMap;
 /**
  * Default metric factory implementation.
  */
-public class DMetricFactory implements MetricFactory {
+public final class DMetricFactory implements MetricFactory {
 
   @Override
   public TimedMetricMap createTimedMetricMap(String name) {

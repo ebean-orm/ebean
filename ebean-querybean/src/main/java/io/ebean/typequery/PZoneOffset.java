@@ -7,7 +7,7 @@ import java.time.ZoneOffset;
  *
  * @param <R> the root query bean type
  */
-public class PZoneOffset<R> extends PBaseValueEqual<R,ZoneOffset> {
+public final class PZoneOffset<R> extends PBaseValueEqual<R,ZoneOffset> {
 
   /**
    * Construct with a property name and root instance.

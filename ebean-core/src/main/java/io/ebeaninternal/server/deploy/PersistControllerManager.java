@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Default implementation for creating BeanControllers.
  */
-class PersistControllerManager {
+final class PersistControllerManager {
 
   private static final Logger logger = LoggerFactory.getLogger(PersistControllerManager.class);
 

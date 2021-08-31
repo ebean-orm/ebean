@@ -5,8 +5,6 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 
 /**
  * H2 encryption support via encrypt decrypt function.
- *
- * @author rbygrave
  */
 public class H2DbEncrypt extends AbstractDbEncrypt {
 

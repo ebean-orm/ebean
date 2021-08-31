@@ -13,11 +13,12 @@ import io.ebeaninternal.api.SpiQueryBindCapture;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.util.Md5;
+import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.util.Md5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,46 +54,31 @@ public class CQueryPlan implements SpiQueryPlan {
   static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
   private final SpiEbeanServer server;
-
   private final ProfileLocation profileLocation;
-
   private final String location;
-
   private final String label;
-
   private final String name;
-
   private final CQueryPlanKey planKey;
-
   private final boolean rawSql;
-
   private final String sql;
   private final String hash;
-
   private final String logWhereSql;
-
   private final SqlTree sqlTree;
 
   /**
    * Encrypted properties required additional binding.
    */
   private final STreeProperty[] encryptedProps;
-
   private final CQueryPlanStats stats;
-
   private final Class<?> beanType;
-
   final DataTimeZone dataTimeZone;
-
   private final int asOfTableCount;
 
   /**
    * Key used to identify the query plan in audit logging.
    */
   private volatile String auditQueryHash;
-
   private final Set<String> dependentTables;
-
   private final SpiQueryBindCapture bindCapture;
 
   /**
@@ -105,9 +91,9 @@ public class CQueryPlan implements SpiQueryPlan {
     this.planKey = request.getQueryPlanKey();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
+    this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType());
-    this.location = location();
+    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -117,7 +103,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(query);
-    this.hash = md5Hash();
+    this.hash = Md5.hash(sql, name, location);
   }
 
   /**
@@ -129,9 +115,9 @@ public class CQueryPlan implements SpiQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     SpiQuery<?> query = request.getQuery();
     this.profileLocation = query.getProfileLocation();
+    this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType());
-    this.location = location();
+    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;
@@ -142,17 +128,22 @@ public class CQueryPlan implements SpiQueryPlan {
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCaptureRaw(sql, query);
-    this.hash = md5Hash();
+    this.hash = Md5.hash(sql, name, location);
   }
 
-  private String deriveName(String label, SpiQuery.Type type) {
+  private String deriveName(String label, SpiQuery.Type type, String simpleName) {
     if (label == null) {
-      return "orm." + beanType.getSimpleName() + "." + type.label();
+      return Str.add("orm.", simpleName, ".", type.label());
     }
-    if (label.startsWith(beanType.getSimpleName())) {
-      return "orm." + label;
+    int pos = simpleName.indexOf('.');
+    if (pos > 1) {
+      // element collection and label
+      return Str.add("orm.", simpleName.substring(0, pos), "_", label);
     }
-    return "orm." + beanType.getSimpleName() + "_" + label;
+    if (label.startsWith(simpleName)) {
+      return Str.add("orm.", label);
+    }
+    return Str.add("orm.", simpleName, "_", label);
   }
 
   private SpiQueryBindCapture initBindCapture(SpiQuery<?> query) {
@@ -161,10 +152,6 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private SpiQueryBindCapture initBindCaptureRaw(String sql, SpiQuery<?> query) {
     return sql.equals(RESULT_SET_BASED_RAW_SQL) || query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
-  }
-
-  private String location() {
-    return (profileLocation == null) ? null : profileLocation.location();
   }
 
   private CQueryPlanKey buildPlanKey(String sql, String logWhereSql) {
@@ -177,49 +164,49 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   @Override
-  public Class<?> getBeanType() {
+  public final Class<?> getBeanType() {
     return beanType;
   }
 
   @Override
-  public String getName() {
+  public final String getName() {
     return name;
   }
 
   @Override
-  public String getHash() {
+  public final String getHash() {
     return hash;
   }
 
   @Override
-  public String getSql() {
+  public final String getSql() {
     return sql;
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public final ProfileLocation getProfileLocation() {
     return profileLocation;
   }
 
-  public String getLabel() {
+  public final String getLabel() {
     return label;
   }
 
-  public Set<String> getDependentTables() {
+  public final Set<String> getDependentTables() {
     return dependentTables;
   }
 
-  public String getLocation() {
+  public final String getLocation() {
     return location;
   }
 
   @Override
-  public void queryPlanInit(long thresholdMicros) {
+  public final void queryPlanInit(long thresholdMicros) {
     bindCapture.queryPlanInit(thresholdMicros);
   }
 
   @Override
-  public DQueryPlanOutput createMeta(String bind, String planString) {
+  public final DQueryPlanOutput createMeta(String bind, String planString) {
     return new DQueryPlanOutput(getBeanType(), name, hash, sql, profileLocation, bind, planString);
   }
 
@@ -230,7 +217,7 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Bind keys for encrypted properties if necessary returning the DataBind.
    */
-  DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
+  final DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
@@ -250,14 +237,14 @@ public class CQueryPlan implements SpiQueryPlan {
     return dataBind;
   }
 
-  int getAsOfTableCount() {
+  final int getAsOfTableCount() {
     return asOfTableCount;
   }
 
   /**
    * Return a key used in audit logging to identify the query.
    */
-  String getAuditQueryKey() {
+  final String getAuditQueryKey() {
     if (auditQueryHash == null) {
       // volatile object assignment (so happy for multithreaded access)
       auditQueryHash = calcAuditQueryKey();
@@ -270,44 +257,29 @@ public class CQueryPlan implements SpiQueryPlan {
     return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
   }
 
-  /**
-   * Return the MD5 hash of the sql.
-   */
-  private String md5Hash() {
-    StringBuilder sb = new StringBuilder(sql)
-      .append("|").append(name)
-      .append("|").append(location);
-    try {
-      return Md5.hash(sb.toString());
-    } catch (Exception e) {
-      logger.error("Failed to MD5 hash the query", e);
-      return "error";
-    }
-  }
-
-  SqlTree getSqlTree() {
+  final SqlTree getSqlTree() {
     return sqlTree;
   }
 
-  public boolean isRawSql() {
+  public final boolean isRawSql() {
     return rawSql;
   }
 
-  String getLogWhereSql() {
+  final String getLogWhereSql() {
     return logWhereSql;
   }
 
   /**
    * Reset the query statistics.
    */
-  public void resetStatistics() {
+  public final void resetStatistics() {
     stats.reset();
   }
 
   /**
    * Register an execution time against this query plan;
    */
-  boolean executionTime(long timeMicros) {
+  final boolean executionTime(long timeMicros) {
     stats.add(timeMicros);
     return bindCapture != null && bindCapture.collectFor(timeMicros);
   }
@@ -315,33 +287,33 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Return a copy of the current query statistics.
    */
-  public Snapshot getSnapshot(boolean reset) {
+  public final Snapshot getSnapshot(boolean reset) {
     return stats.getSnapshot(reset);
   }
 
   /**
    * Return the time this query plan was last used.
    */
-  public long getLastQueryTime() {
+  public final long getLastQueryTime() {
     return stats.getLastQueryTime();
   }
 
-  ScalarDataReader<?> getSingleAttributeScalarType() {
+  final ScalarDataReader<?> getSingleAttributeScalarType() {
     return sqlTree.getRootNode().getSingleAttributeReader();
   }
 
   /**
    * Return true if there are no statistics collected since the last reset.
    */
-  public boolean isEmptyStats() {
+  public final boolean isEmptyStats() {
     return stats.isEmpty();
   }
 
-  TimedMetric createTimedMetric() {
+  final TimedMetric createTimedMetric() {
     return MetricFactory.get().createTimedMetric(label);
   }
 
-  void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
+  final void captureBindForQueryPlan(CQueryPredicates predicates, long executionTimeMicros) {
     final long startNanos = System.nanoTime();
     try {
       DataBindCapture capture = bindCapture();

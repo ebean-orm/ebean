@@ -32,39 +32,52 @@ public final class EntityBeanIntercept implements Serializable {
   private static final int STATE_REFERENCE = 1;
   private static final int STATE_LOADED = 2;
 
-  private transient final ReentrantLock lock = new ReentrantLock(false);
+  /**
+   * Used when a bean is partially filled.
+   */
+  private static final byte FLAG_LOADED_PROP = 1;
+  private static final byte FLAG_CHANGED_PROP = 2;
+  private static final byte FLAG_CHANGEDLOADED_PROP = 3;
+  /**
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
+   * between an embedded bean being completely overwritten and one of its
+   * embedded properties being made dirty.
+   */
+  private static final byte FLAG_EMBEDDED_DIRTY = 4;
+  /**
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
+   * between an embedded bean being completely overwritten and one of its
+   * embedded properties being made dirty.
+   */
+  private static final byte FLAG_ORIG_VALUE_SET = 8;
 
+  /**
+   * Flags indicating if the mutable hash is set.
+   */
+  private static final byte FLAG_MUTABLE_HASH_SET = 16;
+
+  private transient final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
-
   private transient PersistenceContext persistenceContext;
-
   private transient BeanLoader beanLoader;
-
   private transient PreGetterCallback preGetterCallback;
 
   private String ebeanServerName;
-
   private boolean deletedFromCollection;
 
   /**
    * The actual entity bean that 'owns' this intercept.
    */
   private final EntityBean owner;
-
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
-
   /**
    * One of NEW, REF, UPD.
    */
   private int state;
-
   private boolean forceUpdate;
-
   private boolean readOnly;
-
   private boolean dirty;
-
   /**
    * Flag set to disable lazy loading - typically for SQL "report" type entity beans.
    */
@@ -74,40 +87,25 @@ public final class EntityBeanIntercept implements Serializable {
    * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
    */
   private boolean lazyLoadFailure;
-
-  /**
-   * Used when a bean is partially filled.
-   */
-  private static final byte FLAG_LOADED_PROP = 1;
-
-  /**
-   * Set of changed properties.
-   */
-  private static final byte FLAG_CHANGED_PROP = 2;
-
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
-  private static final byte FLAG_EMBEDDED_DIRTY = 4;
-
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
-  private static final byte FLAG_ORIG_VALUE_SET = 8;
-
-  private final byte[] flags;
-
   private boolean fullyLoadedBean;
   private boolean loadedFromCache;
+  private final byte[] flags;
   private Object[] origValues;
   private Exception[] loadErrors;
   private int lazyLoadProperty = -1;
   private Object ownerId;
   private int sortOrder;
+
+  /**
+   * Holds information of json loaded jackson beans (e.g. the original json or checksum).
+   */
+  private MutableValueInfo[] mutableInfo;
+
+  /**
+   * Holds json content determined at point of dirty check.
+   * Stored here on dirty check such that we only convert to json once.
+   */
+  private MutableValueNext[] mutableNext;
 
   /**
    * Create a intercept with a given entity.
@@ -246,6 +244,17 @@ public final class EntityBeanIntercept implements Serializable {
    * if any embedded beans are either new or dirty (and hence need saving).
    */
   public boolean isDirty() {
+    if (dirty) {
+      return true;
+    }
+    if (mutableInfo != null) {
+      for (int i = 0; i < mutableInfo.length; i++) {
+        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
+          dirty = true;
+          break;
+        }
+      }
+    }
     return dirty;
   }
 
@@ -386,8 +395,18 @@ public final class EntityBeanIntercept implements Serializable {
     this.owner._ebean_setEmbeddedLoaded();
     this.lazyLoadProperty = -1;
     this.origValues = null;
+    // after save, transfer the mutable next values back to mutable info
+    if (mutableNext != null) {
+      for (int i = 0; i < mutableNext.length; i++) {
+        MutableValueNext next = mutableNext[i];
+        if (next != null) {
+          mutableInfo(i, next.info());
+        }
+      }
+    }
+    this.mutableNext = null;
     for (int i = 0; i < flags.length; i++) {
-      flags[i] &= ~(FLAG_CHANGED_PROP + FLAG_ORIG_VALUE_SET);
+      flags[i] &= ~(FLAG_CHANGED_PROP | FLAG_ORIG_VALUE_SET);
     }
     this.dirty = false;
   }
@@ -460,6 +479,10 @@ public final class EntityBeanIntercept implements Serializable {
    * Return the original value that was changed via an update.
    */
   public Object getOrigValue(int propertyIndex) {
+    if ((flags[propertyIndex] & (FLAG_ORIG_VALUE_SET | FLAG_MUTABLE_HASH_SET)) == FLAG_MUTABLE_HASH_SET) {
+      // mutable hash set, but not ORIG_VALUE
+      setOriginalValue(propertyIndex, mutableInfo[propertyIndex].get());
+    }
     if (origValues == null) {
       return null;
     }
@@ -494,7 +517,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Return the number of properties.
    */
   public int getPropertyLength() {
-    return owner._ebean_getPropertyNames().length;
+    return flags.length;
   }
 
   /**
@@ -569,6 +592,10 @@ public final class EntityBeanIntercept implements Serializable {
     flags[propertyIndex] |= FLAG_CHANGED_PROP;
   }
 
+  private void setChangeLoaded(int propertyIndex) {
+    flags[propertyIndex] |= FLAG_CHANGEDLOADED_PROP;
+  }
+
   /**
    * Set that an embedded bean has had one of its properties changed.
    */
@@ -578,7 +605,7 @@ public final class EntityBeanIntercept implements Serializable {
 
   private void setOriginalValue(int propertyIndex, Object value) {
     if (origValues == null) {
-      origValues = new Object[owner._ebean_getPropertyNames().length];
+      origValues = new Object[flags.length];
     }
     if ((flags[propertyIndex] & FLAG_ORIG_VALUE_SET) == 0) {
       flags[propertyIndex] |= FLAG_ORIG_VALUE_SET;
@@ -591,7 +618,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   private void setOriginalValueForce(int propertyIndex, Object value) {
     if (origValues == null) {
-      origValues = new Object[owner._ebean_getPropertyNames().length];
+      origValues = new Object[flags.length];
     }
     origValues[propertyIndex] = value;
   }
@@ -652,7 +679,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void addDirtyPropertyNames(Set<String> props, String prefix) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if (isChangedProp(i)) {
         // the property has been changed on this bean
         props.add((prefix == null ? getProperty(i) : prefix + getProperty(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
@@ -670,7 +697,7 @@ public final class EntityBeanIntercept implements Serializable {
     String[] names = owner._ebean_getPropertyNames();
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if (isChangedProp(i)) {
         if (propertyNames.contains(names[i])) {
           return true;
         }
@@ -698,7 +725,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void addDirtyPropertyValues(Map<String, ValuePair> dirtyValues, String prefix) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if (isChangedProp(i)) {
         // the property has been changed on this bean
         String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
         Object newVal = owner._ebean_getField(i);
@@ -720,7 +747,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void addDirtyPropertyValues(BeanDiffVisitor visitor) {
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if (isChangedProp(i)) {
         // the property has been changed on this bean
         Object newVal = owner._ebean_getField(i);
         Object oldVal = getOrigValue(i);
@@ -755,7 +782,7 @@ public final class EntityBeanIntercept implements Serializable {
     }
     int len = getPropertyLength();
     for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      if ((flags[i] & FLAG_CHANGED_PROP) != 0) { // we do not check against mutablecontent here.
         sb.append(i).append(',');
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
@@ -931,10 +958,14 @@ public final class EntityBeanIntercept implements Serializable {
    * OneToMany and ManyToMany only set loaded state.
    */
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-    if (readOnly) {
-      throw new IllegalStateException("This bean is readOnly");
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else {
+      if (readOnly) {
+        throw new IllegalStateException("This bean is readOnly");
+      }
+      setChangeLoaded(propertyIndex);
     }
-    setLoadedProperty(propertyIndex);
   }
 
   private void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
@@ -972,7 +1003,6 @@ public final class EntityBeanIntercept implements Serializable {
       setChangedPropertyValue(propertyIndex, intercept, oldValue);
     }
   }
-
 
   /**
    * Check for primitive boolean.
@@ -1123,7 +1153,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setLoadError(int propertyIndex, Exception t) {
     if (loadErrors == null) {
-      loadErrors = new Exception[owner._ebean_getPropertyNames().length];
+      loadErrors = new Exception[flags.length];
     }
     loadErrors[propertyIndex] = t;
     flags[propertyIndex] |= FLAG_LOADED_PROP;
@@ -1149,4 +1179,61 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return ret;
   }
+
+  private boolean isChangedProp(int i) {
+    if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
+      return true;
+    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
+      return false;
+    } else {
+      // mark for change
+      flags[i] |= FLAG_CHANGED_PROP;
+      dirty = true; // this makes the bean automatically dirty!
+      return true;
+    }
+  }
+
+  /**
+   * Return the MutableValueInfo for the given property or null.
+   */
+  public MutableValueInfo mutableInfo(int propertyIndex) {
+    return mutableInfo == null ? null : mutableInfo[propertyIndex];
+  }
+
+  /**
+   * Set the MutableValueInfo for the given property.
+   */
+  public void mutableInfo(int propertyIndex, MutableValueInfo info) {
+    if (mutableInfo == null) {
+      mutableInfo = new MutableValueInfo[flags.length];
+    }
+    flags[propertyIndex] |= FLAG_MUTABLE_HASH_SET;
+    mutableInfo[propertyIndex] = info;
+  }
+
+  /**
+   * Dirty detection set the next mutable property content and info .
+   * <p>
+   * Set here as the mutable property dirty detection is based on json content comparison.
+   * We only want to perform the json serialisation once so storing it here as part of
+   * dirty detection so that we can get it back to bind in insert or update etc.
+   */
+  public void mutableNext(int propertyIndex, MutableValueNext next) {
+    if (mutableNext == null) {
+      mutableNext = new MutableValueNext[flags.length];
+    }
+    mutableNext[propertyIndex] = next;
+  }
+
+  /**
+   * Update the 'next' mutable info returning the content that was obtained via dirty detection.
+   */
+  public String mutableNext(int propertyIndex) {
+    if (mutableNext == null) {
+      return null;
+    }
+    final MutableValueNext next = mutableNext[propertyIndex];
+    return next != null ? next.content() : null;
+  }
+
 }

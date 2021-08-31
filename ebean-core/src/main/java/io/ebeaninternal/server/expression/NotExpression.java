@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.Expression;
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -20,6 +21,11 @@ final class NotExpression implements SpiExpression {
 
   NotExpression(Expression exp) {
     this.exp = (SpiExpression) exp;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    exp.prefixProperty(path);
   }
 
   @Override
@@ -94,8 +100,8 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return exp.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    exp.queryBindKey(key);
   }
 
   @Override

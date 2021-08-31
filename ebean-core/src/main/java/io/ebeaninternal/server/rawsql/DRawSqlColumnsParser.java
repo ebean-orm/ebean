@@ -6,6 +6,7 @@ import io.ebeaninternal.server.util.DSelectColumnsParser;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -16,7 +17,6 @@ final class DRawSqlColumnsParser {
   private static final Pattern COLINFO_SPLIT = Pattern.compile("\\s(?=[^\\)]*(?:\\(|$))");
 
   private final String sqlSelect;
-
   private int indexPos;
 
   public static ColumnMapping parse(String sqlSelect) {
@@ -28,11 +28,8 @@ final class DRawSqlColumnsParser {
   }
 
   private ColumnMapping parse() {
-
-    List<String> columnList = DSelectColumnsParser.parse(sqlSelect);
-
+    Set<String> columnList = DSelectColumnsParser.parse(sqlSelect);
     List<ColumnMapping.Column> columns = new ArrayList<>(columnList.size());
-
     for (String rawColumn : columnList) {
       columns.add(parseColumn(rawColumn));
     }
@@ -40,7 +37,6 @@ final class DRawSqlColumnsParser {
   }
 
   private ColumnMapping.Column parseColumn(String colInfo) {
-
     String[] split = COLINFO_SPLIT.split(colInfo);
     if (split.length > 1) {
       ArrayList<String> tmp = new ArrayList<>(split.length);

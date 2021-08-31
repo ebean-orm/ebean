@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Query plan key for ORM queries.
  */
-class OrmQueryPlanKey implements CQueryPlanKey {
+final class OrmQueryPlanKey implements CQueryPlanKey {
 
   private final SpiRawSql.Key rawSqlKey;
   private final int maxRows;
@@ -29,7 +29,7 @@ class OrmQueryPlanKey implements CQueryPlanKey {
 
   @Override
   public CQueryPlanKey withDeleteByIds() {
-    return new OrmQueryPlanKey(description + ":deleteByIds", 0, 0, null);
+    return new OrmQueryPlanKey(description + "/deleteByIds", 0, 0, null);
   }
 
   @Override

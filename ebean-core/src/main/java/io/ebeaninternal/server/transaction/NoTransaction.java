@@ -3,9 +3,9 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
+import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
@@ -19,11 +19,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Place holder for use with SUPPORTS and NEVER transactional when there really isn't a transaction.
+ * Placeholder for use with SUPPORTS and NEVER transactional when there really isn't a transaction.
  */
-class NoTransaction implements SpiTransaction {
+final class NoTransaction implements SpiTransaction {
 
   static final NoTransaction INSTANCE = new NoTransaction();
+
+  @Override
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    // do nothing
+  }
+
+  @Override
+  public boolean isAutoPersistUpdates() {
+    return false;
+  }
 
   @Override
   public void setLabel(String label) {
@@ -85,6 +95,21 @@ class NoTransaction implements SpiTransaction {
 
   @Override
   public void close() {
+    // do nothing
+  }
+
+  @Override
+  public void preCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
     // do nothing
   }
 
@@ -324,12 +349,12 @@ class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext getPersistenceContext() {
     return null;
   }
 
   @Override
-  public void setPersistenceContext(PersistenceContext context) {
+  public void setPersistenceContext(SpiPersistenceContext context) {
   }
 
   @Override

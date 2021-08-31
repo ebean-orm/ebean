@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Executes the generated property (like WhenCreated, WhoCreated etc) for doc store persisting.
  */
-class GeneratedProperties {
+final class GeneratedProperties {
 
   /**
    * Create the GeneratedProperties for the given bean type.

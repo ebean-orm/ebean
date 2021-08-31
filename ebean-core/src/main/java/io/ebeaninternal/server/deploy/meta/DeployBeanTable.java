@@ -13,15 +13,13 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
  * in a BeanDescriptor.
  * </p>
  */
-public class DeployBeanTable {
+public final class DeployBeanTable {
 
   private final Class<?> beanType;
-
   /**
    * The base table.
    */
   private String baseTable;
-
   private DeployBeanProperty idProperty;
 
   /**

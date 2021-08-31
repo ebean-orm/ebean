@@ -6,7 +6,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 /**
  * Generate a (Long) Timestamp whenever the bean is inserted or updated.
  */
-public class GeneratedUpdateLong implements GeneratedProperty {
+final class GeneratedUpdateLong implements GeneratedProperty {
 
   /**
    * Return now as a Timestamp.

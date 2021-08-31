@@ -8,12 +8,7 @@ import java.util.List;
 public interface ModuleInfoLoader {
 
   /**
-   * Return the entity classes to register with the default DB.
-   */
-  List<Class<?>> entityClasses();
-
-  /**
    * Return entity classes to register for a named DB (not default DB).
    */
-  List<Class<?>> entityClassesFor(String dbName);
+  List<Class<?>> classesFor(String dbName, boolean defaultServer);
 }

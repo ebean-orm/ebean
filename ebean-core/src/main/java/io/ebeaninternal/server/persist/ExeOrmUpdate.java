@@ -15,15 +15,11 @@ import java.sql.SQLException;
 /**
  * Executes the UpdateSql requests.
  */
-class ExeOrmUpdate {
+final class ExeOrmUpdate {
 
   private final Binder binder;
-
   private final PstmtFactory pstmtFactory;
 
-  /**
-   * Create with a given binder.
-   */
   ExeOrmUpdate(Binder binder) {
     this.pstmtFactory = new PstmtFactory();
     this.binder = binder;
@@ -33,9 +29,7 @@ class ExeOrmUpdate {
    * Execute the orm update request.
    */
   public int execute(PersistRequestOrmUpdate request) {
-
     boolean batchThisRequest = request.isBatchThisRequest();
-
     PreparedStatement pstmt = null;
     try {
       pstmt = bindStmt(request, batchThisRequest);
@@ -68,13 +62,11 @@ class ExeOrmUpdate {
    * Convert bean and property names to db table and columns.
    */
   private String translate(PersistRequestOrmUpdate request, String sql) {
-
     BeanDescriptor<?> descriptor = request.getBeanDescriptor();
     return descriptor.convertOrmUpdateToSql(sql);
   }
 
   private PreparedStatement bindStmt(PersistRequestOrmUpdate request, boolean batchThisRequest) throws SQLException {
-
     request.startBind(batchThisRequest);
     SpiUpdate<?> ormUpdate = request.getOrmUpdate();
     SpiTransaction t = request.getTransaction();

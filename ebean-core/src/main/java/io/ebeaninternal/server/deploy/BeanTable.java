@@ -17,19 +17,13 @@ import org.slf4j.LoggerFactory;
  * in a BeanDescriptor.
  * </p>
  */
-public class BeanTable {
+public final class BeanTable {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
 
   private final BeanDescriptorMap owner;
-
   private final Class<?> beanType;
-
-  /**
-   * The base table.
-   */
   private final String baseTable;
-
   private final BeanProperty idProperty;
 
   /**
@@ -91,11 +85,9 @@ public class BeanTable {
   }
 
   public void createJoinColumn(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect) {
-
     if (idProperty == null) {
       return;
     }
-
     if (idProperty instanceof BeanPropertyAssocOne<?>) {
       BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) idProperty;
       BeanProperty[] props = assocOne.getProperties();
@@ -108,13 +100,11 @@ public class BeanTable {
   }
 
   private void addToJoin(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect, boolean complexKey, BeanProperty prop) {
-
     String lc = prop.getDbColumn();
     String fk = lc;
     if (foreignKeyPrefix != null) {
       fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);
     }
-
     if (complexKey) {
       // just to copy the column name rather than prefix with the foreignKeyPrefix.
       // I think that with complex keys this is the more common approach.
@@ -124,7 +114,6 @@ public class BeanTable {
     if (sqlFormulaSelect != null) {
       fk = sqlFormulaSelect;
     }
-
     DeployTableJoinColumn joinCol = new DeployTableJoinColumn(lc, fk);
     joinCol.setForeignSqlFormula(sqlFormulaSelect);
     if (reverse) {

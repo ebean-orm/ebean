@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * Save details for a simple scalar element collection.
  */
-class SaveManyElementCollection extends SaveManyBase {
+final class SaveManyElementCollection extends SaveManyBase {
 
   private Collection<?> collection;
 
@@ -48,7 +48,7 @@ class SaveManyElementCollection extends SaveManyBase {
       final SpiSqlUpdate sqlInsert = proto.copy();
       sqlInsert.setParameter(parentId);
       many.bindElementValue(sqlInsert, value);
-      persister.addToFlushQueueLast(sqlInsert, transaction);
+      persister.addToFlushQueue(sqlInsert, transaction, 2);
     }
     resetModifyState();
     postElementCollectionUpdate();

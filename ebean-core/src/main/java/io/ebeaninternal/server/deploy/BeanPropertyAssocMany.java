@@ -43,7 +43,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssocMany.class);
 
   private final BeanPropertyAssocManyJsonHelp jsonHelp;
-
   /**
    * Join for manyToMany intersection table.
    */
@@ -51,72 +50,46 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private final String intersectionPublishTable;
   private final String intersectionDraftTable;
   private final boolean orphanRemoval;
-
   private IntersectionTable intersectionTable;
-
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
    */
   final TableJoin inverseJoin;
-
   /**
    * Flag to indicate that this is a unidirectional relationship.
    */
   private final boolean unidirectional;
-
   private final boolean o2mJoinTable;
-
   /**
    * Flag to indicate that the target has a order column to auto populate.
    */
   private final boolean hasOrderColumn;
-
   /**
    * Flag to indicate manyToMany relationship.
    */
   private final boolean manyToMany;
-
   private final boolean elementCollection;
-
   /**
    * Descriptor for the 'target' when the property maps to an element collection.
    */
   final BeanDescriptor<T> elementDescriptor;
-
   /**
    * Order by used when fetch joining the associated many.
    */
   private final String fetchOrderBy;
-
   /**
    * Order by used when lazy loading the associated many.
    */
   private String lazyFetchOrderBy;
-
   private final String mapKey;
-
-  /**
-   * The type of the many, set, list or map.
-   */
   private final ManyType manyType;
-
   private final ModifyListenMode modifyListenMode;
-
   private BeanProperty mapKeyProperty;
-
-  /**
-   * Property on the 'child' bean that links back to the 'master'.
-   */
   private BeanPropertyAssocOne<?> childMasterProperty;
-
   private String childMasterIdProperty;
-
   private boolean embeddedExportedProperties;
-
   private BeanCollectionHelp<T> help;
-
   private ImportedId importedId;
-
   private BeanPropertyAssocManySqlHelp<T> sqlHelp;
 
   /**
@@ -234,6 +207,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Return the underlying collection of beans.
    */
+  @SuppressWarnings("rawtypes")
   public Collection getRawCollection(EntityBean bean) {
     return help.underlying(getVal(bean));
   }
@@ -399,8 +373,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
-   * Return the mode for listening to modifications to collections for this
-   * association.
+   * Return the mode for listening to modifications to collections for this association.
    */
   public ModifyListenMode getModifyListenMode() {
     return modifyListenMode;
@@ -439,6 +412,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   @Override
   public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
     boolean softDelete = targetDescriptor.isSoftDelete();
+    boolean needsX2Table = softDelete || getExtraWhere() != null;
     StringBuilder sb = new StringBuilder(50);
     SpiQuery<?> query = request.getQueryRequest().getQuery();
     if (hasJoinTable()) {
@@ -446,7 +420,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     } else {
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
     }
-    if (softDelete && hasJoinTable()) {
+    if (needsX2Table && hasJoinTable()) {
       sb.append(" x join ");
       sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
       sb.append(" x2 on ");
@@ -460,6 +434,14 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         sb.append(" and ");
       }
       exportedProperties[i].appendWhere(sb, "x.", path);
+    }
+    if (getExtraWhere() != null) {
+      sb.append(" and ");
+      if (hasJoinTable()) {
+        sb.append(getExtraWhere().replace("${ta}", "x2").replace("${mta}", "x"));
+      } else {
+        sb.append(getExtraWhere().replace("${ta}", "x"));
+      }
     }
     if (softDelete) {
       String alias = hasJoinTable() ? "x2" : "x";
@@ -570,6 +552,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
+   * Return the element bean descriptor (for an element collection only).
+   */
+  public BeanDescriptor<T> getElementDescriptor() {
+    return elementDescriptor;
+  }
+
+  /**
    * ManyToMany only, join from local table to intersection table.
    */
   @Override
@@ -588,7 +577,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (!manyToMany && childMasterProperty != null) {
       // bidirectional in the sense that the 'master' property
       // exists on the 'detail' bean
-      childMasterProperty.setValue(child, parent);
+      childMasterProperty.setValueIntercept(child, parent);
     }
   }
 
@@ -702,7 +691,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * <p>
    * Note that childMasterProperty will be null if a field is used instead of
    * a ManyToOne bean association.
-   * </p>
    */
   private BeanPropertyAssocOne<?> initChildMasterProperty() {
     if (unidirectional) {
@@ -889,7 +877,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
           // add new relationship (Map not allowed here)
           liveVal.addBean(targetDescriptor.createReference(id, null));
         }
-
       } else {
         // recursively publish the OneToMany child bean
         T newLive = targetDescriptor.publish(bean, liveBean);
@@ -899,7 +886,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         }
       }
     }
-
     // anything remaining should be deleted (so remove from modify aware collection)
     Collection<T> values = liveBeansAsMap.values();
     for (T value : values) {
@@ -912,7 +898,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     liveVal.size();
     Collection<?> liveBeans = liveVal.getActualDetails();
     Map<Object, T> liveMap = new LinkedHashMap<>();
-
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.getId((EntityBean) liveBean);
       liveMap.put(id, (T) liveBean);
@@ -1053,5 +1038,17 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   public void bindElementValue(SqlUpdate insert, Object value) {
     targetDescriptor.bindElementValue(insert, value);
+  }
+
+  /**
+   * Returns true, if we must create a m2m join table.
+   */
+  public boolean createJoinTable() {
+    if (hasJoinTable() && getMappedBy() == null) {
+      // only create on other 'owning' side
+      return !descriptor.isTableManaged(intersectionJoin.getTable());
+    } else {
+      return false;
+    }
   }
 }

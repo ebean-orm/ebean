@@ -16,9 +16,9 @@ import java.sql.Types;
 /**
  * ScalarType for Double and double.
  */
-public class ScalarTypeDouble extends ScalarTypeBase<Double> {
+final class ScalarTypeDouble extends ScalarTypeBase<Double> {
 
-  public ScalarTypeDouble() {
+  ScalarTypeDouble() {
     super(Double.class, true, Types.DOUBLE);
   }
 

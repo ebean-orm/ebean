@@ -62,10 +62,7 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-    final String generated = processingContext.getGeneratedAnnotation();
-    if (generated != null) {
-      importTypes.add(generated);
-    }
+    importTypes.add(Constants.GENERATED);
     importTypes.add(beanFullName);
     importTypes.add(Constants.TQROOTBEAN);
     importTypes.add(Constants.TYPEQUERYBEAN);
@@ -191,6 +188,24 @@ class SimpleQueryBeanWriter {
     writer.eol();
     writer.append("  /**").eol();
     writer.append("   * Return a query bean used to build a FetchGroup.").eol();
+    writer.append("   * <p>").eol();
+    writer.append("   * FetchGroups are immutable and threadsafe and can be used by many").eol();
+    writer.append("   * concurrent queries. We typically stored FetchGroup as a static final field.").eol();
+    writer.append("   * <p>").eol();
+    writer.append("   * Example creating and using a FetchGroup.").eol();
+    writer.append("   * <pre>{@code").eol();
+    writer.append("   * ").eol();
+    writer.append("   * static final FetchGroup<Customer> fetchGroup = ").eol();
+    writer.append("   *   QCustomer.forFetchGroup()").eol();
+    writer.append("   *     .shippingAddress.fetch()").eol();
+    writer.append("   *     .contacts.fetch()").eol();
+    writer.append("   *     .buildFetchGroup();").eol();
+    writer.append("   * ").eol();
+    writer.append("   * List<Customer> customers = new QCustomer()").eol();
+    writer.append("   *   .select(fetchGroup)").eol();
+    writer.append("   *   .findList();").eol();
+    writer.append("   * ").eol();
+    writer.append("   * }</pre>").eol();
     writer.append("   */").eol();
     writer.append("  public static Q%s forFetchGroup() {", shortName).eol();
     writer.append("    return new Q%s(FetchGroup.queryFor(%s.class));", shortName, shortName).eol();
@@ -301,9 +316,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       writer.append("public class Q%s<R> extends TQAssocBean<%s,R> {", shortName, origShortName).eol();
 
@@ -313,9 +326,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       writer.append("public class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
     }

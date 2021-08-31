@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Main Finder implementation.
  */
-public class DefaultOrmQueryEngine implements OrmQueryEngine {
+public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
   /**
    * Find using predicates
@@ -58,7 +58,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
       // before we perform a query, we need to flush any
       // previous persist requests that are queued/batched.
       // The query may read data affected by those requests.
-      t.flushBatch();
+      t.flush();
     }
   }
 

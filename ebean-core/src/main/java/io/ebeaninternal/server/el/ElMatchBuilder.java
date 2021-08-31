@@ -8,12 +8,12 @@ import java.util.regex.Pattern;
 /**
  * Contains the various ElMatcher implementations.
  */
-class ElMatchBuilder {
+final class ElMatchBuilder {
 
   /**
    * Case insensitive equals.
    */
-  static class RegularExpr<T> implements ElMatcher<T> {
+  static final class RegularExpr<T> implements ElMatcher<T> {
 
     final ElPropertyValue elGetValue;
     final String value;
@@ -49,7 +49,7 @@ class ElMatchBuilder {
     public abstract boolean isMatch(T bean);
   }
 
-  static class Ieq<T> extends BaseString<T> {
+  static final class Ieq<T> extends BaseString<T> {
     Ieq(ElPropertyValue elGetValue, String value) {
       super(elGetValue, value);
     }
@@ -64,7 +64,7 @@ class ElMatchBuilder {
   /**
    * Case insensitive starts with matcher.
    */
-  static class IStartsWith<T> implements ElMatcher<T> {
+  static final class IStartsWith<T> implements ElMatcher<T> {
 
     final ElPropertyValue elGetValue;
     final CharMatch charMatch;
@@ -85,7 +85,7 @@ class ElMatchBuilder {
   /**
    * Case insensitive ends with matcher.
    */
-  static class IEndsWith<T> implements ElMatcher<T> {
+  static final class IEndsWith<T> implements ElMatcher<T> {
 
     final ElPropertyValue elGetValue;
     final CharMatch charMatch;
@@ -103,7 +103,7 @@ class ElMatchBuilder {
     }
   }
 
-  static class StartsWith<T> extends BaseString<T> {
+  static final class StartsWith<T> extends BaseString<T> {
     StartsWith(ElPropertyValue elGetValue, String value) {
       super(elGetValue, value);
     }
@@ -115,7 +115,7 @@ class ElMatchBuilder {
     }
   }
 
-  static class EndsWith<T> extends BaseString<T> {
+  static final class EndsWith<T> extends BaseString<T> {
     EndsWith(ElPropertyValue elGetValue, String value) {
       super(elGetValue, value);
     }
@@ -127,7 +127,7 @@ class ElMatchBuilder {
     }
   }
 
-  static class IsNull<T> implements ElMatcher<T> {
+  static final class IsNull<T> implements ElMatcher<T> {
 
     final ElPropertyValue elGetValue;
 
@@ -141,7 +141,7 @@ class ElMatchBuilder {
     }
   }
 
-  static class IsNotNull<T> implements ElMatcher<T> {
+  static final class IsNotNull<T> implements ElMatcher<T> {
 
     final ElPropertyValue elGetValue;
 
@@ -170,7 +170,7 @@ class ElMatchBuilder {
     public abstract boolean isMatch(T value);
   }
 
-  static class InSet<T> implements ElMatcher<T> {
+  static final class InSet<T> implements ElMatcher<T> {
 
     final Set<?> set;
     final ElPropertyValue elGetValue;
@@ -183,7 +183,6 @@ class ElMatchBuilder {
 
     @Override
     public boolean isMatch(T bean) {
-
       Object value = elGetValue.pathGet(bean);
       return value != null && set.contains(value);
     }
@@ -192,7 +191,7 @@ class ElMatchBuilder {
   /**
    * Equal To.
    */
-  static class Eq<T> extends Base<T> {
+  static final class Eq<T> extends Base<T> {
 
     public Eq(Object filterValue, ElComparator<T> comparator) {
       super(filterValue, comparator);
@@ -207,7 +206,7 @@ class ElMatchBuilder {
   /**
    * Not Equal To.
    */
-  static class Ne<T> extends Base<T> {
+  static final class Ne<T> extends Base<T> {
 
     public Ne(Object filterValue, ElComparator<T> comparator) {
       super(filterValue, comparator);
@@ -222,7 +221,7 @@ class ElMatchBuilder {
   /**
    * Between.
    */
-  static class Between<T> implements ElMatcher<T> {
+  static final class Between<T> implements ElMatcher<T> {
 
     final Object min;
     final Object max;
@@ -236,7 +235,6 @@ class ElMatchBuilder {
 
     @Override
     public boolean isMatch(T value) {
-
       return (comparator.compareValue(min, value) <= 0
         && comparator.compareValue(max, value) >= 0);
     }
@@ -245,7 +243,7 @@ class ElMatchBuilder {
   /**
    * Greater Than.
    */
-  static class Gt<T> extends Base<T> {
+  static final class Gt<T> extends Base<T> {
     Gt(Object filterValue, ElComparator<T> comparator) {
       super(filterValue, comparator);
     }
@@ -259,7 +257,7 @@ class ElMatchBuilder {
   /**
    * Greater Than or Equal To.
    */
-  static class Ge<T> extends Base<T> {
+  static final class Ge<T> extends Base<T> {
     Ge(Object filterValue, ElComparator<T> comparator) {
       super(filterValue, comparator);
     }
@@ -273,7 +271,7 @@ class ElMatchBuilder {
   /**
    * Less Than or Equal To.
    */
-  static class Le<T> extends Base<T> {
+  static final class Le<T> extends Base<T> {
     Le(Object filterValue, ElComparator<T> comparator) {
       super(filterValue, comparator);
     }
@@ -287,7 +285,7 @@ class ElMatchBuilder {
   /**
    * Less Than.
    */
-  static class Lt<T> extends Base<T> {
+  static final class Lt<T> extends Base<T> {
     Lt(Object filterValue, ElComparator<T> comparator) {
       super(filterValue, comparator);
     }

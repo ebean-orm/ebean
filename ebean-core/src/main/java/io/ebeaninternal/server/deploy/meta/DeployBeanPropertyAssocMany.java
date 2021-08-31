@@ -17,41 +17,29 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
    * The type of the many, set, list or map.
    */
   private final ManyType manyType;
-
   ModifyListenMode modifyListenMode = ModifyListenMode.NONE;
-
   /**
    * Flag to indicate manyToMany relationship.
    */
   private boolean manyToMany;
-
   private boolean o2mJoinTable;
-
   private boolean elementCollection;
-
   /**
    * Flag to indicate this is a unidirectional relationship.
    */
   private boolean unidirectional;
-
   /**
    * Join for manyToMany intersection table.
    */
   private DeployTableJoin intersectionJoin;
-
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
    */
   private DeployTableJoin inverseJoin;
-
   private String fetchOrderBy;
-
   private String mapKey;
-
   private String intersectionDraftTable;
-
   private DeployOrderColumn orderColumn;
-
   /**
    * Effectively the dynamically created target descriptor (that doesn't have a mapped type/class per say).
    */
@@ -64,19 +52,6 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
     super(desc, targetType);
     this.manyType = manyType;
   }
-
-  /**
-   * When generics is not used for manyType you can specify via annotations.
-   * <p>
-   * Really only expect this for Scala due to a Scala compiler bug at the moment.
-   * Otherwise I'd probably not bother support this.
-   * </p>
-   */
-  @SuppressWarnings("unchecked")
-  public void setTargetType(Class<?> cls) {
-    this.targetType = (Class<T>) cls;
-  }
-
 
   /**
    * Return the many type.

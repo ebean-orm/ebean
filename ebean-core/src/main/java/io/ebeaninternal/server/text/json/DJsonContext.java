@@ -43,18 +43,14 @@ import java.util.Set;
 /**
  * Default implementation of JsonContext.
  */
-public class DJsonContext implements SpiJsonContext {
+public final class DJsonContext implements SpiJsonContext {
 
   private static final PrettyPrinter PRETTY_PRINTER = new Pretty();
 
   private final SpiEbeanServer server;
-
   private final JsonFactory jsonFactory;
-
   private final Object defaultObjectMapper;
-
   private final JsonConfig.Include defaultInclude;
-
   private final DJsonScalar jsonScalar;
 
   private static class Pretty extends DefaultPrettyPrinter {

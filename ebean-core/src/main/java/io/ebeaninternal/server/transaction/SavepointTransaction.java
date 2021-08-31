@@ -2,7 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionProxy;
-import io.ebeaninternal.server.lib.Str;
+import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -12,7 +12,7 @@ import java.sql.Savepoint;
 /**
  * A nested transaction that represents a Savepoint.
  */
-class SavepointTransaction extends SpiTransactionProxy {
+final class SavepointTransaction extends SpiTransactionProxy {
 
   private static final int STATE_COMMITTED = 1;
   private static final int STATE_ROLLED_BACK = 2;

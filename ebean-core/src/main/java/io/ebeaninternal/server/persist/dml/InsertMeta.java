@@ -26,28 +26,18 @@ final class InsertMeta {
   private final String sqlWithId;
   private final String sqlDraftNullId;
   private final String sqlDraftWithId;
-
   private final BindableId id;
-
   private final Bindable discriminator;
-
   private final BindableList all;
-
   private final BindableList allExcludeDraftOnly;
-
   private final boolean supportsGetGeneratedKeys;
-
-  private final boolean concatinatedKey;
-
+  private final boolean concatenatedKey;
   /**
    * Used for DB that do not support getGeneratedKeys.
    */
   private final boolean supportsSelectLastInsertedId;
-
   private final Bindable shadowFKey;
-
   private final String[] identityDbColumns;
-
   private final Platform platform;
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
@@ -66,7 +56,7 @@ final class InsertMeta {
     // only available for single Id property
     if (id.isConcatenated()) {
       // concatenated key
-      this.concatinatedKey = true;
+      this.concatenatedKey = true;
       this.identityDbColumns = null;
       this.sqlNullId = null;
       this.sqlDraftNullId = null;
@@ -75,7 +65,7 @@ final class InsertMeta {
 
     } else {
       // insert sql for db identity or sequence insert
-      this.concatinatedKey = false;
+      this.concatenatedKey = false;
       if (id.getIdentityColumn() == null) {
         this.identityDbColumns = new String[]{};
         this.supportsGetGeneratedKeys = false;
@@ -99,7 +89,7 @@ final class InsertMeta {
    * Return true if this is a concatenated key.
    */
   boolean isConcatenatedKey() {
-    return concatinatedKey;
+    return concatenatedKey;
   }
 
   String[] getIdentityDbColumns() {
@@ -133,7 +123,6 @@ final class InsertMeta {
    * Bind the request based on whether the id value(s) are null.
    */
   public void bind(DmlHandler request, EntityBean bean, boolean withId, boolean publish) throws SQLException {
-
     if (withId) {
       id.dmlBind(request, bean);
     }
@@ -154,7 +143,6 @@ final class InsertMeta {
    * get the sql based whether the id value(s) are null.
    */
   public String getSql(boolean withId, boolean publish) {
-
     if (withId) {
       return publish ? sqlWithId : sqlDraftWithId;
     } else {
@@ -163,7 +151,6 @@ final class InsertMeta {
   }
 
   private String genSql(boolean nullId, String table, boolean draftTable) {
-
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.setInsertSetMode();
 

@@ -19,7 +19,7 @@ import static java.util.Collections.EMPTY_LIST;
  * H2 database support for DB ARRAY.
  */
 @SuppressWarnings("rawtypes")
-class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
+final class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
 
   static PlatformArrayTypeFactory factory() {
     return new ScalarTypeArrayListH2.Factory();
@@ -27,7 +27,7 @@ class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
 
   static class Factory implements PlatformArrayTypeFactory {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final Map<String, ScalarTypeArrayListH2> cache = new HashMap<>();
 
     /**

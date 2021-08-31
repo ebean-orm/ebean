@@ -26,6 +26,7 @@ import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -55,15 +56,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   private static final String AND = " and ";
 
   protected List<SpiExpression> list;
-
   protected final Query<T> query;
-
   private final ExpressionList<T> parentExprList;
-
   protected final ExpressionFactory expr;
-
   String allDocNestedPath;
-
   /**
    * Set to true for the "Text" root expression list.
    */
@@ -109,10 +105,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * @return A single SpiExpression that has the nestedPath set
    */
   SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
-
     DefaultExpressionList<T> wrapper = new DefaultExpressionList<>(query, expr, null, list, false);
     wrapper.setAllDocNested(nestedPath);
-
     if (type != null) {
       return new JunctionExpression<>(type, wrapper);
     } else {
@@ -121,8 +115,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   void simplifyEntries() {
-    for (SpiExpression element : list) {
-      element.simplify();
+    for (SpiExpression expr : list) {
+      expr.simplify();
+    }
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    for (SpiExpression expr : list) {
+      expr.prefixProperty(path);
     }
   }
 
@@ -167,7 +168,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
         context.startNested(allDocNestedPath);
       }
       int size = list.size();
-
       SpiExpression first = list.get(0);
       boolean explicitBool = first instanceof SpiJunction<?>;
       boolean implicitBool = !explicitBool && size > 1;
@@ -203,7 +203,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
-
     if (allDocNestedPath != null) {
       context.startNested(allDocNestedPath);
     }
@@ -220,8 +219,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (idEquals != null) {
         idEquals.writeDocQuery(context);
       }
-      for (SpiExpression aList : list) {
-        aList.writeDocQuery(context);
+      for (SpiExpression expr : list) {
+        expr.writeDocQuery(context);
       }
       context.endBool();
     }
@@ -271,16 +270,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
-
-    for (SpiExpression aList : list) {
-      aList.containsMany(desc, whereManyJoins);
+    for (SpiExpression expr : list) {
+      expr.containsMany(desc, whereManyJoins);
     }
   }
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    for (SpiExpression aList : list) {
-      aList.validate(validation);
+    for (SpiExpression expr : list) {
+      expr.validate(validation);
     }
   }
 
@@ -437,6 +435,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    query.findEach(batch, consumer);
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     query.findEachWhile(consumer);
   }
@@ -487,13 +490,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> forUpdate() {
-    return query.forUpdate();
+  public Query<T> withLock(Query.LockType lockType) {
+    return query.withLock(lockType);
   }
 
   @Override
-  public Query<T> forUpdate(Query.LockType lockType) {
-    return query.forUpdate(lockType);
+  public Query<T> withLock(Query.LockType lockType, Query.LockWait lockWait) {
+    return query.withLock(lockType, lockWait);
+  }
+
+  @Override
+  public Query<T> forUpdate() {
+    return query.forUpdate();
   }
 
   @Override
@@ -502,18 +510,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> forUpdateNoWait(Query.LockType lockType) {
-    return query.forUpdateNoWait(lockType);
-  }
-
-  @Override
   public Query<T> forUpdateSkipLocked() {
     return query.forUpdateSkipLocked();
-  }
-
-  @Override
-  public Query<T> forUpdateSkipLocked(Query.LockType lockType) {
-    return query.forUpdateSkipLocked(lockType);
   }
 
   @Override
@@ -623,7 +621,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
       if (i > 0) {
@@ -635,15 +632,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    for (SpiExpression aList : list) {
-      aList.addBindValues(request);
+    for (SpiExpression expr : list) {
+      expr.addBindValues(request);
     }
   }
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    for (SpiExpression aList : list) {
-      aList.prepareExpression(request);
+    for (SpiExpression expr : list) {
+      expr.prepareExpression(request);
     }
   }
 
@@ -660,23 +657,19 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     if (allDocNestedPath != null) {
       builder.append("path:").append(allDocNestedPath).append(" ");
     }
-    for (SpiExpression aList : list) {
-      aList.queryPlanHash(builder);
+    for (SpiExpression expr : list) {
+      expr.queryPlanHash(builder);
       builder.append(",");
     }
     builder.append("]");
   }
 
-  /**
-   * Calculate a hash based on the expressions.
-   */
   @Override
-  public int queryBindHash() {
-    int hash = DefaultExpressionList.class.getName().hashCode();
-    for (SpiExpression aList : list) {
-      hash = hash * 92821 + aList.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(list.size());
+    for (SpiExpression expr : list) {
+      expr.queryBindKey(key);
     }
-    return hash;
   }
 
   @Override

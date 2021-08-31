@@ -1,15 +1,7 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanDescriptorMap;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.BeanPropertyIdClass;
-import io.ebeaninternal.server.deploy.BeanPropertyOrderColumn;
-import io.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
-import io.ebeaninternal.server.deploy.InheritInfo;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeString;
@@ -23,54 +15,35 @@ import java.util.List;
 /**
  * Helper object to classify BeanProperties into appropriate lists.
  */
-public class DeployBeanPropertyLists {
+public final class DeployBeanPropertyLists {
 
   private static final Logger logger = LoggerFactory.getLogger(DeployBeanPropertyLists.class);
 
   private static final NoopSetter NOOP_SETTER = new NoopSetter();
 
   private BeanProperty versionProperty;
-
   private BeanProperty unmappedJson;
-
   private BeanProperty draft;
-
   private BeanProperty draftDirty;
-
   private BeanProperty tenant;
-
   private final BeanDescriptor<?> desc;
-
   private final LinkedHashMap<String, BeanProperty> propertyMap;
-
   private BeanProperty id;
 
   private final List<BeanProperty> local = new ArrayList<>();
-
   private final List<BeanProperty> mutable = new ArrayList<>();
-
   private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<>();
-
   private final List<BeanProperty> nonManys = new ArrayList<>();
-
   private final List<BeanProperty> aggs = new ArrayList<>();
-
   private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<>();
-
   private final List<BeanPropertyAssocOne<?>> onesImported = new ArrayList<>();
-
   private final List<BeanPropertyAssocOne<?>> embedded = new ArrayList<>();
-
   private final List<BeanProperty> baseScalar = new ArrayList<>();
-
   private final List<BeanProperty> transients = new ArrayList<>();
-
   private final List<BeanProperty> nonTransients = new ArrayList<>();
-
   private final BeanPropertyAssocOne<?> unidirectional;
   private final BeanProperty orderColumn;
 
-  @SuppressWarnings({"unchecked"})
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
 
@@ -86,7 +59,7 @@ public class DeployBeanPropertyLists {
     this.orderColumn = deployOrderColumn != null ? new BeanPropertyOrderColumn(desc, deployOrderColumn) : null;
 
     DeployBeanPropertyAssocOne<?> deployUnidirectional = deploy.getUnidirectional();
-    this.unidirectional = deployUnidirectional == null ? null : new BeanPropertyAssocOne(owner, desc, deployUnidirectional);
+    this.unidirectional = deployUnidirectional == null ? null : new BeanPropertyAssocOne<>(owner, desc, deployUnidirectional);
 
     this.propertyMap = new LinkedHashMap<>();
 
@@ -127,7 +100,7 @@ public class DeployBeanPropertyLists {
     }
 
     if (orderColumn != null) {
-      orderColumn.setDeployOrder(order++);
+      orderColumn.setDeployOrder(order);
       allocateToList(orderColumn);
       propertyMap.put(orderColumn.getName(), orderColumn);
     }
@@ -154,7 +127,6 @@ public class DeployBeanPropertyLists {
   }
 
   private void setImportedPrimaryKeysFor(DeployBeanDescriptor<?> deploy, DeployBeanPropertyAssocOne<?> id) {
-
     for (DeployBeanProperty prop : id.getTargetDeploy().properties()) {
       DeployBeanProperty match = findImported(deploy, prop);
       if (match != null) {
@@ -164,7 +136,6 @@ public class DeployBeanPropertyLists {
   }
 
   private DeployBeanProperty findImported(DeployBeanDescriptor<?> deploy, DeployBeanProperty embeddedScalar) {
-
     // the logical name and db column we are looking for a match on
     String name = embeddedScalar.getName();
     String dbColumn = embeddedScalar.getDbColumn();
@@ -180,7 +151,6 @@ public class DeployBeanPropertyLists {
         return assocOne;
       }
     }
-
     return null;
   }
 
@@ -368,7 +338,6 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty getSoftDeleteProperty() {
-
     for (BeanProperty prop : nonManys) {
       if (prop.isSoftDelete()) {
         return prop;
@@ -385,7 +354,6 @@ public class DeployBeanPropertyLists {
    * Return the properties set via generated values on insert.
    */
   public BeanProperty[] getGeneratedInsert() {
-
     List<BeanProperty> list = new ArrayList<>();
     for (BeanProperty prop : nonTransients) {
       GeneratedProperty gen = prop.getGeneratedProperty();
@@ -400,7 +368,6 @@ public class DeployBeanPropertyLists {
    * Return the properties set via generated values on update.
    */
   public BeanProperty[] getGeneratedUpdate() {
-
     List<BeanProperty> list = new ArrayList<>();
     for (BeanProperty prop : nonTransients) {
       GeneratedProperty gen = prop.getGeneratedProperty();
@@ -438,8 +405,7 @@ public class DeployBeanPropertyLists {
         }
       }
     }
-
-    return (BeanPropertyAssocOne[]) list.toArray(new BeanPropertyAssocOne[0]);
+    return list.toArray(new BeanPropertyAssocOne<?>[0]);
   }
 
   private BeanPropertyAssocMany<?>[] getMany2Many() {
@@ -449,8 +415,7 @@ public class DeployBeanPropertyLists {
         list.add(prop);
       }
     }
-
-    return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[0]);
+    return list.toArray(new BeanPropertyAssocMany<?>[0]);
   }
 
   private BeanPropertyAssocMany<?>[] getMany(Mode mode) {
@@ -471,25 +436,26 @@ public class DeployBeanPropertyLists {
           break;
       }
     }
-
-    return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[0]);
+    return list.toArray(new BeanPropertyAssocMany<?>[0]);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private BeanProperty createBeanProperty(BeanDescriptorMap owner, DeployBeanProperty deployProp) {
-
     if (deployProp instanceof DeployBeanPropertyAssocOne) {
       return new BeanPropertyAssocOne(owner, desc, (DeployBeanPropertyAssocOne) deployProp);
     }
-
     if (deployProp instanceof DeployBeanPropertySimpleCollection<?>) {
       return new BeanPropertySimpleCollection(desc, (DeployBeanPropertySimpleCollection) deployProp);
     }
-
     if (deployProp instanceof DeployBeanPropertyAssocMany) {
       return new BeanPropertyAssocMany(desc, (DeployBeanPropertyAssocMany) deployProp);
     }
-
+    if (deployProp.isJsonMapper()) {
+      return new BeanPropertyJsonMapper(desc, deployProp);
+    }
+    if (deployProp.isJsonType()) {
+      return new BeanPropertyJsonBasic(desc, deployProp);
+    }
     return new BeanProperty(desc, deployProp);
   }
 

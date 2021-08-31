@@ -8,7 +8,7 @@ import io.ebeaninternal.server.core.PersistRequest;
 /**
  * Metrics for ORM Insert Update and Delete for a given bean type.
  */
-class BeanIudMetrics {
+final class BeanIudMetrics {
 
   private final TimedMetric insert;
   private final TimedMetric update;
@@ -21,7 +21,6 @@ class BeanIudMetrics {
    * Create for a given bean type.
    */
   BeanIudMetrics(String beanShortName) {
-
     MetricFactory metricFactory = MetricFactory.get();
     String prefix = "iud." + beanShortName;
     this.insert = metricFactory.createTimedMetric(prefix + ".insert");

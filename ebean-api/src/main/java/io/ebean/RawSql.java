@@ -41,14 +41,14 @@ package io.ebean;
  * <h3>Example OrderAggregate</h3>
  * <pre>{@code
  *  ...
- *   // ＠Sql indicates to that this bean
+ *   // @Sql indicates to that this bean
  *   // is based on RawSql rather than a table
  *
- *   ＠Entity
- *   ＠Sql
+ *   @Entity
+ *   @Sql
  *   public class OrderAggregate {
  *
- *    ＠OneToOne
+ *    @OneToOne
  *    Order order;
  *
  *    Double totalAmount;
@@ -107,7 +107,7 @@ package io.ebean;
  *
  *   List<OrderAggregate> orders = DB.find(OrderAggregate.class)
  *     .setRawSql(rawSql)
- *     .fetch("order", "status,orderDate", new FetchConfig().query())
+ *     .fetch("order", "status,orderDate", FetchConfig.ofQuery())
  *     .fetch("order.customer", "name")
  *     .where().gt("order.id", 0)
  *     .having().gt("totalAmount", 20)

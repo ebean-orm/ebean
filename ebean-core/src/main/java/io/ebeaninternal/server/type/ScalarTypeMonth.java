@@ -11,10 +11,9 @@ import java.time.Month;
 /**
  * ScalarType mapping for Month enum.
  */
-public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
+final class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
 
   static final EnumToDbIntegerMap beanDbMap = new EnumToDbIntegerMap();
-
   static {
     Month[] values = Month.values();
     for (Month value : values) {
@@ -22,7 +21,7 @@ public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
     }
   }
 
-  public ScalarTypeMonth() {
+  ScalarTypeMonth() {
     super(beanDbMap, Month.class, 1);
   }
 

@@ -8,18 +8,12 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory
 /**
  * Read the deployment annotations for the bean.
  */
-public class ReadAnnotations {
+public final class ReadAnnotations {
 
   private final ReadAnnotationConfig readConfig;
 
   public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
     this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, config);
-    if (readConfig.isJavaxValidationAnnotations()) {
-      InitMetaValidationAnnotation.init(readConfig);
-    }
-    if (readConfig.isJacksonAnnotations()) {
-      InitMetaJacksonAnnotation.init(readConfig);
-    }
   }
 
   /**
@@ -49,19 +43,14 @@ public class ReadAnnotations {
    * </p>
    */
   public void readAssociations(DeployBeanInfo<?> info, BeanDescriptorManager factory) {
-
     try {
-
       new AnnotationAssocOnes(info, readConfig, factory).parse();
       new AnnotationAssocManys(info, readConfig, factory).parse();
-
       // read the Sql annotations last because they may be
       // dependent on field level annotations
       new AnnotationSql(info, readConfig).parse();
-
       new AnnotationClass(info, readConfig).parseAttributeOverride();
       info.getDescriptor().postAnnotations();
-
     } catch (RuntimeException e) {
       throw new RuntimeException("Error reading annotations for " + info, e);
     }

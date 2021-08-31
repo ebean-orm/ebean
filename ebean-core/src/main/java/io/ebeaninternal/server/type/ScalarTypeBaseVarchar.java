@@ -17,13 +17,13 @@ import java.sql.Types;
  * Base ScalarType for types which converts to and from a VARCHAR database
  * column.
  */
-public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
+abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
 
-  public ScalarTypeBaseVarchar(Class<T> type) {
+  ScalarTypeBaseVarchar(Class<T> type) {
     super(type, false, Types.VARCHAR);
   }
 
-  public ScalarTypeBaseVarchar(Class<T> type, boolean jdbcNative, int jdbcType) {
+  ScalarTypeBaseVarchar(Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
   }
 

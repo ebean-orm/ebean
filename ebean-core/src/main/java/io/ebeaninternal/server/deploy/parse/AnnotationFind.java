@@ -15,7 +15,7 @@ import java.util.Set;
 
 import static io.ebean.util.AnnotationUtil.get;
 
-public class AnnotationFind {
+final class AnnotationFind {
 
   public static Set<JoinColumn> joinColumns(Field field) {
     final JoinColumn col = get(field, JoinColumn.class);

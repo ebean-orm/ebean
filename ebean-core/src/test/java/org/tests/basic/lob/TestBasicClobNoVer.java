@@ -1,12 +1,10 @@
 package org.tests.basic.lob;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobNoVer;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
@@ -21,53 +19,50 @@ public class TestBasicClobNoVer extends BaseTestCase {
     EBasicClobNoVer entity = new EBasicClobNoVer();
     entity.setName("test");
     entity.setDescription("initialClobValue");
-    EbeanServer server = Ebean.getServer(null);
-    server.save(entity);
-
-
-    String sqlNoClob = "select t0.id, t0.name from ebasic_clob_no_ver t0 where t0.id = ?";
-    String sqlWithClob = "select t0.id, t0.name, t0.description from ebasic_clob_no_ver t0 where t0.id = ?";
-
+    DB.save(entity);
 
     // Clob by default is Fetch Lazy
-    Query<EBasicClobNoVer> defaultQuery = Ebean.find(EBasicClobNoVer.class).setId(entity.getId());
+    Query<EBasicClobNoVer> defaultQuery = DB.find(EBasicClobNoVer.class).setId(entity.getId());
     defaultQuery.findOne();
     String sql = sqlOf(defaultQuery, 2);
 
-    Assert.assertTrue("Clob is fetch lazy by default", sql.contains(sqlNoClob));
+    // default SQL select excludes clob
+    String sqlNoClob = "select t0.id, t0.name from ebasic_clob_no_ver t0 where t0.id = ?";
+    assertThat(sql).contains(sqlNoClob);
 
 
     // Explicitly select * including Clob
-    Query<EBasicClobNoVer> explicitQuery = Ebean.find(EBasicClobNoVer.class).setId(entity.getId()).select("*");
+    Query<EBasicClobNoVer> explicitQuery = DB.find(EBasicClobNoVer.class).setId(entity.getId()).select("*");
 
     explicitQuery.findOne();
     sql = sqlOf(explicitQuery, 2);
 
-    Assert.assertTrue("Explicitly include Clob", sql.contains(sqlWithClob));
+    // Explicitly include Clob
+    String sqlWithClob = "select t0.id, t0.name, t0.description from ebasic_clob_no_ver t0 where t0.id = ?";
+    assertThat(sql).contains(sqlWithClob);
 
     // Update description to test refresh
 
     EBasicClobNoVer updateBean = new EBasicClobNoVer();
     updateBean.setId(entity.getId());
     updateBean.setDescription("modified");
-    Ebean.update(updateBean);
+    DB.update(updateBean);
 
 
     // Test refresh function
 
-    Assert.assertEquals("initialClobValue", entity.getDescription());
+    assertThat(entity.getDescription()).isEqualTo("initialClobValue");
 
     LoggedSqlCollector.start();
 
     // Refresh query includes all properties
-    server.refresh(entity);
+    DB.refresh(entity);
 
     // Assert all properties fetched in refresh
     List<String> loggedSql = LoggedSqlCollector.stop();
-    Assert.assertEquals(1, loggedSql.size());
+    assertThat(loggedSql).hasSize(1);
     assertThat(trimSql(loggedSql.get(0), 2)).contains(sqlWithClob);
-    Assert.assertEquals("modified", entity.getDescription());
-
+    assertThat(entity.getDescription()).isEqualTo("modified");
   }
 
 }

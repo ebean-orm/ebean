@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
+import io.ebean.QueryIterator;
 import io.ebean.Transaction;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiDtoQuery;
@@ -15,39 +16,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Default implementation of DtoQuery.
  */
-public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
+public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
 
   private final SpiEbeanServer server;
-
   private final DtoBeanDescriptor<T> descriptor;
-
   private final SpiQuery<?> ormQuery;
-
   private String sql;
-
   private int firstRow;
-
   private int maxRows;
-
   private int timeout;
-
   private int bufferFetchSizeHint;
-
   private boolean relaxedMode;
-
   private String label;
-
   private ProfileLocation profileLocation;
-
-  /**
-   * Bind parameters when using the query language.
-   */
   private final BindParams bindParams = new BindParams();
-
   private Transaction transaction;
 
   /**
@@ -103,8 +90,23 @@ public class DefaultDtoQuery<T> implements SpiDtoQuery<T> {
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    server.findDtoEach(this, batch, consumer);
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     server.findDtoEachWhile(this, consumer);
+  }
+
+  @Override
+  public QueryIterator<T> findIterate() {
+    return server.findDtoIterate(this);
+  }
+
+  @Override
+  public Stream<T> findStream() {
+    return server.findDtoStream(this);
   }
 
   @Override

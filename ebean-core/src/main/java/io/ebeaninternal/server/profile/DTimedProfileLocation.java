@@ -7,14 +7,11 @@ import io.ebean.metric.TimedMetricStats;
 /**
  * Default profile location that uses stack trace.
  */
-class DTimedProfileLocation extends DProfileLocation implements TimedProfileLocation {
+final class DTimedProfileLocation extends DProfileLocation implements TimedProfileLocation {
 
   private final String label;
-
   private final TimedMetric timedMetric;
-
   private final boolean overrideMetricName;
-
   private String fullName;
 
   DTimedProfileLocation(int lineNumber, String label, TimedMetric timedMetric) {
@@ -48,7 +45,7 @@ class DTimedProfileLocation extends DProfileLocation implements TimedProfileLoca
 
   @Override
   public void visit(MetricVisitor visitor) {
-    TimedMetricStats collect = timedMetric.collect(visitor.isReset());
+    TimedMetricStats collect = timedMetric.collect(visitor.reset());
     if (collect != null) {
       if (overrideMetricName) {
         collect.setName(fullName);

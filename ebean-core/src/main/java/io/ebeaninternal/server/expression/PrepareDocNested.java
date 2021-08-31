@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Prepare nested path expressions for
  */
-class PrepareDocNested {
+final class PrepareDocNested {
 
   /**
    * Prepare the top level expressions for nested path handling.

@@ -76,7 +76,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   public void when_extra_queryFetchToMany_then_same() {
 
     assertDifferent(detail(query().select("id,name").fetch("customer")),
-      detail(query().select("id,name").fetch("customer").fetch("details", new FetchConfig().query())));
+      detail(query().select("id,name").fetch("customer").fetch("details", FetchConfig.ofQuery())));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     // with the fetch of customer the foreign key must be added to the root query
     assertDifferent(detail(query().select("id,name")),
-      detail(query().select("id,name").fetch("customer", new FetchConfig().query())));
+      detail(query().select("id,name").fetch("customer", FetchConfig.ofQuery())));
   }
 
   @Test
@@ -99,7 +99,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
       .select("status, shipDate")
-      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name");
 
 
@@ -145,7 +145,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .fetch("details", new FetchConfig().query());
+      .fetchQuery("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -173,7 +173,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .fetch("details", new FetchConfig().lazy());
+      .fetch("details", FetchConfig.ofLazy());
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
     OrmQueryDetail detail = queryRequest.getQuery().getDetail();
@@ -201,7 +201,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
-      .fetch("details", new FetchConfig().lazy())
+      .fetchLazy("details")
       .fetch("details.product");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
@@ -230,7 +230,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
     Query<Order> query = Ebean.find(Order.class)
       .select("status, orderDate")
-      .fetch("details", new FetchConfig().query())
+      .fetchQuery("details")
       .fetch("details.product")
       .fetch("customer", "name");
 
@@ -288,10 +288,44 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   }
 
   @Test
-  public void test_removeJoinToMany_when_filterMany() {
+  public void test_filterMany_included() {
 
     Query<Order> query = Ebean.find(Order.class)
       .fetch("details")
+      .fetch("details.product")
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .filterMany("details").eq("orderQuantity", 10)
+      .query();
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query);
+    OrmQueryDetail detail = queryRequest.getQuery().getDetail();
+
+    assertThat(detail.getFetchPaths()).containsExactly("details", "details.product", "customer");
+  }
+
+  @Test
+  public void test_filterMany_excludedByOrdering() {
+
+    Query<Order> query = Ebean.find(Order.class)
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .fetch("details")
+      .fetch("details.product")
+      .filterMany("details").eq("orderQuantity", 10)
+      .query();
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query);
+    OrmQueryDetail detail = queryRequest.getQuery().getDetail();
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
+  }
+
+  @Test
+  public void test_filterMany_excludedExplicitly() {
+
+    Query<Order> query = Ebean.find(Order.class)
+      .fetchQuery("details")
       .fetch("details.product")
       .fetch("customer")
       .fetch("customer.contacts")

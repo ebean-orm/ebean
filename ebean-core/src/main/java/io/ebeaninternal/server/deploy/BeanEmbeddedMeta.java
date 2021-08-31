@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-public class BeanEmbeddedMeta {
-
+public final class BeanEmbeddedMeta {
 
   private final BeanProperty[] properties;
 

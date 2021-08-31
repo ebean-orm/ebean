@@ -1,16 +1,16 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
 
-class BetweenExpression extends AbstractExpression {
+final class BetweenExpression extends AbstractExpression {
 
   private static final String _BETWEEN = " between ? and ?";
 
   private final Object valueHigh;
-
   private final Object valueLow;
 
   BetweenExpression(String propertyName, Object valueLow, Object valueHigh) {
@@ -49,10 +49,8 @@ class BetweenExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = low().hashCode();
-    hc = hc * 92821 + high().hashCode();
-    return hc;
+  public void queryBindKey(BindValuesKey key) {
+    key.add(low()).add(high());
   }
 
   @Override

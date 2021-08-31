@@ -12,11 +12,10 @@ import java.util.List;
 /**
  * Cache events broadcast across the cluster.
  */
-public class RemoteCacheEvent implements BinaryWritable {
+public final class RemoteCacheEvent implements BinaryWritable {
 
-  private boolean clearAll;
-
-  private List<String> clearCaches;
+  private final boolean clearAll;
+  private final List<String> clearCaches;
 
   /**
    * Clear all the caches.
@@ -57,10 +56,8 @@ public class RemoteCacheEvent implements BinaryWritable {
   }
 
   public static RemoteCacheEvent readBinaryMessage(BinaryReadContext dataInput) throws IOException {
-
     boolean clearAll = dataInput.readBoolean();
     int size = dataInput.readInt();
-
     List<String> clearCache = null;
     if (size > 0) {
       clearCache = new ArrayList<>(size);
@@ -68,7 +65,6 @@ public class RemoteCacheEvent implements BinaryWritable {
         clearCache.add(dataInput.readUTF());
       }
     }
-
     return new RemoteCacheEvent(clearAll, clearCache);
   }
 

@@ -170,14 +170,31 @@ public interface ExpressionList<T> {
   UpdateQuery<T> asUpdate();
 
   /**
+   * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
+   */
+  Query<T> withLock(Query.LockType lockType);
+
+  /**
+   * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
+   */
+  Query<T> withLock(Query.LockType lockType, Query.LockWait lockWait);
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   Query<T> forUpdate();
-
-  /**
-   * Execute using "for update" with given lock type (currently Postgres only).
-   */
-  Query<T> forUpdate(Query.LockType lockType);
 
   /**
    * Execute using "for update" clause with No Wait option.
@@ -188,22 +205,12 @@ public interface ExpressionList<T> {
   Query<T> forUpdateNoWait();
 
   /**
-   * Execute using "for update nowait" with given lock type (currently Postgres only).
-   */
-  Query<T> forUpdateNoWait(Query.LockType lockType);
-
-  /**
    * Execute using "for update" clause with Skip Locked option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
    * </p>
    */
   Query<T> forUpdateSkipLocked();
-
-  /**
-   * Execute using "for update skip locked" with given lock type (currently Postgres only).
-   */
-  Query<T> forUpdateSkipLocked(Query.LockType lockType);
 
   /**
    * Execute the query including soft deleted rows.
@@ -299,6 +306,13 @@ public interface ExpressionList<T> {
    * @see Query#findEach(Consumer)
    */
   void findEach(Consumer<T> consumer);
+
+  /**
+   * Execute findEach with a batch consumer.
+   *
+   * @see Query#findEach(int, Consumer)
+   */
+  void findEach(int batch, Consumer<List<T>> consumer);
 
   /**
    * Execute the query processing the beans one at a time with the ability to
@@ -902,7 +916,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> gtOrNull(String propertyName, Object value);
 
   /**
-   * Greater Than or Equal to OR Null - <code> >= or null </code>.
+   * Greater Than or Equal to OR Null - ({@code >= or null }).
    */
   ExpressionList<T> geOrNull(String propertyName, Object value);
 
@@ -923,7 +937,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> ltOrNull(String propertyName, Object value);
 
   /**
-   * Less Than or Equal to OR Null - <code> <= or null </code>.
+   * Less Than or Equal to OR Null - ({@code <= or null }).
    */
   ExpressionList<T> leOrNull(String propertyName, Object value);
 
@@ -1657,7 +1671,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> endAnd();
 
   /**
-   * End a AND junction - synonym for endJunction().
+   * End a OR junction - synonym for endJunction().
    */
   ExpressionList<T> endOr();
 

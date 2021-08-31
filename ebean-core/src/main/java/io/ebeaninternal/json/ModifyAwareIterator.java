@@ -7,10 +7,9 @@ import java.util.Iterator;
 /**
  * Wraps an iterator for the purposes of detecting modifications.
  */
-public class ModifyAwareIterator<E> implements Iterator<E> {
+public final class ModifyAwareIterator<E> implements Iterator<E> {
 
   private final ModifyAwareType owner;
-
   private final Iterator<E> it;
 
   /**

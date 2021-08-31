@@ -24,7 +24,7 @@ class SimpleModuleInfoWriter {
   SimpleModuleInfoWriter(ProcessingContext processingContext) {
     this.processingContext = processingContext;
     this.factoryPackage = processingContext.getFactoryPackage();
-    this.factoryShortName = "_ebean$ModuleInfo";
+    this.factoryShortName = "_Ebean$ModuleInfo";
     this.factoryFullName = factoryPackage + "." + factoryShortName;
   }
 
@@ -39,7 +39,6 @@ class SimpleModuleInfoWriter {
   }
 
   private void writeServicesFile() {
-
     try {
       FileObject jfo = processingContext.createMetaInfServicesWriter();
       if (jfo != null) {
@@ -90,21 +89,15 @@ class SimpleModuleInfoWriter {
     writer.append("import java.util.ArrayList;").eol();
     writer.append("import java.util.Collections;").eol();
     writer.append("import java.util.List;").eol();
-    final String generated = processingContext.getGeneratedAnnotation();
-    if (generated != null) {
-      writer.append("import %s;", generated).eol();
-    }
+    writer.append("import %s;", Constants.GENERATED).eol();
     writer.eol();
     writer.append("import io.ebean.config.ModuleInfo;").eol();
     writer.append("import io.ebean.config.ModuleInfoLoader;").eol();
     writer.eol();
-
   }
 
   void buildAtContextModule(Append writer) {
-    if (processingContext.isGeneratedAvailable()) {
-      writer.append(Constants.AT_GENERATED).eol();
-    }
+    writer.append(Constants.AT_GENERATED).eol();
     writer.append("@ModuleInfo(");
     if (processingContext.hasOtherClasses()) {
       writer.append("other={%s}, ", otherClasses());
@@ -138,14 +131,15 @@ class SimpleModuleInfoWriter {
     writeMethodEntityClasses(processingContext.getDbEntities(), null);
 
     final Map<String, Set<String>> otherDbEntities = processingContext.getOtherDbEntities();
-    writeMethodEntityClassesFor(otherDbEntities.keySet());
-
     for (Map.Entry<String, Set<String>> otherDb : otherDbEntities.entrySet()) {
       writeMethodEntityClasses(otherDb.getValue(), otherDb.getKey());
     }
+    writeMethodEntityClassesFor(otherDbEntities.keySet());
+    writeMethodEntityClassesFor();
   }
 
   private void writeMethodOtherClasses() {
+    writeMethodComment("Register AttributeConverter etc", "");
     writer.append("  private List<Class<?>> otherClasses() {").eol();
     if (!processingContext.hasOtherClasses()) {
       writer.append("    return Collections.emptyList();").eol();
@@ -160,36 +154,52 @@ class SimpleModuleInfoWriter {
   }
 
   private void writeMethodEntityClasses(Set<String> dbEntities, String dbName) {
-
-    String modifier = "public";
-    String method = "entityClasses";
-
-    if (dbName == null) {
-      writer.append("  @Override").eol();
+    String method = "defaultEntityClasses";
+    if (dbName != null) {
+      method = "entitiesFor_" + dbName;
+      writeMethodComment("Entities for @DbName(name=\"%s\"))", dbName);
     } else {
-      method = dbName + "_entities";
-      modifier = "private";
+      writeMethodComment("Entities with no @DbName", dbName);
     }
-    writer.append("  %s List<Class<?>> %s() {", modifier, method).eol();
-    writer.append("    List<Class<?>> entities = new ArrayList<>();").eol();
-    for (String dbEntity : dbEntities) {
-      writer.append("    entities.add(%s.class);", dbEntity).eol();
+    writer.append("  private List<Class<?>> %s() {", method).eol();
+    if (dbEntities.isEmpty() && !processingContext.hasOtherClasses()) {
+      writer.append("    return Collections.emptyList();").eol();
+    } else {
+      writer.append("    List<Class<?>> entities = new ArrayList<>();").eol();
+      for (String dbEntity : dbEntities) {
+        writer.append("    entities.add(%s.class);", dbEntity).eol();
+      }
+      if (processingContext.hasOtherClasses()) {
+        writer.append("    entities.addAll(otherClasses());").eol();
+      }
+      writer.append("    return entities;").eol();
     }
-    if (processingContext.hasOtherClasses()) {
-      writer.append("    entities.addAll(otherClasses());").eol();
-    }
-    writer.append("    return entities;").eol();
     writer.append("  }").eol().eol();
   }
 
-  private void writeMethodEntityClassesFor(Set<String> otherDbNames) {
+  private void writeMethodComment(String msg, String arg) {
+    writer.append("  /**").eol();
+    writer.append("   * ").append(msg, arg).eol();
+    writer.append("   */").eol();
+  }
 
-    writer.append("  @Override").eol();
-    writer.append("  public List<Class<?>> entityClassesFor(String dbName) {").eol().eol();
+  private void writeMethodEntityClassesFor(Set<String> otherDbNames) {
+    writer.append("  private List<Class<?>> classesFor(String dbName) {").eol();
     for (String dbName : otherDbNames) {
-      writer.append("    if (\"%s\".equals(dbName)) return %s_entities();", dbName, dbName).eol();
+      writer.append("    if (\"%s\".equals(dbName)) return entitiesFor_%s();", dbName, dbName).eol();
     }
-    writer.append("    return Collections.emptyList();").eol();
+    writer.append("    return new ArrayList<>();").eol();
+    writer.append("  }").eol().eol();
+  }
+
+  private void writeMethodEntityClassesFor() {
+    writer.append("  @Override").eol();
+    writer.append("  public List<Class<?>> classesFor(String dbName, boolean defaultServer) {").eol();
+    writer.append("    List<Class<?>> classes = classesFor(dbName);").eol();
+    writer.append("    if (defaultServer) {").eol();
+    writer.append("      classes.addAll(defaultEntityClasses());").eol();
+    writer.append("    }").eol();
+    writer.append("    return classes;").eol();
     writer.append("  }").eol().eol();
   }
 

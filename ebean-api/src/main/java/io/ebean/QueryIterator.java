@@ -56,7 +56,7 @@ import java.util.Iterator;
  *
  * @param <T> the type of entity bean in the iteration
  */
-public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
+public interface QueryIterator<T> extends Iterator<T>, AutoCloseable {
 
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
@@ -69,12 +69,6 @@ public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
    */
   @Override
   T next();
-
-  /**
-   * Remove is not allowed.
-   */
-  @Override
-  void remove();
 
   /**
    * Close the underlying resources held by this iterator.

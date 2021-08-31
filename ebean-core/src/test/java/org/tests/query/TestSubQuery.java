@@ -4,11 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.Test;
-import org.tests.model.basic.CKeyParent;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
-import org.tests.model.basic.Vehicle;
-import org.tests.model.basic.VehicleDriver;
+import org.tests.model.basic.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +40,93 @@ public class TestSubQuery extends BaseTestCase {
     Query<Order> sq = DB.createQuery(Order.class).select("id").where()
       .isIn("details.product.id", productIds).query();
 
-    DB.find(Order.class).where().isIn("id", sq).findList();
+    assertThat(DB.find(Order.class).where().isIn("id", sq).findList()).hasSize(2);
+  }
+
+  @Test
+  public void test_IsInNoWhere() {
+    ResetBasicData.reset();
+
+    Query<Order> sq = DB.createQuery(Order.class).select("id");
+    int expectedSize = DB.find(Order.class).findCount(); // expect everything
+
+    assertThat(DB.find(Order.class).where().isIn("id", sq).findList()).hasSize(expectedSize);
+  }
+
+  /**
+   * Testcase, that discovered, that DefaultOrmQuery.setDefaultSelectClause is set on subQueries with fetch path.
+   * Also checks, that SqlTreeBuilder does not read id on Many2One props.
+   */
+  @Test
+  public void test_IsInWithFetchSubQuery1() {
+
+    List<Integer> productIds = new ArrayList<>();
+    productIds.add(3);
+
+    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).fetch("order", "id").where()
+        .isIn("product.id", productIds).query();
+
+    // execute the subQuery as copy (generatedSQL must be part of original query)
+    Query<OrderDetail> debugSq = sq.copy();
+    debugSq.findSingleAttribute();
+    if (isPostgres()) {
+      assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id = any(?)");
+    } else {
+      assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id in (?)");
+    }
+
+    Query<Order> query = DB.find(Order.class).select("shipDate").where().isIn("id", sq).query();
+    query.findSingleAttribute();
+
+    if (isPostgres()) {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+    } else {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+    }
+  }
+
+  /**
+   * Test checks, that DefaultOrmQuery.markQueryJoins handles subQuery correct.
+   */
+  @Test
+  public void test_IsInWithFetchSubQuery2() {
+
+    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).fetch("order.customer", "anniversary").where()
+        .eq("order.customer.name", "Roland")
+        .query().setDistinct(true);
+
+    // execute the subQuery as copy (generatedSQL must be part of original query)
+    Query<OrderDetail> debugSq = sq.copy();
+    debugSq.findSingleAttribute();
+
+    Query<Order> query = DB.find(Order.class).select("status").where().isIn("shipDate", sq).query();
+    query.findSingleAttribute();
+    assertThat(query.getGeneratedSql())
+        .isEqualTo("select t0.status from o_order t0 where  (t0.ship_date) in (" + debugSq.getGeneratedSql() + ")");
+  }
+
+  /**
+   * Checks, that SqlTreeBuilder does not read id on One2Many props.
+   */
+  @Test
+  public void test_IsInWithFetchSubQuery3() {
+
+    List<Integer> productIds = new ArrayList<>();
+    productIds.add(3);
+
+    Query<OrderDetail> sq = DB.createQuery(OrderDetail.class).fetch("order.shipments", "id").where()
+        .isIn("product.id", productIds).query();
+
+    // execute the subQuery as copy (generatedSQL must be part of original query)
+    Query<OrderDetail> debugSq = sq.copy();
+    debugSq.findSingleAttribute();
+    assertThat(debugSq.getGeneratedSql()).contains("select t2.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id left join or_order_ship t2");
+
+    Query<OrderShipment> query = DB.find(OrderShipment.class).select("shipTime").where().isIn("id", sq).query();
+    query.findSingleAttribute();
+
+    assertThat(query.getGeneratedSql())
+        .isEqualTo("select t0.ship_time from or_order_ship t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
   }
 
   public void testCompositeKey() {

@@ -113,7 +113,7 @@ import java.util.ServiceLoader;
  * Used to extend the DatabaseConfig with additional objects used to configure and
  * construct an Database.
  */
-public class InternalConfiguration {
+public final class InternalConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
 
@@ -423,13 +423,13 @@ public class InternalConfiguration {
   /**
    * Create the TransactionManager taking into account autoCommit mode.
    */
-  TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
+  TransactionManager createTransactionManager(SpiServer server, DocStoreUpdateProcessor indexUpdateProcessor) {
 
     TransactionScopeManager scopeManager = createTransactionScopeManager();
     boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || config.isNotifyL2CacheInForeground();
 
     TransactionManagerOptions options =
-      new TransactionManagerOptions(notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
+      new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
         indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
         tableModState, cacheNotify, clockService);
 
@@ -617,10 +617,10 @@ public class InternalConfiguration {
   }
 
   public QueryPlanManager initQueryPlanManager(TransactionManager transactionManager) {
-    if (!config.isCollectQueryPlans()) {
+    if (!config.isQueryPlanEnable()) {
       return QueryPlanManager.NOOP;
     }
-    long threshold = config.getCollectQueryPlanThresholdMicros();
+    long threshold = config.getQueryPlanThresholdMicros();
     return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.getPlatform()), extraMetrics);
   }
 

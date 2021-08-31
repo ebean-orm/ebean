@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 class RunOnceMarker {
 
-  private static final ReentrantLock lock = new ReentrantLock(false);
+  private static final ReentrantLock lock = new ReentrantLock();
   private static boolean hasRun;
 
   static boolean isRun() {

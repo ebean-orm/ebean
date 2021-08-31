@@ -4,6 +4,7 @@ import io.ebean.ExpressionFactory;
 import io.ebean.FetchConfig;
 import io.ebean.OrderBy;
 import io.ebean.Query;
+import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
@@ -22,49 +23,36 @@ import java.util.Set;
 /**
  * Represents the Properties of an Object Relational query.
  */
-public class OrmQueryProperties implements Serializable {
+public final class OrmQueryProperties implements Serializable {
 
   private static final long serialVersionUID = -8785582703966455658L;
 
-  static final FetchConfig DEFAULT_FETCH = new FetchConfig();
+  static final FetchConfig DEFAULT_FETCH = FetchConfig.ofDefault();
 
   private final String parentPath;
   private final String path;
-
-  private final String rawProperties;
-  private final String trimmedProperties;
-
-  private final LinkedHashSet<String> included;
-
+  private final boolean allProperties;
+  private final Set<String> included;
   private final FetchConfig fetchConfig;
-
+  private final boolean cache;
   /**
    * Flag set when this fetch path needs to be a query join.
    */
   private boolean markForQueryJoin;
-
-  private boolean cache;
-
-  private boolean readOnly;
-
   /**
    * Included bean joins.
    */
   private Set<String> includedBeanJoin;
-
   /**
    * Add these properties to the select so that the foreign key columns are included in the query.
    */
   private Set<String> secondaryQueryJoins;
-
   private List<OrmQueryProperties> secondaryChildren;
-
   /**
    * OrderBy properties that where on the main query but moved here as they relate to this (query join).
    */
   @SuppressWarnings("rawtypes")
   private OrderBy orderBy;
-
   /**
    * A filter that can be applied to the fetch of this path in the object graph.
    */
@@ -84,68 +72,51 @@ public class OrmQueryProperties implements Serializable {
   public OrmQueryProperties(String path) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.rawProperties = null;
-    this.trimmedProperties = null;
+    this.allProperties = false;
     this.included = null;
+    this.cache = false;
     this.fetchConfig = DEFAULT_FETCH;
   }
 
   public OrmQueryProperties(String path, String rawProperties) {
-    this(path, rawProperties, null);
+    this(path, rawProperties, DEFAULT_FETCH);
   }
 
   public OrmQueryProperties(String path, String rawProperties, FetchConfig fetchConfig) {
-
-    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
-
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.rawProperties = rawProperties;
-    this.trimmedProperties = response.properties;
+    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
+    this.allProperties = response.allProperties;
     this.included = response.included;
-    this.cache = response.cache;
-    this.readOnly = response.readOnly;
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
-      if (fetchConfig.isCache()) {
-        this.cache = true;
-      }
+      this.cache = fetchConfig.isCache();
     } else {
-      this.fetchConfig = response.fetchConfig;
+      this.cache = false;
+      this.fetchConfig = DEFAULT_FETCH;
     }
   }
 
-  public OrmQueryProperties(String path, LinkedHashSet<String> parsedProperties) {
-    if (parsedProperties == null) {
-      throw new IllegalArgumentException("parsedProperties is null");
-    }
+  public OrmQueryProperties(String path, Set<String> included) {
+    this(path, included, DEFAULT_FETCH);
+  }
 
+  OrmQueryProperties(String path, Set<String> included, FetchConfig fetchConfig) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    // for rawSql parsedProperties can be empty (when only fetching Id property)
-    this.included = parsedProperties;
-    this.rawProperties = join(parsedProperties);
-    this.trimmedProperties = rawProperties;
-    this.cache = false;
-    this.readOnly = false;
-    this.fetchConfig = DEFAULT_FETCH;
+    this.included = included;
+    this.allProperties = false;
+    this.fetchConfig = fetchConfig;
+    this.cache = fetchConfig.isCache();
   }
 
-  /**
-   * Join the set of properties into a comma delimited string.
-   */
-  private String join(LinkedHashSet<String> parsedProperties) {
-    StringBuilder sb = new StringBuilder(50);
-    boolean first = true;
-    for (String property : parsedProperties) {
-      if (first) {
-        first = false;
-      } else {
-        sb.append(",");
-      }
-      sb.append(property);
-    }
-    return sb.toString();
+  OrmQueryProperties(String path, OrmQueryProperties other, FetchConfig fetchConfig) {
+    this.path = path;
+    this.parentPath = SplitName.parent(path);
+    this.allProperties = other.allProperties;
+    this.included = other.included;
+    this.fetchConfig = fetchConfig;
+    this.cache = fetchConfig.isCache();
   }
 
   /**
@@ -155,10 +126,8 @@ public class OrmQueryProperties implements Serializable {
     this.fetchConfig = sourceFetchConfig;
     this.parentPath = source.parentPath;
     this.path = source.path;
-    this.rawProperties = source.rawProperties;
-    this.trimmedProperties = source.trimmedProperties;
+    this.allProperties = source.allProperties;
     this.cache = source.cache;
-    this.readOnly = source.readOnly;
     this.filterMany = source.filterMany;
     this.markForQueryJoin = source.markForQueryJoin;
     this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
@@ -181,6 +150,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Move a OrderBy.Property from the main query to this query join.
    */
+  @SuppressWarnings("rawtypes")
   void addSecJoinOrderProperty(OrderBy.Property orderProp) {
     if (orderBy == null) {
       orderBy = new OrderBy();
@@ -196,15 +166,13 @@ public class OrmQueryProperties implements Serializable {
    * Return the expressions used to filter on this path. This should be a many path to use this
    * method.
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public <T> SpiExpressionList<T> filterMany(Query<T> rootQuery) {
     if (filterMany == null) {
       FilterExprPath exprPath = new FilterExprPath(path);
       SpiExpressionFactory queryEf = (SpiExpressionFactory) rootQuery.getExpressionFactory();
       ExpressionFactory filterEf = queryEf.createExpressionFactory();// exprPath);
       filterMany = new FilterExpressionList(exprPath, filterEf, rootQuery);
-      // by default we need to make this a 'query join' now
-      markForQueryJoin = true;
     }
     return filterMany;
   }
@@ -220,6 +188,24 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
+   * Adjust filterMany expressions for inclusion in main query.
+   */
+  public void filterManyInline() {
+    if (filterMany != null){
+      filterMany.prefixProperty(path);
+    }
+  }
+
+  /**
+   * Prepare filterMany expressions for query plan key.
+   */
+  public void prepareExpressions(BeanQueryRequest<?> request) {
+    if (filterMany != null) {
+      filterMany.prepareExpression(request);
+    }
+  }
+
+  /**
    * Return the filterMany expression list (can be null).
    */
   public SpiExpressionList<?> getFilterMany() {
@@ -231,7 +217,6 @@ public class OrmQueryProperties implements Serializable {
    */
   public void setFilterMany(SpiExpressionList<?> filterMany) {
     this.filterMany = filterMany;
-    this.markForQueryJoin = true;
   }
 
   /**
@@ -239,9 +224,8 @@ public class OrmQueryProperties implements Serializable {
    */
   @SuppressWarnings("unchecked")
   public void configureBeanQuery(SpiQuery<?> query) {
-
-    if (trimmedProperties != null && !trimmedProperties.isEmpty()) {
-      query.select(trimmedProperties);
+    if (hasProperties()) {
+      query.selectProperties(this);
     }
 
     if (filterMany != null) {
@@ -257,7 +241,7 @@ public class OrmQueryProperties implements Serializable {
       for (OrmQueryProperties p : secondaryChildren) {
         String path = p.getPath();
         path = path.substring(trimPath);
-        query.fetch(path, p.getProperties(), p.getFetchConfig());
+        query.fetchProperties(path, p);
         query.setFilterMany(path, p.getFilterManyTrimPath(trimPath));
       }
     }
@@ -268,37 +252,26 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public boolean hasSelectClause() {
-    if ("*".equals(trimmedProperties)) {
-      // explicitly selected all properties
-      return true;
-    }
-    // explicitly selected some properties
-    return included != null || filterMany != null;
+    return allProperties || included != null || filterMany != null;
   }
 
   /**
-   * Return true if the properties and configuration are empty.
+   * Return true if explicit properties have been specified.
    */
-  public boolean isEmpty() {
-    return rawProperties == null || rawProperties.isEmpty();
+  boolean hasProperties() {
+    return allProperties || included != null;
   }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(40);
-    append("", sb);
-    return sb.toString();
-  }
-
-  public String append(String prefix, StringBuilder sb) {
+  public void asStringDebug(String prefix, StringBuilder sb) {
     sb.append(prefix);
     if (path != null) {
       sb.append(path).append(" ");
     }
-    if (!isEmpty()) {
-      sb.append("(").append(rawProperties).append(")");
+    if (allProperties) {
+      sb.append("(*)");
+    } else if (included != null) {
+      sb.append("(").append(String.join(",", included)).append(")");
     }
-    return sb.toString();
   }
 
   boolean isChild(OrmQueryProperties possibleChild) {
@@ -316,16 +289,10 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Return the raw properties.
-   */
-  public String getProperties() {
-    return rawProperties;
-  }
-
-  /**
    * Return true if this includes all properties on the path.
    */
   public boolean allProperties() {
+    // this is really "default" properties
     return included == null;
   }
 
@@ -350,10 +317,6 @@ public class OrmQueryProperties implements Serializable {
     includedBeanJoin.add(propertyName);
   }
 
-  public Set<String> getSelectInclude() {
-    return included;
-  }
-
   public Set<String> getSelectQueryJoin() {
     return secondaryQueryJoins;
   }
@@ -373,11 +336,9 @@ public class OrmQueryProperties implements Serializable {
   }
 
   boolean isIncluded(String propName) {
-
     if (includedBeanJoin != null && includedBeanJoin.contains(propName)) {
       return false;
     }
-    // all properties included
     return included == null || included.contains(propName);
   }
 
@@ -392,53 +353,29 @@ public class OrmQueryProperties implements Serializable {
    * Return true if this path is a 'query join'.
    */
   public boolean isQueryFetch() {
-    return markForQueryJoin || getQueryFetchBatch() > -1;
+    return markForQueryJoin || cache || fetchConfig.isQuery();
   }
 
   /**
    * Return true if this path is a 'fetch join'.
    */
   boolean isFetchJoin() {
-    return !isQueryFetch() && !isLazyFetch();
+    return !markForQueryJoin && fetchConfig.isJoin();
   }
 
   /**
    * Return true if this path is a lazy fetch.
    */
   boolean isLazyFetch() {
-    return getLazyFetchBatch() > -1;
+    return fetchConfig.isLazy();
+  }
+
+  public int getBatchSize() {
+    return fetchConfig.getBatchSize();
   }
 
   /**
-   * Return the batch size to use for the query join.
-   */
-  public int getQueryFetchBatch() {
-    return fetchConfig.getQueryBatchSize();
-  }
-
-  /**
-   * Return true if a query join should eagerly fetch 'all' rather than the 'first'.
-   */
-  public boolean isQueryFetchAll() {
-    return fetchConfig.isQueryAll();
-  }
-
-  /**
-   * Return the batch size to use for lazy loading.
-   */
-  public int getLazyFetchBatch() {
-    return fetchConfig.getLazyBatchSize();
-  }
-
-  /**
-   * Return true if this path has the +readonly option.
-   */
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  /**
-   * Return true if this path has the +cache option to hit the cache.
+   * Return true if this path should hit the L2 cache.
    */
   public boolean isCache() {
     return cache;
@@ -474,26 +411,24 @@ public class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-
-    builder.append("qpp[");
-    builder.append(path);
-    if (included != null){
-      builder.append(" included:").append(included);
+    builder.append("{");
+    if (path != null) {
+      builder.append(path);
+    }
+    if (included != null) {
+      builder.append("/i").append(included);
     }
     if (secondaryQueryJoins != null) {
-      builder.append(" secondary:").append(secondaryQueryJoins);
+      builder.append("/s").append(secondaryQueryJoins);
     }
-
     if (filterMany != null) {
-      builder.append(" filterMany[");
+      builder.append("/f");
       filterMany.queryPlanHash(builder);
-      builder.append("]");
     }
-
     if (fetchConfig != null) {
-      builder.append(" config:").append(fetchConfig.hashCode());
+      builder.append("/c").append(fetchConfig.hashCode());
     }
-    builder.append("]");
+    builder.append("}");
   }
 
 }

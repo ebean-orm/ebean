@@ -150,7 +150,7 @@ public class BaseTableDdl implements TableDdl {
         buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
       }
       for (String ddlScript : before) {
-        buffer.appendStatement(translate(ddlScript, tableName, columnName, this.defaultValue));
+        buffer.appendStatement(translate(ddlScript, tableName, columnName, defaultValue));
       }
     }
 

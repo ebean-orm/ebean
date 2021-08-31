@@ -13,9 +13,9 @@ import java.sql.Types;
 /**
  * ScalarType for Joda LocalTime. This maps to a JDBC Time.
  */
-public class ScalarTypeJodaLocalTimeUTC extends ScalarTypeJodaLocalTime {
+final class ScalarTypeJodaLocalTimeUTC extends ScalarTypeJodaLocalTime {
 
-  public ScalarTypeJodaLocalTimeUTC() {
+  ScalarTypeJodaLocalTimeUTC() {
     super();
   }
 

@@ -8,9 +8,9 @@ import org.joda.time.LocalDateTime;
 /**
  * Support joda time types as GeneratedProperty.
  */
-public class GeneratedInsertJodaTime {
+final class GeneratedInsertJodaTime {
 
-  public static abstract class Base implements GeneratedProperty, GeneratedWhenCreated {
+  static abstract class Base implements GeneratedProperty, GeneratedWhenCreated {
 
     @Override
     public boolean includeInUpdate() {
@@ -41,7 +41,7 @@ public class GeneratedInsertJodaTime {
   /**
    * LocalDateTime support.
    */
-  public static class LocalDT extends Base {
+  static final class LocalDT extends Base {
 
     @Override
     public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
@@ -52,7 +52,7 @@ public class GeneratedInsertJodaTime {
   /**
    * DateTime support.
    */
-  public static class DateTimeDT extends Base {
+  static final class DateTimeDT extends Base {
 
     @Override
     public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
@@ -60,6 +60,5 @@ public class GeneratedInsertJodaTime {
     }
 
   }
-
 
 }

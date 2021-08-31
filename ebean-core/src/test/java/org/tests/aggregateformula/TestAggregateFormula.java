@@ -81,7 +81,6 @@ public class TestAggregateFormula extends BaseTestCase {
     for (Contact contact : contacts) {
       Customer customer = contact.getCustomer();
       assertNotNull(customer.getName());
-      assertNotNull(customer.getStatus());
     }
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -112,7 +111,6 @@ public class TestAggregateFormula extends BaseTestCase {
     for (Contact contact : contacts) {
       Customer customer = contact.getCustomer();
       assertNotNull(customer.getName());
-      assertNotNull(customer.getStatus());
       final Address billingAddress = customer.getBillingAddress();
       if (billingAddress != null) {
         assertNotNull(billingAddress.getCountry());

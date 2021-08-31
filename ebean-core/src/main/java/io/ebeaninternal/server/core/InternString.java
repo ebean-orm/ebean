@@ -13,7 +13,7 @@ public final class InternString {
 
   private static final HashMap<String, String> map = new HashMap<>();
 
-  private static final ReentrantLock lock = new ReentrantLock(false);
+  private static final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Return the shared instance of this string.

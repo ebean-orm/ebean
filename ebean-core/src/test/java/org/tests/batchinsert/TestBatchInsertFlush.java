@@ -1,6 +1,8 @@
 package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.DtoQuery2Test;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
@@ -78,15 +80,15 @@ public class TestBatchInsertFlush extends BaseTestCase {
     }
 
     ServerMetrics metrics = collectMetrics();
-    List<MetaTimedMetric> txnStats = metrics.getTimedMetrics();
+    List<MetaTimedMetric> txnStats = metrics.timedMetrics();
     for (MetaTimedMetric txnMetric : txnStats) {
       System.out.println(txnMetric);
     }
     assertThat(txnStats).hasSize(4);
-    assertThat(txnStats.get(0).getName()).isEqualTo("txn.main");
-    assertThat(txnStats.get(1).getName()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
-    assertThat(txnStats.get(2).getName()).isEqualTo("iud.TSDetail.insertBatch");
-    assertThat(txnStats.get(3).getName()).isEqualTo("iud.TSMaster.insertBatch");
+    assertThat(txnStats.get(0).name()).isEqualTo("txn.main");
+    assertThat(txnStats.get(1).name()).isEqualTo("txn.named.TestBatchInsertFlush.no_cascade");
+    assertThat(txnStats.get(2).name()).isEqualTo("iud.TSDetail.insertBatch");
+    assertThat(txnStats.get(3).name()).isEqualTo("iud.TSMaster.insertBatch");
   }
 
   @Test
@@ -103,6 +105,41 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertSql(sql.get(0)).contains("select count(*)");
+  }
+
+  @Test
+  @Transactional(batchSize = 20)
+  public void transactional_flushOnSqlQuery() {
+
+    LoggedSqlCollector.start();
+
+    DB.save(new EBasicVer("b1"));
+    DB.save(new EBasicVer("b2"));
+
+    // trigger JDBC batch by default
+    DB.sqlQuery("select count(*) from e_basicver")
+      .mapToScalar(Integer.class)
+      .findOne();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("insert into e_basicver");
+  }
+
+  @Test
+  @Transactional(batchSize = 20)
+  public void transactional_flushOnDtoQuery() {
+
+    LoggedSqlCollector.start();
+
+    DB.save(new EBasicVer("b1"));
+    DB.save(new EBasicVer("b2"));
+
+    // trigger JDBC batch by default
+    DB.findDto(DtoQuery2Test.DCust.class, "select id, name from o_customer")
+    .findList();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertSql(sql.get(0)).contains("insert into e_basicver");
   }
 
   @Test

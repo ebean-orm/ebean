@@ -20,5 +20,9 @@ class Address(
   @Size(max = 100)
   var city: String,
   // Dummy metadata field just to test generation
-  val metadata: GenericType<GenericTypeArgument>
+  val metadata: GenericType<GenericTypeArgument>,
+  @Transient
+  val javaxPersistenceTransient: Set<String>,
+  @kotlin.jvm.Transient
+  val kotlinJvmTransient: Set<String>,
 ) : BaseModel()

@@ -1,6 +1,14 @@
 package io.ebean.typequery;
 
 import io.ebean.ExpressionList;
+import io.ebean.FetchConfig;
+import io.ebean.FetchGroup;
+import io.ebeaninternal.api.SpiQueryFetch;
+import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import io.ebeaninternal.server.querydefn.SpiFetchGroup;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Base type for associated beans.
@@ -10,6 +18,11 @@ import io.ebean.ExpressionList;
  */
 @SuppressWarnings("rawtypes")
 public abstract class TQAssocBean<T, R> extends TQProperty<R> {
+
+  private static final FetchConfig FETCH_DEFAULT = FetchConfig.ofDefault();
+  private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
+  private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
+  private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
 
   /**
    * Construct with a property name and root instance.
@@ -88,9 +101,8 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
 
   /**
    * Deprecated in favor of fetch().
-   *
-   * @deprecated
    */
+  @Deprecated
   public R fetchAll() {
     return fetch();
   }
@@ -100,8 +112,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    */
   @SafeVarargs
   protected final R fetchProperties(TQProperty<?>... props) {
-    ((TQRootBean) _root).query().fetch(_name, properties(props));
-    return _root;
+    return fetchWithProperties(FETCH_DEFAULT, props);
   }
 
   /**
@@ -109,8 +120,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    */
   @SafeVarargs
   protected final R fetchQueryProperties(TQProperty<?>... props) {
-    ((TQRootBean) _root).query().fetchQuery(_name, properties(props));
-    return _root;
+    return fetchWithProperties(FETCH_QUERY, props);
   }
 
   /**
@@ -118,8 +128,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    */
   @SafeVarargs
   protected final R fetchCacheProperties(TQProperty<?>... props) {
-    ((TQRootBean) _root).query().fetchCache(_name, properties(props));
-    return _root;
+    return fetchWithProperties(FETCH_CACHE, props);
   }
 
   /**
@@ -127,23 +136,53 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    */
   @SafeVarargs
   protected final R fetchLazyProperties(TQProperty<?>... props) {
-    ((TQRootBean) _root).query().fetchLazy(_name, properties(props));
+    return fetchWithProperties(FETCH_LAZY, props);
+  }
+
+  @SafeVarargs
+  private final R fetchWithProperties(FetchConfig config, TQProperty<?>... props) {
+    spiQuery().fetchProperties(_name, properties(props), config);
     return _root;
   }
 
   /**
-   * Append the properties as a comma delimited string.
+   * Fetch using the nested FetchGroup.
    */
+  public R fetch(FetchGroup<T> nestedGroup) {
+    return fetchNested(nestedGroup, FETCH_DEFAULT);
+  }
+
+  /**
+   * Fetch query using the nested FetchGroup.
+   */
+  public R fetchQuery(FetchGroup<T> nestedGroup) {
+    return fetchNested(nestedGroup, FETCH_QUERY);
+  }
+
+  /**
+   * Fetch cache using the nested FetchGroup.
+   */
+  public R fetchCache(FetchGroup<T> nestedGroup) {
+    return fetchNested(nestedGroup, FETCH_CACHE);
+  }
+
+  private R fetchNested(FetchGroup<T> nestedGroup, FetchConfig fetchConfig) {
+    OrmQueryDetail nestedDetail = ((SpiFetchGroup) nestedGroup).underlying();
+    spiQuery().addNested(_name, nestedDetail, fetchConfig);
+    return _root;
+  }
+
+  private SpiQueryFetch spiQuery() {
+    return (SpiQueryFetch)((TQRootBean) _root).query();
+  }
+
   @SafeVarargs
-  protected final String properties(TQProperty<?>... props) {
-    StringBuilder selectProps = new StringBuilder(50);
-    for (int i = 0; i < props.length; i++) {
-      if (i > 0) {
-        selectProps.append(",");
-      }
-      selectProps.append(props[i].propertyName());
+  private final Set<String> properties(TQProperty<?>... props) {
+    Set<String> set = new LinkedHashSet<>();
+    for (TQProperty<?> prop : props) {
+      set.add(prop.propertyName());
     }
-    return selectProps.toString();
+    return set;
   }
 
   /**

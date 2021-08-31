@@ -23,7 +23,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAutoTuneService.class);
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
 
   private final SpiEbeanServer server;
 
@@ -77,7 +77,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
       loadTuningFile();
       if (isRuntimeTuningUpdates()) {
         // periodically gather and update query tuning
-        server.getBackgroundExecutor().executePeriodically(new ProfilingUpdate(), profilingUpdateFrequency, TimeUnit.SECONDS);
+        server.getBackgroundExecutor().scheduleWithFixedDelay(new ProfilingUpdate(), profilingUpdateFrequency, profilingUpdateFrequency, TimeUnit.SECONDS);
       }
     }
   }

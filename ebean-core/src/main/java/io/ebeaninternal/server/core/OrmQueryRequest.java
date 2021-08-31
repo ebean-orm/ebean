@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CacheMode;
+import io.ebean.CancelableQuery;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.QueryIterator;
@@ -35,7 +36,6 @@ import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,8 +173,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * iteration is fine.
    * </p>
    */
-  public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
-    return loadContext.getSecondaryQueriesMinBatchSize(defaultQueryBatch);
+  public int getSecondaryQueriesMinBatchSize() {
+    return loadContext.getSecondaryQueriesMinBatchSize();
   }
 
   /**
@@ -219,10 +219,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void prepareQuery() {
+    secondaryQueries = query.convertJoins();
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
-    this.secondaryQueries = query.convertJoins();
-    this.queryPlanKey = query.prepare(this);
+    queryPlanKey = query.prepare(this);
   }
 
   public boolean isNativeSql() {
@@ -426,6 +426,24 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     try (QueryIterator<T> it = queryEngine.findIterate(this)) {
       while (it.hasNext()) {
         consumer.accept(it.next());
+      }
+    }
+  }
+
+  @Override
+  public void findEach(int batch, Consumer<List<T>> batchConsumer) {
+    final List<T> buffer = new ArrayList<>(batch);
+    try (QueryIterator<T> it = queryEngine.findIterate(this)) {
+      while (it.hasNext()) {
+        buffer.add(it.next());
+        if (buffer.size() >= batch) {
+          batchConsumer.accept(buffer);
+          buffer.clear();
+        }
+      }
+      if (!buffer.isEmpty()) {
+        // consume the remainder
+        batchConsumer.accept(buffer);
       }
     }
   }

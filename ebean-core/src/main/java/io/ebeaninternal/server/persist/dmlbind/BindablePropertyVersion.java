@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Bindable for a Version BeanProperty. Obtains value from 'old values'.
  */
-public class BindablePropertyVersion implements Bindable {
+final class BindablePropertyVersion implements Bindable {
 
   private final BeanProperty prop;
 
-  public BindablePropertyVersion(BeanProperty prop) {
+  BindablePropertyVersion(BeanProperty prop) {
     this.prop = prop;
   }
 

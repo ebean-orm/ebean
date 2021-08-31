@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
@@ -21,22 +21,20 @@ import java.util.Set;
  * etc in this case we must add an extra join.
  * </p>
  */
-class SqlTreeNodeExtraJoin implements SqlTreeNode {
+final class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private final STreePropertyAssoc assocBeanProperty;
-
+  private final SpiQuery.TemporalMode temporalMode;
   private final String prefix;
-
   private final boolean manyJoin;
-
   private final boolean pathContainsMany;
-
   private List<SqlTreeNodeExtraJoin> children;
 
-  SqlTreeNodeExtraJoin(String prefix, STreePropertyAssoc assocBeanProperty, boolean pathContainsMany) {
+  SqlTreeNodeExtraJoin(String prefix, STreePropertyAssoc assocBeanProperty, boolean pathContainsMany, SpiQuery.TemporalMode temporalMode) {
     this.prefix = prefix;
     this.assocBeanProperty = assocBeanProperty;
     this.pathContainsMany = pathContainsMany;
+    this.temporalMode = temporalMode;
     this.manyJoin = assocBeanProperty instanceof STreePropertyAssocMany;
   }
 
@@ -113,9 +111,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
     boolean manyToMany = false;
-
     if (assocBeanProperty instanceof STreePropertyAssocMany) {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) assocBeanProperty;
       if (manyProp.hasJoinTable()) {
@@ -134,6 +130,14 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       }
     }
 
+    boolean oneToOneExported = false;
+    if (assocBeanProperty instanceof BeanPropertyAssocOne) {
+      BeanPropertyAssocOne<?> oneToOneProp = (BeanPropertyAssocOne<?>) assocBeanProperty;
+      if (oneToOneProp.isOneToOneExported()) {
+        oneToOneExported = true;
+      }
+    }
+
     if (pathContainsMany) {
       // "promote" to left join as the path contains a many
       joinType = SqlJoinType.OUTER;
@@ -144,15 +148,16 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
         assocBeanProperty.appendFrom(ctx, joinType);
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
+      if (!oneToOneExported && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
+        ctx.append(" and ").append(assocBeanProperty.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
+      }
     }
 
     if (children != null) {
-
       if (manyJoin || pathContainsMany) {
         // if AUTO then make all descendants use OUTER JOIN
         joinType = joinType.autoToOuter();
       }
-
       for (SqlTreeNodeExtraJoin child : children) {
         child.appendFrom(ctx, joinType);
       }
@@ -178,14 +183,6 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
    */
   @Override
   public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) {
-    return null;
-  }
-
-  /**
-   * Does nothing.
-   */
-  @Override
-  public <T> Version<T> loadVersion(DbReadContext ctx) {
     return null;
   }
 

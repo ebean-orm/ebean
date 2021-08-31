@@ -6,7 +6,7 @@ package io.ebeaninternal.server.el;
  * @author Roland Praml, FOCONIS AG
  *
  */
-public class ElComparatorNoop<T> implements ElComparator<T> {
+public final class ElComparatorNoop<T> implements ElComparator<T> {
 
   private static final long serialVersionUID = -9060871822183687180L;
 

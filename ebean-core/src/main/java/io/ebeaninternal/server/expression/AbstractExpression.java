@@ -14,12 +14,17 @@ import io.ebeaninternal.api.NaturalKeyQueryData;
 /**
  * Base class for simple expressions.
  */
-public abstract class AbstractExpression implements SpiExpression {
+abstract class AbstractExpression implements SpiExpression {
 
-  protected final String propName;
+  protected String propName;
 
   protected AbstractExpression(String propName) {
     this.propName = propName;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    this.propName = path + "." + propName;
   }
 
   @Override
@@ -61,7 +66,6 @@ public abstract class AbstractExpression implements SpiExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-
     propertyContainsMany(propName, desc, manyWhereJoin);
   }
 
@@ -98,7 +102,6 @@ public abstract class AbstractExpression implements SpiExpression {
   }
 
   protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
-
     return request.getBeanDescriptor().getElGetValue(propName);
   }
 }

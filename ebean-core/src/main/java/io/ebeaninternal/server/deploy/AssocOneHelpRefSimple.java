@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 /**
  * Helper for BeanPropertyAssocOne imported reference - this is the common case.
  */
-class AssocOneHelpRefSimple extends AssocOneHelp {
+final class AssocOneHelpRefSimple extends AssocOneHelp {
 
   AssocOneHelpRefSimple(BeanPropertyAssocOne<?> property, String embeddedPrefix) {
     super(property, embeddedPrefix);

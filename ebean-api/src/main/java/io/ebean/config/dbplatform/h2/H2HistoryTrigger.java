@@ -4,11 +4,7 @@ import org.h2.api.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Arrays;
 
 /**
@@ -43,7 +39,6 @@ public class H2HistoryTrigger implements Trigger {
 
   @Override
   public void init(Connection conn, String schemaName, String triggerName, String tableName, boolean before, int type) throws SQLException {
-
     // get the columns for the table
     ResultSet rs = conn.getMetaData().getColumns(null, schemaName, tableName, null);
 
@@ -79,7 +74,6 @@ public class H2HistoryTrigger implements Trigger {
 
   @Override
   public void fire(Connection connection, Object[] oldRow, Object[] newRow) throws SQLException {
-
     if (oldRow != null) {
       // a delete or update event
       Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -99,7 +93,6 @@ public class H2HistoryTrigger implements Trigger {
    * Insert the data into the history table.
    */
   private void insertIntoHistory(Connection connection, Object[] oldRow) throws SQLException {
-
     try (PreparedStatement stmt = connection.prepareStatement(insertHistorySql)) {
       for (int i = 0; i < oldRow.length; i++) {
         stmt.setObject(i + 1, oldRow[i]);
@@ -110,11 +103,11 @@ public class H2HistoryTrigger implements Trigger {
 
   @Override
   public void close() throws SQLException {
-
+    // do nothing
   }
 
   @Override
   public void remove() throws SQLException {
-
+    // do nothing
   }
 }

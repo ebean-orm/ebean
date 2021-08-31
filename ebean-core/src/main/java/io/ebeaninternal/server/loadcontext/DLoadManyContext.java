@@ -21,26 +21,20 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * ToMany bean load context.
  */
-class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
+final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
-  protected final BeanPropertyAssocMany<?> property;
-
+  private final BeanPropertyAssocMany<?> property;
   private final boolean docStoreMapped;
-
   private List<LoadBuffer> bufferList;
-
   private LoadBuffer currentBuffer;
 
-  DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property,
-                          String path, int defaultBatchSize, OrmQueryProperties queryProps) {
-
-    super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
-
+  DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property, String path, OrmQueryProperties queryProps) {
+    super(parent, property.getBeanDescriptor(), path, queryProps);
     this.property = property;
     this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
-    this.currentBuffer = createBuffer(firstBatchSize);
+    this.currentBuffer = createBuffer(batchSize);
   }
 
   private LoadBuffer createBuffer(int size) {
@@ -58,11 +52,10 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
     if (bufferList != null) {
       bufferList.clear();
     }
-    currentBuffer = createBuffer(secondaryBatchSize);
+    currentBuffer = createBuffer(batchSize);
   }
 
   private void configureQuery(SpiQuery<?> query) {
-
     setLabel(query);
     parent.propagateQueryState(query, docStoreMapped);
     query.setParentNode(objectGraphNode);
@@ -85,9 +78,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
   }
 
   public void register(BeanCollection<?> bc) {
-
     if (currentBuffer.isFull()) {
-      currentBuffer = createBuffer(secondaryBatchSize);
+      currentBuffer = createBuffer(batchSize);
     }
     currentBuffer.add(bc);
     bc.setLoader(currentBuffer);
@@ -105,13 +97,8 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
           if (!loadBuffer.list.isEmpty()) {
             LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest);
             parent.getEbeanServer().loadMany(req);
-            if (!queryProps.isQueryFetchAll()) {
-              // Stop - only fetch the first batch ... the rest will be lazy loaded
-              break;
-            }
           }
         }
-
         if (forEach) {
           clear();
         } else {
@@ -130,7 +117,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
    */
   static class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
 
-    private final ReentrantLock lock = new ReentrantLock(false);
+    private final ReentrantLock lock = new ReentrantLock();
     private final PersistenceContext persistenceContext;
     private final DLoadManyContext context;
     private final int batchSize;
@@ -211,7 +198,6 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
     @Override
     public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-
       lock.lock();
       try {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
@@ -225,6 +211,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
               // find it using instance equality - avoiding equals() and potential deadlock issue
               if (list.get(i) == bc) {
                 list.remove(i);
+                bc.setLoader(context.parent.getEbeanServer());
                 return;
               }
             }
@@ -232,10 +219,9 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
           }
         }
 
-        // Should reduce the list by checking each beanCollection in the L2 first before executing the query
-
-        LoadManyRequest req = new LoadManyRequest(this, onlyIds, useCache);
-        context.parent.getEbeanServer().loadMany(req);
+        context.parent.getEbeanServer().loadMany(new LoadManyRequest(this, onlyIds, useCache));
+        // clear the buffer as all entries have been loaded
+        list.clear();
       } finally {
         lock.unlock();
       }

@@ -17,9 +17,9 @@ import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
-import io.ebeaninternal.server.query.CancelableQuery;
 import io.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
+import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * Object Relational query - Internal extension to Query object.
  */
-public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
+public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCodes, SpiCancelableQuery {
 
   enum Mode {
     NORMAL(false), LAZYLOAD_MANY(false), LAZYLOAD_BEAN(true), REFRESH_BEAN(true);
@@ -84,7 +84,7 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     /**
      * Find single attribute.
      */
-    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute"),
+    ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute", false, false),
 
     /**
      * Find rowCount.
@@ -92,9 +92,14 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     COUNT(FIND_COUNT, "findCount"),
 
     /**
-     * A subquery used as part of a where clause.
+     * A subquery used as part of an exists where clause.
      */
-    SUBQUERY(FIND_SUBQUERY, "subquery"),
+    SQ_EXISTS(FIND_SUBQUERY, "sqExists", false, false),
+
+    /**
+     * A subquery used as part of an in where clause.
+     */
+    SQ_IN(FIND_SUBQUERY, "sqIn", false, false),
 
     /**
      * Delete query.
@@ -107,17 +112,21 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
     UPDATE(FIND_UPDATE, "update", true);
 
     private final boolean update;
+    private final boolean defaultSelect;
     private final String profileEventId;
     private final String label;
 
     Type(String profileEventId, String label) {
-      this(profileEventId, label, false);
+      this(profileEventId, label, false, true);
     }
-
     Type(String profileEventId, String label, boolean update) {
+      this(profileEventId, label, update, true);
+    }
+    Type(String profileEventId, String label, boolean update, boolean defaultSelect) {
       this.profileEventId = profileEventId;
       this.label = label;
       this.update = update;
+      this.defaultSelect = defaultSelect;
     }
 
     /**
@@ -125,6 +134,13 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
      */
     public boolean isUpdate() {
       return update;
+    }
+
+    /**
+     * Return true if this allows default select clause.
+     */
+    public boolean defaultSelect() {
+      return defaultSelect;
     }
 
     public String profileEventId() {
@@ -288,6 +304,16 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * invoking a lazy load was included in the query.
    */
   boolean selectAllForLazyLoadProperty();
+
+  /**
+   * Set the select properties.
+   */
+  void selectProperties(OrmQueryProperties other);
+
+  /**
+   * Set the fetch properties for the given path.
+   */
+  void fetchProperties(String path, OrmQueryProperties other);
 
   /**
    * Set the on a secondary query given the label, relativePath and profile location of the parent query.
@@ -619,13 +645,11 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
   CQueryPlanKey prepare(SpiOrmQueryRequest<T> request);
 
   /**
-   * Calculate a hash based on the bind values used in the query.
+   * Build the key for the bind values used in the query (for l2 query cache).
    * <p>
-   * Combined with queryPlanHash() to return getQueryHash (a unique hash for a
-   * query).
-   * </p>
+   * Combined with queryPlanHash() to return queryHash (a unique key for a query).
    */
-  int queryBindHash();
+  void queryBindKey(BindValuesKey key);
 
   /**
    * Identifies queries that are exactly the same including bind variables.
@@ -835,16 +859,6 @@ public interface SpiQuery<T> extends Query<T>, TxnProfileEventCodes {
    * Read the readEvent for future queries (null otherwise).
    */
   ReadEvent getFutureFetchAudit();
-
-  /**
-   * Set the underlying cancelable query (with the PreparedStatement).
-   */
-  void setCancelableQuery(CancelableQuery cancelableQuery);
-
-  /**
-   * Return true if this query has been cancelled.
-   */
-  boolean isCancelled();
 
   /**
    * Return the base table to use if user defined on the query.

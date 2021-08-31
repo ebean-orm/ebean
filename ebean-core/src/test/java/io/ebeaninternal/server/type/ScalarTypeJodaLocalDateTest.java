@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,11 +26,28 @@ public class ScalarTypeJodaLocalDateTest {
   }
 
   @Test
+  public void convertToDate_convertFromDate_westOfUtc() {
+    final TimeZone originaDefaultTimezone = TimeZone.getDefault();
+    try {
+      TimeZone.setDefault(TimeZone.getTimeZone("America/Chicago"));
+
+      convertDate(new LocalDate());
+      convertDate(new LocalDate(1899, 12, 1));
+      convertDate(new LocalDate(1900, 1, 1));
+      convertDate(new LocalDate(2021, 2, 8));
+
+    } finally {
+      TimeZone.setDefault(originaDefaultTimezone);
+    }
+  }
+
+  @Test
   public void convertToDate_convertFromDate() {
 
     convertDate(new LocalDate());
     convertDate(new LocalDate(1899, 12, 1));
     convertDate(new LocalDate(1900, 1, 1));
+    convertDate(new LocalDate(2021, 2, 8));
   }
 
   private void convertDate(LocalDate localDate) {

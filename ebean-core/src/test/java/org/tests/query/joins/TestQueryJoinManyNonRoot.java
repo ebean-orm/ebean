@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,6 +55,17 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     assertTrue(sql.contains("join o_customer t1 on t1.id "));
     assertTrue(sql.contains("left join contact t2 on"));
 
+    Map<Integer, Order> ordersById = Ebean.find(Order.class).setMapKey("id").where().gt("id", 0).query().findMap();
+    for (Order o: list) {
+      int withoutFetch = ordersById.get(o.getId()).getCustomer().getContacts().size();
+      int withFetch = o.getCustomer().getContacts().size();
+      assertEquals(String.format("order.customer.contacts for order %d did not match. " +
+              "Items without fetch: %d, with fetch: %d", o.getId(), withoutFetch, withFetch),
+              withoutFetch,
+              withFetch);
+    }
+
+
     // select t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t1.name c4, t0.cretime c5, t0.updtime c6,
     //        t1.id c7, t1.status c8, t1.name c9, t1.smallnote c10, t1.anniversary c11, t1.cretime c12, t1.updtime c13, t1.billing_address_id c14, t1.shipping_address_id c15,
     //        t2.id c16, t2.first_name c17, t2.last_name c18, t2.phone c19, t2.mobile c20, t2.email c21, t2.cretime c22, t2.updtime c23, t2.customer_id c24, t2.group_id c25
@@ -96,7 +108,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     Query<Order> q = Ebean.find(Order.class)
       .fetch("customer")
       .fetch("customer.contacts")
-      .fetch("details", new FetchConfig().query(10))
+      .fetchQuery("details")
       .fetch("details.product")
       .where().gt("id", 0).query();
 

@@ -5,9 +5,7 @@ interface Constants {
   String AT_GENERATED = "@Generated(\"io.ebean.querybean.generator\")";
 
   String AT_TYPEQUERYBEAN = "@TypeQueryBean(\"v1\")";
-
-  String GENERATED_9 = "javax.annotation.processing.Generated";
-  String GENERATED_8 = "javax.annotation.Generated";
+  String GENERATED = "io.ebean.typequery.Generated";
 
   String MAPPED_SUPERCLASS = "javax.persistence.MappedSuperclass";
   String INHERITANCE = "javax.persistence.Inheritance";

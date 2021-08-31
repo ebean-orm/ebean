@@ -22,14 +22,7 @@ import java.util.List;
 /**
  * Factory for creating InsertMeta UpdateMeta and DeleteMeta.
  */
-class MetaFactory {
-
-  private final FactoryBaseProperties baseFact;
-  private final FactoryEmbedded embeddedFact;
-  private final FactoryVersion versionFact = new FactoryVersion();
-  private final FactoryAssocOnes assocOneFact = new FactoryAssocOnes();
-
-  private final FactoryId idFact = new FactoryId();
+final class MetaFactory {
 
   /**
    * Include Lobs in the base statement. Generally true. Oracle9 used to require
@@ -37,6 +30,11 @@ class MetaFactory {
    */
   private static final boolean includeLobs = true;
 
+  private final FactoryBaseProperties baseFact;
+  private final FactoryEmbedded embeddedFact;
+  private final FactoryVersion versionFact = new FactoryVersion();
+  private final FactoryAssocOnes assocOneFact = new FactoryAssocOnes();
+  private final FactoryId idFact = new FactoryId();
   private final DatabasePlatform dbPlatform;
 
   MetaFactory(DatabasePlatform dbPlatform) {
@@ -52,9 +50,7 @@ class MetaFactory {
    * Create the UpdateMeta for the given bean type.
    */
   UpdateMeta createUpdate(BeanDescriptor<?> desc) {
-
     List<Bindable> setList = new ArrayList<>();
-
     baseFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     embeddedFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     assocOneFact.create(setList, desc, DmlMode.UPDATE);
@@ -75,7 +71,6 @@ class MetaFactory {
    * Create the DeleteMeta for the given bean type.
    */
   DeleteMeta createDelete(BeanDescriptor<?> desc) {
-
     BindableId id = idFact.createId(desc);
     Bindable version = versionFact.createForDelete(desc);
     Bindable tenantId = versionFact.createTenantId(desc);
@@ -86,19 +81,15 @@ class MetaFactory {
    * Create the InsertMeta for the given bean type.
    */
   InsertMeta createInsert(BeanDescriptor<?> desc) {
-
     BindableId id = idFact.createId(desc);
 
     List<Bindable> allList = new ArrayList<>();
-
     baseFact.create(allList, desc, DmlMode.INSERT, includeLobs);
     embeddedFact.create(allList, desc, DmlMode.INSERT, includeLobs);
     assocOneFact.create(allList, desc, DmlMode.INSERT);
 
     BindableList allBindable = new BindableList(allList);
-
     BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
-
     Bindable shadowFkey;
     if (unidirectional == null) {
       shadowFkey = null;

@@ -3,26 +3,16 @@ package io.ebeaninternal.server.persist.dml;
 /**
  * Helper to support the generation of DML statements.
  */
-public class GenerateDmlRequest {
+public final class GenerateDmlRequest {
 
   private final StringBuilder sb = new StringBuilder(100);
-
   private StringBuilder insertBindBuffer;
-
   private String prefix;
   private String prefix2;
-
   private int insertMode;
-
   private int bindColumnCount;
 
-  /**
-   * Create from a PersistRequestBean.
-   */
-  public GenerateDmlRequest() {
-  }
-
-  public GenerateDmlRequest append(String s) {
+  GenerateDmlRequest append(String s) {
     sb.append(s);
     return this;
   }
@@ -33,9 +23,7 @@ public class GenerateDmlRequest {
   }
 
   public void appendColumn(String column, String bind) {
-
     ++bindColumnCount;
-
     sb.append(prefix);
     sb.append(column);
     //sb.append(expr);
@@ -48,7 +36,6 @@ public class GenerateDmlRequest {
       sb.append("=");
       sb.append(bind);
     }
-
     if (prefix2 != null) {
       prefix = prefix2;
       prefix2 = null;

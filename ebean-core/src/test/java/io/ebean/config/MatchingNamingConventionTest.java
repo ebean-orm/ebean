@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNull;
 
 public class MatchingNamingConventionTest {
 
-  private MatchingNamingConvention namingConvention;
+  private final MatchingNamingConvention namingConvention;
 
   public MatchingNamingConventionTest() {
     this.namingConvention = new MatchingNamingConvention();
@@ -28,6 +28,50 @@ public class MatchingNamingConventionTest {
     MatchingNamingConvention nc = new MatchingNamingConvention();
     nc.setDatabasePlatform(platform);
     return nc;
+  }
+
+  @Test
+  public void getTableName() {
+    assertThat(namingConvention.getTableName("a", "b", "c")).isEqualTo("a.b.c");
+    assertThat(namingConvention.getTableName("", "b", "c")).isEqualTo("b.c");
+    assertThat(namingConvention.getTableName("", "", "c")).isEqualTo("c");
+    assertThat(namingConvention.getTableName("a", "", "c")).isEqualTo("a.c");
+  }
+
+  @Test
+  public void getTableName_when_allQuoted() {
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
+
+    assertThat(nc.getTableName("a", "b", "c")).isEqualTo("[a].[b].[c]");
+    assertThat(nc.getTableName("", "b", "c")).isEqualTo("[b].[c]");
+    assertThat(nc.getTableName("", "", "c")).isEqualTo("[c]");
+    assertThat(nc.getTableName("a", "", "c")).isEqualTo("[a].[c]");
+  }
+
+  @Test
+  public void getM2MJoinTableName() {
+    TableName t0 = new TableName("One");
+    TableName t1 = new TableName("Two");
+    assertThat(namingConvention.getM2MJoinTableName(t0, t1).toString()).isEqualTo("One_Two");
+  }
+
+  @Test
+  public void getM2MJoinTableName_when_allQuoted() {
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
+    TableName t0 = new TableName("[One]");
+    TableName t1 = new TableName("[Two]");
+    assertThat(nc.getM2MJoinTableName(t0, t1).toString()).isEqualTo("[One_Two]");
+  }
+
+  @Test
+  public void deriveM2MColumn() {
+    assertThat(namingConvention.deriveM2MColumn("One", "Two")).isEqualTo("One_Two");
+  }
+
+  @Test
+  public void deriveM2MColumn_when_allQuoted() {
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
+    assertThat(nc.deriveM2MColumn("[One]", "[Two]")).isEqualTo("[One_Two]");
   }
 
   @Test
@@ -50,11 +94,16 @@ public class MatchingNamingConventionTest {
     assertNull(tableName.getSchema());
   }
 
-
   @Test
   public void getSequenceName() {
     MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
-    assertEquals("Customer_seq", nc.getSequenceName("[Customer]", null));
+    assertThat(nc.getSequenceName("[Customer]", null)).isEqualTo("[Customer_seq]");
+  }
+
+  @Test
+  public void getSequenceName_when_quotedSchema() {
+    MatchingNamingConvention nc = createMatchingNamingConventionAllQuoted();
+    assertThat(nc.getSequenceName("[dbo].[Customer]", null)).isEqualTo("[dbo].[Customer_seq]");
   }
 
   @Test

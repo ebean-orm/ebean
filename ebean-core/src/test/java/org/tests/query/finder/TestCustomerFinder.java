@@ -31,7 +31,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer0 = new StringBuilder();
-    server().getMetaInfoManager()
+    DB.getDefault().getMetaInfoManager()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer0);
@@ -45,7 +45,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer1 = new StringBuilder();
-    server().getMetaInfoManager()
+    DB.getDefault().getMetaInfoManager()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer1);
@@ -55,7 +55,6 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(json1).contains("\"name\":\"txn.main\"");
     assertThat(json1).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(json1).doesNotContain("\"sql\":\"select t0.id, t0.status, t0.name");
-
   }
 
   @Test
@@ -85,7 +84,6 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(customer.getName()).isEqualTo(customer1.getName());
 
     assertThat(Customer.find.db().getName()).isEqualTo(DB.getDefault().getName());
-
   }
 
   @Test
@@ -175,40 +173,56 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    // change default collect query plan threshold to 200 micros
+    QueryPlanInit init0 = new QueryPlanInit();
+    init0.setAll(true);
+    init0.thresholdMicros(2);
+    final List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanInit(init0);
+    assertThat(plans.size()).isGreaterThan(1);
+
     // the server has some plans
     runQueries();
 
-    // enable query plan bind capture on all plans threshold 100 micros
+    // change query plan threshold to 100 micros
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
-    init.setThresholdMicros(100);
+    init.thresholdMicros(1);
     final List<MetaQueryPlan> appliedToPlans = server().getMetaInfoManager().queryPlanInit(init);
     assertThat(appliedToPlans.size()).isGreaterThan(4);
 
-    // will collect bind captures
+    // run queries again
     runQueries();
 
-    ServerMetrics metrics = server().getMetaInfoManager().collectMetrics();
+    ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
 
-    List<MetaQueryMetric> planStats = metrics.getQueryMetrics();
+    List<MetaQueryMetric> planStats = metrics.queryMetrics();
     assertThat(planStats.size()).isGreaterThan(4);
 
     for (MetaQueryMetric planStat : planStats) {
       System.out.println(planStat);
     }
 
-    for (MetaTimedMetric txnTimed : metrics.getTimedMetrics()) {
+    for (MetaTimedMetric txnTimed : metrics.timedMetrics()) {
       System.out.println(txnTimed);
     }
 
     // obtains db query plans ...
     QueryPlanRequest request = new QueryPlanRequest();
-    List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanCollectNow(request);
-    assertThat(plans).isNotEmpty();
+    // collect max 1000 plans (use something more like 10)
+    request.maxCount(1_000);
+    // don't collect any more plans if used 10 secs
+    request.maxTimeMillis(10_000);
+    List<MetaQueryPlan> plans0 = server().getMetaInfoManager().queryPlanCollectNow(request);
+    assertThat(plans0).isNotEmpty();
 
     for (MetaQueryPlan plan : plans) {
+      logger.info("queryPlan label:{}, queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
+        plan.label(), plan.queryTimeMicros(), plan.profileLocation(),
+        plan.sql(), plan.bind(), plan.plan());
       System.out.println(plan);
     }
+
+    //DB.getBackgroundExecutor().scheduleWithFixedDelay(...)
   }
 
   @Test
@@ -228,9 +242,9 @@ public class TestCustomerFinder extends BaseTestCase {
 
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
-    assertThat(metricsJson).contains("\"loc\":\"CustomerFinder.byNameStatus(CustomerFinder.java:44)\"");
+    assertThat(metricsJson).contains("\"loc\":\"org.tests.model.basic.finder.CustomerFinder.byNameStatus\"");
     if (isH2() || isPostgres()) {
-      assertThat(metricsJson).contains("\"hash\":\"cc20eb930403cfd418db2d0475c6e26a\"");
+      assertThat(metricsJson).contains("\"hash\":\"de3affa5b4bff07e19c1c012590dcde6\"");
       assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
     }
   }
@@ -253,7 +267,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"txn.main\"");
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).doesNotContain("\"loc\":");
-    assertThat(metricsJson).doesNotContain("\"hash\":");
+    assertThat(metricsJson).doesNotContain("\"sqlHash\":");
     assertThat(metricsJson).doesNotContain("\"sql\":");
   }
 

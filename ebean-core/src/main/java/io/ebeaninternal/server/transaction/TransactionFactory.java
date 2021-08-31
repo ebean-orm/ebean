@@ -33,8 +33,7 @@ abstract class TransactionFactory {
   /**
    * Set the Transaction Isolation level if required.
    */
-  SpiTransaction setIsolationLevel(SpiTransaction t, boolean explicit, int isolationLevel) {
-
+  final SpiTransaction setIsolationLevel(SpiTransaction t, boolean explicit, int isolationLevel) {
     if (isolationLevel > -1) {
       Connection connection = t.getConnection();
       try {
@@ -44,11 +43,9 @@ abstract class TransactionFactory {
         throw new PersistenceException(e);
       }
     }
-
     if (explicit && manager.log().txn().isTrace()) {
       manager.log().txn().trace(t.getLogPrefix() + "Begin");
     }
-
     return t;
   }
 }

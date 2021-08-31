@@ -36,4 +36,13 @@ public interface STreePropertyAssoc extends STreeProperty {
    */
   void setValue(EntityBean parentBean, Object contextBean);
 
+  /**
+   * Return true if the associated type has soft delete.
+   */
+  boolean isTargetSoftDelete();
+
+  /**
+   * Return the soft delete predicate.
+   */
+  String getSoftDeletePredicate(String tableAlias);
 }

@@ -18,12 +18,8 @@ public class MigrationModel {
   private static final Logger logger = LoggerFactory.getLogger(MigrationModel.class);
 
   private final ModelContainer model = new ModelContainer();
-
   private final File modelDirectory;
-
   private final String modelSuffix;
-
-  private MigrationVersion lastVersion;
 
   public MigrationModel(File modelDirectory, String modelSuffix) {
     this.modelDirectory = modelDirectory;
@@ -34,16 +30,14 @@ public class MigrationModel {
    * Read all the migrations returning the model with all
    * the migrations applied in version order.
    *
-   * @param dbinitMigration If true we don't apply model changes, migration is from scratch.
+   * @param initMigration If true we don't apply model changes, migration is from scratch.
    */
-  public ModelContainer read(boolean dbinitMigration) {
-
-    readMigrations(dbinitMigration);
+  public ModelContainer read(boolean initMigration) {
+    readMigrations(initMigration);
     return model;
   }
 
-  private void readMigrations(boolean dbinitMigration) {
-
+  private void readMigrations(boolean initMigration) {
     // find all the migration xml files
     File[] xmlFiles = modelDirectory.listFiles(pathname -> pathname.getName().toLowerCase().endsWith(modelSuffix));
     if (xmlFiles == null || xmlFiles.length == 0) {
@@ -57,16 +51,11 @@ public class MigrationModel {
     // sort into version order before applying
     Collections.sort(resources);
 
-    if (!dbinitMigration) {
+    if (!initMigration) {
       for (MigrationResource migrationResource : resources) {
         logger.debug("read {}", migrationResource);
-        model.apply(migrationResource.read(), migrationResource.getVersion());
+        model.apply(migrationResource.read(), migrationResource.version());
       }
-    }
-
-    // remember the last version
-    if (!resources.isEmpty()) {
-      lastVersion = resources.get(resources.size() - 1).getVersion();
     }
   }
 
@@ -74,10 +63,5 @@ public class MigrationModel {
     String fileName = xmlFile.getName();
     String versionName = fileName.substring(0, fileName.length() - modelSuffix.length());
     return MigrationVersion.parse(versionName);
-  }
-
-  public String getNextVersion(String initialVersion) {
-
-    return lastVersion == null ? initialVersion : lastVersion.nextVersion();
   }
 }

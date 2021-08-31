@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public class PClass<R> extends PBaseString<R,Class> {
+public final class PClass<R> extends PBaseString<R,Class> {
 
   /**
    * Construct with a property name and root instance.

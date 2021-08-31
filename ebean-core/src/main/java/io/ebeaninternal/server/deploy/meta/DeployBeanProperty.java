@@ -1,18 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.DocCode;
-import io.ebean.annotation.DocProperty;
-import io.ebean.annotation.DocSortable;
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.Platform;
-import io.ebean.annotation.SoftDelete;
-import io.ebean.annotation.UpdatedTimestamp;
-import io.ebean.annotation.WhenCreated;
-import io.ebean.annotation.WhenModified;
-import io.ebean.annotation.Where;
-import io.ebean.annotation.WhoCreated;
-import io.ebean.annotation.WhoModified;
+import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -34,13 +22,11 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import javax.validation.constraints.Size;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,169 +55,119 @@ public class DeployBeanProperty {
    * Flag to mark this at part of the unique id.
    */
   private boolean id;
-
   boolean importedPrimaryKey;
-
   /**
    * Flag to mark the property as embedded. This could be on
    * BeanPropertyAssocOne rather than here. Put it here for checking Id type
    * (embedded or not).
    */
   private boolean embedded;
-
   /**
    * Flag indicating if this the version property.
    */
   private boolean versionColumn;
-
   private boolean fetchEager = true;
-
   /**
    * Set if this property is nullable.
    */
   private boolean nullable = true;
-
   private boolean unique;
-
   private boolean discriminator;
-
   /**
    * The length or precision of the DB column.
    */
   private int dbLength;
-
   private int dbScale;
-
   private String dbColumnDefn;
-
   private boolean isTransient;
-
   private boolean localEncrypted;
-
   private boolean jsonSerialize = true;
   private boolean jsonDeserialize = true;
-
+  private MutationDetection mutationDetection;
   private boolean dbEncrypted;
   private DbEncryptFunction dbEncryptFunction;
-
   private int dbEncryptedType;
-
   private String dbBind = "?";
-
   /**
    * Is this property include in database resultSet.
    */
   private boolean dbRead;
-
   /**
    * Include this in DB insert.
    */
   private boolean dbInsertable;
-
   /**
    * Include this in a DB update.
    */
   private boolean dbUpdateable;
-
   private DeployTableJoin secondaryTableJoin;
-
   private String secondaryTableJoinPrefix;
-
   /**
    * Set to true if this property is based on a secondary table.
    */
   private String secondaryTable;
-
   /**
    * The type that owns this property.
    */
   private Class<?> owningType;
-
   /**
    * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
    */
   private boolean lob;
-
   private boolean naturalKey;
-
   /**
    * The logical bean property name.
    */
   private String name;
-
   /**
    * The reflected field.
    */
   private Field field;
-
   /**
    * The bean type.
    */
   private final Class<?> propertyType;
-
   private final Type genericType;
-
   /**
    * Set for Non-JDBC types to provide logical to db type conversion.
    */
   private ScalarType<?> scalarType;
-
   /**
    * The database column. This can include quoted identifiers.
    */
   private String dbColumn;
-
   private String aggregationPrefix;
   private String aggregation;
   private String aggregationParsed;
-
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
-
   /**
    * The jdbc data type this maps to.
    */
   private int dbType;
-
   private final DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
-
   private int propertyIndex;
-
   private BeanPropertyGetter getter;
-
   private BeanPropertySetter setter;
-
   /**
    * Generator for insert or update timestamp etc.
    */
   private GeneratedProperty generatedProperty;
-
   final DeployBeanDescriptor<?> desc;
-
   private boolean undirectionalShadow;
-
   private boolean elementProperty;
-
   private int sortOrder;
-
   private boolean excludedFromHistory;
-
   private boolean tenantId;
-
   private boolean draft;
   private boolean draftOnly;
   private boolean draftDirty;
   private boolean draftReset;
-
   private boolean softDelete;
   private boolean unmappedJson;
-
   private String dbComment;
-
   private String dbColumnDefault;
-
   private List<DbMigrationInfo> dbMigrationInfos;
-
   private Set<Annotation> metaAnnotations;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
@@ -326,6 +262,14 @@ public class DeployBeanProperty {
 
   public void setJsonDeserialize(boolean jsonDeserialize) {
     this.jsonDeserialize = jsonDeserialize;
+  }
+
+  public MutationDetection getMutationDetection() {
+    return mutationDetection;
+  }
+
+  public void setMutationDetection(MutationDetection dirtyDetection) {
+    this.mutationDetection = dirtyDetection;
   }
 
   /**
@@ -683,7 +627,6 @@ public class DeployBeanProperty {
    */
   public void setAggregationPrefix(String prefix) {
     this.aggregationPrefix = prefix;
-    this.aggregation = (prefix == null) ? aggregation : aggregation.replace(aggregationPrefix, "u1");
   }
 
   public String getElPrefix() {
@@ -716,7 +659,7 @@ public class DeployBeanProperty {
       return sqlFormulaSelect;
     }
     if (aggregation != null) {
-      return aggregation;
+      return aggregationParsed == null ? dbColumn : aggregationParsed;
     }
     return dbColumn;
   }
@@ -1140,15 +1083,6 @@ public class DeployBeanProperty {
     return result;
   }
 
-  public List<Size> getMetaAnnotationSize() {
-    final List<Size> size = getMetaAnnotations(Size.class);
-    final List<Size.List> lists = getMetaAnnotations(Size.List.class);
-    for (Size.List list : lists) {
-      Collections.addAll(size, list.value());
-    }
-    return size;
-  }
-
   public Formula getMetaAnnotationFormula(Platform platform) {
     Formula fallback = null;
     for (Annotation ann : metaAnnotations) {
@@ -1212,4 +1146,11 @@ public class DeployBeanProperty {
     return false;
   }
 
+  boolean isJsonMapper() {
+    return scalarType != null && scalarType.isJsonMapper();
+  }
+
+  boolean isJsonType() {
+    return mutationDetection != null;
+  }
 }

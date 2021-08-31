@@ -1,10 +1,12 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.query.CQuery;
 
 import java.io.IOException;
@@ -13,14 +15,11 @@ import java.util.List;
 /**
  * In expression using a sub query.
  */
-class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
+final class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
 
   private final boolean not;
-
   private final SpiQuery<?> subQuery;
-
   private List<Object> bindParams;
-
   private String sql;
 
   InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
@@ -68,12 +67,12 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
 
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
-    return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
+    return ebeanServer.compileQuery(Type.SQ_IN, subQuery, queryRequest.getTransaction());
   }
 
   @Override
-  public int queryBindHash() {
-    return subQuery.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    subQuery.queryBindKey(key);
   }
 
   @Override

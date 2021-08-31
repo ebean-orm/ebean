@@ -25,6 +25,7 @@ import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -47,11 +48,10 @@ import java.util.function.Predicate;
 /**
  * Junction implementation.
  */
-class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
+final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
-  protected DefaultExpressionList<T> exprList;
-
-  protected Junction.Type type;
+  DefaultExpressionList<T> exprList;
+  Junction.Type type;
 
   JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
     this.type = type;
@@ -64,6 +64,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   JunctionExpression(Junction.Type type, DefaultExpressionList<T> exprList) {
     this.type = type;
     this.exprList = exprList;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    exprList.prefixProperty(path);
   }
 
   @Override
@@ -108,9 +113,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.startBool(type);
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      aList.writeDocQuery(context);
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.writeDocQuery(context);
     }
     context.endBool();
   }
@@ -118,9 +122,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public void writeDocQueryJunction(DocQueryContext context) throws IOException {
     context.startBoolGroupList(type);
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      aList.writeDocQuery(context);
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.writeDocQuery(context);
     }
     context.endBoolGroupList();
   }
@@ -133,18 +136,15 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-
     List<SpiExpression> list = exprList.internalList();
-
     // get the current state for 'require outer joins'
     boolean parentOuterJoins = manyWhereJoin.isRequireOuterJoins();
     if (type == Type.OR) {
       // turn on outer joins required for disjunction expressions
       manyWhereJoin.setRequireOuterJoins(true);
     }
-
-    for (SpiExpression aList : list) {
-      aList.containsMany(desc, manyWhereJoin);
+    for (SpiExpression expr : list) {
+      expr.containsMany(desc, manyWhereJoin);
     }
     if (type == Type.OR && !parentOuterJoins) {
       // restore state to not forcing outer joins
@@ -171,18 +171,14 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      aList.addBindValues(request);
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.addBindValues(request);
     }
   }
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     List<SpiExpression> list = exprList.internalList();
-
     if (!list.isEmpty()) {
       request.append(type.prefix());
       request.append("(");
@@ -199,9 +195,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      aList.prepareExpression(request);
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.prepareExpression(request);
     }
   }
 
@@ -211,22 +206,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append(type).append("[");
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      aList.queryPlanHash(builder);
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.queryPlanHash(builder);
       builder.append(",");
     }
     builder.append("]");
   }
 
   @Override
-  public int queryBindHash() {
-    int hc = JunctionExpression.class.getName().hashCode();
-    List<SpiExpression> list = exprList.internalList();
-    for (SpiExpression aList : list) {
-      hc = hc * 92821 + aList.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    for (SpiExpression expr : exprList.internalList()) {
+      expr.queryBindKey(key);
     }
-    return hc;
   }
 
   @Override
@@ -269,7 +260,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   public ExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
     return exprList.textCommonTerms(search, options);
   }
-
 
   @Override
   public ExpressionList<T> allEq(Map<String, Object> propertyMap) {
@@ -447,6 +437,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public void findEach(int batch, Consumer<List<T>> consumer) {
+    exprList.findEach(batch, consumer);
+  }
+
+  @Override
   public void findEachWhile(Predicate<T> consumer) {
     exprList.findEachWhile(consumer);
   }
@@ -492,13 +487,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> forUpdate() {
-    return exprList.forUpdate();
+  public Query<T> withLock(Query.LockType lockType) {
+    return exprList.withLock(lockType);
   }
 
   @Override
-  public Query<T> forUpdate(Query.LockType lockType) {
-    return exprList.forUpdate(lockType);
+  public Query<T> withLock(Query.LockType lockType, Query.LockWait lockWait) {
+    return exprList.withLock(lockType, lockWait);
+  }
+
+  @Override
+  public Query<T> forUpdate() {
+    return exprList.forUpdate();
   }
 
   @Override
@@ -507,18 +507,8 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public Query<T> forUpdateNoWait(Query.LockType lockType) {
-    return exprList.forUpdateNoWait(lockType);
-  }
-
-  @Override
   public Query<T> forUpdateSkipLocked() {
     return exprList.forUpdateSkipLocked();
-  }
-
-  @Override
-  public Query<T> forUpdateSkipLocked(Query.LockType lockType) {
-    return exprList.forUpdateSkipLocked(lockType);
   }
 
   /**
@@ -1020,7 +1010,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public String nestedPath(BeanDescriptor<?> desc) {
-
     PrepareDocNested.prepare(exprList, desc, type);
     String nestedPath = exprList.allDocNestedPath;
     if (nestedPath != null) {

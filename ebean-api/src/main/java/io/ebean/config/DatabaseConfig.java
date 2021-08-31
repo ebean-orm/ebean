@@ -7,9 +7,7 @@ import io.ebean.EbeanVersion;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import io.ebean.annotation.Encrypted;
-import io.ebean.annotation.PersistBatch;
-import io.ebean.annotation.Platform;
+import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -194,6 +192,11 @@ public class DatabaseConfig {
   private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
 
   /**
+   * The default mode used for {@code @DbJson} with Jackson ObjectMapper.
+   */
+  private MutationDetection jsonMutationDetection = MutationDetection.HASH;
+
+  /**
    * The database platform name. Used to imply a DatabasePlatform to use.
    */
   private String databasePlatformName;
@@ -231,6 +234,12 @@ public class DatabaseConfig {
    * of the base table and the history table in order to support asOf queries.
    */
   private String historyTableSuffix = "_history";
+
+  /**
+   * When true explicit transactions beans that have been made dirty will be
+   * automatically persisted via update on flush.
+   */
+  private boolean autoPersistUpdates;
 
   /**
    * Use for transaction scoped batch mode.
@@ -309,6 +318,8 @@ public class DatabaseConfig {
    * The external transaction manager (like Spring).
    */
   private ExternalTransactionManager externalTransactionManager;
+
+  private boolean skipDataSourceCheck;
 
   /**
    * The data source (if programmatically provided).
@@ -489,7 +500,7 @@ public class DatabaseConfig {
    * Should the javax.validation.constraints.NotNull enforce a notNull column in DB.
    * If set to false, use io.ebean.annotation.NotNull or Column(nullable=true).
    */
-  private boolean useJavaxValidationNotNull = true;
+  private boolean useValidationNotNull = true;
 
   /**
    * Generally we want to perform L2 cache notification in the background and not impact
@@ -498,14 +509,23 @@ public class DatabaseConfig {
   private boolean notifyL2CacheInForeground;
 
   /**
-   * Set to true to support query plan capture.
+   * Set to true to enable bind capture required for query plan capture.
    */
-  private boolean collectQueryPlans;
+  private boolean queryPlanEnable;
 
   /**
    * The default threshold in micros for collecting query plans.
    */
-  private long collectQueryPlanThresholdMicros = Long.MAX_VALUE;
+  private long queryPlanThresholdMicros = Long.MAX_VALUE;
+
+  /**
+   * Set to true to enable automatic periodic query plan capture.
+   */
+  private boolean queryPlanCapture;
+  private long queryPlanCapturePeriodSecs = 60 * 10; // 10 minutes
+  private long queryPlanCaptureMaxTimeMillis = 10_000; // 10 seconds
+  private int queryPlanCaptureMaxCount = 10;
+  private QueryPlanListener queryPlanListener;
 
   /**
    * The time in millis used to determine when a query is alerted for being slow.
@@ -723,6 +743,24 @@ public class DatabaseConfig {
   }
 
   /**
+   * Return the default MutableDetection to use with {@code @DbJson} using Jackson.
+   *
+   * @see DbJson#mutationDetection()
+   */
+  public MutationDetection getJsonMutationDetection() {
+    return jsonMutationDetection;
+  }
+
+  /**
+   * Set the default MutableDetection to use with {@code @DbJson} using Jackson.
+   *
+   * @see DbJson#mutationDetection()
+   */
+  public void setJsonMutationDetection(MutationDetection jsonMutationDetection) {
+    this.jsonMutationDetection = jsonMutationDetection;
+  }
+
+  /**
    * Return the name of the Database.
    */
   public String getName() {
@@ -897,6 +935,20 @@ public class DatabaseConfig {
   }
 
   /**
+   * Return true if dirty beans are automatically persisted.
+   */
+  public boolean isAutoPersistUpdates() {
+    return autoPersistUpdates;
+  }
+
+  /**
+   * Set to true if dirty beans are automatically persisted.
+   */
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    this.autoPersistUpdates = autoPersistUpdates;
+  }
+
+  /**
    * Return the PersistBatch mode to use by default at the transaction level.
    * <p>
    * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
@@ -1045,7 +1097,6 @@ public class DatabaseConfig {
    * This is a performance optimisation to reduce the number times Ebean
    * requests a sequence to be used as an Id for a bean (aka reduce network
    * chatter).
-
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
@@ -1600,6 +1651,20 @@ public class DatabaseConfig {
    */
   public void setAutoTuneConfig(AutoTuneConfig autoTuneConfig) {
     this.autoTuneConfig = autoTuneConfig;
+  }
+
+  /**
+   * Return true if the startup DataSource check should be skipped.
+   */
+  public boolean skipDataSourceCheck() {
+    return skipDataSourceCheck;
+  }
+
+  /**
+   * Set to true to skip the startup DataSource check.
+   */
+  public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
+    this.skipDataSourceCheck = skipDataSourceCheck;
   }
 
   /**
@@ -2693,7 +2758,10 @@ public class DatabaseConfig {
   }
 
   /**
-   * Load settings from ebean.properties.
+   * Load settings from application.properties, application.yaml and other sources.
+   * <p>
+   * Uses <code>avaje-config</code> to load configuration properties.  Goto https://avaje.io/config
+   * for detail on how and where properties are loaded from.
    */
   public void loadFromProperties() {
     this.properties = Config.asProperties();
@@ -2795,21 +2863,27 @@ public class DatabaseConfig {
     }
     loadDocStoreSettings(p);
 
+    defaultServer = p.getBoolean("defaultServer", defaultServer);
+    autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);
     dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
     dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
-    collectQueryPlans = p.getBoolean("collectQueryPlans", collectQueryPlans);
-    collectQueryPlanThresholdMicros = p.getLong("collectQueryPlanThresholdMicros", collectQueryPlanThresholdMicros);
+    queryPlanEnable = p.getBoolean("queryPlan.enable", queryPlanEnable);
+    queryPlanThresholdMicros = p.getLong("queryPlan.thresholdMicros", queryPlanThresholdMicros);
+    queryPlanCapture = p.getBoolean("queryPlan.capture", queryPlanCapture);
+    queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
+    queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
+    queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
     enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);
     notifyL2CacheInForeground = p.getBoolean("notifyL2CacheInForeground", notifyL2CacheInForeground);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
-    useJavaxValidationNotNull = p.getBoolean("useJavaxValidationNotNull", useJavaxValidationNotNull);
+    useValidationNotNull = p.getBoolean("useValidationNotNull", useValidationNotNull);
     autoReadOnlyDataSource = p.getBoolean("autoReadOnlyDataSource", autoReadOnlyDataSource);
     idGeneratorAutomatic = p.getBoolean("idGeneratorAutomatic", idGeneratorAutomatic);
 
@@ -2872,7 +2946,9 @@ public class DatabaseConfig {
     jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
     jsonDateTime = p.getEnum(JsonConfig.DateTime.class, "jsonDateTime", jsonDateTime);
     jsonDate = p.getEnum(JsonConfig.Date.class, "jsonDate", jsonDate);
+    jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
+    skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
@@ -3056,20 +3132,21 @@ public class DatabaseConfig {
   /**
    * Returns if we use javax.validation.constraints.NotNull
    */
-  public boolean isUseJavaxValidationNotNull() {
-    return useJavaxValidationNotNull;
+  public boolean isUseValidationNotNull() {
+    return useValidationNotNull;
   }
 
   /**
-   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code>
+   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code> or
+   * <code>&x64;jakarta.validation.contstraints.NotNull</code>
    * with respect to generating a <code>NOT NULL</code> column.
    * <p>
    * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
    * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
    * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
    */
-  public void setUseJavaxValidationNotNull(boolean useJavaxValidationNotNull) {
-    this.useJavaxValidationNotNull = useJavaxValidationNotNull;
+  public void setUseValidationNotNull(boolean useValidationNotNull) {
+    this.useValidationNotNull = useValidationNotNull;
   }
 
   /**
@@ -3091,14 +3168,17 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return the query plan time to live.
+   * Return the time to live for ebean's internal query plan.
    */
   public int getQueryPlanTTLSeconds() {
     return queryPlanTTLSeconds;
   }
 
   /**
-   * Set the query plan time to live.
+   * Set the time to live for ebean's internal query plan.
+   * <p>
+   * This is the plan that knows how to execute the query, read the result
+   * and collects execution metrics. By default this is set to 5 mins.
    */
   public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
@@ -3171,29 +3251,110 @@ public class DatabaseConfig {
   /**
    * Return true if query plan capture is enabled.
    */
-  public boolean isCollectQueryPlans() {
-    return collectQueryPlans;
+  public boolean isQueryPlanEnable() {
+    return queryPlanEnable;
   }
 
   /**
    * Set to true to enable query plan capture.
    */
-  public void setCollectQueryPlans(boolean collectQueryPlans) {
-    this.collectQueryPlans = collectQueryPlans;
+  public void setQueryPlanEnable(boolean queryPlanEnable) {
+    this.queryPlanEnable = queryPlanEnable;
   }
 
   /**
    * Return the query plan collection threshold in microseconds.
    */
-  public long getCollectQueryPlanThresholdMicros() {
-    return collectQueryPlanThresholdMicros;
+  public long getQueryPlanThresholdMicros() {
+    return queryPlanThresholdMicros;
   }
 
   /**
    * Set the query plan collection threshold in microseconds.
+   * <p>
+   * Queries executing slower than this will have bind values captured such that later
+   * the query plan can be captured and reported.
    */
-  public void setCollectQueryPlanThresholdMicros(long collectQueryPlanThresholdMicros) {
-    this.collectQueryPlanThresholdMicros = collectQueryPlanThresholdMicros;
+  public void setQueryPlanThresholdMicros(long queryPlanThresholdMicros) {
+    this.queryPlanThresholdMicros = queryPlanThresholdMicros;
+  }
+
+  /**
+   * Return true if periodic capture of query plans is enabled.
+   */
+  public boolean isQueryPlanCapture() {
+    return queryPlanCapture;
+  }
+
+  /**
+   * Set to true to turn on periodic capture of query plans.
+   */
+  public void setQueryPlanCapture(boolean queryPlanCapture) {
+    this.queryPlanCapture = queryPlanCapture;
+  }
+
+  /**
+   * Return the frequency to capture query plans.
+   */
+  public long getQueryPlanCapturePeriodSecs() {
+    return queryPlanCapturePeriodSecs;
+  }
+
+  /**
+   * Set the frequency in seconds to capture query plans.
+   */
+  public void setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
+    this.queryPlanCapturePeriodSecs = queryPlanCapturePeriodSecs;
+  }
+
+  /**
+   * Return the time after which a capture query plans request will
+   * stop capturing more query plans.
+   * <p>
+   * Effectively this controls the amount of load/time we want to
+   * allow for query plan capture.
+   */
+  public long getQueryPlanCaptureMaxTimeMillis() {
+    return queryPlanCaptureMaxTimeMillis;
+  }
+
+  /**
+   * Set the time after which a capture query plans request will
+   * stop capturing more query plans.
+   * <p>
+   * Effectively this controls the amount of load/time we want to
+   * allow for query plan capture.
+   */
+  public void setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
+    this.queryPlanCaptureMaxTimeMillis = queryPlanCaptureMaxTimeMillis;
+  }
+
+  /**
+   * Return the max number of query plans captured per request.
+   */
+  public int getQueryPlanCaptureMaxCount() {
+    return queryPlanCaptureMaxCount;
+  }
+
+  /**
+   * Set the max number of query plans captured per request.
+   */
+  public void setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
+    this.queryPlanCaptureMaxCount = queryPlanCaptureMaxCount;
+  }
+
+  /**
+   * Return the listener used to process captured query plans.
+   */
+  public QueryPlanListener getQueryPlanListener() {
+    return queryPlanListener;
+  }
+
+  /**
+   * Set the listener used to process captured query plans.
+   */
+  public void setQueryPlanListener(QueryPlanListener queryPlanListener) {
+    this.queryPlanListener = queryPlanListener;
   }
 
   /**

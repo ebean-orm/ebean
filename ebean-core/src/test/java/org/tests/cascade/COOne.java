@@ -34,4 +34,7 @@ public class COOne {
     return children;
   }
 
+  public void setChildren(List<COOneMany> children) {
+    this.children = children;
+  }
 }

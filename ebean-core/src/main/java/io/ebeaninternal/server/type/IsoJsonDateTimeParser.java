@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-class IsoJsonDateTimeParser {
+final class IsoJsonDateTimeParser {
 
   private static final DateTimeFormatter ISO_MILLIS = new DateTimeFormatterBuilder()
     .parseCaseInsensitive()

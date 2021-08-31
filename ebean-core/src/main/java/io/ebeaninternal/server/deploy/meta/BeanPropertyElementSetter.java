@@ -6,7 +6,7 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 /**
  * Setter used for "element beans" with ElementCollection.
  */
-class BeanPropertyElementSetter implements BeanPropertySetter {
+final class BeanPropertyElementSetter implements BeanPropertySetter {
 
   private final int pos;
 

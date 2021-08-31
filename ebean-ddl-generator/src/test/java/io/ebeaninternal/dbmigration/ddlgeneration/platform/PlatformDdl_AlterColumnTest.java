@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
@@ -9,9 +9,14 @@ import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.Column;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +33,7 @@ public class PlatformDdl_AlterColumnTest {
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   {
-    DatabaseConfig serverConfig = Ebean.getDefaultServer().getPluginApi().getServerConfig();
+    DatabaseConfig serverConfig = DB.getDefault().getPluginApi().getServerConfig();
     sqlServerDdl.configure(serverConfig);
   }
 
@@ -238,6 +243,22 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
+  public void oracle_alterTableAddColumn() throws IOException {
+    DdlWrite write = new DdlWrite();
+    oraDdl.alterTableAddColumn(write.apply(), "my_table", simpleColumn(), false, "1");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table my_table add my_column int default 1 not null;\n");
+  }
+
+  private Column simpleColumn() {
+    Column column = new Column();
+    column.setName("my_column");
+    column.setType("int");
+    column.setNotnull(true);
+    column.setDefaultValue("1");
+    return column;
+  }
+
+  @Test
   public void useIdentityType_h2() {
     assertEquals(h2Ddl.useIdentityType(null), IdType.IDENTITY);
     assertEquals(h2Ddl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
@@ -285,4 +306,34 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals(hanaDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
     assertEquals(hanaDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
   }
+
+  @Test
+  public void appendForeignKeySuffix_when_defaults() {
+    assertThat(alterFkey(null, null)).isEqualTo(" on delete restrict on update restrict");
+  }
+
+  @Test
+  public void appendForeignKeySuffix_when_RestrictSetNull() {
+    assertThat(alterFkey("RESTRICT", "SET_NULL")).isEqualTo(" on delete restrict on update set null");
+  }
+
+  @Test
+  public void appendForeignKeySuffix_when_SetNullRestrict() {
+    assertThat(alterFkey("SET_NULL", "RESTRICT")).isEqualTo(" on delete set null on update restrict");
+  }
+
+  @Test
+  public void appendForeignKeySuffix_when_SetDefaultCascade() {
+    assertThat(alterFkey("SET_DEFAULT", "CASCADE")).isEqualTo(" on delete set default on update cascade");
+  }
+
+  private String alterFkey(String onDelete, String onUpdate) {
+    AlterForeignKey afk = new AlterForeignKey();
+    afk.setOnDelete(onDelete);
+    afk.setOnUpdate(onUpdate);
+    StringBuilder buffer = new StringBuilder();
+    h2Ddl.appendForeignKeySuffix(new WriteForeignKey(afk), buffer);
+    return buffer.toString();
+  }
+
 }

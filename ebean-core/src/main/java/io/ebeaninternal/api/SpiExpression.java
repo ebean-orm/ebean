@@ -54,9 +54,9 @@ public interface SpiExpression extends Expression {
   void queryPlanHash(StringBuilder builder);
 
   /**
-   * Return the hash value for the values that will be bound.
+   * Build the key for bind values of the query.
    */
-  int queryBindHash();
+  void queryBindKey(BindValuesKey key);
 
   /**
    * Return true if the expression is the same with respect to bind values.
@@ -105,4 +105,9 @@ public interface SpiExpression extends Expression {
    * Check for match to a natural key query returning false if it doesn't match.
    */
   boolean naturalKey(NaturalKeyQueryData<?> data);
+
+  /**
+   * Apply property prefix when filterMany expressions included into main query.
+   */
+  void prefixProperty(String path);
 }

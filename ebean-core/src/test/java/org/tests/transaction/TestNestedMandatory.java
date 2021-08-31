@@ -33,7 +33,7 @@ public class TestNestedMandatory extends BaseTestCase {
     }
 
     assertThat(txnMetrics).hasSize(2);
-    assertThat(txnMetrics.get(1).getName()).isEqualTo("txn.named.outer");
+    assertThat(txnMetrics.get(1).name()).isEqualTo("txn.named.outer");
   }
 
   class Outer {

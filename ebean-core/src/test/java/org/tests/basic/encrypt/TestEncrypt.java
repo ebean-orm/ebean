@@ -22,7 +22,7 @@ public class TestEncrypt extends BaseTestCase {
 
 
   @Test
-  @ForPlatform(Platform.H2) // only run this on H2 - PGCrypto not happy on CI server
+  @ForPlatform({Platform.H2, Platform.SQLSERVER}) // only run this on H2 - PGCrypto not happy on CI server
   public void testQueryBind() {
 
     LoggedSqlCollector.start();
@@ -36,7 +36,7 @@ public class TestEncrypt extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(Platform.H2) // only run this on H2 - PGCrypto not happy on CI server
+  @ForPlatform({Platform.H2, Platform.SQLSERVER}) // only run this on H2 - PGCrypto not happy on CI server
   public void testQueryJoin() {
 
     LoggedSqlCollector.start();
@@ -99,7 +99,7 @@ public class TestEncrypt extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(Platform.H2)
+  @ForPlatform({Platform.H2, Platform.SQLSERVER})
   public void test() {
 
     DB.find(EBasicEncrypt.class).delete();

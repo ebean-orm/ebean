@@ -4,26 +4,26 @@ import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.config.CurrentTenantProvider;
+import io.ebeaninternal.server.cache.DefaultServerCache.CacheEntry;
 
+import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultServerCacheConfig {
+public final class DefaultServerCacheConfig {
 
   private final ServerCacheConfig config;
-
-  private int maxSize;
-  private int maxIdleSecs;
-  private int maxSecsToLive;
-  private int trimFrequency;
-
-  private Map<Object, DefaultServerCache.CacheEntry> map;
+  private final int maxSize;
+  private final int maxIdleSecs;
+  private final int maxSecsToLive;
+  private final int trimFrequency;
+  private final Map<Object, SoftReference<CacheEntry>> map;
 
   public DefaultServerCacheConfig(ServerCacheConfig config) {
     this(config,  new ConcurrentHashMap<>());
   }
 
-  public DefaultServerCacheConfig(ServerCacheConfig config, Map<Object, DefaultServerCache.CacheEntry> map) {
+  public DefaultServerCacheConfig(ServerCacheConfig config, Map<Object, SoftReference<CacheEntry>> map) {
     this.config = config;
     this.map = map;
 
@@ -50,7 +50,7 @@ public class DefaultServerCacheConfig {
     return config.getShortName();
   }
 
-  public Map<Object, DefaultServerCache.CacheEntry> getMap() {
+  public Map<Object, SoftReference<CacheEntry>> getMap() {
     return map;
   }
 

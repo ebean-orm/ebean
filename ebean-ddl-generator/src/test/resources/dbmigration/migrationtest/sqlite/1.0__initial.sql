@@ -24,7 +24,7 @@ create table migtest_fk_cascade (
   id                            integer not null,
   one_id                        integer,
   constraint pk_migtest_fk_cascade primary key (id),
-  foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update cascade
+  foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict
 );
 
 create table migtest_fk_cascade_one (
@@ -53,7 +53,7 @@ create table migtest_fk_set_null (
   id                            integer not null,
   one_id                        integer,
   constraint pk_migtest_fk_set_null primary key (id),
-  foreign key (one_id) references migtest_fk_one (id) on delete set null on update set null
+  foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict
 );
 
 create table migtest_e_basic (

@@ -11,7 +11,7 @@ import java.util.List;
  * Makes use of BeanVisitor and PropertyVisitor to navigate BeanDescriptors
  * and their properties.
  */
-public class VisitAllUsing extends VisitProperties {
+public final class VisitAllUsing extends VisitProperties {
 
   private final BeanVisitor visitor;
 

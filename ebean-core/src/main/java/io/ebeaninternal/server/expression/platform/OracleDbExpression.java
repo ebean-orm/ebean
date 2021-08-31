@@ -7,7 +7,7 @@ import io.ebeaninternal.server.expression.Op;
 /**
  * Oracle handling of platform specific expressions. ARRAY expressions not supported.
  */
-public class OracleDbExpression extends BaseDbExpression {
+final class OracleDbExpression extends BaseDbExpression {
 
   @Override
   public String concat(String property0, String separator, String property1, String suffix) {
@@ -16,7 +16,6 @@ public class OracleDbExpression extends BaseDbExpression {
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
-
     if (operator == Op.EXISTS) {
       request.append("json_exists(").append(propName).append(", '$.").append(path).append("')");
     } else if (operator == Op.NOT_EXISTS) {

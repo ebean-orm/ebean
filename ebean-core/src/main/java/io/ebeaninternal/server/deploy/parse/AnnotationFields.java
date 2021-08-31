@@ -69,8 +69,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
@@ -78,15 +76,13 @@ import java.util.UUID;
 /**
  * Read the field level deployment annotations.
  */
-public class AnnotationFields extends AnnotationParser {
+final class AnnotationFields extends AnnotationParser {
 
   /**
    * If present read Jackson JsonIgnore.
    */
   private final boolean jacksonAnnotationsPresent;
-
   private final GeneratedPropertyFactory generatedPropFactory;
-
   /**
    * By default we lazy load Lob properties.
    */
@@ -120,20 +116,16 @@ public class AnnotationFields extends AnnotationParser {
    * Read the Id marker annotations on EmbeddedId properties.
    */
   private void readAssocOne(DeployBeanPropertyAssoc<?> prop) {
-
     readJsonAnnotations(prop);
-
     if (has(prop, Id.class)) {
       readIdAssocOne(prop);
     }
-
     if (has(prop, EmbeddedId.class)) {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
       info.setEmbeddedId(prop);
     }
-
     DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
     if (docEmbedded != null) {
       prop.setDocStoreEmbedded(docEmbedded.doc());
@@ -145,19 +137,16 @@ public class AnnotationFields extends AnnotationParser {
         }
       }
     }
-
     if (prop instanceof DeployBeanPropertyAssocOne<?>) {
       if (prop.isId() && !prop.isEmbedded()) {
         prop.setEmbedded();
       }
       readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>) prop);
     }
-
     Formula formula = prop.getMetaAnnotationFormula(platform);
     if (formula != null) {
-      prop.setSqlFormula(formula.select(), formula.join());
+      prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
-
     initWhoProperties(prop);
     initDbMigration(prop);
   }
@@ -172,32 +161,26 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void readField(DeployBeanProperty prop) {
-
     // all Enums will have a ScalarType assigned...
     boolean isEnum = prop.getPropertyType().isEnum();
     Enumerated enumerated = get(prop, Enumerated.class);
     if (isEnum || enumerated != null) {
       util.setEnumScalarType(enumerated, prop);
     }
-
     // its persistent and assumed to be on the base table
     // rather than on a secondary table
     prop.setDbRead(true);
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
-
     Column column = prop.getMetaAnnotation(Column.class);
     if (column != null) {
       readColumn(column, prop);
     }
-
     readJsonAnnotations(prop);
-
     if (prop.getDbColumn() == null) {
       // No @Column or @Column.name() so use NamingConvention
       prop.setDbColumn(namingConvention.getColumnFromProperty(beanType, prop.getName()));
     }
-
     initIdentity(prop);
     initTenantId(prop);
     initDbJson(prop);
@@ -206,7 +189,6 @@ public class AnnotationFields extends AnnotationParser {
     initWhen(prop);
     initWhoProperties(prop);
     initDbMigration(prop);
-
     // Want to process last so we can use with @Formula
     if (has(prop, Transient.class)) {
       // it is not a persistent property.
@@ -215,9 +197,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbUpdateable(false);
       prop.setTransient();
     }
-
     initEncrypt(prop);
-
     for (Index index : annotationIndexes(prop)) {
       addIndex(prop, index);
     }
@@ -236,51 +216,37 @@ public class AnnotationFields extends AnnotationParser {
     if (identity != null) {
       readIdentity(identity);
     }
-
     // determine the JDBC type using Lob/Temporal
     // otherwise based on the property Class
     Temporal temporal = get(prop, Temporal.class);
     if (temporal != null) {
       readTemporal(temporal, prop);
-
     } else if (has(prop, Lob.class)) {
       util.setLobType(prop);
     }
-
     Length length = get(prop, Length.class);
     if (length != null) {
       prop.setDbLength(length.value());
     }
-
     if (has(prop, io.ebean.annotation.NotNull.class)) {
       prop.setNullable(false);
     }
   }
 
   private void initValidation(DeployBeanProperty prop) {
-    NotNull notNull = get(prop, NotNull.class);
-    if (notNull != null && isEbeanValidationGroups(notNull.groups())) {
-      // Not null on all validation groups so enable
-      // DDL generation of Not Null Constraint
+    if (readConfig.isValidationNotNull(prop)) {
       prop.setNullable(false);
     }
-
     if (!prop.isLob()) {
-      // take the max size of all @Size annotations
-      int maxSize = -1;
-      for (Size size : prop.getMetaAnnotationSize()) {
-        if (size.max() < Integer.MAX_VALUE) {
-          maxSize = Math.max(maxSize, size.max());
-        }
-      }
-      if (maxSize != -1) {
+      int maxSize = readConfig.maxValidationSize(prop);
+      if (maxSize > 0) {
         prop.setDbLength(maxSize);
       }
     }
   }
 
   private void initTenantId(DeployBeanProperty prop) {
-    if (validationAnnotations) {
+    if (readConfig.checkValidationAnnotations()) {
       initValidation(prop);
     }
     if (has(prop, TenantId.class)) {
@@ -311,19 +277,23 @@ public class AnnotationFields extends AnnotationParser {
     DbMap dbMap = get(prop, DbMap.class);
     if (dbMap != null) {
       util.setDbMap(prop, dbMap);
+      setColumnName(prop, dbMap.name());
     }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
       util.setDbJsonType(prop, dbJson);
+      setColumnName(prop, dbJson.name());
     } else {
       DbJsonB dbJsonB = get(prop, DbJsonB.class);
       if (dbJsonB != null) {
         util.setDbJsonBType(prop, dbJsonB);
+        setColumnName(prop, dbJsonB.name());
       }
     }
     DbArray dbArray = get(prop, DbArray.class);
     if (dbArray != null) {
       util.setDbArray(prop, dbArray);
+      setColumnName(prop, dbArray.name());
     }
   }
 
@@ -342,9 +312,8 @@ public class AnnotationFields extends AnnotationParser {
     }
     Formula formula = prop.getMetaAnnotationFormula(platform);
     if (formula != null) {
-      prop.setSqlFormula(formula.select(), formula.join());
+      prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
-
     final Aggregation aggregation = prop.getMetaAnnotation(Aggregation.class);
     if (aggregation != null) {
       prop.setAggregation(aggregation.value().replace("$1", prop.getName()));
@@ -357,7 +326,6 @@ public class AnnotationFields extends AnnotationParser {
       prop.setVersionColumn();
       generatedPropFactory.setVersion(prop);
     }
-
     Basic basic = get(prop, Basic.class);
     if (basic != null) {
       prop.setFetchType(basic.fetch());
@@ -405,7 +373,6 @@ public class AnnotationFields extends AnnotationParser {
     if (dbDefault != null) {
       prop.setDbColumnDefault(dbDefault.value());
     }
-
     Set<DbMigration> dbMigration = annotationDbMigrations(prop);
     dbMigration.forEach(ann -> prop.addDbMigrationInfo(
       new DbMigrationInfo(ann.preAdd(), ann.postAdd(), ann.preAlter(), ann.postAlter(), ann.platforms())));
@@ -431,7 +398,6 @@ public class AnnotationFields extends AnnotationParser {
         throw new RuntimeException("DB-columname has to be specified exactly one time in columnNames.");
       }
     }
-
     if (columnNames.length == 1 && hasRelationshipItem(prop)) {
       throw new RuntimeException("Can't use Index on foreign key relationships.");
     }
@@ -446,13 +412,11 @@ public class AnnotationFields extends AnnotationParser {
         prop.setJsonDeserialize(!jsonIgnore.value());
       }
     }
-
     Expose expose = get(prop, Expose.class);
     if (expose != null) {
       prop.setJsonSerialize(expose.serialize());
       prop.setJsonDeserialize(expose.deserialize());
     }
-
     JsonIgnore jsonIgnore = get(prop, JsonIgnore.class);
     if (jsonIgnore != null) {
       prop.setJsonSerialize(jsonIgnore.serialize());
@@ -468,9 +432,7 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {
-
     util.checkEncryptKeyManagerDefined(prop.getFullBeanName());
-
     ScalarType<?> st = prop.getScalarType();
     if (byte[].class.equals(st.getType())) {
       // Always using Java client encryption rather than DB for encryption
@@ -482,12 +444,9 @@ public class AnnotationFields extends AnnotationParser {
       prop.setScalarType(encryptedScalarType);
       prop.setLocalEncrypted();
       return;
-
     }
     if (dbEncString) {
-
       DbEncrypt dbEncrypt = util.getDbPlatform().getDbEncrypt();
-
       if (dbEncrypt != null) {
         // check if we have a DB encryption function for this type
         int jdbcType = prop.getScalarType().getJdbcType();
@@ -499,7 +458,6 @@ public class AnnotationFields extends AnnotationParser {
         }
       }
     }
-
     prop.setScalarType(createScalarType(prop, st));
     prop.setLocalEncrypted();
     if (dbLen > 0) {
@@ -509,11 +467,9 @@ public class AnnotationFields extends AnnotationParser {
 
   @SuppressWarnings({"unchecked"})
   private ScalarTypeEncryptedWrapper<?> createScalarType(DeployBeanProperty prop, ScalarType<?> st) {
-
     // Use Java Encryptor wrapping the logical scalar type
     DataEncryptSupport support = createDataEncryptSupport(prop);
     ScalarTypeBytesBase byteType = getDbEncryptType(prop);
-
     return new ScalarTypeEncryptedWrapper(st, byteType, support);
   }
 
@@ -523,10 +479,8 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private DataEncryptSupport createDataEncryptSupport(DeployBeanProperty prop) {
-
     String table = info.getDescriptor().getBaseTable();
     String column = prop.getDbColumn();
-
     return util.createDataEncryptSupport(table, column);
   }
 
@@ -538,7 +492,6 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
     descriptor.setIdGeneratedValue();
-
     SequenceGenerator seq = get(prop, SequenceGenerator.class);
     if (seq != null) {
       String seqName = seq.sequenceName();
@@ -551,13 +504,11 @@ public class AnnotationFields extends AnnotationParser {
     GenerationType strategy = gen.strategy();
     if (strategy == GenerationType.IDENTITY) {
       descriptor.setIdentityType(IdType.IDENTITY);
-
     } else if (strategy == GenerationType.SEQUENCE) {
       descriptor.setIdentityType(IdType.SEQUENCE);
       if (!gen.generator().isEmpty()) {
         descriptor.setIdentitySequenceGenerator(gen.generator());
       }
-
     } else if (strategy == GenerationType.AUTO) {
       if (!gen.generator().isEmpty()) {
         // use a custom IdGenerator
@@ -573,21 +524,16 @@ public class AnnotationFields extends AnnotationParser {
   }
 
   private void readTemporal(Temporal temporal, DeployBeanProperty prop) {
-
     TemporalType type = temporal.value();
     if (type == TemporalType.DATE) {
       prop.setDbType(Types.DATE);
-
     } else if (type == TemporalType.TIMESTAMP) {
       prop.setDbType(Types.TIMESTAMP);
-
     } else if (type == TemporalType.TIME) {
       prop.setDbType(Types.TIME);
-
     } else {
       throw new PersistenceException("Unhandled type " + type);
     }
   }
-
 
 }

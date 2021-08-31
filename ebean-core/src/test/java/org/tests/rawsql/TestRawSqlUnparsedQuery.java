@@ -1,18 +1,24 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
+import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
+import org.junit.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestRawSqlUnparsedQuery extends BaseTestCase {
+
+  private static final RawSql rawSql = RawSqlBuilder
+    .unparsed("select r.id, r.name from o_customer r where r.id >= :a and r.name like :b")
+    .columnMapping("r.id", "id")
+    .columnMapping("r.name", "name")
+    .create();
 
   @Test
   public void testDoubleUnparsedQuery() {
@@ -25,17 +31,14 @@ public class TestRawSqlUnparsedQuery extends BaseTestCase {
   }
 
   private static void test() {
-    RawSql rawSql = RawSqlBuilder
-      .unparsed("select r.id, r.name from o_customer r where r.id >= :a and r.name like :b")
-      .columnMapping("r.id", "id").columnMapping("r.name", "name").create();
 
-    Query<Customer> query = Ebean.find(Customer.class);
-    query.setRawSql(rawSql);
-    query.setParameter("a", 1);
-    query.setParameter("b", "R%");
+    List<Customer> list = DB.find(Customer.class)
+      .setRawSql(rawSql)
+      .setParameter("a", 1)
+      .setParameter("b", "R%")
+      .findList();
 
-    List<Customer> list = query.findList();
-    Assert.assertNotNull(list);
+    assertThat(list).isNotNull();
   }
 
 }

@@ -7,7 +7,7 @@ import java.time.Month;
  *
  * @param <R> the root query bean type
  */
-public class PMonth<R> extends PBaseDate<R,Month> {
+public final class PMonth<R> extends PBaseDate<R,Month> {
 
   /**
    * Construct with a property name and root instance.

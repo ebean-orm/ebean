@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -37,8 +38,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * The underlying map (ConcurrentHashMap or similar)
    */
-  protected final Map<Object, CacheEntry> map;
-
+  protected final Map<Object, SoftReference<CacheEntry>> map;
   protected final CountMetric hitCount;
   protected final CountMetric missCount;
   protected final CountMetric putCount;
@@ -48,16 +48,11 @@ public class DefaultServerCache implements ServerCache {
 
   protected final String name;
   protected final String shortName;
-
-  private int maxSize;
-
+  private final int maxSize;
   private final int trimFrequency;
-
-  private int maxIdleSecs;
-
-  private int maxSecsToLive;
-
-  private TenantAwareKey tenantAwareKey;
+  private final int maxIdleSecs;
+  private final int maxSecsToLive;
+  private final TenantAwareKey tenantAwareKey;
 
   public DefaultServerCache(DefaultServerCacheConfig config) {
     this.name = config.getName();
@@ -70,7 +65,6 @@ public class DefaultServerCache implements ServerCache {
     this.trimFrequency = config.determineTrimFrequency();
 
     MetricFactory factory = MetricFactory.get();
-
     String prefix = "l2n.";
     this.hitCount = factory.createCountMetric(prefix + shortName + ".hit");
     this.missCount = factory.createCountMetric(prefix + shortName + ".miss");
@@ -81,12 +75,10 @@ public class DefaultServerCache implements ServerCache {
   }
 
   public void periodicTrim(BackgroundExecutor executor) {
-
     EvictionRunnable trim = new EvictionRunnable();
-
     // default to trimming the cache every 60 seconds
     long trimFreqSecs = (trimFrequency == 0) ? 60 : trimFrequency;
-    executor.executePeriodically(trim, trimFreqSecs, TimeUnit.SECONDS);
+    executor.scheduleWithFixedDelay(trim, trimFreqSecs, trimFreqSecs, TimeUnit.SECONDS);
   }
 
   @Override
@@ -101,11 +93,9 @@ public class DefaultServerCache implements ServerCache {
 
   @Override
   public ServerCacheStatistics getStatistics(boolean reset) {
-
     ServerCacheStatistics cacheStats = new ServerCacheStatistics();
     cacheStats.setCacheName(name);
     cacheStats.setMaxSize(maxSize);
-
     cacheStats.setSize(size());
     cacheStats.setHitCount(hitCount.get(reset));
     cacheStats.setMissCount(missCount.get(reset));
@@ -113,7 +103,6 @@ public class DefaultServerCache implements ServerCache {
     cacheStats.setRemoveCount(removeCount.get(reset));
     cacheStats.setClearCount(clearCount.get(reset));
     cacheStats.setEvictCount(evictCount.get(reset));
-
     return cacheStats;
   }
 
@@ -133,10 +122,8 @@ public class DefaultServerCache implements ServerCache {
 
   @Override
   public int getHitRatio() {
-
     long mc = missCount.get(false);
     long hc = hitCount.get(false);
-
     long totalCount = hc + mc;
     if (totalCount == 0) {
       return 0;
@@ -177,7 +164,6 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public Object get(Object id) {
-
     CacheEntry entry = getCacheEntry(id);
     if (entry == null) {
       missCount.increment();
@@ -199,7 +185,8 @@ public class DefaultServerCache implements ServerCache {
    * Get the cache entry - override for query cache to validate dependent tables.
    */
   protected CacheEntry getCacheEntry(Object id) {
-    return map.get(key(id));
+    final SoftReference<CacheEntry> ref = map.get(key(id));
+    return ref != null ? ref.get() : null;
   }
 
   @Override
@@ -213,7 +200,7 @@ public class DefaultServerCache implements ServerCache {
   @Override
   public void put(Object id, Object value) {
     Object key = key(id);
-    map.put(key, new CacheEntry(key, value));
+    map.put(key, new SoftReference<>(new CacheEntry(key, value)));
     putCount.increment();
   }
 
@@ -222,8 +209,8 @@ public class DefaultServerCache implements ServerCache {
    */
   @Override
   public void remove(Object id) {
-    CacheEntry entry = map.remove(key(id));
-    if (entry != null) {
+    SoftReference<CacheEntry> entry = map.remove(key(id));
+    if (entry != null && entry.get() != null) {
       removeCount.increment();
     }
   }
@@ -250,74 +237,69 @@ public class DefaultServerCache implements ServerCache {
    * Run the eviction based on Idle time, Time to live and LRU last access.
    */
   public void runEviction() {
-
     long trimForMaxSize;
     if (maxSize == 0) {
       trimForMaxSize = 0;
     } else {
       trimForMaxSize = size() - maxSize;
     }
-
     if (maxIdleSecs == 0 && maxSecsToLive == 0 && trimForMaxSize < 0) {
       // nothing to trim on this cache
       return;
     }
-
     long startNanos = System.nanoTime();
-
     long trimmedByIdle = 0;
+    long trimmedByGC = 0;
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
     List<CacheEntry> activeList = new ArrayList<>(map.size());
-
     long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
     long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
-
-    Iterator<CacheEntry> it = map.values().iterator();
+    Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
     while (it.hasNext()) {
-      CacheEntry cacheEntry = it.next();
-      if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
+      SoftReference<CacheEntry> ref = it.next();
+      final CacheEntry cacheEntry = ref.get();
+      if (cacheEntry == null) {
+        it.remove();
+        trimmedByGC++;
+      } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
         it.remove();
         trimmedByIdle++;
-
       } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
         it.remove();
         trimmedByTTL++;
-
       } else if (trimForMaxSize > 0) {
         activeList.add(cacheEntry);
       }
     }
-
-    if (trimForMaxSize > 0) {
-      trimmedByLRU = activeList.size() - maxSize;
-      if (trimmedByLRU > 0) {
-        // sort into last access time ascending
-        activeList.sort(BY_LAST_ACCESS);
-        int trimSize = getTrimSize();
-        for (int i = trimSize; i < activeList.size(); i++) {
-          // remove if still in the cache
-          map.remove(activeList.get(i).getKey());
+    if (trimForMaxSize > 0 && activeList.size() > maxSize) {
+      // sort into last access time ascending
+      activeList.sort(BY_LAST_ACCESS);
+      int trimSize = getTrimSize();
+      for (int i = trimSize; i < activeList.size(); i++) {
+        // remove if still in the cache
+        if (map.remove(activeList.get(i).getKey()) != null) {
+          trimmedByLRU++;
         }
       }
     }
 
     evictCount.add(trimmedByIdle);
+    evictCount.add(trimmedByGC);
     evictCount.add(trimmedByTTL);
     evictCount.add(trimmedByLRU);
-
     if (logger.isTraceEnabled()) {
       long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-      logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
-        , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
+      logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
+        name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
     }
   }
 
   /**
    * Runnable that calls the eviction routine.
    */
-  public class EvictionRunnable implements Runnable {
+  public final class EvictionRunnable implements Runnable {
 
     @Override
     public void run() {
@@ -328,7 +310,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Comparator for sorting by last access time.
    */
-  public static class CompareByLastAccess implements Comparator<CacheEntry>, Serializable {
+  public static final class CompareByLastAccess implements Comparator<CacheEntry>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -341,7 +323,7 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Wraps the value to additionally hold createTime and lastAccessTime and hit counter.
    */
-  public static class CacheEntry {
+  public static final class CacheEntry {
 
     private final Object key;
     private final Object value;

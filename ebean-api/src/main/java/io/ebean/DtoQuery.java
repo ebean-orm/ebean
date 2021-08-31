@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Query for performing native SQL queries that return DTO Bean's.
@@ -37,7 +38,7 @@ import java.util.function.Predicate;
  *
  * }</pre>
  */
-public interface DtoQuery<T> {
+public interface DtoQuery<T> extends CancelableQuery {
 
   /**
    * Execute the query returning a list.
@@ -48,10 +49,41 @@ public interface DtoQuery<T> {
   /**
    * Execute the query iterating a row at a time.
    * <p>
+   * Note that the QueryIterator holds resources related to the underlying
+   * resultSet and potentially connection and MUST be closed. We should use
+   * QueryIterator in a <em>try with resource block</em>.
+   */
+  @Nonnull
+  QueryIterator<T> findIterate();
+
+  /**
+   * Execute the query returning a Stream.
+   * <p>
+   * Note that the Stream holds resources related to the underlying
+   * resultSet and potentially connection and MUST be closed. We should use
+   * the Stream in a <em>try with resource block</em>.
+   */
+  @Nonnull
+  Stream<T> findStream();
+
+  /**
+   * Execute the query iterating a row at a time.
+   * <p>
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
    * </p>
    */
   void findEach(Consumer<T> consumer);
+
+  /**
+   * Execute the query iterating the results and batching them for the consumer.
+   * <p>
+   * This runs like findEach streaming results from the database but just collects the results
+   * into batches to pass to the consumer.
+   *
+   * @param batch    The number of dto beans to collect before given them to the consumer
+   * @param consumer The consumer to process the batch of DTO beans
+   */
+  void findEach(int batch, Consumer<List<T>> consumer);
 
   /**
    * Execute the query iterating a row at a time with the ability to stop consuming part way through.

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Node for processing merge on ManyToMany properties.
  */
-class MergeNodeAssocManyToMany extends MergeNode {
+final class MergeNodeAssocManyToMany extends MergeNode {
 
   private final BeanPropertyAssocMany<?> many;
 
@@ -26,14 +26,11 @@ class MergeNodeAssocManyToMany extends MergeNode {
 
   @Override
   public void merge(MergeRequest request) {
-
     EntityBean parentBean = request.getBean();
-
     Collection beans = many.getRawCollection(parentBean);
     Collection outlines = many.getRawCollection(request.getOutline());
 
     Map<Object, EntityBean> outlineIds = toMap(outlines);
-
     List<EntityBean> additions = new ArrayList<>();
     if (beans != null) {
       for (Object bean : beans) {
@@ -56,8 +53,7 @@ class MergeNodeAssocManyToMany extends MergeNode {
     IntersectionTable intersectionTable = many.intersectionTable();
 
     if (!deletions.isEmpty()) {
-      transaction.flushBatch();
-
+      transaction.flush();
       SqlUpdate delete = intersectionTable.delete(server, false);
       for (EntityBean deletion : deletions) {
         many.intersectionBind(delete, parentBean, deletion);
@@ -67,8 +63,7 @@ class MergeNodeAssocManyToMany extends MergeNode {
     }
 
     if (!additions.isEmpty()) {
-      transaction.flushBatch();
-
+      transaction.flush();
       SqlUpdate insert = intersectionTable.insert(server, false);
       for (EntityBean addition : additions) {
         many.intersectionBind(insert, parentBean, addition);
@@ -76,7 +71,6 @@ class MergeNodeAssocManyToMany extends MergeNode {
       }
       insert.execute();
     }
-
     many.resetMany(parentBean);
   }
 

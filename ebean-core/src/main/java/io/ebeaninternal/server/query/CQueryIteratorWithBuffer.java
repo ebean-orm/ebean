@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 /**
  * A QueryIterator that uses a buffer to execute secondary queries periodically.
  */
-class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
+final class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
 
   private final CQuery<T> cquery;
   private final int bufferSize;
@@ -76,8 +76,4 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     }
   }
 
-  @Override
-  public void remove() {
-    throw new PersistenceException("Remove not allowed");
-  }
 }

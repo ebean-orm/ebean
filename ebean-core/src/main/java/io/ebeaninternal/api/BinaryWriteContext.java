@@ -6,10 +6,9 @@ import java.io.IOException;
 /**
  * Context used to write binary message (like RemoteTransactionEvent).
  */
-public class BinaryWriteContext {
+public final class BinaryWriteContext {
 
   private final DataOutputStream out;
-
   private long counter;
 
   public BinaryWriteContext(DataOutputStream out) {

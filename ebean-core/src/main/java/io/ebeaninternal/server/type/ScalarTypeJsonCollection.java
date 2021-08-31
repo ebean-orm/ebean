@@ -61,7 +61,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
    */
   @Override
   public boolean isDirty(Object value) {
-    return CheckMarkedDirty.isDirty(value);
+    return TypeJsonManager.checkIsDirty(value);
   }
 
   @Override

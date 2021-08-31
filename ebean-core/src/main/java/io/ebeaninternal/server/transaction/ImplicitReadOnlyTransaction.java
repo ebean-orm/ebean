@@ -3,13 +3,9 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.PersistenceContext;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebeaninternal.api.SpiProfileTransactionEvent;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.TransactionEvent;
-import io.ebeaninternal.api.TxnProfileEventCodes;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
@@ -31,7 +27,7 @@ import java.util.Map;
  * persisting features are attempted to be used - which is not expected).
  * </p>
  */
-class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCodes {
+final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private static final Logger logger = LoggerFactory.getLogger(ImplicitReadOnlyTransaction.class);
 
@@ -58,7 +54,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   /**
    * Holder of the objects fetched to ensure unique objects are used.
    */
-  private PersistenceContext persistenceContext;
+  private SpiPersistenceContext persistenceContext;
 
   private Object tenantId;
 
@@ -93,6 +89,16 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
   public long getStartNanoTime() {
     // not used on read only transaction
     return startNanos;
+  }
+
+  @Override
+  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+    // do nothing
+  }
+
+  @Override
+  public boolean isAutoPersistUpdates() {
+    return false;
   }
 
   @Override
@@ -411,7 +417,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    * Return the persistence context associated with this transaction.
    */
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
 
@@ -424,7 +430,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    * </p>
    */
   @Override
-  public void setPersistenceContext(PersistenceContext context) {
+  public void setPersistenceContext(SpiPersistenceContext context) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
@@ -584,6 +590,21 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
     if (isActive()) {
       rollback();
     }
+  }
+
+  @Override
+  public void preCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postCommit() {
+    // do nothing
+  }
+
+  @Override
+  public void postRollback(Throwable cause) {
+    // do nothing
   }
 
   /**

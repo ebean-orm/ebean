@@ -8,6 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +44,23 @@ class SimpleQueryBeanWriter {
     "kotlin.Byte",
     "kotlin.Char"
   };
+
+  // These are special classes under Kotlin, and are auto-imported, same as
+  // java.lang under Java
+  private static final Set<String> kotlinBlackListedImports = Collections.unmodifiableSet(
+    new HashSet<>(
+      Arrays.asList(
+        "java.util.ArrayList",
+        "java.util.HashMap",
+        "java.util.HashSet",
+        "java.util.LinkedHashMap",
+        "java.util.LinkedHashSet",
+        "java.util.List",
+        "java.util.Map",
+        "java.util.Set"
+      )
+    )
+  );
 
   private final Set<String> importTypes = new TreeSet<>();
 
@@ -88,11 +108,7 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-
-    final String generated = processingContext.getGeneratedAnnotation();
-    if (generated != null) {
-      importTypes.add(generated);
-    }
+    importTypes.add(Constants.GENERATED);
     importTypes.add(beanFullName);
     importTypes.add(Constants.TQROOTBEAN);
     importTypes.add(Constants.TYPEQUERYBEAN);
@@ -162,6 +178,7 @@ class SimpleQueryBeanWriter {
         importTypes.add(kotlinTypes[i]);
       }
     }
+    importTypes.removeAll(kotlinBlackListedImports);
   }
 
   private boolean isEntity() {
@@ -282,9 +299,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       lang().beginAssocClass(writer, shortName, origShortName);
 
@@ -294,9 +309,7 @@ class SimpleQueryBeanWriter {
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
-      if (processingContext.isGeneratedAvailable()) {
-        writer.append(Constants.AT_GENERATED).eol();
-      }
+      writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       lang().beginClass(writer, shortName);
     }

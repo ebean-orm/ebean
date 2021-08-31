@@ -17,27 +17,17 @@ import java.util.function.Predicate;
 /**
  * Default implementation of SQuery - SQL Query.
  */
-public class DefaultRelationalQuery implements SpiSqlQuery {
+public final class DefaultRelationalQuery extends AbstractQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
 
   private final transient SpiEbeanServer server;
-
+  private final String query;
   private String label;
-
-  private String query;
-
   private int firstRow;
-
   private int maxRows;
-
   private int timeout;
-
   private int bufferFetchSizeHint;
-
-  /**
-   * Bind parameters when using the query language.
-   */
   private final BindParams bindParams = new BindParams();
 
   /**
@@ -208,19 +198,25 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     return query;
   }
 
-  <T> T mapperFindOne(RowMapper<T> mapper) {
+  private <T> T mapperFindOne(RowMapper<T> mapper) {
     return server.findOneMapper(this, mapper);
   }
 
-  <T> List<T> mapperFindList(RowMapper<T> mapper) {
+  private <T> List<T> mapperFindList(RowMapper<T> mapper) {
     return server.findListMapper(this, mapper);
   }
 
+  private <T> void mapperFindEach(RowMapper<T> mapper, Consumer<T> consumer) {
+    server.findEachRow(this, (resultSet, rowNum) -> consumer.accept(mapper.map(resultSet, rowNum)));
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public <T> TypeQuery<T> mapToScalar(Class<T> attributeType) {
     return new Scalar(attributeType);
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public <T> TypeQuery<T> mapTo(RowMapper<T> mapper) {
     return new Mapper(mapper);
@@ -248,6 +244,15 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     public List<T> findList() {
       return findSingleAttributeList(type);
     }
+
+    @Override
+    public void findEach(Consumer<T> consumer) {
+      scalarFindEach(type, consumer);
+    }
+  }
+
+  private <T> void scalarFindEach(Class<T> type, Consumer<T> consumer) {
+    server.findSingleAttributeEach(this, type, consumer);
   }
 
   private class Mapper<T> implements SqlQuery.TypeQuery<T> {
@@ -271,6 +276,11 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     @Override
     public List<T> findList() {
       return mapperFindList(mapper);
+    }
+
+    @Override
+    public void findEach(Consumer<T> consumer) {
+      mapperFindEach(mapper, consumer);
     }
   }
 }

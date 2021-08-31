@@ -16,7 +16,7 @@ public abstract class QueryPlanLogger {
 
   abstract SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind);
 
-  SpiDbQueryPlan readQueryPlan(SpiQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {
+  final SpiDbQueryPlan readQueryPlan(SpiQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {
     StringBuilder sb = new StringBuilder();
     for (int i = 1; i <= rset.getMetaData().getColumnCount(); i++) {
       sb.append(rset.getMetaData().getColumnLabel(i)).append("\t");
@@ -27,11 +27,11 @@ public abstract class QueryPlanLogger {
     return createPlan(plan, bind.toString(), sb.toString());
   }
 
-  SpiDbQueryPlan createPlan(SpiQueryPlan plan, String bind, String planString) {
+  final SpiDbQueryPlan createPlan(SpiQueryPlan plan, String bind, String planString) {
     return plan.createMeta(bind, planString);
   }
 
-  SpiDbQueryPlan readQueryPlanBasic(SpiQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {
+  final SpiDbQueryPlan readQueryPlanBasic(SpiQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {
     StringBuilder sb = new StringBuilder();
     readPlanData(sb, rset);
     return createPlan(plan, bind.toString(), sb.toString().trim());

@@ -5,12 +5,13 @@ import io.ebean.plugin.ExpressionPath;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-public class SimpleExpression extends AbstractValueExpression {
+public final class SimpleExpression extends AbstractValueExpression {
 
   private final Op type;
 
@@ -121,8 +122,8 @@ public class SimpleExpression extends AbstractValueExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return value().hashCode();
+  public void queryBindKey(BindValuesKey key) {
+    key.add(value());
   }
 
   @Override

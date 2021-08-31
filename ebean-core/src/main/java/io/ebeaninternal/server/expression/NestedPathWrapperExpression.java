@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -13,15 +14,19 @@ import java.io.IOException;
 /**
  * Wraps a single expression with nestedPath for document queries.
  */
-class NestedPathWrapperExpression implements SpiExpression {
+final class NestedPathWrapperExpression implements SpiExpression {
 
-  protected final String nestedPath;
-
-  protected final SpiExpression delegate;
+  final String nestedPath;
+  final SpiExpression delegate;
 
   NestedPathWrapperExpression(String nestedPath, SpiExpression delegate) {
     this.nestedPath = nestedPath;
     this.delegate = delegate;
+  }
+
+  @Override
+  public void prefixProperty(String path) {
+    // do nothing
   }
 
   @Override
@@ -74,8 +79,8 @@ class NestedPathWrapperExpression implements SpiExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return delegate.queryBindHash();
+  public void queryBindKey(BindValuesKey key) {
+    delegate.queryBindKey(key);
   }
 
   @Override

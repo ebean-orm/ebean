@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
  * Product entity bean.
  */
 @Entity
-@Table(name = "o_product")
+@Table(name = "o_product", schema = "foo")
 public class Product extends BaseModel {
 
   @Size(max = 20)

@@ -29,7 +29,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = Ebean.find(Order.class)
-      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
       .findList();
 
@@ -56,7 +56,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = Ebean.find(Order.class)
       .select("status, shipDate")
-      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
       .findList();
 
@@ -83,7 +83,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     List<Order> l0 = Ebean.find(Order.class)
       .setDisableLazyLoading(true)
       .select("status, shipDate")
-      .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
+      .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
       .order().asc("id")
       .findList();

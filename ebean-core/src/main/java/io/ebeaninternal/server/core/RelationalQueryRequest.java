@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.RowConsumer;
-import io.ebean.RowMapper;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlBinding;
 
@@ -22,11 +18,8 @@ import java.util.function.Predicate;
 public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
 
   private final RelationalQueryEngine queryEngine;
-
   private String[] propertyNames;
-
   private int estimateCapacity;
-
   private int rows;
 
   /**
@@ -56,45 +49,57 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   }
 
   boolean findEachRow(RowConsumer mapper) {
-    queryEngine.findEachRow(this, mapper);
+    flushJdbcBatchOnQuery();
+    queryEngine.findEach(this, mapper);
     return true;
   }
 
   <T> List<T> findListMapper(RowMapper<T> mapper) {
-    return queryEngine.findListMapper(this, mapper);
+    flushJdbcBatchOnQuery();
+    return queryEngine.findList(this, () -> mapper.map(resultSet, rows++));
   }
 
   <T> T findOneMapper(RowMapper<T> mapper) {
-    return queryEngine.findOneMapper(this, mapper);
+    flushJdbcBatchOnQuery();
+    return queryEngine.findOne(this, mapper);
+  }
+
+  public <T> boolean findSingleAttributeEach(Class<T> cls, Consumer<T> consumer) {
+    flushJdbcBatchOnQuery();
+    queryEngine.findSingleAttributeEach(this, cls, consumer);
+    return true;
   }
 
   public <T> List<T> findSingleAttributeList(Class<T> cls) {
+    flushJdbcBatchOnQuery();
     return queryEngine.findSingleAttributeList(this, cls);
   }
 
   public <T> T findSingleAttribute(Class<T> cls) {
+    flushJdbcBatchOnQuery();
     return queryEngine.findSingleAttribute(this, cls);
   }
 
   public void findEach(Consumer<SqlRow> consumer) {
-    queryEngine.findEach(this, consumer);
+    flushJdbcBatchOnQuery();
+    queryEngine.findEach(this, (resultSet, rowNum) -> consumer.accept(createNewRow()));
   }
 
   public void findEachWhile(Predicate<SqlRow> consumer) {
-    queryEngine.findEach(this, consumer);
+    flushJdbcBatchOnQuery();
+    queryEngine.findEach(this, this::createNewRow, consumer);
   }
 
   public List<SqlRow> findList() {
-    return queryEngine.findList(this);
+    flushJdbcBatchOnQuery();
+    return queryEngine.findList(this, this::createNewRow);
   }
 
   /**
    * Build the list of property names.
    */
   private String[] getPropertyNames() throws SQLException {
-
     ResultSetMetaData metaData = resultSet.getMetaData();
-
     int columnsPlusOne = metaData.getColumnCount() + 1;
     ArrayList<String> propNames = new ArrayList<>(columnsPlusOne - 1);
     for (int i = 1; i < columnsPlusOne; i++) {
@@ -107,9 +112,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
    * Read and return the next SqlRow.
    */
   public SqlRow createNewRow() throws SQLException {
-
     rows++;
-
     SqlRow sqlRow = queryEngine.createSqlRow(estimateCapacity);
     int index = 0;
     for (String propertyName : propertyNames) {
@@ -121,9 +124,9 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   }
 
   public void logSummary() {
-    if (trans.isLogSummary()) {
+    if (transaction.isLogSummary()) {
       long micros = (System.nanoTime() - startNano) / 1000L;
-      trans.logSummary("SqlQuery  rows[" + rows + "] micros[" + micros + "] bind[" + bindLog + "]");
+      transaction.logSummary("SqlQuery  rows[" + rows + "] micros[" + micros + "] bind[" + bindLog + "]");
     }
   }
 
@@ -131,17 +134,15 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     return resultSet;
   }
 
-  public void incrementRows() {
-    rows++;
-  }
-
-  public <T> List<T> mapList(RowMapper<T> mapper) throws SQLException {
-
-    List<T> list = new ArrayList<>();
-    while (next()) {
-      list.add(mapper.map(resultSet, rows++));
+  @Override
+  public boolean next() throws SQLException {
+    query.checkCancelled();
+    if (!resultSet.next()) {
+      return false;
+    } else {
+      rows++;
+      return true;
     }
-    return list;
   }
 
   public <T> T mapOne(RowMapper<T> mapper) throws SQLException {

@@ -1,14 +1,10 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.EbeanServer;
+import io.ebean.CancelableQuery;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiSqlBinding;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.lib.Str;
+import io.ebeaninternal.api.*;
+import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.util.BindParamsParser;
@@ -17,29 +13,25 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Wraps the objects involved in executing a SQL / Relational Query.
  */
-public abstract class AbstractSqlQueryRequest {
+public abstract class AbstractSqlQueryRequest implements CancelableQuery {
 
   protected final SpiSqlBinding query;
-
   protected final SpiEbeanServer server;
-
-  protected SpiTransaction trans;
-
+  protected SpiTransaction transaction;
   private boolean createdTransaction;
-
   protected String sql;
-
   protected ResultSet resultSet;
-
   protected String bindLog = "";
-
   protected PreparedStatement pstmt;
-
   protected long startNano;
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Create the BeanFindRequest.
@@ -47,18 +39,19 @@ public abstract class AbstractSqlQueryRequest {
   AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query, Transaction t) {
     this.server = server;
     this.query = query;
-    this.trans = (SpiTransaction) t;
+    this.transaction = (SpiTransaction) t;
+    this.query.setCancelableQuery(this);
   }
 
   /**
    * Create a transaction if none currently exists.
    */
   public void initTransIfRequired() {
-    if (trans == null) {
-      trans = server.currentServerTransaction();
-      if (trans == null || !trans.isActive()) {
+    if (transaction == null) {
+      transaction = server.currentServerTransaction();
+      if (transaction == null || !transaction.isActive()) {
         // create a local readOnly transaction
-        trans = server.createReadOnlyTransaction(null);
+        transaction = server.createReadOnlyTransaction(null);
         createdTransaction = true;
       }
     }
@@ -69,26 +62,19 @@ public abstract class AbstractSqlQueryRequest {
    */
   public void endTransIfRequired() {
     if (createdTransaction) {
-      trans.commit();
+      transaction.commit();
     }
   }
 
-  public EbeanServer getServer() {
-    return server;
-  }
-
-  public SpiTransaction getTransaction() {
-    return trans;
+  protected void flushJdbcBatchOnQuery() {
+    if (transaction.isFlushOnQuery()) {
+      transaction.flush();
+    }
   }
 
   public boolean isLogSql() {
-    return trans.isLogSql();
+    return transaction.isLogSql();
   }
-
-  /**
-   * Set the resultSet and associated query plan if known.
-   */
-  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
 
   /**
    * Return the bindLog for this request.
@@ -98,11 +84,14 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   /**
+   * Set the resultSet and associated query plan if known.
+   */
+  abstract void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException;
+
+  /**
    * Return true if we can navigate to the next row.
    */
-  public boolean next() throws SQLException {
-    return resultSet.next();
-  }
+  public abstract boolean next() throws SQLException;
 
   protected abstract void requestComplete();
 
@@ -115,12 +104,10 @@ public abstract class AbstractSqlQueryRequest {
     JdbcClose.close(pstmt);
   }
 
-
   /**
    * Prepare the SQL taking into account named bind parameters.
    */
   private void prepareSql() {
-
     String sql = query.getQuery();
     BindParams bindParams = query.getBindParams();
     if (!bindParams.isEmpty()) {
@@ -131,7 +118,6 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   private String limitOffset(String sql) {
-
     int firstRow = query.getFirstRow();
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
@@ -149,28 +135,31 @@ public abstract class AbstractSqlQueryRequest {
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
-
-    prepareSql();
-    Connection conn = trans.getInternalConnection();
-
-    pstmt = conn.prepareStatement(sql);
-    if (query.getTimeout() > 0) {
-      pstmt.setQueryTimeout(query.getTimeout());
+    lock.lock();
+    try {
+      query.checkCancelled();
+      prepareSql();
+      Connection conn = transaction.getInternalConnection();
+      pstmt = conn.prepareStatement(sql);
+      if (query.getTimeout() > 0) {
+        pstmt.setQueryTimeout(query.getTimeout());
+      }
+      if (query.getBufferFetchSizeHint() > 0) {
+        pstmt.setFetchSize(query.getBufferFetchSizeHint());
+      }
+      BindParams bindParams = query.getBindParams();
+      if (!bindParams.isEmpty()) {
+        this.bindLog = binder.bind(bindParams, pstmt, conn);
+      }
+      if (isLogSql()) {
+        long micros = (System.nanoTime() - startNano) / 1000L;
+        transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ") --micros(", micros + ")"));
+      }
+    } finally {
+      lock.unlock();
     }
-    if (query.getBufferFetchSizeHint() > 0) {
-      pstmt.setFetchSize(query.getBufferFetchSizeHint());
-    }
-
-    BindParams bindParams = query.getBindParams();
-    if (!bindParams.isEmpty()) {
-      this.bindLog = binder.bind(bindParams, pstmt, conn);
-    }
-
-    if (isLogSql()) {
-      trans.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ")"));
-    }
-
     setResultSet(pstmt.executeQuery(), null);
+    query.checkCancelled();
   }
 
   /**
@@ -180,4 +169,13 @@ public abstract class AbstractSqlQueryRequest {
     return sql;
   }
 
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
+  }
 }

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Splits a select clause into 'logical columns' taking into account functions and quotes.
@@ -9,12 +9,10 @@ import java.util.List;
 public final class DSelectColumnsParser {
 
   private final int end;
-
   private final String selectClause;
-
   private int pos;
 
-  public static List<String> parse(String sqlSelect) {
+  public static Set<String> parse(String sqlSelect) {
     return new DSelectColumnsParser(sqlSelect).parse();
   }
 
@@ -23,9 +21,8 @@ public final class DSelectColumnsParser {
     this.end = selectClause.length();
   }
 
-  private List<String> parse() {
-
-    ArrayList<String> columns = new ArrayList<>();
+  private Set<String> parse() {
+    LinkedHashSet<String> columns = new LinkedHashSet<>();
     while (pos <= end) {
       columns.add(nextColumnInfo());
     }

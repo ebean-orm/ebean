@@ -1,22 +1,18 @@
 datasource:
   db:
     username: sa
-    password:
+    password: sa
     databaseUrl: jdbc:h2:mem:tests
 
   pg:
     username: sa
-    password:
+    password: sa
     databaseUrl: jdbc:h2:mem:tests
 
 ebean:
-#  migration:
-#    run: false
-#
-#  ddl:
-#    generate: true
-#    run: true
-##    createOnly: true
+  ddl:
+    generate: true
+    run: true
 
   docstore:
     url: http://127.0.0.1:9200
@@ -26,57 +22,9 @@ ebean:
 #    useDocker: true
     elasticVersion: 5.6
 
-#    create: true
-
   test:
     redis: latest
-    platform: mariadb #, postgres, mysql, mariadb, oracle, sqlserver, hana
+    platform: h2 #, postgres, mysql, mariadb, oracle, sqlserver, hana
 #    useDocker: false
-#    dockerMode: dropCreate
     ddlMode: dropCreate # none | dropCreate | create | migrations
     dbName: junk
-    postgres:
-      version: 9.6
-      extensions: pgcryto, hstore
-      username: asd
-      password: test
-      url: asd
-      driver: asd
-
-
-
-docker:
-  postgres:
-#    port: 6432
-    version: 9.6
-    extensions: pgcryto, hstore
-    username: ${test_db}
-    password: test
-    databaseUrl: jdbc:postgresql://localhost:6432/${test_db}
-    databaseDriver: org.postgresql.Driver
-
-  mysql:
-    version: 5.6
-    username: ${test_db}
-    password: test
-    databaseUrl: jdbc:mysql://localhost:4306/${test_db}
-    databaseDriver: com.mysql.jdbc.Driver
-
-  sqlserver:
-    version: 2017-CE
-    username: ${test_db}
-    password: SqlS3rv#r
-    databaseUrl: jdbc:sqlserver://localhost:1433;databaseName=${test_db}
-    databaseDriver: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
-  oracle:
-    username: ${test_db}
-    password: test
-    databaseUrl: jdbc:oracle:thin:@127.0.0.1:1521:XE
-    databaseDriver: oracle.jdbc.driver.OracleDriver
-
-  hana:
-    username: ${test_db}
-    password: HXEHana1
-    databaseUrl: jdbc:sap://localhost:39017/?databaseName=HXE
-    databaseDriver: com.sap.db.jdbc.Driver

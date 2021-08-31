@@ -1,16 +1,18 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.QueryIterator;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
 
 import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class DtoQueryEngine {
+public final class DtoQueryEngine {
 
   private final Binder binder;
 
@@ -27,10 +29,19 @@ public class DtoQueryEngine {
       }
       return rows;
 
-    } catch (Throwable e) {
+    } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     } finally {
       request.close();
+    }
+  }
+
+  public <T> QueryIterator<T> findIterate(DtoQueryRequest<T> request) {
+    try {
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      return new DtoQueryIterator<>(request);
+    } catch (SQLException e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
     }
   }
 
@@ -40,9 +51,30 @@ public class DtoQueryEngine {
       while (request.next()) {
         consumer.accept(request.readNextBean());
       }
+    } catch (SQLException e) {
+      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
+    } finally {
+      request.close();
+    }
+  }
+
+  public <T> void findEach(DtoQueryRequest<T> request, int batchSize, Consumer<List<T>> consumer) {
+    try {
+      List<T> buffer = new ArrayList<>();
+      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      while (request.next()) {
+        buffer.add(request.readNextBean());
+        if (buffer.size() >= batchSize) {
+          consumer.accept(buffer);
+          buffer.clear();
+        }
+      }
+      if (!buffer.isEmpty()) {
+        // consume the remainder
+        consumer.accept(buffer);
+      }
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
     } finally {
       request.close();
     }
@@ -56,9 +88,8 @@ public class DtoQueryEngine {
           break;
         }
       }
-    } catch (Exception e) {
+    } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
     } finally {
       request.close();
     }

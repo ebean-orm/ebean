@@ -9,8 +9,9 @@ import io.ebeaninternal.server.query.DefaultSqlRow;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 
-public class DRawSqlService implements SpiRawSqlService {
+public final class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public RawSql resultSet(ResultSet resultSet, String... propertyNames) {
@@ -19,10 +20,8 @@ public class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public RawSqlBuilder parsed(String sql) {
-
     SpiRawSql.Sql sql2 = DRawSqlParser.parse(sql);
     String select = sql2.getPreFrom();
-
     SpiRawSql.ColumnMapping mapping = DRawSqlColumnsParser.parse(select);
     return new DRawSqlBuilder(sql2, mapping);
   }
@@ -35,7 +34,6 @@ public class DRawSqlService implements SpiRawSqlService {
 
   @Override
   public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException {
-
     ResultSetMetaData meta = resultSet.getMetaData();
     int estCap = (int) (meta.getColumnCount() / 0.7f) + 1;
     DefaultSqlRow ret = new DefaultSqlRow(estCap, 0.75f, dbTrueValue, binaryOptimizedUUID);
@@ -48,7 +46,26 @@ public class DRawSqlService implements SpiRawSqlService {
       if (ret.containsKey(name)) {
         name = combine(meta.getSchemaName(i), meta.getTableName(i), name);
       }
-      ret.put(name, resultSet.getObject(i));
+
+      // convert (C/B)LOBs to java objects.
+      // A java.sql.Clob depends on an open connection, so storing this object in a map
+      // that is accessed later, when the connection is closed, will result in a "connection is closed" exception.
+      // From the java.sql.Clob documentation: "... which means that a Clob object contains a logical pointer to the SQL CLOB
+      // data rather than the data itself."
+      switch (meta.getColumnType(i)) {
+        case Types.CLOB:
+        case Types.NCLOB:
+          ret.put(name, resultSet.getString(i));
+          break;
+
+        case Types.BLOB:
+          ret.put(name, resultSet.getBytes(i));
+          break;
+
+        default:
+          ret.put(name, resultSet.getObject(i));
+          break;
+      }
     }
     return ret;
   }
@@ -57,7 +74,6 @@ public class DRawSqlService implements SpiRawSqlService {
    * Combine schema table and column names allowing for null schema and table.
    */
   String combine(String schemaName, String tableName, String name) {
-
     StringBuilder sb = new StringBuilder();
     if (schemaName != null) {
       sb.append(schemaName).append(".");

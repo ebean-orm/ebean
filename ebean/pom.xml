@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.6.2-SNAPSHOT</version>
+    <version>12.11.3-SNAPSHOT</version>
   </parent>
 
   <name>ebean composite</name>
@@ -22,34 +22,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
+      <version>12.11.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
+      <version>12.11.3-SNAPSHOT</version>
     </dependency>
 
     <!-- Technically optional but most expected to use query beans -->
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
-    </dependency>
-
-    <!-- In future ebean-ddl-generator would only be dependency of ebean-test -->
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
-    </dependency>
-
-    <!-- In future this is optional and not included by default -->
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-autotune</artifactId>
-      <version>12.6.2-SNAPSHOT</version>
+      <version>12.11.3-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

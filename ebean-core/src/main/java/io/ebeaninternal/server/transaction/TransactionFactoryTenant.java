@@ -29,8 +29,7 @@ class TransactionFactoryTenant extends TransactionFactory {
   }
 
   @Override
-  public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-
+  public final SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
     SpiTransaction t = create(explicit, null);
     return setIsolationLevel(t, explicit, isolationLevel);
   }

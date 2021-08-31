@@ -8,6 +8,13 @@ public interface MetaMetric {
   /**
    * Return the metric name.
    */
-  String getName();
+  String name();
 
+  /**
+   * Migrate to name().
+   */
+  @Deprecated
+  default String getName() {
+    return name();
+  }
 }

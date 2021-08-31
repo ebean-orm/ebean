@@ -177,14 +177,15 @@ import java.util.stream.Stream;
  *
  * @param <T> the type of Entity bean this query will fetch.
  */
-public interface Query<T> {
+public interface Query<T> extends CancelableQuery {
 
   /**
    * The lock type (strength) to use with query FOR UPDATE row locking.
    */
   enum LockType {
     /**
-     * The default lock type - See PlatformConfig.forUpdateNoKey option.
+     * The default lock type being either UPDATE or NO_KEY_UPDATE based on
+     * PlatformConfig.forUpdateNoKey configuration (Postgres option).
      */
     DEFAULT,
 
@@ -194,17 +195,17 @@ public interface Query<T> {
     UPDATE,
 
     /**
-     * FOR NO KEY UPDATE.
+     * FOR NO KEY UPDATE (Postgres only).
      */
     NO_KEY_UPDATE,
 
     /**
-     * FOR SHARE UPDATE.
+     * FOR SHARE (Postgres only).
      */
     SHARE,
 
     /**
-     * FOR KEY SHARE UPDATE.
+     * FOR KEY SHARE (Postgres only).
      */
     KEY_SHARE
   }
@@ -289,15 +290,6 @@ public interface Query<T> {
    * }</pre>
    */
   UpdateQuery<T> asUpdate();
-
-  /**
-   * Cancel the query execution if supported by the underlying database and
-   * driver.
-   * <p>
-   * This must be called from a different thread to the query executor.
-   * </p>
-   */
-  void cancel();
 
   /**
    * Return a copy of the query.
@@ -513,7 +505,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, fetchProperties, new FetchConfig().query())
+   *  fetch(path, fetchProperties, FetchConfig.ofQuery())
    *
    * }</pre>
    * <p>
@@ -547,7 +539,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, fetchProperties, new FetchConfig().lazy())
+   *  fetch(path, fetchProperties, FetchConfig.ofLazy())
    *
    * }</pre>
    * <p>
@@ -572,7 +564,7 @@ public interface Query<T> {
    * // fetch customers (their id, name and status)
    * List<Customer> customers = DB.find(Customer.class)
    *     .select("name, status")
-   *     .fetch("contacts", "firstName,lastName,email", new FetchConfig().lazy(10))
+   *     .fetch("contacts", "firstName,lastName,email", FetchConfig.ofLazy(10))
    *     .findList();
    *
    * }</pre>
@@ -609,7 +601,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, new FetchConfig().query())
+   *  fetch(path, FetchConfig.ofQuery())
    *
    * }</pre>
    * <p>
@@ -638,7 +630,7 @@ public interface Query<T> {
    * </p>
    * <pre>{@code
    *
-   *  fetch(path, new FetchConfig().lazy())
+   *  fetch(path, FetchConfig.ofLazy())
    *
    * }</pre>
    * <p>
@@ -661,7 +653,7 @@ public interface Query<T> {
    * // fetch customers (their id, name and status)
    * List<Customer> customers = DB.find(Customer.class)
    *     // lazy fetch contacts with a batch size of 100
-   *     .fetch("contacts", new FetchConfig().lazy(100))
+   *     .fetch("contacts", FetchConfig.ofLazy(100))
    *     .findList();
    *
    * }</pre>
@@ -809,7 +801,7 @@ public interface Query<T> {
    * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the Consumer interface which is better suited to use with Java8 closures.
+   * iterator uses the Consumer interface which is better suited to use with closures.
    * </p>
    * <pre>{@code
    *
@@ -829,6 +821,21 @@ public interface Query<T> {
   void findEach(Consumer<T> consumer);
 
   /**
+   * Execute findEach streaming query batching the results for consuming.
+   * <p>
+   * This query execution will stream the results and is suited to consuming
+   * large numbers of results from the database.
+   * <p>
+   * Typically we use this batch consumer when we want to do further processing on
+   * the beans and want to do that processing in batch form, for example - 100 at
+   * a time.
+   *
+   * @param batch    The number of beans processed in the batch
+   * @param consumer Process the batch of beans
+   */
+  void findEach(int batch, Consumer<List<T>> consumer);
+
+  /**
    * Execute the query using callbacks to a visitor to process the resulting
    * beans one at a time.
    * <p>
@@ -838,12 +845,12 @@ public interface Query<T> {
    * </p>
    * <p>
    * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the Predicate (SAM) interface which is better suited to use with Java8 closures.
+   * iterator uses the Predicate interface which is better suited to use with closures.
    * </p>
    * <pre>{@code
    *
    *  DB.find(Customer.class)
-   *     .fetch("contacts", new FetchConfig().query(2))
+   *     .fetchQuery("contacts")
    *     .where().eq("status", Status.NEW)
    *     .order().asc("id")
    *     .setMaxRows(2000)
@@ -1644,40 +1651,51 @@ public interface Query<T> {
   String getGeneratedSql();
 
   /**
-   * Execute using "for update" clause which results in the DB locking the record.
+   * Execute the query with the given lock type and WAIT.
+   * <p>
+   * Note that <code>forUpdate()</code> is the same as
+   * <code>withLock(LockType.UPDATE)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  Query<T> forUpdate();
+  Query<T> withLock(LockType lockType);
 
   /**
-   * Execute using "for update" with given lock type (currently Postgres only).
+   * Execute the query with the given lock type and lock wait.
+   * <p>
+   * Note that <code>forUpdateNoWait()</code> is the same as
+   * <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
+   * <p>
+   * Provides us with the ability to explicitly use Postgres
+   * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  Query<T> forUpdate(LockType lockType);
+  Query<T> withLock(LockType lockType, LockWait lockWait);
+
+  /**
+   * Execute using "for update" clause which results in the DB locking the record.
+   * <p>
+   * The same as <code>withLock(LockType.UPDATE, LockWait.WAIT)</code>.
+   */
+  Query<T> forUpdate();
 
   /**
    * Execute using "for update" clause with "no wait" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
-   * </p>
+   * <p>
+   * The same as <code>withLock(LockType.UPDATE, LockWait.NOWAIT)</code>.
    */
   Query<T> forUpdateNoWait();
-
-  /**
-   * Execute using "for update nowait" with given lock type (currently Postgres only).
-   */
-  Query<T> forUpdateNoWait(LockType lockType);
 
   /**
    * Execute using "for update" clause with "skip locked" option.
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
-   * </p>
+   * <p>
+   * The same as <code>withLock(LockType.UPDATE, LockWait.SKIPLOCKED)</code>.
    */
   Query<T> forUpdateSkipLocked();
-
-  /**
-   * Execute using "for update skip locked" with given lock type (currently Postgres only).
-   */
-  Query<T> forUpdateSkipLocked(LockType lockType);
 
   /**
    * Return true if this query has forUpdate set.

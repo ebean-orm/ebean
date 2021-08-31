@@ -67,7 +67,7 @@ public interface ExtendedServer {
    *
    * @return True if the query finds a matching row in the database
    */
-  <T> boolean exists(Query<?> ormQuery, Transaction transaction);
+  <T> boolean exists(Query<T> ormQuery, Transaction transaction);
 
   /**
    * Return the number of 'top level' or 'root' entities this query should return.
@@ -158,6 +158,13 @@ public interface ExtendedServer {
    * @see Query#findEachWhile(Predicate)
    */
   <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
+
+  /**
+   * Execute findEach with batch consumer.
+   *
+   * @see Query#findEach(int, Consumer)
+   */
+  <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction t);
 
   /**
    * Execute the query visiting the each bean one at a time.

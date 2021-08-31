@@ -20,19 +20,15 @@ import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.s
 public class MCompoundUniqueConstraint {
 
   private final String name;
-
   /**
    * Flag if true indicates this was specifically created for a OneToOne mapping.
    */
   private final boolean oneToOne;
-
   /**
    * The columns combined to be unique.
    */
   private final String[] columns;
-
   private final String platforms;
-
   private String[] nullableColumns;
 
   /**

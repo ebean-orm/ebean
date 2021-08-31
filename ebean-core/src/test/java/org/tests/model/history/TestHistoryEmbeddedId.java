@@ -48,7 +48,7 @@ public class TestHistoryEmbeddedId extends BaseTestCase {
     assertThat(namePair.getOldValue()).isEqualTo("ten");
 
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("from hembi_bean_with_history t0 where t0.part = ?  and t0.brand = ?");
+    assertThat(sql.get(0)).contains("from hembi_bean_with_history t0 where t0.part=? and t0.brand=?");
     if (isH2()) {
       assertThat(sql.get(0)).contains("order by t0.sys_period_start desc");
     } else if (isPostgres()) {

@@ -6,7 +6,7 @@ import io.ebean.common.BeanMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class ElementHelpMap implements ElementHelp {
+final class ElementHelpMap implements ElementHelp {
 
   @Override
   public ElementCollector createCollector() {

@@ -48,67 +48,32 @@ public class MTable {
 
   private static final Logger logger = LoggerFactory.getLogger(MTable.class);
 
-  /**
-   * Table name.
-   */
   private final String name;
-
-  /**
-   * The associated draft table.
-   */
   private MTable draftTable;
-
   /**
    * Marked true for draft tables. These need to have their FK references adjusted
    * after all the draft tables have been identified.
    */
   private boolean draft;
-
   private PartitionMeta partitionMeta;
-
-  /**
-   * Primary key name.
-   */
   private String pkName;
-
-  /**
-   * Table comment.
-   */
   private String comment;
-
-  /**
-   * Tablespace to use.
-   */
   private String tablespace;
-
   private String storageEngine;
-
-  /**
-   * Tablespace to use for indexes on this table.
-   */
   private String indexTablespace;
-
   private IdentityMode identityMode;
-
-  /**
-   * If set to true this table should has history support.
-   */
   private boolean withHistory;
-
-  /**
-   * The columns on the table.
-   */
-  private Map<String, MColumn> columns = new LinkedHashMap<>();
+  private final Map<String, MColumn> columns = new LinkedHashMap<>();
 
   /**
    * Compound unique constraints.
    */
-  private List<MCompoundUniqueConstraint> uniqueConstraints = new ArrayList<>();
+  private final List<MCompoundUniqueConstraint> uniqueConstraints = new ArrayList<>();
 
   /**
    * Compound foreign keys.
    */
-  private List<MCompoundForeignKey> compoundKeys = new ArrayList<>();
+  private final List<MCompoundForeignKey> compoundKeys = new ArrayList<>();
 
   /**
    * Column name for the 'When created' column. This can be used for the initial effective start date when adding
@@ -121,7 +86,7 @@ public class MTable {
    */
   private AddColumn addColumn;
 
-  private List<String> droppedColumns = new ArrayList<>();
+  private final List<String> droppedColumns = new ArrayList<>();
 
   public MTable(BeanDescriptor<?> descriptor) {
     this.name = descriptor.getBaseTable();
@@ -153,18 +118,15 @@ public class MTable {
    * later when creating the CreateTable object.
    */
   public MTable createDraftTable() {
-
     draftTable = new MTable(name + "_draft");
     draftTable.draft = true;
     draftTable.whenCreatedColumn = whenCreatedColumn;
     // compoundKeys
     // compoundUniqueConstraints
     draftTable.identityMode = identityMode;
-
     for (MColumn col : allColumns()) {
       draftTable.addColumn(col.copyForDraft());
     }
-
     return draftTable;
   }
 
@@ -239,7 +201,6 @@ public class MTable {
    * Return the CreateTable migration for this table.
    */
   public CreateTable createTable() {
-
     CreateTable createTable = new CreateTable();
     createTable.setName(name);
     createTable.setPkName(pkName);
@@ -258,22 +219,18 @@ public class MTable {
     if (draft) {
       createTable.setDraft(Boolean.TRUE);
     }
-
     for (MColumn column : allColumns()) {
       // filter out draftOnly columns from the base table
       if (draft || !column.isDraftOnly()) {
         createTable.getColumn().add(column.createColumn());
       }
     }
-
     for (MCompoundForeignKey compoundKey : compoundKeys) {
       createTable.getForeignKey().add(compoundKey.createForeignKey());
     }
-
     for (MCompoundUniqueConstraint constraint : uniqueConstraints) {
       createTable.getUniqueConstraint().add(constraint.getUniqueConstraint());
     }
-
     return createTable;
   }
 
@@ -281,7 +238,6 @@ public class MTable {
    * Compare to another version of the same table to perform a diff.
    */
   public void compare(ModelDiff modelDiff, MTable newTable) {
-
     if (withHistory != newTable.withHistory) {
       if (withHistory) {
         DropHistoryTable dropHistoryTable = new DropHistoryTable();
@@ -308,14 +264,12 @@ public class MTable {
       modelDiff.addTableComment(addTableComment);
     }
 
-
     compareCompoundKeys(modelDiff, newTable);
     compareUniqueKeys(modelDiff, newTable);
   }
 
   private void compareColumns(ModelDiff modelDiff, MTable newTable) {
     addColumn = null;
-
     Map<String, MColumn> newColumnMap = newTable.getColumns();
 
     // compare newColumns to existing columns (look for new and diff columns)
@@ -374,10 +328,10 @@ public class MTable {
     currentKeys.removeAll(newTable.getUniqueConstraints());
     newKeys.removeAll(getUniqueConstraints());
 
-    for (MCompoundUniqueConstraint currentKey: currentKeys) {
+    for (MCompoundUniqueConstraint currentKey : currentKeys) {
       modelDiff.addUniqueConstraint(currentKey.dropUniqueConstraint(name));
     }
-    for (MCompoundUniqueConstraint newKey: newKeys) {
+    for (MCompoundUniqueConstraint newKey : newKeys) {
       modelDiff.addUniqueConstraint(newKey.addUniqueConstraint(name));
     }
   }
@@ -489,7 +443,6 @@ public class MTable {
   }
 
   public List<String> allHistoryColumns(boolean includeDropped) {
-
     List<String> columnNames = new ArrayList<>(columns.size());
     for (MColumn column : columns.values()) {
       if (column.isIncludeInHistory()) {
@@ -595,7 +548,6 @@ public class MTable {
    * Sometimes the case for a primaryKey that is also a foreign key.
    */
   public MColumn addColumn(String dbCol, String columnDefn, boolean notnull) {
-
     MColumn existingColumn = getColumn(dbCol);
     if (existingColumn != null) {
       if (notnull) {
@@ -613,7 +565,6 @@ public class MTable {
    * Add a 'new column' to the AddColumn migration object.
    */
   private void diffNewColumn(MColumn newColumn) {
-
     if (addColumn == null) {
       addColumn = new AddColumn();
       addColumn.setTableName(name);
@@ -631,7 +582,6 @@ public class MTable {
    * Add a 'drop column' to the diff.
    */
   private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn) {
-
     DropColumn dropColumn = new DropColumn();
     dropColumn.setTableName(name);
     dropColumn.setColumnName(existingColumn.getName());
@@ -640,7 +590,6 @@ public class MTable {
       // table as well as the base table
       dropColumn.setWithHistory(Boolean.TRUE);
     }
-
     modelDiff.addDropColumn(dropColumn);
   }
 
@@ -661,7 +610,6 @@ public class MTable {
    * </p>
    */
   public void checkDuplicateForeignKeys() {
-
     if (hasDuplicateForeignKeys()) {
       int counter = 1;
       for (MCompoundForeignKey fk : compoundKeys) {
@@ -687,7 +635,6 @@ public class MTable {
    * Adjust the references (FK) if it should relate to a draft table.
    */
   public void adjustReferences(ModelContainer modelContainer) {
-
     Collection<MColumn> cols = allColumns();
     for (MColumn col : cols) {
       String references = col.getReferences();

@@ -46,7 +46,6 @@ class ProcessingContext implements Constants {
   private final Filer filer;
   private final Messager messager;
   private final Elements elementUtils;
-  private final String generatedAnnotation;
 
   private final PropertyTypeMap propertyTypeMap = new PropertyTypeMap();
 
@@ -95,9 +94,6 @@ class ProcessingContext implements Constants {
     this.filer = processingEnv.getFiler();
     this.messager = processingEnv.getMessager();
     this.elementUtils = processingEnv.getElementUtils();
-
-    boolean jdk8 = processingEnv.getSourceVersion().compareTo(SourceVersion.RELEASE_8) <= 0;
-    this.generatedAnnotation = generatedAnnotation(jdk8);
     this.readModuleInfo = new ReadModuleInfo(this);
   }
 
@@ -115,17 +111,6 @@ class ProcessingContext implements Constants {
 
   TypeElement componentAnnotation() {
     return elementUtils.getTypeElement(EBEAN_COMPONENT);
-  }
-
-  private String generatedAnnotation(boolean jdk8) {
-    if (jdk8) {
-      return isTypeAvailable(GENERATED_8) ? GENERATED_8 : null;
-    }
-    return isTypeAvailable(GENERATED_9) ? GENERATED_9 : null;
-  }
-
-  private boolean isTypeAvailable(String canonicalName) {
-    return null != elementUtils.getTypeElement(canonicalName);
   }
 
   /**
@@ -171,7 +156,11 @@ class ProcessingContext implements Constants {
 
   private boolean isStaticOrTransient(VariableElement field) {
     Set<Modifier> modifiers = field.getModifiers();
-    return (modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.TRANSIENT));
+    return (
+      modifiers.contains(Modifier.STATIC) ||
+      modifiers.contains(Modifier.TRANSIENT) ||
+      hasAnnotations(field, "javax.persistence.Transient")
+    );
   }
 
   private static boolean hasAnnotations(Element element, String... annotations) {
@@ -282,6 +271,15 @@ class ProcessingContext implements Constants {
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
     }
 
+    // look for targetEntity annotation attribute
+    final String targetEntity = readTargetEntity(field);
+    if (targetEntity != null) {
+      final TypeElement element = elementUtils.getTypeElement(targetEntity);
+      if (isEntityOrEmbedded(element)) {
+        return createPropertyTypeAssoc(typeDef(element.asType()));
+      }
+    }
+
     if (isEntityOrEmbedded(fieldType)) {
       //  public QAssocContact<QCustomer> contacts;
       return createPropertyTypeAssoc(typeDef(typeMirror));
@@ -327,15 +325,11 @@ class ProcessingContext implements Constants {
       Element argElement = typeUtils.asElement(typeArguments.get(0));
       if (isEntityOrEmbedded(argElement)) {
         return createPropertyTypeAssoc(typeDef(argElement.asType()));
-      } else {
-        // look for targetEntity annotation attribute
-        final String targetEntity = readTargetEntity(field);
-        if (targetEntity != null) {
-          final TypeElement element = elementUtils.getTypeElement(targetEntity);
-          if (isEntityOrEmbedded(element)) {
-            return createPropertyTypeAssoc(typeDef(element.asType()));
-          }
-        }
+      }
+    } else if (typeArguments.size() == 2) {
+      Element argElement = typeUtils.asElement(typeArguments.get(1));
+      if (isEntityOrEmbedded(argElement)) {
+        return createPropertyTypeAssoc(typeDef(argElement.asType()));
       }
     }
     return null;
@@ -402,14 +396,6 @@ class ProcessingContext implements Constants {
 
   void logNote(String msg, Object... args) {
     messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
-  }
-
-  boolean isGeneratedAvailable() {
-    return generatedAnnotation != null;
-  }
-
-  String getGeneratedAnnotation() {
-    return generatedAnnotation;
   }
 
   void readModuleInfo() {

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CancelableQuery;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
@@ -10,40 +11,25 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Executes the delete query.
+ * Executes the update query.
  */
-class CQueryUpdate implements SpiProfileTransactionEvent {
+final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
-
   private final OrmQueryRequest<?> request;
-
   private final BeanDescriptor<?> desc;
-
   private final SpiQuery<?> query;
-
-  /**
-   * Where clause predicates.
-   */
   private final CQueryPredicates predicates;
-
-  /**
-   * The final sql that is generated.
-   */
   private final String sql;
-
-  /**
-   * The statement used to create the resultSet.
-   */
   private PreparedStatement pstmt;
-
   private String bindLog;
-
   private int rowCount;
-
   private long profileOffset;
+  private long executionTimeMicros;
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Create the Sql select based on the request.
@@ -76,22 +62,25 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
    * Execute the update or delete statement returning the row count.
    */
   public int execute() throws SQLException {
-
     long startNano = System.nanoTime();
     try {
       SpiTransaction t = getTransaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
-      pstmt = conn.prepareStatement(sql);
-
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
+      lock.lock();
+      try {
+        query.checkCancelled();
+        pstmt = conn.prepareStatement(sql);
+        if (query.getTimeout() > 0) {
+          pstmt.setQueryTimeout(query.getTimeout());
+        }
+        bindLog = predicates.bind(pstmt, conn);
+      } finally {
+        lock.unlock();
       }
-
-      bindLog = predicates.bind(pstmt, conn);
       rowCount = pstmt.executeUpdate();
-
-      long executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
+      query.checkCancelled();
+      executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
@@ -102,6 +91,10 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
     } finally {
       close();
     }
+  }
+
+  long micros() {
+    return executionTimeMicros;
   }
 
   private SpiTransaction getTransaction() {
@@ -121,5 +114,15 @@ class CQueryUpdate implements SpiProfileTransactionEvent {
     getTransaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), rowCount, query.getProfileId());
+  }
+
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
   }
 }

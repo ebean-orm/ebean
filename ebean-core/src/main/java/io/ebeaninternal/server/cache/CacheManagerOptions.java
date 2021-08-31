@@ -10,18 +10,13 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 /**
  * Configuration options when creating the default cache manager.
  */
-public class CacheManagerOptions {
+public final class CacheManagerOptions {
 
   private final ClusterManager clusterManager;
-
   private final DatabaseConfig databaseConfig;
-
   private final boolean localL2Caching;
-
   private CurrentTenantProvider currentTenantProvider;
-
   private QueryCacheEntryValidate queryCacheEntryValidate;
-
   private ServerCacheFactory cacheFactory = new DefaultServerCacheFactory();
   private ServerCacheOptions beanDefault = new ServerCacheOptions();
   private ServerCacheOptions queryDefault = new ServerCacheOptions();

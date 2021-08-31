@@ -10,15 +10,13 @@ import javax.persistence.PersistenceException;
  *
  * These can be nested and internally they are pushed and popped from a stack.
  */
-public class ScopedTransaction extends SpiTransactionProxy {
+public final class ScopedTransaction extends SpiTransactionProxy {
 
   private final TransactionScopeManager manager;
-
   /**
    * Stack of 'nested' transactions.
    */
   private final ArrayStack<ScopeTrans> stack = new ArrayStack<>();
-
   private ScopeTrans current;
 
   /**

@@ -45,6 +45,7 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
+import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -54,7 +55,6 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.reflect.Type;
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Collections;
@@ -256,7 +256,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> CQuery<T> compileQuery(Query<T> query, Transaction t) {
+  public <T> CQuery<T> compileQuery(Type type, Query<T> query, Transaction t) {
     return null;
   }
 
@@ -316,7 +316,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public boolean isSupportedType(Type genericType) {
+  public boolean isSupportedType(java.lang.reflect.Type genericType) {
     return false;
   }
 
@@ -446,7 +446,21 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> void findDtoEach(SpiDtoQuery<T> query, int batch, Consumer<List<T>> consumer) {
+  }
+
+  @Override
   public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
+  }
+
+  @Override
+  public <T> QueryIterator<T> findDtoIterate(SpiDtoQuery<T> query) {
+    return null;
+  }
+
+  @Override
+  public <T> Stream<T> findDtoStream(SpiDtoQuery<T> query) {
+    return null;
   }
 
   @Override
@@ -487,6 +501,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public <T> List<T> findSingleAttributeList(SpiSqlQuery query, Class<T> cls) {
     return null;
+  }
+
+  @Override
+  public <T> void findSingleAttributeEach(SpiSqlQuery query, Class<T> cls, Consumer<T> consumer) {
   }
 
   @Override
@@ -632,7 +650,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(Query<?> ormQuery, Transaction transaction) {
+  public <T> boolean exists(Query<T> ormQuery, Transaction transaction) {
     return false;
   }
 
@@ -673,6 +691,10 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction) {
+  }
+
+  @Override
+  public <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction t) {
   }
 
   @Override

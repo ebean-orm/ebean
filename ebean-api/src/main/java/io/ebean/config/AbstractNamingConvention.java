@@ -7,6 +7,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
 
+import static io.ebean.util.StringHelper.isNull;
+
 /**
  * Provides some base implementation for NamingConventions.
  *
@@ -78,10 +80,16 @@ public abstract class AbstractNamingConvention implements NamingConvention {
 
   @Override
   public String getSequenceName(String rawTableName, String pkColumn) {
-    final String tableNameUnquoted = databasePlatform.unQuote(rawTableName);
+    TableName tableName = new TableName(rawTableName);
+    String seqName = seqName(pkColumn, tableName.getName());
+    return tableName.withCatalogAndSchema(seqName);
+  }
+
+  private String seqName(String pkColumn, String tableName) {
+    final String tableNameUnquoted = unQuote(tableName);
     String seqName = sequenceFormat.replace("{table}", tableNameUnquoted);
-    pkColumn = (pkColumn == null) ? "" : databasePlatform.unQuote(pkColumn);
-    return seqName.replace("{column}", pkColumn);
+    pkColumn = (pkColumn == null) ? "" : unQuote(pkColumn);
+    return quoteIdentifiers(seqName.replace("{column}", pkColumn));
   }
 
   /**
@@ -216,15 +224,13 @@ public abstract class AbstractNamingConvention implements NamingConvention {
         || AnnotationUtil.has(supCls, DiscriminatorValue.class);
   }
 
-
   @Override
   public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable) {
-
     StringBuilder buffer = new StringBuilder();
-    buffer.append(lhsTable.getName());
+    buffer.append(unQuote(lhsTable.getName()));
     buffer.append("_");
 
-    String rhsTableName = rhsTable.getName();
+    String rhsTableName = unQuote(rhsTable.getName());
     if (rhsTableName.indexOf('_') < rhsPrefixLength) {
       // trim off a xx_ prefix if there is one
       rhsTableName = rhsTableName.substring(rhsTableName.indexOf('_') + 1);
@@ -238,7 +244,13 @@ public abstract class AbstractNamingConvention implements NamingConvention {
       buffer.setLength(maxTableNameLength);
     }
 
-    return new TableName(lhsTable.getCatalog(), lhsTable.getSchema(), buffer.toString());
+    String tableName = quoteIdentifiers(buffer.toString());
+    return new TableName(lhsTable.getCatalog(), lhsTable.getSchema(), tableName);
+  }
+
+  @Override
+  public String deriveM2MColumn(String tableName, String dbColumn) {
+    return quoteIdentifiers(unQuote(tableName) +"_" + unQuote(dbColumn));
   }
 
   /**
@@ -255,12 +267,27 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     return null;
   }
 
+  @Override
+  public String getTableName(String catalog, String schema, String name) {
+    StringBuilder sb = new StringBuilder();
+    if (!isNull(catalog)) {
+      sb.append(quoteIdentifiers(catalog)).append(".");
+    }
+    if (!isNull(schema)) {
+      sb.append(quoteIdentifiers(schema)).append(".");
+    }
+    return sb.append(quoteIdentifiers(name)).toString();
+  }
+
   /**
-   * Replace back ticks (if they are used) with database platform specific
-   * quoted identifiers.
+   * Replace back ticks (if they are used) with database platform specific quoted identifiers.
    */
   protected String quoteIdentifiers(String s) {
     return databasePlatform.convertQuotedIdentifiers(s);
+  }
+
+  private String unQuote(String val) {
+    return databasePlatform.unQuote(val);
   }
 
   /**

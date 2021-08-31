@@ -40,7 +40,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       // nothing flushed yet
       assertThat(LoggedSqlCollector.start()).isEmpty();
 
-      txn.flushBatch();
+      txn.flush();
 
       List<String> loggedSql1 = LoggedSqlCollector.start();
       assertThat(loggedSql1).hasSize(4);

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.type.DataBind;
@@ -12,10 +13,9 @@ import java.util.Set;
 /**
  * Set properties for a UpdateQuery.
  */
-public class OrmUpdateProperties {
+public final class OrmUpdateProperties {
 
   private static final NullValue NULL_VALUE = new NullValue();
-
   private static final NoneValue NONE_VALUE = new NoneValue();
 
   /**
@@ -40,7 +40,7 @@ public class OrmUpdateProperties {
   /**
    * Set property to null.
    */
-  private static class NullValue extends Value {
+  private static final class NullValue extends Value {
     @Override
     public String bindClause() {
       return "=null";
@@ -50,12 +50,14 @@ public class OrmUpdateProperties {
   /**
    * Set property to a simple value.
    */
-  private static class SimpleValue extends Value {
+  private static final class SimpleValue extends Value {
 
     final Object value;
+    final ScalarType<Object> scalarType;
 
-    SimpleValue(Object value) {
+    SimpleValue(Object value, ScalarType<Object> scalarType) {
       this.value = value;
+      this.scalarType = scalarType;
     }
 
     @Override
@@ -70,7 +72,11 @@ public class OrmUpdateProperties {
 
     @Override
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
-      binder.bindObject(dataBind, value);
+      if (scalarType != null) {
+        scalarType.bind(dataBind, value);
+      } else {
+        binder.bindObject(dataBind, value);
+      }
       dataBind.append(value).append(",");
     }
   }
@@ -78,7 +84,7 @@ public class OrmUpdateProperties {
   /**
    * Set using an expression with no bind value.
    */
-  private static class NoneValue extends Value {
+  private static final class NoneValue extends Value {
     @Override
     public String bindClause() {
       return "";
@@ -88,7 +94,7 @@ public class OrmUpdateProperties {
   /**
    * Set using an expression with many bind values.
    */
-  private static class RawArrayValue extends Value {
+  private static final class RawArrayValue extends Value {
 
     final Object[] bindValues;
 
@@ -115,16 +121,12 @@ public class OrmUpdateProperties {
    */
   private final LinkedHashMap<String, Value> values = new LinkedHashMap<>();
 
-  /**
-   * Normal set property.
-   */
-  public void set(String propertyName, Object value) {
-    if (value == null) {
-      values.put(propertyName, NULL_VALUE);
+  public void set(String propertyName, Object value, ScalarType<Object> scalarType) {
+    values.put(propertyName, new SimpleValue(value, scalarType));
+  }
 
-    } else {
-      values.put(propertyName, new SimpleValue(value));
-    }
+  public void setNull(String propertyName) {
+    values.put(propertyName, NULL_VALUE);
   }
 
   /**

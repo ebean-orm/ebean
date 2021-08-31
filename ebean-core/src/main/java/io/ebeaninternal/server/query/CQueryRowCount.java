@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.CancelableQuery;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
@@ -13,50 +14,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Executes the select row count query.
  */
-class CQueryRowCount implements SpiProfileTransactionEvent {
+final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
-
-  /**
-   * The overall find request wrapper object.
-   */
   private final OrmQueryRequest<?> request;
-
   private final BeanDescriptor<?> desc;
-
   private final SpiQuery<?> query;
-
-  /**
-   * Where clause predicates.
-   */
   private final CQueryPredicates predicates;
-
-  /**
-   * The final sql that is generated.
-   */
   private final String sql;
-
-  /**
-   * The resultSet that is read and converted to objects.
-   */
   private ResultSet rset;
-
-  /**
-   * The statement used to create the resultSet.
-   */
   private PreparedStatement pstmt;
-
   private String bindLog;
-
   private long executionTimeMicros;
-
   private int rowCount;
-
   private long profileOffset;
+  private final ReentrantLock lock = new ReentrantLock();
 
   /**
    * Create the Sql select based on the request.
@@ -100,30 +77,36 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
     return sql;
   }
 
+  long micros() {
+    return executionTimeMicros;
+  }
+
   /**
    * Execute the query returning the row count.
    */
   public int findCount() throws SQLException {
-
     long startNano = System.nanoTime();
     try {
       SpiTransaction t = getTransaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
-      pstmt = conn.prepareStatement(sql);
-
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
+      lock.lock();
+      try {
+        query.checkCancelled();
+        pstmt = conn.prepareStatement(sql);
+        if (query.getTimeout() > 0) {
+          pstmt.setQueryTimeout(query.getTimeout());
+        }
+        bindLog = predicates.bind(pstmt, conn);
+      } finally {
+        lock.unlock();
       }
-
-      bindLog = predicates.bind(pstmt, conn);
       rset = pstmt.executeQuery();
+      query.checkCancelled();
       if (!rset.next()) {
         throw new PersistenceException("Expecting 1 row but got none?");
       }
-
       rowCount = rset.getInt(1);
-
       executionTimeMicros = (System.nanoTime() - startNano) / 1000L;
       request.slowQueryCheck(executionTimeMicros, rowCount);
       if (queryPlan.executionTime(executionTimeMicros)) {
@@ -131,7 +114,6 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
       }
       t.profileEvent(this);
       return rowCount;
-
     } finally {
       close();
     }
@@ -160,5 +142,15 @@ class CQueryRowCount implements SpiProfileTransactionEvent {
 
   Set<String> getDependentTables() {
     return queryPlan.getDependentTables();
+  }
+
+  @Override
+  public void cancel() {
+    lock.lock();
+    try {
+      JdbcClose.cancel(pstmt);
+    } finally {
+      lock.unlock();
+    }
   }
 }

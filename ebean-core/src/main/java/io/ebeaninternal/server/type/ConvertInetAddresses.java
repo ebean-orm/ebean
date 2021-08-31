@@ -112,7 +112,7 @@ import java.util.regex.Pattern;
  * @author Erik Kline
  * @since 5
  */
-public final class ConvertInetAddresses {
+final class ConvertInetAddresses {
 
   private static final int IPV4_PART_COUNT = 4;
   private static final int IPV6_PART_COUNT = 8;

@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class DbPrimary {
 
-  private static final ReentrantLock lock = new ReentrantLock(false);
+  private static final ReentrantLock lock = new ReentrantLock();
   private static String defaultServerName;
   private static boolean skip;
 

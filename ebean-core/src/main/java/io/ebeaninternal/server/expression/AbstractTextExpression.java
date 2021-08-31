@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
@@ -9,7 +10,7 @@ import io.ebeaninternal.api.SpiExpressionRequest;
  * This means they can not be part of a SQL query nor do they use the built in query plan cache etc.
  * </p>
  */
-public abstract class AbstractTextExpression extends AbstractExpression {
+abstract class AbstractTextExpression extends AbstractExpression {
 
   AbstractTextExpression(String propName) {
     super(propName);
@@ -37,9 +38,9 @@ public abstract class AbstractTextExpression extends AbstractExpression {
   }
 
   @Override
-  public int queryBindHash() {
-    return 0;
-  }
+  public void queryBindKey(BindValuesKey key) {
+    // do nothing, only execute against document store
+  };
 
   @Override
   public boolean isSameByBind(SpiExpression other) {

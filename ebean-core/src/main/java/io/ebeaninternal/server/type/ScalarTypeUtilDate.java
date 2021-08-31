@@ -16,11 +16,11 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 /**
  * ScalarType for java.util.Date.
  */
-public class ScalarTypeUtilDate {
+final class ScalarTypeUtilDate {
 
-  public static class TimestampType extends ScalarTypeBaseDateTime<java.util.Date> {
+  static final class TimestampType extends ScalarTypeBaseDateTime<java.util.Date> {
 
-    public TimestampType(JsonConfig.DateTime mode) {
+    TimestampType(JsonConfig.DateTime mode) {
       super(mode, java.util.Date.class, false, Types.TIMESTAMP);
     }
 
@@ -89,9 +89,9 @@ public class ScalarTypeUtilDate {
     }
   }
 
-  public static class DateType extends ScalarTypeBaseDate<java.util.Date> {
+  static final class DateType extends ScalarTypeBaseDate<java.util.Date> {
 
-    public DateType(JsonConfig.Date mode) {
+    DateType(JsonConfig.Date mode) {
       super(mode, Date.class, false, Types.DATE);
     }
 

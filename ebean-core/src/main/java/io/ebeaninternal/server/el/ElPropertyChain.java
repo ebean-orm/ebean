@@ -22,30 +22,22 @@ import java.util.Arrays;
  * no further processing of the chain occurs.
  * </p>
  */
-public class ElPropertyChain implements ElPropertyValue {
+public final class ElPropertyChain implements ElPropertyValue {
 
   private final String prefix;
-
   private final String placeHolder;
   private final String placeHolderEncrypted;
-
   private final String name;
-
   private final String expression;
-
   private final boolean containsMany;
-
   private final ElPropertyValue[] chain;
-
   private final boolean assocId;
   private final int last;
   private final BeanProperty lastBeanProperty;
   private final ScalarType<?> scalarType;
-
   private final ElPropertyValue lastElPropertyValue;
 
   public ElPropertyChain(boolean containsMany, boolean embedded, String expression, ElPropertyValue[] chain) {
-
     this.containsMany = containsMany;
     this.chain = chain;
     this.expression = expression;
@@ -119,15 +111,12 @@ public class ElPropertyChain implements ElPropertyValue {
     if (!expression.startsWith(sinceProperty)) {
       return containsMany;
     }
-
     int i = 1 + SplitName.count(sinceProperty);
-
     for (; i < chain.length; i++) {
       if (chain[i].getBeanProperty().containsMany()) {
         return true;
       }
     }
-
     return false;
   }
 
@@ -281,7 +270,6 @@ public class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public Object pathGetNested(Object bean) {
-
     Object prevBean = bean;
     for (int i = 0; i < last; i++) {
       // always return non null prevBean
@@ -293,7 +281,6 @@ public class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public void pathSet(Object bean, Object value) {
-
     Object prevBean = bean;
     for (int i = 0; i < last; i++) {
       prevBean = chain[i].pathGetNested(prevBean);
@@ -309,6 +296,5 @@ public class ElPropertyChain implements ElPropertyValue {
       }
     }
   }
-
 
 }

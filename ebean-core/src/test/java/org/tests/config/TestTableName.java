@@ -5,7 +5,27 @@ import io.ebean.config.TableName;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestTableName extends BaseTestCase {
+
+  @Test
+  public void withCatalogAndSchema() {
+    TableName t = new TableName("a.b.c");
+    assertThat(t.withCatalogAndSchema("foo")).isEqualTo("a.b.foo");
+  }
+
+  @Test
+  public void withCatalogAndSchema_when_quoted() {
+    TableName t = new TableName("[a].[b].[c]");
+    assertThat(t.withCatalogAndSchema("foo")).isEqualTo("[a].[b].foo");
+
+    TableName noCat = new TableName("[b].[c]");
+    assertThat(noCat.withCatalogAndSchema("foo")).isEqualTo("[b].foo");
+
+    TableName tabOnly = new TableName("[c]");
+    assertThat(tabOnly.withCatalogAndSchema("foo")).isEqualTo("foo");
+  }
 
   @Test
   public void test() {

@@ -17,9 +17,9 @@ import java.sql.Types;
 /**
  * ScalarType for java.sql.Time.
  */
-public class ScalarTypeTime extends ScalarTypeBase<Time> {
+final class ScalarTypeTime extends ScalarTypeBase<Time> {
 
-  public ScalarTypeTime() {
+  ScalarTypeTime() {
     super(Time.class, true, Types.TIME);
   }
 

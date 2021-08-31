@@ -25,10 +25,9 @@ class PropertyTypeMap {
    */
   private final PropertyType dbJsonType = new PropertyType("PJson");
 
-  private Map<String,PropertyType> map = new HashMap<>();
+  private final Map<String,PropertyType> map = new HashMap<>();
 
   PropertyTypeMap() {
-
     map.put("boolean", new PropertyType("PBoolean"));
     map.put("short", new PropertyType("PShort"));
     map.put("int", new PropertyType("PInteger"));
@@ -57,7 +56,6 @@ class PropertyTypeMap {
     addType(Locale.class);
     addType(File.class);
     addType(InetAddress.class);
-
     map.put(URI.class.getName(), new PropertyType("PUri"));
     map.put(URL.class.getName(), new PropertyType("PUrl"));
     map.put(UUID.class.getName(), new PropertyType("PUuid"));
@@ -74,7 +72,6 @@ class PropertyTypeMap {
   }
 
   private void addJava8Types() {
-
     try {
       Class.forName("java.time.Instant");
     } catch (ClassNotFoundException e) {
@@ -94,6 +91,7 @@ class PropertyTypeMap {
     addType(java.time.YearMonth.class);
     addType(java.time.ZoneId.class);
     addType(java.time.ZoneOffset.class);
+    addType(java.time.ZonedDateTime.class);
   }
 
   private void addJodaTypes() {

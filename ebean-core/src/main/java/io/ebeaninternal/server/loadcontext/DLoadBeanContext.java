@@ -23,19 +23,17 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * ToOne bean load context.
  */
-class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
+final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
 
   private final boolean cache;
-
   private List<LoadBuffer> bufferList;
-
   private LoadBuffer currentBuffer;
 
-  DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, int defaultBatchSize, OrmQueryProperties queryProps) {
-    super(parent, desc, path, defaultBatchSize, queryProps);
+  DLoadBeanContext(DLoadContext parent, BeanDescriptor<?> desc, String path, OrmQueryProperties queryProps) {
+    super(parent, desc, path, queryProps);
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
-    this.currentBuffer = createBuffer(firstBatchSize);
+    this.currentBuffer = createBuffer(batchSize);
     this.cache = (queryProps != null) && queryProps.isCache();
   }
 
@@ -52,11 +50,10 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
     if (bufferList != null) {
       bufferList.clear();
     }
-    currentBuffer = createBuffer(secondaryBatchSize);
+    currentBuffer = createBuffer(batchSize);
   }
 
   private void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
-
     if (cache) {
       query.setBeanCacheMode(CacheMode.ON);
     }
@@ -70,9 +67,8 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
   }
 
   protected void register(EntityBeanIntercept ebi) {
-
     if (currentBuffer.isFull()) {
-      currentBuffer = createBuffer(secondaryBatchSize);
+      currentBuffer = createBuffer(batchSize);
     }
     ebi.setBeanLoader(currentBuffer, getPersistenceContext());
     currentBuffer.add(ebi);
@@ -97,10 +93,6 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
             parent.getEbeanServer().loadBean(new LoadBeanRequest(loadBuffer, parentRequest));
-            if (!queryProps.isQueryFetchAll()) {
-              // Stop - only fetch the first batch ... the rest will be lazy loaded
-              break;
-            }
           }
           if (forEach) {
             clear();
@@ -120,7 +112,7 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
    */
   static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
 
-    private final ReentrantLock bufferLock = new ReentrantLock(false);
+    private final ReentrantLock bufferLock = new ReentrantLock();
     private final DLoadBeanContext context;
     private final int batchSize;
     private final List<EntityBeanIntercept> list;
@@ -198,8 +190,10 @@ class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext {
         // lazy load property was a Many
         return;
       }
-
-      if (context.hitCache) {
+      if (list.isEmpty()) {
+        // re-add to the batch and lazy load from DB skipping l2 cache
+        list.add(ebi);
+      } else if (context.hitCache) {
         Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(list, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
         list.removeAll(hits);
         if (list.isEmpty() || hits.contains(ebi)) {

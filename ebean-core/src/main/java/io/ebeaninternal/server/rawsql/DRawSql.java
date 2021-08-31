@@ -8,9 +8,7 @@ import java.sql.ResultSet;
 public final class DRawSql implements SpiRawSql {
 
   private final ResultSet resultSet;
-
   private final Sql sql;
-
   private final ColumnMapping columnMapping;
 
   /**
@@ -22,7 +20,7 @@ public final class DRawSql implements SpiRawSql {
     this.columnMapping = new ColumnMapping(propertyNames);
   }
 
-  protected DRawSql(ResultSet resultSet, Sql sql, ColumnMapping columnMapping) {
+  DRawSql(ResultSet resultSet, Sql sql, ColumnMapping columnMapping) {
     this.resultSet = resultSet;
     this.sql = sql;
     this.columnMapping = columnMapping;

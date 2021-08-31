@@ -9,10 +9,8 @@ import java.util.concurrent.Callable;
 
 /**
  * Represent the fetch Id's query as a Callable.
- *
- * @param <T> the entity bean type
  */
-public class CallableQueryIds<T> extends CallableQuery<T> implements Callable<List<Object>> {
+public final class CallableQueryIds<T> extends CallableQuery<T> implements Callable<List<Object>> {
 
 
   public CallableQueryIds(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {

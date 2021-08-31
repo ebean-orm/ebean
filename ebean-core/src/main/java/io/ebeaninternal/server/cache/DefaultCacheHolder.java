@@ -23,14 +23,13 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Manages the construction of caches.
  */
-class DefaultCacheHolder {
+final class DefaultCacheHolder {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.ALL");
 
-  private final ReentrantLock lock = new ReentrantLock(false);
+  private final ReentrantLock lock = new ReentrantLock();
   private final ConcurrentHashMap<String, ServerCache> allCaches = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, Set<String>> collectIdCaches = new ConcurrentHashMap<>();
-
   private final ServerCacheFactory cacheFactory;
   private final ServerCacheOptions beanDefault;
   private final ServerCacheOptions queryDefault;
@@ -76,7 +75,6 @@ class DefaultCacheHolder {
    * Return the cache for a given bean type.
    */
   private ServerCache getCacheInternal(Class<?> beanType, ServerCacheType type, String collectionProperty) {
-
     String shortName = key(beanType.getSimpleName(), collectionProperty, type);
     String fullKey = key(beanType.getName(), collectionProperty, type);
     return allCaches.computeIfAbsent(fullKey, s -> createCache(beanType, type, fullKey, shortName));
@@ -143,10 +141,8 @@ class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
-
     Cache cache = cls.getAnnotation(Cache.class);
     boolean nearCache = (cache != null && cache.nearCache());
-
     CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
     if (tuning != null) {
       return new ServerCacheOptions(nearCache, tuning).applyDefaults(beanDefault);

@@ -1,9 +1,7 @@
 package org.tests.model.bridge;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Version;
+import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -17,6 +15,10 @@ public class BSiteUserD {
   private UUID userId;
 
   private BAccessLevel accessLevel;
+
+  @OneToMany(cascade = CascadeType.PERSIST)
+  @JoinColumns({@JoinColumn(name="site_id", referencedColumnName = "site_id"), @JoinColumn(name="user_id", referencedColumnName = "user_id")})
+  private List<BSiteUserDMany> children;
 
   @Version
   private long version;
@@ -57,5 +59,13 @@ public class BSiteUserD {
 
   public void setVersion(long version) {
     this.version = version;
+  }
+
+  public List<BSiteUserDMany> children() {
+    return children;
+  }
+
+  public void setChildren(List<BSiteUserDMany> children) {
+    this.children = children;
   }
 }

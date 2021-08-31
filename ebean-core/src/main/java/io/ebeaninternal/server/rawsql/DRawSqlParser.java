@@ -7,20 +7,15 @@ import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
  * Parses sql-select queries to try and determine the location where WHERE and
  * HAVING clauses can be added dynamically to the sql.
  */
-class DRawSqlParser {
+final class DRawSqlParser {
 
   private static final String $_AND_HAVING = "${andHaving}";
-
   private static final String $_HAVING = "${having}";
-
   private static final String $_AND_WHERE = "${andWhere}";
-
   private static final String $_WHERE = "${where}";
 
   private final SimpleTextParser textParser;
-
   private String sql;
-
   private int placeHolderWhere;
   private int placeHolderAndWhere;
   private int placeHolderHaving;

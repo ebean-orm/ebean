@@ -29,8 +29,8 @@ public class TestM2MDistinct_sqlServer extends BaseTestCase {
 
     List<String> sqls = LoggedSql.stop();
     assertThat(sqls.get(0)).startsWith("select distinct t0.id, t0.name, t0.version, t0.tenant_id, t0.name collate Latin1_General_CI_AS "
-      + "from mt_role t0 join mt_role_permission u1z_ on u1z_.mt_role_id = t0.id  "
-      + "join mt_permission u1 on u1.id = u1z_.mt_permission_id  where u1.id = ? "
+      + "from mt_role t0 join mt_role_permission u1z_ on u1z_.mt_role_id = t0.id "
+      + "join mt_permission u1 on u1.id = u1z_.mt_permission_id where u1.id = ? "
       + "order by t0.name collate Latin1_General_CI_AS;");
   }
 }

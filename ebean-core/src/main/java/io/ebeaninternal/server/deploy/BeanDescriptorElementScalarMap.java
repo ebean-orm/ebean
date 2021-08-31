@@ -49,7 +49,6 @@ class BeanDescriptorElementScalarMap<T> extends BeanDescriptorElement<T> {
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-
     JsonParser parser = readJson.getParser();
     ElementCollector add = elementHelp.createCollector();
     do {
@@ -69,7 +68,6 @@ class BeanDescriptorElementScalarMap<T> extends BeanDescriptorElement<T> {
         add.addKeyValue(key, val);
       }
     } while (true);
-
     return add.collection();
   }
 

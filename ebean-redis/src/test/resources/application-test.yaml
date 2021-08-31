@@ -1,0 +1,9 @@
+ebean:
+  dumpMetricsOnShutdown: true
+  dumpMetricsOptions: sql,hash,loc
+  test:
+    redis: latest
+#    shutdown: stop # stop | remove
+    platform: h2 # h2, postgres, mysql, oracle, sqlserver, sqlite
+    ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
+    dbName: myapp
