@@ -1,7 +1,7 @@
 package org.tests.model.array;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestDbArray_asSet extends BaseTestCase {
 
-  private EArraySetBean bean = new EArraySetBean();
+  private final EArraySetBean bean = new EArraySetBean();
 
   private EArraySetBean found;
 
@@ -51,14 +51,14 @@ public class TestDbArray_asSet extends BaseTestCase {
     status.add(EArrayBean.Status.TWO);
     bean.setStatus(status);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    found = Ebean.find(EArraySetBean.class, bean.getId());
+    found = DB.find(EArraySetBean.class, bean.getId());
 
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
 
     if (isPostgres()) {
-      Query<EArraySetBean> query = Ebean.find(EArraySetBean.class)
+      Query<EArraySetBean> query = DB.find(EArraySetBean.class)
         .where()
         .arrayContains("otherIds", 96L, 97L)
         .arrayContains("uids", first)
@@ -74,7 +74,7 @@ public class TestDbArray_asSet extends BaseTestCase {
       assertSql(query).contains(" coalesce(cardinality(t0.phone_numbers),0) <> 0");
       assertThat(list).hasSize(1);
 
-      query = Ebean.find(EArraySetBean.class)
+      query = DB.find(EArraySetBean.class)
         .where()
         .arrayIsEmpty("otherIds")
         .arrayNotContains("uids", first)
@@ -93,11 +93,11 @@ public class TestDbArray_asSet extends BaseTestCase {
   //@Test//(dependsOnMethods = "insert")
   public void json_parse_format() {
 
-    String asJson = Ebean.json().toJson(found);
+    String asJson = DB.json().toJson(found);
     assertThat(asJson).contains("\"phoneNumbers\":[\"4321\",\"9823\"]");
     assertThat(asJson).contains("\"id\":");
 
-    EArraySetBean fromJson = Ebean.json().toBean(EArraySetBean.class, asJson);
+    EArraySetBean fromJson = DB.json().toBean(EArraySetBean.class, asJson);
     assertEquals(found.getId(), fromJson.getId());
     assertEquals(found.getId(), fromJson.getId());
     assertEquals(found.getName(), fromJson.getName());
@@ -109,7 +109,7 @@ public class TestDbArray_asSet extends BaseTestCase {
 
     found.setName("jack");
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     // we don't update the phone numbers (as they are not dirty)
@@ -123,7 +123,7 @@ public class TestDbArray_asSet extends BaseTestCase {
     found.getUids().add(UUID.randomUUID());
 
     LoggedSqlCollector.start();
-    Ebean.save(found);
+    DB.save(found);
     List<String> sql = LoggedSqlCollector.stop();
 
     assertSql(sql.get(0)).contains("update earray_set_bean set phone_numbers=?, uids=?, version=? where");
@@ -139,8 +139,8 @@ public class TestDbArray_asSet extends BaseTestCase {
     bean.setOtherIds(null);
     bean.setUids(null);
 
-    Ebean.save(bean);
-    Ebean.delete(bean);
+    DB.save(bean);
+    DB.delete(bean);
   }
 
   @Test
@@ -156,8 +156,8 @@ public class TestDbArray_asSet extends BaseTestCase {
     Set<EArraySetBean> all = new HashSet<>();
     all.add(bean);
 
-    Ebean.saveAll(all);
-    Ebean.deleteAll(all);
+    DB.saveAll(all);
+    DB.deleteAll(all);
   }
 
   @Test
@@ -177,14 +177,14 @@ public class TestDbArray_asSet extends BaseTestCase {
     bean.setUids(uids);
     bean.setStatus(statuses);
 
-    Ebean.save(bean);
+    DB.save(bean);
     // load cache
-    final EArraySetBean entry = Ebean.find(EArraySetBean.class, bean.getId());
+    final EArraySetBean entry = DB.find(EArraySetBean.class, bean.getId());
     assertThat(entry.getUids()).hasSameElementsAs(uids);
     assertThat(entry.getStatus()).hasSameElementsAs(statuses);
 
     // hit cache
-    EArraySetBean found = Ebean.find(EArraySetBean.class, bean.getId());
+    EArraySetBean found = DB.find(EArraySetBean.class, bean.getId());
     assertThat(found.getUids()).hasSameElementsAs(uids);
     assertThat(found.getStatus()).hasSameElementsAs(statuses);
   }
