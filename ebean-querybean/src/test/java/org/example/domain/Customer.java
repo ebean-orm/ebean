@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Lob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,9 @@ public class Customer extends BaseModel {
 
   @OneToMany(mappedBy = "customer", cascade = CascadeType.PERSIST)
   List<Contact> contacts;
+
+  @Column @Lob
+  byte[] photo;
 
   public Status getStatus() {
     return status;
@@ -154,6 +158,14 @@ public class Customer extends BaseModel {
 
   public void setEmail(final ValidEmail email) {
     this.email = email;
+  }
+
+  public byte[] getPhoto() {
+    return photo;
+  }
+
+  public void setPhoto(byte[] photo) {
+    this.photo = photo;
   }
 
   /**
