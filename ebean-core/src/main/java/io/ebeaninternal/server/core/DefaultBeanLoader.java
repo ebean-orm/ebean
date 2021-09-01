@@ -109,7 +109,7 @@ final class DefaultBeanLoader {
     }
 
     query.where().idEq(parentId);
-    query.setUseCache(false);
+    query.setBeanCacheMode(CacheMode.OFF);
     query.setMode(Mode.LAZYLOAD_MANY);
     query.setLazyLoadManyPath(many.getName());
     query.setPersistenceContext(pc);
@@ -235,7 +235,7 @@ final class DefaultBeanLoader {
     query.setId(id);
     if (embeddedOwnerIndex > -1 || mode == Mode.REFRESH_BEAN) {
       // make sure the query doesn't use the cache
-      query.setUseCache(false);
+      query.setBeanCacheMode(CacheMode.OFF);
     }
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);
