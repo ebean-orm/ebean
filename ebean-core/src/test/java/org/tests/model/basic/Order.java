@@ -1,26 +1,8 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.Cache;
-import io.ebean.annotation.ChangeLog;
-import io.ebean.annotation.DocEmbedded;
-import io.ebean.annotation.DocStore;
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.WhenCreated;
-import io.ebean.annotation.Where;
+import io.ebean.annotation.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Date;
@@ -31,7 +13,6 @@ import java.util.List;
 /**
  * Order entity bean.
  */
-@Cache
 @DocStore
 @ChangeLog
 @Entity
