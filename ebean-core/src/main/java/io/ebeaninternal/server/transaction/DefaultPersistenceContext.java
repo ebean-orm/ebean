@@ -65,6 +65,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     return new DefaultPersistenceContext(this, false);
   }
 
+  @Override
   public boolean resetLimit() {
     lock.lock();
     try {

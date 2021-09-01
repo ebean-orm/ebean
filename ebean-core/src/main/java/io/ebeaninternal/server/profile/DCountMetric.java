@@ -26,6 +26,7 @@ final class DCountMetric implements CountMetric {
     count.add(value);
   }
 
+  @Override
   public void increment() {
     count.increment();
   }

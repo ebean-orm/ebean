@@ -145,6 +145,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
     this.bindLog = bindLog;
   }
 
+  @Override
   public void startBind(boolean batchThisRequest) {
     this.batchThisRequest = batchThisRequest;
     super.startBind(batchThisRequest);

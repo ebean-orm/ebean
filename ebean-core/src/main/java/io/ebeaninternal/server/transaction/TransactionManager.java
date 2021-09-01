@@ -201,6 +201,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the scope manager.
    */
+  @Override
   public final TransactionScopeManager scope() {
     return scopeManager;
   }

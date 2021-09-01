@@ -150,6 +150,7 @@ public final class DefaultPersister implements Persister {
   /**
    * Add to the flush queue in position 0, 1 or 2.
    */
+  @Override
   public void addToFlushQueue(SpiSqlUpdate update, SpiTransaction t, int pos) {
     new PersistRequestUpdateSql(server, update, t, persistExecute).addToFlushQueue(pos);
   }
