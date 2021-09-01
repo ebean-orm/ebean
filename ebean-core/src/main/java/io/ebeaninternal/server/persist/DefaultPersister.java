@@ -824,7 +824,7 @@ public final class DefaultPersister implements Persister {
 
     BeanPersistController controller = descriptor.getPersistController();
     if (controller != null) {
-      DeleteIdRequest request = new DeleteIdRequest(server, transaction, id);
+      DeleteIdRequest request = new DeleteIdRequest(server, transaction, descriptor.getBeanType(), id);
       if (idList == null) {
         controller.preDelete(request);
       } else {
