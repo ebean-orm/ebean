@@ -352,7 +352,7 @@ final class BeanDescriptorCacheHelp<T> {
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
     List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
-      idList.add(targetDescriptor.getId((EntityBean) bean));
+      idList.add(targetDescriptor.beanId(bean));
     }
     return new CachedManyIds(idList);
   }

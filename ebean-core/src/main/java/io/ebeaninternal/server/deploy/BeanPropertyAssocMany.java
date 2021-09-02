@@ -869,7 +869,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     draftVal.size();
     Collection<T> actualDetails = draftVal.getActualDetails();
     for (T bean : actualDetails) {
-      Object id = targetDescriptor.getId((EntityBean) bean);
+      Object id = targetDescriptor.beanId(bean);
       T liveBean = liveBeansAsMap.remove(id);
 
       if (isManyToMany()) {
@@ -899,7 +899,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     Collection<?> liveBeans = liveVal.getActualDetails();
     Map<Object, T> liveMap = new LinkedHashMap<>();
     for (Object liveBean : liveBeans) {
-      Object id = targetDescriptor.getId((EntityBean) liveBean);
+      Object id = targetDescriptor.beanId(liveBean);
       liveMap.put(id, (T) liveBean);
     }
     return liveMap;

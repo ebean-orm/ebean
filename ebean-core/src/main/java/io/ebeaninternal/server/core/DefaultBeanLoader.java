@@ -69,12 +69,10 @@ final class DefaultBeanLoader {
     }
 
     Object parentId = parentDesc.getId(parentBean);
-
     if (pc == null) {
       pc = new DefaultPersistenceContext();
       parentDesc.contextPut(pc, parentId, parentBean);
     }
-
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
       Boolean readOnly = null;
@@ -87,7 +85,6 @@ final class DefaultBeanLoader {
     }
 
     SpiQuery<?> query = server.createQuery(parentDesc.getBeanType());
-
     if (refresh) {
       // populate a new collection
       BeanCollection<?> emptyCollection = many.createEmpty(parentBean);
@@ -98,7 +95,6 @@ final class DefaultBeanLoader {
     }
 
     query.select(parentDesc.getIdBinder().getIdProperty());
-
     if (onlyIds) {
       query.fetch(many.getName(), many.getTargetIdProperty());
     } else {
@@ -113,7 +109,6 @@ final class DefaultBeanLoader {
     query.setMode(Mode.LAZYLOAD_MANY);
     query.setLazyLoadManyPath(many.getName());
     query.setPersistenceContext(pc);
-
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);
     }

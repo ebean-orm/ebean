@@ -120,8 +120,7 @@ public final class LoadBeanRequest extends LoadRequest {
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     // collect Ids and maybe load bean cache
     for (Object bean : list) {
-      EntityBean loadedBean = (EntityBean) bean;
-      loadedIds.add(desc.getId(loadedBean));
+      loadedIds.add(desc.beanId(bean));
     }
     if (loadCache) {
       desc.cacheBeanPutAll(list);

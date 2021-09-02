@@ -225,7 +225,7 @@ public final class SaveManyBeans extends SaveManyBase {
         detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
       }
       if (detailBean instanceof EntityBean) {
-        Object id = targetDescriptor.getId((EntityBean) detailBean);
+        Object id = targetDescriptor.beanId(detailBean);
         if (!isNullOrZero(id)) {
           // remember the Id (other details not in the collection) will be removed
           detailIds.add(id);

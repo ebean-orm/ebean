@@ -195,7 +195,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       } else {
         Object assocBean = getValue(bean);
         if (assocBean != null) {
-          Object parentId = targetDescriptor.getId((EntityBean) assocBean);
+          Object parentId = targetDescriptor.beanId(assocBean);
           if (parentId != null) {
             changeSet.addManyRemove(targetDescriptor, relationshipProperty.getName(), parentId);
           }
