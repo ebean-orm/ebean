@@ -39,15 +39,12 @@ final class DefaultBeanLoader {
   }
 
   void loadMany(LoadManyRequest loadRequest) {
-    SpiQuery<?> query = loadRequest.createQuery(server);
-    executeQuery(loadRequest, query);
+    executeQuery(loadRequest, loadRequest.createQuery(server));
     loadRequest.postLoad();
   }
 
   void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-    EntityBean parentBean = bc.getOwnerBean();
-    String propertyName = bc.getPropertyName();
-    loadManyInternal(parentBean, propertyName, null, false, onlyIds);
+    loadManyInternal(bc.getOwnerBean(), bc.getPropertyName(), null, false, onlyIds);
   }
 
   void refreshMany(EntityBean parentBean, String propertyName) {
@@ -183,8 +180,7 @@ final class DefaultBeanLoader {
     if (EntityType.EMBEDDED == desc.getEntityType()) {
       // lazy loading on an embedded bean property
       EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();
-      int ownerIndex = ebi.getEmbeddedOwnerIndex();
-      refreshBeanInternal(embeddedOwner, mode, ownerIndex);
+      refreshBeanInternal(embeddedOwner, mode, ebi.getEmbeddedOwnerIndex());
     }
 
     Object id = desc.getId(bean);
@@ -240,8 +236,7 @@ final class DefaultBeanLoader {
 
     Object dbBean = query.findOne();
     if (dbBean == null) {
-      String msg = "Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.getBeanType() + "]";
-      throw new EntityNotFoundException(msg);
+      throw new EntityNotFoundException("Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.getBeanType() + "]");
     }
     desc.resetManyProperties(dbBean);
   }

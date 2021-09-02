@@ -40,7 +40,7 @@ public final class LoadBeanRequest extends LoadRequest {
                           String lazyLoadProperty, boolean alreadyLoaded, boolean loadCache) {
     super(parentRequest, lazy);
     this.loadBuffer = loadBuffer;
-    this.batch = loadBuffer.getBatch();
+    this.batch = loadBuffer.batch();
     this.lazyLoadProperty = lazyLoadProperty;
     this.alreadyLoaded = alreadyLoaded;
     this.loadCache = loadCache;
@@ -48,11 +48,11 @@ public final class LoadBeanRequest extends LoadRequest {
 
   @Override
   public Class<?> beanType() {
-    return loadBuffer.getBeanDescriptor().getBeanType();
+    return loadBuffer.descriptor().getBeanType();
   }
 
   public String description() {
-    return loadBuffer.getFullPath();
+    return loadBuffer.fullPath();
   }
 
   /**
@@ -67,7 +67,7 @@ public final class LoadBeanRequest extends LoadRequest {
    */
   public List<Object> getIdList() {
     List<Object> idList = new ArrayList<>();
-    BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
+    BeanDescriptor<?> desc = loadBuffer.descriptor();
     for (EntityBeanIntercept ebi : batch) {
       idList.add(desc.getId(ebi.getOwner()));
     }
@@ -79,10 +79,10 @@ public final class LoadBeanRequest extends LoadRequest {
    */
   public void configureQuery(SpiQuery<?> query, List<Object> idList) {
     query.setMode(Mode.LAZYLOAD_BEAN);
-    query.setPersistenceContext(loadBuffer.getPersistenceContext());
+    query.setPersistenceContext(loadBuffer.persistenceContext());
     query.setLoadDescription(lazy ? "+lazy" : "+query", description());
     if (lazy) {
-      query.setLazyLoadBatchSize(loadBuffer.getBatchSize());
+      query.setLazyLoadBatchSize(loadBuffer.batchSize());
       if (alreadyLoaded) {
         query.setBeanCacheMode(CacheMode.OFF);
       }
@@ -105,7 +105,7 @@ public final class LoadBeanRequest extends LoadRequest {
    */
   public void postLoad(List<?> list) {
     Set<Object> loadedIds = new HashSet<>();
-    BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
+    BeanDescriptor<?> desc = loadBuffer.descriptor();
     // collect Ids and maybe load bean cache
     for (Object bean : list) {
       loadedIds.add(desc.beanId(bean));

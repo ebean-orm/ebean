@@ -131,7 +131,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public int getBatchSize() {
+    public int batchSize() {
       return batchSize;
     }
 
@@ -154,7 +154,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public List<EntityBeanIntercept> getBatch() {
+    public List<EntityBeanIntercept> batch() {
       return list;
     }
 
@@ -164,17 +164,17 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public String getFullPath() {
+    public String fullPath() {
       return context.fullPath;
     }
 
     @Override
-    public BeanDescriptor<?> getBeanDescriptor() {
+    public BeanDescriptor<?> descriptor() {
       return context.desc;
     }
 
     @Override
-    public PersistenceContext getPersistenceContext() {
+    public PersistenceContext persistenceContext() {
       return persistenceContext;
     }
 
