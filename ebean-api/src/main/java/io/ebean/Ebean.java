@@ -1208,7 +1208,7 @@ public final class Ebean {
    * Return the manager of the server cache ("L2" cache).
    */
   public static ServerCacheManager getServerCacheManager() {
-    return getDefault().getServerCacheManager();
+    return getDefault().cacheManager();
   }
 
   /**

@@ -27,7 +27,7 @@ public class TestL2DirtyFlagOnLazyLoad extends BaseTestCase {
 
     // clearAll() caches via the ServerCacheManager ...
     // Clear all the caches on the default/primary EbeanServer
-    server().getServerCacheManager().clearAll();
+    server().cacheManager().clearAll();
 
     //TEST
     try (Transaction tx1 = Ebean.beginTransaction()) {

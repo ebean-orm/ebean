@@ -538,7 +538,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ServerCacheManager getServerCacheManager() {
+  public ServerCacheManager cacheManager() {
     return serverCacheManager;
   }
 

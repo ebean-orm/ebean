@@ -1246,7 +1246,7 @@ public final class DB {
    * Return the manager of the level 2 cache ("L2" cache).
    */
   public static ServerCacheManager getServerCacheManager() {
-    return getDefault().getServerCacheManager();
+    return getDefault().cacheManager();
   }
 
   /**

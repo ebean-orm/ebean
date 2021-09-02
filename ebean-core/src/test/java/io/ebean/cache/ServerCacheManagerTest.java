@@ -12,7 +12,7 @@ public class ServerCacheManagerTest {
   @Test
   public void test() {
 
-    ServerCacheManager cacheManager = DB.getDefault().getServerCacheManager();
+    ServerCacheManager cacheManager = DB.getDefault().cacheManager();
 
     for (ServerCacheRegion region : cacheManager.allRegions()) {
       assertTrue(region.isEnabled());

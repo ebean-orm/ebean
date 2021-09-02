@@ -77,7 +77,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     assertEquals("3 Pineapple St", billAddress.getStreet());
 
     EbeanServer server = Ebean.getServer(null);
-    ServerCacheManager serverCacheManager = server.getServerCacheManager();
+    ServerCacheManager serverCacheManager = server.cacheManager();
 
     // get cache, clear the cache and statistics
     ServerCache beanCache = serverCacheManager.getBeanCache(EInvoice.class);

@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestBeanFetchJoinCache extends BaseTestCase {
 
-  private final ServerCache customerBeanCache = server().getServerCacheManager().getBeanCache(Customer.class);
+  private final ServerCache customerBeanCache = server().cacheManager().getBeanCache(Customer.class);
 
   @Test
   public void fetchCache_when_allHits() {
@@ -181,6 +181,6 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
   private void initDataClearCache() {
     ResetBasicData.reset();
-    server().getServerCacheManager().clearAll();
+    server().cacheManager().clearAll();
   }
 }

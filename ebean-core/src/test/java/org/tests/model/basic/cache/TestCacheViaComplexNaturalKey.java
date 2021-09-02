@@ -27,7 +27,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
   private static boolean loadOnce;
 
   private ServerCacheManager cacheManager() {
-    return server().getServerCacheManager();
+    return server().cacheManager();
   }
 
   private static void insertSome() {

@@ -27,7 +27,7 @@ public class TestBeanCache extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestBeanCache.class);
 
-  private final ServerCache beanCache = DB.getDefault().getServerCacheManager().getBeanCache(OCachedBean.class);
+  private final ServerCache beanCache = DB.getDefault().cacheManager().getBeanCache(OCachedBean.class);
 
   @Test
   public void findById_when_idTypeConverted() {

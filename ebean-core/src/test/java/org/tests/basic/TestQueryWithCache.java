@@ -30,7 +30,7 @@ public class TestQueryWithCache extends BaseTestCase {
     assertTrue(cacheOptions.isReadOnly());
     assertTrue(beanDescriptor.isCacheSharableBeans());
 
-    ServerCacheManager serverCacheManager = server.getServerCacheManager();
+    ServerCacheManager serverCacheManager = server.cacheManager();
     serverCacheManager.clear(Country.class);
 
     ServerCache beanCache = serverCacheManager.getBeanCache(Country.class);

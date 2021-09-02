@@ -10,7 +10,6 @@ import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   private static boolean loadOnce;
 
   private ServerCacheManager cacheManager() {
-    return server().getServerCacheManager();
+    return server().cacheManager();
   }
 
   private static void insertSome() {

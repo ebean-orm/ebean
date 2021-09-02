@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
-  private final ServerCache beanCache = server().getServerCacheManager().getBeanCache(UUOne.class);
+  private final ServerCache beanCache = server().cacheManager().getBeanCache(UUOne.class);
 
   private UUOne insert(String name) {
     UUOne one = new UUOne();

@@ -83,7 +83,7 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache() {
     resetCounters();
 
-    ServerCache beanCache = server.getServerCacheManager().getBeanCache(EBasicChangeLog.class);
+    ServerCache beanCache = server.cacheManager().getBeanCache(EBasicChangeLog.class);
     beanCache.getStatistics(true);
 
     EBasicChangeLog found = server.find(EBasicChangeLog.class, id1);
@@ -111,7 +111,7 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache_sharedBean() {
     resetCounters();
 
-    ServerCache beanCache = server.getServerCacheManager().getBeanCache(Country.class);
+    ServerCache beanCache = server.cacheManager().getBeanCache(Country.class);
     beanCache.getStatistics(true);
 
     Country found = server.find(Country.class, "AR");

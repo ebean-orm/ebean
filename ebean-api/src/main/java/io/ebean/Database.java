@@ -1495,7 +1495,15 @@ public interface Database {
   /**
    * Return the manager of the server cache ("L2" cache).
    */
-  ServerCacheManager getServerCacheManager();
+  ServerCacheManager cacheManager();
+
+  /**
+   * Deprecated migrate to cacheManager().
+   */
+  @Deprecated
+  default ServerCacheManager getServerCacheManager() {
+    return cacheManager();
+  }
 
   /**
    * Return the BackgroundExecutor service for asynchronous processing of

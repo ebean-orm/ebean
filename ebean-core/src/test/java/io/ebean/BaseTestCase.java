@@ -78,7 +78,7 @@ public abstract class BaseTestCase {
   }
 
   protected void clearAllL2Cache() {
-    server().getServerCacheManager().clearAll();
+    server().cacheManager().clearAll();
   }
 
   protected void resetAllMetrics() {
@@ -242,7 +242,7 @@ public abstract class BaseTestCase {
   }
 
   protected <T> ServerCacheStatistics getBeanCacheStats(Class<T> cls, boolean reset) {
-    return server().getServerCacheManager().getBeanCache(cls).getStatistics(reset);
+    return server().cacheManager().getBeanCache(cls).getStatistics(reset);
   }
 
   protected Platform platform() {

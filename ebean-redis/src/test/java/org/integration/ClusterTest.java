@@ -54,7 +54,7 @@ public class ClusterTest {
     fooA = DB.find(Person.class, foo.getId());
     assertCounts(dualCacheA, 2, 1, 0, 1);
     fooB = other.find(Person.class, foo.getId());
-    DuelCache dualCacheB = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
+    DuelCache dualCacheB = (DuelCache) other.cacheManager().getBeanCache(Person.class);
     assertCounts(dualCacheB, 2, 1, 1, 0);
   }
 
@@ -69,10 +69,10 @@ public class ClusterTest {
       foo.save();
     }
 
-    other.getServerCacheManager().clearAll();
+    other.cacheManager().clearAll();
     other.metaInfo().resetAllMetrics();
 
-    DuelCache dualCache = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
+    DuelCache dualCache = (DuelCache) other.cacheManager().getBeanCache(Person.class);
 
     Person foo0 = other.find(Person.class, 1);
     assertCounts(dualCache, 0, 1, 0, 1);

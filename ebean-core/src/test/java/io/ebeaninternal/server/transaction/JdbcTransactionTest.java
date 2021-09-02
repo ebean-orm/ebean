@@ -43,7 +43,7 @@ public class JdbcTransactionTest {
   @Test
   public void skipCacheAfterSave() {
 
-    ServerCacheManager cacheManager = DB.getDefault().getServerCacheManager();
+    ServerCacheManager cacheManager = DB.getDefault().cacheManager();
     ServerCache customerBeanCache = cacheManager.getBeanCache(Customer.class);
     ServerCache contactNatKeyCache = cacheManager.getNaturalKeyCache(Contact.class);
 
