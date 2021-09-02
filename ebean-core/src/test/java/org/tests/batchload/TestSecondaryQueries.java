@@ -1,10 +1,6 @@
 package org.tests.batchload;
 
-import io.ebean.Ebean;
-import io.ebean.FetchConfig;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.TransactionalTestCase;
+import io.ebean.*;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 import org.tests.model.basic.Customer;
@@ -42,6 +38,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
   public void fetchLazy() {
 
     LoggedSqlCollector.start();
+    DB.getServerCacheManager().clearAll();
 
     List<Order> orders = Ebean.find(Order.class)
       .select("status")

@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.CacheMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.BindPadding;
@@ -63,17 +64,6 @@ public final class LoadManyRequest extends LoadRequest {
   }
 
   /**
-   * Return true if lazy loading should only load the id values.
-   * <p>
-   * This for use when lazy loading is invoked on methods such as clear() and removeAll() where it
-   * generally makes sense to only fetch the Id values as the other property information is not
-   * used.
-   */
-  private boolean isOnlyIds() {
-    return onlyIds;
-  }
-
-  /**
    * Return true if we should load the Collection ids into the cache.
    */
   private boolean isLoadCache() {
@@ -111,31 +101,25 @@ public final class LoadManyRequest extends LoadRequest {
     if (orderBy != null) {
       query.order(orderBy);
     }
-
     String extraWhere = many.getExtraWhere();
     if (extraWhere != null) {
       // replace special ${ta} placeholder with the base table alias
       // which is always t0 and add the extra where clause
       query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
     }
-
     query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
     query.setPersistenceContext(loadContext.getPersistenceContext());
-
-    String mode = isLazy() ? "+lazy" : "+query";
-    query.setLoadDescription(mode, getDescription());
-
-    if (isLazy()) {
-      // cascade the batch size (if set) for further lazy loading
+    query.setLoadDescription(lazy ? "+lazy" : "+query", getDescription());
+    if (lazy) {
       query.setLazyLoadBatchSize(getBatchSize());
+    } else {
+      query.setBeanCacheMode(CacheMode.OFF);
     }
-
-    // potentially changes the joins and selected properties
+    // potentially changes the joins, selected properties, cache mode
     loadContext.configureQuery(query);
-
-    if (isOnlyIds()) {
-      // override to just select the Id values
+    if (onlyIds) {
+      // lazy loading invoked via clear() and removeAll()
       query.select(many.getTargetIdProperty());
     }
     return query;

@@ -9,13 +9,10 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 public abstract class LoadRequest {
 
   protected final OrmQueryRequest<?> parentRequest;
-
   protected final Transaction transaction;
-
   protected final boolean lazy;
 
   public LoadRequest(OrmQueryRequest<?> parentRequest, boolean lazy) {
-
     this.parentRequest = parentRequest;
     this.transaction = parentRequest == null ? null : parentRequest.getTransaction();
     this.lazy = lazy;

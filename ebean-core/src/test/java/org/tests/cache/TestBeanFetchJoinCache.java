@@ -22,10 +22,8 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
   @Test
   public void fetchCache_when_allHits() {
-
     initDataClearCache();
     loadCustomerBeanCache();
-
     customerBeanCache.getStatistics(true);
 
     LoggedSqlCollector.start();
@@ -59,7 +57,6 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
   @Test
   public void fetchCache_when_someHits() {
-
     initDataClearCache();
 
     DB.find(Customer.class)
@@ -94,7 +91,6 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
   @Test
   public void fetchCache_when_hitsButBeanCachePartiallyLoaded() {
-
     initDataClearCache();
 
     DB.find(Customer.class)
@@ -110,6 +106,9 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
       .fetchCache("customer")
       .findList();
 
+    for (Order order : orders) {
+      assertThat(order.getCustomer().getName()).isNotNull();
+    }
     final List<String> sql0 = LoggedSqlCollector.current();
     assertThat(sql0).hasSize(1);
 
@@ -121,17 +120,17 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     for (Order order : orders) {
       final Customer customer = order.getCustomer();
       assertThat(customer.getName()).isNotNull();
-      assertThat(customer.getStatus()).isNotNull(); // We hit the DB here as previously hit bean cache
+      assertThat(customer.getStatus()).isNotNull(); // We cache miss on property(status)
     }
 
-    // assert we didn't hit the L2 bean cache the second time around
-    final ServerCacheStatistics statistics1 = customerBeanCache.getStatistics(true);
-    assertThat(statistics1.getHitCount()).isEqualTo(0);
-
-    // assert we did hit the DB the second time around
+    // assert we hit the DB the second time around
     final List<String> sql1 = LoggedSqlCollector.stop();
     assertThat(sql1).hasSize(1);
     assertThat(sql1.get(0)).contains(" from o_customer t0 ");
+
+    // assert we didn't hit the L2 bean cache the second time around
+    final ServerCacheStatistics statistics1 = customerBeanCache.getStatistics(true);
+    assertThat(statistics1.getHitCount()).isGreaterThan(0);
   }
 
   private final FetchGroup<Order> fgBasic = FetchGroup.of(Order.class)
@@ -140,9 +139,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
   @Test
   public void fetchGroup_fetchCache() {
-
     initDataClearCache();
-
     loadCustomerBeanCache();
     customerBeanCache.getStatistics(true);
 
@@ -160,12 +157,9 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     .fetchCache("customer", "name")
     .build();
 
-
   @Test
   public void fetchGroup_fetchCache_partial() {
-
     initDataClearCache();
-
     customerBeanCache.getStatistics(true);
 
     LoggedSqlCollector.start();
