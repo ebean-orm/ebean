@@ -20,7 +20,7 @@ public abstract class SingleBeanLoader implements BeanLoader {
 
   @Override
   public String getName() {
-    return database.getName();
+    return database.name();
   }
 
   @Override

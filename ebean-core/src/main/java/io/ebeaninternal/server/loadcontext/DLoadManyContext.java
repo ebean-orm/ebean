@@ -74,7 +74,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
 
 
   public String getName() {
-    return parent.getEbeanServer().getName();
+    return parent.getEbeanServer().name();
   }
 
   public void register(BeanCollection<?> bc) {

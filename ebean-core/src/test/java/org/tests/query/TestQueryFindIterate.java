@@ -194,7 +194,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     });
 
-    if (!DB.getDefault().getName().equals("h2")) {
+    if (!DB.getDefault().name().equals("h2")) {
       // MySql allows the query with type conversion?
       throw new PersistenceException("H2 does expected thing but MySql does not");
     }

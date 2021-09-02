@@ -83,7 +83,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(customer.getId()).isEqualTo(customer1.getId());
     assertThat(customer.getName()).isEqualTo(customer1.getName());
 
-    assertThat(Customer.find.db().getName()).isEqualTo(DB.getDefault().getName());
+    assertThat(Customer.find.db().name()).isEqualTo(DB.getDefault().name());
   }
 
   @Test

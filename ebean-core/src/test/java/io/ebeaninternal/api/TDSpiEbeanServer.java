@@ -348,7 +348,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 

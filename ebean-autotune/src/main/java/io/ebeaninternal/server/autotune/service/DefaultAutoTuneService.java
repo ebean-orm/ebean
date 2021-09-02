@@ -59,7 +59,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     this.tuningFile = config.getQueryTuningFile();
     this.profilingFile = config.getProfilingFile();
     this.profilingUpdateFrequency = config.getProfilingUpdateFrequency();
-    this.serverName = server.getName();
+    this.serverName = server.name();
     this.profileManager = new ProfileManager(config, server);
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
     this.skipGarbageCollectionOnShutdown = config.isSkipGarbageCollectionOnShutdown();

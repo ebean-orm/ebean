@@ -499,7 +499,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the server name.
    */
   @Override
-  public String getName() {
+  public String name() {
     return serverName;
   }
 

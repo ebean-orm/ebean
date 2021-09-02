@@ -73,7 +73,7 @@ final class DumpMetrics {
 
   void dump() {
 
-    out("-- Dumping metrics for " + server.getName() + " -- ");
+    out("-- Dumping metrics for " + server.name() + " -- ");
     ServerMetrics serverMetrics = server.getMetaInfoManager().collectMetrics();
 
     for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {

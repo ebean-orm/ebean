@@ -112,7 +112,7 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
     if (withHeader) {
       objStart();
       key("db");
-      val(database.getName());
+      val(database.name());
       key("metrics");
       listStart();
     }

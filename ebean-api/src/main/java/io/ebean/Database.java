@@ -136,7 +136,15 @@ public interface Database {
    * Return the name. This is used with {@link DB#byName(String)} to get a
    * Database that was registered with the DB singleton.
    */
-  String getName();
+  String name();
+
+  /**
+   * Deprecated migrate to name().
+   */
+  @Deprecated
+  default String getName() {
+    return name();
+  }
 
   /**
    * Return the ExpressionFactory for this database.

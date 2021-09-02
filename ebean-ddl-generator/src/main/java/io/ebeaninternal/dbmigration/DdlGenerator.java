@@ -321,11 +321,11 @@ public class DdlGenerator implements SpiDdlGenerator {
   }
 
   protected String getDropFileName() {
-    return server.getName() + "-drop-all.sql";
+    return server.name() + "-drop-all.sql";
   }
 
   protected String getCreateFileName() {
-    return server.getName() + "-create-all.sql";
+    return server.name() + "-create-all.sql";
   }
 
   protected CurrentModel currentModel() {
