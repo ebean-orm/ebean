@@ -126,8 +126,16 @@ public final class DB {
    * an expression that uses OR like Expression e = Expr.or(..., ...);
    * </p>
    */
-  public static ExpressionFactory getExpressionFactory() {
+  public static ExpressionFactory expressionFactory() {
     return getDefault().expressionFactory();
+  }
+
+  /**
+   * Deprecated migrate to expressionFactory().
+   */
+  @Deprecated
+  public static ExpressionFactory getExpressionFactory() {
+    return expressionFactory();
   }
 
   /**
@@ -1261,8 +1269,16 @@ public final class DB {
    * Return the BackgroundExecutor service for asynchronous processing of
    * queries.
    */
-  public static BackgroundExecutor getBackgroundExecutor() {
+  public static BackgroundExecutor backgroundExecutor() {
     return getDefault().backgroundExecutor();
+  }
+
+  /**
+   * Deprecated migrate to backgroundExecutor().
+   */
+  @Deprecated
+  public static BackgroundExecutor getBackgroundExecutor() {
+    return backgroundExecutor();
   }
 
   /**
