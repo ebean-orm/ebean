@@ -21,12 +21,12 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
   @BeforeClass
   public static void resetStats() {
-    DB.getDefault().getMetaInfoManager().resetAllMetrics();
+    DB.getDefault().metaInfo().resetAllMetrics();
   }
 
   @AfterClass
   public static void reportStats() {
-    ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
+    ServerMetrics metrics = DB.getDefault().metaInfo().collectMetrics();
     for (MetaQueryMetric metric : metrics.queryMetrics()) {
       System.out.println(metric);
     }

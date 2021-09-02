@@ -82,11 +82,11 @@ public abstract class BaseTestCase {
   }
 
   protected void resetAllMetrics() {
-    server().getMetaInfoManager().resetAllMetrics();
+    server().metaInfo().resetAllMetrics();
   }
 
   protected ServerMetrics collectMetrics() {
-     return server().getMetaInfoManager().collectMetrics();
+     return server().metaInfo().collectMetrics();
   }
 
   protected List<MetaTimedMetric> visitTimedMetrics() {

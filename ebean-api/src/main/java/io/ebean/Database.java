@@ -187,7 +187,15 @@ public interface Database {
    * Return the MetaInfoManager which is used to get meta data from the Database
    * such as query execution statistics.
    */
-  MetaInfoManager getMetaInfoManager();
+  MetaInfoManager metaInfo();
+
+  /**
+   * Deprecated migrate to metaInfo().
+   */
+  @Deprecated
+  default MetaInfoManager getMetaInfoManager() {
+    return metaInfo();
+  }
 
   /**
    * Return the platform used for this database instance.

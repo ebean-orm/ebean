@@ -31,7 +31,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer0 = new StringBuilder();
-    DB.getDefault().getMetaInfoManager()
+    DB.getDefault().metaInfo()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer0);
@@ -45,7 +45,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer1 = new StringBuilder();
-    DB.getDefault().getMetaInfoManager()
+    DB.getDefault().metaInfo()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer1);
@@ -177,7 +177,7 @@ public class TestCustomerFinder extends BaseTestCase {
     QueryPlanInit init0 = new QueryPlanInit();
     init0.setAll(true);
     init0.thresholdMicros(2);
-    final List<MetaQueryPlan> plans = server().getMetaInfoManager().queryPlanInit(init0);
+    final List<MetaQueryPlan> plans = server().metaInfo().queryPlanInit(init0);
     assertThat(plans.size()).isGreaterThan(1);
 
     // the server has some plans
@@ -187,13 +187,13 @@ public class TestCustomerFinder extends BaseTestCase {
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
     init.thresholdMicros(1);
-    final List<MetaQueryPlan> appliedToPlans = server().getMetaInfoManager().queryPlanInit(init);
+    final List<MetaQueryPlan> appliedToPlans = server().metaInfo().queryPlanInit(init);
     assertThat(appliedToPlans.size()).isGreaterThan(4);
 
     // run queries again
     runQueries();
 
-    ServerMetrics metrics = DB.getDefault().getMetaInfoManager().collectMetrics();
+    ServerMetrics metrics = DB.getDefault().metaInfo().collectMetrics();
 
     List<MetaQueryMetric> planStats = metrics.queryMetrics();
     assertThat(planStats.size()).isGreaterThan(4);
@@ -212,7 +212,7 @@ public class TestCustomerFinder extends BaseTestCase {
     request.maxCount(1_000);
     // don't collect any more plans if used 10 secs
     request.maxTimeMillis(10_000);
-    List<MetaQueryPlan> plans0 = server().getMetaInfoManager().queryPlanCollectNow(request);
+    List<MetaQueryPlan> plans0 = server().metaInfo().queryPlanCollectNow(request);
     assertThat(plans0).isNotEmpty();
 
     for (MetaQueryPlan plan : plans) {
@@ -232,7 +232,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     runQueries();
 
-    String metricsJson = server().getMetaInfoManager()
+    String metricsJson = server().metaInfo()
       .collectMetricsAsJson()
       .withHash(true)
       .withExtraAttributes(true)
@@ -256,7 +256,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     runQueries();
 
-    String metricsJson = server().getMetaInfoManager()
+    String metricsJson = server().metaInfo()
       .collectMetricsAsJson()
       .withHash(false)
       .withExtraAttributes(false)
@@ -279,7 +279,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer = new StringBuilder();
-    server().getMetaInfoManager()
+    server().metaInfo()
       .collectMetricsAsJson()
       .withHeader(false)
       .write(buffer);
@@ -297,7 +297,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     StringBuilder buffer = new StringBuilder();
-    server().getMetaInfoManager()
+    server().metaInfo()
       .collectMetricsAsJson()
       .withHeader(true)
       .write(buffer);

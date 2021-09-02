@@ -325,7 +325,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public MetaInfoManager getMetaInfoManager() {
+  public MetaInfoManager metaInfo() {
     return metaInfoManager;
   }
 

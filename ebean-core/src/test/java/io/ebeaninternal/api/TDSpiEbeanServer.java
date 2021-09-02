@@ -358,7 +358,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public MetaInfoManager getMetaInfoManager() {
+  public MetaInfoManager metaInfo() {
     return null;
   }
 

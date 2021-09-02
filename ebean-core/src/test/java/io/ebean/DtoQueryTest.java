@@ -281,7 +281,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     // collect without reset
     BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
-    server().getMetaInfoManager().visitMetrics(basic);
+    server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();
     assertThat(stats).hasSize(1);
@@ -297,7 +297,7 @@ public class DtoQueryTest extends BaseTestCase {
       .setParameter("name", "rob")
       .findList();
 
-    ServerMetrics metric2 = server().getMetaInfoManager().collectMetrics();
+    ServerMetrics metric2 = server().metaInfo().collectMetrics();
 
     stats = metric2.queryMetrics();
     assertThat(stats).hasSize(2);

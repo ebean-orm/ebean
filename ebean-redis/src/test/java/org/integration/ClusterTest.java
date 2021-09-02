@@ -40,8 +40,8 @@ public class ClusterTest {
     foo.save();
 
     DB.getServerCacheManager().clearAll();
-    DB.getDefault().getMetaInfoManager().resetAllMetrics();
-    other.getMetaInfoManager().resetAllMetrics();
+    DB.getDefault().metaInfo().resetAllMetrics();
+    other.metaInfo().resetAllMetrics();
 
     Person fooA = DB.find(Person.class, foo.getId());
     Person fooB = other.find(Person.class, foo.getId());
@@ -70,7 +70,7 @@ public class ClusterTest {
     }
 
     other.getServerCacheManager().clearAll();
-    other.getMetaInfoManager().resetAllMetrics();
+    other.metaInfo().resetAllMetrics();
 
     DuelCache dualCache = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
 

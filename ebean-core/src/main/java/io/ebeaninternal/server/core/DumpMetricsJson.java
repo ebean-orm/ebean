@@ -66,14 +66,14 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
   @Override
   public String json() {
     writer = new StringWriter();
-    collect(database.getMetaInfoManager().collectMetrics());
+    collect(database.metaInfo().collectMetrics());
     return writer.toString();
   }
 
   @Override
   public void write(Appendable buffer) {
     writer = buffer;
-    collect(database.getMetaInfoManager().collectMetrics());
+    collect(database.metaInfo().collectMetrics());
   }
 
   private void collect(ServerMetrics serverMetrics) {
