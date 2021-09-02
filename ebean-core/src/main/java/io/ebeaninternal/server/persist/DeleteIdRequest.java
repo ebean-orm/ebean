@@ -9,11 +9,13 @@ final class DeleteIdRequest implements BeanDeleteIdRequest {
 
   private final EbeanServer server;
   private final Transaction transaction;
+  private Class<?> beanType;
   private Object id;
 
-  DeleteIdRequest(SpiEbeanServer server, Transaction transaction, Object id) {
+  DeleteIdRequest(SpiEbeanServer server, Transaction transaction, Class<?> beanType, Object id) {
     this.server = server;
     this.transaction = transaction;
+    this.beanType = beanType;
     this.id = id;
   }
 
@@ -29,6 +31,11 @@ final class DeleteIdRequest implements BeanDeleteIdRequest {
   @Override
   public Transaction getTransaction() {
     return transaction;
+  }
+  
+  @Override 
+  public Class<?> getBeanType() {
+    return beanType;
   }
 
   @Override
