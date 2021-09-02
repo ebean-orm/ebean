@@ -1,7 +1,6 @@
 package io.ebeaninternal.api;
 
 import io.ebean.CacheMode;
-import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -52,8 +51,8 @@ public final class LoadBeanRequest extends LoadRequest {
     return loadBuffer.getBeanDescriptor().getBeanType();
   }
 
-  public String getDescription() {
-    return "path:" + loadBuffer.getFullPath() + " batch:" + batch.size();
+  public String description() {
+    return loadBuffer.getFullPath();
   }
 
   /**
@@ -92,7 +91,7 @@ public final class LoadBeanRequest extends LoadRequest {
   public void configureQuery(SpiQuery<?> query, List<Object> idList) {
     query.setMode(Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.getPersistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", getDescription());
+    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
     if (lazy) {
       query.setLazyLoadBatchSize(getBatchSize());
       if (alreadyLoaded) {

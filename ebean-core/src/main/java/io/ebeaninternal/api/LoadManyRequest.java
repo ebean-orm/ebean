@@ -52,8 +52,8 @@ public final class LoadManyRequest extends LoadRequest {
     return loadContext.getBeanDescriptor().getBeanType();
   }
 
-  public String getDescription() {
-    return "path:" + loadContext.getFullPath() + " size:" + batch.size();
+  public String description() {
+    return loadContext.getFullPath();
   }
 
   /**
@@ -110,7 +110,7 @@ public final class LoadManyRequest extends LoadRequest {
     query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
     query.setPersistenceContext(loadContext.getPersistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", getDescription());
+    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
     if (lazy) {
       query.setLazyLoadBatchSize(getBatchSize());
     } else {
