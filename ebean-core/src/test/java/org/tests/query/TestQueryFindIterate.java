@@ -235,7 +235,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     SpiServer pluginApi = server().getPluginApi();
     DataSourcePool dsPool = (DataSourcePool) pluginApi.getServerConfig().getReadOnlyDataSource();
     if (dsPool == null) {
-      dsPool = (DataSourcePool) server().getDataSource();
+      dsPool = (DataSourcePool) server().dataSource();
     }
 
     int startConns = dsPool.getStatus(false).getBusy();

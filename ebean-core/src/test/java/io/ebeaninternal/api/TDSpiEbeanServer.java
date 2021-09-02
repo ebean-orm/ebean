@@ -338,12 +338,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public DataSource getDataSource() {
+  public DataSource dataSource() {
     return null;
   }
 
   @Override
-  public DataSource getReadOnlyDataSource() {
+  public DataSource readOnlyDataSource() {
     return null;
   }
 

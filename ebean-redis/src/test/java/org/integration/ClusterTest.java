@@ -30,7 +30,7 @@ public class ClusterTest {
   public void testBothNear() {
     // ensure the default server exists first
     final Database db = DB.getDefault();
-    Database other = createOther(db.getPluginApi().getDataSource());
+    Database other = createOther(db.getPluginApi().dataSource());
 
     new QPerson()
       .name.eq("Someone")
@@ -62,7 +62,7 @@ public class ClusterTest {
   public void test() throws InterruptedException {
     // ensure the default server exists first
     final Database db = DB.getDefault();
-    Database other = createOther(db.getPluginApi().getDataSource());
+    Database other = createOther(db.getPluginApi().dataSource());
 
     for (int i = 0; i < 10; i++) {
       Person foo = new Person("name " + i);

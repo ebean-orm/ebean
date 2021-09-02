@@ -355,12 +355,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public DataSource getDataSource() {
+  public DataSource dataSource() {
     return transactionManager.getDataSource();
   }
 
   @Override
-  public DataSource getReadOnlyDataSource() {
+  public DataSource readOnlyDataSource() {
     return transactionManager.getReadOnlyDataSource();
   }
 
@@ -635,7 +635,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void truncate(String... tables) {
-    try (Connection connection = getDataSource().getConnection()) {
+    try (Connection connection = dataSource().getConnection()) {
       for (String table : tables) {
         executeSql(connection, databasePlatform.truncateStatement(table));
       }

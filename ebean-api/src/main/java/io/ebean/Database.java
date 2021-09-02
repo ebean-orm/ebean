@@ -133,12 +133,28 @@ public interface Database {
   /**
    * Return the associated DataSource for this Database instance.
    */
-  DataSource getDataSource();
+  DataSource dataSource();
+
+  /**
+   * Deprecated migrate to dataSource().
+   */
+  @Deprecated
+  default DataSource getDataSource() {
+    return dataSource();
+  }
 
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
-  DataSource getReadOnlyDataSource();
+  DataSource readOnlyDataSource();
+
+  /**
+   * Deprecated migrate to readOnlyDataSource().
+   */
+  @Deprecated
+  default DataSource getReadOnlyDataSource() {
+    return readOnlyDataSource();
+  }
 
   /**
    * Return the name. This is used with {@link DB#byName(String)} to get a

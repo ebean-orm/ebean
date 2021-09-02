@@ -2,7 +2,6 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -24,7 +23,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    DataSource dataSource = DB.getDefault().getDataSource();
+    DataSource dataSource = DB.getDefault().dataSource();
 
     try (Connection connection = dataSource.getConnection()) {
 

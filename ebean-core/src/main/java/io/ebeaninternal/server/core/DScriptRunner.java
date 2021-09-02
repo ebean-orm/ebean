@@ -102,7 +102,7 @@ final class DScriptRunner implements ScriptRunner {
 
   private Connection obtainConnection() {
     try {
-      return server.getDataSource().getConnection();
+      return server.dataSource().getConnection();
     } catch (SQLException e) {
       throw new PersistenceException("Failed to obtain connection to run script", e);
     }

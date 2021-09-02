@@ -277,7 +277,7 @@ public class QCustomerTest {
     cust.setStatus(Customer.Status.GOOD);
     cust.save();
 
-    DataSource dataSource = DB.getDefault().getDataSource();
+    DataSource dataSource = DB.getDefault().dataSource();
 
     try (Connection connection = dataSource.getConnection()) {
 
