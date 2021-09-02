@@ -1238,8 +1238,16 @@ public final class DB {
   /**
    * Return the value of the Id property for a given bean.
    */
-  public static Object getBeanId(Object bean) {
+  public static Object beanId(Object bean) {
     return getDefault().beanId(bean);
+  }
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
+  public static Object getBeanId(Object bean) {
+    return beanId(bean);
   }
 
   /**

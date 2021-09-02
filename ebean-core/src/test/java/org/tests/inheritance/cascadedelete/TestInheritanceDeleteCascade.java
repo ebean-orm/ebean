@@ -19,8 +19,8 @@ public class TestInheritanceDeleteCascade extends BaseTestCase {
     DB.save(referencingBean);
     DB.delete(referencingBean);
 
-    assertNull(DB.find(RootBean.class, DB.getBeanId(bean1)));
-    assertNull(DB.find(RootBean.class, DB.getBeanId(bean2)));
+    assertNull(DB.find(RootBean.class, DB.beanId(bean1)));
+    assertNull(DB.find(RootBean.class, DB.beanId(bean2)));
   }
 
 }
