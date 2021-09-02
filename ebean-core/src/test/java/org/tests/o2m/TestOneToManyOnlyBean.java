@@ -33,7 +33,7 @@ public class TestOneToManyOnlyBean extends BaseTestCase {
   @Test
   public void isReference_when_getReference_expectTrue() {
 
-    OMVertex myBean = DB.getReference(OMVertex.class, UUID.randomUUID());
+    OMVertex myBean = DB.reference(OMVertex.class, UUID.randomUUID());
     assertTrue(isReference(myBean));
   }
 

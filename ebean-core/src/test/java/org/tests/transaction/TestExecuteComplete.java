@@ -27,7 +27,7 @@ public class TestExecuteComplete extends BaseTestCase {
     try {
       DB.execute(TxScope.required().setBatch(PersistBatch.ALL), () -> {
 
-        Customer customer = DB.getReference(Customer.class, 42424242L);
+        Customer customer = DB.reference(Customer.class, 42424242L);
         Order order = new Order();
         order.setCustomer(customer);
 
@@ -48,7 +48,7 @@ public class TestExecuteComplete extends BaseTestCase {
       DB.execute(TxScope.required().setBatch(PersistBatch.ALL), () ->
       DB.execute(() -> {
 
-          Customer customer = DB.getReference(Customer.class, 42424242L);
+          Customer customer = DB.reference(Customer.class, 42424242L);
           Order order = new Order();
           order.setCustomer(customer);
 
@@ -75,7 +75,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
   @Transactional(batchSize = 10)
   private void errorOnCommit() {
-    Customer customer = DB.getReference(Customer.class, 42424242L);
+    Customer customer = DB.reference(Customer.class, 42424242L);
     Order order = new Order();
     order.setCustomer(customer);
 

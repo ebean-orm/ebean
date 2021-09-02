@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.tests.model.m2m.MnyEdge;
-import org.tests.model.m2m.MnyNode;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
@@ -108,8 +106,8 @@ public class TestM2MWithWhere extends BaseTestCase {
       sb.append("from = ").append(from).append(" |");
       for (int to = 1; to <= 5; to++) {
         MnyEdge edge = new MnyEdge();
-        edge.setFrom(DB.getReference(MnyNode.class, from));
-        edge.setTo(DB.getReference(MnyNode.class, to));
+        edge.setFrom(DB.reference(MnyNode.class, from));
+        edge.setTo(DB.reference(MnyNode.class, to));
         int flags = 0;
         if (from < to) {
           flags |= 1;
@@ -125,7 +123,7 @@ public class TestM2MWithWhere extends BaseTestCase {
     }
     // System.out.println(sb); dump the table
   }
-  
+
 
   @Test
   public void testWithDbTableName() {

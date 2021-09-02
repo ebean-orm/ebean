@@ -85,7 +85,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     // make m2 dirty ... cascades to an update on Uim
     m2.setFoodPreference("Apple");
     trainer.getMonkeys().add(m2);
-    trainer.getMonkeys().add(DB.getReference(JtMonkey.class, m1.getMid()));
+    trainer.getMonkeys().add(DB.reference(JtMonkey.class, m1.getMid()));
     trainer.getMonkeys().add(new JtMonkey("FAlp"));
     trainer.getMonkeys().add(new JtMonkey("FBet"));
     trainer.getMonkeys().add(new JtMonkey("FThe"));

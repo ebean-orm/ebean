@@ -71,7 +71,7 @@ public class TestQueryForUpdatePostgresLock extends BaseTestCase {
     log.info("insert start");
     timePreInsert = System.currentTimeMillis();
     Section section = new Section();
-    section.setArticle(DB.getReference(Article.class, id));
+    section.setArticle(DB.reference(Article.class, id));
     DB.save(section);
     timePostInsert = System.currentTimeMillis();
     log.info("inserted");

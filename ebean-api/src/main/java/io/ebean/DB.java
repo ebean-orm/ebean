@@ -658,8 +658,16 @@ public final class DB {
    * @param beanType the type of entity bean
    * @param id       the id value
    */
-  public static <T> T getReference(Class<T> beanType, Object id) {
+  public static <T> T reference(Class<T> beanType, Object id) {
     return getDefault().reference(beanType, id);
+  }
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
+  public static <T> T getReference(Class<T> beanType, Object id) {
+    return reference(beanType, id);
   }
 
   /**
@@ -668,14 +676,12 @@ public final class DB {
    * <ul>
    * <li>asc - ascending order (which is the default)</li>
    * <li>desc - Descending order</li>
-   * <li>nullsHigh - Treat null values as high/large values (which is the
-   * default)</li>
+   * <li>nullsHigh - Treat null values as high/large values (which is the default)</li>
    * <li>nullsLow- Treat null values as low/very small values</li>
    * </ul>
    * <p>
    * If you leave off any keywords the defaults are ascending order and treating
    * nulls as high values.
-   * </p>
    * <p>
    * Note that the sorting uses a Comparator and Collections.sort(); and does
    * not invoke a DB query.
