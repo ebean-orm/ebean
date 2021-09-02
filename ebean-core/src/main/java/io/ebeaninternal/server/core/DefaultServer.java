@@ -350,7 +350,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public AutoTune getAutoTune() {
+  public AutoTune autoTune() {
     return autoTuneService;
   }
 

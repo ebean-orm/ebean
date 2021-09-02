@@ -117,7 +117,7 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
   private static void collectUsage() {
 
-    DB.getDefault().getAutoTune().collectProfiling();
+    DB.getDefault().autoTune().collectProfiling();
   }
 
 }

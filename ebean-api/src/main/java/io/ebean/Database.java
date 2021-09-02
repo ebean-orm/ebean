@@ -120,7 +120,15 @@ public interface Database {
   /**
    * Return AutoTune which is used to control the AutoTune service at runtime.
    */
-  AutoTune getAutoTune();
+  AutoTune autoTune();
+
+  /**
+   * Deprecated migrate to autoTune().
+   */
+  @Deprecated
+  default AutoTune getAutoTune() {
+    return autoTune();
+  }
 
   /**
    * Return the associated DataSource for this Database instance.

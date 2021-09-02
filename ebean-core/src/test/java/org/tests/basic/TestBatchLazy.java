@@ -32,8 +32,8 @@ public class TestBatchLazy extends BaseTestCase {
       }
     }
 
-    Ebean.getDefaultServer().getAutoTune().collectProfiling();
-    Ebean.getDefaultServer().getAutoTune().reportProfiling();
+    Ebean.getDefaultServer().autoTune().collectProfiling();
+    Ebean.getDefaultServer().autoTune().reportProfiling();
 
   }
 

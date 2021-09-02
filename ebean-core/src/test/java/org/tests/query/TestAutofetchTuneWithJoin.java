@@ -68,7 +68,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
   private static void collectUsage() {
 
-    Ebean.getDefaultServer().getAutoTune().collectProfiling();
+    Ebean.getDefaultServer().autoTune().collectProfiling();
   }
 
 }

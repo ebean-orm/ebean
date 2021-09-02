@@ -333,7 +333,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public AutoTune getAutoTune() {
+  public AutoTune autoTune() {
     return null;
   }
 
