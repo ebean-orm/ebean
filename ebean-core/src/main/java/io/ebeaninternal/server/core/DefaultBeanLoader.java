@@ -129,7 +129,7 @@ final class DefaultBeanLoader {
    * Load a batch of beans for +query or +lazy loading.
    */
   void loadBean(LoadBeanRequest loadRequest) {
-    List<EntityBeanIntercept> batch = loadRequest.getBatch();
+    List<EntityBeanIntercept> batch = loadRequest.batch();
     if (batch.isEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
@@ -140,7 +140,7 @@ final class DefaultBeanLoader {
       return;
     }
 
-    SpiQuery<?> query = server.createQuery(loadRequest.getBeanType());
+    SpiQuery<?> query = server.createQuery(loadRequest.beanType());
     loadRequest.configureQuery(query, idList);
     List<?> list = executeQuery(loadRequest, query);
     loadRequest.postLoad(list);
@@ -159,7 +159,7 @@ final class DefaultBeanLoader {
         extraTxn.end();
       }
     } else {
-      return server.findList(query, loadRequest.getTransaction());
+      return server.findList(query, loadRequest.transaction());
     }
   }
 

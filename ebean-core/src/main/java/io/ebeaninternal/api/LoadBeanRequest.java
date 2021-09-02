@@ -47,7 +47,7 @@ public final class LoadBeanRequest extends LoadRequest {
   }
 
   @Override
-  public Class<?> getBeanType() {
+  public Class<?> beanType() {
     return loadBuffer.getBeanDescriptor().getBeanType();
   }
 
@@ -58,19 +58,8 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Return the batch of beans to actually load.
    */
-  public List<EntityBeanIntercept> getBatch() {
+  public List<EntityBeanIntercept> batch() {
     return batch;
-  }
-
-  /**
-   * Return the load context.
-   */
-  private LoadBeanBuffer getLoadContext() {
-    return loadBuffer;
-  }
-
-  public int getBatchSize() {
-    return getLoadContext().getBatchSize();
   }
 
   /**
@@ -93,7 +82,7 @@ public final class LoadBeanRequest extends LoadRequest {
     query.setPersistenceContext(loadBuffer.getPersistenceContext());
     query.setLoadDescription(lazy ? "+lazy" : "+query", description());
     if (lazy) {
-      query.setLazyLoadBatchSize(getBatchSize());
+      query.setLazyLoadBatchSize(loadBuffer.getBatchSize());
       if (alreadyLoaded) {
         query.setBeanCacheMode(CacheMode.OFF);
       }

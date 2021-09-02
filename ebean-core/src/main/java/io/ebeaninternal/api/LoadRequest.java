@@ -12,7 +12,7 @@ public abstract class LoadRequest {
   protected final Transaction transaction;
   protected final boolean lazy;
 
-  public LoadRequest(OrmQueryRequest<?> parentRequest, boolean lazy) {
+  LoadRequest(OrmQueryRequest<?> parentRequest, boolean lazy) {
     this.parentRequest = parentRequest;
     this.transaction = parentRequest == null ? null : parentRequest.getTransaction();
     this.lazy = lazy;
@@ -21,7 +21,7 @@ public abstract class LoadRequest {
   /**
    * Return the associated bean type for this load request.
    */
-  public abstract Class<?> getBeanType();
+  public abstract Class<?> beanType();
 
   /**
    * Return true if this is a lazy load and false if it is a secondary query.
@@ -36,7 +36,7 @@ public abstract class LoadRequest {
    * Lazy loading queries run in their own transaction.
    * </p>
    */
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return transaction;
   }
 
