@@ -1201,7 +1201,7 @@ public final class Ebean {
    * </p>
    */
   public static BeanState getBeanState(Object bean) {
-    return getDefault().getBeanState(bean);
+    return getDefault().beanState(bean);
   }
 
   /**

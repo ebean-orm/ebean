@@ -363,7 +363,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public BeanState getBeanState(Object bean) {
+  public BeanState beanState(Object bean) {
     return null;
   }
 

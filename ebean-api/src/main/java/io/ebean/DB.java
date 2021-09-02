@@ -1239,8 +1239,16 @@ public final class DB {
    * This will return null if the bean is not an enhanced entity bean.
    * </p>
    */
+  public static BeanState beanState(Object bean) {
+    return getDefault().beanState(bean);
+  }
+
+  /**
+   * Deprecated migrate to beanState().
+   */
+  @Deprecated
   public static BeanState getBeanState(Object bean) {
-    return getDefault().getBeanState(bean);
+    return beanState(bean);
   }
 
   /**

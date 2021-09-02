@@ -92,7 +92,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     found.setName("p1-mod");
     found.setBeanList(null);
 
-    BeanState state = DB.getBeanState(found);
+    BeanState state = DB.beanState(found);
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("name", "beanList");
 
     ValuePair pair = state.getDirtyValues().get("name");
@@ -115,12 +115,12 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
       .extracting(Map.Entry::toString)
       .containsExactlyInAnyOrder("beanList=null,[name:a]","name=p1-mod,p1","version=2,1");
 
-    assertThat(DB.getBeanState(found).isDirty()).isFalse();
+    assertThat(DB.beanState(found).isDirty()).isFalse();
 
     found.getPlainBean().setName("b");
-    assertThat(DB.getBeanState(found).isDirty()).isTrue();
+    assertThat(DB.beanState(found).isDirty()).isTrue();
 
-    state = DB.getBeanState(found);
+    state = DB.beanState(found);
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainBean");
     pair = state.getDirtyValues().get("plainBean");
     assertThat(pair.getNewValue()).hasToString("name:b");
@@ -153,7 +153,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     final EBasicJsonList found = DB.find(EBasicJsonList.class, bean.getId());
     found.getBeanList().get(0).setName("p1-mod");
 
-    BeanState state = DB.getBeanState(found);
+    BeanState state = DB.beanState(found);
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
   }
 
@@ -169,7 +169,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     bean.setPlainValue2(contentBean2);
     bean.setPlainValue3(contentBean3);
 
-    BeanState state = DB.getBeanState(bean);
+    BeanState state = DB.beanState(bean);
     // a new bean is not considered as dirty (thus have no changed props)
     assertThat(state.isDirty()).isFalse();
     assertThat(state.isNewOrDirty()).isTrue();
@@ -178,7 +178,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     bean.save();
 
     bean = DB.find(EBasicJsonJackson3.class, bean.getId());
-    state = DB.getBeanState(bean);
+    state = DB.beanState(bean);
     // a fresh loaded bean is also not considered as dirty
     assertThat(state.isDirty()).isFalse();
     assertThat(state.isNewOrDirty()).isFalse();
@@ -222,19 +222,19 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     LoggedSql.stop();
   }
-  
+
   @Test
   public void push_pop_test() {
-    
+
     EBasicJsonMulti bean = new EBasicJsonMulti();
     bean.setPlainValue2(new PlainBeanDirtyAware("x", 42));
     bean.save();
-    
+
     bean = DB.find(EBasicJsonMulti.class, bean.getId());
     bean.setPlainValue1(null); // already null
     bean.setPlainValue2(null);
     bean.setPlainValue3(null); // already null
-    BeanState state = DB.getBeanState(bean);
+    BeanState state = DB.beanState(bean);
     assertThat(state.getDirtyValues()).hasSize(1).containsKey("plainValue2");
   }
 

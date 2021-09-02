@@ -29,7 +29,7 @@ public class TestDynamicUpdate extends BaseTestCase {
 
     b2.getEmbeddable().setDescription("ABC");
 
-    BeanState beanState = server.getBeanState(b2);
+    BeanState beanState = server.beanState(b2);
     boolean dirty = beanState.isDirty();
     Assert.assertTrue(dirty);
 

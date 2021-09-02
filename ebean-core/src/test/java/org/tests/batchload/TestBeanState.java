@@ -29,7 +29,7 @@ public class TestBeanState extends BaseTestCase {
       .setUseCache(false)
       .findOne();
 
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     assertFalse(beanState.isNew());
     assertFalse(beanState.isDirty());
     assertFalse(beanState.isNewOrDirty());
@@ -67,7 +67,7 @@ public class TestBeanState extends BaseTestCase {
       .setUseCache(false)
       .findOne();
 
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     beanState.setDisableLazyLoad(true);
     assertNull(customer.getName());
   }
@@ -79,7 +79,7 @@ public class TestBeanState extends BaseTestCase {
 
     Customer customer = DB.find(Customer.class).order("id").setMaxRows(1).findOne();
 
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     assertThat(beanState.getChangedProps()).isEmpty();
 
     customer.setContacts(new ArrayList<>());
@@ -91,7 +91,7 @@ public class TestBeanState extends BaseTestCase {
 
     Customer customer = new Customer();
 
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     assertThat(beanState.getChangedProps()).isEmpty();
 
     // when new state, then loaded
@@ -112,7 +112,7 @@ public class TestBeanState extends BaseTestCase {
     Customer customer = new Customer();
     customer.setContacts(new ArrayList<>());
 
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     beanState.setLoaded();
     beanState.setReadOnly(true);
 
@@ -127,7 +127,7 @@ public class TestBeanState extends BaseTestCase {
     Customer customer = new Customer();
     customer.setName("a");
 
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     beanState.setLoaded();
     beanState.setReadOnly(true);
 

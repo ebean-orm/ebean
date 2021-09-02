@@ -227,7 +227,7 @@ public class TestQueryCache extends BaseTestCase {
     Assert.assertTrue(bc.isReadOnly());
     Assert.assertFalse(bc.isEmpty());
     Assert.assertTrue(!list.isEmpty());
-    Assert.assertTrue(DB.getBeanState(list.get(0)).isReadOnly());
+    Assert.assertTrue(DB.beanState(list.get(0)).isReadOnly());
 
     List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
       .ilike("name", "Rob").findList();

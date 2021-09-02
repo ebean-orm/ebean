@@ -216,7 +216,7 @@ public class TestDbJson_List extends BaseTestCase {
       .setAllowLoadErrors() // allow invalid JSON content
       .findOne();
 
-    Map<String, Exception> errors = server().getBeanState(bean).getLoadErrors();
+    Map<String, Exception> errors = server().beanState(bean).getLoadErrors();
 
     assertThat(errors).containsKey("beanMap").hasSize(1);
     assertThat(errors.values().iterator().next())

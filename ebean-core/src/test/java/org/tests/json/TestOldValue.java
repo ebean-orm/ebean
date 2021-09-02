@@ -18,8 +18,8 @@ import java.util.Set;
 
 public class TestOldValue extends BaseTestCase {
 
-  
-  
+
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
   public void testDbJsonOldValue() throws Exception {
@@ -35,9 +35,9 @@ public class TestOldValue extends BaseTestCase {
     bean.getIntList().add(2);
     bean.getIntSet().add(1002);
     bean.getIntMap().put("ik1",2002);
-    
+
     bean.setJsonNode(jnf.arrayNode().add("Foo"));
-    
+
     DB.save(bean);
     bean = DB.find(EBasicOldValue.class, bean.getId());
 
@@ -51,8 +51,8 @@ public class TestOldValue extends BaseTestCase {
     bean.getIntSet().add(1006);
     bean.getIntMap().put("ik2",2006);
     ((ArrayNode)bean.getJsonNode()).add("Bar");
-    
-    Map<String, ValuePair> dirty = DB.getBeanState(bean).getDirtyValues();
+
+    Map<String, ValuePair> dirty = DB.beanState(bean).getDirtyValues();
     SoftAssertions softly = new SoftAssertions();
     softly.assertThat(dirty).hasSize(10);
 
@@ -83,7 +83,7 @@ public class TestOldValue extends BaseTestCase {
     softly.assertAll();
 
   }
-  
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
   @Ignore("Old value detection does not work for @DbArray")
@@ -91,16 +91,16 @@ public class TestOldValue extends BaseTestCase {
     EBasicOldValue bean = new EBasicOldValue();
 
     bean.getStringArr().add("sa1");
-  
+
 
     DB.save(bean);
     bean = DB.find(EBasicOldValue.class, bean.getId());
 
     bean.getStringArr().add("sa2");
-    
 
-    
-    Map<String, ValuePair> dirty = DB.getBeanState(bean).getDirtyValues();
+
+
+    Map<String, ValuePair> dirty = DB.beanState(bean).getDirtyValues();
     SoftAssertions softly = new SoftAssertions();
     softly.assertThat(dirty).hasSize(1);
 

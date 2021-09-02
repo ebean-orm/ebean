@@ -30,7 +30,7 @@ public class TestTransient extends BaseTestCase {
 
     assertNotNull(c);
 
-    BeanState beanState = DB.getBeanState(c);
+    BeanState beanState = DB.beanState(c);
     assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
 
     c.getLock().tryLock();

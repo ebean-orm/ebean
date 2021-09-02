@@ -91,7 +91,7 @@ public class BeanPostLoadTest extends BaseTestCase {
     public void postLoad(Object bean) {
       this.methodsCalled.add("postLoad");
       this.bean = bean;
-      this.beanState = DB.getBeanState(bean);
+      this.beanState = DB.beanState(bean);
     }
 
   }

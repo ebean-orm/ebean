@@ -272,7 +272,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
   }
 
   private boolean containsContacts(Customer cust) {
-    return DB.getBeanState(cust).getLoadedProps().contains("contacts");
+    return DB.beanState(cust).getLoadedProps().contains("contacts");
   }
 
   /**

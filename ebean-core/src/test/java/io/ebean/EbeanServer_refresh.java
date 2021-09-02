@@ -40,10 +40,10 @@ public class EbeanServer_refresh {
     assertEquals(rows, 1);
 
     basic.setName("modify");
-    assertTrue(DB.getBeanState(basic).isDirty());
+    assertTrue(DB.beanState(basic).isDirty());
     server.refresh(basic);
     assertEquals(basic.getStatus(), EBasic.Status.ACTIVE);
-    assertFalse(DB.getBeanState(basic).isDirty());
+    assertFalse(DB.beanState(basic).isDirty());
   }
 
   @Test

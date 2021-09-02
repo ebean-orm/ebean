@@ -30,31 +30,31 @@ public class BeanDescriptorTest extends BaseTestCase {
 
     Customer bean = customerDesc.createReference(null, false, 42, null);
     assertThat(bean.getId()).isEqualTo(42);
-    assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
+    assertThat(server().beanState(bean).isReadOnly()).isFalse();
   }
 
   @Test
   public void createReference_whenReadOnly() {
 
     Customer bean = customerDesc.createReference(Boolean.TRUE, false, 42, null);
-    assertThat(server().getBeanState(bean).isReadOnly()).isTrue();
+    assertThat(server().beanState(bean).isReadOnly()).isTrue();
   }
 
   @Test
   public void createReference_whenNotReadOnly() {
 
     Customer bean = customerDesc.createReference(Boolean.FALSE, false, 42, null);
-    assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
+    assertThat(server().beanState(bean).isReadOnly()).isFalse();
 
     bean = customerDesc.createReference(42, null);
-    assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
+    assertThat(server().beanState(bean).isReadOnly()).isFalse();
   }
 
   @Test
   public void createReference_when_disabledLazyLoad() {
 
     Customer bean = customerDesc.createReference(Boolean.FALSE, true, 42, null);
-    assertThat(server().getBeanState(bean).isDisableLazyLoad()).isTrue();
+    assertThat(server().beanState(bean).isDisableLazyLoad()).isTrue();
   }
 
   @Test

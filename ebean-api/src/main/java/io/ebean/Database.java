@@ -243,7 +243,15 @@ public interface Database {
    * This will return null if the bean is not an enhanced entity bean.
    * </p>
    */
-  BeanState getBeanState(Object bean);
+  BeanState beanState(Object bean);
+
+  /**
+   * Deprecated migrate to beanState().
+   */
+  @Deprecated
+  default BeanState getBeanState(Object bean) {
+    return beanState(bean);
+  }
 
   /**
    * Return the value of the Id property for a given bean.
