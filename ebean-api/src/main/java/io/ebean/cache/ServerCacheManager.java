@@ -44,7 +44,7 @@ public interface ServerCacheManager {
   void setAllRegionsEnabled(boolean enabled);
 
   /**
-   * Return the cache region by name. Typically to enable or disable the region.
+   * Return the cache region by name. Typically, to enable or disable the region.
    */
   ServerCacheRegion getRegion(String name);
 

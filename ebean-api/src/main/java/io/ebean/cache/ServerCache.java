@@ -19,8 +19,10 @@ import java.util.Set;
  */
 public interface ServerCache {
 
+  /**
+   * Get values for many keys.
+   */
   default Map<Object, Object> getAll(Set<Object> keys) {
-
     Map<Object, Object> map = new LinkedHashMap<>();
     for (Object key : keys) {
       Object value = get(key);
