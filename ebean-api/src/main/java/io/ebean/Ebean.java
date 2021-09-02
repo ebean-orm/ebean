@@ -1216,7 +1216,7 @@ public final class Ebean {
    * queries.
    */
   public static BackgroundExecutor getBackgroundExecutor() {
-    return getDefault().getBackgroundExecutor();
+    return getDefault().backgroundExecutor();
   }
 
   /**

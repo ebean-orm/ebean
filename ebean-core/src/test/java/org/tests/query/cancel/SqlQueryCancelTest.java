@@ -1,7 +1,6 @@
 package org.tests.query.cancel;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.SQLException;
@@ -76,7 +75,7 @@ public class SqlQueryCancelTest extends BaseTestCase {
       EBasic model = new EBasic("Basic " + i);
       DB.save(model);
     }
-    if (Platform.H2.equals(DB.getDefault().getPlatform())) {
+    if (Platform.H2.equals(DB.getDefault().platform())) {
       SlowDownEBasic.setSelectWaitMillis(0);
     }
   }

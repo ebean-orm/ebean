@@ -23,7 +23,7 @@ public class SpiServerTest extends BaseTestCase {
   public void test() {
 
     EbeanServer defaultServer = Ebean.getDefaultServer();
-    SpiServer pluginApi = defaultServer.getPluginApi();
+    SpiServer pluginApi = defaultServer.pluginApi();
 
     BeanType<Customer> beanType = pluginApi.getBeanType(Customer.class);
     assertEquals("o_customer", beanType.getBaseTable());

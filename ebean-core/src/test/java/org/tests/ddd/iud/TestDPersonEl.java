@@ -23,7 +23,7 @@ public class TestDPersonEl {
 
     Currency NZD = Currency.getInstance("NZD");
     assertThat(NZD).isNotNull();
-    
+
     DPerson p = new DPerson();
     p.setFirstName("first");
     p.setLastName("last");
@@ -31,7 +31,7 @@ public class TestDPersonEl {
 
     Ebean.save(p);
 
-    SpiServer server = Ebean.getDefaultServer().getPluginApi();
+    SpiServer server = Ebean.getDefaultServer().pluginApi();
 
     BeanType<DPerson> descriptor = server.getBeanType(DPerson.class);
 

@@ -25,7 +25,7 @@ public class PlatformDdl_CreateIndexTest {
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   {
-    DatabaseConfig config = DB.getDefault().getPluginApi().getServerConfig();
+    DatabaseConfig config = DB.getDefault().pluginApi().getServerConfig();
     h2Ddl.configure(config);
     pgDdl.configure(config);
     mysqlDdl.configure(config);

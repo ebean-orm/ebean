@@ -28,7 +28,7 @@ public class BeanTypeTest {
   private static Database db = DB.getDefault();
 
   private <T> BeanType<T> beanType(Class<T> cls) {
-    return db.getPluginApi().getBeanType(cls);
+    return db.pluginApi().getBeanType(cls);
   }
 
   @Test

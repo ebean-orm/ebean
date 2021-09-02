@@ -143,12 +143,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public Platform getPlatform() {
+  public Platform platform() {
     return Platform.GENERIC;
   }
 
   @Override
-  public SpiServer getPluginApi() {
+  public SpiServer pluginApi() {
     return null;
   }
 
@@ -924,7 +924,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public BackgroundExecutor getBackgroundExecutor() {
+  public BackgroundExecutor backgroundExecutor() {
     return null;
   }
 

@@ -20,7 +20,7 @@ public class DocStoreIndexEventTest {
   static EbeanServer server = Ebean.getDefaultServer();
 
   <T> BeanType<T> beanType(Class<T> cls) {
-    return server.getPluginApi().getBeanType(cls);
+    return server.pluginApi().getBeanType(cls);
   }
 
   BeanType<Order> orderType() {

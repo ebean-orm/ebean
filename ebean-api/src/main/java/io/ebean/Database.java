@@ -214,12 +214,28 @@ public interface Database {
    *
    * @return platform for this database instance
    */
-  Platform getPlatform();
+  Platform platform();
+
+  /**
+   * Deprecated migrate to platform().
+   */
+  @Deprecated
+  default Platform getPlatform() {
+    return platform();
+  }
 
   /**
    * Return the extended API intended for use by plugins.
    */
-  SpiServer getPluginApi();
+  SpiServer pluginApi();
+
+  /**
+   * Deprecated migrate to pluginApi().
+   */
+  @Deprecated
+  default SpiServer getPluginApi() {
+    return pluginApi();
+  }
 
   /**
    * Return the BeanState for a given entity bean.
@@ -1485,7 +1501,15 @@ public interface Database {
    * Return the BackgroundExecutor service for asynchronous processing of
    * queries.
    */
-  BackgroundExecutor getBackgroundExecutor();
+  BackgroundExecutor backgroundExecutor();
+
+  /**
+   * Deprecated migrate to backgroundExecutor().
+   */
+  @Deprecated
+  default BackgroundExecutor getBackgroundExecutor() {
+    return backgroundExecutor();
+  }
 
   /**
    * Return the JsonContext for reading/writing JSON.

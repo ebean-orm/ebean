@@ -20,7 +20,7 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    BeanType<EAddr> embType = Ebean.getDefaultServer().getPluginApi().getBeanType(EAddr.class);
+    BeanType<EAddr> embType = Ebean.getDefaultServer().pluginApi().getBeanType(EAddr.class);
 
     Ebean.getDefaultServer().getServerCacheManager().clearAll();
 

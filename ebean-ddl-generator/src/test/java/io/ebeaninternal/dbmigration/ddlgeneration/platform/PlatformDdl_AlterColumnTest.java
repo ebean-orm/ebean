@@ -33,7 +33,7 @@ public class PlatformDdl_AlterColumnTest {
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   {
-    DatabaseConfig serverConfig = DB.getDefault().getPluginApi().getServerConfig();
+    DatabaseConfig serverConfig = DB.getDefault().pluginApi().getServerConfig();
     sqlServerDdl.configure(serverConfig);
   }
 

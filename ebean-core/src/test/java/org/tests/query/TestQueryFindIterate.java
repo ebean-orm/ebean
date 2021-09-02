@@ -232,7 +232,7 @@ public class TestQueryFindIterate extends BaseTestCase {
   public void findIterateCloseConnection(boolean withLoadBatch) {
     ResetBasicData.reset();
 
-    SpiServer pluginApi = server().getPluginApi();
+    SpiServer pluginApi = server().pluginApi();
     DataSourcePool dsPool = (DataSourcePool) pluginApi.getServerConfig().getReadOnlyDataSource();
     if (dsPool == null) {
       dsPool = (DataSourcePool) server().dataSource();

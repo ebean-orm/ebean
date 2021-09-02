@@ -1254,7 +1254,7 @@ public final class DB {
    * queries.
    */
   public static BackgroundExecutor getBackgroundExecutor() {
-    return getDefault().getBackgroundExecutor();
+    return getDefault().backgroundExecutor();
   }
 
   /**

@@ -16,7 +16,7 @@ public class DefaultChangeLogListenerTest extends BaseTestCase {
     DefaultChangeLogListener changeLogListener = new DefaultChangeLogListener();
 
     EbeanServer defaultServer = Ebean.getDefaultServer();
-    changeLogListener.configure(defaultServer.getPluginApi());
+    changeLogListener.configure(defaultServer.pluginApi());
 
     ChangeSet changeSet = helper.createChangeSet("INT-001", 13);
 

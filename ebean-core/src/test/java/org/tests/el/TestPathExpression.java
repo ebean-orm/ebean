@@ -20,7 +20,7 @@ public class TestPathExpression {
   final ExpressionPath city;
 
   public TestPathExpression() {
-    SpiServer server = Ebean.getDefaultServer().getPluginApi();
+    SpiServer server = Ebean.getDefaultServer().pluginApi();
     beanType = server.getBeanType(Customer.class);
     billingId = beanType.getExpressionPath("billingAddress.id");
     line1 = beanType.getExpressionPath("billingAddress.line1");

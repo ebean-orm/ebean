@@ -26,7 +26,7 @@ public class SqlServerStepSequenceTest extends BaseTestCase {
     server().sqlUpdate("drop sequence if exists sqls_testseq_9876").execute();
     server().sqlUpdate("create sequence sqls_testseq_9876 start with 1 increment by 50").execute();
 
-    BackgroundExecutor be = server().getBackgroundExecutor();
+    BackgroundExecutor be = server().backgroundExecutor();
     DataSource ds = server().dataSource();
 
     SqlServerStepSequence s = new SqlServerStepSequence(be, ds, "sqls_testseq_9876", 50);

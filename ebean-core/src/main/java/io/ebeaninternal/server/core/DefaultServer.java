@@ -330,17 +330,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Platform getPlatform() {
+  public Platform platform() {
     return databasePlatform.getPlatform();
   }
 
   @Override
-  public SpiServer getPluginApi() {
+  public SpiServer pluginApi() {
     return this;
   }
 
   @Override
-  public BackgroundExecutor getBackgroundExecutor() {
+  public BackgroundExecutor backgroundExecutor() {
     return backgroundExecutor;
   }
 

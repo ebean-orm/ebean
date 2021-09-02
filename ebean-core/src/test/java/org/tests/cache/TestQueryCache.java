@@ -300,7 +300,7 @@ public class TestQueryCache extends BaseTestCase {
 
   @Test
   public void findCountDifferentQueriesBit() {
-    DB.getDefault().getPluginApi().getServerCacheManager().clearAll();
+    DB.getDefault().pluginApi().getServerCacheManager().clearAll();
     differentFindCount(q->q.bitwiseAny("id",1), q->q.bitwiseAny("id",0));
     differentFindCount(q->q.bitwiseAll("id",1), q->q.bitwiseAll("id",0));
     // differentFindCount(q->q.bitwiseNot("id",1), q->q.bitwiseNot("id",0)); NOT 1 == AND 1 = 0

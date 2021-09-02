@@ -15,7 +15,7 @@ public class TestShutdownWithBackgroundTasks extends BaseTestCase {
   public void test() {
 
     Database server = DB.getDefault();
-    final BackgroundExecutor bg = server.getBackgroundExecutor();
+    final BackgroundExecutor bg = server.backgroundExecutor();
     try {
       for (int i = 0; i < 12; i++) {
         bg.execute(new Job(server, 500, i));
