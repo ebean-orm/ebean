@@ -345,7 +345,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ExpressionFactory getExpressionFactory() {
+  public ExpressionFactory expressionFactory() {
     return expressionFactory;
   }
 

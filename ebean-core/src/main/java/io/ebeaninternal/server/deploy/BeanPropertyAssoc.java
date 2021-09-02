@@ -229,7 +229,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * We use target descriptor rather than target property type to support ElementCollection.
    */
   public SpiQuery<T> newQuery(SpiEbeanServer server) {
-    return new DefaultOrmQuery<>(targetDescriptor, server, server.getExpressionFactory());
+    return new DefaultOrmQuery<>(targetDescriptor, server, server.expressionFactory());
   }
 
   @Override

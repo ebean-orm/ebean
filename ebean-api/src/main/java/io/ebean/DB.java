@@ -127,7 +127,7 @@ public final class DB {
    * </p>
    */
   public static ExpressionFactory getExpressionFactory() {
-    return getDefault().getExpressionFactory();
+    return getDefault().expressionFactory();
   }
 
   /**

@@ -1793,7 +1793,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * We actually need to do a query because we don't know the type without the discriminator value.
    */
   private T findReferenceBean(Object id, PersistenceContext pc) {
-    DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.getExpressionFactory());
+    DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.expressionFactory());
     query.setPersistenceContext(pc);
     return query.setId(id).findOne();
   }

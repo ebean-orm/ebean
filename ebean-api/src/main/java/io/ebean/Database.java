@@ -173,7 +173,15 @@ public interface Database {
   /**
    * Return the ExpressionFactory for this database.
    */
-  ExpressionFactory getExpressionFactory();
+  ExpressionFactory expressionFactory();
+
+  /**
+   * Deprecated migrate to expressionFactory().
+   */
+  @Deprecated
+  default ExpressionFactory getExpressionFactory() {
+    return expressionFactory();
+  }
 
   /**
    * Return the MetaInfoManager which is used to get meta data from the Database

@@ -103,7 +103,7 @@ public final class Ebean {
    * </p>
    */
   public static ExpressionFactory getExpressionFactory() {
-    return getDefault().getExpressionFactory();
+    return getDefault().expressionFactory();
   }
 
   /**

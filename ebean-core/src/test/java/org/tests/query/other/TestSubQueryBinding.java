@@ -17,7 +17,7 @@ public class TestSubQueryBinding extends BaseTestCase {
 
     Query<Customer> someCustomerIds = server.find(Customer.class).select("id").where().lt("id", 5).query();
 
-    Expression someCustIdsExpression = server.getExpressionFactory().in("id", someCustomerIds);
+    Expression someCustIdsExpression = server.expressionFactory().in("id", someCustomerIds);
 
     Query<Customer> query = server.find(Customer.class).where().like("name", "Rob%").not(someCustIdsExpression).query();
 
