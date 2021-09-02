@@ -114,6 +114,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     return queryEngine.findList(this);
   }
 
+  @Override
   public boolean next() throws SQLException {
     query.checkCancelled();
     return dataReader.next();

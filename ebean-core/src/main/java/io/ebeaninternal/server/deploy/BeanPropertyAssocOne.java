@@ -154,6 +154,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   /**
    * Return the property value as an entity bean.
    */
+  @Override
   public EntityBean getValueAsEntityBean(EntityBean owner) {
     return (EntityBean) getValue(owner);
   }
@@ -203,6 +204,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  @Override
   Object naturalKeyVal(Map<String, Object> values) {
     EntityBean bean = (EntityBean) values.get(name);
     if (bean == null) {
@@ -339,6 +341,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  @Override
   public boolean hasForeignKey() {
     return foreignKey == null || primaryKeyJoin || !foreignKey.isNoConstraint();
   }
@@ -402,6 +405,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   /**
    * Return the bean cache value for this property using original values.
    */
+  @Override
   public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
     return cacheDataConvert(ebi.getOrigValue(propertyIndex));
   }

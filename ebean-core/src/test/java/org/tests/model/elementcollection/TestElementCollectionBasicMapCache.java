@@ -96,6 +96,7 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
     LoggedSqlCollector.stop();
   }
 
+  @Override
   public boolean isPersistBatchOnCascade() {
     return ((SpiEbeanServer) Ebean.getDefaultServer()).getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }

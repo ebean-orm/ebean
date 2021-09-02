@@ -1339,6 +1339,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     return fetchInternal(path, null, FETCH_QUERY);
   }
 
+  @Override
   public Query<T> fetchCache(String path) {
     return fetchInternal(path, null, FETCH_CACHE);
   }

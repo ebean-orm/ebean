@@ -44,8 +44,4 @@ public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
     // do nothing by default
   }
 
-  /**
-   * Apply property prefix when filterMany expressions included in main query.
-   */
-  void prefixProperty(String path);
 }
