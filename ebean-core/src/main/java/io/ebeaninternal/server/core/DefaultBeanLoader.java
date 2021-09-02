@@ -147,10 +147,6 @@ final class DefaultBeanLoader {
 
     SpiQuery<?> query = server.createQuery(loadRequest.getBeanType());
     loadRequest.configureQuery(query, idList);
-    if (loadRequest.isLoadedFromCache()) {
-      query.setBeanCacheMode(CacheMode.PUT);
-    }
-
     List<?> list = executeQuery(loadRequest, query);
     loadRequest.postLoad(list);
   }

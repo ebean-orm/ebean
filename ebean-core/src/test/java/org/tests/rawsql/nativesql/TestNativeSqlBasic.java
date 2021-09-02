@@ -1,9 +1,6 @@
 package org.tests.rawsql.nativesql;
 
-import io.ebean.BaseTestCase;
-import io.ebean.BeanState;
-import io.ebean.Ebean;
-import io.ebean.Query;
+import io.ebean.*;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
@@ -157,11 +154,10 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
   @Test
   public void partialAssocIncludingOracle() {
-
     ResetBasicData.reset();
+    DB.getServerCacheManager().clearAll();
 
     String nativeSql = "select o.id, o.status, o.kcustomer_id from o_order o";
-
     List<Order> orders = Ebean.findNative(Order.class, nativeSql)
       .findList();
 

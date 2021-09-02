@@ -27,9 +27,8 @@ public class TestQueryJoin extends BaseTestCase {
     custCache.clear();
 
     Query<Order> query = Ebean.find(Order.class).select("status")
-      // .join("details","+query(10)")
-      .fetchLazy("customer", "name, status").fetch("customer.contacts").order().asc("id");
-    // .join("customer.billingAddress");
+      .fetchLazy("customer", "name, status")
+      .fetch("customer.contacts").order().asc("id");
 
     List<Order> list = query.findList();
 

@@ -1232,10 +1232,8 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
 
   @Override
   public void resetBeanCacheAutoMode(boolean findOne) {
-    if (useBeanCache == CacheMode.AUTO) {
-      if (!findOne || useQueryCache != CacheMode.OFF) {
-        useBeanCache = CacheMode.OFF;
-      }
+    if (useBeanCache == CacheMode.AUTO && useQueryCache != CacheMode.OFF) {
+      useBeanCache = CacheMode.OFF;
     }
   }
 
