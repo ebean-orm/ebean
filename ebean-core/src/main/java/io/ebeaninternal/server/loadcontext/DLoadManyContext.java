@@ -177,7 +177,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return context.serverName;
     }
 
