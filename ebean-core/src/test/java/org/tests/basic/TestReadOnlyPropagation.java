@@ -37,7 +37,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
 
     Address billingAddress = customer.getBillingAddress();
     assertNotNull(billingAddress);
-    //Assert.assertTrue(Ebean.getBeanState(billingAddress).isReadOnly());
+    Assert.assertTrue(DB.getBeanState(billingAddress).isReadOnly());
 
 
     List<OrderDetail> details = order.getDetails();
