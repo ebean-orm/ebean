@@ -660,7 +660,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> T getReference(Class<T> beanType, Object id) {
+  public <T> T reference(Class<T> beanType, Object id) {
     return null;
   }
 

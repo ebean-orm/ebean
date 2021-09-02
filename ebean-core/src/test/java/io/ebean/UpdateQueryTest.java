@@ -174,7 +174,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     EbeanServer server = server();
 
-    Country nz = server.getReference(Country.class, "NZ");
+    Country nz = server.reference(Country.class, "NZ");
 
     UpdateQuery<Customer> update = server.update(Customer.class);
     Query<Customer> query = update
@@ -198,7 +198,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     EbeanServer server = server();
 
-    Country nz = server.getReference(Country.class, "NZ");
+    Country nz = server.reference(Country.class, "NZ");
 
     LoggedSqlCollector.start();
 

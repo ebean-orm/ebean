@@ -35,7 +35,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order1 = new Order();
     order1.setId(12);
     order1.setCretime(new Timestamp(firstTime));
-    order1.setCustomer(server.getReference(Customer.class, 1234));
+    order1.setCustomer(server.reference(Customer.class, 1234));
     order1.setStatus(Status.NEW);
     order1.setShipDate(new Date(firstTime));
     order1.setOrderDate(new Date(firstTime));
@@ -51,7 +51,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order2 = new Order();
     order2.setId(14);
     order2.setCretime(new Timestamp(secondTime));
-    order2.setCustomer(server.getReference(Customer.class, 2133));
+    order2.setCustomer(server.reference(Customer.class, 2133));
     order2.setStatus(Status.COMPLETE);
     order2.setShipDate(new Date(secondTime));
     order2.setOrderDate(new Date(secondTime));
@@ -77,7 +77,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order2 = new Order();
     order2.setId(14);
     order2.setCretime(new Timestamp(secondTime));
-    order2.setCustomer(server.getReference(Customer.class, 2133));
+    order2.setCustomer(server.reference(Customer.class, 2133));
     order2.setStatus(Status.COMPLETE);
     order2.setShipDate(new Date(secondTime));
     order2.setOrderDate(new Date(secondTime));
@@ -114,7 +114,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order1 = createBaseOrder(server);
 
     Order order2 = createBaseOrder(server);
-    order2.setCustomer(server.getReference(Customer.class, 2133));
+    order2.setCustomer(server.reference(Customer.class, 2133));
     order2.setStatus(Status.COMPLETE);
     order2.setShipDate(null);
 

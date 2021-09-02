@@ -659,7 +659,7 @@ public final class DB {
    * @param id       the id value
    */
   public static <T> T getReference(Class<T> beanType, Object id) {
-    return getDefault().getReference(beanType, id);
+    return getDefault().reference(beanType, id);
   }
 
   /**

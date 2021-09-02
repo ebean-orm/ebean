@@ -642,7 +642,7 @@ public final class Ebean {
    * @param id       the id value
    */
   public static <T> T getReference(Class<T> beanType, Object id) {
-    return getDefault().getReference(beanType, id);
+    return getDefault().reference(beanType, id);
   }
 
   /**

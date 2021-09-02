@@ -39,7 +39,7 @@ public class CacheBeanDataTest extends BaseTestCase {
     Address billingAddress = new Address();
     billingAddress.setId(12);
     billingAddress.setCity("Auckland");
-    billingAddress.setCountry(server.getReference(Country.class, "NZ"));
+    billingAddress.setCountry(server.reference(Country.class, "NZ"));
     billingAddress.setLine1("92 Someplace Else");
     c.setBillingAddress(billingAddress);
 

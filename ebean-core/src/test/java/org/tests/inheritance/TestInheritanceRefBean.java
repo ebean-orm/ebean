@@ -26,12 +26,12 @@ public class TestInheritanceRefBean extends BaseTestCase {
       Parent test;
 
       LoggedSqlCollector.start();
-      test = server().getReference(ChildA.class, idA);
+      test = server().reference(ChildA.class, idA);
       assertTrue(test instanceof ChildA);
       assertEquals(0, LoggedSqlCollector.stop().size());
 
       LoggedSqlCollector.start();
-      test = server().getReference(Parent.class, idB);
+      test = server().reference(Parent.class, idB);
       assertTrue(test instanceof ChildB);
       assertEquals(1, LoggedSqlCollector.stop().size());
 

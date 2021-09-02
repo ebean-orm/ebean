@@ -687,7 +687,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public <T> T getReference(Class<T> type, Object id) {
+  public <T> T reference(Class<T> type, Object id) {
     if (id == null) {
       throw new NullPointerException("The id is null");
     }

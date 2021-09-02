@@ -134,7 +134,7 @@ public class TestReadAudit extends BaseTestCase {
 
     assertThat(readAuditLogger.beans).hasSize(2);
 
-    Country ref = server.getReference(Country.class, "AR");
+    Country ref = server.reference(Country.class, "AR");
     assertThat(readAuditLogger.beans).hasSize(3);
     assertThat(ref).isSameAs(found2);
   }

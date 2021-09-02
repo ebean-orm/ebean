@@ -950,7 +950,15 @@ public interface Database {
    * @param id       the id value
    */
   @Nonnull
-  <T> T getReference(Class<T> beanType, Object id);
+  <T> T reference(Class<T> beanType, Object id);
+
+  /**
+   * Deprecated migrate to reference().
+   */
+  @Deprecated
+  default <T> T getReference(Class<T> beanType, Object id) {
+    return reference(beanType, id);
+  }
 
   /**
    * Return the extended API for Database.

@@ -137,11 +137,11 @@ public class Finder<I, T> {
   /**
    * Creates an entity reference for this ID.
    * <p>
-   * Equivalent to {@link Database#getReference(Class, Object)}
+   * Equivalent to {@link Database#reference(Class, Object)}
    */
   @Nonnull
   public T ref(I id) {
-    return db().getReference(type, id);
+    return db().reference(type, id);
   }
 
   /**

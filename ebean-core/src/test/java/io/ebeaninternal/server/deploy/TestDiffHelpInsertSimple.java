@@ -37,7 +37,7 @@ public class TestDiffHelpInsertSimple extends BaseTestCase {
     Order order1 = new Order();
     order1.setId(12);
     order1.setCretime(new Timestamp(firstTime));
-    order1.setCustomer(server.getReference(Customer.class, 1234));
+    order1.setCustomer(server.reference(Customer.class, 1234));
     order1.setStatus(Status.NEW);
     //order1.setShipDate(new Date(firstTime));
     order1.setOrderDate(new Date(firstTime));
