@@ -2079,7 +2079,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Object setBeanId(Object bean, Object id) {
+  public Object beanId(Object bean, Object id) {
     EntityBean eb = checkEntityBean(bean);
     BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
     if (desc == null) {
@@ -2089,7 +2089,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Object getBeanId(Object bean) {
+  public Object beanId(Object bean) {
     EntityBean eb = checkEntityBean(bean);
     BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
     if (desc == null) {

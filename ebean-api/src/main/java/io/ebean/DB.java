@@ -1239,7 +1239,7 @@ public final class DB {
    * Return the value of the Id property for a given bean.
    */
   public static Object getBeanId(Object bean) {
-    return getDefault().getBeanId(bean);
+    return getDefault().beanId(bean);
   }
 
   /**

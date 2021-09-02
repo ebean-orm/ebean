@@ -31,7 +31,7 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
 
     // should invoke a flush which then means the
     // insert occurs and the bean has an Id value
-    Object beanId = server.getBeanId(model);
+    Object beanId = server.beanId(model);
     assertNotNull(beanId);
 
     Ebean.delete(Customer.class, beanId);

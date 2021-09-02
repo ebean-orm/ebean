@@ -22,7 +22,7 @@ public class TestExplicitInsert extends BaseTestCase {
     EbeanServer server = Ebean.getDefaultServer();
 
     Customer cust = new Customer();
-    Object returnId = server.setBeanId(cust, "42");
+    Object returnId = server.beanId(cust, "42");
 
     assertThat(returnId).isEqualTo(42);
     assertThat(cust.getId()).isEqualTo(42);
@@ -34,7 +34,7 @@ public class TestExplicitInsert extends BaseTestCase {
     EbeanServer server = Ebean.getDefaultServer();
 
     Customer customer = new Customer();
-    Object returnId = server.setBeanId(customer, 42);
+    Object returnId = server.beanId(customer, 42);
 
     assertThat(returnId).isEqualTo(42);
     assertThat(customer.getId()).isEqualTo(42);
@@ -57,7 +57,7 @@ public class TestExplicitInsert extends BaseTestCase {
 
     Assert.assertNotNull(b.getId());
 
-    Assert.assertEquals(b.getId(), server.getBeanId(b));
+    Assert.assertEquals(b.getId(), server.beanId(b));
 
 
     EBasic b2 = server.find(EBasic.class, b.getId());

@@ -248,7 +248,15 @@ public interface Database {
   /**
    * Return the value of the Id property for a given bean.
    */
-  Object getBeanId(Object bean);
+  Object beanId(Object bean);
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
+  default Object getBeanId(Object bean) {
+    return beanId(bean);
+  }
 
   /**
    * Set the Id value onto the bean converting the type of the id value if necessary.
@@ -260,7 +268,15 @@ public interface Database {
    * @param bean The entity bean to set the id value on.
    * @param id   The id value to set.
    */
-  Object setBeanId(Object bean, Object id);
+  Object beanId(Object bean, Object id);
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
+  default Object setBeanId(Object bean, Object id) {
+    return beanId(bean, id);
+  }
 
   /**
    * Return a map of the differences between two objects of the same type.

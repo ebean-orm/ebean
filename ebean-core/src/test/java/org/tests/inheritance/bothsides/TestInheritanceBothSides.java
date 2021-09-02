@@ -57,8 +57,8 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
     final Database db = DB.getDefault();
 
-    final SourceBase foundA = DB.find(SourceBase.class, db.getBeanId(sourceA));
-    final SourceBase foundB = DB.find(SourceBase.class, db.getBeanId(sourceB));
+    final SourceBase foundA = DB.find(SourceBase.class, db.beanId(sourceA));
+    final SourceBase foundB = DB.find(SourceBase.class, db.beanId(sourceB));
 
     assertSourceBaseEqual(foundA, sourceA);
     assertThat(foundA).isInstanceOf(SourceA.class);
