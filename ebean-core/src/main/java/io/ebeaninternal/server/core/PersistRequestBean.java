@@ -50,142 +50,94 @@ import java.util.Set;
 public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate, PreGetterCallback, SpiProfileTransactionEvent {
 
   private final BeanManager<T> beanManager;
-
   private final BeanDescriptor<T> beanDescriptor;
-
   private final BeanPersistListener beanPersistListener;
-
-  /**
-   * For per post insert update delete control.
-   */
   private final BeanPersistController controller;
-
-  /**
-   * The bean being persisted.
-   */
   private final T bean;
-
   private final EntityBean entityBean;
-
-  /**
-   * The associated intercept.
-   */
   private final EntityBeanIntercept intercept;
-
   /**
    * The parent bean for unidirectional save.
    */
   private final Object parentBean;
-
   private final boolean dirty;
-
   private final boolean publish;
-
   private int flags;
-
   private boolean saveRecurse;
-
   private DocStoreMode docStoreMode;
-
   private final ConcurrencyMode concurrencyMode;
-
   /**
    * The unique id used for logging summary.
    */
   private Object idValue;
-
   /**
    * Hash value used to handle cascade delete both ways in a relationship.
    */
   private Integer beanHash;
-
-  /**
-   * Flag set if this is a stateless update.
-   */
   private boolean statelessUpdate;
-
   private boolean notifyCache;
-
   /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
    * appropriate caches are updated in that case.
    */
   private boolean updatedManysOnly;
-
   /**
    * Element collection change as part of bean cache.
    */
   private Map<String, Object> collectionChanges;
-
   /**
    * Set true when the request includes cascade save to a many.
    */
   private boolean updatedMany;
-
   /**
    * Many properties that were cascade saved (and hence might need caches updated later).
    */
   private List<BeanPropertyAssocMany<?>> updatedManys;
-
   /**
    * Need to get and store the updated properties because the persist listener is notified
    * later on a different thread and the bean has been reset at that point.
    */
   private Set<String> updatedProperties;
-
   /**
    * Flags indicating the dirty properties on the bean.
    */
   private boolean[] dirtyProperties;
-
   /**
    * Imported OneToOne orphan that needs to be deleted.
    */
   private EntityBean orphanBean;
-
   /**
    * Flag set when request is added to JDBC batch.
    */
   private boolean batched;
-
   /**
    * Flag set when batchOnCascade to avoid using batch on the top bean.
    */
   private boolean skipBatchForTopLevel;
-
   /**
    * Flag set when batch mode is turned on for a persist cascade.
    */
   private boolean batchOnCascadeSet;
-
   /**
    * Set for updates to determine if all loaded properties are included in the update.
    */
   private boolean requestUpdateAllLoadedProps;
-
   private long version;
-
   private long now;
-
   private long profileOffset;
-
   /**
    * Flag set when request is added to JDBC batch registered as a "getter callback" to automatically flush batch.
    */
   private boolean getterCallback;
-
   private boolean pendingPostUpdateNotify;
-
   /**
    * Set to true when post execute has occurred (so includes batch flush).
    */
   private boolean postExecute;
-
   /**
    * Set to true after many properties have been persisted (so includes element collections).
    */
   private boolean complete;
-
   /**
    * Many to many intersection table changes that are held for later batch processing.
    */
@@ -582,8 +534,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Return true if this bean has been already been persisted (inserted or updated) in this
-   * transaction.
+   * Return true if this bean has been already been persisted (inserted or updated) in this transaction.
    */
   public boolean isRegisteredBean() {
     return transaction.isRegisteredBean(bean);
@@ -600,7 +551,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * The hash used to register the bean with the transaction.
    * <p>
    * Takes into account the class type and id value.
-   * </p>
    */
   private Integer getBeanHash() {
     if (beanHash == null) {
@@ -631,7 +581,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the BeanDescriptor for the associated bean.
    */
-  public BeanDescriptor<T> getBeanDescriptor() {
+  public BeanDescriptor<T> descriptor() {
     return beanDescriptor;
   }
 
@@ -656,7 +606,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the concurrency mode used for this persist.
    */
-  public ConcurrencyMode getConcurrencyMode() {
+  public ConcurrencyMode concurrencyMode() {
     return concurrencyMode;
   }
 
@@ -667,7 +617,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Used to determine common persist requests for queueing and statement batching.
    * </p>
    */
-  public String getFullName() {
+  public String fullName() {
     return beanDescriptor.getFullName();
   }
 
@@ -679,14 +629,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return bean;
   }
 
-  public EntityBean getEntityBean() {
+  public EntityBean entityBean() {
     return entityBean;
   }
 
   /**
    * Return the Id value for the bean.
    */
-  public Object getBeanId() {
+  public Object beanId() {
     return beanDescriptor.getId(entityBean);
   }
 
@@ -694,7 +644,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Create and return a new reference bean matching this beans Id value.
    */
   public T createReference() {
-    return beanDescriptor.createRef(getBeanId(), null);
+    return beanDescriptor.createRef(beanId(), null);
   }
 
   /**
@@ -739,14 +689,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the parent bean for cascading save with unidirectional relationship.
    */
-  public Object getParentBean() {
+  public Object parentBean() {
     return parentBean;
   }
 
   /**
    * Return the intercept if there is one.
    */
-  public EntityBeanIntercept getEntityBeanIntercept() {
+  public EntityBeanIntercept intercept() {
     return intercept;
   }
 
@@ -854,7 +804,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Check for optimistic concurrency exception.
    */
   @Override
-  public final void checkRowCount(int rowCount) {
+  public void checkRowCount(int rowCount) {
     if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
       if (ConcurrencyMode.VERSION == concurrencyMode) {
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
@@ -1074,7 +1024,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the list of updated many properties for L2 cache update (can be null).
    */
-  public List<BeanPropertyAssocMany<?>> getUpdatedManyForL2Cache() {
+  public List<BeanPropertyAssocMany<?>> updatedManyForL2Cache() {
     return updatedManys;
   }
 
@@ -1183,7 +1133,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the flags set on this persist request.
    */
-  public int getFlags() {
+  public int flags() {
     return flags;
   }
 
@@ -1197,7 +1147,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the key for an update persist request.
    */
-  public String getUpdatePlanHash() {
+  public String updatePlanHash() {
     StringBuilder key;
     if (determineUpdateAllLoadedProperties()) {
       key = intercept.getLoadedPropertyKey();
@@ -1219,7 +1169,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the table to update depending if the request is a 'publish' one or normal.
    */
-  public String getUpdateTable() {
+  public String updateTable() {
     return publish ? beanDescriptor.getBaseTable() : beanDescriptor.getDraftTable();
   }
 
@@ -1240,7 +1190,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the version in long form (if set).
    */
-  public long getVersion() {
+  public long version() {
     return version;
   }
 
@@ -1383,7 +1333,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
       String key = beanDescriptor.cacheKey(idValue);
       Map<String, Object> changes = new LinkedHashMap<>();
-      EntityBean bean = getEntityBean();
+      EntityBean bean = entityBean();
       boolean[] dirtyProperties = dirtyProperties();
       if (dirtyProperties != null) {
         for (int i = 0; i < dirtyProperties.length; i++) {
@@ -1405,7 +1355,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         // add element collection update
         changes.putAll(collectionChanges);
       }
-      changeSet.addBeanUpdate(beanDescriptor, key, changes, updateNaturalKey, getVersion());
+      changeSet.addBeanUpdate(beanDescriptor, key, changes, updateNaturalKey, version());
     }
   }
 
@@ -1419,7 +1369,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  public EntityBean getImportedOrphanForRemoval() {
+  public EntityBean importedOrphanForRemoval() {
     return orphanBean;
   }
 

@@ -803,7 +803,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (beanCache != null) {
         changeSet.addBeanRemove(desc, id);
       }
-      cacheDeleteImported(true, deleteRequest.getEntityBean(), changeSet);
+      cacheDeleteImported(true, deleteRequest.entityBean(), changeSet);
     }
   }
 
@@ -815,7 +815,7 @@ final class BeanDescriptorCacheHelp<T> {
       changeSet.addInvalidate(desc);
     } else {
       queryCacheClear(changeSet);
-      cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
+      cacheDeleteImported(false, insertRequest.entityBean(), changeSet);
       changeSet.addBeanInsert(desc.getBaseTable());
     }
   }
@@ -839,10 +839,10 @@ final class BeanDescriptorCacheHelp<T> {
         // query caching only
         return;
       }
-      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyForL2Cache();
+      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.updatedManyForL2Cache();
       if (manyCollections != null) {
         for (BeanPropertyAssocMany<?> many : manyCollections) {
-          Object details = many.getValue(updateRequest.getEntityBean());
+          Object details = many.getValue(updateRequest.entityBean());
           CachedManyIds entry = createManyIds(many, details);
           if (entry != null) {
             changeSet.addManyPut(desc, many.getName(), id, entry);

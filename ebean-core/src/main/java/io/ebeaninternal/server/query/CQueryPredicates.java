@@ -115,7 +115,7 @@ public final class CQueryPredicates {
       dataBind.append(", ");
     }
 
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       int asOfTableCount = queryPlan.getAsOfTableCount();
       if (asOfTableCount > 0) {
@@ -132,7 +132,7 @@ public final class CQueryPredicates {
 
     if (idValue != null) {
       // this is a find by id type query...
-      request.getBeanDescriptor().bindId(dataBind, idValue);
+      request.descriptor().bindId(dataBind, idValue);
       dataBind.append(idValue);
       dataBind.append(", ");
     }
@@ -244,7 +244,7 @@ public final class CQueryPredicates {
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
 
     // order by is dependent on the manyProperty (if there is one)
-    String logicalOrderBy = deriveOrderByWithMany(request.getManyProperty());
+    String logicalOrderBy = deriveOrderByWithMany(request.manyProperty());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
@@ -312,7 +312,7 @@ public final class CQueryPredicates {
     if (orderBy == null) {
       return null;
     }
-    return CQueryOrderBy.parse(request.getBeanDescriptor(), orderBy);
+    return CQueryOrderBy.parse(request.descriptor(), orderBy);
   }
 
   /**
@@ -327,7 +327,7 @@ public final class CQueryPredicates {
 
     String orderBy = parseOrderBy();
 
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
+    BeanDescriptor<?> desc = request.descriptor();
     String orderById = desc.getDefaultOrderBy();
 
     if (orderBy == null) {

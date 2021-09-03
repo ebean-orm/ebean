@@ -90,7 +90,7 @@ final class BindableIdEmbedded implements BindableId {
       throw new PersistenceException(m);
     }
 
-    EntityBean bean = persist.getEntityBean();
+    EntityBean bean = persist.entityBean();
 
     // create the new id
     EntityBean newId = (EntityBean) embId.createEmbeddedId();

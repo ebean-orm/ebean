@@ -799,7 +799,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the bean change for a delete.
    */
   private BeanChange deleteBeanChange(PersistRequestBean<T> request) {
-    return beanChange(ChangeType.DELETE, request.getBeanId(), null, null);
+    return beanChange(ChangeType.DELETE, request.beanId(), null, null);
   }
 
   /**
@@ -808,9 +808,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private BeanChange updateBeanChange(PersistRequestBean<T> request) {
     try {
       BeanChangeJson changeJson = new BeanChangeJson(this, request.isStatelessUpdate());
-      request.getEntityBeanIntercept().addDirtyPropertyValues(changeJson);
+      request.intercept().addDirtyPropertyValues(changeJson);
       changeJson.flush();
-      return beanChange(ChangeType.UPDATE, request.getBeanId(), changeJson.newJson(), changeJson.oldJson());
+      return beanChange(ChangeType.UPDATE, request.beanId(), changeJson.newJson(), changeJson.oldJson());
     } catch (RuntimeException e) {
       logger.error("Failed to write ChangeLog entry for update", e);
       return null;
@@ -824,9 +824,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     try {
       StringWriter writer = new StringWriter(200);
       SpiJsonWriter jsonWriter = createJsonWriter(writer);
-      jsonWriteForInsert(jsonWriter, request.getEntityBean());
+      jsonWriteForInsert(jsonWriter, request.entityBean());
       jsonWriter.flush();
-      return beanChange(ChangeType.INSERT, request.getBeanId(), writer.toString(), null);
+      return beanChange(ChangeType.INSERT, request.beanId(), writer.toString(), null);
     } catch (IOException e) {
       logger.error("Failed to write ChangeLog entry for insert", e);
       return null;

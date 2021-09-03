@@ -82,7 +82,7 @@ final class CQueryBuilderRawSql {
       // assumption that id has its proper dbColumn assigned
       // which may change if using multiple raw sql statements
       // against the same bean.
-      BeanDescriptor<?> descriptor = request.getBeanDescriptor();
+      BeanDescriptor<?> descriptor = request.descriptor();
       //FIXME: I think this is broken... needs to be logical
       // and then parsed for RawSqlSelect...
       dynamicWhere = descriptor.getIdBinderIdSql(null);

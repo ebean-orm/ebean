@@ -31,17 +31,10 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     }
   }
 
-  boolean persistCascade;
-
-  /**
-   * One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
-   */
   protected Type type;
-
+  boolean persistCascade;
   final PersistExecute persistExecute;
-
   protected String label;
-
   protected long startNanos;
 
   PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute) {

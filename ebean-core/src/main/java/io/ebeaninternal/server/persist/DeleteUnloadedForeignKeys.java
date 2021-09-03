@@ -49,10 +49,10 @@ final class DeleteUnloadedForeignKeys {
    */
   void queryForeignKeys() {
 
-    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
+    BeanDescriptor<?> descriptor = request.descriptor();
     SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.getBeanType());
 
-    Object id = request.getBeanId();
+    Object id = request.beanId();
 
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropList : propList) {

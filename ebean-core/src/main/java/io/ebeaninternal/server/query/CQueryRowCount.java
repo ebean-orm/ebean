@@ -43,7 +43,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     this.request = request;
     this.query = request.query();
     this.sql = queryPlan.getSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     query.setGeneratedSql(sql);
   }

@@ -186,7 +186,7 @@ public final class SaveManyBeans extends SaveManyBase {
         }
 
         if (!skipSavingThisBean) {
-          persister.saveRecurse(detail, transaction, parentBean, request.getFlags());
+          persister.saveRecurse(detail, transaction, parentBean, request.flags());
           if (many.hasOrderColumn()) {
             // Clear the bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
             final BeanDescriptor<?> beanDescriptor = many.getBeanDescriptor();
@@ -344,7 +344,7 @@ public final class SaveManyBeans extends SaveManyBase {
     }
     if (!(value instanceof BeanCollection<?>)) {
       if (!insertedParent && cascade && isChangedProperty()) {
-        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
+        persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 0);
       }
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
@@ -363,7 +363,7 @@ public final class SaveManyBeans extends SaveManyBase {
             EntityBean eb = (EntityBean) removedBean;
             if (eb._ebean_intercept().isOrphanDelete()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
-              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.getFlags()));
+              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.flags()));
             }
           }
         }

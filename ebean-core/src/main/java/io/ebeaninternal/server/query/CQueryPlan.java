@@ -87,13 +87,13 @@ public class CQueryPlan implements SpiQueryPlan {
   CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
     this.server = request.server();
     this.dataTimeZone = server.getDataTimeZone();
-    this.beanType = request.getBeanDescriptor().getBeanType();
-    this.planKey = request.getQueryPlanKey();
+    this.beanType = request.descriptor().getBeanType();
+    this.planKey = request.queryPlanKey();
     SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
+    this.name = deriveName(label, query.getType(), request.descriptor().getSimpleName());
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -112,12 +112,12 @@ public class CQueryPlan implements SpiQueryPlan {
   CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, String logWhereSql) {
     this.server = request.server();
     this.dataTimeZone = server.getDataTimeZone();
-    this.beanType = request.getBeanDescriptor().getBeanType();
+    this.beanType = request.descriptor().getBeanType();
     SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
+    this.name = deriveName(label, query.getType(), request.descriptor().getSimpleName());
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;

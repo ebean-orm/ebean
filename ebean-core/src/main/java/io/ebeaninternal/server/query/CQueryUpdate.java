@@ -39,7 +39,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
     this.queryPlan = queryPlan;
     this.query = request.query();
     this.sql = queryPlan.getSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     query.setGeneratedSql(sql);
   }

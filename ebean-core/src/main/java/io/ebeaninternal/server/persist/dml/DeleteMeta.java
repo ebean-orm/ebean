@@ -40,13 +40,13 @@ final class DeleteMeta extends BaseMeta {
    * Bind the request based on the concurrency mode.
    */
   public void bind(PersistRequestBean<?> persist, DmlHandler bind) throws SQLException {
-    EntityBean bean = persist.getEntityBean();
+    EntityBean bean = persist.entityBean();
     id.dmlBind(bind, bean);
     if (tenantId != null) {
       tenantId.dmlBind(bind, bean);
     }
 
-    if (persist.getConcurrencyMode() == ConcurrencyMode.VERSION) {
+    if (persist.concurrencyMode() == ConcurrencyMode.VERSION) {
       version.dmlBind(bind, bean);
     }
   }
@@ -56,11 +56,11 @@ final class DeleteMeta extends BaseMeta {
    */
   public String getSql(PersistRequestBean<?> request) {
     if (id.isEmpty()) {
-      throw new IllegalStateException("Can not deleteById on " + request.getFullName() + " as no @Id property");
+      throw new IllegalStateException("Can not deleteById on " + request.fullName() + " as no @Id property");
     }
 
     boolean publish = request.isPublish();
-    switch (request.getConcurrencyMode()) {
+    switch (request.concurrencyMode()) {
       case NONE:
         return publish ? sqlNone : sqlDraftNone;
 
@@ -68,7 +68,7 @@ final class DeleteMeta extends BaseMeta {
         return publish ? sqlVersion : sqlDraftVersion;
 
       default:
-        throw new RuntimeException("Invalid mode " + request.getConcurrencyMode());
+        throw new RuntimeException("Invalid mode " + request.concurrencyMode());
     }
   }
 

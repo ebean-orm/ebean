@@ -202,7 +202,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.sql = queryPlan.getSql();
     this.rawSql = queryPlan.isRawSql();
     this.logWhereSql = queryPlan.getLogWhereSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     if (lazyLoadManyProperty != null) {
       this.help = NOOP_ADD;
@@ -370,7 +370,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
    */
   @Override
   public PersistenceContext getPersistenceContext() {
-    return request.getPersistenceContext();
+    return request.persistenceContext();
   }
 
   @Override
@@ -586,19 +586,19 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void registerBeanInherit(BeanPropertyAssocOne<?> property, EntityBeanIntercept ebi) {
     String path = getPath(property.getName());
-    request.getGraphContext().register(path, ebi, property);
+    request.loadContext().register(path, ebi, property);
   }
 
   @Override
   public void register(String path, EntityBeanIntercept ebi) {
     path = getPath(path);
-    request.getGraphContext().register(path, ebi);
+    request.loadContext().register(path, ebi);
   }
 
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     String path = getPath(many.getName());
-    request.getGraphContext().register(path, many, bc);
+    request.loadContext().register(path, many, bc);
   }
 
   /**
@@ -683,7 +683,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
-    ObjectGraphNode node = request.getGraphContext().getObjectGraphNode(prefix);
+    ObjectGraphNode node = request.loadContext().getObjectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListenerRef));
   }
 

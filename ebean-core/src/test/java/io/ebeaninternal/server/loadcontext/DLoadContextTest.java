@@ -28,7 +28,7 @@ public class DLoadContextTest extends BaseTestCase {
     queryRequest.initTransIfRequired();
     queryRequest.endTransIfRequired();
 
-    DLoadContext graphContext = (DLoadContext) queryRequest.getGraphContext();
+    DLoadContext graphContext = (DLoadContext) queryRequest.loadContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
 
     assertThat(customer.batchSize).isEqualTo(10);
@@ -41,7 +41,7 @@ public class DLoadContextTest extends BaseTestCase {
     queryRequest.initTransIfRequired();
     queryRequest.endTransIfRequired();
 
-    DLoadContext graphContext = (DLoadContext) queryRequest.getGraphContext();
+    DLoadContext graphContext = (DLoadContext) queryRequest.loadContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
 
     assertThat(customer.batchSize).isEqualTo(100);
@@ -54,7 +54,7 @@ public class DLoadContextTest extends BaseTestCase {
     queryRequest.initTransIfRequired();
     queryRequest.endTransIfRequired();
 
-    DLoadContext graphContext = (DLoadContext) queryRequest.getGraphContext();
+    DLoadContext graphContext = (DLoadContext) queryRequest.loadContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
 
     assertThat(customer.batchSize).isEqualTo(100);
@@ -67,7 +67,7 @@ public class DLoadContextTest extends BaseTestCase {
     queryRequest.initTransIfRequired();
     queryRequest.endTransIfRequired();
 
-    DLoadContext graphContext = (DLoadContext) queryRequest.getGraphContext();
+    DLoadContext graphContext = (DLoadContext) queryRequest.loadContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
 
     assertThat(customer.batchSize).isEqualTo(50);
@@ -80,7 +80,7 @@ public class DLoadContextTest extends BaseTestCase {
     queryRequest.initTransIfRequired();
     queryRequest.endTransIfRequired();
 
-    DLoadContext graphContext = (DLoadContext) queryRequest.getGraphContext();
+    DLoadContext graphContext = (DLoadContext) queryRequest.loadContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
 
     assertThat(customer.batchSize).isEqualTo(100);
@@ -95,7 +95,7 @@ public class DLoadContextTest extends BaseTestCase {
     queryRequest.initTransIfRequired();
     queryRequest.endTransIfRequired();
 
-    DLoadContext graphContext = (DLoadContext) queryRequest.getGraphContext();
+    DLoadContext graphContext = (DLoadContext) queryRequest.loadContext();
     DLoadManyContext details = graphContext.getManyContext("details", many);
 
     assertThat(details.batchSize).isEqualTo(100);

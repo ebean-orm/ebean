@@ -91,11 +91,11 @@ public final class DLoadContext implements LoadContext {
   }
 
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
-    this.tenantId = request.getTenantId();
-    this.persistenceContext = request.getPersistenceContext();
+    this.tenantId = request.tenantId();
+    this.persistenceContext = request.persistenceContext();
     this.ebeanServer = request.server();
-    this.defaultBatchSize = request.getLazyLoadBatchSize();
-    this.rootDescriptor = request.getBeanDescriptor();
+    this.defaultBatchSize = request.lazyLoadBatchSize();
+    this.rootDescriptor = request.descriptor();
 
     SpiQuery<?> query = request.query();
     this.useDocStore = query.isUseDocStore();

@@ -54,7 +54,7 @@ public final class BindableUnidirectional implements Bindable {
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
     PersistRequestBean<?> persistRequest = request.getPersistRequest();
-    Object parentBean = persistRequest.getParentBean();
+    Object parentBean = persistRequest.parentBean();
     if (parentBean == null) {
       Class<?> localType = desc.getBeanType();
       Class<?> targetType = unidirectional.getTargetType();

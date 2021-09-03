@@ -906,11 +906,11 @@ public final class DefaultPersister implements Persister {
    */
   private void saveAssocMany(PersistRequestBean<?> request) {
 
-    EntityBean parentBean = request.getEntityBean();
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
+    EntityBean parentBean = request.entityBean();
+    BeanDescriptor<?> desc = request.descriptor();
     SpiTransaction t = request.transaction();
 
-    EntityBean orphanForRemoval = request.getImportedOrphanForRemoval();
+    EntityBean orphanForRemoval = request.importedOrphanForRemoval();
     if (orphanForRemoval != null) {
       delete(orphanForRemoval, request.transaction(), true);
     }
@@ -924,7 +924,7 @@ public final class DefaultPersister implements Persister {
           if (!prop.isSaveRecurseSkippable(detailBean)) {
             t.depth(+1);
             prop.setParentBeanToChild(parentBean, detailBean);
-            saveRecurse(detailBean, t, parentBean, request.getFlags());
+            saveRecurse(detailBean, t, parentBean, request.flags());
             t.depth(-1);
           }
         }
@@ -980,8 +980,8 @@ public final class DefaultPersister implements Persister {
     SpiTransaction t = request.transaction();
     t.depth(-1);
 
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
-    EntityBean parentBean = request.getEntityBean();
+    BeanDescriptor<?> desc = request.descriptor();
+    EntityBean parentBean = request.entityBean();
     DeleteMode deleteMode = request.deleteMode();
 
     BeanPropertyAssocOne<?>[] expOnes = desc.propertiesOneExportedDelete();
@@ -1107,7 +1107,7 @@ public final class DefaultPersister implements Persister {
    */
   private void saveAssocOne(PersistRequestBean<?> request) {
 
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
+    BeanDescriptor<?> desc = request.descriptor();
 
     // imported ones with save cascade
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneImportedSave()) {
@@ -1117,14 +1117,14 @@ public final class DefaultPersister implements Persister {
       }
 
       if (request.isLoadedProperty(prop)) {
-        EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
+        EntityBean detailBean = prop.getValueAsEntityBean(request.entityBean());
         if (detailBean != null
           && !prop.isSaveRecurseSkippable(detailBean)
           && !prop.isReference(detailBean)
           && !request.isParent(detailBean)) {
           SpiTransaction t = request.transaction();
           t.depth(-1);
-          saveRecurse(detailBean, t, null, request.getFlags());
+          saveRecurse(detailBean, t, null, request.flags());
           t.depth(+1);
         }
       }
@@ -1152,7 +1152,7 @@ public final class DefaultPersister implements Persister {
 
     DeleteUnloadedForeignKeys fkeys = null;
 
-    for (BeanPropertyAssocOne<?> one : request.getBeanDescriptor().propertiesOneImportedDelete()) {
+    for (BeanPropertyAssocOne<?> one : request.descriptor().propertiesOneImportedDelete()) {
       if (!request.isLoadedProperty(one)) {
         // we have cascade Delete on a partially populated bean and
         // this property was not loaded (so we are going to have to fetch it)
@@ -1173,10 +1173,10 @@ public final class DefaultPersister implements Persister {
 
     DeleteMode deleteMode = request.deleteMode();
 
-    for (BeanPropertyAssocOne<?> prop : request.getBeanDescriptor().propertiesOneImportedDelete()) {
+    for (BeanPropertyAssocOne<?> prop : request.descriptor().propertiesOneImportedDelete()) {
       if (deleteMode.isHard() || prop.isTargetSoftDelete()) {
         if (request.isLoadedProperty(prop)) {
-          Object detailBean = prop.getValue(request.getEntityBean());
+          Object detailBean = prop.getValue(request.entityBean());
           if (detailBean != null) {
             EntityBean detail = (EntityBean) detailBean;
             if (prop.hasId(detail)) {

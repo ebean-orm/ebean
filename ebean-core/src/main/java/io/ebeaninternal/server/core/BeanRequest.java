@@ -28,7 +28,6 @@ public abstract class BeanRequest {
    * <p>
    * A transaction may have been passed in or active in the thread local. If
    * not then create one implicitly to handle the request.
-   * </p>
    *
    * @return True if a transaction was set (from current or created).
    */

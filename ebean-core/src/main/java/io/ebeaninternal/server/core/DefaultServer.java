@@ -1227,7 +1227,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     request.resetBeanCacheAutoMode(false);
     if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
       // hit bean cache and got all results from cache
-      return request.getBeanCacheHitsAsMap();
+      return request.beanCacheHitsAsMap();
     }
     Object result = request.getFromQueryCache();
     if (result != null) {
@@ -1341,7 +1341,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         if (ids.isEmpty()) {
           return 0;
         } else {
-          return persister.deleteByIds(request.getBeanDescriptor(), ids, request.transaction(), false);
+          return persister.deleteByIds(request.descriptor(), ids, request.transaction(), false);
         }
       }
     } finally {
@@ -1504,7 +1504,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     request.resetBeanCacheAutoMode(findOne);
     if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
       // hit bean cache and got all results from cache
-      return request.getBeanCacheHits();
+      return request.beanCacheHits();
     }
     request.prepareQuery();
     Object result = request.getFromQueryCache();

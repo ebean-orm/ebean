@@ -121,7 +121,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
 
-    BeanFindController finder = request.getBeanFinder();
+    BeanFindController finder = request.finder();
 
     BeanCollection<T> result;
     if (finder != null && finder.isInterceptFindMany(request)) {
@@ -135,7 +135,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     if (result != null && request.isBeanCachePutMany()) {
       // load the individual beans into the bean cache
-      BeanDescriptor<T> descriptor = request.getBeanDescriptor();
+      BeanDescriptor<T> descriptor = request.descriptor();
       Collection<T> c = result.getActualDetails();
       descriptor.cacheBeanPutAll(c);
     }
@@ -162,7 +162,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
 
-    BeanFindController finder = request.getBeanFinder();
+    BeanFindController finder = request.finder();
 
     T result;
     if (finder != null && finder.isInterceptFind(request)) {
@@ -172,7 +172,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
     }
 
     if (result != null && request.isBeanCachePut()) {
-      request.getBeanDescriptor().cacheBeanPut((EntityBean) result);
+      request.descriptor().cacheBeanPut((EntityBean) result);
     }
 
     return result;

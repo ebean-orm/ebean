@@ -59,7 +59,7 @@ public final class SqlTreeBuilder {
    */
   SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
     this.rawSql = true;
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.rawNoId = rawNoId;
     this.disableLazyLoad = request.query().isDisableLazyLoading();
     this.query = null;
@@ -82,7 +82,7 @@ public final class SqlTreeBuilder {
   SqlTreeBuilder(String columnAliasPrefix, CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
     this.rawSql = false;
     this.rawNoId = false;
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.query = request.query();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
@@ -95,7 +95,7 @@ public final class SqlTreeBuilder {
     this.manyWhereJoins = query.getManyWhereJoins();
     this.queryDetail = query.getDetail();
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getBaseTableAlias(), temporalMode);
+    this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.getHistorySupport(query);

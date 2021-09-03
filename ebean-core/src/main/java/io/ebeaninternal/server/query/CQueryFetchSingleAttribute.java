@@ -52,7 +52,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     this.queryPlan = queryPlan;
     this.query = request.query();
     this.sql = queryPlan.getSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     this.containsCounts = containsCounts;
     this.reader = queryPlan.getSingleAttributeScalarType();

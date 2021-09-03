@@ -198,7 +198,7 @@ public final class CQueryEngine {
         logSql(cquery);
       }
       // first check batch sizes set on query joins
-      int iterateBufferSize = request.getSecondaryQueriesMinBatchSize();
+      int iterateBufferSize = request.secondaryQueriesMinBatchSize();
       if (iterateBufferSize < 1) {
         // not set on query joins so check if batch size set on query itself
         int queryBatch = request.query().getLazyLoadBatchSize();
@@ -274,7 +274,7 @@ public final class CQueryEngine {
   }
 
   private <T> void deriveVersionDiffs(List<Version<T>> versions, OrmQueryRequest<T> request) {
-    BeanDescriptor<T> descriptor = request.getBeanDescriptor();
+    BeanDescriptor<T> descriptor = request.descriptor();
     if (!versions.isEmpty()) {
       Version<T> current = versions.get(0);
       if (versions.size() > 1) {
