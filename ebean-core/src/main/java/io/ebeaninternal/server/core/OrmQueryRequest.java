@@ -146,7 +146,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public String getDBLikeClause(boolean rawLikeExpression) {
-    return ebeanServer.getDatabasePlatform().getLikeClause(rawLikeExpression);
+    return server.getDatabasePlatform().getLikeClause(rawLikeExpression);
   }
 
   /**
@@ -154,7 +154,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public String escapeLikeString(String value) {
-    return ebeanServer.getDatabasePlatform().escapeLikeString(value);
+    return server.getDatabasePlatform().escapeLikeString(value);
   }
 
   @Override
@@ -271,11 +271,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (transaction == null) {
       if (query.getType().isUpdate()) {
         // bulk update or delete query
-        transaction = ebeanServer.beginServerTransaction();
+        transaction = server.beginServerTransaction();
       } else {
         // create an implicit transaction to execute this query
         // potentially using read-only DataSource with autoCommit
-        transaction = ebeanServer.createReadOnlyTransaction(query.getTenantId());
+        transaction = server.createReadOnlyTransaction(query.getTenantId());
       }
       createdTransaction = true;
     }
@@ -343,7 +343,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (ctx != null) return ctx;
 
     // determine the scope (from the query and then server)
-    PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
+    PersistenceContextScope scope = server.getPersistenceContextScope(query);
     if (scope == PersistenceContextScope.QUERY || t == null) {
       return new DefaultPersistenceContext();
     }
@@ -365,7 +365,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       transaction.commit();
       if (query.getType().isUpdate()) {
         // for implicit update/delete queries clear the thread local
-        ebeanServer.clearServerTransaction();
+        server.clearServerTransaction();
       }
     }
   }
@@ -688,7 +688,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public Object getFromQueryCache() {
     if (query.getUseQueryCache() == CacheMode.OFF
       || (transaction != null && transaction.isSkipCache())
-      || ebeanServer.isDisableL2Cache()) {
+      || server.isDisableL2Cache()) {
       return null;
     } else {
       cacheKey = query.queryHash();
@@ -768,7 +768,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public int getLazyLoadBatchSize() {
     int batchSize = query.getLazyLoadBatchSize();
-    return (batchSize > 0) ? batchSize : ebeanServer.getLazyLoadBatchSize();
+    return (batchSize > 0) ? batchSize : server.getLazyLoadBatchSize();
   }
 
   /**
@@ -806,7 +806,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Check for slow query event.
    */
   public void slowQueryCheck(long executionTimeMicros, int rowCount) {
-    ebeanServer.slowQueryCheck(executionTimeMicros, rowCount, query);
+    server.slowQueryCheck(executionTimeMicros, rowCount, query);
   }
 
   public void setInlineCountDistinct() {
@@ -830,6 +830,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return true if no MaxRows or use LIMIT in SQL update.
    */
   public boolean isInlineSqlUpdateLimit() {
-    return query.getMaxRows() < 1 || ebeanServer.getDatabasePlatform().isInlineSqlUpdateLimit();
+    return query.getMaxRows() < 1 || server.getDatabasePlatform().isInlineSqlUpdateLimit();
   }
 }

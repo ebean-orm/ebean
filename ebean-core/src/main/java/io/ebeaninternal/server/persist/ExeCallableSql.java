@@ -64,7 +64,7 @@ final class ExeCallableSql {
 
     // process named parameters if required
     sql = BindParamsParser.parse(bindParams, sql);
-    boolean logSql = request.isLogSql();
+    boolean logSql = request.logSql();
 
     CallableStatement cstmt;
     if (batchThisRequest) {

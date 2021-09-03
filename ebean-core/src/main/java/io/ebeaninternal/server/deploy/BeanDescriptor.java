@@ -777,7 +777,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return true if this request should be included in the change log.
    */
   public BeanChange getChangeLogBean(PersistRequestBean<T> request) {
-    switch (request.getType()) {
+    switch (request.type()) {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request) : null;
       case UPDATE:
@@ -786,7 +786,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) : null;
       default:
-        throw new IllegalStateException("Unhandled request type " + request.getType());
+        throw new IllegalStateException("Unhandled request type " + request.type());
     }
   }
 

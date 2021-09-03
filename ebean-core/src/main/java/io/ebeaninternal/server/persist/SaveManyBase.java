@@ -30,7 +30,7 @@ abstract class SaveManyBase implements SaveMany {
   SaveManyBase(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     this.persister = persister;
     this.request = request;
-    this.server = request.getServer();
+    this.server = request.server();
     this.many = many;
     this.parentBean = parentBean;
     this.transaction = request.transaction();

@@ -14,21 +14,13 @@ public abstract class BeanRequest {
 
   static final Logger log = LoggerFactory.getLogger(BeanRequest.class);
 
-  /**
-   * The server processing the request.
-   */
-  protected final SpiEbeanServer ebeanServer;
-
-  /**
-   * The transaction this is part of.
-   */
+  protected final SpiEbeanServer server;
   protected SpiTransaction transaction;
-
   protected boolean createdTransaction;
 
-  public BeanRequest(SpiEbeanServer ebeanServer, SpiTransaction t) {
-    this.ebeanServer = ebeanServer;
-    this.transaction = t;
+  public BeanRequest(SpiEbeanServer server, SpiTransaction transaction) {
+    this.server = server;
+    this.transaction = transaction;
   }
 
   /**
@@ -44,10 +36,10 @@ public abstract class BeanRequest {
     if (transaction != null) {
       return false;
     }
-    transaction = ebeanServer.currentServerTransaction();
+    transaction = server.currentServerTransaction();
     if (transaction == null || !transaction.isActive()) {
       // create an implicit transaction to execute this query
-      transaction = ebeanServer.beginServerTransaction();
+      transaction = server.beginServerTransaction();
       createdTransaction = true;
     }
     return true;
@@ -58,7 +50,7 @@ public abstract class BeanRequest {
    */
   public void commitTransIfRequired() {
     if (createdTransaction) {
-      ebeanServer.commitTransaction();
+      server.commitTransaction();
     }
   }
 
@@ -68,7 +60,7 @@ public abstract class BeanRequest {
   public void rollbackTransIfRequired() {
     if (createdTransaction) {
       try {
-        ebeanServer.endTransaction();
+        server.endTransaction();
       } catch (Exception e) {
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
@@ -83,7 +75,7 @@ public abstract class BeanRequest {
    */
   public void clearTransIfRequired() {
     if (createdTransaction) {
-      ebeanServer.clearServerTransaction();
+      server.clearServerTransaction();
     }
   }
 
@@ -92,11 +84,11 @@ public abstract class BeanRequest {
    * BeanController and BeanFinder.
    */
   public EbeanServer getEbeanServer() {
-    return ebeanServer;
+    return server;
   }
 
-  public SpiEbeanServer getServer() {
-    return ebeanServer;
+  public SpiEbeanServer server() {
+    return server;
   }
 
   /**
@@ -109,28 +101,28 @@ public abstract class BeanRequest {
   /**
    * Set the transaction to use for this request.
    */
-  public void setTransaction(SpiTransaction transaction) {
+  public void transaction(SpiTransaction transaction) {
     this.transaction = transaction;
   }
 
   /**
    * Return true if SQL should be logged for this transaction.
    */
-  public boolean isLogSql() {
+  public boolean logSql() {
     return transaction.isLogSql();
   }
 
   /**
    * Return true if SUMMARY information should be logged for this transaction.
    */
-  public boolean isLogSummary() {
+  public boolean logSummary() {
     return transaction.isLogSummary();
   }
 
   /**
    * Return the DataTimeZone to use.
    */
-  public DataTimeZone getDataTimeZone() {
-    return ebeanServer.getDataTimeZone();
+  public DataTimeZone dataTimeZone() {
+    return server.getDataTimeZone();
   }
 }

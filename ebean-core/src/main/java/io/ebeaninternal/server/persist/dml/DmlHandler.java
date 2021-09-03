@@ -68,7 +68,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Bind to the statement returning the DataBind.
    */
   DataBind bind(PreparedStatement stmt) {
-    return new DataBind(persistRequest.getDataTimeZone(), stmt, transaction.getInternalConnection());
+    return new DataBind(persistRequest.dataTimeZone(), stmt, transaction.getInternalConnection());
   }
 
   /**

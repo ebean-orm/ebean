@@ -18,7 +18,7 @@ public interface DocQueryRequest<T> extends DocQueryContext<T> {
   /**
    * Set the (document store) transaction to use for this query.
    */
-  void setTransaction(SpiTransaction transaction);
+  void transaction(SpiTransaction transaction);
 
   /**
    * Return the query for this request.

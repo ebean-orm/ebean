@@ -937,8 +937,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     addPostCommitListeners();
     notifyCacheOnPostExecute();
-    if (isLogSummary()) {
-      logSummary();
+    if (logSummary()) {
+      logSummaryMessage();
     }
   }
 
@@ -985,7 +985,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  private void logSummary() {
+  private void logSummaryMessage() {
     String draft = (beanDescriptor.isDraftable() && !publish) ? " draft[true]" : "";
     String name = beanDescriptor.getName();
     switch (type) {
@@ -1031,7 +1031,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Register the derived relationships to get executed later (on JDBC batch flush or commit).
    */
   public void deferredRelationship(EntityBean assocBean, ImportedId importedId, EntityBean bean) {
-    transaction.registerDeferred(new PersistDeferredRelationship(ebeanServer, beanDescriptor, assocBean, importedId, bean));
+    transaction.registerDeferred(new PersistDeferredRelationship(server, beanDescriptor, assocBean, importedId, bean));
   }
 
   private void postInsert() {
@@ -1175,7 +1175,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       requestUpdateAllLoadedProps = txnUpdateAll;
     } else {
       // if using batch use the server default setting
-      requestUpdateAllLoadedProps = isBatchThisRequest() && ebeanServer.isUpdateAllPropertiesInBatch();
+      requestUpdateAllLoadedProps = isBatchThisRequest() && server.isUpdateAllPropertiesInBatch();
     }
     return requestUpdateAllLoadedProps;
   }
@@ -1313,7 +1313,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public long now() {
     if (now == 0) {
-      now = ebeanServer.clockNow();
+      now = server.clockNow();
     }
     return now;
   }

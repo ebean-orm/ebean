@@ -95,12 +95,12 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
   }
 
   @Override
-  public boolean isLogSql() {
+  public boolean logSql() {
     return transaction.isLogSql();
   }
 
   @Override
-  public boolean isLogSummary() {
+  public boolean logSummary() {
     return transaction.isLogSummary();
   }
 
@@ -149,10 +149,9 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
   }
 
   /**
-   * Return the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL
-   * or CALLABLESQL.
+   * Return the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
    */
-  public Type getType() {
+  public Type type() {
     return type;
   }
 

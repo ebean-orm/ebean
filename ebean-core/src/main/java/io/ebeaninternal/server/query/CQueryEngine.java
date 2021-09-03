@@ -79,7 +79,7 @@ public final class CQueryEngine {
   private <T> int executeUpdate(OrmQueryRequest<T> request, CQueryUpdate query) {
     try {
       int rows = query.execute();
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         request.logSql(Str.add(query.getGeneratedSql(), "; --bind(", query.getBindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")"));
       }
       return rows;
@@ -101,10 +101,10 @@ public final class CQueryEngine {
   private <A> List<A> findAttributeList(OrmQueryRequest<?> request, CQueryFetchSingleAttribute rcQuery) {
     try {
       List<A> list = (List<A>) rcQuery.findList();
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
       }
-      if (request.isLogSummary()) {
+      if (request.logSummary()) {
         request.transaction().logSummary(rcQuery.getSummary());
       }
       if (request.isQueryCachePut()) {
@@ -159,10 +159,10 @@ public final class CQueryEngine {
     request.setCancelableQuery(rcQuery);
     try {
       int count = rcQuery.findCount();
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
       }
-      if (request.isLogSummary()) {
+      if (request.logSummary()) {
         request.transaction().logSummary(rcQuery.getSummary());
       }
       if (request.query().isFutureFetch()) {
@@ -194,7 +194,7 @@ public final class CQueryEngine {
         logger.trace("Future fetch already cancelled");
         return null;
       }
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logSql(cquery);
       }
       // first check batch sizes set on query joins
@@ -210,7 +210,7 @@ public final class CQueryEngine {
       }
 
       QueryIterator<T> readIterate = cquery.readIterate(iterateBufferSize, request);
-      if (request.isLogSummary()) {
+      if (request.logSummary()) {
         logFindManySummary(cquery);
       }
       if (request.isAuditReads()) {
@@ -248,7 +248,7 @@ public final class CQueryEngine {
     request.setCancelableQuery(cquery);
     try {
       cquery.prepareBindExecuteQuery();
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logSql(cquery);
       }
       List<Version<T>> versions = cquery.readVersions();
@@ -256,7 +256,7 @@ public final class CQueryEngine {
       // is not universally supported, not expect huge list here
       versions.sort(OrderVersionDesc.INSTANCE);
       deriveVersionDiffs(versions, request);
-      if (request.isLogSummary()) {
+      if (request.logSummary()) {
         logFindManySummary(cquery);
       }
       if (request.isAuditReads()) {
@@ -324,7 +324,7 @@ public final class CQueryEngine {
         }
       }
       ResultSet resultSet = cquery.prepareResultSet(fwdOnly);
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logSql(cquery);
       }
       return new SpiResultSet(cquery.getPstmt(), resultSet);
@@ -350,11 +350,11 @@ public final class CQueryEngine {
         logger.trace("Future fetch already cancelled");
         return null;
       }
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logSql(cquery);
       }
       BeanCollection<T> beanCollection = cquery.readCollection();
-      if (request.isLogSummary()) {
+      if (request.logSummary()) {
         logFindManySummary(cquery);
       }
       if (request.isAuditReads()) {
@@ -385,13 +385,13 @@ public final class CQueryEngine {
     request.setCancelableQuery(cquery);
     try {
       cquery.prepareBindExecuteQuery();
-      if (request.isLogSql()) {
+      if (request.logSql()) {
         logSql(cquery);
       }
       if (cquery.readBean()) {
         bean = cquery.next();
       }
-      if (request.isLogSummary()) {
+      if (request.logSummary()) {
         logFindBeanSummary(cquery);
       }
       if (request.isAuditReads()) {
