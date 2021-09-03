@@ -34,7 +34,7 @@ public class TestDbJson_Jackson2 extends BaseTestCase {
     bean.getValueMap().put(1, new StringJacksonType("A"));
     bean.getValueMap().put(2, new LongJacksonType(7l));
 
-    ObjectMapper mapper = (ObjectMapper) Ebean.getDefaultServer().pluginApi().getServerConfig().getObjectMapper();
+    ObjectMapper mapper = (ObjectMapper) Ebean.getDefaultServer().pluginApi().config().getObjectMapper();
 
     String json = mapper.writeValueAsString(bean);
     found = mapper.readValue(json, EBasicJsonJackson2.class);

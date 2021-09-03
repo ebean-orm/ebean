@@ -216,7 +216,7 @@ public class TestNewTypes extends BaseTestCase {
 
   private void testSetGetPath(SomeNewTypesBean refBean) {
     SomeNewTypesBean testBean = new SomeNewTypesBean();
-    BeanType<SomeNewTypesBean> beanType = DB.getDefault().pluginApi().getBeanType(SomeNewTypesBean.class);
+    BeanType<SomeNewTypesBean> beanType = DB.getDefault().pluginApi().beanType(SomeNewTypesBean.class);
     ExpressionPath localDate = beanType.getExpressionPath("localDate");
     ExpressionPath localDateTime = beanType.getExpressionPath("localDateTime");
     ExpressionPath offsetDateTime = beanType.getExpressionPath("offsetDateTime");

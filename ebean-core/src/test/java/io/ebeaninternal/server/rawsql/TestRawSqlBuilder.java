@@ -302,7 +302,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     final String sql = "select description from ebasic_clob where id = ?";
 
     List<SqlRow> rows = new ArrayList<>();
-    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).getServerConfig().getDataSourceConfig();
+    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).config().getDataSourceConfig();
 
     try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
          PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -327,7 +327,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     DB.save(pfc);
 
     List<SqlRow> rows = new ArrayList<>();
-    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).getServerConfig().getDataSourceConfig();
+    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).config().getDataSourceConfig();
 
     final String sql = "select content from persistent_file_content where id = ?";
     try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());

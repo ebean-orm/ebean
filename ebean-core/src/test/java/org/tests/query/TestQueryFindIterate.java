@@ -233,7 +233,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     ResetBasicData.reset();
 
     SpiServer pluginApi = server().pluginApi();
-    DataSourcePool dsPool = (DataSourcePool) pluginApi.getServerConfig().getReadOnlyDataSource();
+    DataSourcePool dsPool = (DataSourcePool) pluginApi.config().getReadOnlyDataSource();
     if (dsPool == null) {
       dsPool = (DataSourcePool) server().dataSource();
     }

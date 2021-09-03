@@ -35,7 +35,7 @@ final class DefaultBeanLoader {
 
   DefaultBeanLoader(DefaultServer server) {
     this.server = server;
-    this.onIterateUseExtraTxn = server.getDatabasePlatform().useExtraTransactionOnIterateSecondaryQueries();
+    this.onIterateUseExtraTxn = server.databasePlatform().useExtraTransactionOnIterateSecondaryQueries();
   }
 
   void loadMany(LoadManyRequest loadRequest) {

@@ -15,7 +15,7 @@ public class ExpressionPathTest {
   static EbeanServer server = Ebean.getDefaultServer();
 
   <T> BeanType<T> beanType(Class<T> cls) {
-    return server.pluginApi().getBeanType(cls);
+    return server.pluginApi().beanType(cls);
   }
 
   @Test

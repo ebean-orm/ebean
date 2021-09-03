@@ -25,9 +25,9 @@ public class SpiServerTest extends BaseTestCase {
     EbeanServer defaultServer = Ebean.getDefaultServer();
     SpiServer pluginApi = defaultServer.pluginApi();
 
-    BeanType<Customer> beanType = pluginApi.getBeanType(Customer.class);
+    BeanType<Customer> beanType = pluginApi.beanType(Customer.class);
     assertEquals("o_customer", beanType.getBaseTable());
-    assertNotNull(pluginApi.getDatabasePlatform());
+    assertNotNull(pluginApi.databasePlatform());
     assertNull(beanType.getFindController());
     assertNotNull(beanType.getPersistController());
     assertNull(beanType.getPersistListener());
@@ -45,15 +45,15 @@ public class SpiServerTest extends BaseTestCase {
 
     assertEquals(42, beanType.getBeanId(customer));
 
-    List<? extends BeanType<?>> beanTypes = pluginApi.getBeanTypes("o_customer");
+    List<? extends BeanType<?>> beanTypes = pluginApi.beanTypes("o_customer");
     assertEquals(2, beanTypes.size());
 
-    BeanType<VwCustomer> vwBeanType = pluginApi.getBeanType(VwCustomer.class);
+    BeanType<VwCustomer> vwBeanType = pluginApi.beanType(VwCustomer.class);
 
     assertThat(beanTypes.contains(beanType)).isTrue();
     assertThat(beanTypes.contains(vwBeanType)).isTrue();
 
-    List<? extends BeanType<?>> allTypes = pluginApi.getBeanTypes();
+    List<? extends BeanType<?>> allTypes = pluginApi.beanTypes();
     assertFalse(allTypes.isEmpty());
   }
 

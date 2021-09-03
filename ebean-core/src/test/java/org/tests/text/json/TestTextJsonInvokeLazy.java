@@ -16,7 +16,7 @@ public class TestTextJsonInvokeLazy extends BaseTestCase {
 
   @Before
   public void clearBeanCache() {
-    server().pluginApi().getBeanType(Customer.class).clearBeanCache();
+    server().pluginApi().beanType(Customer.class).clearBeanCache();
   }
 
   @Test

@@ -305,12 +305,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public DatabaseConfig getServerConfig() {
+  public DatabaseConfig config() {
     return config;
   }
 
   @Override
-  public DatabasePlatform getDatabasePlatform() {
+  public DatabasePlatform databasePlatform() {
     return databasePlatform;
   }
 
@@ -2118,7 +2118,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return all the SPI BeanTypes.
    */
   @Override
-  public List<? extends BeanType<?>> getBeanTypes() {
+  public List<? extends BeanType<?>> beanTypes() {
     return getBeanDescriptors();
   }
 
@@ -2126,12 +2126,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the SPI bean types mapped to the given table.
    */
   @Override
-  public List<? extends BeanType<?>> getBeanTypes(String tableName) {
+  public List<? extends BeanType<?>> beanTypes(String tableName) {
     return beanDescriptorManager.getBeanTypes(tableName);
   }
 
   @Override
-  public BeanType<?> getBeanTypeForQueueId(String queueId) {
+  public BeanType<?> beanTypeForQueueId(String queueId) {
     return getBeanDescriptorByQueueId(queueId);
   }
 
@@ -2144,7 +2144,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the SPI bean types for the given bean class.
    */
   @Override
-  public <T> BeanType<T> getBeanType(Class<T> beanType) {
+  public <T> BeanType<T> beanType(Class<T> beanType) {
     return getBeanDescriptor(beanType);
   }
 

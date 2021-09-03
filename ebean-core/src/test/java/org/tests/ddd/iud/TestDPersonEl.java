@@ -33,7 +33,7 @@ public class TestDPersonEl {
 
     SpiServer server = Ebean.getDefaultServer().pluginApi();
 
-    BeanType<DPerson> descriptor = server.getBeanType(DPerson.class);
+    BeanType<DPerson> descriptor = server.beanType(DPerson.class);
 
 
     JsonContext jsonContext = server.json();

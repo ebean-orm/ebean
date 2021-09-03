@@ -37,7 +37,7 @@ public class TestNativeILikeExpression extends BaseTestCase {
   private boolean isExpectNative() {
 
     SpiServer pluginApi = server().pluginApi();
-    boolean expressionNativeIlike = pluginApi.getServerConfig().isExpressionNativeIlike();
+    boolean expressionNativeIlike = pluginApi.config().isExpressionNativeIlike();
     Platform platform = pluginApi.platform().base();
 
     return expressionNativeIlike && platform == Platform.POSTGRES;
