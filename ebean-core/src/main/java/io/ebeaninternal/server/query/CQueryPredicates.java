@@ -88,7 +88,7 @@ public final class CQueryPredicates {
   CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
     this.request = request;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.bindParams = query.getBindParams();
     this.idValue = query.getId();
   }

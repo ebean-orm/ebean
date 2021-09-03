@@ -105,13 +105,13 @@ public final class CQueryEngine {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
       }
       if (request.isLogSummary()) {
-        request.getTransaction().logSummary(rcQuery.getSummary());
+        request.transaction().logSummary(rcQuery.getSummary());
       }
       if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.getDependentTables());
         list = Collections.unmodifiableList(list);
         request.putToQueryCache(list);
-        if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+        if (Boolean.FALSE.equals(request.query().isReadOnly())) {
           list = new ArrayList<>(list);
         }
       }
@@ -125,7 +125,7 @@ public final class CQueryEngine {
    * Translate the SQLException into a PersistenceException.
    */
   <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e) {
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
       // log the error to the transaction log
       String msg = "ERROR executing query, bindLog[" + bindLog + "] error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
@@ -163,10 +163,10 @@ public final class CQueryEngine {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
       }
       if (request.isLogSummary()) {
-        request.getTransaction().logSummary(rcQuery.getSummary());
+        request.transaction().logSummary(rcQuery.getSummary());
       }
-      if (request.getQuery().isFutureFetch()) {
-        request.getTransaction().end();
+      if (request.query().isFutureFetch()) {
+        request.transaction().end();
       }
       if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.getDependentTables());
@@ -201,7 +201,7 @@ public final class CQueryEngine {
       int iterateBufferSize = request.getSecondaryQueriesMinBatchSize();
       if (iterateBufferSize < 1) {
         // not set on query joins so check if batch size set on query itself
-        int queryBatch = request.getQuery().getLazyLoadBatchSize();
+        int queryBatch = request.query().getLazyLoadBatchSize();
         if (queryBatch > 0) {
           iterateBufferSize = queryBatch;
         } else {
@@ -235,7 +235,7 @@ public final class CQueryEngine {
    * Execute the find versions query returning version beans.
    */
   public <T> List<Version<T>> findVersions(OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     String sysPeriodLower = getSysPeriodLower(query);
     if (query.isVersionsBetween() && !historySupport.isStandardsBased()) {
       query.where().lt(sysPeriodLower, query.getVersionEnd());
@@ -417,7 +417,7 @@ public final class CQueryEngine {
    * Log the FindById summary to the transaction log.
    */
   private void logFindBeanSummary(CQuery<?> q) {
-    SpiQuery<?> query = q.getQueryRequest().getQuery();
+    SpiQuery<?> query = q.getQueryRequest().query();
     String loadMode = query.getLoadMode();
     String loadDesc = query.getLoadDescription();
     String lazyLoadProp = query.getLazyLoadProperty();
@@ -460,7 +460,7 @@ public final class CQueryEngine {
    * Log the FindMany to the transaction log.
    */
   private void logFindManySummary(CQuery<?> q) {
-    SpiQuery<?> query = q.getQueryRequest().getQuery();
+    SpiQuery<?> query = q.getQueryRequest().query();
     String loadMode = query.getLoadMode();
     String loadDesc = query.getLoadDescription();
     String lazyLoadProp = query.getLazyLoadProperty();

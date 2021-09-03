@@ -14,7 +14,7 @@ public class TWithPreInsertPersistAdapter extends BeanPersistAdapter {
   @Override
   public boolean preInsert(BeanPersistRequest<?> request) {
 
-    TWithPreInsert e = (TWithPreInsert) request.getBean();
+    TWithPreInsert e = (TWithPreInsert) request.bean();
     if (e.getName() == null) {
       e.setName("set on preInsert");
     }
@@ -24,7 +24,7 @@ public class TWithPreInsertPersistAdapter extends BeanPersistAdapter {
   @Override
   public boolean preUpdate(BeanPersistRequest<?> request) {
 
-    TWithPreInsert b = (TWithPreInsert) request.getBean();
+    TWithPreInsert b = (TWithPreInsert) request.bean();
     System.out.println("preUpdate - title is: " + b.getTitle());
     if (b.getTitle() == null) {
       b.setTitle("set on preUpdate");

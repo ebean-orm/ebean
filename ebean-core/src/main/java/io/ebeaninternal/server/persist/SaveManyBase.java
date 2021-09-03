@@ -33,7 +33,7 @@ abstract class SaveManyBase implements SaveMany {
     this.server = request.getServer();
     this.many = many;
     this.parentBean = parentBean;
-    this.transaction = request.getTransaction();
+    this.transaction = request.transaction();
     this.value = many.getValue(parentBean);
     this.insertedParent = insertedParent;
     if (!insertedParent) {

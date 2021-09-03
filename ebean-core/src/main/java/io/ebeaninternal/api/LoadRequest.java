@@ -14,7 +14,7 @@ public abstract class LoadRequest {
 
   LoadRequest(OrmQueryRequest<?> parentRequest, boolean lazy) {
     this.parentRequest = parentRequest;
-    this.transaction = parentRequest == null ? null : parentRequest.getTransaction();
+    this.transaction = parentRequest == null ? null : parentRequest.transaction();
     this.lazy = lazy;
   }
 
@@ -45,6 +45,6 @@ public abstract class LoadRequest {
    * So one of - findIterate(), findEach(), findEachWhile() or findVisit().
    */
   public boolean isParentFindIterate() {
-    return parentRequest != null && parentRequest.getQuery().getType() == SpiQuery.Type.ITERATE;
+    return parentRequest != null && parentRequest.query().getType() == SpiQuery.Type.ITERATE;
   }
 }

@@ -88,7 +88,7 @@ final class CQueryBuilder {
    * Build the delete query.
    */
   <T> CQueryUpdate buildUpdateQuery(boolean deleteRequest, OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     String rootTableAlias = query.getAlias();
     query.setupForDeleteOrUpdate();
 
@@ -117,7 +117,7 @@ final class CQueryBuilder {
 
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
     String alias = alias(rootTableAlias);
-    if (sqlTree.noJoins() && !request.getQuery().hasMaxRowsOrFirstRow()) {
+    if (sqlTree.noJoins() && !request.query().hasMaxRowsOrFirstRow()) {
       if (dbPlatform.isSupportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSqlDelete("delete", request, predicates, sqlTree).getSql(), alias);
@@ -177,7 +177,7 @@ final class CQueryBuilder {
   }
 
   CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     query.setSingleAttribute();
     if (!query.isIncludeSoftDeletes()) {
       BeanDescriptor<?> desc = request.getBeanDescriptor();
@@ -208,7 +208,7 @@ final class CQueryBuilder {
    * Build the find ids query.
    */
   <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     query.setSelectId();
     BeanDescriptor<T> desc = request.getBeanDescriptor();
     if (!query.isIncludeSoftDeletes() && desc.isSoftDelete()) {
@@ -235,7 +235,7 @@ final class CQueryBuilder {
    * Build the row count query.
    */
   <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     // always set the order by to null for row count query
     query.setOrder(null);
     query.setFirstRow(0);
@@ -340,7 +340,7 @@ final class CQueryBuilder {
     predicates.prepare(true);
 
     // Build the tree structure that represents the query.
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
 
     SqlTree sqlTree = createSqlTree(request, predicates);
     if (query.isAsOfQuery()) {
@@ -401,7 +401,7 @@ final class CQueryBuilder {
    * Create the SqlTree by reading the ResultSetMetaData and mapping table/columns to bean property paths.
    */
   private SqlTree createNativeSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     // parse named parameters returning the final sql to execute
     String sql = predicates.parseBindParams(query.getNativeSql());
     if (query.hasMaxRowsOrFirstRow()) {
@@ -409,7 +409,7 @@ final class CQueryBuilder {
     }
     query.setGeneratedSql(sql);
 
-    Connection connection = request.getTransaction().getConnection();
+    Connection connection = request.transaction().getConnection();
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
     try {
@@ -446,7 +446,7 @@ final class CQueryBuilder {
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
     BeanDescriptor<?> descriptor = request.getBeanDescriptor();
-    ColumnMapping columnMapping = request.getQuery().getRawSql().getColumnMapping();
+    ColumnMapping columnMapping = request.query().getRawSql().getColumnMapping();
     PathProperties pathProps = new PathProperties();
 
     // convert list of columns into (tree like) PathProperties
@@ -523,7 +523,7 @@ final class CQueryBuilder {
    * Return the SQL response with row limiting (when not an update statement).
    */
   private SqlLimitResponse buildSql(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     if (query.isNativeSql()) {
       return new SqlLimitResponse(query.getGeneratedSql());
     }
@@ -562,7 +562,7 @@ final class CQueryBuilder {
     private BuildReq(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select, boolean updateStatement) {
       this.selectClause = selectClause;
       this.request = request;
-      this.query = request.getQuery();
+      this.query = request.query();
       this.predicates = predicates;
       this.select = select;
       this.updateStatement = updateStatement;

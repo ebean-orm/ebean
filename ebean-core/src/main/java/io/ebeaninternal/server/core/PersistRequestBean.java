@@ -424,12 +424,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   @Override
-  public Set<String> getLoadedProperties() {
+  public Set<String> loadedProperties() {
     return intercept.getLoadedPropertyNames();
   }
 
   @Override
-  public Set<String> getUpdatedProperties() {
+  public Set<String> updatedProperties() {
     return intercept.getDirtyPropertyNames();
   }
 
@@ -437,7 +437,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the dirty properties on this request.
    */
   @Override
-  public boolean[] getDirtyProperties() {
+  public boolean[] dirtyProperties() {
     return dirtyProperties;
   }
 
@@ -462,7 +462,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   @Override
-  public Map<String, ValuePair> getUpdatedValues() {
+  public Map<String, ValuePair> updatedValues() {
     return intercept.getDirtyValues();
   }
 
@@ -675,7 +675,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the bean associated with this request.
    */
   @Override
-  public T getBean() {
+  public T bean() {
     return bean;
   }
 
@@ -783,7 +783,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       case UPDATE:
         if (beanPersistListener != null) {
           // store the updated properties for sending later
-          updatedProperties = getUpdatedProperties();
+          updatedProperties = updatedProperties();
         }
         executeUpdate();
         return -1;
@@ -1384,7 +1384,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       String key = beanDescriptor.cacheKey(idValue);
       Map<String, Object> changes = new LinkedHashMap<>();
       EntityBean bean = getEntityBean();
-      boolean[] dirtyProperties = getDirtyProperties();
+      boolean[] dirtyProperties = dirtyProperties();
       if (dirtyProperties != null) {
         for (int i = 0; i < dirtyProperties.length; i++) {
           if (dirtyProperties[i]) {

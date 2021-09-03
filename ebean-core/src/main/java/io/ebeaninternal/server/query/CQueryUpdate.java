@@ -37,7 +37,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
   CQueryUpdate(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
     this.queryPlan = queryPlan;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
@@ -98,7 +98,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
   }
 
   private SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**

@@ -67,12 +67,12 @@ public abstract class BaseExpressionTest extends BaseTestCase {
     }
 
     @Override
-    public Transaction getTransaction() {
+    public Transaction transaction() {
       return null;
     }
 
     @Override
-    public Query<T> getQuery() {
+    public Query<T> query() {
       return null;
     }
 

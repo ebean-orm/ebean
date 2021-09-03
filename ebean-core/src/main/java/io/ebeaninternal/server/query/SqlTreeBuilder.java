@@ -61,7 +61,7 @@ public final class SqlTreeBuilder {
     this.rawSql = true;
     this.desc = request.getBeanDescriptor();
     this.rawNoId = rawNoId;
-    this.disableLazyLoad = request.getQuery().isDisableLazyLoading();
+    this.disableLazyLoad = request.query().isDisableLazyLoading();
     this.query = null;
     this.subQuery = false;
     this.distinctOnPlatform = false;
@@ -83,7 +83,7 @@ public final class SqlTreeBuilder {
     this.rawSql = false;
     this.rawNoId = false;
     this.desc = request.getBeanDescriptor();
-    this.query = request.getQuery();
+    this.query = request.query();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
     this.subQuery = Type.SQ_EXISTS == query.getType()

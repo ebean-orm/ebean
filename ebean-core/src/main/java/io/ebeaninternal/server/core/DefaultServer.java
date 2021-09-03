@@ -1312,7 +1312,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query, t);
     Object result = request.getFromQueryCache();
     if (result != null) {
-      if (Boolean.FALSE.equals(request.getQuery().isReadOnly())) {
+      if (Boolean.FALSE.equals(request.query().isReadOnly())) {
         return new CopyOnFirstWriteList<>((List<A>) result);
       } else {
         return (List<A>) result;
@@ -1341,7 +1341,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         if (ids.isEmpty()) {
           return 0;
         } else {
-          return persister.deleteByIds(request.getBeanDescriptor(), ids, request.getTransaction(), false);
+          return persister.deleteByIds(request.getBeanDescriptor(), ids, request.transaction(), false);
         }
       }
     } finally {

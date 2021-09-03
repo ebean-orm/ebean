@@ -53,7 +53,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
    */
   private <T> void flushJdbcBatchOnQuery(OrmQueryRequest<T> request) {
 
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = request.transaction();
     if (t.isFlushOnQuery()) {
       // before we perform a query, we need to flush any
       // previous persist requests that are queued/batched.
@@ -131,7 +131,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
       result = queryEngine.findMany(request);
     }
 
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
 
     if (result != null && request.isBeanCachePutMany()) {
       // load the individual beans into the bean cache

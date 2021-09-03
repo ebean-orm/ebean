@@ -22,7 +22,7 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    * Return the query.
    */
   @Override
-  SpiQuery<T> getQuery();
+  SpiQuery<T> query();
 
   /**
    * Return the associated BeanDescriptor.

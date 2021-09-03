@@ -67,7 +67,7 @@ public final class InsertHandler extends DmlHandler {
       }
     }
 
-    SpiTransaction t = persistRequest.getTransaction();
+    SpiTransaction t = persistRequest.transaction();
     // get the appropriate sql
     sql = meta.getSql(withId, persistRequest.isPublish());
     PreparedStatement pstmt;

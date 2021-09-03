@@ -39,7 +39,7 @@ public final class TransactionEventTable implements Serializable, BinaryWritable
   }
 
   public void add(TableIUD newTableIUD) {
-    TableIUD existingTableIUD = map.put(newTableIUD.getTableName(), newTableIUD);
+    TableIUD existingTableIUD = map.put(newTableIUD.tableName(), newTableIUD);
     if (existingTableIUD != null) {
       newTableIUD.add(existingTableIUD);
     }
@@ -104,7 +104,7 @@ public final class TransactionEventTable implements Serializable, BinaryWritable
     }
 
     @Override
-    public String getTableName() {
+    public String tableName() {
       return table;
     }
 

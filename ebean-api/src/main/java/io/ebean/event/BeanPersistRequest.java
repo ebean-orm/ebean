@@ -1,5 +1,6 @@
 package io.ebean.event;
 
+import io.ebean.Database;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
@@ -17,20 +18,44 @@ import java.util.Set;
 public interface BeanPersistRequest<T> {
 
   /**
-   * Return the server processing the request.
+   * Return the DB processing the request.
    */
+  default Database database() {
+    return getEbeanServer();
+  }
+
+  /**
+   * Deprecated migrate to database().
+   */
+  @Deprecated
   EbeanServer getEbeanServer();
 
   /**
    * Return the Transaction associated with this request.
    */
-  Transaction getTransaction();
+  Transaction transaction();
+
+  /**
+   * Deprecated migrate to transaction().
+   */
+  @Deprecated
+  default Transaction getTransaction() {
+    return transaction();
+  }
 
   /**
    * For an update or delete of a partially populated bean this is the set of
    * loaded properties and otherwise returns null.
    */
-  Set<String> getLoadedProperties();
+  Set<String> loadedProperties();
+
+  /**
+   * Deprecated migrate to loadedProperties().
+   */
+  @Deprecated
+  default Set<String> getLoadedProperties() {
+    return loadedProperties();
+  }
 
   /**
    * For an update this is the set of properties that where updated.
@@ -39,12 +64,28 @@ public interface BeanPersistRequest<T> {
    * should be preferred if it satisfies the requirement.
    * </p>
    */
-  Set<String> getUpdatedProperties();
+  Set<String> updatedProperties();
+
+  /**
+   * Deprecated migrate to updatedProperties().
+   */
+  @Deprecated
+  default Set<String> getUpdatedProperties() {
+    return updatedProperties();
+  }
 
   /**
    * Flags set for dirty properties (used by ElasticSearch integration).
    */
-  boolean[] getDirtyProperties();
+  boolean[] dirtyProperties();
+
+  /**
+   * Deprecated migrate to updatedProperties().
+   */
+  @Deprecated
+  default boolean[] getDirtyProperties() {
+    return dirtyProperties();
+  }
 
   /**
    * Return true for an update request if at least one of dirty properties is contained
@@ -66,11 +107,27 @@ public interface BeanPersistRequest<T> {
   /**
    * Returns the bean being inserted updated or deleted.
    */
-  T getBean();
+  T bean();
+
+  /**
+   * Deprecated migrate to bean().
+   */
+  @Deprecated
+  default T getBean() {
+    return bean();
+  }
 
   /**
    * Returns a map of the properties that have changed and their new and old values.
    */
-  Map<String, ValuePair> getUpdatedValues();
+  Map<String, ValuePair> updatedValues();
+
+  /**
+   * Deprecated migrate to updatedValues().
+   */
+  @Deprecated
+  default Map<String, ValuePair> getUpdatedValues() {
+    return updatedValues();
+  }
 
 }

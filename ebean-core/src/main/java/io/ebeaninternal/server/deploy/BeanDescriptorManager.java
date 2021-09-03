@@ -377,7 +377,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * For SQL based modifications we need to invalidate appropriate parts of the cache.
    */
   public void cacheNotify(TransactionEventTable.TableIUD tableIUD, CacheChangeSet changeSet) {
-    String tableName = tableIUD.getTableName().toLowerCase();
+    String tableName = tableIUD.tableName().toLowerCase();
     List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
     if (normalBeanTypes != null) {
       // 'normal' entity beans based on a "base table"

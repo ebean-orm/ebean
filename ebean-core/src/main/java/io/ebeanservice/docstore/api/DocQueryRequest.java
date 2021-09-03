@@ -13,7 +13,7 @@ public interface DocQueryRequest<T> extends DocQueryContext<T> {
   /**
    * Return the transaction for this request (can be null for document store only queries).
    */
-  SpiTransaction getTransaction();
+  SpiTransaction transaction();
 
   /**
    * Set the (document store) transaction to use for this query.
@@ -23,7 +23,7 @@ public interface DocQueryRequest<T> extends DocQueryContext<T> {
   /**
    * Return the query for this request.
    */
-  SpiQuery<T> getQuery();
+  SpiQuery<T> query();
 
   /**
    * Create JsonReadOptions taking into account persistence context and lazy loading support.

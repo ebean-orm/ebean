@@ -97,7 +97,7 @@ public final class DLoadContext implements LoadContext {
     this.defaultBatchSize = request.getLazyLoadBatchSize();
     this.rootDescriptor = request.getBeanDescriptor();
 
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();

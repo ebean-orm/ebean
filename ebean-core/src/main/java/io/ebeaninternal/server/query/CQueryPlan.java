@@ -89,7 +89,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.planKey = request.getQueryPlanKey();
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
@@ -113,7 +113,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.server = request.getServer();
     this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();

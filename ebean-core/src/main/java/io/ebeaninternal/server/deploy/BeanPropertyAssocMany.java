@@ -414,7 +414,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     boolean softDelete = targetDescriptor.isSoftDelete();
     boolean needsX2Table = softDelete || getExtraWhere() != null;
     StringBuilder sb = new StringBuilder(50);
-    SpiQuery<?> query = request.getQueryRequest().getQuery();
+    SpiQuery<?> query = request.getQueryRequest().query();
     if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {

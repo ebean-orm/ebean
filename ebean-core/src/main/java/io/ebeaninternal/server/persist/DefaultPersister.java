@@ -538,7 +538,7 @@ public final class DefaultPersister implements Persister {
         request.executeOrQueue();
 
       } else if (logger.isDebugEnabled()) {
-        logger.debug("Update skipped as bean is unchanged: {}", request.getBean());
+        logger.debug("Update skipped as bean is unchanged: {}", request.bean());
       }
 
       if (request.isPersistCascade()) {
@@ -590,7 +590,7 @@ public final class DefaultPersister implements Persister {
       // skip deleting bean. Used where cascade is on
       // both sides of a relationship
       if (logger.isDebugEnabled()) {
-        logger.debug("skipping delete on alreadyRegistered " + req.getBean());
+        logger.debug("skipping delete on alreadyRegistered " + req.bean());
       }
       return 0;
     }
@@ -600,7 +600,7 @@ public final class DefaultPersister implements Persister {
       int rows = delete(req);
       if (draftReq != null) {
         // delete the 'draft' bean ('live' bean deleted first)
-        draftReq.setTrans(req.getTransaction());
+        draftReq.setTrans(req.transaction());
         rows = delete(draftReq);
       }
       req.commitTransIfRequired();
@@ -908,11 +908,11 @@ public final class DefaultPersister implements Persister {
 
     EntityBean parentBean = request.getEntityBean();
     BeanDescriptor<?> desc = request.getBeanDescriptor();
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = request.transaction();
 
     EntityBean orphanForRemoval = request.getImportedOrphanForRemoval();
     if (orphanForRemoval != null) {
-      delete(orphanForRemoval, request.getTransaction(), true);
+      delete(orphanForRemoval, request.transaction(), true);
     }
 
     // exported ones with cascade save
@@ -977,7 +977,7 @@ public final class DefaultPersister implements Persister {
    */
   private void deleteAssocMany(PersistRequestBean<?> request) {
 
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = request.transaction();
     t.depth(-1);
 
     BeanDescriptor<?> desc = request.getBeanDescriptor();
@@ -1122,7 +1122,7 @@ public final class DefaultPersister implements Persister {
           && !prop.isSaveRecurseSkippable(detailBean)
           && !prop.isReference(detailBean)
           && !request.isParent(detailBean)) {
-          SpiTransaction t = request.getTransaction();
+          SpiTransaction t = request.transaction();
           t.depth(-1);
           saveRecurse(detailBean, t, null, request.getFlags());
           t.depth(+1);
@@ -1140,7 +1140,7 @@ public final class DefaultPersister implements Persister {
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
     Object origValue = request.getOrigValue(prop);
     if (origValue instanceof EntityBean) {
-      delete((EntityBean) origValue, request.getTransaction(), true);
+      delete((EntityBean) origValue, request.transaction(), true);
     }
   }
 
@@ -1180,7 +1180,7 @@ public final class DefaultPersister implements Persister {
           if (detailBean != null) {
             EntityBean detail = (EntityBean) detailBean;
             if (prop.hasId(detail)) {
-              deleteRecurse(detail, request.getTransaction(), deleteMode);
+              deleteRecurse(detail, request.transaction(), deleteMode);
             }
           }
         }

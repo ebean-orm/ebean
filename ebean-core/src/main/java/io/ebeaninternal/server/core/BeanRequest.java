@@ -102,7 +102,7 @@ public abstract class BeanRequest {
   /**
    * Return the Transaction associated with this request.
    */
-  public SpiTransaction getTransaction() {
+  public SpiTransaction transaction() {
     return transaction;
   }
 

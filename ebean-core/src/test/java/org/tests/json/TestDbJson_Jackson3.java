@@ -33,13 +33,13 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     @Override
     public boolean preInsert(BeanPersistRequest<?> request) {
-      updatedValues = request.getUpdatedValues();
+      updatedValues = request.updatedValues();
       return true;
     }
 
     @Override
     public boolean preUpdate(BeanPersistRequest<?> request) {
-      updatedValues = request.getUpdatedValues();
+      updatedValues = request.updatedValues();
       return true;
     }
   }

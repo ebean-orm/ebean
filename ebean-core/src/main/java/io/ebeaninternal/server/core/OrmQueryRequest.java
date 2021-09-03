@@ -509,7 +509,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
-  public SpiQuery<T> getQuery() {
+  public SpiQuery<T> query() {
     return query;
   }
 

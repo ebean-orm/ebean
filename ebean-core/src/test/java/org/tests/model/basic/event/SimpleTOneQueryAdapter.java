@@ -21,7 +21,7 @@ public class SimpleTOneQueryAdapter implements BeanQueryAdapter {
   @Override
   public void preQuery(BeanQueryRequest<?> request) {
 
-    Query<?> query = request.getQuery();
+    Query<?> query = request.query();
 
     switch (query.getQueryType()) {
       case DELETE: {

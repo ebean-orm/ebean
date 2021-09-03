@@ -18,8 +18,8 @@ public class MPrinterListener extends BeanPersistAdapter {
   public boolean preUpdate(BeanPersistRequest<?> request) {
 
     logger.info("preUpdate ...");
-    logger.info("preUpdate ..." + request.getUpdatedValues());
-    request.getUpdatedProperties();
+    logger.info("preUpdate ..." + request.updatedValues());
+    request.updatedProperties();
     return super.preUpdate(request);
   }
 }

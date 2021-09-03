@@ -168,7 +168,7 @@ public class BeanPersistControllerTest {
     public boolean preUpdate(BeanPersistRequest<?> request) {
       methodsCalled.add("preUpdate");
 
-      Object bean = request.getBean();
+      Object bean = request.bean();
       if (bean instanceof UTDetail) {
         UTDetail detail = (UTDetail)bean;
         // invoke lazy loading ... which invoke the flush of the jdbc batch

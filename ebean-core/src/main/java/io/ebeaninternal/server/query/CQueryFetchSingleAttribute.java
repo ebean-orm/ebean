@@ -50,7 +50,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan, boolean containsCounts) {
     this.request = request;
     this.queryPlan = queryPlan;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
@@ -105,7 +105,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   }
 
   private SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**

@@ -40,7 +40,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   DmlHandler(PersistRequestBean<?> persistRequest) {
     this.now = System.currentTimeMillis();
     this.persistRequest = persistRequest;
-    this.transaction = persistRequest.getTransaction();
+    this.transaction = persistRequest.transaction();
     this.logLevelSql = transaction.isLogSql();
     if (logLevelSql) {
       this.bindLog = new StringBuilder(50);
@@ -103,7 +103,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
       String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
-      persistRequest.getTransaction().logSummary("OptimisticLockException:" + m);
+      persistRequest.transaction().logSummary("OptimisticLockException:" + m);
       throw new OptimisticLockException(m, null, e.getEntity());
     }
   }

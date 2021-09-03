@@ -41,7 +41,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   CQueryRowCount(CQueryPlan queryPlan, OrmQueryRequest<?> request, CQueryPredicates predicates) {
     this.queryPlan = queryPlan;
     this.request = request;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.sql = queryPlan.getSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
@@ -120,7 +120,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   }
 
   private SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**

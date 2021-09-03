@@ -184,7 +184,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.request = request;
     this.audit = request.isAuditReads();
     this.queryPlan = queryPlan;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.queryMode = query.getMode();
     this.lazyLoadManyProperty = query.getLazyLoadMany();
     this.readOnly = request.isReadOnly();
@@ -216,7 +216,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (request.isFindById()) {
       return null;
     } else {
-      SpiQuery.Type manyType = request.getQuery().getType();
+      SpiQuery.Type manyType = request.query().getType();
       if (manyType == null) {
         // subQuery compiled for InQueryExpression
         return null;
@@ -306,7 +306,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       // cancelled before we started
       query.checkCancelled();
       startNano = System.nanoTime();
-      SpiTransaction t = request.getTransaction();
+      SpiTransaction t = request.transaction();
       profileOffset = t.profileOffset();
       if (query.isRawSql()) {
         ResultSet suppliedResultSet = query.getRawSql().getResultSet();
@@ -630,7 +630,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   public SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**

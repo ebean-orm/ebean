@@ -45,7 +45,7 @@ public final class BeanCollectionHelpFactory {
 
     } else if (manyType == SpiQuery.Type.MAP) {
       BeanDescriptor<T> target = request.getBeanDescriptor();
-      ElPropertyValue elProperty = target.getElGetValue(request.getQuery().getMapKey());
+      ElPropertyValue elProperty = target.getElGetValue(request.query().getMapKey());
       return new BeanMapQueryHelp<>(elProperty);
 
     } else {

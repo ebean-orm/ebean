@@ -67,7 +67,7 @@ final class DeleteUnloadedForeignKeys {
     q.setIncludeSoftDeletes();
     q.where().idEq(id);
 
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
       t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
     }
@@ -87,9 +87,9 @@ final class DeleteUnloadedForeignKeys {
         // if bean exists with a unique id then delete it
         if (detailBean != null && prop.hasId((EntityBean) detailBean)) {
           if (deletePermanent) {
-            server.deletePermanent(detailBean, request.getTransaction());
+            server.deletePermanent(detailBean, request.transaction());
           } else {
-            server.delete(detailBean, request.getTransaction());
+            server.delete(detailBean, request.transaction());
           }
         }
       }

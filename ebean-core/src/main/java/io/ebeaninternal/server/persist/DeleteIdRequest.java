@@ -29,17 +29,17 @@ final class DeleteIdRequest implements BeanDeleteIdRequest {
   }
 
   @Override
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return transaction;
   }
-  
-  @Override 
-  public Class<?> getBeanType() {
+
+  @Override
+  public Class<?> beanType() {
     return beanType;
   }
 
   @Override
-  public Object getId() {
+  public Object id() {
     return id;
   }
 }

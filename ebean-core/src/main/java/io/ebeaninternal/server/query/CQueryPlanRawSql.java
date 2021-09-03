@@ -28,7 +28,7 @@ final class CQueryPlanRawSql extends CQueryPlan {
 
   private int[] createIndexPositions(OrmQueryRequest<?> request, SqlTree sqlTree) {
     List<String> chain = sqlTree.buildRawSqlSelectChain();
-    ColumnMapping columnMapping = request.getQuery().getRawSql().getColumnMapping();
+    ColumnMapping columnMapping = request.query().getRawSql().getColumnMapping();
 
     int[] indexPositions = new int[chain.size()];
 

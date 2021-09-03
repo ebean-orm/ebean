@@ -10,31 +10,62 @@ import io.ebean.Transaction;
 public interface BeanDeleteIdRequest {
 
   /**
-   * Return the server processing the request.
-   * @deprecated use {@link #getDatabase()}
+   * Deprecated migrate to database().
    */
+  @Deprecated
   EbeanServer getEbeanServer();
+
+  /**
+   * Deprecated migrate to database().
+   */
+  @Deprecated
+  default Database getDatabase() {
+    return getEbeanServer();
+  }
 
   /**
    * Return the DB processing the request.
    */
-  default Database getDatabase() {
+  default Database database() {
     return getEbeanServer();
   }
-  
+
   /**
    * Return the Transaction associated with this request.
    */
-  Transaction getTransaction();
-  
+  Transaction transaction();
+
+  /**
+   * Deprecated migrate to transaction().
+   */
+  @Deprecated
+  default Transaction getTransaction() {
+    return transaction();
+  }
+
   /**
    * Returns the bean type of the bean being deleted.
    */
-  Class<?> getBeanType();
+  Class<?> beanType();
+
+  /**
+   * Deprecated migrate to beanType().
+   */
+  @Deprecated
+  default Class<?> getBeanType() {
+    return beanType();
+  }
 
   /**
    * Returns the Id value of the bean being deleted.
    */
-  Object getId();
+  Object id();
 
+  /**
+   * Deprecated migrate to id().
+   */
+  @Deprecated
+  default Object getId() {
+    return id();
+  }
 }
