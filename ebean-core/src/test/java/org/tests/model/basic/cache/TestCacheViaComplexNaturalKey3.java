@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
-  private ServerCache beanCache = cacheManager().getBeanCache(OCachedNatKeyBean3.class);
-  private ServerCache natKeyCache = cacheManager().getNaturalKeyCache(OCachedNatKeyBean3.class);
+  private ServerCache beanCache = cacheManager().beanCache(OCachedNatKeyBean3.class);
+  private ServerCache natKeyCache = cacheManager().naturalKeyCache(OCachedNatKeyBean3.class);
 
   private static boolean loadOnce;
 
@@ -55,17 +55,17 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   }
 
   private void clearStatistics() {
-    beanCache.getStatistics(true);
-    natKeyCache.getStatistics(true);
+    beanCache.statistics(true);
+    natKeyCache.statistics(true);
   }
 
   private void assertNaturalKeyHitMiss(int expectedHit, int expectedMiss) {
-    ServerCacheStatistics stats = natKeyCache.getStatistics(true);
+    ServerCacheStatistics stats = natKeyCache.statistics(true);
     assertHitMiss(expectedHit, expectedMiss, stats);
   }
 
   private void assertBeanCacheHitMiss(int expectedHit, int expectedMiss) {
-    ServerCacheStatistics stats = beanCache.getStatistics(true);
+    ServerCacheStatistics stats = beanCache.statistics(true);
     assertHitMiss(expectedHit, expectedMiss, stats);
   }
 

@@ -381,7 +381,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (encryptKeyManager != null) {
       encryptKeyManager.initialise();
     }
-    serverCacheManager.setEnabledRegions(config.getEnabledL2Regions());
+    serverCacheManager.enabledRegions(config.getEnabledL2Regions());
   }
 
   /**

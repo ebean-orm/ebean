@@ -18,13 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestBeanFetchJoinCache extends BaseTestCase {
 
-  private final ServerCache customerBeanCache = server().cacheManager().getBeanCache(Customer.class);
+  private final ServerCache customerBeanCache = server().cacheManager().beanCache(Customer.class);
 
   @Test
   public void fetchCache_when_allHits() {
     initDataClearCache();
     loadCustomerBeanCache();
-    customerBeanCache.getStatistics(true);
+    customerBeanCache.statistics(true);
 
     LoggedSqlCollector.start();
 
@@ -35,7 +35,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     final List<String> sql0 = LoggedSqlCollector.current();
     assertThat(sql0).hasSize(1);
 
-    final ServerCacheStatistics statistics = customerBeanCache.getStatistics(true);
+    final ServerCacheStatistics statistics = customerBeanCache.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(2);
 
     assertThat(trimSql(sql0.get(0))).doesNotContain("t1.status");
@@ -64,7 +64,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
       .where().lt("id", 2)
       .findList();
 
-    customerBeanCache.getStatistics(true);
+    customerBeanCache.statistics(true);
 
     LoggedSqlCollector.start();
 
@@ -77,7 +77,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     assertThat(sql0.get(0)).contains(" from o_order ");
     assertThat(sql0.get(1)).contains(" from o_customer t0 where t0.id ");
 
-    final ServerCacheStatistics statistics = customerBeanCache.getStatistics(true);
+    final ServerCacheStatistics statistics = customerBeanCache.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(1);
 
     for (Order order : orders) {
@@ -98,7 +98,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
       .select("name") // not included status in bean cache
       .findList();
 
-    customerBeanCache.getStatistics(true);
+    customerBeanCache.statistics(true);
 
     LoggedSqlCollector.start();
 
@@ -112,7 +112,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     final List<String> sql0 = LoggedSqlCollector.current();
     assertThat(sql0).hasSize(1);
 
-    final ServerCacheStatistics statistics = customerBeanCache.getStatistics(true);
+    final ServerCacheStatistics statistics = customerBeanCache.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(2);
 
     assertThat(trimSql(sql0.get(0))).doesNotContain("t1.status");
@@ -129,7 +129,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     assertThat(sql1.get(0)).contains(" from o_customer t0 ");
 
     // assert we didn't hit the L2 bean cache the second time around
-    final ServerCacheStatistics statistics1 = customerBeanCache.getStatistics(true);
+    final ServerCacheStatistics statistics1 = customerBeanCache.statistics(true);
     assertThat(statistics1.getHitCount()).isGreaterThan(0);
   }
 
@@ -141,7 +141,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
   public void fetchGroup_fetchCache() {
     initDataClearCache();
     loadCustomerBeanCache();
-    customerBeanCache.getStatistics(true);
+    customerBeanCache.statistics(true);
 
     List<Order> orders = DB.find(Order.class)
       .select(fgBasic)
@@ -149,7 +149,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
     assertThat(orders).isNotEmpty();
 
-    final ServerCacheStatistics statistics1 = customerBeanCache.getStatistics(true);
+    final ServerCacheStatistics statistics1 = customerBeanCache.statistics(true);
     assertThat(statistics1.getHitCount()).isEqualTo(2);
   }
 
@@ -160,7 +160,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
   @Test
   public void fetchGroup_fetchCache_partial() {
     initDataClearCache();
-    customerBeanCache.getStatistics(true);
+    customerBeanCache.statistics(true);
 
     LoggedSqlCollector.start();
 
@@ -170,7 +170,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
     assertThat(orders).isNotEmpty();
 
-    final ServerCacheStatistics statistics1 = customerBeanCache.getStatistics(true);
+    final ServerCacheStatistics statistics1 = customerBeanCache.statistics(true);
     assertThat(statistics1.getMissCount()).isEqualTo(2);
 
     final List<String> sql = LoggedSqlCollector.stop();

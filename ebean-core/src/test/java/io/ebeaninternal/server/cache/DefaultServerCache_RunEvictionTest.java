@@ -40,7 +40,7 @@ public class DefaultServerCache_RunEvictionTest {
     for (int i = 0; i < 15; i++) {
       doStuff();
       cache.runEviction();
-      ServerCacheStatistics statistics = cache.getStatistics(true);
+      ServerCacheStatistics statistics = cache.statistics(true);
       System.out.println(statistics);
       Thread.sleep(500);
     }

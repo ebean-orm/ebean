@@ -26,20 +26,20 @@ public class DefaultServerCacheTest {
   public void testGetHitRatio() {
 
     DefaultServerCache cache = createCache();
-    assertEquals(0, cache.getHitRatio());
+    assertEquals(0, cache.hitRatio());
     assertEquals(0, cache.getHitCount());
     assertEquals(0, cache.getMissCount());
     cache.put("A", "A");
     cache.get("A");
-    assertEquals(100, cache.getHitRatio());
+    assertEquals(100, cache.hitRatio());
     assertEquals(1, cache.getHitCount());
     assertEquals(0, cache.getMissCount());
     cache.get("B");
-    assertEquals(50, cache.getHitRatio());
+    assertEquals(50, cache.hitRatio());
     assertEquals(1, cache.getMissCount());
     cache.get("B");
     cache.get("B");
-    assertEquals(25, cache.getHitRatio());
+    assertEquals(25, cache.hitRatio());
     assertEquals(3, cache.getMissCount());
     assertEquals(1, cache.getHitCount());
   }

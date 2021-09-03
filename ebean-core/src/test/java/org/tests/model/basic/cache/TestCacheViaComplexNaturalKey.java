@@ -21,8 +21,8 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestCacheViaComplexNaturalKey.class);
 
-  private ServerCache beanCache = cacheManager().getBeanCache(OCachedNatKeyBean.class);
-  private ServerCache natKeyCache = cacheManager().getNaturalKeyCache(OCachedNatKeyBean.class);
+  private ServerCache beanCache = cacheManager().beanCache(OCachedNatKeyBean.class);
+  private ServerCache natKeyCache = cacheManager().naturalKeyCache(OCachedNatKeyBean.class);
 
   private static boolean loadOnce;
 
@@ -52,17 +52,17 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
   }
 
   private void clearStatistics() {
-    beanCache.getStatistics(true);
-    natKeyCache.getStatistics(true);
+    beanCache.statistics(true);
+    natKeyCache.statistics(true);
   }
 
   private void assertNaturalKeyHitMiss(int expectedHit, int expectedMiss) {
-    ServerCacheStatistics stats = natKeyCache.getStatistics(true);
+    ServerCacheStatistics stats = natKeyCache.statistics(true);
     assertHitMiss(expectedHit, expectedMiss, stats);
   }
 
   private void assertBeanCacheHitMiss(int expectedHit, int expectedMiss) {
-    ServerCacheStatistics stats = beanCache.getStatistics(true);
+    ServerCacheStatistics stats = beanCache.statistics(true);
     assertHitMiss(expectedHit, expectedMiss, stats);
   }
 

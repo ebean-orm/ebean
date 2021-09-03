@@ -28,8 +28,8 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     Ebean.save(f1);
 
-    ServerCache beanCache = Ebean.getServerCacheManager().getBeanCache(FeatureDescription.class);
-    beanCache.getStatistics(true);
+    ServerCache beanCache = Ebean.getServerCacheManager().beanCache(FeatureDescription.class);
+    beanCache.statistics(true);
 
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("name");
@@ -49,7 +49,7 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
     // load the cache
     FeatureDescription fetchOne = Ebean.find(FeatureDescription.class, f1.getId());
     Assert.assertNotNull(fetchOne);
-    assertEquals(1, beanCache.getStatistics(false).getSize());
+    assertEquals(1, beanCache.statistics(false).getSize());
 
     FeatureDescription fetchTwo = Ebean.find(FeatureDescription.class, f1.getId());
     FeatureDescription fetchThree = Ebean.find(FeatureDescription.class, f1.getId());

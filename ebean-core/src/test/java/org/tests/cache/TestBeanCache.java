@@ -27,7 +27,7 @@ public class TestBeanCache extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestBeanCache.class);
 
-  private final ServerCache beanCache = DB.getDefault().cacheManager().getBeanCache(OCachedBean.class);
+  private final ServerCache beanCache = DB.getDefault().cacheManager().beanCache(OCachedBean.class);
 
   @Test
   public void findById_when_idTypeConverted() {
@@ -61,7 +61,7 @@ public class TestBeanCache extends BaseTestCase {
     List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
 
     beanCache.clear();
-    beanCache.getStatistics(true);
+    beanCache.statistics(true);
     try (Transaction transaction = DB.beginTransaction()) {
 
       // skipCacheAfterWrite set after this write ...
@@ -77,7 +77,7 @@ public class TestBeanCache extends BaseTestCase {
       transaction.commit();
     }
 
-    ServerCacheStatistics statistics = beanCache.getStatistics(true);
+    ServerCacheStatistics statistics = beanCache.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(0);
     assertThat(statistics.getMissCount()).isEqualTo(2);
     assertThat(statistics.getPutCount()).isEqualTo(2);
@@ -90,7 +90,7 @@ public class TestBeanCache extends BaseTestCase {
     List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
 
     beanCache.clear();
-    beanCache.getStatistics(true);
+    beanCache.statistics(true);
 
     LoggedSqlCollector.start();
 
@@ -158,7 +158,7 @@ public class TestBeanCache extends BaseTestCase {
   }
 
   private void assertBeanCacheHitMiss(int hitCount, int missCount) {
-    ServerCacheStatistics statistics = beanCache.getStatistics(true);
+    ServerCacheStatistics statistics = beanCache.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(hitCount);
     assertThat(statistics.getMissCount()).isEqualTo(missCount);
   }

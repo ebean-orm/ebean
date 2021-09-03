@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestCacheWithSoftDelete extends BaseTestCase {
 
-  private final ServerCache beanCache = DB.getServerCacheManager().getBeanCache(ESoftWithCache.class);
+  private final ServerCache beanCache = DB.getServerCacheManager().beanCache(ESoftWithCache.class);
 
   @Test
   public void idIn_expect_hitCache() {
@@ -41,6 +41,6 @@ public class TestCacheWithSoftDelete extends BaseTestCase {
   }
 
   private ServerCacheStatistics stats() {
-    return beanCache.getStatistics(true);
+    return beanCache.statistics(true);
   }
 }

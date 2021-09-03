@@ -22,7 +22,7 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache contactCache = Ebean.getServerCacheManager().getBeanCache(Contact.class);
+    ServerCache contactCache = Ebean.getServerCacheManager().beanCache(Contact.class);
 
     List<Contact> list = Ebean.find(Contact.class).setBeanCacheMode(CacheMode.PUT).findList();
 
@@ -36,15 +36,15 @@ public class TestCacheNaturalId extends BaseTestCase {
       }
     }
 
-    contactCache.getStatistics(true);
+    contactCache.statistics(true);
 
     Contact c0 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findOne();
 
-    ServerCacheStatistics stats0 = contactCache.getStatistics(false);
+    ServerCacheStatistics stats0 = contactCache.statistics(false);
 
     Contact c1 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findOne();
 
-    ServerCacheStatistics stats1 = contactCache.getStatistics(false);
+    ServerCacheStatistics stats1 = contactCache.statistics(false);
 
     assertNotNull(c0);
     assertNotNull(c1);
@@ -59,7 +59,7 @@ public class TestCacheNaturalId extends BaseTestCase {
     Contact c2 = Ebean.find(Contact.class).where().eq("email", "mychangedemail@what.com")
       .findOne();
 
-    ServerCacheStatistics stats2 = contactCache.getStatistics(false);
+    ServerCacheStatistics stats2 = contactCache.statistics(false);
 
     assertNotNull(c2);
     assertEquals(c2.getId(), c1.getId());

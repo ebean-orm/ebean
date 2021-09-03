@@ -18,28 +18,28 @@ public class ServerCacheManagerTest {
       assertTrue(region.isEnabled());
     }
 
-    cacheManager.setEnabledRegions("r0,doesNotExist");
-    assertThat(cacheManager.getRegion("email").isEnabled()).isFalse();
-    assertThat(cacheManager.getRegion("r0").isEnabled()).isTrue();
+    cacheManager.enabledRegions("r0,doesNotExist");
+    assertThat(cacheManager.region("email").isEnabled()).isFalse();
+    assertThat(cacheManager.region("r0").isEnabled()).isTrue();
 
-    cacheManager.setEnabledRegions("r0");
-    assertThat(cacheManager.getRegion("email").isEnabled()).isFalse();
-    assertThat(cacheManager.getRegion("r0").isEnabled()).isTrue();
+    cacheManager.enabledRegions("r0");
+    assertThat(cacheManager.region("email").isEnabled()).isFalse();
+    assertThat(cacheManager.region("r0").isEnabled()).isTrue();
 
-    cacheManager.setEnabledRegions(null);
-    assertThat(cacheManager.getRegion("email").isEnabled()).isFalse();
-    assertThat(cacheManager.getRegion("r0").isEnabled()).isTrue();
+    cacheManager.enabledRegions(null);
+    assertThat(cacheManager.region("email").isEnabled()).isFalse();
+    assertThat(cacheManager.region("r0").isEnabled()).isTrue();
 
-    cacheManager.setEnabledRegions("email");
-    assertThat(cacheManager.getRegion("email").isEnabled()).isTrue();
-    assertThat(cacheManager.getRegion("r0").isEnabled()).isFalse();
+    cacheManager.enabledRegions("email");
+    assertThat(cacheManager.region("email").isEnabled()).isTrue();
+    assertThat(cacheManager.region("r0").isEnabled()).isFalse();
 
-    cacheManager.setAllRegionsEnabled(false);
+    cacheManager.allRegionsEnabled(false);
     for (ServerCacheRegion region : cacheManager.allRegions()) {
       assertFalse(region.isEnabled());
     }
 
-    cacheManager.setAllRegionsEnabled(true);
+    cacheManager.allRegionsEnabled(true);
     for (ServerCacheRegion region : cacheManager.allRegions()) {
       assertTrue(region.isEnabled());
     }

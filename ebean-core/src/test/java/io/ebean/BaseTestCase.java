@@ -242,7 +242,7 @@ public abstract class BaseTestCase {
   }
 
   protected <T> ServerCacheStatistics getBeanCacheStats(Class<T> cls, boolean reset) {
-    return server().cacheManager().getBeanCache(cls).getStatistics(reset);
+    return server().cacheManager().beanCache(cls).statistics(reset);
   }
 
   protected Platform platform() {

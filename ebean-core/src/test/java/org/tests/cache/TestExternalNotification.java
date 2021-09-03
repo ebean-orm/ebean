@@ -21,7 +21,7 @@ public class TestExternalNotification extends BaseTestCase {
 
     loadCountryCache();
 
-    ServerCache countryCache = Ebean.getServerCacheManager().getBeanCache(Country.class);
+    ServerCache countryCache = Ebean.getServerCacheManager().beanCache(Country.class);
 
     assertTrue(countryCache.size() > 0);
 

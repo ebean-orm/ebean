@@ -217,7 +217,7 @@ public class TestQueryCache extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache customerCache = DB.getServerCacheManager().getQueryCache(Customer.class);
+    ServerCache customerCache = DB.getServerCacheManager().queryCache(Customer.class);
     customerCache.clear();
 
     List<Customer> list = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()

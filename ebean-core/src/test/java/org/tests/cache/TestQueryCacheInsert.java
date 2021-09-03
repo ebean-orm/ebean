@@ -44,8 +44,8 @@ public class TestQueryCacheInsert extends BaseTestCase {
 
     Ebean.save(doda);
 
-    ServerCache queryCache = Ebean.getServerCacheManager().getQueryCache(EBasicVer.class);
-    queryCache.getStatistics(true);
+    ServerCache queryCache = Ebean.getServerCacheManager().queryCache(EBasicVer.class);
+    queryCache.statistics(true);
 
     Optional<EBasicVer> found0 = Ebean.find(EBasicVer.class)
       .where().eq("description", "OddButUniqueSillyExample")
@@ -65,7 +65,7 @@ public class TestQueryCacheInsert extends BaseTestCase {
   }
 
   private void assertHitMiss(int hits, int miss, ServerCache queryCache) {
-    ServerCacheStatistics stats = queryCache.getStatistics(true);
+    ServerCacheStatistics stats = queryCache.statistics(true);
     assertEquals(hits, stats.getHitCount());
     assertEquals(miss, stats.getMissCount());
   }

@@ -23,7 +23,7 @@ public class TestQueryJoin extends BaseTestCase {
 
     // Need to make sure the customer cache is cleared for the later
     // asserts on the lazy loading
-    ServerCache custCache = Ebean.getServerCacheManager().getBeanCache(Customer.class);
+    ServerCache custCache = Ebean.getServerCacheManager().beanCache(Customer.class);
     custCache.clear();
 
     Query<Order> query = Ebean.find(Order.class).select("status")

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
-  private final ServerCache beanCache = server().cacheManager().getBeanCache(UUOne.class);
+  private final ServerCache beanCache = server().cacheManager().beanCache(UUOne.class);
 
   private UUOne insert(String name) {
     UUOne one = new UUOne();
@@ -61,19 +61,19 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     platformAssertIn(sql.get(1), "from uuone t0 where t0.id");
 
     // not lazy loading into bean cache
-    final ServerCacheStatistics stats = beanCache.getStatistics(true);
+    final ServerCacheStatistics stats = beanCache.statistics(true);
     assertThat(stats.getHitCount()).isEqualTo(10);
     assertThat(stats.getSize()).isEqualTo(10);
   }
 
   private void assertBeanCacheHits(int hits) {
-    ServerCacheStatistics statistics = beanCache.getStatistics(true);
+    ServerCacheStatistics statistics = beanCache.statistics(true);
     assertEquals(statistics.getHitCount(), hits);
   }
 
   private void clearCacheAndStatistics() {
     beanCache.clear();
-    beanCache.getStatistics(true);
+    beanCache.statistics(true);
   }
 
   private List<UUOne> insertData() {

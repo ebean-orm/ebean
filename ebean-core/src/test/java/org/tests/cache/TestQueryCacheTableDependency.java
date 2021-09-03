@@ -25,7 +25,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache customerCache = Ebean.getServerCacheManager().getQueryCache(Customer.class);
+    ServerCache customerCache = Ebean.getServerCacheManager().queryCache(Customer.class);
     customerCache.clear();
 
     List<Address> addrs = Ebean.find(Address.class)
@@ -138,8 +138,8 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     child.setName("bobby");
     child.setBillingAddress(root);
     DB.save(child);
-    DB.getServerCacheManager().getQueryCache(Address.class).clear();
-    DB.getServerCacheManager().getQueryCache(Customer.class).clear();
+    DB.getServerCacheManager().queryCache(Address.class).clear();
+    DB.getServerCacheManager().queryCache(Customer.class).clear();
     // Test preparation finished, start the test
     Thread.sleep(10);
 
@@ -169,8 +169,8 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     child.setName("testChild");
     child.setRoot(root);
     DB.save(child);
-    DB.getServerCacheManager().getQueryCache(ECacheChild.class).clear();
-    DB.getServerCacheManager().getQueryCache(ECacheRoot.class).clear();
+    DB.getServerCacheManager().queryCache(ECacheChild.class).clear();
+    DB.getServerCacheManager().queryCache(ECacheRoot.class).clear();
     // Test preparation finished, start the test
     Thread.sleep(10);
     // we need this thread.sleep here, because on a fast machine, DB.save(child) and computing the

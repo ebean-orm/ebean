@@ -21,7 +21,15 @@ public interface ServerCacheManager {
    * rather than background processing.
    * </p>
    */
-  boolean isLocalL2Caching();
+  boolean localL2Caching();
+
+  /**
+   * Deprecated migrate to localL2Caching().
+   */
+  @Deprecated
+  default boolean isLocalL2Caching() {
+    return localL2Caching();
+  }
 
   /**
    * Return all the cache regions.
@@ -36,37 +44,78 @@ public interface ServerCacheManager {
    *
    * @param regions A region name or comma delimited list of region names.
    */
-  void setEnabledRegions(String regions);
+  void enabledRegions(String regions);
+
+  /**
+   * Deprecated migrate to enabledRegions().
+   */
+  @Deprecated
+  default void setEnabledRegions(String regions) {
+    enabledRegions(regions);
+  }
 
   /**
    * Enable or disable all the cache regions.
    */
-  void setAllRegionsEnabled(boolean enabled);
+  void allRegionsEnabled(boolean enabled);
+
+  /**
+   * Deprecated migrate to allRegionsEnabled().
+   */
+  @Deprecated
+  default void setAllRegionsEnabled(boolean enabled) {
+    allRegionsEnabled(enabled);
+  }
 
   /**
    * Return the cache region by name. Typically, to enable or disable the region.
    */
-  ServerCacheRegion getRegion(String name);
+  ServerCacheRegion region(String name);
+
+  @Deprecated
+  default ServerCacheRegion getRegion(String name) {
+    return region(name);
+  }
 
   /**
    * Return the cache for mapping natural keys to id values.
    */
-  ServerCache getNaturalKeyCache(Class<?> beanType);
+  ServerCache naturalKeyCache(Class<?> beanType);
+
+  @Deprecated
+  default ServerCache getNaturalKeyCache(Class<?> beanType) {
+    return naturalKeyCache(beanType);
+  }
 
   /**
    * Return the cache for beans of a particular type.
    */
-  ServerCache getBeanCache(Class<?> beanType);
+  ServerCache beanCache(Class<?> beanType);
+
+  @Deprecated
+  default ServerCache getBeanCache(Class<?> beanType) {
+    return beanCache(beanType);
+  }
 
   /**
    * Return the cache for associated many properties of a bean type.
    */
-  ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName);
+  ServerCache collectionIdsCache(Class<?> beanType, String propertyName);
+
+  @Deprecated
+  default ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
+    return collectionIdsCache(beanType, propertyName);
+  }
 
   /**
    * Return the cache for query results of a particular type of bean.
    */
-  ServerCache getQueryCache(Class<?> beanType);
+  ServerCache queryCache(Class<?> beanType);
+
+  @Deprecated
+  default ServerCache getQueryCache(Class<?> beanType) {
+    return queryCache(beanType);
+  }
 
   /**
    * This clears both the bean and query cache for a given type.

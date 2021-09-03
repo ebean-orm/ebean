@@ -33,7 +33,7 @@ public class TestQueryWithCache extends BaseTestCase {
     ServerCacheManager serverCacheManager = server.cacheManager();
     serverCacheManager.clear(Country.class);
 
-    ServerCache beanCache = serverCacheManager.getBeanCache(Country.class);
+    ServerCache beanCache = serverCacheManager.beanCache(Country.class);
     assertEquals(0, beanCache.size());
 
     Country nz1 = Ebean.getReference(Country.class, "NZ");

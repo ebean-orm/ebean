@@ -21,10 +21,10 @@ public class PersonCacheTests {
 
   private final List<Object> ids = Arrays.asList("E001", "E002", "E003");
 
-  private ServerCache beanCacheInfo = DB.getDefault().cacheManager().getBeanCache(PersonCacheInfo.class);
-  private ServerCache beanCacheEmail = DB.getDefault().cacheManager().getBeanCache(PersonCacheEmail.class);
+  private ServerCache beanCacheInfo = DB.getDefault().cacheManager().beanCache(PersonCacheInfo.class);
+  private ServerCache beanCacheEmail = DB.getDefault().cacheManager().beanCache(PersonCacheEmail.class);
 
-  private ServerCacheRegion region = DB.getDefault().cacheManager().getRegion("email");
+  private ServerCacheRegion region = DB.getDefault().cacheManager().region("email");
 
   private void insert(int id, String email) {
 
@@ -56,7 +56,7 @@ public class PersonCacheTests {
       .setUseCache(true)
       .findList();
 
-    beanCacheInfo.getStatistics(true);
+    beanCacheInfo.statistics(true);
 
     List<PersonCacheEmail> emailList =
       DB.find(PersonCacheEmail.class)
@@ -73,7 +73,7 @@ public class PersonCacheTests {
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(3);
 
-    assertThat(beanCacheInfo.getStatistics(true).getHitCount()).isEqualTo(3);
+    assertThat(beanCacheInfo.statistics(true).getHitCount()).isEqualTo(3);
 
     // force cache misses on PersonCacheEmail
     beanCacheEmail.clear();
@@ -94,7 +94,7 @@ public class PersonCacheTests {
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
 
-    assertThat(beanCacheInfo.getStatistics(true).getHitCount()).isEqualTo(3);
+    assertThat(beanCacheInfo.statistics(true).getHitCount()).isEqualTo(3);
 
     turnOffRegion_expect_noCacheUse();
 
@@ -103,7 +103,7 @@ public class PersonCacheTests {
   private void turnOffRegion_expect_noCacheUse() {
 
     assertTrue(region.isEnabled());
-    beanCacheEmail.getStatistics(true);
+    beanCacheEmail.statistics(true);
 
     log.info("Disabled region ...");
     region.setEnabled(false);
@@ -116,7 +116,7 @@ public class PersonCacheTests {
     }
 
     // assert that we didn't hit the cache
-    ServerCacheStatistics statistics = beanCacheEmail.getStatistics(true);
+    ServerCacheStatistics statistics = beanCacheEmail.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(0);
     assertThat(statistics.getMissCount()).isEqualTo(0);
 
@@ -131,7 +131,7 @@ public class PersonCacheTests {
     }
 
     // assert that we DID hit the cache
-    statistics = beanCacheEmail.getStatistics(true);
+    statistics = beanCacheEmail.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(3);
     assertThat(statistics.getMissCount()).isEqualTo(0);
   }

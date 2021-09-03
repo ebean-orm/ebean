@@ -20,13 +20,13 @@ import static org.junit.Assert.assertTrue;
 public class TestQueryCacheCountry extends BaseTestCase {
 
   private ServerCacheManager cacheManager = Ebean.getServerCacheManager();
-  private ServerCache queryCache = cacheManager.getQueryCache(Country.class);
-  private ServerCache beanCache = cacheManager.getBeanCache(Country.class);
+  private ServerCache queryCache = cacheManager.queryCache(Country.class);
+  private ServerCache beanCache = cacheManager.beanCache(Country.class);
 
   private void clearCache() {
     queryCache.clear();
     beanCache.clear();
-    queryCache.getStatistics(true);
+    queryCache.statistics(true);
   }
 
 
@@ -44,7 +44,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     assertThat(countryList0).isEmpty();
 
-    ServerCacheStatistics queryStats = queryCache.getStatistics(false);
+    ServerCacheStatistics queryStats = queryCache.statistics(false);
     assertEquals(1, queryStats.getMissCount());
     assertEquals(1, queryStats.getSize());
 
@@ -56,7 +56,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     assertThat(countryList1).isEmpty();
 
-    ServerCacheStatistics queryStats1 = queryCache.getStatistics(false);
+    ServerCacheStatistics queryStats1 = queryCache.statistics(false);
     assertEquals(1, queryStats1.getMissCount());
     assertEquals(1, queryStats1.getSize());
     assertEquals(1, queryStats1.getHitCount());
@@ -83,7 +83,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     assertThat(countryList1.get(0).getName()).isEqualTo("Australia");
 
-    ServerCacheStatistics queryStats1 = queryCache.getStatistics(false);
+    ServerCacheStatistics queryStats1 = queryCache.statistics(false);
     assertEquals(2, queryStats1.getMissCount());
     assertEquals(2, queryStats1.getSize());
     assertEquals(0, queryStats1.getHitCount()); // no hits yet
@@ -97,7 +97,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     assertThat(countryList2.get(0).getName()).isEqualTo("New Zealand");
 
-    ServerCacheStatistics queryStats2 = queryCache.getStatistics(false);
+    ServerCacheStatistics queryStats2 = queryCache.statistics(false);
     assertEquals(2, queryStats2.getMissCount());
     assertEquals(2, queryStats2.getSize());
     assertEquals(1, queryStats2.getHitCount()); // got a hit
@@ -110,7 +110,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     assertThat(countryList3.get(0).getName()).isEqualTo("Australia");
 
-    ServerCacheStatistics queryStats3 = queryCache.getStatistics(false);
+    ServerCacheStatistics queryStats3 = queryCache.statistics(false);
     assertEquals(2, queryStats3.getMissCount());
     assertEquals(2, queryStats3.getSize());
     assertEquals(2, queryStats3.getHitCount()); // got another hit
@@ -124,14 +124,14 @@ public class TestQueryCacheCountry extends BaseTestCase {
     awaitL2Cache();
     clearCache();
 
-    assertEquals(0, queryCache.getStatistics(false).getSize());
+    assertEquals(0, queryCache.statistics(false).getSize());
 
     List<Country> countryList0 = Ebean.find(Country.class)
       .setUseQueryCache(true)
       .order().asc("name")
       .findList();
 
-    assertEquals(1, queryCache.getStatistics(false).getSize());
+    assertEquals(1, queryCache.statistics(false).getSize());
     assertTrue(!countryList0.isEmpty());
 
     List<Country> countryList1 = Ebean.find(Country.class)
@@ -139,7 +139,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
       .order().asc("name")
       .findList();
 
-    ServerCacheStatistics statistics = queryCache.getStatistics(false);
+    ServerCacheStatistics statistics = queryCache.statistics(false);
     assertEquals(1, statistics.getSize());
     assertEquals(1, statistics.getHitCount());
     Assert.assertSame(countryList1, countryList0);
@@ -149,7 +149,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     Ebean.save(nz);
     awaitL2Cache();
 
-    statistics = queryCache.getStatistics(false);
+    statistics = queryCache.statistics(false);
     assertEquals(0, statistics.getSize());
 
     List<Country> countryList2 = Ebean.find(Country.class)

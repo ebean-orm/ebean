@@ -39,8 +39,8 @@ public class TestCacheCollectionIds extends BaseTestCase {
     ResetBasicData.reset();
     awaitL2Cache();
 
-    ServerCache custCache = cacheManager.getBeanCache(Customer.class);
-    ServerCache custManyIdsCache = cacheManager.getCollectionIdsCache(Customer.class, "contacts");
+    ServerCache custCache = cacheManager.beanCache(Customer.class);
+    ServerCache custManyIdsCache = cacheManager.collectionIdsCache(Customer.class, "contacts");
 
     // cacheManager.setCaching(Customer.class, true);
     // cacheManager.setCaching(Contact.class, true);
@@ -121,7 +121,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
     dummyToLoad.getCountries().size();
 
-    ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
+    ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
 
     // confirm the starting data and cache entry
@@ -249,7 +249,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
     dummyToLoad.getCountries().size();
 
-    ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
+    ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
 
     // confirm the starting data and cache entry
@@ -293,7 +293,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Ebean.save(cachedBean);
 
     // clear the cache
-    ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
+    ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
     cachedBeanCountriesCache.clear();
     assertEquals(0, cachedBeanCountriesCache.size());
 

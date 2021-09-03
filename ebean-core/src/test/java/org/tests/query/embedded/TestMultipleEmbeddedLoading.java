@@ -80,15 +80,15 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     ServerCacheManager serverCacheManager = server.cacheManager();
 
     // get cache, clear the cache and statistics
-    ServerCache beanCache = serverCacheManager.getBeanCache(EInvoice.class);
+    ServerCache beanCache = serverCacheManager.beanCache(EInvoice.class);
     beanCache.clear();
-    beanCache.getStatistics(true);
+    beanCache.statistics(true);
 
     // fetch and load the cache
     EInvoice invoice4 = Ebean.find(EInvoice.class, invoice.getId());
     assertNotNull(invoice4);
 
-    ServerCacheStatistics statistics = beanCache.getStatistics(false);
+    ServerCacheStatistics statistics = beanCache.statistics(false);
 
     assertEquals(1, statistics.getSize());
     assertEquals(0, statistics.getHitCount());
@@ -97,7 +97,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     EInvoice invoice5 = Ebean.find(EInvoice.class, invoice.getId());
     assertNotNull(invoice5);
 
-    statistics = beanCache.getStatistics(false);
+    statistics = beanCache.statistics(false);
     assertEquals(1, statistics.getSize());
     assertEquals(1, statistics.getHitCount());
 

@@ -19,7 +19,7 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache beanCache = Ebean.getServerCacheManager().getBeanCache(Order.class);
+    ServerCache beanCache = Ebean.getServerCacheManager().beanCache(Order.class);
     beanCache.clear();
 
     Order order = Ebean.getReference(Order.class, 1);

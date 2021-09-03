@@ -44,18 +44,18 @@ public class JdbcTransactionTest {
   public void skipCacheAfterSave() {
 
     ServerCacheManager cacheManager = DB.getDefault().cacheManager();
-    ServerCache customerBeanCache = cacheManager.getBeanCache(Customer.class);
-    ServerCache contactNatKeyCache = cacheManager.getNaturalKeyCache(Contact.class);
+    ServerCache customerBeanCache = cacheManager.beanCache(Customer.class);
+    ServerCache contactNatKeyCache = cacheManager.naturalKeyCache(Contact.class);
 
     try (Transaction transaction = DB.beginTransaction()) {
-      customerBeanCache.getStatistics(true);
-      contactNatKeyCache.getStatistics(true);
+      customerBeanCache.statistics(true);
+      contactNatKeyCache.statistics(true);
 
       Customer.find.byId(19898989);
       DB.find(Contact.class).where().eq("email", "junk@foo.com").findOne();
 
-      assertThat(customerBeanCache.getStatistics(true).getMissCount()).isEqualTo(1);
-      assertThat(contactNatKeyCache.getStatistics(true).getMissCount()).isEqualTo(1);
+      assertThat(customerBeanCache.statistics(true).getMissCount()).isEqualTo(1);
+      assertThat(contactNatKeyCache.statistics(true).getMissCount()).isEqualTo(1);
 
       EBasic basic = new EBasic("b1");
       DB.save(basic);
@@ -64,8 +64,8 @@ public class JdbcTransactionTest {
       Customer.find.byId(29898989);
       DB.find(Contact.class).where().eq("email", "junk2@foo.com").findOne();
 
-      assertThat(customerBeanCache.getStatistics(true).getMissCount()).isEqualTo(0);
-      assertThat(contactNatKeyCache.getStatistics(true).getMissCount()).isEqualTo(0);
+      assertThat(customerBeanCache.statistics(true).getMissCount()).isEqualTo(0);
+      assertThat(contactNatKeyCache.statistics(true).getMissCount()).isEqualTo(0);
     }
   }
 

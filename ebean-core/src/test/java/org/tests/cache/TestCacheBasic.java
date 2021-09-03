@@ -17,16 +17,16 @@ public class TestCacheBasic extends BaseTestCase {
     ResetBasicData.reset();
 
     Ebean.getServerCacheManager().clear(Country.class);
-    ServerCache countryCache = Ebean.getServerCacheManager().getBeanCache(Country.class);
+    ServerCache countryCache = Ebean.getServerCacheManager().beanCache(Country.class);
 
     loadCountryCache();
     Assert.assertTrue(countryCache.size() > 0);
 
     // reset the statistics
-    countryCache.getStatistics(true);
+    countryCache.statistics(true);
 
     Country c0 = Ebean.getReference(Country.class, "NZ");
-    ServerCacheStatistics statistics = countryCache.getStatistics(false);
+    ServerCacheStatistics statistics = countryCache.statistics(false);
     long hc = statistics.getHitCount();
     Assert.assertEquals(1, hc);
     Assert.assertNotNull(c0);

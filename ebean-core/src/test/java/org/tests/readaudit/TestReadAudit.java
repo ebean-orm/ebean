@@ -83,8 +83,8 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache() {
     resetCounters();
 
-    ServerCache beanCache = server.cacheManager().getBeanCache(EBasicChangeLog.class);
-    beanCache.getStatistics(true);
+    ServerCache beanCache = server.cacheManager().beanCache(EBasicChangeLog.class);
+    beanCache.statistics(true);
 
     EBasicChangeLog found = server.find(EBasicChangeLog.class, id1);
     assertThat(found).isNotNull();
@@ -94,13 +94,13 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.beans.get(0).getBeanType()).isEqualTo(EBasicChangeLog.class.getName());
     assertThat(readAuditLogger.beans.get(0).getId()).isEqualTo(id1);
 
-    ServerCacheStatistics statistics = beanCache.getStatistics(false);
+    ServerCacheStatistics statistics = beanCache.statistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(0);
 
     EBasicChangeLog found2 = server.find(EBasicChangeLog.class, id1);
     assertThat(found2).isNotNull();
-    statistics = beanCache.getStatistics(false);
+    statistics = beanCache.statistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(1);
 
@@ -111,8 +111,8 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache_sharedBean() {
     resetCounters();
 
-    ServerCache beanCache = server.cacheManager().getBeanCache(Country.class);
-    beanCache.getStatistics(true);
+    ServerCache beanCache = server.cacheManager().beanCache(Country.class);
+    beanCache.statistics(true);
 
     Country found = server.find(Country.class, "AR");
     assertThat(found).isNotNull();
@@ -122,13 +122,13 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.beans.get(0).getBeanType()).isEqualTo(Country.class.getName());
     assertThat(readAuditLogger.beans.get(0).getId()).isEqualTo("AR");
 
-    ServerCacheStatistics statistics = beanCache.getStatistics(false);
+    ServerCacheStatistics statistics = beanCache.statistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(0);
 
     Country found2 = server.find(Country.class, "AR");
     assertThat(found2).isNotNull();
-    statistics = beanCache.getStatistics(false);
+    statistics = beanCache.statistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(1);
 

@@ -56,7 +56,7 @@ public class TestInheritCacheRefLoad {
     Class streetClassLazyLoaded = customerReloaded.getAddress().getStreet().getClass();
 
     //Show Cache Hits
-    System.out.println("Class of Street (Cache on: " + l2Cache + "): " + streetClassLazyLoaded + " | Cache Hit: " + DB.getDefault().cacheManager().getQueryCache(streetClassLazyLoaded).getStatistics(false).getHitCount());
+    System.out.println("Class of Street (Cache on: " + l2Cache + "): " + streetClassLazyLoaded + " | Cache Hit: " + DB.getDefault().cacheManager().queryCache(streetClassLazyLoaded).statistics(false).getHitCount());
     return streetClassLazyLoaded;
   }
 
