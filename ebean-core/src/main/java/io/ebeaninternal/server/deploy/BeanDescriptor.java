@@ -3087,7 +3087,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   public boolean isIdLoaded(EntityBeanIntercept ebi) {
     // assume id loaded for IdClass case with idPropertyIndex == -1
-    return idPropertyIndex == -1 ? true : ebi.isLoadedProperty(idPropertyIndex);
+    return idPropertyIndex == -1 || ebi.isLoadedProperty(idPropertyIndex);
   }
 
   boolean hasIdValue(EntityBean bean) {
