@@ -592,7 +592,7 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public DatabaseConfig getServerConfig() {
+  public DatabaseConfig config() {
     return null;
   }
 
