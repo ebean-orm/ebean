@@ -305,7 +305,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public DatabaseConfig config() {
+  public DatabaseConfig getServerConfig() {
     return config;
   }
 

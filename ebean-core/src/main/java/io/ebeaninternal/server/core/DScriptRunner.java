@@ -26,7 +26,7 @@ final class DScriptRunner implements ScriptRunner {
 
   DScriptRunner(SpiEbeanServer server) {
     this.server = server;
-    this.platformName = this.server.getDatabasePlatform().getPlatform().base().name();
+    this.platformName = this.server.platform().base().name();
   }
 
   @Override

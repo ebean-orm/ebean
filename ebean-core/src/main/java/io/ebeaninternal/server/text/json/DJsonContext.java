@@ -62,8 +62,8 @@ public final class DJsonContext implements SpiJsonContext {
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
-    this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
-    this.defaultInclude = this.server.getServerConfig().getJsonInclude();
+    this.defaultObjectMapper = this.server.config().getObjectMapper();
+    this.defaultInclude = this.server.config().getJsonInclude();
     this.jsonScalar = new DJsonScalar(typeManager);
   }
 

@@ -43,7 +43,7 @@ public class SpiServerTest extends BaseTestCase {
     Customer customer = new Customer();
     customer.setId(42);
 
-    assertEquals(42, beanType.getBeanId(customer));
+    assertEquals(42, beanType.beanId(customer));
 
     List<? extends BeanType<?>> beanTypes = pluginApi.beanTypes("o_customer");
     assertEquals(2, beanTypes.size());

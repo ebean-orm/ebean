@@ -135,7 +135,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     Transaction transaction = Ebean.beginTransaction();
     try {
       transaction.setBatchMode(true);
-      transaction.setBatchOnCascade(PersistBatch.ALL.equals(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade()));
+      transaction.setBatchOnCascade(PersistBatch.ALL.equals(spiEbeanServer().databasePlatform().getPersistBatchOnCascade()));
       transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value

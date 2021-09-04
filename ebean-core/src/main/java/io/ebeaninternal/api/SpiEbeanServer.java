@@ -8,6 +8,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollectionLoader {
+public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, BeanCollectionLoader {
 
   /**
    * Return true if the L2 cache has been disabled.
@@ -49,16 +50,6 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
    * Return the current Tenant Id.
    */
   Object currentTenantId();
-
-  /**
-   * Return the server configuration.
-   */
-  DatabaseConfig getServerConfig();
-
-  /**
-   * Return the DatabasePlatform for this server.
-   */
-  DatabasePlatform getDatabasePlatform();
 
   /**
    * Create an object to represent the current CallStack.

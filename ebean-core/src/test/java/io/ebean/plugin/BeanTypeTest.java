@@ -92,10 +92,7 @@ public class BeanTypeTest {
     order.setId(42);
 
     Object id1 = beanType(Order.class).beanId(order);
-    Object id2 = beanType(Order.class).getBeanId(order);
-
     assertThat(id1).isEqualTo(order.getId());
-    assertThat(id2).isEqualTo(order.getId());
   }
 
   @Test

@@ -73,7 +73,7 @@ public final class DefaultPersister implements Persister {
   public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr) {
     this.server = server;
     this.beanDescriptorManager = descMgr;
-    this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize());
+    this.persistExecute = new DefaultPersistExecute(binder, server.config().getPersistBatchSize());
   }
 
   @Override
@@ -208,7 +208,7 @@ public final class DefaultPersister implements Persister {
   private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
     List<Object> idList = new ArrayList<>(beans.size());
     for (T liveBean : beans) {
-      idList.add(desc.getBeanId(liveBean));
+      idList.add(desc.beanId(liveBean));
     }
     return idList;
   }
@@ -348,7 +348,7 @@ public final class DefaultPersister implements Persister {
      * Publish/restore the values from the sourceBean to the matching destination bean.
      */
     T publishToDestinationBean(T sourceBean) {
-      id = desc.getBeanId(sourceBean);
+      id = desc.beanId(sourceBean);
       T destBean = destBeans.get(id);
       insert = (destBean == null);
       // apply changes from liveBean to draftBean

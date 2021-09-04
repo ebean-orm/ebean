@@ -375,7 +375,7 @@ final class BeanDescriptorCacheHelp<T> {
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
       T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
-      result.add(bean, desc.getBeanId(bean));
+      result.add(bean, desc.beanId(bean));
     }
     return result;
   }

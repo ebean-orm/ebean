@@ -167,8 +167,8 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     this.rootBeanDescriptor = desc;
     this.beanType = desc.getBeanType();
     this.server = server;
-    this.orderById = server.getServerConfig().isDefaultOrderById();
-    this.disableLazyLoading = server.getServerConfig().isDisableLazyLoading();
+    this.orderById = server.config().isDefaultOrderById();
+    this.disableLazyLoading = server.config().isDisableLazyLoading();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
   }

@@ -167,7 +167,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformCaseSensitive() {
-    return spiEbeanServer().getDatabasePlatform().isCaseSensitiveCollation();
+    return spiEbeanServer().databasePlatform().isCaseSensitiveCollation();
   }
 
   /**
@@ -215,7 +215,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformBooleanNative() {
-    return Types.BOOLEAN == spiEbeanServer().getDatabasePlatform().getBooleanDbType();
+    return Types.BOOLEAN == spiEbeanServer().databasePlatform().getBooleanDbType();
   }
 
   public boolean isPlatformOrderNullsSupport() {
@@ -223,11 +223,11 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformSupportsDeleteTableAlias() {
-    return spiEbeanServer().getDatabasePlatform().isSupportsDeleteTableAlias();
+    return spiEbeanServer().databasePlatform().isSupportsDeleteTableAlias();
   }
 
   public boolean isPersistBatchOnCascade() {
-    return spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
+    return spiEbeanServer().databasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }
 
   /**
@@ -246,11 +246,11 @@ public abstract class BaseTestCase {
   }
 
   protected Platform platform() {
-    return spiEbeanServer().getDatabasePlatform().getPlatform().base();
+    return spiEbeanServer().databasePlatform().getPlatform().base();
   }
 
   protected IdType idType() {
-    return spiEbeanServer().getDatabasePlatform().getDbIdentity().getIdType();
+    return spiEbeanServer().databasePlatform().getDbIdentity().getIdType();
   }
 
   protected SpiEbeanServer spiEbeanServer() {
@@ -299,7 +299,7 @@ public abstract class BaseTestCase {
   }
 
   protected String concat(String property0, String separator, String property1, String suffix) {
-    DbExpressionHandler dbExpressionHandler = DbExpressionHandlerFactory.from(spiEbeanServer().getDatabasePlatform());
+    DbExpressionHandler dbExpressionHandler = DbExpressionHandlerFactory.from(spiEbeanServer().databasePlatform());
     return dbExpressionHandler.concat(property0, separator, property1, suffix);
   }
 

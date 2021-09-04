@@ -134,7 +134,7 @@ public class TestEncrypt extends BaseTestCase {
     assertEquals(EBasicEncrypt.Status.ONE, e2.getStatus());
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
-    DbEncrypt dbEncrypt = server.getDatabasePlatform().getDbEncrypt();
+    DbEncrypt dbEncrypt = server.databasePlatform().getDbEncrypt();
 
     if (dbEncrypt == null) {
       // can not test the where clause

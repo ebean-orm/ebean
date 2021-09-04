@@ -1,41 +1,12 @@
 package io.ebeaninternal.api;
 
-import io.ebean.AutoTune;
-import io.ebean.BackgroundExecutor;
-import io.ebean.BeanState;
-import io.ebean.CallableSql;
-import io.ebean.DocumentStore;
-import io.ebean.DtoQuery;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExtendedServer;
-import io.ebean.Filter;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.MergeOptions;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.RowConsumer;
-import io.ebean.RowMapper;
-import io.ebean.ScriptRunner;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
-import io.ebean.TransactionCallback;
-import io.ebean.TxScope;
-import io.ebean.Update;
-import io.ebean.UpdateQuery;
-import io.ebean.ValuePair;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
@@ -56,12 +27,7 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.time.Clock;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -71,7 +37,7 @@ import java.util.stream.Stream;
 /**
  * Test double for SpiEbeanServer.
  */
-public class TDSpiEbeanServer implements SpiEbeanServer {
+public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
 
   String name;
 
@@ -158,12 +124,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public ServerConfig getServerConfig() {
+  public DatabaseConfig config() {
     return null;
   }
 
   @Override
-  public DatabasePlatform getDatabasePlatform() {
+  public DatabasePlatform databasePlatform() {
     return null;
   }
 

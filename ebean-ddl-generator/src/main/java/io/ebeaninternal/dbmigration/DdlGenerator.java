@@ -58,13 +58,13 @@ public class DdlGenerator implements SpiDdlGenerator {
 
   public DdlGenerator(SpiEbeanServer server) {
     this.server = server;
-    final DatabaseConfig config = server.getServerConfig();
+    final DatabaseConfig config = server.config();
     this.jaxbPresent = Detect.isJAXBPresent(config);
     this.generateDdl = config.isDdlGenerate();
     this.extraDdl = config.isDdlExtra();
     this.createOnly = config.isDdlCreateOnly();
     this.dbSchema = config.getDbSchema();
-    final DatabasePlatform databasePlatform = server.getDatabasePlatform();
+    final DatabasePlatform databasePlatform = server.databasePlatform();
     this.platform = databasePlatform.getPlatform();
     this.platformName = platform.base().name();
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
@@ -150,7 +150,7 @@ public class DdlGenerator implements SpiDdlGenerator {
   private void createSchemaIfRequired(Connection connection) {
     try {
       for (String schema : dbSchema.split(",")) {
-        server.getDatabasePlatform().createSchemaIfNotExists(schema, connection);
+        server.databasePlatform().createSchemaIfNotExists(schema, connection);
       }
     } catch (SQLException e) {
       throw new PersistenceException("Failed to create DB Schema", e);
@@ -231,7 +231,7 @@ public class DdlGenerator implements SpiDdlGenerator {
    * extra-ddl.xml should have some partition initialisation but this helps people get going.
    */
   private void checkInitialTablePartitions(Connection connection) {
-    DatabasePlatform databasePlatform = server.getDatabasePlatform();
+    DatabasePlatform databasePlatform = server.databasePlatform();
     try {
       StringBuilder sb = new StringBuilder();
       for (MTable table : currentModel.getPartitionedTables()) {
@@ -255,11 +255,11 @@ public class DdlGenerator implements SpiDdlGenerator {
   }
 
   protected void runInitSql(Connection connection) throws IOException {
-    runResourceScript(connection, server.getServerConfig().getDdlInitSql());
+    runResourceScript(connection, server.config().getDdlInitSql());
   }
 
   protected void runSeedSql(Connection connection) throws IOException {
-    runResourceScript(connection, server.getServerConfig().getDdlSeedSql());
+    runResourceScript(connection, server.config().getDdlSeedSql());
   }
 
   protected void runResourceScript(Connection connection, String sqlScript) throws IOException {

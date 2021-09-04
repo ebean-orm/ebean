@@ -90,7 +90,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     Transaction txn = server.beginTransaction();
     try {
       assertThat(txn.isBatchMode()).isFalse();
-      assertThat(txn.isBatchOnCascade()).isSameAs(PersistBatch.ALL.equals(spiEbeanServer().getDatabasePlatform().getPersistBatchOnCascade()));
+      assertThat(txn.isBatchOnCascade()).isSameAs(PersistBatch.ALL.equals(spiEbeanServer().databasePlatform().getPersistBatchOnCascade()));
 
       failingOperation.run();
       Assertions.fail("PersistenceException expected");

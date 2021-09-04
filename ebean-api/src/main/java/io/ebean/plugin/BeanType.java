@@ -121,8 +121,9 @@ public interface BeanType<T> {
   Object beanId(Object bean);
 
   /**
-   * Return the id value for the given bean.
+   * Deprecated migrate to beanId()
    */
+  @Deprecated
   Object getBeanId(T bean);
 
   /**
