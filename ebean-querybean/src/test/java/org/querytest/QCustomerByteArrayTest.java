@@ -4,10 +4,10 @@ import io.ebean.DB;
 import io.ebean.Database;
 import org.example.domain.Customer;
 import org.example.domain.query.QCustomer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class QCustomerByteArrayTest {
   @Test

@@ -19,11 +19,8 @@ import org.example.domain.otherpackage.ValidEmail;
 import org.example.domain.query.QAnimal;
 import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -46,11 +43,9 @@ import static org.example.domain.query.QAddress.Alias.country;
 import static org.example.domain.query.QAddress.Alias.line1;
 import static org.example.domain.query.QContact.Alias.lastName;
 import static org.example.domain.query.QCustomer.Alias.billingAddress;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class QCustomerTest {
-
-  @Rule
-  public final TestName testName = new TestName();
 
   @Test
   public void findWithTransaction() {
@@ -213,8 +208,7 @@ public class QCustomerTest {
       .findOne();
   }
 
-
-  @Ignore
+  @Disabled
   @Test
   public void arrayContains() {
 
@@ -775,7 +769,7 @@ public class QCustomerTest {
   public void testFindSet() {
 
     Set<Customer> customerSet = new QCustomer().findSet();
-    Assert.assertNotNull(customerSet);
+    assertNotNull(customerSet);
   }
 
   @Test
@@ -831,11 +825,11 @@ public class QCustomerTest {
   @Test
   public void testFetchByScalarValue() {
     Customer cust = new Customer();
-    cust.setName(testName.getMethodName());
+    cust.setName("testFetchByScalarValue");
     cust.setPhoneNumber(new PhoneNumber("+18005555555"));
     cust.save();
     assertThat(new QCustomer()
-      .name.eq(testName.getMethodName())
+      .name.eq("testFetchByScalarValue")
       .phoneNumber.eq(new PhoneNumber("+18005555555"))
       .findOne()).isNotNull();
   }
@@ -844,23 +838,23 @@ public class QCustomerTest {
   @Test
   public void testFetchByComparableScalarValue() {
     Customer cust = new Customer();
-    cust.setName(testName.getMethodName());
+    cust.setName("testFetchByComparableScalarValue");
     cust.setEmail(new ValidEmail("foo2@example.org"));
     cust.save();
     assertThat(new QCustomer()
-      .name.eq(testName.getMethodName())
+      .name.eq("testFetchByComparableScalarValue")
       .email.eq(new ValidEmail("foo2@example.org"))
       .findOne()).isNotNull();
     assertThat(new QCustomer()
-      .name.eq(testName.getMethodName())
+      .name.eq("testFetchByComparableScalarValue")
       .email.gt(new ValidEmail("foo2@example.org"))
       .findOne()).isNull();
     assertThat(new QCustomer()
-      .name.eq(testName.getMethodName())
+      .name.eq("testFetchByComparableScalarValue")
       .email.gt(new ValidEmail("foo1@example.org"))
       .findOne()).isNotNull();
     assertThat(new QCustomer()
-      .name.eq(testName.getMethodName())
+      .name.eq("testFetchByComparableScalarValue")
       .email.greaterOrEqualTo(new ValidEmail("foo2@example.org"))
       .findOne()).isNotNull();
   }
