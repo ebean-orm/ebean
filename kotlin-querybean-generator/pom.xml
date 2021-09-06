@@ -20,9 +20,9 @@
     <!-- test dependencies -->
 
     <dependency>
-      <groupId>org.avaje.composite</groupId>
+      <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>5.0</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
 

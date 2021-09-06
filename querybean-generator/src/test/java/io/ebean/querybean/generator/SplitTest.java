@@ -1,12 +1,12 @@
 package io.ebean.querybean.generator;
 
+import org.junit.jupiter.api.Test;
+
 import static java.util.Arrays.asList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.HashSet;
-
-import org.testng.annotations.Test;
 
 public class SplitTest {
 
