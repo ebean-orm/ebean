@@ -4,7 +4,7 @@ import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.ForTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -124,9 +124,9 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
+      <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
 
