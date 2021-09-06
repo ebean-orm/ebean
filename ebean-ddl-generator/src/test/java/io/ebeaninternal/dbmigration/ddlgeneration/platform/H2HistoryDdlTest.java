@@ -9,7 +9,7 @@ import io.ebeaninternal.dbmigration.model.MConfiguration;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

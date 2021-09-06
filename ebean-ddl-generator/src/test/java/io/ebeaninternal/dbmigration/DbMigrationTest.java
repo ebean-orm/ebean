@@ -6,7 +6,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;

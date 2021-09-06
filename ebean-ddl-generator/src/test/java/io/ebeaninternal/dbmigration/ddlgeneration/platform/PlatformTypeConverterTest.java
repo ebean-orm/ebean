@@ -4,7 +4,7 @@ import io.ebean.config.dbplatform.DbPlatformTypeMapping;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -15,7 +15,7 @@ import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;

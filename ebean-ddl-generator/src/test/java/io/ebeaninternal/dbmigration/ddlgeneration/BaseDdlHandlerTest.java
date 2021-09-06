@@ -11,8 +11,8 @@ import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -223,7 +223,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void generateChangeSetFromModel() throws Exception {
 
@@ -243,7 +243,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void generateChangeSetFromModel_given_postgresTypes() throws Exception {
 

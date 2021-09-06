@@ -12,12 +12,8 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
-import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import org.assertj.core.api.AbstractCharSequenceAssert;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,25 +22,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
-@RunWith(ConditionalTestRunner.class)
+@ExtendWith(PlatformCondition.class)
 public abstract class BaseTestCase {
 
   protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
 
-  @Rule public TestName name = new TestName();
-
-  @After
-  public void checkForLeak() {
-    TransactionScopeManager scope = spiEbeanServer().getTransactionManager().scope();
-    SpiTransaction trans = scope.getInScope();
-    if (trans != null) {
-      String msg = getClass().getSimpleName() + "." + name.getMethodName() + " did not clear threadScope:" + trans;
-      scope.clearExternal(); // clear for next test
-      fail(msg);
-    }
-  }
+//  @Rule public TestName name = new TestName();
+//
+//  @After
+//  public void checkForLeak() {
+//    TransactionScopeManager scope = spiEbeanServer().getTransactionManager().scope();
+//    SpiTransaction trans = scope.getInScope();
+//    if (trans != null) {
+//      String msg = getClass().getSimpleName() + "." + name.getMethodName() + " did not clear threadScope:" + trans;
+//      scope.clearExternal(); // clear for next test
+//      fail(msg);
+//    }
+//  }
 
 
   /**

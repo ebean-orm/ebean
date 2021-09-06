@@ -8,9 +8,9 @@ import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PlatformDdl_dropUniqueConstraintTest {
 

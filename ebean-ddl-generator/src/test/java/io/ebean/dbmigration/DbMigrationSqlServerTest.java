@@ -2,16 +2,19 @@ package io.ebean.dbmigration;
 
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.DbOffline;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DbMigrationSqlServerTest {
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void need_explicitPlatform() {
-
     try {
       DbMigration dbMigration = DbMigration.create();
-      dbMigration.setPlatform(Platform.SQLSERVER);
+      assertThrows(IllegalArgumentException.class,
+        () -> dbMigration.setPlatform(Platform.SQLSERVER));
     } finally {
       DbOffline.reset();
     }
@@ -19,7 +22,6 @@ public class DbMigrationSqlServerTest {
 
   @Test
   public void explicit_16_isGood() {
-
     DbMigration dbMigration = DbMigration.create();
     dbMigration.setPlatform(Platform.SQLSERVER16);
     DbOffline.reset();
@@ -27,7 +29,6 @@ public class DbMigrationSqlServerTest {
 
   @Test
   public void explicit_17_isGood() {
-
     DbMigration dbMigration = DbMigration.create();
     dbMigration.setPlatform(Platform.SQLSERVER17);
     DbOffline.reset();
