@@ -4,6 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.ValuePair;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import io.ebeantest.LoggedSql;
@@ -43,9 +45,10 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
       return true;
     }
   }
+
+  @IgnorePlatform(Platform.MYSQL)
   @Test
   public void updateIncludesJsonColumn_when_explicit_isMarkedDirty() {
-
     PlainBeanDirtyAware contentBean = new PlainBeanDirtyAware("a", 42);
 
     EBasicJsonJackson3 bean = new EBasicJsonJackson3();
@@ -78,7 +81,6 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
   @Test
   public void updateIncludesJsonColumn_when_loadedAndNotDirtyAware() {
-
     PlainBean contentBean = new PlainBean("a", 42);
     EBasicJsonList bean = new EBasicJsonList();
     bean.setName("p1");
@@ -101,9 +103,8 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     pair = state.getDirtyValues().get("beanList");
     assertThat(pair.getNewValue()).isEqualTo(null);
-    assertThat((List<PlainBean>)pair.getOldValue()).hasSize(1)
+    assertThat((List<PlainBean>) pair.getOldValue()).hasSize(1)
       .extracting(PlainBean::getName).containsExactly("a");
-
 
     LoggedSql.start();
     DB.save(found);
@@ -113,7 +114,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
     assertThat(EBasicJsonListPersistController.updatedValues.entrySet())
       .extracting(Map.Entry::toString)
-      .containsExactlyInAnyOrder("beanList=null,[name:a]","name=p1-mod,p1","version=2,1");
+      .containsExactlyInAnyOrder("beanList=null,[name:a]", "name=p1-mod,p1", "version=2,1");
 
     assertThat(DB.beanState(found).isDirty()).isFalse();
 
@@ -142,7 +143,6 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
   @Test
   public void updateIncludesJsonColumn_when_list_loadedAndNotDirtyAware() {
-
     PlainBean contentBean = new PlainBean("a", 42);
     EBasicJsonList bean = new EBasicJsonList();
     bean.setName("p1");
@@ -157,6 +157,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
   }
 
+  @IgnorePlatform(Platform.MYSQL)
   @Test
   public void update_with_differentDbJsonSettings() {
     PlainBeanDirtyAware contentBean1 = new PlainBeanDirtyAware("x", 42);
@@ -225,7 +226,6 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
 
   @Test
   public void push_pop_test() {
-
     EBasicJsonMulti bean = new EBasicJsonMulti();
     bean.setPlainValue2(new PlainBeanDirtyAware("x", 42));
     bean.save();
