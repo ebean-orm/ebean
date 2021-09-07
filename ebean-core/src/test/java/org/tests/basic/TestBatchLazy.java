@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -18,7 +18,7 @@ public class TestBatchLazy extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
     List<Order> list = query.findList();
 
 
@@ -32,8 +32,8 @@ public class TestBatchLazy extends BaseTestCase {
       }
     }
 
-    Ebean.getDefaultServer().autoTune().collectProfiling();
-    Ebean.getDefaultServer().autoTune().reportProfiling();
+    DB.getDefault().autoTune().collectProfiling();
+    DB.getDefault().autoTune().reportProfiling();
 
   }
 

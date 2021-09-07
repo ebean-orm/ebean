@@ -2,7 +2,7 @@ package org.tests.model.bridge;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -84,8 +84,8 @@ public class TestIdClassScalar extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.save(user);
-    Ebean.save(site);
+    DB.save(user);
+    DB.save(site);
 
     insertUpdateBridgeD(user, site);
     insertUpdateBridgeE(user, site);
@@ -99,12 +99,12 @@ public class TestIdClassScalar extends BaseTestCase {
     LoggedSqlCollector.start();
 
     BSiteUserD access = new BSiteUserD(BAccessLevel.ONE, site.id, user.id);
-    Ebean.save(access);
+    DB.save(access);
 
     access.setAccessLevel(BAccessLevel.TWO);
-    Ebean.save(access);
+    DB.save(access);
 
-    List<BSiteUserD> list = Ebean.find(BSiteUserD.class).findList();
+    List<BSiteUserD> list = DB.find(BSiteUserD.class).findList();
     assertThat(list).isNotEmpty();
 
     for (BSiteUserD bridge : list) {
@@ -120,14 +120,14 @@ public class TestIdClassScalar extends BaseTestCase {
 
 
     BEmbId id = new BEmbId(site.id, user.id);
-    BSiteUserD one = Ebean.find(BSiteUserD.class, id);
+    BSiteUserD one = DB.find(BSiteUserD.class, id);
 
     assertThat(one).isNotNull();
     assertThat(one.getSiteId()).isEqualTo(site.id);
     assertThat(one.getUserId()).isEqualTo(user.id);
 
     one.setAccessLevel(BAccessLevel.THREE);
-    Ebean.save(one);
+    DB.save(one);
 
     sql = LoggedSqlCollector.stop();
 
@@ -144,12 +144,12 @@ public class TestIdClassScalar extends BaseTestCase {
     LoggedSqlCollector.start();
 
     BSiteUserE access = new BSiteUserE(BAccessLevel.ONE, site, user);
-    Ebean.save(access);
+    DB.save(access);
 
     access.setAccessLevel(BAccessLevel.TWO);
-    Ebean.save(access);
+    DB.save(access);
 
-    List<BSiteUserE> list = Ebean.find(BSiteUserE.class).findList();
+    List<BSiteUserE> list = DB.find(BSiteUserE.class).findList();
     assertThat(list).isNotEmpty();
 
     List<String> sql = LoggedSqlCollector.current();
@@ -166,14 +166,14 @@ public class TestIdClassScalar extends BaseTestCase {
 
     BEmbId id = new BEmbId(site.id, user.id);
 
-    BSiteUserE one = Ebean.find(BSiteUserE.class, id);
+    BSiteUserE one = DB.find(BSiteUserE.class, id);
 
     assertThat(one).isNotNull();
     assertThat(one.getSite().id).isEqualTo(site.id);
     assertThat(one.getUser().id).isEqualTo(user.id);
 
     one.setAccessLevel(BAccessLevel.THREE);
-    Ebean.save(one);
+    DB.save(one);
 
     sql = LoggedSqlCollector.stop();
 

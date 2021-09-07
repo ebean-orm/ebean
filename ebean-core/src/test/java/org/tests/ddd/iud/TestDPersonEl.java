@@ -1,6 +1,6 @@
 package org.tests.ddd.iud;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -29,9 +29,9 @@ public class TestDPersonEl {
     p.setLastName("last");
     p.setSalary(new Money("12200"));
 
-    Ebean.save(p);
+    DB.save(p);
 
-    SpiServer server = Ebean.getDefaultServer().pluginApi();
+    SpiServer server = DB.getDefault().pluginApi();
 
     BeanType<DPerson> descriptor = server.beanType(DPerson.class);
 

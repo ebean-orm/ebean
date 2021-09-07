@@ -1,7 +1,7 @@
 package org;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -13,8 +13,7 @@ public class Main {
 
   public static void main(String[] args) throws SQLException {
 
-
-    EbeanServer ms = Ebean.getServer("ms");
+    Database ms = DB.byName("ms");
     DataSource dataSource = ms.dataSource();
 
     Connection connection = dataSource.getConnection();

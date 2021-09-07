@@ -1,7 +1,7 @@
 package org.tests.types;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -25,7 +25,7 @@ public class TestEncryptedString extends BaseTestCase {
 
     model.save();
 
-    model = Ebean.find(PasswordStoreModel.class, model.getId());
+    model = DB.find(PasswordStoreModel.class, model.getId());
 
     assertThat(model.getEnc1().getEncryptedData()).isNotEqualTo("Hello");
     assertThat(model.getEnc2().getEncryptedData()).isNotEqualTo("World");

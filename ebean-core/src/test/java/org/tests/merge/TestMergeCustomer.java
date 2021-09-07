@@ -1,7 +1,7 @@
 package org.tests.merge;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchPath;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
@@ -28,7 +28,7 @@ public class TestMergeCustomer extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.merge(mCustomer);
+    DB.merge(mCustomer);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -50,7 +50,7 @@ public class TestMergeCustomer extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.merge(mCustomer, options);
+    DB.merge(mCustomer, options);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
@@ -175,7 +175,7 @@ public class TestMergeCustomer extends BaseTestCase {
     MCustomer c = new MCustomer("Null Address");
     c.setBillingAddress(new MAddress("Cow corner", "Mid Wicket"));
 
-    Ebean.save(c);
+    DB.save(c);
 
     MCustomer mCustomer = rebuildViaJson(c);
 
@@ -189,13 +189,13 @@ public class TestMergeCustomer extends BaseTestCase {
       .setClientGeneratedIds()
       .build();
 
-    Ebean.merge(mCustomer, options);
+    DB.merge(mCustomer, options);
 
   }
 
   private MCustomer rebuildViaJson(MCustomer input) {
-    String asJson = Ebean.json().toJson(input);
-    return Ebean.json().toBean(MCustomer.class, asJson);
+    String asJson = DB.json().toJson(input);
+    return DB.json().toBean(MCustomer.class, asJson);
   }
 
   @Test
@@ -361,21 +361,21 @@ public class TestMergeCustomer extends BaseTestCase {
 
   private MCustomer partial(String name, String fetchGraph) {
     MCustomer cust1 = buildCustomer(name);
-    Ebean.save(cust1);
+    DB.save(cust1);
 
     FetchPath fetchPath = PathProperties.parse(fetchGraph);
-    String asJson = Ebean.json().toJson(cust1, fetchPath);
-    return Ebean.json().toBean(MCustomer.class, asJson);
+    String asJson = DB.json().toJson(cust1, fetchPath);
+    return DB.json().toBean(MCustomer.class, asJson);
   }
 
   private MCustomer customer(String name) {
 
     MCustomer cust1 = buildCustomer(name);
-    Ebean.save(cust1);
+    DB.save(cust1);
 
-    String asJson = Ebean.json().toJson(cust1);
+    String asJson = DB.json().toJson(cust1);
 
-    return Ebean.json().toBean(MCustomer.class, asJson);
+    return DB.json().toBean(MCustomer.class, asJson);
   }
 
   private MCustomer buildCustomer(String name) {

@@ -1,7 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -19,24 +19,24 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
 
     Customer customer = new Customer();
     customer.setName("daCustomer");
-    Ebean.save(customer);
+    DB.save(customer);
 
     Order order = new Order();
     order.setStatus(Order.Status.NEW);
     order.setCustomer(customer);
-    Ebean.save(order);
+    DB.save(order);
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
 
-      Order foundOrder = Ebean.find(Order.class)
+      Order foundOrder = DB.find(Order.class)
         .where().eq("id", order.getId())
         .findOne();
 
       foundOrder.setStatus(Order.Status.APPROVED);
-      assertTrue(Ebean.getBeanState(foundOrder).isDirty());
+      assertTrue(DB.getBeanState(foundOrder).isDirty());
 
-      Customer foundCustomer = Ebean.find(Customer.class)
+      Customer foundCustomer = DB.find(Customer.class)
         .where().eq("id", customer.getId())
         .findOne();
 
@@ -46,14 +46,14 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
       Order order1 = foundCustomer.getOrders().get(0);
 
       assertSame(foundOrder, order1);
-      assertTrue(Ebean.getBeanState(foundOrder).isDirty());
+      assertTrue(DB.getBeanState(foundOrder).isDirty());
 
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
 
     // cleanup
-    Ebean.delete(order);
-    Ebean.delete(customer);
+    DB.delete(order);
+    DB.delete(customer);
   }
 }

@@ -15,11 +15,11 @@ public class EbeanServer_deleteByIdTest extends BaseTestCase {
   public void deleteById() {
 
     EBasicVer someBean = bean("foo1");
-    Ebean.save(someBean);
+    DB.save(someBean);
 
     // act
     LoggedSqlCollector.start();
-    Ebean.delete(EBasicVer.class, someBean.getId());
+    DB.delete(EBasicVer.class, someBean.getId());
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -30,11 +30,11 @@ public class EbeanServer_deleteByIdTest extends BaseTestCase {
   public void deletePermanentById() {
 
     EBasicVer someBean = bean("foo1");
-    Ebean.save(someBean);
+    DB.save(someBean);
 
     // act
     LoggedSqlCollector.start();
-    Ebean.deletePermanent(EBasicVer.class, someBean.getId());
+    DB.deletePermanent(EBasicVer.class, someBean.getId());
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -46,9 +46,9 @@ public class EbeanServer_deleteByIdTest extends BaseTestCase {
   public void deleteById_withTransaction() {
 
     EBasicVer someBean = bean("foo1");
-    Ebean.save(someBean);
+    DB.save(someBean);
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     // act
     LoggedSqlCollector.start();
     Transaction txn = server.beginTransaction();
@@ -67,9 +67,9 @@ public class EbeanServer_deleteByIdTest extends BaseTestCase {
   public void deletePermanentById_withTransaction() {
 
     EBasicVer someBean = bean("foo2");
-    Ebean.save(someBean);
+    DB.save(someBean);
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     // act
     LoggedSqlCollector.start();
     Transaction txn = server.beginTransaction();

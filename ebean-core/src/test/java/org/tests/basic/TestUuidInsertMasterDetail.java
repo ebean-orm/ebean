@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
 import org.junit.jupiter.api.Test;
@@ -23,22 +23,22 @@ public class TestUuidInsertMasterDetail extends BaseTestCase {
     one.setName("some one");
     one.setComments(list);
 
-    Ebean.save(one);
+    DB.save(one);
 
-    UUOne oneB = Ebean.find(UUOne.class, one.getId());
+    UUOne oneB = DB.find(UUOne.class, one.getId());
 
     UUTwo twoB = new UUTwo();
     twoB.setName("another something");
     oneB.getComments().add(twoB);
 
-    Ebean.save(oneB);
+    DB.save(oneB);
   }
 
   public void testNullFK() {
 
     UUTwo two = new UUTwo();
     two.setName("something");
-    Ebean.save(two);
+    DB.save(two);
   }
 
 }

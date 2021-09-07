@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
@@ -18,40 +18,40 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
   @Test
   public void test() {
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
 
       MRole r1 = new MRole();
       r1.setRoleName("role1");
-      Ebean.save(r1);
+      DB.save(r1);
 
       MRole r2 = new MRole();
       r2.setRoleName("role2special");
-      Ebean.save(r2);
+      DB.save(r2);
 
       MRole r3 = new MRole();
       r3.setRoleName("role3");
-      Ebean.save(r3);
+      DB.save(r3);
 
       MUser u0 = new MUser();
       u0.setUserName("user0");
       u0.addRole(r1);
       u0.addRole(r2);
 
-      Ebean.save(u0);
+      DB.save(u0);
 
       MUser u1 = new MUser();
       u1.setUserName("user1");
       u1.addRole(r1);
 
-      Ebean.save(u1);
+      DB.save(u1);
 
       MUser u2 = new MUser();
       u2.setUserName("user2");
-      Ebean.save(u2);
+      DB.save(u2);
 
       txn.commit();
     }
-    Query<MUser> query = Ebean.find(MUser.class).fetch("roles")
+    Query<MUser> query = DB.find(MUser.class).fetch("roles")
       // the where on a 'many' (like orders) requires an
       // additional join and distinct which is independent
       // of a fetch join (if there is a fetch join)
@@ -71,7 +71,7 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
   private void isEmpty() {
 
-    Query<MUser> query = Ebean.find(MUser.class)
+    Query<MUser> query = DB.find(MUser.class)
       .where().isEmpty("roles")
       .query();
 
@@ -83,7 +83,7 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
   private void isNotEmpty() {
 
-    Query<MUser> query = Ebean.find(MUser.class)
+    Query<MUser> query = DB.find(MUser.class)
       .select("userName")
       .where().isNotEmpty("roles")
       .query();

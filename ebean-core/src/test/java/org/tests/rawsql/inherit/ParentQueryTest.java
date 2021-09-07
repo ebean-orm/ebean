@@ -2,7 +2,7 @@ package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Data;
@@ -28,17 +28,17 @@ public class ParentQueryTest extends BaseTestCase {
 
     ChildA a = new ChildA(1000, "PQT-PA");
     a.setData(exampleData);
-    Ebean.save(a);
+    DB.save(a);
 
     ChildB b = new ChildB(1001, "PQT-PB");
     b.setData(exampleData);
-    Ebean.save(b);
+    DB.save(b);
 
     ChildA c = new ChildA(1002, "PQT-PC");
     c.setData(exampleData);
-    Ebean.save(c);
+    DB.save(c);
 
-    List<Parent> partial = Ebean.find(Parent.class).where().ge("val", 1001).findList();
+    List<Parent> partial = DB.find(Parent.class).where().ge("val", 1001).findList();
     assertNotNull(partial.get(0).getData());
     assertThat(partial.get(0).getMore()).startsWith("PQT-");
     assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);

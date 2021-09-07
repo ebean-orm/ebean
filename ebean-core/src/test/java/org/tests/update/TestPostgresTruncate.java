@@ -7,7 +7,7 @@ public class TestPostgresTruncate extends BaseTestCase {
 
   @Test
   public void test() {
-    // EbeanServer server = Ebean.getServer(null);
+    // Database server = DB.getDefault();
     //
     // EBasic e = new EBasic();
     // e.setName("something");
@@ -18,12 +18,12 @@ public class TestPostgresTruncate extends BaseTestCase {
     //
     // server.beginTransaction();
     // Integer oriC =
-    // Ebean.createSqlQuery("select count(*) as c from e_basic").findOne().getInteger("c");
-    // int rows = Ebean.createSqlUpdate("truncate e_basic cascade").execute();
+    // DB.sqlQuery("select count(*) as c from e_basic").findOne().getInteger("c");
+    // int rows = DB.sqlUpdate("truncate e_basic cascade").execute();
     // Integer currentC =
-    // Ebean.createSqlQuery("select count(*) as c from e_basic").findOne().getInteger("c");
+    // DB.sqlQuery("select count(*) as c from e_basic").findOne().getInteger("c");
     // server.commitTransaction();
-    // //Ebean.getServerCacheManager().clearAll();
+    // //DB.cacheManager().clearAll();
     // System.out.println("table : ori="+oriC+", delC="+rows+", currentC="+currentC);
 
   }

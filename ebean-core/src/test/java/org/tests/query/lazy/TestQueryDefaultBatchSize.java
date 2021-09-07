@@ -1,7 +1,7 @@
 package org.tests.query.lazy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.ProfileLocation;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -24,7 +24,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setProfileLocation(loc0)
       .setLazyLoadBatchSize(2)
       .findEach(bean -> doStuff(bean));
@@ -35,7 +35,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setProfileLocation(loc1)
       .fetch("details", "id")
       .fetch("details.product", "sku")
@@ -51,7 +51,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> orders =
-      Ebean.find(Order.class)
+      DB.find(Order.class)
         .setProfileLocation(loc2)
         .setLazyLoadBatchSize(2)
         .findList();
@@ -67,7 +67,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Order> orders =
-      Ebean.find(Order.class)
+      DB.find(Order.class)
         .setProfileLocation(loc3)
         .fetch("details", "id")
         .fetch("details.product", "sku")
@@ -86,7 +86,7 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .setLazyLoadBatchSize(100)
       .findList();
 

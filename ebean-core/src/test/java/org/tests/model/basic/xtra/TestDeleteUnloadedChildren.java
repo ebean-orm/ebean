@@ -1,7 +1,7 @@
 package org.tests.model.basic.xtra;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
@@ -12,16 +12,16 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
   private void init() {
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
       String sql;
       SqlUpdate delete;
 
       sql = "delete from td_child";
-      delete = Ebean.createSqlUpdate(sql);
+      delete = DB.createSqlUpdate(sql);
       delete.execute();
 
       sql = "delete from td_parent";
-      delete = Ebean.createSqlUpdate(sql);
+      delete = DB.createSqlUpdate(sql);
       delete.execute();
 
       EdParent parent = new EdParent();
@@ -34,7 +34,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
       children.add(child);
       parent.setChildren(children);
 
-      Ebean.save(parent);
+      DB.save(parent);
 
       EdExtendedParent extendedParent = new EdExtendedParent();
       extendedParent.setName("My second computer");
@@ -46,7 +46,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
       children.add(child);
       extendedParent.setChildren(children);
 
-      Ebean.save(extendedParent);
+      DB.save(extendedParent);
 
       txn.commit();
     }
@@ -57,11 +57,11 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
     init();
 
-    try (Transaction txn = Ebean.beginTransaction()) {
-      EdParent parent = Ebean.find(EdParent.class).where().eq("name", "MyComputer").findOne();
+    try (Transaction txn = DB.beginTransaction()) {
+      EdParent parent = DB.find(EdParent.class).where().eq("name", "MyComputer").findOne();
       // // Works only if the following statement is included
       // int x = parent.getChildren().size();
-      Ebean.delete(parent);
+      DB.delete(parent);
       txn.commit();
     }
   }
@@ -71,15 +71,15 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
     init();
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      EdExtendedParent extendedParent = Ebean.find(EdExtendedParent.class).where()
+      EdExtendedParent extendedParent = DB.find(EdExtendedParent.class).where()
         .eq("name", "My second computer").findOne();
       extendedParent.getChildren().size();
-      Ebean.delete(extendedParent);
-      Ebean.commitTransaction();
+      DB.delete(extendedParent);
+      DB.commitTransaction();
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
   }
 

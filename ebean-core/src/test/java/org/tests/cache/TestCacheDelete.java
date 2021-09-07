@@ -1,7 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
 import org.tests.model.basic.OCachedBeanChild;
@@ -25,21 +25,21 @@ public class TestCacheDelete extends BaseTestCase {
     OCachedBean parentBean = new OCachedBean();
     parentBean.getChildren().add(child);
     parentBean.getChildren().add(child2);
-    Ebean.save(parentBean);
+    DB.save(parentBean);
 
     // confirm there are 2 children loaded from the parent
-    assertEquals(2, Ebean.find(OCachedBean.class, parentBean.getId()).getChildren().size());
+    assertEquals(2, DB.find(OCachedBean.class, parentBean.getId()).getChildren().size());
 
     // ensure cache has been populated
-    Ebean.find(OCachedBeanChild.class, child.getId());
-    child2 = Ebean.find(OCachedBeanChild.class, child2.getId());
-    parentBean = Ebean.find(OCachedBean.class, parentBean.getId());
+    DB.find(OCachedBeanChild.class, child.getId());
+    child2 = DB.find(OCachedBeanChild.class, child2.getId());
+    parentBean = DB.find(OCachedBean.class, parentBean.getId());
 
     // act
-    Ebean.delete(child2);
+    DB.delete(child2);
     awaitL2Cache();
 
-    OCachedBean beanFromCache = Ebean.find(OCachedBean.class, parentBean.getId());
+    OCachedBean beanFromCache = DB.find(OCachedBean.class, parentBean.getId());
     assertEquals(1, beanFromCache.getChildren().size());
   }
 }

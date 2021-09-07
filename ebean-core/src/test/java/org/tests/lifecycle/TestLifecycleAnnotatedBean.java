@@ -2,7 +2,7 @@ package org.tests.lifecycle;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.EBasicWithLifecycle;
@@ -18,7 +18,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PrePersist");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     assertThat(bean.getBuffer()).contains("prePersist1");
     assertThat(bean.getBuffer()).contains("prePersist2");
@@ -30,7 +30,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PostPersist");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     assertThat(bean.getBuffer()).contains("postPersist1");
     assertThat(bean.getBuffer()).contains("postPersist2");
@@ -42,9 +42,9 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PostLoad");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicWithLifecycle loaded = Ebean.find(EBasicWithLifecycle.class, bean.getId());
+    EBasicWithLifecycle loaded = DB.find(EBasicWithLifecycle.class, bean.getId());
     assertThat(loaded.getBuffer()).contains("postLoad1");
     assertThat(loaded.getBuffer()).contains("postLoad2");
   }
@@ -55,10 +55,10 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     bean.setName("PreUpdate");
-    Ebean.save(bean);
+    DB.save(bean);
 
     assertThat(bean.getBuffer()).contains("preUpdate1");
     assertThat(bean.getBuffer()).contains("preUpdate2");
@@ -87,10 +87,10 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     bean.setName("PostUpdate");
-    Ebean.save(bean);
+    DB.save(bean);
 
     assertThat(bean.getBuffer()).contains("postUpdate1");
     assertThat(bean.getBuffer()).contains("postUpdate2");
@@ -102,13 +102,13 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.save(bean);
-    Ebean.delete(bean);
+    DB.save(bean);
+    DB.delete(bean);
 
     assertThat(bean.getBuffer()).contains("preSoftDelete");
     assertThat(bean.getBuffer()).contains("postSoftDelete");
 
-    Ebean.deletePermanent(bean);
+    DB.deletePermanent(bean);
 
     assertThat(bean.getBuffer()).contains("preRemove1");
     assertThat(bean.getBuffer()).contains("preRemove2");
@@ -122,8 +122,8 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.save(bean);
-    Ebean.deletePermanent(bean);
+    DB.save(bean);
+    DB.deletePermanent(bean);
 
     assertThat(bean.getBuffer()).contains("postRemove1");
     assertThat(bean.getBuffer()).contains("postRemove2");
@@ -135,9 +135,9 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PostConstruct");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicWithLifecycle loaded = Ebean.find(EBasicWithLifecycle.class, bean.getId());
+    EBasicWithLifecycle loaded = DB.find(EBasicWithLifecycle.class, bean.getId());
     assertThat(loaded.getBuffer()).contains("postConstruct1");
     assertThat(loaded.getBuffer()).contains("postConstruct2");
     // assert also that postLoad was executed
@@ -147,7 +147,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePostConstructMethodsWhenInstantiated() {
-    EBasicWithLifecycle bean = Ebean.getDefaultServer().createEntityBean(EBasicWithLifecycle.class);
+    EBasicWithLifecycle bean = DB.getDefault().createEntityBean(EBasicWithLifecycle.class);
     bean.setName("PostConstruct");
 
 
@@ -165,7 +165,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("LazyLoad");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     BeanDescriptor<EBasicWithLifecycle> desc = ((SpiEbeanServer) server()).getBeanDescriptor(EBasicWithLifecycle.class);
     EBasicWithLifecycle loaded = desc.createReference(false, false, bean.getId(), null);

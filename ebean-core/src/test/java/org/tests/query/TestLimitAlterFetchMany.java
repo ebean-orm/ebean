@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -21,7 +21,7 @@ public class TestLimitAlterFetchMany extends BaseTestCase {
     // ... otherwise we wouldn't be able to use the
     // limit offset clause
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       // this will automatically get converted to a
       // query join ... due to the maxRows
       .fetch("contacts").setMaxRows(5).order("id");

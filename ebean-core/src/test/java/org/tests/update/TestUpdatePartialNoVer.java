@@ -1,7 +1,7 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
 import org.junit.jupiter.api.Test;
@@ -16,13 +16,13 @@ public class TestUpdatePartialNoVer extends BaseTestCase {
     b.setStatus(Status.ACTIVE);
     b.setDescription("description");
 
-    Ebean.save(b);
+    DB.save(b);
 
-    EBasic basic = Ebean.find(EBasic.class).select("status, name").setId(b.getId()).findOne();
+    EBasic basic = DB.find(EBasic.class).select("status, name").setId(b.getId()).findOne();
 
     basic.setName("modiName");
 
-    Ebean.save(basic);
+    DB.save(basic);
 
   }
 

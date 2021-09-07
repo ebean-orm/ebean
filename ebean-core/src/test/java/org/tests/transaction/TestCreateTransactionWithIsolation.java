@@ -8,7 +8,7 @@ public class TestCreateTransactionWithIsolation extends BaseTestCase {
   @Test
   public void test() {
 
-//    EbeanServer server = Ebean.getServer(null);
+//    Database server = DB.getDefault();
 //    Transaction txn = server.createTransaction(TxIsolation.SERIALIZABLE);
 //    txn.end();
 

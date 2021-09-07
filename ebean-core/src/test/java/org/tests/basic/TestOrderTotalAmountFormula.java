@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -16,7 +16,7 @@ public class TestOrderTotalAmountFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> l0 = Ebean.find(Customer.class)
+    List<Customer> l0 = DB.find(Customer.class)
       .select("id, name")
       .fetch("orders", "status, totalAmount")
       .where()

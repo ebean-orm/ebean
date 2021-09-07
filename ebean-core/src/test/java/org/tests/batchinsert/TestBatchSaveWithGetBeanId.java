@@ -1,8 +1,8 @@
 package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
@@ -23,7 +23,7 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
   @IgnorePlatform(Platform.HANA) // HANA doesn't support insert batching
   public void test() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Customer model = new Customer();
     model.setName("foo");
 
@@ -34,6 +34,6 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
     Object beanId = server.beanId(model);
     assertNotNull(beanId);
 
-    Ebean.delete(Customer.class, beanId);
+    DB.delete(Customer.class, beanId);
   }
 }

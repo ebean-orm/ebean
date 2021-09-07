@@ -1,7 +1,7 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
     truck.setCapacity(50D);
     truck.setLicenseNumber("ASB23");
 
-    Ebean.save(truck);
+    DB.save(truck);
 
 
     String sql = "select dtype, id, license_number from vehicle where id = :id";
@@ -34,7 +34,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
 
     RawSql rawSql = rawSqlBuilder.create();
 
-    List<Vehicle> list = Ebean.find(Vehicle.class)
+    List<Vehicle> list = DB.find(Vehicle.class)
       .setRawSql(rawSql)
       .setParameter("id", truck.getId())
       .findList();
@@ -51,7 +51,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
     truck2.setCapacity(30D);
 
     // and now save
-    Ebean.save(truck2);
+    DB.save(truck2);
   }
 
   @Test
@@ -63,7 +63,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
     longLease.setMinDuration(100);
     longLease.setActiveEnd(LocalDate.now());
 
-    Ebean.save(longLease);
+    DB.save(longLease);
 
 
     Truck truck = new Truck();
@@ -71,7 +71,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
     truck.setLicenseNumber("ZK1");
     truck.setLease(longLease);
 
-    Ebean.save(truck);
+    DB.save(truck);
 
 
     String sql = "select v.dtype, v.id, v.license_number, l.dtype, l.id, l.name " +
@@ -84,7 +84,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
       .tableAliasMapping("l", "lease")
       .create();
 
-    Vehicle veh = Ebean.find(Vehicle.class)
+    Vehicle veh = DB.find(Vehicle.class)
       .setRawSql(rawSql)
       .setParameter(truck.getId())
       .findOne();
@@ -103,7 +103,7 @@ public class TestInheritanceRawSql extends BaseTestCase {
       .columnMapping("l.name", "lease.name")
       .create();
 
-    Vehicle veh2 = Ebean.find(Vehicle.class)
+    Vehicle veh2 = DB.find(Vehicle.class)
       .setRawSql(rawSql2)
       .setParameter(truck.getId())
       .findOne();

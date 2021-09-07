@@ -2,8 +2,8 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.embedded.EMain;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class TestDynamicUpdate extends BaseTestCase {
     b.setName("aaa");
     b.getEmbeddable().setDescription("123");
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     server.save(b);
 

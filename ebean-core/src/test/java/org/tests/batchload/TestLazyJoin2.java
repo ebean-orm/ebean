@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
 
@@ -18,7 +18,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     ResetBasicData.reset();
 
     // This will use 3 SQL queries to build this object graph
-    List<Order> l0 = Ebean.find(Order.class).select("status, shipDate")
+    List<Order> l0 = DB.find(Order.class).select("status, shipDate")
 
       .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
@@ -38,7 +38,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     // query 3) find customer (name) join contacts (*) join shippingAddress (*)
     // where id in (?,?,?,?,?)
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       // .select("status")
       .fetchQuery("customer").order().asc("id").findList();
     // .join("customer.contacts");
@@ -56,7 +56,7 @@ public class TestLazyJoin2 extends BaseTestCase {
 
     assertNotNull(billingAddress);
 
-    List<Order> list = Ebean.find(Order.class).fetchLazy("customer", "name")
+    List<Order> list = DB.find(Order.class).fetchLazy("customer", "name")
       .fetch("customer.contacts", "contactName, phone, email").fetch("customer.shippingAddress")
       .where().eq("status", Order.Status.NEW).order().asc("id").findList();
 

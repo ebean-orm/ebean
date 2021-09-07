@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -15,19 +15,19 @@ public class TestEmptyManyLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Customer c = Ebean.find(Customer.class).findList().get(0);
+    Customer c = DB.find(Customer.class).findList().get(0);
 
     Order o = new Order();
     o.setCustomer(c);
     o.setStatus(Status.NEW);
 
-    Ebean.save(o);
+    DB.save(o);
 
-    Order o2 = Ebean.find(Order.class, o.getId());
+    Order o2 = DB.find(Order.class, o.getId());
     o2.getDetails().size();
 
     // cleanup
-    Ebean.delete(o2);
+    DB.delete(o2);
 
   }
 }

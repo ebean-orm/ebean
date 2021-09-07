@@ -1,7 +1,7 @@
 package org.tests.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.EJson;
 import org.tests.model.json.EBasicJsonMapBlob;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,9 @@ public class TestJsonMapBlob extends BaseTestCase {
     bean.setName("one");
     bean.setContent(content);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicJsonMapBlob bean1 = Ebean.find(EBasicJsonMapBlob.class, bean.getId());
+    EBasicJsonMapBlob bean1 = DB.find(EBasicJsonMapBlob.class, bean.getId());
 
     assertEquals(bean.getId(), bean1.getId());
     assertEquals(bean.getName(), bean1.getName());
@@ -34,6 +34,6 @@ public class TestJsonMapBlob extends BaseTestCase {
     assertEquals(18L, bean1.getContent().get("docId"));
 
     bean1.setName("just change name");
-    Ebean.save(bean1);
+    DB.save(bean1);
   }
 }

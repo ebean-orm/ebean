@@ -1,6 +1,6 @@
 package org.tests.model.m2m;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 public class TestM2MDoubleInsert {
@@ -18,6 +18,6 @@ public class TestM2MDoubleInsert {
 
     DRot rot = new DRot("rot");
     rot.getCroles().add(role);
-    Ebean.save(rot);
+    DB.save(rot);
   }
 }

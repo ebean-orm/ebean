@@ -1,7 +1,7 @@
 package org.tests.model.pview;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +14,9 @@ public class TestPview extends BaseTestCase {
   @Test
   public void test() {
 
-    Wview wview = Ebean.getReference(Wview.class, UUID.randomUUID());
+    Wview wview = DB.getReference(Wview.class, UUID.randomUUID());
 
-    Query<Paggview> query = Ebean.find(Paggview.class);
+    Query<Paggview> query = DB.find(Paggview.class);
     query.select("amount");
     query.where().eq("pview.wviews", wview);
     query.order("pview.value");

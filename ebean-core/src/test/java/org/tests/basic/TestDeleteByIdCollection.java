@@ -1,6 +1,6 @@
 package org.tests.basic;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 
 import org.tests.model.basic.Customer;
@@ -24,11 +24,11 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     Customer c0 = ResetBasicData.createCustomer("del1", "del1 ship", "del1 bill", 1);
     Customer c1 = ResetBasicData.createCustomer("del2", "del2 ship", "del2 bill", 2);
 
-    Ebean.save(c0);
-    Ebean.save(c1);
+    DB.save(c0);
+    DB.save(c1);
 
-    Customer c0Back = Ebean.find(Customer.class, c0.getId());
-    Customer c1Back = Ebean.find(Customer.class, "" + c1.getId());
+    Customer c0Back = DB.find(Customer.class, c0.getId());
+    Customer c1Back = DB.find(Customer.class, "" + c1.getId());
 
     assertNotNull(c0Back);
     assertNotNull(c1Back);
@@ -39,11 +39,11 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     ids.add("" + c1.getId());
 
 
-    Ebean.deleteAll(Customer.class, ids);
+    DB.deleteAll(Customer.class, ids);
     awaitL2Cache();
 
-    c0Back = Ebean.find(Customer.class, c0.getId());
-    c1Back = Ebean.find(Customer.class, "" + c1.getId());
+    c0Back = DB.find(Customer.class, c0.getId());
+    c1Back = DB.find(Customer.class, "" + c1.getId());
 
     assertNull(c0Back);
     assertNull(c1Back);
@@ -57,8 +57,8 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     Order order0 = ResetBasicData.createOrderCustAndOrder("delBySql 0");
     Order order1 = ResetBasicData.createOrderCustAndOrder("delBySql 1");
 
-    Order o0Back = Ebean.find(Order.class, order0.getId());
-    Order o1Back = Ebean.find(Order.class, order1.getId());
+    Order o0Back = DB.find(Order.class, order0.getId());
+    Order o1Back = DB.find(Order.class, order1.getId());
 
     assertNotNull(o0Back);
     assertNotNull(o1Back);
@@ -69,11 +69,11 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     ids.add(order0.getId());
     ids.add(order1.getId());
 
-    Ebean.deleteAll(Order.class, ids);
+    DB.deleteAll(Order.class, ids);
     awaitL2Cache();
 
-    o0Back = Ebean.find(Order.class, order0.getId());
-    o1Back = Ebean.find(Order.class, order1.getId());
+    o0Back = DB.find(Order.class, order0.getId());
+    o1Back = DB.find(Order.class, order1.getId());
 
     assertNull(o0Back);
     assertNull(o1Back);

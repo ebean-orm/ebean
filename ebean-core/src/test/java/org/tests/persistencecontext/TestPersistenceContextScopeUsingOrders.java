@@ -1,7 +1,7 @@
 package org.tests.persistencecontext;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -23,7 +23,7 @@ public class TestPersistenceContextScopeUsingOrders extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       // Use QUERY or TRANSACTION scope (just not NONE)
       .setPersistenceContextScope(QUERY)
       .fetch("customer", "id, name")

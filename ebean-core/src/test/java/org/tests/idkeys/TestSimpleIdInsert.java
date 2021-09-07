@@ -27,24 +27,24 @@ public class TestSimpleIdInsert extends BaseTestCase {
 //		GlobalProperties.put("datasource.default", "hsqldb");
 //		GlobalProperties.put("ebean.classes", ESimple.class.getName());
 //
-//		Transaction transaction = Ebean.beginTransaction();
+//		Transaction transaction = DB.beginTransaction();
 //		try {
 //			transaction.setBatchMode(true);
 //			transaction.setLogLevel(LogLevel.SQL);
 //			ESimple e = new ESimple();
 //			e.setName("name");
-//			Ebean.save(e);
+//			DB.save(e);
 //
 //			ESimple e2 = new ESimple();
 //			e2.setName("name2");
-//			Ebean.save(e2);
+//			DB.save(e2);
 //			transaction.commit();
 //
 //			Assert.assertNotNull(e.getId());
 //			Assert.assertNotNull(e2.getId());
 //
 //		} finally {
-//			Ebean.endTransaction();
+//			DB.endTransaction();
 //		}
 //	}
 

@@ -1,6 +1,6 @@
 package org.tests.batchload;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.TransactionalTestCase;
 
@@ -21,9 +21,9 @@ public class TestLazyLoadEmptyCollection extends TransactionalTestCase {
     Contact con = new Contact("jim", "slim");
     c.addContact(con);
 
-    Ebean.save(c);
+    DB.save(c);
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .fetchQuery("contacts")
       .fetchQuery("contacts.notes")
       .findList();

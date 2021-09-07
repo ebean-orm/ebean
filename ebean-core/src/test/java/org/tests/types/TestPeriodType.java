@@ -1,7 +1,7 @@
 package org.tests.types;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.types.SomePeriodBean;
 
@@ -20,19 +20,19 @@ public class TestPeriodType extends BaseTestCase {
 
     SomePeriodBean bean = new SomePeriodBean();
     bean.setAnniversary(MonthDay.of(4, 29));
-    Ebean.save(bean);
+    DB.save(bean);
 
-    SomePeriodBean bean1 = Ebean.find(SomePeriodBean.class, bean.getId());
+    SomePeriodBean bean1 = DB.find(SomePeriodBean.class, bean.getId());
     assertEquals(bean.getAnniversary(), bean1.getAnniversary());
 
     // insert fetch null value
     SomePeriodBean bean2 = new SomePeriodBean();
-    Ebean.save(bean2);
+    DB.save(bean2);
 
-    SomePeriodBean bean3 = Ebean.find(SomePeriodBean.class, bean2.getId());
+    SomePeriodBean bean3 = DB.find(SomePeriodBean.class, bean2.getId());
     assertNull(bean3.getAnniversary());
 
-    List<SomePeriodBean> anniversaryList = Ebean.find(SomePeriodBean.class)
+    List<SomePeriodBean> anniversaryList = DB.find(SomePeriodBean.class)
       .where()
       .eq("anniversary", MonthDay.of(4, 29))
       .findList();
@@ -41,7 +41,7 @@ public class TestPeriodType extends BaseTestCase {
 
     // must use year 2000 for range predicates
     // ... using 2001 here so not finding anything
-    anniversaryList = Ebean.find(SomePeriodBean.class)
+    anniversaryList = DB.find(SomePeriodBean.class)
       .where()
       .gt("anniversary", Date.valueOf(LocalDate.of(2001, 4, 29)))
       .findList();
@@ -50,15 +50,15 @@ public class TestPeriodType extends BaseTestCase {
 
     // can use year 2000 for range predicates
     // ... and can use LocalDate to bind
-    anniversaryList = Ebean.find(SomePeriodBean.class)
+    anniversaryList = DB.find(SomePeriodBean.class)
       .where()
       .gt("anniversary", MonthDay.of(4, 22))
       .findList();
 
     assertEquals(1, anniversaryList.size());
 
-    Ebean.delete(bean);
-    Ebean.delete(bean2);
+    DB.delete(bean);
+    DB.delete(bean2);
   }
 
 }

@@ -1,7 +1,7 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.EBasicVer;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ public class TestMarkAsDirty extends BaseTestCase {
   public void test() throws InterruptedException {
 
     EBasicVer bean = new EBasicVer("markAsDirty");
-    Ebean.save(bean);
+    DB.save(bean);
 
     Timestamp lastUpdate = bean.getLastUpdate();
     assertNotNull(lastUpdate);
@@ -24,8 +24,8 @@ public class TestMarkAsDirty extends BaseTestCase {
     Thread.sleep(100);
 
     // ensure the update occurs and version property is updated/incremented
-    Ebean.markAsDirty(bean);
-    Ebean.save(bean);
+    DB.markAsDirty(bean);
+    DB.save(bean);
 
     Timestamp lastUpdate2 = bean.getLastUpdate();
     assertNotNull(lastUpdate2);

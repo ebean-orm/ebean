@@ -2,7 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
@@ -21,18 +21,18 @@ public class TestCacheCustomer extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Country nz = Ebean.getReference(Country.class, "NZ");
+    Country nz = DB.getReference(Country.class, "NZ");
     Address address = new Address();
     address.setLine1("Some Place");
     address.setCity("Auckland");
     address.setCountry(nz);
 
-    Ebean.save(address);
+    DB.save(address);
 
     address.setLine2("Else");
-    Ebean.save(address);
+    DB.save(address);
 
-    Ebean.delete(address);
+    DB.delete(address);
   }
 
   @Test
@@ -40,7 +40,7 @@ public class TestCacheCustomer extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
+    List<Customer> list = DB.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
       .findList();
 
     assertTrue(list.size() > 1);

@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -21,9 +21,9 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
     Customer c = new Customer();
     c.setName("testll");
 
-    Ebean.save(c);
+    DB.save(c);
 
-    Customer c1 = Ebean.find(Customer.class)
+    Customer c1 = DB.find(Customer.class)
       .setAutoTune(false)
       .select("id")
       .fetch("contacts", "id")
@@ -36,6 +36,6 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
     assertTrue(sz == 0);
 
     // cleanup
-    Ebean.delete(c1);
+    DB.delete(c1);
   }
 }

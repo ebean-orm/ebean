@@ -1,7 +1,7 @@
 package org.tests.basic.delete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -21,8 +21,8 @@ public class TestDeleteByIdList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    OrderDetail dummy = Ebean.getReference(OrderDetail.class, 1);
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    OrderDetail dummy = DB.getReference(OrderDetail.class, 1);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     server.getBeanDescriptor(OrderDetail.class).cacheBeanPut(dummy);
 
     Customer c0 = ResetBasicData.createCustAndOrder("DelIdList-0");
@@ -30,13 +30,13 @@ public class TestDeleteByIdList extends BaseTestCase {
 
     Customer c1 = ResetBasicData.createCustAndOrder("DelIdList-1");
 
-    List<Object> orderIds = Ebean.find(Order.class).where().in("customer", c0, c1).findIds();
+    List<Object> orderIds = DB.find(Order.class).where().in("customer", c0, c1).findIds();
 
     assertEquals(2, orderIds.size());
 
-    Ebean.deleteAll(Order.class, orderIds);
-    Ebean.delete(c0);
-    Ebean.delete(c1);
+    DB.deleteAll(Order.class, orderIds);
+    DB.delete(c0);
+    DB.delete(c1);
 
   }
 }

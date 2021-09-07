@@ -2,7 +2,7 @@ package org.tests.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonJackson;
 import org.tests.model.json.EBasicJsonJackson2;
@@ -37,7 +37,7 @@ public class TestDbJson_Jackson extends BaseTestCase {
     bean.getValueMap().put(1, "one");
     bean.getValueMap().put(2, "two");
 
-    ObjectMapper mapper = (ObjectMapper) Ebean.getDefaultServer().pluginApi().config().getObjectMapper();
+    ObjectMapper mapper = (ObjectMapper) DB.getDefault().pluginApi().config().getObjectMapper();
 
     String json = mapper.writeValueAsString(bean);
     EBasicJsonJackson found = mapper.readValue(json, EBasicJsonJackson.class);
@@ -48,10 +48,10 @@ public class TestDbJson_Jackson extends BaseTestCase {
     assertThat(found.getValueSet()).containsExactly("A", "B");
     assertThat(found.getValueMap()).containsEntry(1L, "one").containsEntry(2L, "two");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     // here we do the same and expect, that we can deserialize the bean also
-    found = Ebean.find(EBasicJsonJackson.class, bean.getId());
+    found = DB.find(EBasicJsonJackson.class, bean.getId());
 
     assertThat(found.getPlainValue()).isEqualTo("plain");
     assertThat(found.getValueList()).containsExactly("A", "B");
@@ -83,7 +83,7 @@ public class TestDbJson_Jackson extends BaseTestCase {
     bean.getValueMap().put(1, new StringJacksonType("A"));
     bean.getValueMap().put(2, new LongJacksonType(7l));
 
-    ObjectMapper mapper = (ObjectMapper) Ebean.getDefaultServer().pluginApi().config().getObjectMapper();
+    ObjectMapper mapper = (ObjectMapper) DB.getDefault().pluginApi().config().getObjectMapper();
 
     String json = mapper.writeValueAsString(bean);
     assertThat(json)
@@ -96,9 +96,9 @@ public class TestDbJson_Jackson extends BaseTestCase {
     assertThat(found.getValueSet()).hasSize(2);
     assertThat(found.getValueMap()).hasSize(2);;
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    found = Ebean.find(EBasicJsonJackson2.class, bean.getId());
+    found = DB.find(EBasicJsonJackson2.class, bean.getId());
 
     assertThat(found.getPlainValue()).isInstanceOf(LongJacksonType.class);
     assertThat(found.getValueList()).hasSize(2);

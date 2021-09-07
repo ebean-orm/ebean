@@ -1,6 +1,6 @@
 package org.tests.basic;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.TransactionalTestCase;
 
@@ -20,12 +20,12 @@ public class TestOrderByAnnotation extends TransactionalTestCase {
 
     Customer custTest = ResetBasicData.createCustAndOrder("testOrderByAnn");
 
-    Customer customer = Ebean.find(Customer.class, custTest.getId());
+    Customer customer = DB.find(Customer.class, custTest.getId());
     List<Order> orders = customer.getOrders();
 
     assertTrue(!orders.isEmpty());
 
-    Query<Order> q1 = Ebean.find(Order.class)
+    Query<Order> q1 = DB.find(Order.class)
       .fetch("details");
 
     q1.findList();

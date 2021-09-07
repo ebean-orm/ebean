@@ -3,8 +3,8 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DtoQuery2Test;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
@@ -31,7 +31,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Test
   public void no_cascade() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     resetAllMetrics();
 
@@ -97,11 +97,11 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.save(new EBasicVer("b1"));
-    Ebean.save(new EBasicVer("b2"));
+    DB.save(new EBasicVer("b1"));
+    DB.save(new EBasicVer("b2"));
 
     // does not trigger JDBC batch with flushOnQuery = false
-    Ebean.find(Customer.class).findCount();
+    DB.find(Customer.class).findCount();
 
     List<String> sql = LoggedSqlCollector.stop();
     assertSql(sql.get(0)).contains("select count(*)");
@@ -148,11 +148,11 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.save(new EBasicVer("b1"));
-    Ebean.save(new EBasicVer("b2"));
+    DB.save(new EBasicVer("b1"));
+    DB.save(new EBasicVer("b2"));
 
     // by default triggers flush of JDBC batch
-    Ebean.find(Customer.class).findCount();
+    DB.find(Customer.class).findCount();
 
     List<String> sql = LoggedSqlCollector.stop();
     assertSql(sql.get(0)).contains("insert into e_basicver");
@@ -163,7 +163,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @IgnorePlatform({Platform.SQLSERVER, Platform.HANA}) // has generated IDs
   public void transactional_flushOnGetId() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     LoggedSqlCollector.start();
 
     EBasicVer b1 = new EBasicVer("b1");
@@ -186,7 +186,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @IgnorePlatform({Platform.SQLSERVER, Platform.HANA})
   public void testFlushOnGetId() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
       LoggedSqlCollector.start();
@@ -218,7 +218,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Transactional(batch = PersistBatch.ALL)
   public void transactional_noflushWhenIdIsLoaded() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     LoggedSqlCollector.start();
 
@@ -245,7 +245,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE})
   public void noflushWhenIdIsLoaded() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
       LoggedSqlCollector.start();
@@ -279,7 +279,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Test
   public void testFlushOnGetProperty() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
       txn.setBatchMode(true);
@@ -307,7 +307,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Test
   public void testFlushOnSetProperty() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
       txn.setBatchMode(true);

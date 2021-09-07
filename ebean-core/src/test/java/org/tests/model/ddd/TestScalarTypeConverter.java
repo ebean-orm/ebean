@@ -1,6 +1,6 @@
 package org.tests.model.ddd;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.ivo.Oid;
 import org.tests.model.ivo.converter.AnEnumType;
@@ -16,9 +16,9 @@ public class TestScalarTypeConverter {
     exhEntity.setOid(new Oid<>(12));
     exhEntity.setAnEnumType(AnEnumType.ONE);
 
-    Ebean.save(exhEntity);
+    DB.save(exhEntity);
 
-    int count = Ebean.find(DExhEntity.class)
+    int count = DB.find(DExhEntity.class)
       .where().eq("anEnumType", AnEnumType.ONE)
       .findCount();
 

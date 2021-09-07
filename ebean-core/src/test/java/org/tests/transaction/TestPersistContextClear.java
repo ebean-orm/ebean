@@ -1,8 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
@@ -24,7 +24,7 @@ public class TestPersistContextClear extends BaseTestCase {
 
     Order order0 = null;
 
-    Transaction t = Ebean.beginTransaction();
+    Transaction t = DB.beginTransaction();
     try {
       ResetBasicData.createOrderCustAndOrder("testPc");
       SpiTransaction spiTxn = (SpiTransaction) t;
@@ -34,7 +34,7 @@ public class TestPersistContextClear extends BaseTestCase {
       assertEquals(0, pc.size(Order.class));
       assertEquals(0, pc.size(Customer.class));
 
-      EbeanServer server = Ebean.getServer(null);
+      Database server = DB.getDefault();
       List<Order> list = server.find(Order.class).fetch("customer").fetch("details").findList();
 
       int orderSize = list.size();

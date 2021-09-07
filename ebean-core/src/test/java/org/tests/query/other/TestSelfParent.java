@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.selfref.SelfParent;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ public class TestSelfParent extends BaseTestCase {
   @Test
   public void test() {
 
-    if (Ebean.find(SelfParent.class).findCount() > 0) {
+    if (DB.find(SelfParent.class).findCount() > 0) {
       // only run once
       return;
     }
@@ -29,16 +29,16 @@ public class TestSelfParent extends BaseTestCase {
     SelfParent child21 = new SelfParent("child21", child2);
     SelfParent child22 = new SelfParent("child22", child2);
 
-    Ebean.save(root);
-    Ebean.save(child1);
-    Ebean.save(child11);
-    Ebean.save(child111);
-    Ebean.save(child12);
-    Ebean.save(child2);
-    Ebean.save(child21);
-    Ebean.save(child22);
+    DB.save(root);
+    DB.save(child1);
+    DB.save(child11);
+    DB.save(child111);
+    DB.save(child12);
+    DB.save(child2);
+    DB.save(child21);
+    DB.save(child22);
 
-    List<SelfParent> roots = Ebean.find(SelfParent.class).where().eq("parent", null).findList();
+    List<SelfParent> roots = DB.find(SelfParent.class).where().eq("parent", null).findList();
 
     assertEquals(1, roots.size());
 

@@ -1,7 +1,7 @@
 package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Integer> orderIds = Ebean.find(Order.class)
+    List<Integer> orderIds = DB.find(Order.class)
         .where().eq("totalItems", 3)
         .findIds();
     assertThat(orderIds).hasSize(2);
@@ -43,7 +43,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
         .where().eq("totalItems", 3)
         .findList();
     assertThat(orders).hasSize(2);
@@ -58,7 +58,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    int orders = Ebean.find(Order.class)
+    int orders = DB.find(Order.class)
         .where().eq("totalItems", 3)
         .findCount();
     assertThat(orders).isEqualTo(2);
@@ -74,7 +74,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    int orders = Ebean.find(Order.class)
+    int orders = DB.find(Order.class)
       .where()
       .eq("totalItems", 3)
       .gt("totalAmount", 10)
@@ -92,7 +92,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Date> orderDates = Ebean.find(Order.class)
+    List<Date> orderDates = DB.find(Order.class)
         .select("orderDate")
         .where().eq("totalItems", 3)
         .findSingleAttributeList();
@@ -109,7 +109,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Order order = Ebean.find(Order.class)
+    Order order = DB.find(Order.class)
         .select("totalItems")
         .where().eq("totalItems", 3)
         .setMaxRows(1)
@@ -133,7 +133,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<ParentPerson> orderIds = Ebean.find(ParentPerson.class)
+    List<ParentPerson> orderIds = DB.find(ParentPerson.class)
         .where().eq("totalAge", 3)
         .findIds();
 
@@ -147,7 +147,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(ParentPerson.class)
+    DB.find(ParentPerson.class)
         .select("identifier")
         //.where().eq("totalAge", 3)
         .where().eq("familyName", "foo")
@@ -163,7 +163,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(ParentPerson.class)
+    DB.find(ParentPerson.class)
       .where().eq("totalAge", 3)
       .findCount();
 
@@ -178,7 +178,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(ParentPerson.class)
+    DB.find(ParentPerson.class)
       .select("address")
       .where().eq("totalAge", 3)
       .findSingleAttributeList();
@@ -194,7 +194,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(ParentPerson.class)
+    DB.find(ParentPerson.class)
       .where().eq("totalAge", 3)
       .setMaxRows(1)
       .orderById(true)
@@ -210,7 +210,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(ChildPerson.class)
+    DB.find(ChildPerson.class)
         .where().eq("parent.totalAge", 3)
         .findIds();
 
@@ -225,7 +225,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(ChildPerson.class)
+    DB.find(ChildPerson.class)
         .where().eq("parent.totalAge", 3)
         .findCount();
 

@@ -2,7 +2,7 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlRow;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -20,10 +20,10 @@ public class TestUpdatePartial extends BaseTestCase {
     c.setStatus(Customer.Status.ACTIVE);
     c.setSmallnote("a note");
 
-    Ebean.save(c);
+    DB.save(c);
     checkDbStatusValue(c.getId(), "A");
 
-    Customer c2 = Ebean.find(Customer.class)
+    Customer c2 = DB.find(Customer.class)
       .setUseCache(false)
       .select("status, smallnote")
       .setId(c.getId())
@@ -32,10 +32,10 @@ public class TestUpdatePartial extends BaseTestCase {
     c2.setStatus(Customer.Status.INACTIVE);
     c2.setSmallnote("2nd note");
 
-    Ebean.save(c2);
+    DB.save(c2);
     checkDbStatusValue(c.getId(), "I");
 
-    Customer c3 = Ebean.find(Customer.class)
+    Customer c3 = DB.find(Customer.class)
       .setUseCache(false)
       .select("status")
       .setId(c.getId())
@@ -44,11 +44,11 @@ public class TestUpdatePartial extends BaseTestCase {
     c3.setStatus(Customer.Status.NEW);
     c3.setSmallnote("3rd note");
 
-    Ebean.save(c3);
+    DB.save(c3);
     checkDbStatusValue(c.getId(), "N");
 
     // cleanup
-    Ebean.delete(Customer.class, c.getId());
+    DB.delete(Customer.class, c.getId());
   }
 
   private void checkDbStatusValue(Integer custId, String dbStatus) {
@@ -68,15 +68,15 @@ public class TestUpdatePartial extends BaseTestCase {
     Customer customer = new Customer();
     customer.setName("something");
 
-    Ebean.save(customer);
+    DB.save(customer);
 
-    Customer customerWithoutChanges = Ebean.find(Customer.class, customer.getId());
-    Ebean.save(customerWithoutChanges);
+    Customer customerWithoutChanges = DB.find(Customer.class, customer.getId());
+    DB.save(customerWithoutChanges);
 
     assertThat(customerWithoutChanges.getUpdtime()).isEqualToIgnoringMillis(customer.getUpdtime());
 
     // cleanup
-    Ebean.delete(customerWithoutChanges);
+    DB.delete(customerWithoutChanges);
 
   }
 }

@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,11 +21,11 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
     // object if it is currently null so you don't need to do the extra
     // o.setCustomer(c);
 
-    Ebean.save(master);
+    DB.save(master);
 
     assertNotNull(child.getId());
 
-    OtoChild child2 = Ebean.find(OtoChild.class, child.getId());
+    OtoChild child2 = DB.find(OtoChild.class, child.getId());
     OtoMaster master2 = child2.getMaster();
     assertNotNull(master2);
   }

@@ -2,7 +2,7 @@ package org.tests.iud;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.EBasicVer;
 import org.junit.jupiter.api.Test;
 
@@ -17,23 +17,23 @@ public class TestInsertQueryUpdate extends BaseTestCase {
 
     EBasicVer e0 = new EBasicVer("name0");
     e0.setDescription("desc0");
-    Ebean.save(e0);
+    DB.save(e0);
 
-    EBasicVer e1 = Ebean.find(EBasicVer.class)
+    EBasicVer e1 = DB.find(EBasicVer.class)
       .select("name")
       .setId(e0.getId())
       .findOne();
 
-    BeanState beanState = Ebean.getBeanState(e1);
+    BeanState beanState = DB.getBeanState(e1);
     Set<String> loadedProps = beanState.getLoadedProps();
     assertFalse(loadedProps.contains("description"));
     //lastUpdate
 
     e1.setName("name1");
-    Ebean.save(e1);
+    DB.save(e1);
 
     e1.setDescription("desc1");
-    Ebean.save(e1);
+    DB.save(e1);
 
   }
 

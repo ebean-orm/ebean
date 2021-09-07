@@ -1,8 +1,8 @@
 package io.ebeanservice.docstore.api.support;
 
 import io.ebean.DocStoreQueueEntry;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 public class DocStoreIndexEventTest {
 
-  static EbeanServer server = Ebean.getDefaultServer();
+  static Database server = DB.getDefault();
 
   <T> BeanType<T> beanType(Class<T> cls) {
     return server.pluginApi().beanType(cls);

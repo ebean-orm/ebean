@@ -1,7 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -17,10 +17,10 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     EcbmPerson person = new EcbmPerson("Cache1");
     person.getPhoneNumbers().put("home", new EcPhone("64", "021", "1234"));
     person.getPhoneNumbers().put("work", new EcPhone("64", "021", "4321"));
-    Ebean.save(person);
+    DB.save(person);
 
 
-    EcbmPerson one = Ebean.find(EcbmPerson.class)
+    EcbmPerson one = DB.find(EcbmPerson.class)
       .setId(person.getId())
       .fetch("phoneNumbers")
       .findOne();
@@ -32,7 +32,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty();
 
-    EcbmPerson two = Ebean.find(EcbmPerson.class)
+    EcbmPerson two = DB.find(EcbmPerson.class)
       .setId(person.getId())
       .findOne();
 
@@ -45,7 +45,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     two.getPhoneNumbers().put("mob", new EcPhone("61", "07", "11"));
     two.getPhoneNumbers().remove("home");
 
-    Ebean.save(two);
+    DB.save(two);
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -62,7 +62,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
       assertThat(sql.get(3)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,phnum) values (?,?,?,?,?)");
     }
 
-    EcbmPerson three = Ebean.find(EcbmPerson.class)
+    EcbmPerson three = DB.find(EcbmPerson.class)
       .setId(person.getId())
       .findOne();
 
@@ -76,12 +76,12 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     three.setName("mod-3");
     three.getPhoneNumbers().remove("work");
 
-    Ebean.save(three);
+    DB.save(three);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(5);
 
-    EcbmPerson four = Ebean.find(EcbmPerson.class)
+    EcbmPerson four = DB.find(EcbmPerson.class)
       .setId(person.getId())
       .findOne();
 
@@ -89,7 +89,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     assertThat(four.getPhoneNumbers()).hasSize(1);
 
 
-    Ebean.delete(four);
+    DB.delete(four);
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(2);
 

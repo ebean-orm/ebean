@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EOptOneA;
@@ -14,7 +14,7 @@ public class TestJoinOptOneCascade extends BaseTestCase {
   public void test() {
 
     // the left join cascades to the join for c
-    Query<EOptOneA> query = Ebean.find(EOptOneA.class).fetch("b").fetch("b.c");
+    Query<EOptOneA> query = DB.find(EOptOneA.class).fetch("b").fetch("b.c");
 
     query.findList();
     String sql = query.getGeneratedSql();
@@ -28,7 +28,7 @@ public class TestJoinOptOneCascade extends BaseTestCase {
   public void test_where() {
 
     // the left join cascades to the join for c
-    Query<EOptOneA> query = Ebean.find(EOptOneA.class)
+    Query<EOptOneA> query = DB.find(EOptOneA.class)
       .where()
       .eq("b.c.nameForC", "foo")
       .query();

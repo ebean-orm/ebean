@@ -15,11 +15,11 @@ public class EbeanServer_deleteTest extends BaseTestCase  {
   public void delete() {
 
     EBasicVer someBean = bean("foo1");
-    Ebean.save(someBean);
+    DB.save(someBean);
 
     // act
     LoggedSqlCollector.start();
-    Ebean.delete(someBean);
+    DB.delete(someBean);
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
@@ -30,9 +30,9 @@ public class EbeanServer_deleteTest extends BaseTestCase  {
   public void delete_withTransaction() {
 
     EBasicVer someBean = bean("foo1");
-    Ebean.save(someBean);
+    DB.save(someBean);
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     // act
     LoggedSqlCollector.start();
     Transaction txn = server.beginTransaction();

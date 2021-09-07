@@ -1,8 +1,8 @@
 package org.tests.basic.lob;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobFetchEager;
 import org.ebeantest.LoggedSqlCollector;
@@ -21,14 +21,14 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     EBasicClobFetchEager entity = new EBasicClobFetchEager();
     entity.setName("test");
     entity.setDescription("initialClobValue");
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     server.save(entity);
 
 
     String expectedSql = "select t0.id, t0.name, t0.title, t0.description, t0.last_update from ebasic_clob_fetch_eager t0 where t0.id = ?";
 
     // Clob included in fetch as FetchType.EAGER set by annotation
-    Query<EBasicClobFetchEager> defaultQuery = Ebean.find(EBasicClobFetchEager.class).setId(entity.getId());
+    Query<EBasicClobFetchEager> defaultQuery = DB.find(EBasicClobFetchEager.class).setId(entity.getId());
     defaultQuery.findOne();
     String sql = trimSql(defaultQuery.getGeneratedSql(), 6);
 
@@ -38,7 +38,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // Same as previous query - clob included by default based on annotation
-    Ebean.find(EBasicClobFetchEager.class, entity.getId());
+    DB.find(EBasicClobFetchEager.class, entity.getId());
 
     // Assert query same as previous ...
     List<String> loggedSql = LoggedSqlCollector.stop();
@@ -47,7 +47,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
 
 
     // Explicitly select * including Clob
-    Query<EBasicClobFetchEager> explicitQuery = Ebean.find(EBasicClobFetchEager.class).setId(entity.getId()).select("*");
+    Query<EBasicClobFetchEager> explicitQuery = DB.find(EBasicClobFetchEager.class).setId(entity.getId()).select("*");
 
     explicitQuery.findOne();
     sql = sqlOf(explicitQuery, 6);
@@ -59,7 +59,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     EBasicClobFetchEager updateBean = new EBasicClobFetchEager();
     updateBean.setId(entity.getId());
     updateBean.setDescription("modified");
-    Ebean.update(updateBean);
+    DB.update(updateBean);
 
 
     // Test refresh function

@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -21,15 +21,15 @@ public class TestBasicNavOnEmpty extends BaseTestCase {
     Customer c = new Customer();
     c.setName("HelloRob");
 
-    Ebean.save(c);
+    DB.save(c);
 
-    c = Ebean.find(Customer.class, c.getId());
+    c = DB.find(Customer.class, c.getId());
 
     List<Contact> contacts = c.getContacts();
     assertEquals(0, contacts.size());
 
     // cleanup
-    Ebean.delete(c);
+    DB.delete(c);
   }
 
 }

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import org.tests.model.basic.TOne;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ScalarTypeBooleanTest {
 
-  JsonContext jsonContext = Ebean.getDefaultServer().json();
+  JsonContext jsonContext = DB.getDefault().json();
 
   @Test
   public void json_true() {

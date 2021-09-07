@@ -1,7 +1,7 @@
 package org.tests.query.orderby;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -19,7 +19,7 @@ public class TestOrderByOnComplex extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class).order().desc("customer");
+    Query<Order> query = DB.find(Order.class).order().desc("customer");
 
     query.findList();
 
@@ -32,7 +32,7 @@ public class TestOrderByOnComplex extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .order("case when status=3 then 10 when status=2 then 11 else 99 end");
 
     List<Order> list = query.findList();

@@ -3,7 +3,7 @@ package org.tests.insert;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DataIntegrityException;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class TestInsertDataIntegrityException extends BaseTestCase {
     ResetBasicData.reset();
 
     // an invalid foreign key value
-    Customer invalidCustomer = Ebean.getReference(Customer.class, 900000);
+    Customer invalidCustomer = DB.getReference(Customer.class, 900000);
 
     Order order = new Order();
     order.setStatus(Order.Status.NEW);

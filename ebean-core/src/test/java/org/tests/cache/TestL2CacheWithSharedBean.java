@@ -1,7 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
@@ -25,16 +25,16 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
     f1.setName("one");
     f1.setDescription("helloOne");
 
-    Ebean.save(f1);
+    DB.save(f1);
 
-    ServerCache beanCache = Ebean.getServerCacheManager().beanCache(FeatureDescription.class);
+    ServerCache beanCache = DB.cacheManager().beanCache(FeatureDescription.class);
     beanCache.statistics(true);
 
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("name");
 //    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
 
-    Query<FeatureDescription> query = Ebean.find(FeatureDescription.class).setId(f1.getId());
+    Query<FeatureDescription> query = DB.find(FeatureDescription.class).setId(f1.getId());
 
 //    tunedInfo.tuneQuery((SpiQuery<?>) query);
 
@@ -46,12 +46,12 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
     assertEquals("helloOne", description0);
 
     // load the cache
-    FeatureDescription fetchOne = Ebean.find(FeatureDescription.class, f1.getId());
+    FeatureDescription fetchOne = DB.find(FeatureDescription.class, f1.getId());
     assertNotNull(fetchOne);
     assertEquals(1, beanCache.statistics(false).getSize());
 
-    FeatureDescription fetchTwo = Ebean.find(FeatureDescription.class, f1.getId());
-    FeatureDescription fetchThree = Ebean.find(FeatureDescription.class, f1.getId());
+    FeatureDescription fetchTwo = DB.find(FeatureDescription.class, f1.getId());
+    FeatureDescription fetchThree = DB.find(FeatureDescription.class, f1.getId());
     assertSame(fetchTwo, fetchThree);
 
     String description1 = fetchThree.getDescription();

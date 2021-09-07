@@ -2,7 +2,7 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
@@ -29,7 +29,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where()
       .raw("(status = ? or (orderDate < ? and shipDate is null) or customer.name like ?)",
         Order.Status.APPROVED, new Timestamp(System.currentTimeMillis()), "Rob")
@@ -45,7 +45,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(OrderDetail.class)
+    DB.find(OrderDetail.class)
       .where()
       .not(Expr.eq("id", 1))
       .raw("orderQty < shipQty")
@@ -75,7 +75,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     List<String> vals = asList("Rob", "Fiona", "Jack");
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("name")
       .where()
       .rawOrEmpty("id in (select c.id from o_customer c where c.name in (?1))", vals)
@@ -91,7 +91,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("name")
       .where()
       .rawOrEmpty("id in (select c.id from o_customer c where c.name in (?1))", null)
@@ -107,7 +107,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("name")
       .where()
       .rawOrEmpty("id in (select c.id from o_customer c where c.name in (?1))", Collections.emptySet())
@@ -123,7 +123,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .where()
       .raw("name in (?1)", asList("Rob", "Fiona", "Jack"))
       .query();
@@ -139,7 +139,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .where()
       .raw("name = any(?)", asList("Rob", "Fiona", "Jack"))
       .findList();
@@ -155,15 +155,15 @@ public class TestWhereRawClause extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .select("name").where().rawOrEmpty("name = any(?)", asList("Rob", "Fiona", "Jack"))
       .findList();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .select("name").where().rawOrEmpty("name = any(?)", asList())
       .findList();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .select("name").where().rawOrEmpty("name = any(?)", null)
       .findList();
 
@@ -179,7 +179,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(OrderDetail.class)
+    DB.find(OrderDetail.class)
       .where()
       .ne("id", 42)
       .raw("orderQty < ?", 100)

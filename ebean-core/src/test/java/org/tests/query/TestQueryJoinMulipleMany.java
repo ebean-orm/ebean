@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -18,7 +18,7 @@ public class TestQueryJoinMulipleMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class).fetch("customer").fetch("customer.contacts").where()
+    List<Order> list = DB.find(Order.class).fetch("customer").fetch("customer.contacts").where()
       .gt("id", 0).findList();
 
     assertNotNull(list);

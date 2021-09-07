@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 public class TestOneToOneJoinColumn extends BaseTestCase {
@@ -14,7 +14,7 @@ public class TestOneToOneJoinColumn extends BaseTestCase {
     company.setCorpId("corp_id_1000000");
     msg.setCompany(company);
 
-    Ebean.save(msg);
-    Ebean.find(ORoadShowMsg.class, msg.getId());
+    DB.save(msg);
+    DB.find(ORoadShowMsg.class, msg.getId());
   }
 }

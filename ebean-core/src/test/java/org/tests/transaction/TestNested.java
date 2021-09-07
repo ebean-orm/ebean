@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.PersistenceException;
@@ -15,7 +15,7 @@ public class TestNested extends BaseTestCase {
   public void testRunnableFail() {
 
     try {
-      Ebean.execute(this::willFail);
+      DB.execute(this::willFail);
     } catch (PersistenceException e) {
       assertThat(e.getMessage()).contains("test runnable rollback");
     }
@@ -25,20 +25,20 @@ public class TestNested extends BaseTestCase {
   public void testCallableFail() {
 
     try {
-      Ebean.execute(this::willFailCallable);
+      DB.execute(this::willFailCallable);
     } catch (PersistenceException e) {
       assertThat(e.getMessage()).contains("test callable rollback");
     }
   }
 
   private void willFail() {
-    Ebean.executeCall(() -> {
+    DB.executeCall(() -> {
       throw new RuntimeException("test runnable rollback");
     });
   }
 
   private void willFailCallable() {
-    Ebean.executeCall((Callable<String>) () -> {
+    DB.executeCall((Callable<String>) () -> {
       throw new Exception("test callable rollback");
     });
   }

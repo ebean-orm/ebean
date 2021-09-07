@@ -1,7 +1,7 @@
 package org.tests.iud;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.info.InfoCompany;
 import org.tests.model.info.InfoCustomer;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class TestInfoOneToOne extends BaseTestCase {
     customer.save();
 
     // assert JsonIgnore working as expected
-    String asJson = Ebean.json().toJson(company);
+    String asJson = DB.json().toJson(company);
     assertThat(asJson).doesNotContain("contacts");
 
     // assert both are inserted

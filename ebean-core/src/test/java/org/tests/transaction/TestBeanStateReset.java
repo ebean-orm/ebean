@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyC;
@@ -37,7 +37,7 @@ public class TestBeanStateReset extends BaseTestCase {
     } catch (PersistenceException e) {
       logger.info("expected error " + e.getMessage());
 
-      Ebean.getBeanState(b).resetForInsert();
+      DB.getBeanState(b).resetForInsert();
       b.getCs().clear();
 
       LoggedSqlCollector.start();
@@ -60,7 +60,7 @@ public class TestBeanStateReset extends BaseTestCase {
     MnyB b = new MnyB();
     b.getCs().add(c);
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       // turn off cascade ...
       transaction.setPersistCascade(false);
@@ -92,7 +92,7 @@ public class TestBeanStateReset extends BaseTestCase {
     }
 
     // assert our insert prior to the commitAndContinue succeeded
-    MnyB madeIt = Ebean.find(MnyB.class, b.getId());
+    MnyB madeIt = DB.find(MnyB.class, b.getId());
     assertNotNull(madeIt);
   }
 }

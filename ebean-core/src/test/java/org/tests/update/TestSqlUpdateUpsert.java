@@ -2,7 +2,7 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -26,7 +26,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
       .setParameter(true)
       .executeGetKey();
 
-    EPersonOnline found = Ebean.find(EPersonOnline.class, key);
+    EPersonOnline found = DB.find(EPersonOnline.class, key);
     assertThat(found).isNotNull();
     assertThat(found.getEmail()).isEqualTo(email);
     assertThat(found.isOnlineStatus()).isTrue();
@@ -34,7 +34,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     Thread.sleep(50); // have to wait some millis here
     String sqlNamed = "merge into e_person_online (email, online_status, when_updated) key(email) values (:email, :online, now())";
 
-    SqlUpdate sqlUpdate2 = Ebean.createSqlUpdate(sqlNamed)
+    SqlUpdate sqlUpdate2 = DB.sqlUpdate(sqlNamed)
       .setGetGeneratedKeys(true)
       .setParameter("email", email)
       .setParameter("online", false);
@@ -43,7 +43,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     assertThat(key2).isNull();
 
 
-    EPersonOnline found2 = Ebean.find(EPersonOnline.class).where().eq("email", email).findOne();
+    EPersonOnline found2 = DB.find(EPersonOnline.class).where().eq("email", email).findOne();
     assertThat(found2).isNotNull();
     assertThat(found2.getId()).isEqualTo(key);
     assertThat(found2.getEmail()).isEqualTo(email);
@@ -66,7 +66,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
       .setParameter(3, true)
       .executeGetKey();
 
-    EPersonOnline found = Ebean.find(EPersonOnline.class, key);
+    EPersonOnline found = DB.find(EPersonOnline.class, key);
     assertThat(found).isNotNull();
     assertThat(found.getEmail()).isEqualTo("foo@one.com");
     assertThat(found.isOnlineStatus()).isTrue();
@@ -80,7 +80,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
 
     Object key2 = sqlUpdate2.executeGetKey();
 
-    EPersonOnline found2 = Ebean.find(EPersonOnline.class, key2);
+    EPersonOnline found2 = DB.find(EPersonOnline.class, key2);
     assertThat(found2).isNotNull();
     assertThat(found2.getId()).isEqualTo(key);
     assertThat(found2.getEmail()).isEqualTo("foo@one.com");
@@ -96,7 +96,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     String email = "bar@one.com";
 
     String sql = "insert into e_person_online (email, online_status, when_updated) values (?, ?, current_time) on duplicate key update when_updated=current_time, online_status = ?";
-    SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql)
+    SqlUpdate sqlUpdate = DB.sqlUpdate(sql)
       .setGetGeneratedKeys(true)
       .setParameter(1, email)
       .setParameter(2, true)
@@ -105,14 +105,14 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     Object key = sqlUpdate.executeGetKey();
     assertThat(key).isNotNull();
 
-    EPersonOnline found = Ebean.find(EPersonOnline.class, key);
+    EPersonOnline found = DB.find(EPersonOnline.class, key);
     assertThat(found).isNotNull();
     assertThat(found.getEmail()).isEqualTo("bar@one.com");
     assertThat(found.isOnlineStatus()).isTrue();
 
 
     String sqlNamed = "insert into e_person_online (email, online_status, when_updated) values (:email, :online, current_time) on duplicate key update when_updated=current_time, online_status = :online";
-    SqlUpdate sqlUpdate2 = Ebean.createSqlUpdate(sqlNamed)
+    SqlUpdate sqlUpdate2 = DB.sqlUpdate(sqlNamed)
       .setGetGeneratedKeys(true)
       .setParameter("email", email)
       .setParameter("online", false);
@@ -120,7 +120,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
     sqlUpdate2.execute();
     Object key2 = sqlUpdate2.getGeneratedKey();
 
-    EPersonOnline found2 = Ebean.find(EPersonOnline.class, key2);
+    EPersonOnline found2 = DB.find(EPersonOnline.class, key2);
     assertThat(found2).isNotNull();
     assertThat(found2.getId().toString()).isEqualTo(key.toString());
     assertThat(found2.getEmail()).isEqualTo("bar@one.com");

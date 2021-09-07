@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.PagedList;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -38,14 +38,14 @@ public class TestQueryFindPagedList extends BaseTestCase {
   @Test
   public void test_noMaxRows() {
     assertThrows(PersistenceException.class, () ->
-      Ebean.find(Order.class).findPagedList());
+      DB.find(Order.class).findPagedList());
   }
 
   @Test
   public void test_maxRows_NoCount() {
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class)
+    PagedList<Order> pagedList = DB.find(Order.class)
       .setMaxRows(4)
       .findPagedList();
 
@@ -65,7 +65,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class)
+    PagedList<Order> pagedList = DB.find(Order.class)
       .setMaxRows(3)
       .findPagedList();
 
@@ -88,7 +88,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     ResetBasicData.reset();
 
     // fetch less that total orders (page size 3)
-    PagedList<Order> pagedList = Ebean.find(Order.class)
+    PagedList<Order> pagedList = DB.find(Order.class)
       .setMaxRows(3)
       .findPagedList();
 
@@ -102,7 +102,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
 
     // fetch less that total orders (page size 3)
-    PagedList<Order> pagedList2 = Ebean.find(Order.class)
+    PagedList<Order> pagedList2 = DB.find(Order.class)
       .setFirstRow(1)
       .setMaxRows(3)
       .order("id")
@@ -118,7 +118,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertThat(orders2.size()).isLessThan(totalRowCount);
 
 
-    PagedList<Order> pagedList3 = Ebean.find(Order.class)
+    PagedList<Order> pagedList3 = DB.find(Order.class)
       .setFirstRow(2)
       .setMaxRows(150)
       .order("id")
@@ -132,7 +132,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertThat(xtoYofZ).isEqualTo("3 to " + totalRowCount + " of " + totalRowCount);
     assertThat(list3.size()).isEqualTo(totalRowCount - 2);
 
-    PagedList<Order> pagedList4 = Ebean.find(Order.class)
+    PagedList<Order> pagedList4 = DB.find(Order.class)
       .setFirstRow(0)
       .setMaxRows(totalRowCount)
       .findPagedList();
@@ -141,7 +141,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertFalse(pagedList4.hasPrev());
     assertThat(pagedList4.getDisplayXtoYofZ(" to ", " of ")).isEqualTo("1 to " + totalRowCount + " of " + totalRowCount);
 
-    PagedList<Order> pagedList5 = Ebean.find(Order.class)
+    PagedList<Order> pagedList5 = DB.find(Order.class)
       .setFirstRow(0)
       .setMaxRows(totalRowCount - 1)
       .findPagedList();
@@ -155,7 +155,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(4).findPagedList();
+    PagedList<Order> pagedList = DB.find(Order.class).setMaxRows(4).findPagedList();
 
     LoggedSqlCollector.start();
 
@@ -172,7 +172,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
+    PagedList<Order> pagedList = DB.find(Order.class).setMaxRows(3).findPagedList();
 
     Future<Integer> rowCount = pagedList.getFutureCount();
     List<Order> orders = pagedList.getList();
@@ -194,7 +194,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     ResetBasicData.reset();
 
     // fetch less that total orders (page size 3)
-    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
+    PagedList<Order> pagedList = DB.find(Order.class).setMaxRows(3).findPagedList();
 
     pagedList.loadCount();
     List<Order> orders = pagedList.getList();
@@ -209,14 +209,14 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
+    PagedList<Order> pagedList = DB.find(Order.class).setMaxRows(3).findPagedList();
 
     LoggedSqlCollector.start();
 
     // kinda not normal but just wrap in a transaction to assert
     // the background fetch does not occur (which explicitly creates
     // its own transaction) ... so a bit naughty with the test here
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
 
       List<Order> orders = pagedList.getList();
@@ -237,7 +237,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
       assertEquals(firstTxn, secTxn);
 
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
   }
 
@@ -247,7 +247,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class)
+    PagedList<Order> pagedList = DB.find(Order.class)
       .alias("b")
       .where().raw("b.id > 0")
       .setMaxRows(6)

@@ -1,7 +1,7 @@
 package org.tests.model.embedded;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
 import org.ebeantest.LoggedSqlCollector;
@@ -20,11 +20,11 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    BeanType<EAddr> embType = Ebean.getDefaultServer().pluginApi().beanType(EAddr.class);
+    BeanType<EAddr> embType = DB.getDefault().pluginApi().beanType(EAddr.class);
 
-    Ebean.getDefaultServer().cacheManager().clearAll();
+    DB.getDefault().cacheManager().clearAll();
 
-    Country nz = Ebean.getReference(Country.class, "NZ");
+    Country nz = DB.getReference(Country.class, "NZ");
 
     EAddr addr = new EAddr("Foo", "Bar", nz);
     EPerAddr perAddr = new EPerAddr("Embed", addr);
@@ -34,12 +34,12 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
 
     assertThat(val).isSameAs(nz);
 
-    Ebean.save(perAddr);
+    DB.save(perAddr);
 
 
     LoggedSqlCollector.start();
 
-    EPerAddr found = Ebean.find(EPerAddr.class, perAddr.getId());
+    EPerAddr found = DB.find(EPerAddr.class, perAddr.getId());
 
     assertThat(found.getAddress().getCountry().getCode()).isEqualTo("NZ");
     assertThat(found.getAddress().getCountry().getName()).startsWith("New");

@@ -1,6 +1,6 @@
 package org.tests.el;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
@@ -20,7 +20,7 @@ public class TestPathExpression {
   final ExpressionPath city;
 
   public TestPathExpression() {
-    SpiServer server = Ebean.getDefaultServer().pluginApi();
+    SpiServer server = DB.getDefault().pluginApi();
     beanType = server.beanType(Customer.class);
     billingId = beanType.getExpressionPath("billingAddress.id");
     line1 = beanType.getExpressionPath("billingAddress.line1");

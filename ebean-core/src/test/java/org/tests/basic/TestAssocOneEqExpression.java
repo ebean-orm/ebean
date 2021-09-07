@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
@@ -21,7 +21,7 @@ public class TestAssocOneEqExpression extends BaseTestCase {
     Customer c = new Customer();
     c.setId(1);
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where().eq("customer", c)
       .query();
 
@@ -32,7 +32,7 @@ public class TestAssocOneEqExpression extends BaseTestCase {
     Address b = new Address();
     b.setId(1);
 
-    Query<Order> q2 = Ebean.find(Order.class)
+    Query<Order> q2 = DB.find(Order.class)
       .where().eq("customer.billingAddress", b)
       .query();
 

@@ -1,7 +1,7 @@
 package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.config.dbplatform.IdType;
 
 import org.ebeantest.LoggedSqlCollector;
@@ -32,7 +32,7 @@ public class TestOneToManyJoinTableInheritance extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.saveAll(Arrays.asList(classA, classB));
+    DB.saveAll(Arrays.asList(classA, classB));
 
     List<String> sql = LoggedSqlCollector.current();
 
@@ -51,8 +51,8 @@ public class TestOneToManyJoinTableInheritance extends BaseTestCase {
     }
     assertSqlBind(sql, 8, 10);
 
-    ClassA dbA = Ebean.find(ClassA.class, 1);
-    ClassB dbB = Ebean.find(ClassB.class, 2);
+    ClassA dbA = DB.find(ClassA.class, 1);
+    ClassB dbB = DB.find(ClassB.class, 2);
 
     assertThat(dbA.getMonkeys()).hasSize(2);
     assertThat(dbB.getMonkeys()).hasSize(1);

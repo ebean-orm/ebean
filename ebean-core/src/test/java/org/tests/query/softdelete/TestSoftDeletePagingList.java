@@ -1,6 +1,6 @@
 package org.tests.query.softdelete;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.TransactionalTestCase;
 import org.ebeantest.LoggedSqlCollector;
@@ -22,12 +22,12 @@ public class TestSoftDeletePagingList extends TransactionalTestCase {
     list.add(new Cover("SoftDelPaged-2"));
     list.add(new Cover("SoftDelPaged-3"));
 
-    Ebean.saveAll(list);
-    Ebean.delete(list.get(1));
+    DB.saveAll(list);
+    DB.delete(list.get(1));
 
     LoggedSqlCollector.start();
 
-    PagedList<Cover> pagedList = Ebean.find(Cover.class)
+    PagedList<Cover> pagedList = DB.find(Cover.class)
       .where().startsWith("s3Url", "SoftDelPaged-")
       .setMaxRows(10)
       .findPagedList();

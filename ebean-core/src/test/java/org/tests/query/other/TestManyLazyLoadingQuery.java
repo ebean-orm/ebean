@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -23,7 +23,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
     BeanDescriptor<Order> descOrder = server.getBeanDescriptor(Order.class);
     BeanPropertyAssocMany<?> beanProperty = (BeanPropertyAssocMany<?>) descOrder.getBeanProperty("details");
@@ -33,7 +33,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
 
 
     List<Order> orders =
-      Ebean.find(Order.class)
+      DB.find(Order.class)
         .where().lt("id", 4)
         .findList();
 
@@ -44,11 +44,11 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
 
 
     // start transaction to keep PC going to lazy query
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      Ebean.find(Order.class, 1);
+      DB.find(Order.class, 1);
 
-      SpiQuery<?> query0 = (SpiQuery<?>) Ebean.find(OrderDetail.class);
+      SpiQuery<?> query0 = (SpiQuery<?>) DB.find(OrderDetail.class);
 
       query0.setLazyLoadForParents(beanProperty);
 
@@ -59,10 +59,10 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       platformAssertIn(query0.getGeneratedSql(), "where (t0.order_id)");
 
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
 
-    List<OrderDetail> details = Ebean.find(OrderDetail.class)
+    List<OrderDetail> details = DB.find(OrderDetail.class)
       .where().eq("order.id", 1)
       .findList();
 

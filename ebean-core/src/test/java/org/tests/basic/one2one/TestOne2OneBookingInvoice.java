@@ -1,7 +1,7 @@
 package org.tests.basic.one2one;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,12 +23,12 @@ public class TestOne2OneBookingInvoice extends BaseTestCase {
     b.setAgentInvoice(ai);
     b.setClientInvoice(ci);
 
-    Ebean.save(b);
+    DB.save(b);
 
-    Invoice invoice = Ebean.find(Invoice.class, ai.getId());
+    Invoice invoice = DB.find(Invoice.class, ai.getId());
     assertEquals(b.getId(), invoice.getBooking().getId());
 
-    Booking b1 = Ebean.find(Booking.class, b.getId());
+    Booking b1 = DB.find(Booking.class, b.getId());
 
     Invoice ai1 = b1.getAgentInvoice();
     assertNotNull(ai1);
@@ -47,8 +47,8 @@ public class TestOne2OneBookingInvoice extends BaseTestCase {
     // cleanup
     ai.setBooking(null);
     ci.setBooking(null);
-    Ebean.save(ai);
-    Ebean.save(ci);
-    Ebean.delete(b);
+    DB.save(ai);
+    DB.save(ci);
+    DB.delete(b);
   }
 }

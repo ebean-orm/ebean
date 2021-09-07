@@ -23,7 +23,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
   public void testReadOnly() {
 
     ResetBasicData.reset();
-    DB.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
 
     Order order = DB.find(Order.class)
       .setReadOnly(true)

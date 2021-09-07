@@ -1,7 +1,7 @@
 package org.tests.model.basic.xtra;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -20,7 +20,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
   public void test() {
 
     LoggedSqlCollector.start();
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
 
       LoggedSqlCollector.start();
@@ -35,16 +35,16 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       children.add(child);
       parent.setChildren(children);
 
-      Ebean.save(parent);
+      DB.save(parent);
 
       // get Id or any generated property and that invokes a flush
       parent.getId();
 
       // going to get an update now
       parent.setName("MyDesk");
-      Ebean.save(parent);
+      DB.save(parent);
 
-      Ebean.commitTransaction();
+      DB.commitTransaction();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSqlCollector.stop();
@@ -61,7 +61,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
   public void test_noFlushOn_getterOfNonGeneratedProperty() {
 
     LoggedSqlCollector.start();
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
 
       LoggedSqlCollector.start();
@@ -76,7 +76,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       children.add(child);
       parent.setChildren(children);
 
-      Ebean.save(parent);
+      DB.save(parent);
 
       // no getter call on a generated property
       // so no flush here
@@ -84,10 +84,10 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       parent.setName(existing+" - additional");
       // the first and second save of parent merge into a single insert
-      Ebean.save(parent);
+      DB.save(parent);
 
       // flush
-      Ebean.commitTransaction();
+      DB.commitTransaction();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSqlCollector.stop();

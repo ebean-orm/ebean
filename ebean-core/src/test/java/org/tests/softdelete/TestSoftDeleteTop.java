@@ -1,7 +1,7 @@
 package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
@@ -20,10 +20,10 @@ public class TestSoftDeleteTop extends BaseTestCase {
   public void testDeletePermanent() {
 
     ESoftDelUp up1 = new ESoftDelUp("up1");
-    Ebean.save(up1);
+    DB.save(up1);
 
-    Ebean.delete(up1);
-    Ebean.deletePermanent(up1);
+    DB.delete(up1);
+    DB.deletePermanent(up1);
   }
 
 
@@ -31,15 +31,15 @@ public class TestSoftDeleteTop extends BaseTestCase {
   public void testSoftDeleteJdbcBatch() {
 
     ESoftDelUp up1 = new ESoftDelUp("upBatch1");
-    Ebean.save(up1);
+    DB.save(up1);
     ESoftDelUp up2 = new ESoftDelUp("upBatch2");
-    Ebean.save(up2);
+    DB.save(up2);
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       transaction.setBatchMode(true);
-      Ebean.delete(up1);
-      Ebean.delete(up2);
+      DB.delete(up1);
+      DB.delete(up2);
       transaction.commit();
     } finally {
       transaction.end();
@@ -49,7 +49,7 @@ public class TestSoftDeleteTop extends BaseTestCase {
     list.add(up1);
     list.add(up2);
 
-    Ebean.deleteAllPermanent(list);
+    DB.deleteAllPermanent(list);
   }
 
   @Test
@@ -63,9 +63,9 @@ public class TestSoftDeleteTop extends BaseTestCase {
     list.add(up2);
 
     // by default uses JDBC for the 'all' methods
-    Ebean.saveAll(list);
-    Ebean.deleteAll(list);
-    Ebean.deleteAllPermanent(list);
+    DB.saveAll(list);
+    DB.deleteAll(list);
+    DB.deleteAllPermanent(list);
 
   }
 
@@ -84,11 +84,11 @@ public class TestSoftDeleteTop extends BaseTestCase {
     mid2.addDown("down3");
     mid2.addDown("down4");
 
-    Ebean.save(top1);
+    DB.save(top1);
 
-    Ebean.delete(top1);
+    DB.delete(top1);
 
-    Ebean.deletePermanent(top1);
+    DB.deletePermanent(top1);
   }
 
   @Test
@@ -98,9 +98,9 @@ public class TestSoftDeleteTop extends BaseTestCase {
     top1.addMids("mid1");
     top1.addMids("mid2");
 
-    Ebean.save(top1);
+    DB.save(top1);
 
-    Query<ESoftDelTop> query = Ebean.find(ESoftDelTop.class)
+    Query<ESoftDelTop> query = DB.find(ESoftDelTop.class)
       .where().isEmpty("mids")
       .query();
 

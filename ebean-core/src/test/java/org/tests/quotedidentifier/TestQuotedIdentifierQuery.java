@@ -1,7 +1,7 @@
 package org.tests.quotedidentifier;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BWithQIdent;
 
@@ -14,11 +14,11 @@ public class TestQuotedIdentifierQuery extends BaseTestCase {
     bean.setName("foo");
     bean.setCODE("bar");
 
-    Ebean.save(bean);
+    DB.save(bean);
 
     if (isMySql()) {
 
-      Ebean.find(BWithQIdent.class)
+      DB.find(BWithQIdent.class)
         .where()
         .eq("name", "foo")
         .raw("t0.`Name` = ?", "foo")
@@ -27,7 +27,7 @@ public class TestQuotedIdentifierQuery extends BaseTestCase {
 
     } else if (isH2() || isPostgres()) {
 
-      Ebean.find(BWithQIdent.class)
+      DB.find(BWithQIdent.class)
         .where()
         .eq("name", "foo")
         .raw("t0.\"Name\" = ?", "foo")

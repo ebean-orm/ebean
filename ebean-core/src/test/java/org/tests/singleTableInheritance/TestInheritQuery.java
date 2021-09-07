@@ -1,7 +1,7 @@
 package org.tests.singleTableInheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.singleTableInheritance.model.PalletLocation;
 import org.tests.singleTableInheritance.model.PalletLocationExternal;
 import org.tests.singleTableInheritance.model.Warehouse;
@@ -20,18 +20,18 @@ public class TestInheritQuery extends BaseTestCase {
   public void test() {
     ZoneExternal zone = new ZoneExternal();
     zone.setAttribute("ABC");
-    Ebean.save(zone);
+    DB.save(zone);
 
     PalletLocationExternal location = new PalletLocationExternal();
     location.setZone(zone);
     location.setAttribute("123");
-    Ebean.save(location);
+    DB.save(location);
 
     // This line should work too:
-    List<PalletLocation> locations = Ebean.find(PalletLocation.class).where().eq("zone", zone)
+    List<PalletLocation> locations = DB.find(PalletLocation.class).where().eq("zone", zone)
       .findList();
     // List<PalletLocation> locations =
-    // Ebean.find(PalletLocation.class).where().eq("zone.id",
+    // DB.find(PalletLocation.class).where().eq("zone.id",
     // zone.getId()).findList();
 
     assertNotNull(locations);
@@ -48,24 +48,24 @@ public class TestInheritQuery extends BaseTestCase {
   public void testDiscriminator_bug417() {
 
 
-    Ebean.deleteAll(Ebean.find(Warehouse.class).findList());
-    Ebean.deleteAll(Ebean.find(PalletLocation.class).findList());
-    Ebean.deleteAll(Ebean.find(Zone.class).findList());
-    Ebean.deleteAll(Ebean.find(ZoneInternal.class).findList());
-    Ebean.deleteAll(Ebean.find(ZoneInternal.class).findList());
+    DB.deleteAll(DB.find(Warehouse.class).findList());
+    DB.deleteAll(DB.find(PalletLocation.class).findList());
+    DB.deleteAll(DB.find(Zone.class).findList());
+    DB.deleteAll(DB.find(ZoneInternal.class).findList());
+    DB.deleteAll(DB.find(ZoneInternal.class).findList());
 
     ZoneInternal zoneInt = new ZoneInternal();
     zoneInt.setAttribute("some zone 1");
-    Ebean.save(zoneInt);
+    DB.save(zoneInt);
 
     ZoneExternal zoneExt = new ZoneExternal();
     zoneExt.setAttribute("some zone 2");
-    Ebean.save(zoneExt);
+    DB.save(zoneExt);
 
     // queries of Zone and subclasses as root node of query
 
     // query abstract class on attribute (root of heirarchy)
-    List<Zone> zones = Ebean.find(Zone.class).where().startsWith("attribute", "some zone").findList();
+    List<Zone> zones = DB.find(Zone.class).where().startsWith("attribute", "some zone").findList();
     // select t0.type c0, t0.ID c1, t0.attribute c2, t0.attribute c3 from zones t0 where t0.attribute like ? ; --bind(some zone%)
     assertEquals(2, zones.size());
     assertTrue(zones.contains(zoneInt));
@@ -73,7 +73,7 @@ public class TestInheritQuery extends BaseTestCase {
 
     // query internal zones only
     // discriminator is in WHERE clause where it belongs
-    List<ZoneInternal> internalZones = Ebean.find(ZoneInternal.class).where().startsWith("attribute", "some zone").findList();
+    List<ZoneInternal> internalZones = DB.find(ZoneInternal.class).where().startsWith("attribute", "some zone").findList();
     // select t0.type c0, t0.ID c1, t0.attribute c2 from zones t0 where t0.type = 'INT'  and t0.attribute like ? ; --bind(some zone%)
     assertEquals(1, internalZones.size());
     assertTrue(internalZones.contains(zoneInt));
@@ -81,7 +81,7 @@ public class TestInheritQuery extends BaseTestCase {
     assertTrue(internalZones.get(0) instanceof ZoneInternal);
 
     // query external zones only
-    List<ZoneExternal> externalZones = Ebean.find(ZoneExternal.class).where().startsWith("attribute", "some zone").findList();
+    List<ZoneExternal> externalZones = DB.find(ZoneExternal.class).where().startsWith("attribute", "some zone").findList();
     // select t0.type c0, t0.ID c1, t0.attribute c2 from zones t0 where t0.type = 'EXT'  and t0.attribute like ? ; --bind(some zone%)
     assertEquals(1, externalZones.size());
     assertTrue(externalZones.contains(zoneExt));
@@ -93,12 +93,12 @@ public class TestInheritQuery extends BaseTestCase {
     Warehouse wh = new Warehouse();
     wh.setOfficeZone(zoneInt); // many-to-one
     wh.getShippingZones().add(zoneExt); // many-to-many
-    Ebean.save(wh);
+    DB.save(wh);
 
     // JOIN clause, no discriminator
     // parent with many-to-one, doesn't put in discriminator, why not, PK sufficient?
     // eager join
-    Warehouse wh2 = Ebean.find(Warehouse.class, wh.getId());
+    Warehouse wh2 = DB.find(Warehouse.class, wh.getId());
     assertNotNull(wh2);
     assertEquals(wh.getId(), wh2.getId());
     assertEquals(wh.getOfficeZone(), wh2.getOfficeZone());
@@ -120,10 +120,10 @@ public class TestInheritQuery extends BaseTestCase {
 
     // set optional concrete to null to set stage for failure
     wh.setOfficeZone(null);
-    Ebean.save(wh);
+    DB.save(wh);
 
     // no discriminator here
-    wh2 = Ebean.find(Warehouse.class)
+    wh2 = DB.find(Warehouse.class)
       .where().eq("id", wh.getId())
       .findOne();
 
@@ -134,7 +134,7 @@ public class TestInheritQuery extends BaseTestCase {
     // select t0.ID c0, t1.type c1, t1.ID c2, t1.attribute c3 from warehouses t0 left join zones t1 on t1.ID = t0.officeZoneId  where t1.type = 'INT'  and t0.ID = ?
     // todo: after Daryl's fix, not sure if this is proper, no discriminator at all, isn't PK/FK sufficient?
     // select t0.ID c0, t1.type c1, t1.ID c2, t1.attribute c3 from warehouses t0 left join zones t1 on t1.ID = t0.officeZoneId  where t0.ID = ? ; --bind(1)
-    wh2 = Ebean.find(Warehouse.class)
+    wh2 = DB.find(Warehouse.class)
       .fetch("officeZone")
       .where().eq("id", wh.getId())
       .findOne();
@@ -143,15 +143,15 @@ public class TestInheritQuery extends BaseTestCase {
 
     // clear children to set the stage for left join failure
     wh.getShippingZones().clear();
-    Ebean.save(wh);
+    DB.save(wh);
 
-    wh2 = Ebean.find(Warehouse.class, wh.getId());
+    wh2 = DB.find(Warehouse.class, wh.getId());
     assertNotNull(wh2);
     assertEquals(wh.getId(), wh2.getId());
     assertEquals(0, wh.getShippingZones().size());
 
     // query with lazy load of abstract children
-    wh = Ebean.find(Warehouse.class)
+    wh = DB.find(Warehouse.class)
       .where().eq("id", wh.getId())
       .findOne();
     assertNotNull(wh);
@@ -159,7 +159,7 @@ public class TestInheritQuery extends BaseTestCase {
     assertEquals(0, wh.getShippingZones().size());
 
     // query with fetch of abstract children
-    wh = Ebean.find(Warehouse.class)
+    wh = DB.find(Warehouse.class)
       .fetch("shippingZones")
       .where().eq("id", wh.getId())
       .findOne();

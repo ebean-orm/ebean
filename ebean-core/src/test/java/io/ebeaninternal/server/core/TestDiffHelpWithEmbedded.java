@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.ValuePair;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDiffHelpWithEmbedded extends BaseTestCase {
 
-  EbeanServer server;
+  Database server;
 
   BeanDescriptor<EMain> emainDesc;
 
   public TestDiffHelpWithEmbedded() {
-    server = Ebean.getServer(null);
+    server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
     emainDesc = spiServer.getBeanDescriptor(EMain.class);
   }
@@ -143,15 +143,13 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
   }
 
   private EMain createEMain() {
-
     EMain emain = new EMain();
     emain.setName("foo");
-    emain.setVersion(13l);
+    emain.setVersion(13L);
 
     Eembeddable embeddable = new Eembeddable();
     embeddable.setDescription("bar");
     emain.setEmbeddable(embeddable);
-
     return emain;
   }
 

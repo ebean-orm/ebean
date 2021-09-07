@@ -1,7 +1,7 @@
 package org.tests.model.embedded;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ public class TestEmbeddedAttrOverride extends BaseTestCase {
     bean.setName("hello");
 
     LoggedSqlCollector.start();
-    Ebean.save(bean);
+    DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);

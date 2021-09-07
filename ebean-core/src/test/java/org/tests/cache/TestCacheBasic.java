@@ -1,7 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.tests.model.basic.Country;
@@ -17,8 +17,8 @@ public class TestCacheBasic extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.getServerCacheManager().clear(Country.class);
-    ServerCache countryCache = Ebean.getServerCacheManager().beanCache(Country.class);
+    DB.cacheManager().clear(Country.class);
+    ServerCache countryCache = DB.cacheManager().beanCache(Country.class);
 
     loadCountryCache();
     assertTrue(countryCache.size() > 0);
@@ -26,13 +26,13 @@ public class TestCacheBasic extends BaseTestCase {
     // reset the statistics
     countryCache.statistics(true);
 
-    Country c0 = Ebean.getReference(Country.class, "NZ");
+    Country c0 = DB.getReference(Country.class, "NZ");
     ServerCacheStatistics statistics = countryCache.statistics(false);
     long hc = statistics.getHitCount();
     assertEquals(1, hc);
     assertNotNull(c0);
 
-    // Country c1 = Ebean.getReference(Country.class, "NZ");
+    // Country c1 = DB.getReference(Country.class, "NZ");
     // assertEquals(2, countryCache.getStatistics(false).getHitCount());
     // //assertEquals(100,
     // countryCache.getStatistics(false).getHitRatio());
@@ -54,7 +54,7 @@ public class TestCacheBasic extends BaseTestCase {
     //
     // Customer custTest = ResetBasicData.createCustAndOrder("cacheBasic");
     // Integer id = custTest.getId();
-    // Customer customer = Ebean.find(Customer.class, id);
+    // Customer customer = DB.find(Customer.class, id);
     //
     // Address billingAddress = customer.getBillingAddress();
     // Country c2 = billingAddress.getCountry();
@@ -62,17 +62,17 @@ public class TestCacheBasic extends BaseTestCase {
     //
     // assertTrue(countryCache.getStatistics(false).getHitCount() > 0);
     //
-    // //Country c3 = Ebean.getReference(Country.class, "NZ");
-    // //Country c4 = Ebean.find(Country.class, "NZ");
+    // //Country c3 = DB.getReference(Country.class, "NZ");
+    // //Country c4 = DB.find(Country.class, "NZ");
     //
     //
     // // clear the cache
-    // Ebean.getServerCacheManager().clear(Country.class);
+    // DB.cacheManager().clear(Country.class);
     // // reset statistics
     // countryCache.getStatistics(true);
     //
     // // try to hit the country cache automatically via join
-    // customer = Ebean.find(Customer.class, id);
+    // customer = DB.find(Customer.class, id);
     // billingAddress = customer.getBillingAddress();
     // Country c5 = billingAddress.getCountry();
     // // but cache is empty so c5 is reference that will load cache
@@ -85,13 +85,13 @@ public class TestCacheBasic extends BaseTestCase {
     // assertEquals("cache populated via lazy load",1,countryCache.getStatistics(false).getSize());
     //
     // // now these get hits in the cache
-    // Country c6 = Ebean.find(Country.class, "NZ");
+    // Country c6 = DB.find(Country.class, "NZ");
     //
     // assertTrue("different instance as cache cleared",c2 != c5);
     // assertTrue("these 2 are different",c5 != c6);
     //
     // // by default readOnly based on deployment annotation
-    // assertTrue("read only",Ebean.getBeanState(c6).isReadOnly());
+    // assertTrue("read only",DB.getBeanState(c6).isReadOnly());
     //
     // try {
     // // can't modify a readOnly bean
@@ -101,40 +101,40 @@ public class TestCacheBasic extends BaseTestCase {
     // assertTrue("This is readOnly",true);
     // }
     //
-    // Country c8 = Ebean.find(Country.class)
+    // Country c8 = DB.find(Country.class)
     // .setId("NZ")
     // .setReadOnly(false)
     // .findOne();
     //
     // // Explicitly NOT readOnly
-    // assertFalse("NOT read only",Ebean.getBeanState(c8).isReadOnly());
+    // assertFalse("NOT read only",DB.getBeanState(c8).isReadOnly());
     //
     // assertEquals("1 countries in cache", 1, countryCache.size());
     // c8.setName("Nu Zilund");
     // // the update will remove the entry from the cache
-    // Ebean.save(c8);
+    // DB.save(c8);
     //
     // assertEquals("1 country in cache", 1, countryCache.size());
     //
-    // Country c9 = Ebean.find(Country.class)
+    // Country c9 = DB.find(Country.class)
     // .setReadOnly(false)
     // .setId("NZ")
     // .findOne();
     //
     // // Find loads cache ...
-    // assertFalse(Ebean.getBeanState(c9).isReadOnly());
+    // assertFalse(DB.getBeanState(c9).isReadOnly());
     // assertTrue(countryCache.size() > 0);
     //
-    // Country c10 = Ebean.find(Country.class,"NZ");
+    // Country c10 = DB.find(Country.class,"NZ");
     //
-    // assertTrue(Ebean.getBeanState(c10).isReadOnly());
+    // assertTrue(DB.getBeanState(c10).isReadOnly());
     // assertTrue(countryCache.size() > 0);
     //
-    // Ebean.getServerCacheManager().clear(Country.class);
+    // DB.cacheManager().clear(Country.class);
     // assertEquals("0 country in cache", 0, countryCache.size());
     //
     // // reference doesn't load cache yet
-    // Country c11 = Ebean.getReference(Country.class, "NZ");
+    // Country c11 = DB.getReference(Country.class, "NZ");
     //
     // // still 0 in cache
     // assertEquals("0 country in cache", 0, countryCache.size());

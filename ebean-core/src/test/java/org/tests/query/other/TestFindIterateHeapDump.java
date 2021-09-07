@@ -1,8 +1,8 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.junit.jupiter.api.Disabled;
 import org.tests.model.basic.EBasic;
 import com.sun.management.HotSpotDiagnosticMXBean;
@@ -32,7 +32,7 @@ public class TestFindIterateHeapDump extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
 //    Transaction transaction = server.beginTransaction();
 //    try {

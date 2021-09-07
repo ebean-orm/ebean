@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().isEmpty("contacts")
       .query();
@@ -37,7 +37,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(EUserNoFk.class)
+    DB.find(EUserNoFk.class)
       .where().isEmpty("files")
       .delete();
 
@@ -58,7 +58,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().isNotEmpty("contacts")
       .query();
@@ -72,7 +72,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("id")
       .where().isEmpty("notes")
       .query();
@@ -86,7 +86,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("id")
       .where().isNotEmpty("notes")
       .query();
@@ -101,7 +101,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("id")
       .where().isEmpty("notes")
       .query();
@@ -115,7 +115,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().isEmpty("contacts.notes")
       .query();
@@ -134,7 +134,7 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().isNotEmpty("contacts.notes")
       .query();

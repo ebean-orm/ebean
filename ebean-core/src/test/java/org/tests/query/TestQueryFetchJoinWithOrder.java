@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -18,14 +18,14 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class)
+    List<Order> list = DB.find(Order.class)
       .fetchQuery("details")
       .order().asc("id")
       .order().desc("details.id").findList();
 
     assertNotNull(list);
 
-    List<Order> list2 = Ebean.find(Order.class)
+    List<Order> list2 = DB.find(Order.class)
       .fetchQuery("customer")
       .fetch("customer.contacts")
       .order().asc("id")
@@ -34,7 +34,7 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
 
     assertNotNull(list2);
 
-    List<Customer> list3 = Ebean.find(Customer.class)
+    List<Customer> list3 = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").eq("status", Order.Status.NEW)
       .order().desc("orders.id")

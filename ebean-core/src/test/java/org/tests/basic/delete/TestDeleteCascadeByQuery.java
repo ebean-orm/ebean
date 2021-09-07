@@ -1,7 +1,7 @@
 package org.tests.basic.delete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,35 +15,35 @@ public class TestDeleteCascadeByQuery extends BaseTestCase {
 
   private OtoUser testUser;
   private OtoUserOptional userOptional;
-  private Query<OtoUserOptional> userOptionalQuery = Ebean.find(OtoUserOptional.class);
-  private Query<OtoUser> userQuery = Ebean.find(OtoUser.class);
+  private Query<OtoUserOptional> userOptionalQuery = DB.find(OtoUserOptional.class);
+  private Query<OtoUser> userQuery = DB.find(OtoUser.class);
 
   /**
    * Init each test. Delete all existing beans. Then create OtoUser, add OtoUserOptional and save.
    */
   @BeforeEach
   public void init() {
-    Ebean.deleteAll(userQuery.findList());
-    Ebean.deleteAll(userOptionalQuery.findList());
+    DB.deleteAll(userQuery.findList());
+    DB.deleteAll(userOptionalQuery.findList());
 
     userOptional = new OtoUserOptional();
-    Ebean.save(userOptional);
+    DB.save(userOptional);
     testUser = new OtoUser();
     testUser.setOptional(userOptional);
-    Ebean.save(testUser);
+    DB.save(testUser);
   }
 
   /**
-   * Test that validates deleting a bean using Ebean.delete() respects the CascadeType.DELETE
+   * Test that validates deleting a bean using DB.delete() respects the CascadeType.DELETE
    * setting.
    */
   @Test
   public void testDeleteCascadeByEbeanDelete() {
 
-    assertThat(Ebean.delete(testUser)).isTrue();
+    assertThat(DB.delete(testUser)).isTrue();
 
     assertThat(userOptionalQuery.findCount())
-      .overridingErrorMessage("Entity OtoUserOptional found. Ebean.delete() on the user "
+      .overridingErrorMessage("Entity OtoUserOptional found. DB.delete() on the user "
           + "did not delete the OneToOne mapped entity as set with CascadeType.ALL")
       .isEqualTo(0);
   }
@@ -68,7 +68,7 @@ public class TestDeleteCascadeByQuery extends BaseTestCase {
    */
   @AfterEach
   public void cleanup() {
-    Ebean.deleteAll(userQuery.findList());
-    Ebean.deleteAll(userOptionalQuery.findList());
+    DB.deleteAll(userQuery.findList());
+    DB.deleteAll(userOptionalQuery.findList());
   }
 }

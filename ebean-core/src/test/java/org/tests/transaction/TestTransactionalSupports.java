@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
@@ -33,12 +33,12 @@ public class TestTransactionalSupports extends BaseTestCase {
   public void withOuterTransaction_expect_currentTransactionAvailable() {
 
     outerTxn = null;
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
       new SomeTransactionalWithSupports().doStuff();
       assertNotNull(outerTxn);
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
   }
 
@@ -53,7 +53,7 @@ public class TestTransactionalSupports extends BaseTestCase {
 
     @Transactional(type = TxType.SUPPORTS)
     void doStuff() {
-      outerTxn = Ebean.currentTransaction();
+      outerTxn = DB.currentTransaction();
       log.info("outer ...{}", outerTxn);
     }
   }
@@ -68,7 +68,7 @@ public class TestTransactionalSupports extends BaseTestCase {
       basic.setName("checkSupports");
 
       // effective creates a transaction replacing the 'No active transaction' placeholder
-      Ebean.save(basic);
+      DB.save(basic);
 
       return 42;
     }

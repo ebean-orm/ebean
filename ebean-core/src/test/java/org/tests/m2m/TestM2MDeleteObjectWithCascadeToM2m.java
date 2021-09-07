@@ -1,7 +1,7 @@
 package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.m2m.Permission;
 import org.tests.model.m2m.Role;
 import org.tests.model.m2m.Tenant;
@@ -18,43 +18,43 @@ public class TestM2MDeleteObjectWithCascadeToM2m extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.createUpdate(Permission.class, "delete from Permission").execute();
-    Ebean.createUpdate(Tenant.class, "delete from Tenant").execute();
-    Ebean.createUpdate(Role.class, "delete from Role").execute();
+    DB.createUpdate(Permission.class, "delete from Permission").execute();
+    DB.createUpdate(Tenant.class, "delete from Tenant").execute();
+    DB.createUpdate(Role.class, "delete from Role").execute();
 
     Tenant tenant1 = new Tenant("Tenant");
-    Ebean.save(tenant1);
+    DB.save(tenant1);
 
     Permission p1 = new Permission("p1");
     Permission p2 = new Permission("p2");
-    Ebean.save(p1);
-    Ebean.save(p2);
+    DB.save(p1);
+    DB.save(p2);
 
     Role role1 = new Role("RoleOne");
     role1.setTenant(tenant1);
 
     Set<Permission> permissions = new HashSet<>();
-    List<Permission> permsList = Ebean.find(Permission.class).findList();
+    List<Permission> permsList = DB.find(Permission.class).findList();
     permissions.addAll(permsList);
 
     role1.setPermissions(permissions);
 
-    Ebean.save(role1);
+    DB.save(role1);
 
 
-    List<Tenant> tenantList = Ebean.find(Tenant.class).fetch("roles").findList();
-    List<Role> roleList = Ebean.find(Role.class).fetch("permissions").findList();
-    List<Permission> permissionList = Ebean.find(Permission.class).fetch("roles").findList();
+    List<Tenant> tenantList = DB.find(Tenant.class).fetch("roles").findList();
+    List<Role> roleList = DB.find(Role.class).fetch("permissions").findList();
+    List<Permission> permissionList = DB.find(Permission.class).fetch("roles").findList();
 
     assertEquals(1, tenantList.size());
     assertEquals(2, permissionList.size());
     assertEquals(1, roleList.size());
 
-    Ebean.delete(tenant1);
+    DB.delete(tenant1);
 
-    List<Tenant> tenantList2 = Ebean.find(Tenant.class).fetch("roles").findList();
-    List<Role> roleList2 = Ebean.find(Role.class).fetch("permissions").findList();
-    List<Permission> permissionList2 = Ebean.find(Permission.class).fetch("roles").findList();
+    List<Tenant> tenantList2 = DB.find(Tenant.class).fetch("roles").findList();
+    List<Role> roleList2 = DB.find(Role.class).fetch("permissions").findList();
+    List<Permission> permissionList2 = DB.find(Permission.class).fetch("roles").findList();
 
     assertEquals(0, tenantList2.size());
     assertEquals(0, roleList2.size());

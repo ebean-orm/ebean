@@ -1,7 +1,7 @@
 package org.tests.unitinternal;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.ENullCollection;
 import org.tests.model.basic.ENullCollectionDetail;
@@ -18,9 +18,9 @@ public class TestNullCollectionSet extends BaseTestCase {
   public void test() {
     ENullCollection c = new ENullCollection();
 
-    Ebean.save(c);
+    DB.save(c);
 
-    ENullCollection c2 = Ebean.find(ENullCollection.class, c.getId());
+    ENullCollection c2 = DB.find(ENullCollection.class, c.getId());
 
     assertNotNull(c2);
 

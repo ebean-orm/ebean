@@ -1,7 +1,7 @@
 package org.tests.draftable;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.PagedList;
 import io.ebean.Query;
 import org.tests.model.draftable.Link;
@@ -26,7 +26,7 @@ public class LinkQueryPublishTest {
     Link link3 = new Link("L3");
     link3.save();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     List<Object> ids = new ArrayList<>();
     ids.add(link1.getId());

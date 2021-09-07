@@ -1,6 +1,6 @@
 package org.tests.inheritance;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
@@ -19,15 +19,15 @@ public class TestInheritanceBatchLazyLoad {
     Car c = new Car();
     c.setLicenseNumber("VZVZ1");
     c.setDriver("CarDriver");
-    Ebean.save(c);
+    DB.save(c);
 
     Truck t = new Truck();
     t.setLicenseNumber("VZVZ2");
     t.setCapacity(20D);
-    Ebean.save(t);
+    DB.save(t);
 
 
-    List<Vehicle> list = Ebean.find(Vehicle.class)
+    List<Vehicle> list = DB.find(Vehicle.class)
       .select("licenseNumber")
       .where().startsWith("licenseNumber", "VZVZ")
       .order().asc("licenseNumber")

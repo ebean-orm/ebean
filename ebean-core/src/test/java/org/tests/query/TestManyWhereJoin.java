@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -18,7 +18,7 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class).select("id,status")
+    Query<Customer> query = DB.find(Customer.class).select("id,status")
       // the where on a 'many' (like orders) requires an
       // additional join and distinct which is independent
       // of a fetch join (if there is a fetch join)
@@ -49,7 +49,7 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class).select("id,status")
+    Query<Customer> query = DB.find(Customer.class).select("id,status")
       .fetch("orders")
       // the where on a 'many' (like orders) requires an
       // additional join and distinct which is independent
@@ -87,7 +87,7 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     Long productId = 1L;
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where().eq("details.product.id", productId)
       .order("cretime asc").query();
 
@@ -118,9 +118,9 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Product product = Ebean.getReference(Product.class, 1L);
+    Product product = DB.getReference(Product.class, 1L);
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       //.fetch("details")
       .where().eq("details.product", product)
       .order("cretime asc").query();
@@ -152,9 +152,9 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Product product = Ebean.getReference(Product.class, 1L);
+    Product product = DB.getReference(Product.class, 1L);
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where().eq("details.product", product)
       .order("cretime asc").query();

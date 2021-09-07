@@ -25,7 +25,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     resetAllMetrics();
 
-    EbeanServer server = server();
+    Database server = server();
     UpdateQuery<Customer> update = server.update(Customer.class);
     Query<Customer> query = update
       .set("status", Customer.Status.ACTIVE)
@@ -127,7 +127,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void update_withTransactionBatch() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     try (Transaction transaction = server.beginTransaction()) {
       transaction.setBatchMode(true);
@@ -154,7 +154,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @IgnorePlatform(Platform.SQLSERVER)
   public void withTableAlias() {
 
-    EbeanServer server = server();
+    Database server = server();
     UpdateQuery<Customer> update = server.update(Customer.class);
     Query<Customer> query = update
       .set("status", Customer.Status.ACTIVE)
@@ -173,7 +173,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void withJoin() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Country nz = server.reference(Country.class, "NZ");
 
@@ -197,7 +197,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void withJoinAndLimit() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Country nz = server.reference(Country.class, "NZ");
 
@@ -219,7 +219,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void simpleWithLimit() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     LoggedSqlCollector.start();
 
@@ -241,7 +241,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void whereIsEmpty() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Query<Customer> updateQuery = server
       .update(Customer.class)
@@ -259,7 +259,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void setNull() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Query<Customer> updateQuery = server
       .update(Customer.class)
@@ -276,7 +276,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void set_whenValueIsNull_expectNull() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Query<Customer> updateQuery = server
       .update(Customer.class)
@@ -293,7 +293,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void setExpression() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Query<Customer> updateQuery = server
       .update(Customer.class)
@@ -310,7 +310,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void setExpression_withBind() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     Query<Customer> updateQuery = server
       .update(Customer.class)
@@ -327,7 +327,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void fluidSyntax() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     int rows = server
       .update(Customer.class)
@@ -342,7 +342,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void updateQuery_withExplicitTransaction() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     int rowsExprList;
     int rowsQuery;
@@ -374,7 +374,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void deleteQuery_withExplicitTransaction() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     int rowsExprList;
     int rowsQuery;
@@ -403,7 +403,7 @@ public class UpdateQueryTest extends BaseTestCase {
   @Test
   public void useViaEbean() {
 
-    int rows = Ebean.update(Customer.class)
+    int rows = DB.update(Customer.class)
       .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
       .where()
       .gt("id", 10000)
@@ -418,7 +418,7 @@ public class UpdateQueryTest extends BaseTestCase {
     Integer id = newEbasicWithUnique("o2", "other1_b");
 
     assertThrows(DuplicateKeyException.class, () -> {
-      Ebean.update(EBasicWithUniqueCon.class)
+      DB.update(EBasicWithUniqueCon.class)
         .set("other", "other1_a")
         .set("otherOne", "other1_a")
         .where().idEq(id)
@@ -431,7 +431,7 @@ public class UpdateQueryTest extends BaseTestCase {
     b0.setName(name);
     b0.setOther(other);
     b0.setOtherOne(other);
-    Ebean.save(b0);
+    DB.save(b0);
 
     return b0.getId();
   }

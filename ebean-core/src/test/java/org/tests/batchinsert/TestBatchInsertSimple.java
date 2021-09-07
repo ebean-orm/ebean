@@ -2,7 +2,7 @@ package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
@@ -28,7 +28,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     int numOfMasters = 4;// 2 + random.nextInt(8);
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       transaction.setBatchMode(false);
       transaction.setBatchOnCascade(true);
@@ -102,7 +102,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     int numOfMasters = 4;
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       transaction.setBatchMode(false);
       transaction.setBatchOnCascade(true);
@@ -112,7 +112,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
       for (int i = 0; i < numOfMasters; i++) {
         UTMaster master = createMaster(i);
-        Ebean.save(master);
+        DB.save(master);
       }
 
       transaction.commit();
@@ -132,14 +132,14 @@ public class TestBatchInsertSimple extends BaseTestCase {
       masters.add(createMasterAndDetails(i, 7));
     }
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       transaction.setBatchMode(true);
       transaction.setBatchOnCascade(PersistBatch.ALL.equals(spiEbeanServer().databasePlatform().getPersistBatchOnCascade()));
       transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value
-      Ebean.saveAll(masters);
+      DB.saveAll(masters);
 
       transaction.commit();
 
@@ -159,7 +159,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     }
 
     // escalate based on batchOnCascade value
-    Ebean.saveAll(masters);
+    DB.saveAll(masters);
 
     for (int i = 0; i < masters.size(); i++) {
       UTMaster utMaster = masters.get(i);
@@ -170,7 +170,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
       }
     }
 
-    Ebean.saveAll(masters);
+    DB.saveAll(masters);
   }
 
   private UTMaster createMasterAndDetails(int masterPos, int size) {

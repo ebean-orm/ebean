@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.TransactionalTestCase;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     Customer c0 = ResetBasicData.createCustAndOrder("Test Json");
 
-    Customer c2 = Ebean.getReference(Customer.class, c0.getId());
+    Customer c2 = DB.getReference(Customer.class, c0.getId());
     List<Order> orders = c2.getOrders();
 
     assertEquals(1, orders.size());
@@ -30,7 +30,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     assertTrue(size >= 3);
 
-    Customer cref = Ebean.getReference(Customer.class, c0.getId());
+    Customer cref = DB.getReference(Customer.class, c0.getId());
     order.setCustomer(cref);
     order.setStatus(Status.SHIPPED);
 
@@ -42,12 +42,12 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
     OrderDetail removedDetail = order.getDetails().remove(2);
     assertNotNull(removedDetail);
 
-    Product p = Ebean.getReference(Product.class, 1);
+    Product p = DB.getReference(Product.class, 1);
     OrderDetail newDetail = new OrderDetail(p, 899, 12.12d);
     // newDetail.setOrder(order);
     order.addDetail(newDetail);
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     JsonContext jsonContext = server.json();
     String jsonString = jsonContext.toJson(order);
@@ -58,15 +58,15 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     MRole r1 = new MRole();
     r1.setRoleName("rolej1");
-    Ebean.save(r1);
+    DB.save(r1);
 
     MRole r2 = new MRole();
     r2.setRoleName("rolej2");
-    Ebean.save(r2);
+    DB.save(r2);
 
     MRole r3 = new MRole();
     r3.setRoleName("rolej3");
-    Ebean.save(r3);
+    DB.save(r3);
 
     MUser u0 = new MUser();
     u0.setUserName("userj1");
@@ -74,7 +74,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
     u0.addRole(r2);
     u0.addRole(r3);
 
-    Ebean.save(u0);
+    DB.save(u0);
 
     jsonContext.toJson(u0);
 

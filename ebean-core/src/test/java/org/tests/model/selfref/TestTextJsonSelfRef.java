@@ -2,7 +2,7 @@ package org.tests.model.selfref;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,9 +14,9 @@ public class TestTextJsonSelfRef extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.execute(() -> {
+    DB.execute(() -> {
 
-      if (Ebean.find(SelfRefCustomer.class).findCount() == 0) {
+      if (DB.find(SelfRefCustomer.class).findCount() == 0) {
         SelfRefCustomer c1 = new SelfRefCustomer();
         c1.setName("Foo");
         c1.setReferredBy(c1);
@@ -29,22 +29,22 @@ public class TestTextJsonSelfRef extends BaseTestCase {
         c3.setName("baz");
         c3.setReferredBy(c1);
 
-        Ebean.save(c1);
-        Ebean.save(c2);
-        Ebean.save(c3);
+        DB.save(c1);
+        DB.save(c2);
+        DB.save(c3);
       }
     });
 
-    List<SelfRefCustomer> customers = Ebean.find(SelfRefCustomer.class).order("id desc").findList();
+    List<SelfRefCustomer> customers = DB.find(SelfRefCustomer.class).order("id desc").findList();
 
     // Check that there are no 'reference' beans here
     for (SelfRefCustomer cust : customers) {
-      BeanState beanState = Ebean.getBeanState(cust);
+      BeanState beanState = DB.getBeanState(cust);
       assertFalse(beanState.isReference());
     }
 
 //    JsonWriteOptions options = JsonWriteOptions.parsePath("(id,name,referredBy(id))");
-//    String customerContent = Ebean.createJsonContext().toJson(customers);//, false, options);
+//    String customerContent = DB.json().toJson(customers);//, false, options);
 //    System.out.println("Customers: " + customerContent);
 //
 //    Assert

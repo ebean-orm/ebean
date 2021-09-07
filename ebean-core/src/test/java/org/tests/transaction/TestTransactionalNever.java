@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
@@ -34,7 +34,7 @@ public class TestTransactionalNever extends BaseTestCase {
 
     @Transactional(type = TxType.NEVER)
     void doStuff() {
-      outerTxn = Ebean.currentTransaction();
+      outerTxn = DB.currentTransaction();
       log.info("currentTransaction ...{}", outerTxn);
     }
   }

@@ -1,7 +1,7 @@
 package io.ebean.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.PersistenceContext;
 import org.tests.model.basic.Customer;
 import com.fasterxml.jackson.core.JsonParser;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JsonBeanReaderTest extends BaseTestCase {
 
-  static JsonContext json = Ebean.json();
+  static JsonContext json = DB.json();
 
   @Test
   public void read() {

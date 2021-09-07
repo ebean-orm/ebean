@@ -2,7 +2,7 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.tests.model.softdelete.ESoftDelMid;
 import io.ebean.Finder;
@@ -21,9 +21,9 @@ public class TestSoftDeleteOptionalRelationship extends BaseTestCase {
   public void testFindWhenNullRelationship() {
 
     ESoftDelMid mid1 = new ESoftDelMid(null, "mid1");
-    Ebean.save(mid1);
+    DB.save(mid1);
 
-    ESoftDelMid bean = Ebean.find(ESoftDelMid.class)
+    ESoftDelMid bean = DB.find(ESoftDelMid.class)
       .setId(mid1.getId())
       .fetch("top")
       .findOne();

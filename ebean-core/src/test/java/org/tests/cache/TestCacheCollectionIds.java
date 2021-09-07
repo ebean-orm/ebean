@@ -2,7 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.Update;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCacheCollectionIds extends BaseTestCase {
 
-  private ServerCacheManager cacheManager = Ebean.getServerCacheManager();
+  private ServerCacheManager cacheManager = DB.cacheManager();
 
   @Test
   public void test() {
@@ -48,7 +48,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     custCache.clear();
     custManyIdsCache.clear();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
+    List<Customer> list = DB.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
       .order().asc("id").findList();
 
     assertTrue(list.size() > 1);
@@ -79,19 +79,19 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Contact newContact = ResetBasicData.createContact("Check", "CollIds");
     newContact.setCustomer(customer);
 
-    Ebean.save(newContact);
+    DB.save(newContact);
     awaitL2Cache();
 
     int currentNumContacts2 = fetchCustomer(customer.getId());
     assertEquals(currentNumContacts + 1, currentNumContacts2);
 
     // cleanup
-    Ebean.delete(newContact);
+    DB.delete(newContact);
   }
 
   private int fetchCustomer(Integer id) {
 
-    Customer customer2 = Ebean.find(Customer.class, id);
+    Customer customer2 = DB.find(Customer.class, id);
 
     List<Contact> contacts2 = customer2.getContacts();
 
@@ -112,13 +112,13 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     OCachedBean cachedBean = new OCachedBean();
     cachedBean.setName("hello");
-    cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
-    cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+    cachedBean.getCountries().add(DB.find(Country.class, "NZ"));
+    cachedBean.getCountries().add(DB.find(Country.class, "AU"));
 
-    Ebean.save(cachedBean);
+    DB.save(cachedBean);
 
     // used to just load the cache - trigger loading
-    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     dummyToLoad.getCountries().size();
 
     ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
@@ -130,15 +130,15 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
 
     // act
-    OCachedBean loadedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean loadedBean = DB.find(OCachedBean.class, cachedBean.getId());
     loadedBean.getCountries().clear();
-    loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+    loadedBean.getCountries().add(DB.find(Country.class, "AU"));
 
-    Ebean.save(loadedBean);
+    DB.save(loadedBean);
     awaitL2Cache();
 
     // Get the data to assert/check against
-    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean result = DB.find(OCachedBean.class, cachedBean.getId());
     cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
 
     // assert that data and cache both show correct data
@@ -155,37 +155,37 @@ public class TestCacheCollectionIds extends BaseTestCase {
     OCachedBean cachedBean = new OCachedBean();
     cachedBean.setName("hello1");
 
-    Ebean.save(cachedBean);
+    DB.save(cachedBean);
     awaitL2Cache();
 
-    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(0, dummyToLoad.getChildren().size());
 
     OCachedBeanChild child1=new OCachedBeanChild();
     child1.setCachedBean(cachedBean);
-    Ebean.insert(child1);
+    DB.insert(child1);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(1, dummyToLoad.getChildren().size());
 
     OCachedBeanChild child2=new OCachedBeanChild();
     child2.setCachedBean(cachedBean);
-    Ebean.insert(child2);
+    DB.insert(child2);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(2, dummyToLoad.getChildren().size());
 
-    Ebean.delete(child2);
+    DB.delete(child2);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(1, dummyToLoad.getChildren().size());
 
-    Ebean.delete(child1);
+    DB.delete(child1);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(0, dummyToLoad.getChildren().size());
 
-    Ebean.delete(cachedBean);
+    DB.delete(cachedBean);
   }
 
   @Test
@@ -195,37 +195,37 @@ public class TestCacheCollectionIds extends BaseTestCase {
     OCachedBean cachedBean = new OCachedBean();
     cachedBean.setName("hello2");
 
-    Ebean.save(cachedBean);
+    DB.save(cachedBean);
     awaitL2Cache();
 
-    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(0, dummyToLoad.getNotCachedChildren().size());
 
     OBeanChild child1=new OBeanChild();
     child1.setCachedBean(cachedBean);
-    Ebean.insert(child1);
+    DB.insert(child1);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(1, dummyToLoad.getNotCachedChildren().size());
 
     OBeanChild child2=new OBeanChild();
     child2.setCachedBean(cachedBean);
-    Ebean.insert(child2);
+    DB.insert(child2);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(2, dummyToLoad.getNotCachedChildren().size());
 
-    Ebean.delete(child2);
+    DB.delete(child2);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(1, dummyToLoad.getNotCachedChildren().size());
 
-    Ebean.delete(child1);
+    DB.delete(child1);
     awaitL2Cache();
-    dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(0, dummyToLoad.getNotCachedChildren().size());
 
-    Ebean.delete(cachedBean);
+    DB.delete(cachedBean);
   }
 
 
@@ -240,13 +240,13 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     OCachedBean cachedBean = new OCachedBean();
     cachedBean.setName("hello");
-    cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
-    cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+    cachedBean.getCountries().add(DB.find(Country.class, "NZ"));
+    cachedBean.getCountries().add(DB.find(Country.class, "AU"));
 
-    Ebean.save(cachedBean);
+    DB.save(cachedBean);
 
     // used to just load the cache - trigger loading
-    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean dummyToLoad = DB.find(OCachedBean.class, cachedBean.getId());
     dummyToLoad.getCountries().size();
 
     ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
@@ -258,16 +258,16 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
 
     // act - this time update the name property so the bean is dirty
-    OCachedBean loadedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean loadedBean = DB.find(OCachedBean.class, cachedBean.getId());
     loadedBean.setName("goodbye");
     loadedBean.getCountries().clear();
-    loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+    loadedBean.getCountries().add(DB.find(Country.class, "AU"));
 
-    Ebean.save(loadedBean);
+    DB.save(loadedBean);
     awaitL2Cache();
 
     // Get the data to assert/check against
-    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean result = DB.find(OCachedBean.class, cachedBean.getId());
     cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
 
     // assert that data and cache both show correct data
@@ -287,10 +287,10 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     OCachedBean cachedBean = new OCachedBean();
     cachedBean.setName("cachedBeanTest");
-    cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
-    cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+    cachedBean.getCountries().add(DB.find(Country.class, "NZ"));
+    cachedBean.getCountries().add(DB.find(Country.class, "AU"));
 
-    Ebean.save(cachedBean);
+    DB.save(cachedBean);
 
     // clear the cache
     ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
@@ -298,7 +298,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     assertEquals(0, cachedBeanCountriesCache.size());
 
     // load the cache
-    OCachedBean dummyLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean dummyLoad = DB.find(OCachedBean.class, cachedBean.getId());
     List<Country> dummyCountries = dummyLoad.getCountries();
     assertEquals(2, dummyCountries.size());
 
@@ -315,9 +315,9 @@ public class TestCacheCollectionIds extends BaseTestCase {
     OCachedBean update = new OCachedBean();
     update.setId(cachedBean.getId());
     update.setName("modified");
-    update.getCountries().add(Ebean.find(Country.class, "AU"));
+    update.getCountries().add(DB.find(Country.class, "AU"));
 
-    Ebean.update(update);
+    DB.update(update);
     awaitL2Cache();
 
     assertEquals(1, cachedBeanCountriesCache.size());
@@ -330,7 +330,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     assertTrue(cachedManyIds.getIdList().contains("AU"));
 
     // assert countries good
-    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    OCachedBean result = DB.find(OCachedBean.class, cachedBean.getId());
     assertEquals(1, result.getCountries().size());
 
   }
@@ -340,23 +340,23 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
 
       OCachedBean cachedBean = new OCachedBean();
       cachedBean.setName("helloForUpdate");
-      Ebean.save(cachedBean);
+      DB.save(cachedBean);
 
-      cachedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
+      cachedBean = DB.find(OCachedBean.class, cachedBean.getId());
 
       cachedBean.setName("mod");
       ArrayList<Country> list = new ArrayList<>();
-      list.add(Ebean.find(Country.class, "NZ"));
+      list.add(DB.find(Country.class, "NZ"));
       cachedBean.setCountries(list);
-      Ebean.save(cachedBean);
+      DB.save(cachedBean);
 
 
       cachedBean.setName("mod2");
-      Ebean.save(cachedBean);
+      DB.save(cachedBean);
 
       txn.commit();
     }
@@ -375,7 +375,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     ResetBasicData.reset();
 
     // load the cache with the order
-    Order order1 = Ebean.find(Order.class, 1L);
+    Order order1 = DB.find(Order.class, 1L);
 
     // load the Collection IDs (order.orderDetail) cache
     OrderDetail orderDetail1 = order1.getDetails().get(0);
@@ -383,13 +383,13 @@ public class TestCacheCollectionIds extends BaseTestCase {
     // delete one order detail from DB. This triggers clearing of OrderDetail caches
     // and should also clear any Collection IDs caches targeting OrderDetail bean
     String updStatement = "delete from orderDetail where id = :id";
-    Update<OrderDetail> update = Ebean.createUpdate(OrderDetail.class, updStatement);
+    Update<OrderDetail> update = DB.createUpdate(OrderDetail.class, updStatement);
     update.set("id", orderDetail1.getId());
     int rows = update.execute();
     assertEquals(1, rows);
 
     // read the order from cache
-    Order orderFromCache = Ebean.find(Order.class, 1L);
+    Order orderFromCache = DB.find(Order.class, 1L);
     OrderDetail orderDetailFromCache = orderFromCache.getDetails().get(0);
 
     // trigger reading from the DB
@@ -410,7 +410,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     ResetBasicData.reset();
 
     // load the cache with the order
-    Order order1 = Ebean.find(Order.class, 1L);
+    Order order1 = DB.find(Order.class, 1L);
 
     // load the Collection IDs (order.orderDetail) cache
     OrderDetail orderDetail1 = order1.getDetails().get(0);
@@ -418,16 +418,16 @@ public class TestCacheCollectionIds extends BaseTestCase {
     // delete one order detail from DB using native SQL. This triggers clearing of OrderDetail caches
     // and should also clear any Collection IDs caches targeting OrderDetail bean
     String updStatement = "delete from o_order_detail where id = :id";
-    SqlUpdate update = Ebean.createSqlUpdate(updStatement);
+    SqlUpdate update = DB.sqlUpdate(updStatement);
     update.setParameter("id", orderDetail1.getId());
     int rows = update.execute();
     assertEquals(1, rows);
 
     // We need to notify the cache manually
-    Ebean.externalModification("o_order_detail", false, false, true);
+    DB.externalModification("o_order_detail", false, false, true);
 
     // read the order from cache
-    Order orderFromCache = Ebean.find(Order.class, 1L);
+    Order orderFromCache = DB.find(Order.class, 1L);
     OrderDetail orderDetailFromCache = orderFromCache.getDetails().get(0);
 
     // trigger reading the whole bean

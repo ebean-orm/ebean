@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.EJson;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ public class TestJsonSimple extends BaseTestCase {
     m.put("hello", "rob");
     m.put("test", "me");
 
-    JsonContext jsonContext = Ebean.json();
+    JsonContext jsonContext = DB.json();
     jsonContext.toJson(m);
 
     String s = "{\"parishId\":\"18\",\"contentId\":null,\"contentStatus\":null,\"contentType\":\"pg-hello\",\"content\":\"asd\"}";

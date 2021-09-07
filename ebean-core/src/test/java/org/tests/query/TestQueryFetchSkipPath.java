@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.ContactNote;
 import org.tests.model.basic.Customer;
@@ -18,7 +18,7 @@ public class TestQueryFetchSkipPath extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class)
+    List<Order> list = DB.find(Order.class)
 
       // .setAutoTune(true)
       .setAutoTune(false).select("status")

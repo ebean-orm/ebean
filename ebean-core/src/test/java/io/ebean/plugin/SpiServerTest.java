@@ -1,8 +1,8 @@
 package io.ebean.plugin;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.VwCustomer;
@@ -22,7 +22,7 @@ public class SpiServerTest extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer defaultServer = Ebean.getDefaultServer();
+    Database defaultServer = DB.getDefault();
     SpiServer pluginApi = defaultServer.pluginApi();
 
     BeanType<Customer> beanType = pluginApi.beanType(Customer.class);

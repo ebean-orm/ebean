@@ -2,7 +2,7 @@ package org.tests.lazyforeignkeys;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.text.PathProperties;
 import org.ebeantest.LoggedSqlCollector;
@@ -73,7 +73,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
     pathProp.addToPath("entity1", "id");
     pathProp.addToPath("entity2", "id");
 
-    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class).apply(pathProp);
+    Query<MainEntityRelation> query = DB.find(MainEntityRelation.class).apply(pathProp);
     List<MainEntityRelation> list = query.findList();
     assertEquals(1, list.size());
 

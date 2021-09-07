@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -20,9 +20,9 @@ public class TestSecondQueryNoRows extends BaseTestCase {
     Customer cnew = new Customer();
     cnew.setName("testSecQueryNoRows");
 
-    Ebean.save(cnew);
+    DB.save(cnew);
 
-    Customer c = Ebean.find(Customer.class)
+    Customer c = DB.find(Customer.class)
       .setAutoTune(false)
       .setId(cnew.getId())
       .fetchQuery("contacts")
@@ -31,6 +31,6 @@ public class TestSecondQueryNoRows extends BaseTestCase {
     assertNotNull(c);
     assertEquals(0, c.getContacts().size());
 
-    Ebean.delete(c);
+    DB.delete(c);
   }
 }

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.grammer;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
@@ -695,7 +695,7 @@ public class EqlParserTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<OrderDetail> query = Ebean.createQuery(OrderDetail.class, "select sum(orderQty) fetch `order` (id)");
+    Query<OrderDetail> query = DB.createQuery(OrderDetail.class, "select sum(orderQty) fetch `order` (id)");
     List<OrderDetail> details = query.findList();
 
     assertThat(details).isNotEmpty();

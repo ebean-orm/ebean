@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -35,7 +35,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
         .parse("select r.id, r.name || 'hello' as name from o_customer r ")
         .create();
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
@@ -48,7 +48,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
         .parse("select r.id, r.name||'hello' as name from o_customer r ")
         .create();
 
-    query = Ebean.find(Customer.class);
+    query = DB.find(Customer.class);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
@@ -59,7 +59,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
       RawSqlBuilder
         .parse("select r.id, r.name||'hello' name from o_customer r ")
         .create();
-    query = Ebean.find(Customer.class);
+    query = DB.find(Customer.class);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
@@ -71,7 +71,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
       RawSqlBuilder
         .parse("select r.id, r.name || 'hello' name from o_customer r ")
         .create();
-    query = Ebean.find(Customer.class);
+    query = DB.find(Customer.class);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 

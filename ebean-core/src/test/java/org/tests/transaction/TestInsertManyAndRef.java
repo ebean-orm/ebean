@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.BBookmark;
 import org.tests.model.basic.BBookmarkUser;
 import org.junit.jupiter.api.Test;
@@ -30,6 +30,6 @@ public class TestInsertManyAndRef extends BaseTestCase {
     bookmarks.add(b1);
     bookmarks.add(b2);
 
-    Ebean.saveAll(bookmarks);
+    DB.saveAll(bookmarks);
   }
 }

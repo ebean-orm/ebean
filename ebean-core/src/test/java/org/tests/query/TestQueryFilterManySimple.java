@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -21,8 +21,7 @@ public class TestQueryFilterManySimple extends BaseTestCase {
     // not really last week :)
     Date lastWeek = Date.valueOf("2010-01-01");
 
-    List<Customer> list = Ebean
-      .find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       // .join("orders", new JoinConfig().lazy())
       // .join("orders", new JoinConfig().query())
       .fetch("orders").fetchQuery("contacts").where().ilike("name", "rob%")

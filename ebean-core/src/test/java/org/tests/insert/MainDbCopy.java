@@ -1,7 +1,7 @@
 package org.tests.insert;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
 
@@ -9,7 +9,7 @@ public class MainDbCopy {
 
   public static void main(String[] args) {
 
-    EbeanServer defaultServer = Ebean.getServer(null);
+    Database defaultServer = DB.getDefault();
 
     EBasic e = new EBasic();
     e.setName("blah");
@@ -20,10 +20,7 @@ public class MainDbCopy {
 
     EBasic e1 = defaultServer.find(EBasic.class, e.getId());
 
-    EbeanServer serverDest = Ebean.getServer("mysql");
-
+    Database serverDest = DB.byName("mysql");
     serverDest.insert(e1);
-
-
   }
 }

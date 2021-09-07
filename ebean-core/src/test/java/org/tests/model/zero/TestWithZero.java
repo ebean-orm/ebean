@@ -1,7 +1,7 @@
 package org.tests.model.zero;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,12 +21,12 @@ public class TestWithZero extends BaseTestCase {
     WithZeroParent parent = new WithZeroParent();
     parent.getChildren().add(withZero);
 
-    Ebean.save(parent);
+    DB.save(parent);
 
     parent.getChildren().add(new WithZero());
 
     //withZero.setName("Foo");
-    Ebean.save(parent);
+    DB.save(parent);
 
   }
 

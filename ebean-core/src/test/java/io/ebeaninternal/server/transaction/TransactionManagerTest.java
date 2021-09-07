@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebeaninternal.api.ScopedTransaction;
@@ -44,7 +44,7 @@ public class TransactionManagerTest extends BaseTestCase {
       Customer.find.byName("In external");
 
       log.info("inner begin");
-      Transaction inner = Ebean.beginTransaction();
+      Transaction inner = DB.beginTransaction();
       try {
 
         current = Transaction.current();

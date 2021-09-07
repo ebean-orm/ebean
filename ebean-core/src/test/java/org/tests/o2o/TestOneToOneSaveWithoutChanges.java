@@ -1,7 +1,7 @@
 package org.tests.o2o;
 
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -18,17 +18,17 @@ public class TestOneToOneSaveWithoutChanges {
     a.setB(new OtoLevelB("B"));
     a.getB().setC(new OtoLevelC("C"));
 
-    Ebean.save(a);
+    DB.save(a);
 
-    OtoLevelA dbA = Ebean.find(OtoLevelA.class, 1);
+    OtoLevelA dbA = DB.find(OtoLevelA.class, 1);
     OtoLevelB dbB = dbA.getB();
     OtoLevelC dbC = dbB.getC();
 
     LoggedSqlCollector.start();
 
-    Ebean.save(dbA);
-    Ebean.save(dbB);
-    Ebean.save(dbC);
+    DB.save(dbA);
+    DB.save(dbB);
+    DB.save(dbC);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(0);

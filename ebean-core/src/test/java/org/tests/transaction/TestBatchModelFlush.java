@@ -2,7 +2,7 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.config.dbplatform.IdType;
@@ -36,7 +36,7 @@ public class TestBatchModelFlush extends BaseTestCase {
     bean2.db().flush();
 
     new MnyB("TestBatchModelFlush_4").save();
-    Ebean.flush();
+    DB.flush();
 
     // the rest is flushed on commit
     new MnyB("TestBatchModelFlush_5").save();

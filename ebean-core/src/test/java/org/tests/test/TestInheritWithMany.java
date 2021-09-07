@@ -1,8 +1,8 @@
 package org.tests.test;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.InheritInfo;
@@ -23,7 +23,7 @@ public class TestInheritWithMany extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     assertNotNull(server);
 
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
@@ -64,7 +64,7 @@ public class TestInheritWithMany extends BaseTestCase {
     relate.setName(string);
     relate.setOwner(owner);
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     server.save(relate);
   }
 

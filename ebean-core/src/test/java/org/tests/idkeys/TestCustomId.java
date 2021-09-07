@@ -2,7 +2,7 @@ package org.tests.idkeys;
 
 import io.avaje.moduuid.ModUUID;
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ECustomId;
 
@@ -15,7 +15,7 @@ public class TestCustomId extends BaseTestCase {
   public void insert() {
 
     ECustomId bean = new ECustomId("fred");
-    Ebean.save(bean);
+    DB.save(bean);
     assertNotNull(bean.getId());
   }
 
@@ -25,9 +25,9 @@ public class TestCustomId extends BaseTestCase {
     ECustomId bean = new ECustomId("gotId");
     String explicitId = ModUUID.newShortId();
     bean.setId(explicitId);
-    Ebean.save(bean);
+    DB.save(bean);
 
-    ECustomId found = Ebean.find(ECustomId.class, explicitId);
+    ECustomId found = DB.find(ECustomId.class, explicitId);
     assertEquals(found.getName(), bean.getName());
   }
 }

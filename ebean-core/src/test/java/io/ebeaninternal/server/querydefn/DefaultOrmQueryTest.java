@@ -3,7 +3,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -18,7 +18,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void when_forUpdate_then_excludeFromBeanCache() {
 
-    DefaultOrmQuery<Customer> q1 = (DefaultOrmQuery<Customer>) Ebean.find(Customer.class)
+    DefaultOrmQuery<Customer> q1 = (DefaultOrmQuery<Customer>) DB.find(Customer.class)
       .forUpdate().where().eq("id", 42).query();
 
     assertThat(q1.getUseBeanCache()).isSameAs(CacheMode.OFF);
@@ -27,7 +27,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void checkForId_when_eqId_then_translatedTo_setId() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().eq("id", 42).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().eq("id", 42).query();
     assertThat(q1.getWhereExpressions()).isNotNull();
     assertThat(q1.getId()).isNull();
 
@@ -40,7 +40,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void checkForId_when_idEq_ok() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().idEq(42).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().idEq(42).query();
     assertThat(q1.getId()).isEqualTo(42);
     assertThat(q1.isFindById()).isTrue();
     assertThat(q1.getId()).isEqualTo(42);
@@ -49,7 +49,7 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void checkForId_when_setId_ok() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).setId(42);
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) DB.find(Order.class).setId(42);
     assertThat(q1.getId()).isEqualTo(42);
     assertThat(q1.isFindById()).isTrue();
     assertThat(q1.getId()).isEqualTo(42);
@@ -58,8 +58,8 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void when_addWhere_then_planChanges() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("name", "a", "b", "c").query();
-    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 2, 2, 3).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().in("name", "a", "b", "c").query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().in("id", 2, 2, 3).query();
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isNotEqualTo(q2.createQueryPlanKey());
@@ -69,8 +69,8 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void when_sameWhereWithDiffBindValues_then_planSame_bindDiff() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
-    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 2, 2, 3).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().in("id", 1, 2, 3).query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().in("id", 2, 2, 3).query();
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
@@ -80,8 +80,8 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void when_sameWhereAndBindValues_then_planSameAndBind() {
 
-    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
-    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class).where().in("id", 1, 2, 3).query();
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().in("id", 1, 2, 3).query();
+    DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>) DB.find(Order.class).where().in("id", 1, 2, 3).query();
 
     prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
@@ -91,11 +91,11 @@ public class DefaultOrmQueryTest extends BaseTestCase {
   @Test
   public void when_diffFirstMaxRows_then_differentPlan() {
 
-    DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
+    DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) DB.find(Order.class)
       .setFirstRow(0)
       .setMaxRows(31);
 
-    DefaultOrmQuery<Order> query2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
+    DefaultOrmQuery<Order> query2 = (DefaultOrmQuery<Order>) DB.find(Order.class)
       .setFirstRow(1)
       .setMaxRows(0);
 

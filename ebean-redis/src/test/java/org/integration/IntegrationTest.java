@@ -63,7 +63,7 @@ public class IntegrationTest {
 
     System.out.println("one2 " + one2);
 
-    DB.getServerCacheManager().clear(Person.class);
+    DB.cacheManager().clear(Person.class);
 
     System.out.println("done");
   }

@@ -1,7 +1,7 @@
 package org.tests.basic.type;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.TOne;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +11,6 @@ public class TestQueryBooleanProperty extends BaseTestCase {
   public void test() {
 
     // when run in MySql is test for BUG 323
-    Ebean.find(TOne.class).where().eq("active", true).findList();
+    DB.find(TOne.class).where().eq("active", true).findList();
   }
 }

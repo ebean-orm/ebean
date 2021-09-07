@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
@@ -23,7 +23,7 @@ public class TestQueryFilterManyOnSecondary extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetchQuery("orders")
       .where().ilike("name", "Rob%").gt("id", 0)
       .filterMany("orders").eq("status", Order.Status.NEW)
@@ -45,7 +45,7 @@ public class TestQueryFilterManyOnSecondary extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetchQuery("details")
       .fetch("details.product", "name")
       .filterMany("details").ilike("product.name", "c%")

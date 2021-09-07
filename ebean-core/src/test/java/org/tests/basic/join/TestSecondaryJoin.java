@@ -1,6 +1,6 @@
 package org.tests.basic.join;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 
 import org.tests.model.basic.Order;
@@ -17,7 +17,7 @@ public class TestSecondaryJoin extends TransactionalTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class)
+    List<Order> list = DB.find(Order.class)
       // .select("*")
       // .join("customer")
       .findList();
@@ -26,7 +26,7 @@ public class TestSecondaryJoin extends TransactionalTestCase {
     o0.setCustomerName("Banan");
     o0.setStatus(Status.APPROVED);
 
-    Ebean.save(o0);
+    DB.save(o0);
   }
 
 }

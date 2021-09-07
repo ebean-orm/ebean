@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.PersistentFile;
 import org.tests.model.basic.PersistentFileContent;
 import org.junit.jupiter.api.Test;
@@ -15,8 +15,8 @@ public class TestSaveDeleteOneToOne extends BaseTestCase {
     PersistentFile persistentFile = new PersistentFile("test.txt",
       new PersistentFileContent("test".getBytes()));
 
-    Ebean.save(persistentFile);
-    Ebean.delete(persistentFile);
+    DB.save(persistentFile);
+    DB.delete(persistentFile);
   }
 
   @Test
@@ -24,15 +24,15 @@ public class TestSaveDeleteOneToOne extends BaseTestCase {
     PersistentFile persistentFile = new PersistentFile("test.txt",
       new PersistentFileContent("test".getBytes()));
 
-    Ebean.save(persistentFile);
+    DB.save(persistentFile);
 
-    persistentFile = Ebean.find(PersistentFile.class, persistentFile.getId());
+    persistentFile = DB.find(PersistentFile.class, persistentFile.getId());
 
     PersistentFileContent persistentFileContent = persistentFile.getPersistentFileContent();
 
     assertNotNull(persistentFileContent);
     assertNotNull(persistentFileContent.getContent());
 
-    Ebean.delete(persistentFile);
+    DB.delete(persistentFile);
   }
 }

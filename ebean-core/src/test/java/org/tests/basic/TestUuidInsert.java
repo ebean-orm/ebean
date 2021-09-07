@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.TUuidEntity;
 import org.junit.jupiter.api.Test;
 
@@ -13,13 +13,13 @@ public class TestUuidInsert extends BaseTestCase {
     TUuidEntity e = new TUuidEntity();
     e.setName("bana");
 
-    Ebean.save(e);
+    DB.save(e);
 
-    TUuidEntity e2 = Ebean.find(TUuidEntity.class, e.getId());
+    TUuidEntity e2 = DB.find(TUuidEntity.class, e.getId());
     e2.setName("apple");
 
-    Ebean.save(e2);
+    DB.save(e2);
 
-    Ebean.delete(e2);
+    DB.delete(e2);
   }
 }

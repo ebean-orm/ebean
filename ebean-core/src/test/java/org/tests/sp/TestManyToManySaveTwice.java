@@ -2,7 +2,7 @@ package org.tests.sp;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.sp.model.car.Car;
@@ -57,8 +57,8 @@ public class TestManyToManySaveTwice extends BaseTestCase {
       transaction.commit();
     }
 
-    c0 = Ebean.find(Car.class, c0.getId());
-    c1 = Ebean.find(Car.class, c1.getId());
+    c0 = DB.find(Car.class, c0.getId());
+    c1 = DB.find(Car.class, c1.getId());
 
     assertThat(c0.getWheels()).hasSize(2);
     assertThat(c0.getDoors()).hasSize(1);
@@ -113,10 +113,10 @@ public class TestManyToManySaveTwice extends BaseTestCase {
 
     DB.save(c); // NOTE 2ND SAVE
 
-    List<Car> allCars = Ebean.find(Car.class).findList();
+    List<Car> allCars = DB.find(Car.class).findList();
     assertEquals(1, allCars.size());
 
-    List<Wheel> allWheels = Ebean.find(Wheel.class).findList();
+    List<Wheel> allWheels = DB.find(Wheel.class).findList();
     assertEquals(4, allWheels.size());
   }
 

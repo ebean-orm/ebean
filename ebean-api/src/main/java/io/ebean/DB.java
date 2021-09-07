@@ -1273,9 +1273,17 @@ public final class DB {
   }
 
   /**
+   * Deprecated migrate to cacheManager().
+   */
+  @Deprecated
+  public static ServerCacheManager getServerCacheManager() {
+    return getDefault().cacheManager();
+  }
+
+  /**
    * Return the manager of the level 2 cache ("L2" cache).
    */
-  public static ServerCacheManager getServerCacheManager() {
+  public static ServerCacheManager cacheManager() {
     return getDefault().cacheManager();
   }
 

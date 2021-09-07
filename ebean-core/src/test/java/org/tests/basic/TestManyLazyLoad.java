@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
@@ -21,14 +21,14 @@ public class TestManyLazyLoad extends BaseTestCase {
 
     awaitL2Cache();
 
-    List<Order> list = Ebean.find(Order.class).order().asc("id").findList();
+    List<Order> list = DB.find(Order.class).order().asc("id").findList();
     assertFalse(list.isEmpty());
 
     // just use the first one
     Order order = list.get(0);
 
     // get it as a reference
-    Order order1 = Ebean.getReference(Order.class, order.getId());
+    Order order1 = DB.getReference(Order.class, order.getId());
     assertNotNull(order1);
 
     Date orderDate = order1.getOrderDate();
@@ -45,10 +45,10 @@ public class TestManyLazyLoad extends BaseTestCase {
     assertSame(o, order1);
 
     // load detail into cache
-    Ebean.find(OrderDetail.class, orderDetail.getId());
+    DB.find(OrderDetail.class, orderDetail.getId());
 
     // change order... list before a scalar property
-    Order order2 = Ebean.getReference(Order.class, order.getId());
+    Order order2 = DB.getReference(Order.class, order.getId());
     assertNotNull(order2);
 
     List<OrderDetail> details2 = order2.getDetails();

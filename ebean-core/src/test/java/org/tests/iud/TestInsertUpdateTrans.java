@@ -1,7 +1,7 @@
 package org.tests.iud;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
@@ -14,11 +14,11 @@ public class TestInsertUpdateTrans extends BaseTestCase {
   @Test
   public void test() {
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
 
       EBasicVer e0 = new EBasicVer("onInsert");
       e0.setDescription("something");
-      Ebean.save(e0);
+      DB.save(e0);
 
       assertNotNull(e0.getId());
       assertNotNull(e0.getLastUpdate());
@@ -27,9 +27,9 @@ public class TestInsertUpdateTrans extends BaseTestCase {
       e0.setName("onUpdate");
       e0.setDescription("differentFromInsert");
 
-      Ebean.save(e0);
+      DB.save(e0);
 
-      EBasicVer e1 = Ebean.find(EBasicVer.class, e0.getId());
+      EBasicVer e1 = DB.find(EBasicVer.class, e0.getId());
 
       // we should fetch back the updated data (not inserted)
       assertEquals(e0.getId(), e1.getId());

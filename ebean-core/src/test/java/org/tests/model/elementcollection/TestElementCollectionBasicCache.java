@@ -1,7 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.ebeantest.LoggedSqlCollector;
@@ -19,9 +19,9 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
     EcPerson person = new EcPerson("Cache1");
     person.getPhoneNumbers().add("021 1234");
     person.getPhoneNumbers().add("021 4321");
-    Ebean.save(person);
+    DB.save(person);
 
-    EcPerson one = Ebean.find(EcPerson.class)
+    EcPerson one = DB.find(EcPerson.class)
       .setId(person.getId())
       .findOne();
 
@@ -29,7 +29,7 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    EcPerson two = Ebean.find(EcPerson.class)
+    EcPerson two = DB.find(EcPerson.class)
       .setId(person.getId())
       .findOne();
 
@@ -39,7 +39,7 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty(); // cache hit containing phone numbers
 
-    Ebean.save(two);
+    DB.save(two);
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -49,12 +49,12 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
       assertThat(sql).hasSize(5);
     }
 
-    Ebean.save(two);
+    DB.save(two);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty(); // no change
 
-    EcPerson three = Ebean.find(EcPerson.class)
+    EcPerson three = DB.find(EcPerson.class)
       .setId(person.getId())
       .findOne();
 
@@ -65,7 +65,7 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
     assertThat(sql).isEmpty(); // cache hit
 
     three.getPhoneNumbers().add("09 6534");
-    Ebean.save(three);
+    DB.save(three);
 
     sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -74,7 +74,7 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
       assertThat(sql).hasSize(5); // cache hit
     }
 
-    EcPerson four = Ebean.find(EcPerson.class)
+    EcPerson four = DB.find(EcPerson.class)
       .setId(person.getId())
       .fetch("phoneNumbers")
       .findOne();
@@ -85,13 +85,13 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
     sql = LoggedSqlCollector.current();
     assertThat(sql).isEmpty(); // cache hit
 
-    Ebean.delete(four);
+    DB.delete(four);
 
     LoggedSqlCollector.stop();
   }
 
   @Override
   public boolean isPersistBatchOnCascade() {
-    return ((SpiEbeanServer) Ebean.getDefaultServer()).databasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
+    return ((SpiEbeanServer) DB.getDefault()).databasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
   }
 }

@@ -21,7 +21,7 @@ public class EbeanServer_refresh {
     Map<String, String> map = new HashMap<>();
     map.put("tableName", "e_basic");
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     DB.script().run("/scripts/test-script.sql");
     DB.script().run("/scripts/test-script-2.sql", map);
     server.script().run(this.getClass().getResource("/scripts/test-script.sql"));
@@ -51,11 +51,11 @@ public class EbeanServer_refresh {
 
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class, 1);
+    Order order = DB.find(Order.class, 1);
     order.getCustomer().getName();
     order.getDetails().size();
 
-    Ebean.refresh(order);
+    DB.refresh(order);
   }
 
   @Test
@@ -63,11 +63,11 @@ public class EbeanServer_refresh {
 
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class, 1);
+    Order order = DB.find(Order.class, 1);
     order.getCustomer().getName();
     order.setDetails(new ArrayList<>());
 
-    Ebean.refresh(order);
+    DB.refresh(order);
   }
 
   @Test
@@ -75,11 +75,11 @@ public class EbeanServer_refresh {
 
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class, 1);
+    Order order = DB.find(Order.class, 1);
     order.getCustomer().getName();
     order.setDetails(null);
 
-    Ebean.refresh(order);
+    DB.refresh(order);
   }
 
 
@@ -89,7 +89,7 @@ public class EbeanServer_refresh {
 
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class, 1);
+    Order order = DB.find(Order.class, 1);
 
     DB.refresh(order); // call refresh BEFORE first access on "getDetail";
 
@@ -123,7 +123,7 @@ public class EbeanServer_refresh {
 
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class, 1);
+    Order order = DB.find(Order.class, 1);
 
     DB.refresh(order); // call refresh BEFORE first access on "getDetail"
     // this changes the loader of the details-bean collection from DefaultServer to DLoadManyContext$LoadBuffer

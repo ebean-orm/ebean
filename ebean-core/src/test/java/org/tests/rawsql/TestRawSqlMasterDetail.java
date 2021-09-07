@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.tests.model.basic.Customer;
@@ -43,7 +43,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
       .columnMapping("t3.name", "details.product.name")
       .create();
 
-    List<Order> ordersFromRaw = Ebean.find(Order.class)
+    List<Order> ordersFromRaw = DB.find(Order.class)
       .setRawSql(rawSql)
       .setParameter("maxOrderId", 2)
       .setParameter("productId", 1)
@@ -67,7 +67,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse(rs).create();
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -89,7 +89,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
       .tableAliasMapping("ba", "billingAddress")
       .create();
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -112,7 +112,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
       .tableAliasMapping("sa", "shippingAddress")
       .create();
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -139,7 +139,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
       .tableAliasMapping("p", "details.product")
       .create();
 
-    List<Order> ordersFromRaw = Ebean.find(Order.class)
+    List<Order> ordersFromRaw = DB.find(Order.class)
       .setRawSql(rawSql)
       .setParameter("maxOrderId", 2)
       .setParameter("productId", 1)
@@ -157,13 +157,13 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
     basic.setName(name);
     basic.setStatus(EBasic.Status.ACTIVE);
 
-    Ebean.save(basic);
+    DB.save(basic);
 
     String rs = "select b.status, b.name from e_basic b ";
 
     RawSql rawSql = RawSqlBuilder.parse(rs).create();
 
-    List<EBasic> list = Ebean.find(EBasic.class)
+    List<EBasic> list = DB.find(EBasic.class)
       .setRawSql(rawSql)
       .where().eq("name", name)
       .findList();
@@ -172,7 +172,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
     EBasic basic1 = list.get(0);
     basic1.setDescription("insertAfterRawFetch");
 
-    Ebean.save(basic1);
+    DB.save(basic1);
   }
 
   @Test
@@ -185,7 +185,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
     RawSql rawSql = RawSqlBuilder.parse(rs)
       .create();
 
-    List<Order> ordersFromRaw = Ebean.find(Order.class)
+    List<Order> ordersFromRaw = DB.find(Order.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -204,7 +204,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
     RawSql rawSql = RawSqlBuilder.parse(rs)
       .create();
 
-    List<Order> ordersFromRaw = Ebean.find(Order.class)
+    List<Order> ordersFromRaw = DB.find(Order.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -227,7 +227,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
       .tableAliasMapping("o", null)
       .create();
 
-    List<Order> ordersFromRaw = Ebean.find(Order.class)
+    List<Order> ordersFromRaw = DB.find(Order.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -256,7 +256,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
       .tableAliasMapping("p", "details.product")
       .create();
 
-    List<Order> ordersFromRaw = Ebean.find(Order.class)
+    List<Order> ordersFromRaw = DB.find(Order.class)
       .setRawSql(rawSql)
       .findList();
 

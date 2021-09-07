@@ -1,7 +1,7 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +24,10 @@ public class TestCore extends BaseTestCase {
 
   @BeforeEach
   public void setUp() throws Exception {
-    Ebean.createUpdate(Item.class, "delete from Item").execute();
-    Ebean.createUpdate(Region.class, "delete from Region").execute();
-    Ebean.createUpdate(Type.class, "delete from Type").execute();
-    Ebean.createUpdate(SubType.class, "delete from SubType").execute();
+    DB.createUpdate(Item.class, "delete from Item").execute();
+    DB.createUpdate(Region.class, "delete from Region").execute();
+    DB.createUpdate(Type.class, "delete from Type").execute();
+    DB.createUpdate(SubType.class, "delete from SubType").execute();
 
     try (Transaction tx = server().beginTransaction()) {
       SubType subType = new SubType();

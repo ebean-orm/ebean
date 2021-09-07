@@ -1,7 +1,7 @@
 package org.tests.insert;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
 
@@ -25,25 +25,25 @@ public class TestInsertCollection extends BaseTestCase {
     customers.add(cust1);
     customers.add(cust2);
 
-    Ebean.insertAll(customers);
+    DB.insertAll(customers);
 
     assertNotNull(cust1.getId());
     assertNotNull(cust2.getId());
 
-    Customer cust1Check = Ebean.find(Customer.class, cust1.getId());
+    Customer cust1Check = DB.find(Customer.class, cust1.getId());
     assertEquals(cust1.getName(), cust1Check.getName());
-    Customer cust2Check = Ebean.find(Customer.class, cust2.getId());
+    Customer cust2Check = DB.find(Customer.class, cust2.getId());
     assertEquals(cust2.getName(), cust2Check.getName());
 
     cust1.setName("jim-changed");
     cust2.setName("bob-changed");
 
-    Ebean.updateAll(customers);
+    DB.updateAll(customers);
     awaitL2Cache();
 
-    Customer cust1Check2 = Ebean.find(Customer.class, cust1.getId());
+    Customer cust1Check2 = DB.find(Customer.class, cust1.getId());
     assertEquals("jim-changed", cust1Check2.getName());
-    Customer cust2Check2 = Ebean.find(Customer.class, cust2.getId());
+    Customer cust2Check2 = DB.find(Customer.class, cust2.getId());
     assertEquals("bob-changed", cust2Check2.getName());
 
 
@@ -55,13 +55,13 @@ public class TestInsertCollection extends BaseTestCase {
     saveList.add(cust1Check2);
     saveList.add(cust3);
 
-    Ebean.saveAll(saveList);
+    DB.saveAll(saveList);
     awaitL2Cache();
 
 
-    Customer cust1Check3 = Ebean.find(Customer.class, cust1.getId());
+    Customer cust1Check3 = DB.find(Customer.class, cust1.getId());
     assertEquals("jim-updated", cust1Check3.getName());
-    Customer cust3Check = Ebean.find(Customer.class, cust3.getId());
+    Customer cust3Check = DB.find(Customer.class, cust3.getId());
     assertEquals("mac", cust3Check.getName());
 
     List<Customer> deleteList = new ArrayList<>();
@@ -69,12 +69,12 @@ public class TestInsertCollection extends BaseTestCase {
     deleteList.add(cust3);
     deleteList.add(cust2Check2);
 
-    Ebean.deleteAll(deleteList);
+    DB.deleteAll(deleteList);
     awaitL2Cache();
 
-    assertNull(Ebean.find(Customer.class, cust1Check3.getId()));
-    assertNull(Ebean.find(Customer.class, cust2Check2.getId()));
-    assertNull(Ebean.find(Customer.class, cust3.getId()));
+    assertNull(DB.find(Customer.class, cust1Check3.getId()));
+    assertNull(DB.find(Customer.class, cust2Check2.getId()));
+    assertNull(DB.find(Customer.class, cust3.getId()));
   }
 
 }

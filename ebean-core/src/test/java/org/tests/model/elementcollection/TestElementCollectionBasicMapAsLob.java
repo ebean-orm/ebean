@@ -1,7 +1,7 @@
 package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class TestElementCollectionBasicMapAsLob extends BaseTestCase {
     EcmcPerson person = new EcmcPerson("Lob021");
     person.getPhoneNumbers().put("home", "021 1234");
     person.getPhoneNumbers().put("work", "021 4321");
-    Ebean.save(person);
+    DB.save(person);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {

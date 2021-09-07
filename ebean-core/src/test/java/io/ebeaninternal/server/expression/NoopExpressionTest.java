@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class NoopExpressionTest extends BaseExpressionTest {
   @Test
   public void test() {
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().add(NoopExpression.INSTANCE)
       .query();
@@ -31,7 +31,7 @@ public class NoopExpressionTest extends BaseExpressionTest {
   @Test
   public void test_withSoftDeleteBean() {
 
-    Query<Cover> query = Ebean.find(Cover.class)
+    Query<Cover> query = DB.find(Cover.class)
       .where().add(NoopExpression.INSTANCE)
       .query();
 
@@ -46,7 +46,7 @@ public class NoopExpressionTest extends BaseExpressionTest {
   @Test
   public void test_withPreAndPost() {
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().eq("name", null)
       .add(NoopExpression.INSTANCE)

@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.SomeEnum;
@@ -21,7 +21,7 @@ public class TestJsonSomeEnumWithToString extends BaseTestCase {
     bean.setName("Some name");
     bean.setSomeEnum(SomeEnum.ALPHA);
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
     String jsonContent = json.toJson(bean);
 
     SomeEnumBean bean2 = json.toBean(SomeEnumBean.class, jsonContent);

@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
@@ -19,9 +19,9 @@ public class TestCreateEntityBean extends BaseTestCase {
 
     // Use `new` to construct EntityBean
     final EDefaultProp beanNew = new EDefaultProp();
-    Ebean.save(beanNew);
+    DB.save(beanNew);
 
-    final EDefaultProp beanNewDb = Ebean.find(EDefaultProp.class, beanNew.getId());
+    final EDefaultProp beanNewDb = DB.find(EDefaultProp.class, beanNew.getId());
     assertNotNull(beanNewDb);
     assertEquals("defaultName", beanNew.getName());
     assertNotNull(beanNewDb.geteSimple());
@@ -29,9 +29,9 @@ public class TestCreateEntityBean extends BaseTestCase {
 
     // Use `createEntityBean` to construct EntityBean and check if it behaves the same as `new`
     final EDefaultProp beanCreateEntityBean = DB.getDefault().createEntityBean(EDefaultProp.class);
-    Ebean.save(beanCreateEntityBean);
+    DB.save(beanCreateEntityBean);
 
-    final EDefaultProp beanCreateEntityBeanDb = Ebean.find(EDefaultProp.class, beanCreateEntityBean.getId());
+    final EDefaultProp beanCreateEntityBeanDb = DB.find(EDefaultProp.class, beanCreateEntityBean.getId());
     assertNotNull(beanCreateEntityBeanDb);
     assertEquals("defaultName", beanCreateEntityBeanDb.getName());
     assertNotNull(beanCreateEntityBeanDb.geteSimple());

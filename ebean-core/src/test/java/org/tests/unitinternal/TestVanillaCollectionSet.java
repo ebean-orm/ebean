@@ -1,7 +1,7 @@
 package org.tests.unitinternal;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.EVanillaCollection;
 import org.tests.model.basic.EVanillaCollectionDetail;
@@ -19,9 +19,9 @@ public class TestVanillaCollectionSet extends BaseTestCase {
 
     EVanillaCollection c = new EVanillaCollection();
 
-    Ebean.save(c);
+    DB.save(c);
 
-    EVanillaCollection c2 = Ebean.find(EVanillaCollection.class, c.getId());
+    EVanillaCollection c2 = DB.find(EVanillaCollection.class, c.getId());
 
     assertNotNull(c2);
 

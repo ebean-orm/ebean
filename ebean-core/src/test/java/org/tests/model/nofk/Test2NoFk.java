@@ -2,7 +2,7 @@ package org.tests.model.nofk;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,24 +29,24 @@ public class Test2NoFk extends BaseTestCase {
     EUserNoFk root = new EUserNoFk();
     root.setUserId(1);
     root.setUserName("root");
-    Ebean.save(root);
+    DB.save(root);
 
     EUserNoFk nobody = new EUserNoFk();
     nobody.setUserId(2);
     nobody.setUserName("nobody");
-    Ebean.save(nobody);
+    DB.save(nobody);
 
 
     // Now build the same with the softDel flag.
     EUserNoFkSoftDel rootSoftDel = new EUserNoFkSoftDel();
     rootSoftDel.setUserId(1);
     rootSoftDel.setUserName("root");
-    Ebean.save(rootSoftDel);
+    DB.save(rootSoftDel);
 
     EUserNoFkSoftDel nobodySoftDel = new EUserNoFkSoftDel();
     nobodySoftDel.setUserId(2);
     nobodySoftDel.setUserName("nobody");
-    Ebean.save(nobodySoftDel);
+    DB.save(nobodySoftDel);
 
 
     EFile2NoFk bash = new EFile2NoFk();
@@ -58,7 +58,7 @@ public class Test2NoFk extends BaseTestCase {
     user501.setUserId(501);
     user501SoftDel.setUserId(501);
 
-    Ebean.save(bash);
+    DB.save(bash);
 
     // create relation to non existent user
     EFile2NoFk cmd = new EFile2NoFk();
@@ -66,11 +66,11 @@ public class Test2NoFk extends BaseTestCase {
     cmd.setFileName("java");
     cmd.setOwnerId(500);
 
-    Ebean.save(cmd);
+    DB.save(cmd);
 
-    assertThat(Ebean.find(EFile2NoFk.class).findCount()).isEqualTo(2);
-    assertThat(Ebean.find(EUserNoFk.class).findCount()).isEqualTo(2);
-    assertThat(Ebean.find(EUserNoFkSoftDel.class).findCount()).isEqualTo(2);
+    assertThat(DB.find(EFile2NoFk.class).findCount()).isEqualTo(2);
+    assertThat(DB.find(EUserNoFk.class).findCount()).isEqualTo(2);
+    assertThat(DB.find(EUserNoFkSoftDel.class).findCount()).isEqualTo(2);
 
     // We should have this data in the database:
     //
@@ -88,7 +88,7 @@ public class Test2NoFk extends BaseTestCase {
 
   @Test
   public void testLazyLoadFile() {
-    List<EFile2NoFk> files = Ebean.find(EFile2NoFk.class).findList();
+    List<EFile2NoFk> files = DB.find(EFile2NoFk.class).findList();
     assertThat(files).hasSize(2);
 
     EFile2NoFk file1 = files.get(0);
@@ -125,7 +125,7 @@ public class Test2NoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadFile() {
-    List<EFile2NoFk> files = Ebean.find(EFile2NoFk.class).fetch("owner").findList();
+    List<EFile2NoFk> files = DB.find(EFile2NoFk.class).fetch("owner").findList();
     assertThat(files).hasSize(2);
 
     EFile2NoFk file1 = files.get(0);
@@ -158,7 +158,7 @@ public class Test2NoFk extends BaseTestCase {
 
   @Test
   public void testLazyLoadFileSoftDel() {
-    List<EFile2NoFk> files = Ebean.find(EFile2NoFk.class).findList();
+    List<EFile2NoFk> files = DB.find(EFile2NoFk.class).findList();
     assertThat(files).hasSize(2);
 
     EFile2NoFk file1 = files.get(0);
@@ -195,7 +195,7 @@ public class Test2NoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadFileSoftDel() {
-    List<EFile2NoFk> files = Ebean.find(EFile2NoFk.class).fetch("ownerSoftDel").findList();
+    List<EFile2NoFk> files = DB.find(EFile2NoFk.class).fetch("ownerSoftDel").findList();
     assertThat(files).hasSize(2);
 
     EFile2NoFk file1 = files.get(0);

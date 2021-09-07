@@ -1,6 +1,6 @@
 package org.tests.json.include;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.json.JsonWriteOptions;
 import org.tests.json.transientproperties.EJsonTransientObject;
@@ -21,7 +21,7 @@ public class TestJsonExcludeNull {
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
 
-    String asJson = Ebean.json().toJson(bean, options);
+    String asJson = DB.json().toJson(bean, options);
 
     String expectedJson = "{\"id\":99}";
 

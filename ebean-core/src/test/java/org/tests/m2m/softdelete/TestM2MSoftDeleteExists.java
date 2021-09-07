@@ -1,7 +1,7 @@
 package org.tests.m2m.softdelete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
     setup();
 
-    Query<MsManyA> query = Ebean.find(MsManyA.class)
+    Query<MsManyA> query = DB.find(MsManyA.class)
       .where().isNotEmpty("manybs")
       .order("aid").query();
 
@@ -41,9 +41,9 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
   private void testDeletedB0() {
 
-    Ebean.delete(bs.get(0));
+    DB.delete(bs.get(0));
 
-    List<MsManyA> list = Ebean.find(MsManyA.class)
+    List<MsManyA> list = DB.find(MsManyA.class)
       .where().isNotEmpty("manybs")
       .order("aid")
       .findList();
@@ -57,9 +57,9 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
   private void testDeletedB1() {
 
-    Ebean.delete(bs.get(1));
+    DB.delete(bs.get(1));
 
-    List<MsManyA> list = Ebean.find(MsManyA.class)
+    List<MsManyA> list = DB.find(MsManyA.class)
       .where().isNotEmpty("manybs")
       .order("aid")
       .findList();
@@ -72,9 +72,9 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
   private void testEndTotals() {
 
-    assertEquals(5, Ebean.find(MsManyA.class).findCount());
-    assertEquals(3, Ebean.find(MsManyB.class).findCount());
-    assertEquals(5, Ebean.find(MsManyB.class).setIncludeSoftDeletes().findCount());
+    assertEquals(5, DB.find(MsManyA.class).findCount());
+    assertEquals(3, DB.find(MsManyB.class).findCount());
+    assertEquals(5, DB.find(MsManyB.class).setIncludeSoftDeletes().findCount());
   }
 
   private void setup() {
@@ -84,9 +84,9 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
   private void clean() {
 
-    Ebean.createSqlUpdate("delete from ms_many_a_many_b").execute();
-    Ebean.createSqlUpdate("delete from ms_many_a").execute();
-    Ebean.createSqlUpdate("delete from ms_many_b").execute();
+    DB.sqlUpdate("delete from ms_many_a_many_b").execute();
+    DB.sqlUpdate("delete from ms_many_a").execute();
+    DB.sqlUpdate("delete from ms_many_b").execute();
   }
 
   private void seed() {
@@ -95,16 +95,16 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
       bs.add(new MsManyB("b" + i));
     }
 
-    Ebean.saveAll(as);
-    Ebean.saveAll(bs);
+    DB.saveAll(as);
+    DB.saveAll(bs);
 
     as.get(0).getManybs().add(bs.get(0));
     as.get(1).getManybs().addAll(bs);
     as.get(2).getManybs().add(bs.get(1));
 
-    Ebean.save(as.get(0));
-    Ebean.save(as.get(1));
-    Ebean.save(as.get(2));
+    DB.save(as.get(0));
+    DB.save(as.get(1));
+    DB.save(as.get(2));
   }
 
 }

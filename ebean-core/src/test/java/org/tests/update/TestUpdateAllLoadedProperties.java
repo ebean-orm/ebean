@@ -1,8 +1,8 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,14 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
     EBasicVer basic1 = new EBasicVer("basic1");
     basic1.setDescription("aaa");
-    Ebean.save(basic1);
+    DB.save(basic1);
 
     EBasicVer basic2 = new EBasicVer("basic2");
     basic1.setDescription("bbb");
-    Ebean.save(basic2);
+    DB.save(basic2);
 
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     try (Transaction txn = server.beginTransaction()) {
 
       txn.setUpdateAllLoadedProperties(true);
@@ -62,7 +62,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
     ids.add(id1);
     ids.add(id2);
 
-    List<EBasicVer> beans = Ebean.find(EBasicVer.class)
+    List<EBasicVer> beans = DB.find(EBasicVer.class)
       .select("name, other")
       .where().idIn(ids)
       .order().asc("id")
@@ -73,18 +73,18 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
     LoggedSqlCollector.start();
 
 
-    Transaction txn = Ebean.beginTransaction();
+    Transaction txn = DB.beginTransaction();
     try {
       txn.setUpdateAllLoadedProperties(true);
 
       EBasicVer basic1 = beans.get(0);
       basic1.setName("jim");
-      Ebean.save(basic1);
+      DB.save(basic1);
 
       EBasicVer basic2 = beans.get(1);
       basic2.setName("john");
       basic2.setOther("otherDesc");
-      Ebean.save(basic2);
+      DB.save(basic2);
 
       txn.commit();
 

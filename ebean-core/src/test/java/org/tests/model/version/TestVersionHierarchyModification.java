@@ -1,7 +1,7 @@
 package org.tests.model.version;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,17 +39,17 @@ public class TestVersionHierarchyModification extends BaseTestCase {
     toy22.setName("vToy2.2");
     child2.getToys().add(toy22);
 
-    Ebean.save(parent);
+    DB.save(parent);
   }
 
   @AfterEach
   public void cleanUp() {
-    Ebean.find(VersionParent.class).delete();
+    DB.find(VersionParent.class).delete();
   }
 
   @Test
   public void testMoveDown() {
-    VersionParent parent = Ebean.find(VersionParent.class).findOne();
+    VersionParent parent = DB.find(VersionParent.class).findOne();
     assertThat(parent).isNotNull();
     assertThat(parent.getChildren()).hasSize(2);
 
@@ -66,9 +66,9 @@ public class TestVersionHierarchyModification extends BaseTestCase {
     toyToMove.setChild(secondChild);
     secondChild.getToys().add(1, toyToMove);
 
-    Ebean.save(parent);
+    DB.save(parent);
 
-    parent = Ebean.find(VersionParent.class).findOne();
+    parent = DB.find(VersionParent.class).findOne();
     assertThat(parent).isNotNull();
     assertThat(parent.getChildren()).hasSize(2);
 
@@ -83,7 +83,7 @@ public class TestVersionHierarchyModification extends BaseTestCase {
 
   @Test
   public void testMoveUp() {
-    VersionParent parent = Ebean.find(VersionParent.class).findOne();
+    VersionParent parent = DB.find(VersionParent.class).findOne();
     assertThat(parent).isNotNull();
     assertThat(parent.getChildren()).hasSize(2);
 
@@ -100,9 +100,9 @@ public class TestVersionHierarchyModification extends BaseTestCase {
     toyToMove.setChild(firstChild);
     firstChild.getToys().add(1, toyToMove);
 
-    Ebean.save(parent);
+    DB.save(parent);
 
-    parent = Ebean.find(VersionParent.class).findOne();
+    parent = DB.find(VersionParent.class).findOne();
     assertThat(parent).isNotNull();
     assertThat(parent.getChildren()).hasSize(2);
 

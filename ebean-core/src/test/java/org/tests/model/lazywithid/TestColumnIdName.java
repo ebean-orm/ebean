@@ -1,7 +1,7 @@
 package org.tests.model.lazywithid;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,9 +14,9 @@ public class TestColumnIdName extends BaseTestCase {
 
     Tune tune = new Tune();
     tune.getLoonies().add(new Looney("Taz"));
-    Ebean.save(tune);
+    DB.save(tune);
 
-    final List<Tune> fetchedCollection = Ebean.find(Tune.class).findList();
+    final List<Tune> fetchedCollection = DB.find(Tune.class).findList();
 
     assertThat(fetchedCollection).hasSize(1);
     assertThat(fetchedCollection.get(0).getLoonies()).hasSize(1);

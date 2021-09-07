@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -26,7 +26,7 @@ public class TestMyAdHocSqlSelect extends BaseTestCase {
       .columnMapping("order_id", "order.id")
       .create();
 
-    Query<MyAdHoc> query = Ebean.find(MyAdHoc.class)
+    Query<MyAdHoc> query = DB.find(MyAdHoc.class)
       .setRawSql(rawSql)
       .where().gt("order_id", 0)
       .having().gt("detailCount", 0)
@@ -49,7 +49,7 @@ public class TestMyAdHocSqlSelect extends BaseTestCase {
       .columnMapping("detail_count", "detailCount")
       .create();
 
-    Query<MyAdHoc> query = Ebean.find(MyAdHoc.class)
+    Query<MyAdHoc> query = DB.find(MyAdHoc.class)
       .setRawSql(rawSql)
       .where().gt("order_id", 0)
       .having().gt("detailCount", 0)

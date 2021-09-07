@@ -1,7 +1,7 @@
 package org.tests.el;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ public class TestUnderscoreParam extends BaseTestCase {
   @Test
   public void test() {
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .where().raw("name like ?", "Rob%")
       .query();
 

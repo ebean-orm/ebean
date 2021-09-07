@@ -1,8 +1,8 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.ExpressionList;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -20,7 +20,7 @@ public class TestFormulaWithFindCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
 
     ExpressionList<Order> ex = server.find(Order.class).select("id, status ,totalAmount").where().gt("totalAmount", 1d);

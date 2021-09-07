@@ -1,7 +1,7 @@
 package org.tests.merge;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
 import org.ebeantest.LoggedSqlCollector;
@@ -22,11 +22,11 @@ public class TestMergeM2M extends BaseTestCase {
     MGroup group4 = new MGroup(4, "gfour");
     MGroup group5 = new MGroup(5, "gfive");
 
-    Ebean.save(group1);
-    Ebean.save(group2);
-    Ebean.save(group3);
-    Ebean.save(group4);
-    Ebean.save(group5);
+    DB.save(group1);
+    DB.save(group2);
+    DB.save(group3);
+    DB.save(group4);
+    DB.save(group5);
 
     MMachine m0 = new MMachine("mac1");
     m0.getGroups().add(group1);
@@ -37,7 +37,7 @@ public class TestMergeM2M extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.merge(m0, options);
+    DB.merge(m0, options);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -63,7 +63,7 @@ public class TestMergeM2M extends BaseTestCase {
     m1.getGroups().add(group4);
     m1.getGroups().add(group5);
 
-    Ebean.merge(m1, options);
+    DB.merge(m1, options);
 
     sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(9);

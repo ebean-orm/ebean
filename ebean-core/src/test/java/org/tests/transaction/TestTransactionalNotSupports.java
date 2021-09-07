@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
@@ -34,9 +34,9 @@ public class TestTransactionalNotSupports extends BaseTestCase {
   public void withOuterTransaction_expect_currentTransaction_null_and_originalTxnRestored() {
 
     outerTxn = null;
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      currentTxn = Ebean.currentTransaction();
+      currentTxn = DB.currentTransaction();
       assertNotNull(currentTxn);
       new SomeTransactionalWithNotSupported().doStuff();
 
@@ -44,10 +44,10 @@ public class TestTransactionalNotSupports extends BaseTestCase {
       assertNull(outerTxn);
 
       // the original transaction was restored
-      Transaction restored = Ebean.currentTransaction();
+      Transaction restored = DB.currentTransaction();
       assertSame(currentTxn, restored);
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
   }
 
@@ -55,7 +55,7 @@ public class TestTransactionalNotSupports extends BaseTestCase {
 
     @Transactional(type = TxType.NOT_SUPPORTED)
     void doStuff() {
-      outerTxn = Ebean.currentTransaction();
+      outerTxn = DB.currentTransaction();
       log.info("outer ...{}", outerTxn);
     }
   }

@@ -1,7 +1,7 @@
 package org.tests.el;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanFkeyProperty;
@@ -20,7 +20,7 @@ public class TestELBasic extends BaseTestCase {
   @Test
   public void testEl() {
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
 
     ElPropertyDeploy elId = descriptor.getElPropertyDeploy("id");

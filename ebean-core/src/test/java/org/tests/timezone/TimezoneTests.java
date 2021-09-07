@@ -1,6 +1,6 @@
 package org.tests.timezone;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ public class TimezoneTests {
 
   private void fetch() throws SQLException {
     try (
-        Transaction transaction = Ebean.beginTransaction();
+        Transaction transaction = DB.beginTransaction();
         Connection connection = transaction.getConnection();
         PreparedStatement statement = connection.prepareStatement("select * from tztest");
         ResultSet resultSet = statement.executeQuery()) {
@@ -79,7 +79,7 @@ public class TimezoneTests {
     }
 
     try (
-        Transaction transaction = Ebean.beginTransaction();
+        Transaction transaction = DB.beginTransaction();
         Connection connection = transaction.getConnection();
         PreparedStatement statement = connection.prepareStatement(insert)) {
       statement.setString(1, zone);

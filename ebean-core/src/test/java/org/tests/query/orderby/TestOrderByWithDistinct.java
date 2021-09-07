@@ -1,7 +1,7 @@
 package org.tests.query.orderby;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -26,7 +26,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .where()
       .eq("junk", "blah")
       .eq("name", "jim")
@@ -43,9 +43,9 @@ public class TestOrderByWithDistinct extends BaseTestCase {
   @IgnorePlatform({Platform.MYSQL, Platform.MARIADB, Platform.SQLSERVER, Platform.NUODB}) // do not support nulls first/last
   public void testDistinctOn() {
 
-    MRole role = Ebean.getReference(MRole.class, 1);
+    MRole role = DB.getReference(MRole.class, 1);
 
-    Query<MUser> query = Ebean.find(MUser.class)
+    Query<MUser> query = DB.find(MUser.class)
       .where()
       .eq("roles", role)
       .order("userName asc nulls first").query();
@@ -64,7 +64,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
   @Test
   public void testOrderByWithDistinct() {
-    Query<MUser> query = Ebean.find(MUser.class);
+    Query<MUser> query = DB.find(MUser.class);
     query.findList();
 
     assertSql(query).doesNotContain("order by");
@@ -75,7 +75,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     if (isH2()) {
       assertSql(query).contains("from muser t0 limit 1000");
     }
-    query = Ebean.find(MUser.class)
+    query = DB.find(MUser.class)
         .where()
         .eq("roles.roleName", "A")
         .query();
@@ -101,25 +101,25 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		 */
 
     MUserType ut = new MUserType("md");
-    Ebean.save(ut);
+    DB.save(ut);
     MUser user1 = new MUser("one");
     user1.setUserType(ut);
-    Ebean.save(user1);
+    DB.save(user1);
     MUser user2 = new MUser("two");
     user2.setUserType(ut);
-    Ebean.save(user2);
+    DB.save(user2);
 
     MRole roleA = new MRole("A");
-    Ebean.save(roleA);
+    DB.save(roleA);
     MRole roleB = new MRole("B");
-    Ebean.save(roleB);
+    DB.save(roleB);
 
     user1.addRole(roleA);
-    Ebean.save(user1);
+    DB.save(user1);
     user2.addRole(roleB);
-    Ebean.save(user2);
+    DB.save(user2);
 
-    Query<MUser> query = Ebean.find(MUser.class)
+    Query<MUser> query = DB.find(MUser.class)
       .fetch("userType", "name")
       .where()
       .eq("roles.roleName", "A")
@@ -151,7 +151,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     // this problem also manifests when autofetch eliminates properties from the select that aren't used in the objects
     // still need them to be present for purpose of order by
     // so here I'm "simulating" a scenario where autofetch has dropped userType.name
-    query = Ebean.find(MUser.class)
+    query = DB.find(MUser.class)
       .setAutoTune(false)
       .select("userName")
       .fetch("userType", "name")

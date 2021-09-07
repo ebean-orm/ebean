@@ -2,7 +2,7 @@ package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.AfterEach;
@@ -23,7 +23,7 @@ public class TestMultiCascadeBatch extends BaseTestCase {
 
   @BeforeEach
   public void before() {
-    txn = Ebean.beginTransaction();
+    txn = DB.beginTransaction();
   }
 
   @AfterEach
@@ -69,7 +69,7 @@ public class TestMultiCascadeBatch extends BaseTestCase {
 
     final Site mainSite = new Site();
     mainSite.setName("mainSite");
-    Ebean.save(mainSite);
+    DB.save(mainSite);
 
     // create child including data
     final Site childSite = new Site();
@@ -88,7 +88,7 @@ public class TestMultiCascadeBatch extends BaseTestCase {
     mainSite.getChildren().add(childSite);
     mainSite.setName("a different name");
 
-    Ebean.save(mainSite);
+    DB.save(mainSite);
   }
 
 }

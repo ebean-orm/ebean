@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -20,7 +20,7 @@ public class TestQueryFindMapTypedKey extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Map<String, Product> productsBySku = Ebean.find(Product.class)
+    Map<String, Product> productsBySku = DB.find(Product.class)
       .setMapKey("sku")
       .findMap();
 
@@ -29,7 +29,7 @@ public class TestQueryFindMapTypedKey extends BaseTestCase {
     Product desk = productsBySku.get("DSK1");
     assertNotNull(desk);
 
-    Map<String, Customer> map = Ebean.find(Customer.class)
+    Map<String, Customer> map = DB.find(Customer.class)
       .select("id, name")
       .setMapKey("name")
       .findMap();
@@ -42,7 +42,7 @@ public class TestQueryFindMapTypedKey extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Map<Object, Order> orderMap = Ebean.find(Order.class)
+    Map<Object, Order> orderMap = DB.find(Order.class)
       .where().eq("status", Order.Status.NEW)
       .setMapKey("customer.id")
       .findMap();

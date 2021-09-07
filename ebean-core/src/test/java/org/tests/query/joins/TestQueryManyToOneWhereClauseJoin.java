@@ -1,7 +1,7 @@
 package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -20,7 +20,7 @@ public class TestQueryManyToOneWhereClauseJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where().ilike("customer.name", "rob%")
       .query();
 
@@ -44,7 +44,7 @@ public class TestQueryManyToOneWhereClauseJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where().disjunction().ilike("customer.name", "rob%").gt("id", 1).endJunction()
       .query();
 
@@ -70,7 +70,7 @@ public class TestQueryManyToOneWhereClauseJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("customer")
       .fetch("customer.contacts")
       .where().ilike("customer.name", "rob%")

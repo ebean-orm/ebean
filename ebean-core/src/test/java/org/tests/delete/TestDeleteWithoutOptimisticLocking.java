@@ -1,8 +1,8 @@
 package org.tests.delete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
@@ -17,13 +17,13 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
   public void testSimpleBeanDelete_missingBean_returnsFalse() {
 
     // delete by by without version loaded ... should not throw OptimisticLockException
-    Contact ref = Ebean.getReference(Contact.class, 999999);
-    assertThat(Ebean.delete(ref)).isFalse();
+    Contact ref = DB.getReference(Contact.class, 999999);
+    assertThat(DB.delete(ref)).isFalse();
 
-    assertThat(Ebean.delete(Contact.class, 999999)).isEqualTo(0);
+    assertThat(DB.delete(Contact.class, 999999)).isEqualTo(0);
 
     // same as above but using Model.delete()
-    Group modelRef = Ebean.getReference(Group.class, 999999);
+    Group modelRef = DB.getReference(Group.class, 999999);
     assertThat(modelRef.delete()).isFalse();
   }
 
@@ -31,10 +31,10 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
   public void testSimpleBeanDelete_existingBean_returnsTrue() {
 
     EBasicVer basic = new EBasicVer("DelTest");
-    Ebean.save(basic);
+    DB.save(basic);
 
-    EBasicVer basicRef = Ebean.getReference(EBasicVer.class, basic.getId());
-    assertThat(Ebean.delete(basicRef)).isTrue();
+    EBasicVer basicRef = DB.getReference(EBasicVer.class, basic.getId());
+    assertThat(DB.delete(basicRef)).isTrue();
   }
 
 
@@ -42,22 +42,22 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
   public void testSimpleBeanDelete_existingBeanWithJdbcBatch_returnsTrue() {
 
     EBasicVer basic = new EBasicVer("DelTestBatch");
-    Ebean.save(basic);
+    DB.save(basic);
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Transaction transaction = server.beginTransaction();
     try {
       transaction.setBatchMode(true);
 
       // returns true even though the delete has not occurred yet
-      assertThat(server.delete(Ebean.getReference(EBasicVer.class, basic.getId()), transaction)).isTrue();
+      assertThat(server.delete(DB.getReference(EBasicVer.class, basic.getId()), transaction)).isTrue();
 
       // returns true even though the bean does not exist
-      assertThat(server.delete(Ebean.getReference(EBasicVer.class, 999999), transaction)).isTrue();
+      assertThat(server.delete(DB.getReference(EBasicVer.class, 999999), transaction)).isTrue();
 
       transaction.commit();
 
-      assertThat(Ebean.find(EBasicVer.class, basic.getId())).isNull();
+      assertThat(DB.find(EBasicVer.class, basic.getId())).isNull();
 
     } finally {
       transaction.end();

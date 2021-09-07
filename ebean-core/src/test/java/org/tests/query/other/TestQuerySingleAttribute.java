@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.CountDistinctOrder;
 import io.ebean.CountedValue;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,7 +76,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     List<String> names =
-      Ebean.find(Customer.class)
+      DB.find(Customer.class)
         .setDistinct(true)
         .select("name")
         .where().eq("status", Customer.Status.NEW).startsWith("name", "R")
@@ -96,7 +96,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Date> dates =
-      Ebean.find(Customer.class)
+      DB.find(Customer.class)
         .setDistinct(true)
         .select("anniversary")
         .where().isNotNull("anniversary")
@@ -110,7 +110,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   public void withOrderBy() {
 
     Query<Customer> query =
-      Ebean.find(Customer.class)
+      DB.find(Customer.class)
         .setDistinct(true)
         .select("name")
         .where().eq("status", Customer.Status.NEW)
@@ -125,7 +125,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class).select("name");
+    Query<Customer> query = DB.find(Customer.class).select("name");
 
     List<String> names = query.findSingleAttributeList();
 
@@ -138,7 +138,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("name")
       .where().eq("id", 1).query();
 
@@ -151,7 +151,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   @Test
   public void findSingleAttributeList_with_join_column() {
     ResetBasicData.reset();
-    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+    Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .fetch("entity1", "attr1")
       .setDistinct(true)
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
@@ -173,7 +173,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @Test
   public void findSingleAttributesVariousSelection1() {
-    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+    Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .fetch("entity1", "attr1")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
       .where().query();
@@ -186,7 +186,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @Test
   public void findSingleAttributesVariousSelection2() {
-    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+    Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .select("attr1")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
       .where().query();
@@ -199,7 +199,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @Test
   public void findSingleAttributesVariousSelection3() {
-    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+    Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .select("id")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
       .where().query();
@@ -212,7 +212,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @Test
   public void findSingleAttributesVariousSelection4() {
-    Query<MainEntityRelation> query = Ebean.find(MainEntityRelation.class)
+    Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .fetch("entity1", "id")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
       .where().query();
@@ -225,7 +225,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @Test
   public void findSingleAttributesVariousSelection5() {
-    Query<OmBasicParent> query = Ebean.find(OmBasicParent.class)
+    Query<OmBasicParent> query = DB.find(OmBasicParent.class)
       .fetch("children", "name")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
       .where().query();
@@ -240,7 +240,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("max(name)")
       .where().gt("id", 1).query();
 
@@ -255,7 +255,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    String name = Ebean.find(Customer.class)
+    String name = DB.find(Customer.class)
       .select("name")
       .where().eq("id", 1)
       .findSingleAttribute();
@@ -268,7 +268,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("name")
       .where().eq("status", Customer.Status.NEW)
@@ -285,7 +285,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("name")
       .where().eq("status", Customer.Status.NEW)
@@ -304,18 +304,18 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class).select("name");
+    Query<Customer> query = DB.find(Customer.class).select("name");
     query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
 
-    Query<Customer> query2 = Ebean.find(Customer.class).select("name");
+    Query<Customer> query2 = DB.find(Customer.class).select("name");
     query2.findList();
     assertThat(sqlOf(query2, 1)).contains("select t0.id, t0.name from o_customer t0");
   }
 
   @Test
   public void distinctOnIdProperty() {
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("id")
       .setMaxRows(100);
@@ -336,7 +336,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .fetch("billingAddress", "city");
 
@@ -351,7 +351,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .fetch("customer.billingAddress", "city");
 
@@ -366,7 +366,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<ChildA> query = Ebean.find(ChildA.class)
+    Query<ChildA> query = DB.find(ChildA.class)
       .setDistinct(true)
       .select("more");
 
@@ -379,7 +379,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<EUncle> query = Ebean.find(EUncle.class)
+    Query<EUncle> query = DB.find(EUncle.class)
       .setDistinct(true)
       .fetch("parent", "more");
 
@@ -395,7 +395,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .setMaxRows(100);
 
@@ -415,7 +415,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .fetch("billingAddress", "city");
 
     List<String> cities = query.findSingleAttributeList();
@@ -429,7 +429,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<VwCustomer> query = Ebean.find(VwCustomer.class)
+    Query<VwCustomer> query = DB.find(VwCustomer.class)
       .fetch("billingAddress", "city");
 
     List<String> cities = query.findSingleAttributeList();
@@ -443,7 +443,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<ChildA> query = Ebean.find(ChildA.class)
+    Query<ChildA> query = DB.find(ChildA.class)
       .select("more");
 
     query.findSingleAttributeList();
@@ -456,7 +456,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<EUncle> query = Ebean.find(EUncle.class)
+    Query<EUncle> query = DB.find(EUncle.class)
       .fetch("parent", "more");
 
     query.findSingleAttributeList();
@@ -469,7 +469,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<EUncle> query = Ebean.find(EUncle.class)
+    Query<EUncle> query = DB.find(EUncle.class)
       .fetch("parent", "more");
 
     query.findSingleAttributeList();
@@ -483,7 +483,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Data> query = Ebean.find(Data.class)
+    Query<Data> query = DB.find(Data.class)
       .setDistinct(true)
       .fetch("parents", "more")
       .setMaxRows(100);
@@ -500,7 +500,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .select("customer")
       .order().desc("customer");
@@ -515,7 +515,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .select("customer.id")
       .order().desc("customer.id");
@@ -530,7 +530,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .order().desc("customer.billingAddress");
@@ -545,7 +545,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
@@ -566,7 +566,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
@@ -587,7 +587,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.billingAddress.city", "Auckland")
@@ -608,7 +608,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setDistinct(true)
       .fetch("customer", "billingAddress")
       .where().eq("customer.shippingAddress.city", "Auckland") // query on shippingAddress
@@ -631,10 +631,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     ResetBasicData.reset();
 
 
-    int count = Ebean.find(Contact.class).findCount();
+    int count = DB.find(Contact.class).findCount();
     assertThat(count).isGreaterThanOrEqualTo(12);
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("firstName");
 
     List<CountedValue<Object>> list1 = query
@@ -649,21 +649,21 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     //assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
 
 
-    query = Ebean.find(Contact.class).select("firstName");
+    query = DB.find(Contact.class).select("firstName");
     list1 = query
       .setCountDistinct(CountDistinctOrder.ATTR_DESC)
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
 
-    query = Ebean.find(Contact.class).select("firstName");
+    query = DB.find(Contact.class).select("firstName");
     list1 = query
       .setCountDistinct(CountDistinctOrder.COUNT_ASC_ATTR_DESC)
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[1: Tracy, 1: Jack, 1: Fiona, 3: Jim1, 3: Fred1, 3: Bugs1]");
 
-    query = Ebean.find(Contact.class).fetch("customer.shippingAddress", "line1");//("firstName")
+    query = DB.find(Contact.class).fetch("customer.shippingAddress", "line1");//("firstName")
     List<CountedValue<Object>> list2 = query
       .setCountDistinct(CountDistinctOrder.ATTR_ASC)
       .findSingleAttributeList();
@@ -676,7 +676,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     //assertThat(list2.toString()).isEqualTo("[1: null, 3: 1 Banana St, 5: 12 Apple St, 3: 15 Kumera Way]");
 
 
-    query = Ebean.find(Contact.class).select("firstName")
+    query = DB.find(Contact.class).select("firstName")
       .where().eq("customer.shippingAddress.line1", "12 Apple St").query();
     List<CountedValue<Object>> list3 = query
       .setCountDistinct(CountDistinctOrder.ATTR_ASC)
@@ -690,7 +690,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     //assertThat(list3.toString()).isEqualTo("[1: Bugs1, 1: Fiona, 1: Fred1, 1: Jim1, 1: Tracy]");
 
 
-    query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1")
+    query = DB.find(Contact.class).fetch("customer.billingAddress", "line1")
       .where().or()
       .ne("customer.shippingAddress.line1", "12 Apple St")
       .isNull("customer.shippingAddress.line1")
@@ -710,7 +710,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
 
     // Test Limiter for MSSQL
-    query = Ebean.find(Contact.class).fetch("customer.billingAddress", "line1").setFirstRow(1).setMaxRows(2);
+    query = DB.find(Contact.class).fetch("customer.billingAddress", "line1").setFirstRow(1).setMaxRows(2);
     List<CountedValue<Object>> list5 = query
       .where().isNotNull("customer.billingAddress.line1").query()
       .setCountDistinct(CountDistinctOrder.ATTR_DESC)
@@ -746,7 +746,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     List<CountedValue<Order.Status>> orderStatusCount =
 
-      Ebean.find(Order.class)
+      DB.find(Order.class)
         .select("status")
         .where()
         .gt("orderDate", LocalDate.now().minusMonths(3))
@@ -793,7 +793,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @AfterEach
   public void cleanup() {
-    Ebean.find(MainEntityRelation.class).delete();
-    Ebean.find(MainEntity.class).delete();
+    DB.find(MainEntityRelation.class).delete();
+    DB.find(MainEntity.class).delete();
   }
 }

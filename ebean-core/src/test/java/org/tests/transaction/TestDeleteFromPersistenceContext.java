@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiTransaction;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.ResetBasicData;
@@ -19,37 +19,37 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
     ResetBasicData.reset();
 
     EBasicVer bean = new EBasicVer("Please Delete Me");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    SpiTransaction transaction = (SpiTransaction) Ebean.beginTransaction();
+    SpiTransaction transaction = (SpiTransaction) DB.beginTransaction();
     try {
 
-      EBasicVer bean2 = Ebean.find(EBasicVer.class, bean.getId());
+      EBasicVer bean2 = DB.find(EBasicVer.class, bean.getId());
       assertNotSame(bean, bean2);
 
-      EBasicVer bean3 = Ebean.find(EBasicVer.class, bean.getId());
+      EBasicVer bean3 = DB.find(EBasicVer.class, bean.getId());
       // same instance from PersistenceContext
       assertSame(bean2, bean3);
 
       Object bean4 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
       assertSame(bean2, bean4);
 
-      Ebean.delete(bean2);
+      DB.delete(bean2);
 
       Object bean5 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
       assertNull(bean5);
 
-      Ebean.commitTransaction();
+      DB.commitTransaction();
 
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
 
-    EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findOne();
+    EBasicVer bean6 = DB.find(EBasicVer.class).where().eq("id", bean.getId()).findOne();
     assertNull(bean6);
 
     awaitL2Cache();
-    EBasicVer bean7 = Ebean.find(EBasicVer.class, bean.getId());
+    EBasicVer bean7 = DB.find(EBasicVer.class, bean.getId());
     assertNull(bean7);
   }
 

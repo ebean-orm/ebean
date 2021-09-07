@@ -1,6 +1,6 @@
 package org.tests.batchinsert;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Transactional;
 import org.junit.jupiter.api.Test;
@@ -35,6 +35,6 @@ public class TestBatchInsertOneToOne {
   public void test() {
     MeterVersion meterVersion = build();
 
-    Ebean.save(meterVersion);
+    DB.save(meterVersion);
   }
 }

@@ -2,7 +2,7 @@ package org.tests.model.nofk;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlRow;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -23,9 +23,9 @@ public class TestNoFk extends BaseTestCase {
   @BeforeEach
   public void setup() {
     // Reset t
-    Ebean.find(EFileNoFk.class).delete();
-    Ebean.find(EUserNoFk.class).delete();
-    Ebean.find(EUserNoFkSoftDel.class).delete();
+    DB.find(EFileNoFk.class).delete();
+    DB.find(EUserNoFk.class).delete();
+    DB.find(EUserNoFkSoftDel.class).delete();
 
     DB.sqlUpdate("delete from efile_no_fk_euser_no_fk").execute();
     String tabName = isOracle() ? "efile_no_fk_euser_no_fk_soft_d" : "efile_no_fk_euser_no_fk_soft_del";
@@ -35,24 +35,24 @@ public class TestNoFk extends BaseTestCase {
     EUserNoFk root = new EUserNoFk();
     root.setUserId(1);
     root.setUserName("root");
-    Ebean.save(root);
+    DB.save(root);
 
     EUserNoFk nobody = new EUserNoFk();
     nobody.setUserId(2);
     nobody.setUserName("nobody");
-    Ebean.save(nobody);
+    DB.save(nobody);
 
 
     // Now build the same with the softDel flag.
     EUserNoFkSoftDel rootSoftDel = new EUserNoFkSoftDel();
     rootSoftDel.setUserId(1);
     rootSoftDel.setUserName("root");
-    Ebean.save(rootSoftDel);
+    DB.save(rootSoftDel);
 
     EUserNoFkSoftDel nobodySoftDel = new EUserNoFkSoftDel();
     nobodySoftDel.setUserId(2);
     nobodySoftDel.setUserName("nobody");
-    Ebean.save(nobodySoftDel);
+    DB.save(nobodySoftDel);
 
 
     EFileNoFk bash = new EFileNoFk();
@@ -71,7 +71,7 @@ public class TestNoFk extends BaseTestCase {
     bash.getEditorsSoftDel().add(nobodySoftDel);
     bash.getEditorsSoftDel().add(user501SoftDel);
 
-    Ebean.save(bash);
+    DB.save(bash);
 
     // create relation to non existent user
     EFileNoFk cmd = new EFileNoFk();
@@ -87,12 +87,12 @@ public class TestNoFk extends BaseTestCase {
     user500SoftDel.setUserName("not persisted");
     cmd.setOwnerSoftDel(user500SoftDel);
 
-    Ebean.save(cmd);
+    DB.save(cmd);
 
 
-    assertThat(Ebean.find(EFileNoFk.class).findCount()).isEqualTo(2);
-    assertThat(Ebean.find(EUserNoFk.class).findCount()).isEqualTo(2);
-    assertThat(Ebean.find(EUserNoFkSoftDel.class).findCount()).isEqualTo(2);
+    assertThat(DB.find(EFileNoFk.class).findCount()).isEqualTo(2);
+    assertThat(DB.find(EUserNoFk.class).findCount()).isEqualTo(2);
+    assertThat(DB.find(EUserNoFkSoftDel.class).findCount()).isEqualTo(2);
 
     SqlRow row = DB.sqlQuery("select count(*) as cnt from efile_no_fk_euser_no_fk").findOne();
     assertThat(row.getInteger("cnt")).isEqualTo(3);
@@ -112,7 +112,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testLazyLoadFile() {
-    List<EFileNoFk> files = Ebean.find(EFileNoFk.class).findList();
+    List<EFileNoFk> files = DB.find(EFileNoFk.class).findList();
     assertThat(files).hasSize(2);
 
     EFileNoFk file1 = files.get(0);
@@ -148,7 +148,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadFile() {
-    List<EFileNoFk> files = Ebean.find(EFileNoFk.class).fetch("owner").findList();
+    List<EFileNoFk> files = DB.find(EFileNoFk.class).fetch("owner").findList();
     assertThat(files).hasSize(2);
 
     EFileNoFk file1 = files.get(0);
@@ -181,7 +181,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testLazyLoadOwner() {
-    List<EUserNoFk> owners = Ebean.find(EUserNoFk.class).findList();
+    List<EUserNoFk> owners = DB.find(EUserNoFk.class).findList();
     assertThat(owners).hasSize(2);
 
     EUserNoFk owner1 = owners.get(0);
@@ -201,7 +201,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadOwner() {
-    List<EUserNoFk> owners = Ebean.find(EUserNoFk.class)
+    List<EUserNoFk> owners = DB.find(EUserNoFk.class)
       .fetch("files")
       .findList();
     assertThat(owners).hasSize(2);
@@ -223,7 +223,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testLazyLoadFileSoftDel() {
-    List<EFileNoFk> files = Ebean.find(EFileNoFk.class).findList();
+    List<EFileNoFk> files = DB.find(EFileNoFk.class).findList();
     assertThat(files).hasSize(2);
 
     EFileNoFk file1 = files.get(0);
@@ -260,7 +260,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadFileSoftDel() {
-    List<EFileNoFk> files = Ebean.find(EFileNoFk.class).fetch("ownerSoftDel").findList();
+    List<EFileNoFk> files = DB.find(EFileNoFk.class).fetch("ownerSoftDel").findList();
     assertThat(files).hasSize(2);
 
     EFileNoFk file1 = files.get(0);
@@ -292,7 +292,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testLazyLoadOwnerSoftDel() {
-    List<EUserNoFkSoftDel> owners = Ebean.find(EUserNoFkSoftDel.class).findList();
+    List<EUserNoFkSoftDel> owners = DB.find(EUserNoFkSoftDel.class).findList();
     assertThat(owners).hasSize(2);
 
     EUserNoFkSoftDel owner1 = owners.get(0);
@@ -312,7 +312,7 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadOwnerSoftDel() {
-    List<EUserNoFkSoftDel> owners = Ebean.find(EUserNoFkSoftDel.class)
+    List<EUserNoFkSoftDel> owners = DB.find(EUserNoFkSoftDel.class)
       .fetch("files")
       .findList();
     assertThat(owners).hasSize(2);
@@ -337,11 +337,11 @@ public class TestNoFk extends BaseTestCase {
   @Disabled("this would be a bonus task :)")
   public void testLazyLoadUser500() {
     // user 500 does not exist in DB
-    EUserNoFk owner = Ebean.find(EUserNoFk.class, 500);
+    EUserNoFk owner = DB.find(EUserNoFk.class, 500);
     assertThat(owner).isNull();
 
     // but there are files that are owned by #500
-    owner = Ebean.getReference(EUserNoFk.class, 500);
+    owner = DB.reference(EUserNoFk.class, 500);
     assertThat(owner.getUserId()).isEqualTo(500);
     // this does not work yet, because the executed select contains a join:
     // select t0.user_id, t1.file_name, t1.owner_user_id
@@ -362,7 +362,7 @@ public class TestNoFk extends BaseTestCase {
   @Test
   @Disabled("Bonus Task 2")
   public void testM2mLazyLoadFile() {
-    List<EFileNoFk> files = Ebean.find(EFileNoFk.class).findList();
+    List<EFileNoFk> files = DB.find(EFileNoFk.class).findList();
     assertThat(files).hasSize(2);
 
     EFileNoFk file1 = files.get(0);

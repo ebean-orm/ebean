@@ -1,8 +1,8 @@
 package org.tests.draftable;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,9 @@ public class DocLinkTest extends BaseTestCase {
     Link link1 = new Link("something");
     link1.save();
 
-    Ebean.getDefaultServer().publish(Link.class, link1.getId());
+    DB.getDefault().publish(Link.class, link1.getId());
 
-    Link link = Ebean.find(Link.class)
+    Link link = DB.find(Link.class)
       .setId(link1.getId())
       .select("name")
       .findOne();
@@ -64,7 +64,7 @@ public class DocLinkTest extends BaseTestCase {
     // automatically set asDraft() on lazy loading query
     linkUpdate.getLocation();
 
-    Ebean.deletePermanent(linkUpdate);
+    DB.deletePermanent(linkUpdate);
   }
 
   @Test
@@ -79,7 +79,7 @@ public class DocLinkTest extends BaseTestCase {
     link1.setComment("some change");
     link1.save();
 
-    Ebean.delete(link1);
+    DB.delete(link1);
   }
 
   @Test
@@ -87,10 +87,10 @@ public class DocLinkTest extends BaseTestCase {
 
     Link link1 = new Link("Ld2");
     link1.save();
-    Ebean.getDefaultServer().publish(Link.class, link1.getId());
+    DB.getDefault().publish(Link.class, link1.getId());
 
-    Link link = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    Ebean.deletePermanent(link);
+    Link link = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
+    DB.deletePermanent(link);
   }
 
   @Test
@@ -99,10 +99,10 @@ public class DocLinkTest extends BaseTestCase {
     Link link1 = new Link("Ld2");
     link1.save();
 
-    Link live = Ebean.getDefaultServer().publish(Link.class, link1.getId());
+    Link live = DB.getDefault().publish(Link.class, link1.getId());
 
     try {
-      Ebean.deletePermanent(live);
+      DB.deletePermanent(live);
       fail("never get here");
 
     } catch (PersistenceException e) {
@@ -116,16 +116,16 @@ public class DocLinkTest extends BaseTestCase {
 
     Link link1 = new Link("Ld2");
     link1.save();
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     server.publish(Link.class, link1.getId());
 
-    link1 = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
+    link1 = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
     assertThat(link1.isDraft()).isTrue();
 
     // this is a soft delete (no automatic publish here, only updates draft)
     link1.delete();
 
-    Link live = Ebean.find(Link.class).setId(link1.getId()).findOne();
+    Link live = DB.find(Link.class).setId(link1.getId()).findOne();
     assertThat(live).isNotNull();
     assertThat(live.isDraft()).isFalse();
     assertThat(live.isDeleted()).isFalse(); // soft delete state not published yet
@@ -133,7 +133,7 @@ public class DocLinkTest extends BaseTestCase {
     // this is a permanent delete (effectively has automatic publish)
     server.deletePermanent(link1);
 
-    live = Ebean.find(Link.class).setId(link1.getId()).findOne();
+    live = DB.find(Link.class).setId(link1.getId()).findOne();
     assertThat(live).isNull();
   }
 
@@ -143,7 +143,7 @@ public class DocLinkTest extends BaseTestCase {
     Link link1 = new Link("forUpdateLive");
     link1.save();
 
-    Link live = Ebean.getDefaultServer().publish(Link.class, link1.getId());
+    Link live = DB.getDefault().publish(Link.class, link1.getId());
 
     live.setComment("foo");
     // Expect a nice
@@ -167,16 +167,16 @@ public class DocLinkTest extends BaseTestCase {
     link1.setWhenPublish(when);
     link1.save();
 
-    Link draft1 = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
+    Link draft1 = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
     assertThat(draft1.isDirty()).isTrue();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Link linkLive = server.publish(Link.class, link1.getId(), null);
     assertThat(linkLive.getComment()).isEqualTo(comment);
     assertThat(linkLive.getWhenPublish()).isEqualToIgnoringMillis(when);
 
-    Link draft1b = Ebean.find(Link.class).setId(link1.getId()).asDraft().findOne();
+    Link draft1b = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
     assertThat(draft1b.isDirty()).isFalse();
     assertThat(draft1b.getComment()).isNull();
     assertThat(draft1b.getWhenPublish()).isNull();
@@ -194,7 +194,7 @@ public class DocLinkTest extends BaseTestCase {
     Link link3 = new Link("LinkThree");
     link3.save();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     server.publish(Link.class, link1.getId(), null);
     server.publish(Link.class, link2.getId(), null);
     server.publish(Link.class, link3.getId(), null);
@@ -240,12 +240,12 @@ public class DocLinkTest extends BaseTestCase {
     link1.setLocation("firstLocation");
     link1.save();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Link live = server.publish(Link.class, link1.getId(), null);
     assertThat(live.isDraft()).isFalse();
 
-    Link draftLink = Ebean.find(Link.class)
+    Link draftLink = DB.find(Link.class)
       .setId(link1.getId())
       .asDraft()
       .findOne();
@@ -255,7 +255,7 @@ public class DocLinkTest extends BaseTestCase {
 
     server.draftRestore(Link.class, link1.getId(), null);
 
-    draftLink = Ebean.find(Link.class)
+    draftLink = DB.find(Link.class)
       .setId(link1.getId())
       .asDraft()
       .findOne();
@@ -271,11 +271,11 @@ public class DocLinkTest extends BaseTestCase {
     link1.setComment("Banana");
     link1.save();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     server.publish(Link.class, link1.getId(), null);
 
-    Link draftLink = Ebean.find(Link.class)
+    Link draftLink = DB.find(Link.class)
       .setId(link1.getId())
       .asDraft()
       .findOne();

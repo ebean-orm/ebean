@@ -2,7 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryCacheCountry extends BaseTestCase {
 
-  private final ServerCacheManager cacheManager = DB.getServerCacheManager();
+  private final ServerCacheManager cacheManager = DB.cacheManager();
   private final ServerCache queryCache = cacheManager.queryCache(Country.class);
   private final ServerCache beanCache = cacheManager.beanCache(Country.class);
 
@@ -33,7 +33,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     ResetBasicData.reset();
     clearCache();
 
-    List<Country> countryList0 = Ebean.find(Country.class)
+    List<Country> countryList0 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().startsWith("name", "XLKMG")
       .order().asc("name")
@@ -45,7 +45,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     assertEquals(1, queryStats.getMissCount());
     assertEquals(1, queryStats.getSize());
 
-    List<Country> countryList1 = Ebean.find(Country.class)
+    List<Country> countryList1 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().startsWith("name", "XLKMG")
       .order().asc("name")
@@ -66,14 +66,14 @@ public class TestQueryCacheCountry extends BaseTestCase {
     awaitL2Cache();
     clearCache();
 
-    List<Country> countryList0 = Ebean.find(Country.class)
+    List<Country> countryList0 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().raw("code = ?", "NZ")
       .findList();
 
     assertThat(countryList0.get(0).getName()).isEqualTo("New Zealand");
 
-    List<Country> countryList1 = Ebean.find(Country.class)
+    List<Country> countryList1 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().raw("code = ?", "AU")
       .findList();
@@ -87,7 +87,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
 
     // we get a hit this time
-    List<Country> countryList2 = Ebean.find(Country.class)
+    List<Country> countryList2 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().raw("code = ?", "NZ")
       .findList();
@@ -100,7 +100,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     assertEquals(1, queryStats2.getHitCount()); // got a hit
 
     // we get a hit on AU
-    List<Country> countryList3 = Ebean.find(Country.class)
+    List<Country> countryList3 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().raw("code = ?", "AU")
       .findList();
@@ -123,7 +123,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     assertEquals(0, queryCache.statistics(false).getSize());
 
-    List<Country> countryList0 = Ebean.find(Country.class)
+    List<Country> countryList0 = DB.find(Country.class)
       .setUseQueryCache(true)
       .order().asc("name")
       .findList();
@@ -131,7 +131,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     assertEquals(1, queryCache.statistics(false).getSize());
     assertTrue(!countryList0.isEmpty());
 
-    List<Country> countryList1 = Ebean.find(Country.class)
+    List<Country> countryList1 = DB.find(Country.class)
       .setUseQueryCache(true)
       .order().asc("name")
       .findList();
@@ -141,24 +141,24 @@ public class TestQueryCacheCountry extends BaseTestCase {
     assertEquals(1, statistics.getHitCount());
     assertSame(countryList1, countryList0);
 
-    Country nz = Ebean.find(Country.class, "NZ");
+    Country nz = DB.find(Country.class, "NZ");
     nz.setName("New Zealandia");
-    Ebean.save(nz);
+    DB.save(nz);
     awaitL2Cache();
 
     statistics = queryCache.statistics(false);
     assertEquals(0, statistics.getSize());
 
-    List<Country> countryList2 = Ebean.find(Country.class)
+    List<Country> countryList2 = DB.find(Country.class)
       .setUseQueryCache(true)
       .order().asc("name")
       .findList();
 
     assertNotSame(countryList2, countryList0);
 
-    nz = Ebean.find(Country.class, "NZ");
+    nz = DB.find(Country.class, "NZ");
     nz.setName("New Zealand");
-    Ebean.save(nz);
+    DB.save(nz);
   }
 
 }

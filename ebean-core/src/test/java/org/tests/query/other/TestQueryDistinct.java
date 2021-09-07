@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -21,7 +21,7 @@ public class TestQueryDistinct extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("name");
 
@@ -47,7 +47,7 @@ public class TestQueryDistinct extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .where().setDistinct(true)
       .select("name");
 
@@ -62,7 +62,7 @@ public class TestQueryDistinct extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("status")
       .where().isNotNull("status").query();
@@ -87,7 +87,7 @@ public class TestQueryDistinct extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setMaxRows(10)
       .setDistinct(true)
       .select("name");

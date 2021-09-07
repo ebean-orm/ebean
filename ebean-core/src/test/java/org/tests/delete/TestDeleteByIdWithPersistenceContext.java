@@ -1,8 +1,8 @@
 package org.tests.delete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Product;
@@ -19,10 +19,10 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.delete(Product.class, 100);
-    Ebean.delete(Product.class, 101);
+    DB.delete(Product.class, 100);
+    DB.delete(Product.class, 101);
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     Product prod1 = createProduct(100, "apples");
     server.insert(prod1);
     Product prod2 = createProduct(101, "bananas");
@@ -44,8 +44,8 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
     }
 
     // cleanup
-    Ebean.delete(Product.class, 100);
-    Ebean.delete(Product.class, 101);
+    DB.delete(Product.class, 100);
+    DB.delete(Product.class, 101);
   }
 
   private Product createProduct(Integer id, String name) {

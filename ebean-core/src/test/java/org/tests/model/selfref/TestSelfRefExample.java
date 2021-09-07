@@ -1,7 +1,7 @@
 package org.tests.model.selfref;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ public class TestSelfRefExample extends BaseTestCase {
   public void test() {
 
     try {
-      Ebean.createSqlUpdate("delete from self_ref_example").execute();
+      DB.sqlUpdate("delete from self_ref_example").execute();
     } catch (PersistenceException e) {
       logger.debug("TestSelfRefExample skipped - MySql not deleting based on constraints");
       return;
@@ -32,16 +32,16 @@ public class TestSelfRefExample extends BaseTestCase {
     SelfRefExample e7 = new SelfRefExample("test3", e3);
     SelfRefExample e8 = new SelfRefExample("test3", e7);
 
-    Ebean.save(e1);
-    Ebean.save(e2);
-    Ebean.save(e3);
-    Ebean.save(e4);
-    Ebean.save(e5);
-    Ebean.save(e6);
-    Ebean.save(e7);
-    Ebean.save(e8);
+    DB.save(e1);
+    DB.save(e2);
+    DB.save(e3);
+    DB.save(e4);
+    DB.save(e5);
+    DB.save(e6);
+    DB.save(e7);
+    DB.save(e8);
 
-    Query<SelfRefExample> examples = Ebean.find(SelfRefExample.class).setLazyLoadBatchSize(1);
+    Query<SelfRefExample> examples = DB.find(SelfRefExample.class).setLazyLoadBatchSize(1);
     List<SelfRefExample> list = examples.where().eq("name", "test1").order().asc("id").findList();
 
     assertThat(list).hasSize(2);
@@ -66,7 +66,7 @@ public class TestSelfRefExample extends BaseTestCase {
     assertThat(e3Searched.getChildren()).extracting("id").contains(e7.getId());
 
     // If we get all the items, you can see the structure goes down a fair bit further.
-    Query<SelfRefExample> examples2 = Ebean.createQuery(SelfRefExample.class).order("id asc");
+    Query<SelfRefExample> examples2 = DB.createQuery(SelfRefExample.class).order("id asc");
     List<SelfRefExample> list2 = examples2.findList();
 
     assertEquals(e1.getId(), list2.get(0).getId());

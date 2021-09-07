@@ -1,7 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
@@ -21,44 +21,43 @@ public class TestExternalNotification extends BaseTestCase {
 
     loadCountryCache();
 
-    ServerCache countryCache = Ebean.getServerCacheManager().beanCache(Country.class);
+    ServerCache countryCache = DB.cacheManager().beanCache(Country.class);
 
     assertTrue(countryCache.size() > 0);
 
     // inserts don't remove from bean cache
-    Ebean.externalModification("o_country", true, false, false);
+    DB.externalModification("o_country", true, false, false);
     assertTrue(countryCache.size() > 0);
 
     // updates flush cache
-    Ebean.externalModification("o_country", false, true, false);
+    DB.externalModification("o_country", false, true, false);
     assertEquals(0, countryCache.size());
 
     loadCountryCache();
     assertTrue(countryCache.size() > 0);
 
     // deletes flush cache
-    Ebean.externalModification("o_country", false, false, true);
+    DB.externalModification("o_country", false, false, true);
     assertEquals(0, countryCache.size());
 
     loadCountryCache();
     assertTrue(countryCache.size() > 0);
 
-    ServerCacheManager serverCacheManager = Ebean.getServerCacheManager();
+    ServerCacheManager serverCacheManager = DB.cacheManager();
     serverCacheManager.clearAll();
     assertEquals(0, countryCache.size());
 
     loadCountryCache();
     assertTrue(countryCache.size() > 0);
 
-    Ebean.getServerCacheManager().clear(Country.class);
+    DB.cacheManager().clear(Country.class);
     assertEquals(0, countryCache.size());
 
     loadCountryCache();
     int cacheSize = countryCache.size();
     assertTrue(cacheSize > 0);
 
-    SqlUpdate sqlUpdate = Ebean
-      .createSqlUpdate("update o_country set name = :name where code = :code");
+    SqlUpdate sqlUpdate = DB.sqlUpdate("update o_country set name = :name where code = :code");
     sqlUpdate.setParameter("name", "Aotearoa");
     sqlUpdate.setParameter("code", "NZ");
 

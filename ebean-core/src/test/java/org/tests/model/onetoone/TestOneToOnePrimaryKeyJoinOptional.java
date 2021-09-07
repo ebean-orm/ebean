@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
     OtoUPrime prime = new OtoUPrime("u" + desc);
     OtoUPrimeExtra extra = new OtoUPrimeExtra("v" + desc);
     prime.setExtra(extra);
-    Ebean.save(prime);
+    DB.save(prime);
     return prime;
   }
 
@@ -26,9 +26,9 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
 
     String desc = "" + System.currentTimeMillis();
     OtoUPrime p1 = new OtoUPrime("u" + desc);
-    Ebean.save(p1);
+    DB.save(p1);
 
-    Query<OtoUPrime> query = Ebean.find(OtoUPrime.class)
+    Query<OtoUPrime> query = DB.find(OtoUPrime.class)
       .setId(p1.getPid())
       .fetch("extra", "eid");
 
@@ -49,7 +49,7 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
     assertThat(p1.getExtra().getEid()).isEqualTo(p1.getPid()).as("Same id values");
 
 
-    Query<OtoUPrime> query = Ebean.find(OtoUPrime.class).setId(p1.getPid());
+    Query<OtoUPrime> query = DB.find(OtoUPrime.class).setId(p1.getPid());
 
     OtoUPrime found = query.findOne();
 
@@ -59,7 +59,7 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
 
     assertThat(found.getName()).isEqualTo("u" + desc);
 
-    Query<OtoUPrime> queryWithFetch = Ebean.find(OtoUPrime.class)
+    Query<OtoUPrime> queryWithFetch = DB.find(OtoUPrime.class)
       .setId(p1.getPid())
       .fetch("extra");
 
@@ -81,21 +81,21 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
     OtoUPrimeExtra extra = oneWith.getExtra();
     extra.setExtra("modified");
 
-    Ebean.save(oneWith);
+    DB.save(oneWith);
 
     extra.setExtra("mod2");
     oneWith.setName("mod2");
 
-    Ebean.save(oneWith);
+    DB.save(oneWith);
   }
 
   private void thenDelete(OtoUPrime found) {
 
 
-    OtoUPrime bean = Ebean.find(OtoUPrime.class, found.getPid());
+    OtoUPrime bean = DB.find(OtoUPrime.class, found.getPid());
 
     LoggedSqlCollector.start();
-    Ebean.delete(bean);
+    DB.delete(bean);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);

@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
@@ -21,10 +21,10 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).select("id, status, shippingAddress").order()
+    List<Customer> list = DB.find(Customer.class).select("id, status, shippingAddress").order()
       .desc("id").findList();
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
 
     // test that lazy loading on
     PathProperties pp = PathProperties.parse("(id,name,contacts(firstName))");
@@ -41,10 +41,10 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).select("id, status, shippingAddress")
+    List<Customer> list = DB.find(Customer.class).select("id, status, shippingAddress")
       .fetch("contacts").order().desc("id").findList();
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
 
     // test that lazy loading on
     PathProperties pp = PathProperties.parse("(id,name,contacts(firstName))");
@@ -61,11 +61,11 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).select("id, name, status, shippingAddress")
+    List<Customer> list = DB.find(Customer.class).select("id, name, status, shippingAddress")
       // .fetch("contacts")
       .order().desc("id").findList();
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
 
     // test that lazy loading on
     PathProperties pp = PathProperties.parse("(id,name,contacts(firstName))");

@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FutureIds;
 import io.ebean.Query;
 import io.ebeantest.LoggedSql;
@@ -24,7 +24,7 @@ public class TestFetchId extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setAutoTune(false)
       .fetch("details")
       .where().gt("id", 1)
@@ -46,10 +46,10 @@ public class TestFetchId extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<OrderDetail> subQuery = Ebean.find(OrderDetail.class)
+    Query<OrderDetail> subQuery = DB.find(OrderDetail.class)
         .alias("sq")
         .where().raw("details.id = sq.id").query();
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where().exists(subQuery)
       .orderBy("orderDate").query();
 

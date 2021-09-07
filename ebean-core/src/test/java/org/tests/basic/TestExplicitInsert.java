@@ -1,8 +1,8 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.MyEBasicConfigStartup;
@@ -18,7 +18,7 @@ public class TestExplicitInsert extends BaseTestCase {
   @Test
   public void setId_when_converted() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Customer cust = new Customer();
     Object returnId = server.beanId(cust, "42");
@@ -30,7 +30,7 @@ public class TestExplicitInsert extends BaseTestCase {
   @Test
   public void setId_when_correctType() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Customer customer = new Customer();
     Object returnId = server.beanId(customer, 42);
@@ -51,7 +51,7 @@ public class TestExplicitInsert extends BaseTestCase {
     b.setDescription("explicit insert");
     b.setStatus(EBasic.Status.ACTIVE);
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     server.insert(b);
     assertNotNull(b.getId());
     assertEquals(b.getId(), server.beanId(b));

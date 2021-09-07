@@ -1,7 +1,7 @@
 package org.tests.query.orderby;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -20,7 +20,7 @@ public class TestOrderByWithFunction extends BaseTestCase {
       length = "len";
     }
 
-    Query<Customer> query = Ebean.find(Customer.class).order(length + "(name),name");
+    Query<Customer> query = DB.find(Customer.class).order(length + "(name),name");
 
     query.findList();
     String sql = query.getGeneratedSql();

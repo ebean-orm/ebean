@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
@@ -17,21 +17,21 @@ public class TestInheritRef extends BaseTestCase {
   @Test
   public void testAssocOne() {
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      Ebean.createUpdate(Vehicle.class, "delete from vehicle");
+      DB.createUpdate(Vehicle.class, "delete from vehicle");
 
       Car c = new Car();
       c.setLicenseNumber("C6788");
       c.setDriver("CarDriver");
-      Ebean.save(c);
+      DB.save(c);
 
       Truck t = new Truck();
       t.setLicenseNumber("T1098BBX");
       t.setCapacity(20D);
-      Ebean.save(t);
+      DB.save(t);
 
-      List<Vehicle> list = Ebean.find(Vehicle.class)
+      List<Vehicle> list = DB.find(Vehicle.class)
         .setAutoTune(false)
         .findList();
 
@@ -54,7 +54,7 @@ public class TestInheritRef extends BaseTestCase {
       assertTrue(foundTruck.getCapacity() == 20D);
 
     } finally {
-      Ebean.rollbackTransaction();
+      DB.rollbackTransaction();
     }
   }
 }

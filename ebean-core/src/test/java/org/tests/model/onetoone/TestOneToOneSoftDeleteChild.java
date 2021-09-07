@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,12 +16,12 @@ public class TestOneToOneSoftDeleteChild extends BaseTestCase {
     OtoSdMaster master = new OtoSdMaster("m1");
     master.setChild(child);
 
-    Ebean.save(master);
+    DB.save(master);
 
 
     verifyBeforeDelete(master, child);
 
-    Ebean.delete(child);
+    DB.delete(child);
 
     verifyAfterDelete(master, child);
   }

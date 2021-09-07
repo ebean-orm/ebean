@@ -1,7 +1,7 @@
 package io.ebean;
 
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.search.Match;
 import io.ebean.search.MultiMatch;
 import org.tests.model.basic.Order;
@@ -12,17 +12,17 @@ public class TextExpressionListTest {
   @Test
   public void syntax() {
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text().match("name", "rob");
 
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text().should()
       .match("name", "rob")
       .match("note", "war and peace");
 
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text()
       .should()
       .match("title", "war and peace")
@@ -32,7 +32,7 @@ public class TextExpressionListTest {
       .match("translator", "Louise Maude");
 
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text()
       .should()
       .match("title", "war and peace")
@@ -44,7 +44,7 @@ public class TextExpressionListTest {
       .gt("reviewDate", 12345);
 
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text()
       .must()
       .match("title", "quick")
@@ -65,7 +65,7 @@ public class TextExpressionListTest {
   @Test
   public void syntax_multiMatch() {
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text()
       .multiMatch("Will Smith", "title", "*name");
 
@@ -73,7 +73,7 @@ public class TextExpressionListTest {
       .opAnd()
       .type(MultiMatch.Type.PHRASE_PREFIX);
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .text()
       .multiMatch("Will Smith", match);
 

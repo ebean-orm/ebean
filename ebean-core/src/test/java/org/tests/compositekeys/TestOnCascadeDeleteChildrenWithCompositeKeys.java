@@ -1,7 +1,7 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.Identity;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -36,11 +36,11 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   public void before() {
 
     // remove all the User records first
-    Ebean.deleteAll(Ebean.find(User.class).findList());
+    DB.deleteAll(DB.find(User.class).findList());
 
     // insert 2 User records
-    Ebean.save(new User(1L, "one"));
-    Ebean.save(new User(2L, "two"));
+    DB.save(new User(1L, "one"));
+    DB.save(new User(2L, "two"));
   }
 
   /**
@@ -49,10 +49,10 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Test
   public void testDeleteById() {
 
-    assertEquals(2, Ebean.find(User.class).findList().size());
-    Ebean.delete(User.class, 1L);
-    Ebean.delete(User.class, 2L);
-    assertEquals(0, Ebean.find(User.class).findList().size());
+    assertEquals(2, DB.find(User.class).findList().size());
+    DB.delete(User.class, 1L);
+    DB.delete(User.class, 2L);
+    assertEquals(0, DB.find(User.class).findList().size());
   }
 
   /**
@@ -62,21 +62,21 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Test
   public void testDeleteByIdList() {
 
-    assertEquals(2, Ebean.find(User.class).findList().size());
+    assertEquals(2, DB.find(User.class).findList().size());
     List<Long> ids = new ArrayList<>();
     ids.add(1L);
     ids.add(2L);
 
-    Ebean.deleteAll(User.class, ids); // PersistenceException would be thrown here
-    assertEquals(0, Ebean.find(User.class).findList().size());
+    DB.deleteAll(User.class, ids); // PersistenceException would be thrown here
+    assertEquals(0, DB.find(User.class).findList().size());
   }
 
   @Test
   public void testFindByParentIdList() {
 
-    assertEquals(2, Ebean.find(User.class).findList().size());
+    assertEquals(2, DB.find(User.class).findList().size());
 
-    SpiEbeanServer spiServer = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer spiServer = (SpiEbeanServer) DB.getDefault();
 
     BeanDescriptor<TestOnCascadeDeleteChildrenWithCompositeKeys.User> beanDescriptor =
       spiServer.getBeanDescriptor(TestOnCascadeDeleteChildrenWithCompositeKeys.User.class);

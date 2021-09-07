@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebeaninternal.api.SpiExpression;
 import org.tests.model.basic.Order;
@@ -16,7 +16,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
   @Test
   public void prepare() throws Exception {
 
-    ExpressionList<Order> where = Ebean.find(Order.class)
+    ExpressionList<Order> where = DB.find(Order.class)
       .where()
       .gt("details.orderQty", 1)
       .query().where();
@@ -33,7 +33,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
   @Test
   public void prepare_when_multipleOfSamePath() throws Exception {
 
-    ExpressionList<Order> where = Ebean.find(Order.class)
+    ExpressionList<Order> where = DB.find(Order.class)
       .where()
       .gt("details.orderQty", 1)
       .gt("details.unitPrice", 1)
@@ -51,7 +51,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
   @Test
   public void prepare_when_mixed() throws Exception {
 
-    ExpressionList<Order> where = Ebean.find(Order.class)
+    ExpressionList<Order> where = DB.find(Order.class)
       .where()
       .gt("customer.id", 1)
       .gt("details.orderQty", 1)
@@ -73,7 +73,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
   @Test
   public void prepare_when_nestedJunction() throws Exception {
 
-    ExpressionList<Order> where = Ebean.find(Order.class)
+    ExpressionList<Order> where = DB.find(Order.class)
       .where()
       .not()
       .gt("customer.id", 1)
@@ -97,7 +97,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
   @Test
   public void prepare_when_nestedMultiple() throws Exception {
 
-    ExpressionList<Order> where = Ebean.find(Order.class)
+    ExpressionList<Order> where = DB.find(Order.class)
       .where()
       .isNotNull("shipments.shipTime")
       .gt("details.orderQty", 1)
@@ -122,7 +122,7 @@ public class PrepareDocNestedTest extends BaseTestCase {
   @Test
   public void prepare_when_manyMixed() throws Exception {
 
-    ExpressionList<Order> where = Ebean.find(Order.class)
+    ExpressionList<Order> where = DB.find(Order.class)
       .where()
       .gt("customer.id", 1)             // 0
       .isNotNull("shipments.shipTime")  // shipments 0

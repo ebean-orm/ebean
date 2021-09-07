@@ -1,7 +1,7 @@
 package org.tests.basic.event;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.QueryType;
 import org.ebeantest.LoggedSqlCollector;
@@ -23,21 +23,21 @@ public class TestQueryAdapter extends BaseTestCase {
     TOne o = new TOne();
     o.setName("something");
 
-    Ebean.save(o);
+    DB.save(o);
 
-    Query<TOne> queryFindId = Ebean.find(TOne.class).setId(o.getId());
+    Query<TOne> queryFindId = DB.find(TOne.class).setId(o.getId());
 
     TOne one = queryFindId.findOne();
 
     assertThat(one.getId()).isEqualTo(o.getId());
     assertThat(sqlOf(queryFindId)).contains(" 1=1");
 
-    Query<TOne> notUsedQuery = Ebean.find(TOne.class);
+    Query<TOne> notUsedQuery = DB.find(TOne.class);
     assertThat(notUsedQuery.getQueryType()).isEqualTo(QueryType.FIND);
 
     LoggedSqlCollector.start();
 
-    Ebean.update(TOne.class)
+    DB.update(TOne.class)
       .set("name", "mod")
       .where().idEq(o.getId())
       .update();
@@ -45,7 +45,7 @@ public class TestQueryAdapter extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.current();
     assertSql(sql.get(0)).contains(" 2=2");
 
-    Ebean.find(TOne.class)
+    DB.find(TOne.class)
       .where().idEq(o.getId())
       .delete();
 

@@ -1,7 +1,7 @@
 package org.tests.basic.type;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.ESomeType;
 import org.junit.jupiter.api.Test;
 
@@ -27,15 +27,15 @@ public class TestExtraScalarTypes extends BaseTestCase {
     e.setTimeZone(tz);
     e.setCurrency(currency);
 
-    Ebean.save(e);
+    DB.save(e);
 
-    ESomeType e2 = Ebean.find(ESomeType.class).setAutoTune(false).setId(e.getId()).findOne();
+    ESomeType e2 = DB.find(ESomeType.class).setAutoTune(false).setId(e.getId()).findOne();
 
     assertNotNull(e2.getCurrency());
     assertNotNull(e2.getLocale());
     assertNotNull(e2.getTimeZone());
 
-    List<ESomeType> list = Ebean.find(ESomeType.class)
+    List<ESomeType> list = DB.find(ESomeType.class)
       .setAutoTune(false).where()
       .eq("locale", locale)
       .eq("timeZone", tz.getID())

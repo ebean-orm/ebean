@@ -1,7 +1,7 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class TestInheritanceQuery extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<Parent> query = Ebean.find(Parent.class);
+    Query<Parent> query = DB.find(Parent.class);
 
     query.where().in("val", 90, 91); // restrict to a & b1
 
@@ -43,7 +43,7 @@ public class TestInheritanceQuery extends BaseTestCase {
     query2.setInheritType(ChildB.class);
     assertThat(query2.findList()).containsExactly(b1);
 
-    query2 = Ebean.find(Parent.class).setInheritType(ChildB.class);
+    query2 = DB.find(Parent.class).setInheritType(ChildB.class);
     assertThat(query2.findList()).contains(b1, b2);
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -52,8 +52,8 @@ public class TestInheritanceQuery extends BaseTestCase {
     assertSql(sql.get(2)).contains("where t0.type = 'B'");
     assertThat(sql.get(3)).contains("where t0.type = 'B'");
 
-    Ebean.delete(a);
-    Ebean.delete(b1);
-    Ebean.delete(b2);
+    DB.delete(a);
+    DB.delete(b1);
+    DB.delete(b2);
   }
 }

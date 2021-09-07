@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -17,7 +17,7 @@ public class TestQueryJoinBatchSize extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class)
+    List<Order> list = DB.find(Order.class)
       .fetch("customer")
       //.fetch("orders.details", new FetchConfig().query())
       //.fetch("orders.shipments", new FetchConfig().query())
@@ -35,7 +35,7 @@ public class TestQueryJoinBatchSize extends BaseTestCase {
 //
 //    ResetBasicData.reset();
 //
-//    Ebean.find(Customer.class)
+//    DB.find(Customer.class)
 //        .fetch("orders", new FetchConfig().query(3).lazy(2))
 //        //.fetch("orders.details", new FetchConfig().query())
 //        //.fetch("orders.shipments", new FetchConfig().query())

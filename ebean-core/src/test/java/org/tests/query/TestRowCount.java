@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -20,7 +20,7 @@ public class TestRowCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where()
       .gt("id", 1)
@@ -45,7 +45,7 @@ public class TestRowCount extends BaseTestCase {
   public void find_count_distinct_singleProperty() {
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("anniversary")
       .where().eq("status", Customer.Status.NEW)
@@ -62,7 +62,7 @@ public class TestRowCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("anniversary, status");
 

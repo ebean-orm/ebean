@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // This will use 2 SQL queries to build this object graph
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
       .findList();
@@ -54,7 +54,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // This will use 2 SQL queries to build this object graph
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .select("status, shipDate")
       .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
@@ -80,7 +80,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // This will use 2 SQL queries to build this object graph
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .select("status, shipDate")
       .fetchQuery("details", "orderQty, unitPrice")
@@ -120,7 +120,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // This will use 2 SQL queries to build this object graph
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .select("status, shipDate")
       .order().asc("id")
@@ -147,18 +147,18 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     Role role0 = new Role("r0");
     Role role1 = new Role("r1");
-    Ebean.save(role0);
-    Ebean.save(role1);
+    DB.save(role0);
+    DB.save(role1);
 
     Tenant tenant = new Tenant("t0");
     tenant.getRoles().add(role0);
     tenant.getRoles().add(role1);
 
-    Ebean.save(tenant);
+    DB.save(tenant);
 
     LoggedSqlCollector.start();
 
-    Tenant found = Ebean.find(Tenant.class)
+    Tenant found = DB.find(Tenant.class)
       .setDisableLazyLoading(true)
       .select("name")
       .setId(tenant.getId())
@@ -179,11 +179,11 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     MpUser u = new MpUser();
     u.setName("disableLazy");
     u.getRoles().put("disableLazyLoading", r0);
-    Ebean.save(u);
+    DB.save(u);
 
     LoggedSqlCollector.start();
 
-    MpUser found = Ebean.find(MpUser.class)
+    MpUser found = DB.find(MpUser.class)
       .setDisableLazyLoading(true)
       .select("name")
       .setId(u.getId())
@@ -196,7 +196,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
 
-    Ebean.deleteAll(Arrays.asList(found, r0));
+    DB.deleteAll(Arrays.asList(found, r0));
   }
 
   @Test
@@ -207,7 +207,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // This will use 2 SQL queries to build this object graph
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .select("status, shipDate")
       .fetch("details", "orderQty, unitPrice")//, new FetchConfig().query())

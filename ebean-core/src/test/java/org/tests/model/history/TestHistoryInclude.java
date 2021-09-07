@@ -1,7 +1,7 @@
 package org.tests.model.history;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class TestHistoryInclude extends BaseTestCase {
 
     prepare();
 
-    HiLink linkFound = Ebean.find(HiLink.class, link.getId());
+    HiLink linkFound = DB.find(HiLink.class, link.getId());
     assertThat(linkFound.getDocs().size()).isEqualTo(2);
   }
 
@@ -43,7 +43,7 @@ public class TestHistoryInclude extends BaseTestCase {
 
     prepare();
 
-    HiLink linkFound = Ebean.find(HiLink.class)
+    HiLink linkFound = DB.find(HiLink.class)
       .asOf(new Timestamp(System.currentTimeMillis() + DB_CLOCK_DELTA))
       .setId(link.getId())
       .findOne();

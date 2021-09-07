@@ -217,7 +217,7 @@ public class TestQueryCache extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache customerCache = DB.getServerCacheManager().queryCache(Customer.class);
+    ServerCache customerCache = DB.cacheManager().queryCache(Customer.class);
     customerCache.clear();
 
     List<Customer> list = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
@@ -251,7 +251,7 @@ public class TestQueryCache extends BaseTestCase {
     assertTrue(list3.size() > 0);
     // TODO: At this stage setReadOnly(false) does create a shallow copy of the List/Set/Map, but does not
     // change the read only state in the entities.
-    // assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
+    // assertFalse(DB.getBeanState(list3.get(0)).isReadOnly());
 
   }
 

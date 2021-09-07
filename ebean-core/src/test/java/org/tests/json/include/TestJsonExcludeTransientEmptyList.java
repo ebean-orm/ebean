@@ -1,6 +1,6 @@
 package org.tests.json.include;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonWriteOptions;
@@ -25,7 +25,7 @@ public class TestJsonExcludeTransientEmptyList {
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_NULL);
 
-    String asJson = Ebean.json().toJson(bean, options);
+    String asJson = DB.json().toJson(bean, options);
 
     String expectedJson = "{\"id\":99,\"fileNames\":[]}";
 
@@ -42,7 +42,7 @@ public class TestJsonExcludeTransientEmptyList {
     JsonWriteOptions options = new JsonWriteOptions();
     options.setInclude(JsonConfig.Include.NON_EMPTY);
 
-    String asJson = Ebean.json().toJson(bean, options);
+    String asJson = DB.json().toJson(bean, options);
 
     String expectedJson = "{\"id\":99}";
 
@@ -58,7 +58,7 @@ public class TestJsonExcludeTransientEmptyList {
 
     PathProperties pathProps = PathProperties.parse("id,name");
 
-    String asJson = Ebean.json().toJson(bean, pathProps);
+    String asJson = DB.json().toJson(bean, pathProps);
 
     assertThat(asJson).isEqualTo("{\"id\":99,\"name\":\"John\"}");
   }

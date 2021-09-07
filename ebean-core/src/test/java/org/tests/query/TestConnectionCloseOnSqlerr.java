@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
     try {
       for (int i = 0; i < 100; i++) {
         try {
-          Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
+          Query<Customer> q0 = DB.find(Customer.class).where().icontains("namexxx", "Rob")
             .query();
 
           q0.findList();
@@ -50,13 +50,13 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
 
     try {
       for (int i = 0; i < 100; i++) {
-        Ebean.beginTransaction();
+        DB.beginTransaction();
         try {
-          Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
+          Query<Customer> q0 = DB.find(Customer.class).where().icontains("namexxx", "Rob")
             .query();
 
           q0.findList();
-          Ebean.commitTransaction();
+          DB.commitTransaction();
         } catch (Exception e) {
           if (e.getMessage().contains("Unsuccessfully waited")) {
             fail("No connections found while only one thread is running. (after " + i + " queries)");
@@ -64,8 +64,8 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
             e.printStackTrace();
           }
         } finally {
-          if (Ebean.currentTransaction().isActive()) {
-            Ebean.rollbackTransaction();
+          if (DB.currentTransaction().isActive()) {
+            DB.rollbackTransaction();
           }
         }
       }

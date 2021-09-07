@@ -1,8 +1,8 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonReadBeanVisitor;
@@ -62,13 +62,13 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .select("id, name, status, shippingAddress")
       .fetch("billingAddress", "line1, city").fetch("billingAddress.country", "*")
       .fetch("contacts", "firstName,email")
       .order().desc("id").findList();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     JsonContext json = server.json();
 
@@ -100,11 +100,11 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .select("id, name")
       .order().desc("id").findList();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     JsonContext json = server.json();
 
@@ -123,11 +123,11 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .select("id, name")
       .order().desc("id").findList();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     JsonContext json = server.json();
 

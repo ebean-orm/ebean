@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
@@ -23,7 +23,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .order().asc("id")
       .findList();
@@ -49,7 +49,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .order().asc("id")
       .findList();
@@ -72,7 +72,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> l0 = Ebean.find(Order.class)
+    List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .fetch("customer", "smallnote")
       .order().asc("id")

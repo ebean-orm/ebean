@@ -1,7 +1,7 @@
 package org.tests.model.history;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
@@ -33,11 +33,11 @@ public class TestHistoryExclude extends BaseTestCase {
   public void testSoftDelete_includeSoftDeletes_findList() {
 
     HeLink l = new HeLink("two", "boo");
-    Ebean.save(l);
+    DB.save(l);
 
-    Ebean.delete(l);
+    DB.delete(l);
 
-    List<HeLink> list = Ebean.find(HeLink.class)
+    List<HeLink> list = DB.find(HeLink.class)
       .setIncludeSoftDeletes()
       .findList();
 
@@ -48,11 +48,11 @@ public class TestHistoryExclude extends BaseTestCase {
   public void testSoftDelete_includeSoftDeletes_findOne() {
 
     HeLink l = new HeLink("three", "boo2");
-    Ebean.save(l);
+    DB.save(l);
 
-    Ebean.delete(l);
+    DB.delete(l);
 
-    HeLink found = Ebean.find(HeLink.class)
+    HeLink found = DB.find(HeLink.class)
       .setId(l.getId())
       .setIncludeSoftDeletes()
       .findOne();
@@ -66,7 +66,7 @@ public class TestHistoryExclude extends BaseTestCase {
 
     prepare();
 
-    HeLink linkFound = Ebean.find(HeLink.class, link.getId());
+    HeLink linkFound = DB.find(HeLink.class, link.getId());
     linkFound.getDocs().size();
   }
 
@@ -76,7 +76,7 @@ public class TestHistoryExclude extends BaseTestCase {
 
     prepare();
 
-    HeLink linkFound = Ebean.find(HeLink.class)
+    HeLink linkFound = DB.find(HeLink.class)
       .asOf(new Timestamp(System.currentTimeMillis() + DB_CLOCK_DELTA))
       .setId(link.getId())
       .findOne();

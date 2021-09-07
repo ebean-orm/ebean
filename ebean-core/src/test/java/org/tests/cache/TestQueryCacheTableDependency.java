@@ -2,10 +2,8 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
-
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
@@ -25,20 +23,20 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache customerCache = Ebean.getServerCacheManager().queryCache(Customer.class);
+    ServerCache customerCache = DB.cacheManager().queryCache(Customer.class);
     customerCache.clear();
 
-    List<Address> addrs = Ebean.find(Address.class)
+    List<Address> addrs = DB.find(Address.class)
       .where().eq("line2", "St Lukes")
       .findList();
 
-    int custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
     assertThat(custs).isEqualTo(3);
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
@@ -46,33 +44,33 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     Address a1 = addrs.get(0);
     a1.setLine2("St Lucky");
-    Ebean.save(a1);
+    DB.save(a1);
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
     assertThat(custs).isEqualTo(2);
 
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lucky")
       .findCount();
 
     assertThat(custs).isEqualTo(1);
 
-    Ebean.update(Address.class)
+    DB.update(Address.class)
       .set("line2", "St Lucky2")
       .where().eq("line2", "St Lucky")
       .update();
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lucky")
       .findCount();
 
     assertThat(custs).isEqualTo(0);
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lucky2")
       .findCount();
     assertThat(custs).isEqualTo(1);
@@ -81,12 +79,12 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .setParameters("St Lucky3", "St Lucky2")
       .execute();
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lucky2")
       .findCount();
     assertThat(custs).isEqualTo(0);
 
-    custs = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where().eq("billingAddress.line2", "St Lucky3")
       .findCount();
 
@@ -99,9 +97,9 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Customer fi = Ebean.find(Customer.class).where().eq("name", "Fiona").findOne();
+    Customer fi = DB.find(Customer.class).where().eq("name", "Fiona").findOne();
 
-    int custCount0 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custCount0 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where()
       .eq("name", "Fiona")
       .isNull("contacts.phone")
@@ -109,7 +107,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     assertThat(custCount0).isEqualTo(1);
 
-    int updateRows = Ebean.update(Contact.class)
+    int updateRows = DB.update(Contact.class)
       .set("phone", "1234")
       .where()
       .eq("customer.id", fi.getId())
@@ -117,7 +115,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     assertThat(updateRows).isGreaterThan(0);
 
-    int custCount1 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custCount1 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
       .where()
       .eq("name", "Fiona")
       .isNull("contacts.phone")
@@ -138,8 +136,8 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     child.setName("bobby");
     child.setBillingAddress(root);
     DB.save(child);
-    DB.getServerCacheManager().queryCache(Address.class).clear();
-    DB.getServerCacheManager().queryCache(Customer.class).clear();
+    DB.cacheManager().queryCache(Address.class).clear();
+    DB.cacheManager().queryCache(Customer.class).clear();
     // Test preparation finished, start the test
     Thread.sleep(10);
 
@@ -169,8 +167,8 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     child.setName("testChild");
     child.setRoot(root);
     DB.save(child);
-    DB.getServerCacheManager().queryCache(ECacheChild.class).clear();
-    DB.getServerCacheManager().queryCache(ECacheRoot.class).clear();
+    DB.cacheManager().queryCache(ECacheChild.class).clear();
+    DB.cacheManager().queryCache(ECacheRoot.class).clear();
     // Test preparation finished, start the test
     Thread.sleep(10);
     // we need this thread.sleep here, because on a fast machine, DB.save(child) and computing the

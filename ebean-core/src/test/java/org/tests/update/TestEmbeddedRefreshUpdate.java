@@ -1,7 +1,7 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.embedded.EEmbDatePeriod;
 import org.tests.model.embedded.EEmbInner;
 import org.tests.model.embedded.EEmbOuter;
@@ -24,20 +24,20 @@ public class TestEmbeddedRefreshUpdate extends BaseTestCase {
 
     outer.setDatePeriod(embeddedBean);
 
-    Ebean.save(outer);
+    DB.save(outer);
 
-    EEmbOuter loaded = Ebean.find(EEmbOuter.class).where().idEq(outer.getId()).findOne();
+    EEmbOuter loaded = DB.find(EEmbOuter.class).where().idEq(outer.getId()).findOne();
 
     // if commented Ebean saves correctly
-    Ebean.refresh(loaded);
+    DB.refresh(loaded);
 
     loaded.getDatePeriod().setDate2(new Date());
 
     // BUG 343
-    Ebean.save(loaded);
+    DB.save(loaded);
 
     // See BUG 344
-    Ebean.find(EEmbInner.class).fetch("outer").orderBy("outer.datePeriod.date1").findList();
+    DB.find(EEmbInner.class).fetch("outer").orderBy("outer.datePeriod.date1").findList();
 
   }
 
@@ -50,14 +50,14 @@ public class TestEmbeddedRefreshUpdate extends BaseTestCase {
     embeddedBean.setDate1(new Date());
     outer.setDatePeriod(embeddedBean);
 
-    Ebean.save(outer);
+    DB.save(outer);
     assertThat(outer.getUpdateCount()).isEqualTo(1);
 
     Date d = new Date();
     d.setTime(1L);
 
     outer.getDatePeriod().setDate1(d);
-    Ebean.save(outer);
+    DB.save(outer);
     assertThat(outer.getUpdateCount()).isEqualTo(2);
   }
 }

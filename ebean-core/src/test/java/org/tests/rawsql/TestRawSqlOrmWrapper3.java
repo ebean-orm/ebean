@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -32,7 +32,7 @@ public class TestRawSqlOrmWrapper3 extends BaseTestCase {
       // .columnMapping("sum(d.order_qty*d.unit_price)", "totalAmount")
       .create();
 
-    List<OrderAggregate> list2 = Ebean.find(OrderAggregate.class).setRawSql(rawSql)
+    List<OrderAggregate> list2 = DB.find(OrderAggregate.class).setRawSql(rawSql)
       .fetchQuery("order")
       .fetchQuery("order.details")
       .where().gt("order.id", 2)

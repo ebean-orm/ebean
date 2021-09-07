@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +20,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    Ebean.saveAll(someBeans);
+    DB.saveAll(someBeans);
 
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
@@ -33,7 +34,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    Ebean.updateAll(someBeans);
+    DB.updateAll(someBeans);
 
     loggedSql = LoggedSqlCollector.stop();
 
@@ -42,7 +43,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // act
     LoggedSqlCollector.start();
-    Ebean.deleteAll(someBeans);
+    DB.deleteAll(someBeans);
 
     loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(4);
@@ -52,7 +53,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
   @Test
   public void saveAll_withExistingBatch_doesNotTriggerFlush() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     try (Transaction transaction = server.beginTransaction()) {
       transaction.setBatchMode(true);
@@ -87,29 +88,29 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
   @Test
   public void deleteAll_withNull() {
-    Ebean.deleteAll(null);
+    DB.deleteAll(null);
   }
 
   @Test
   public void deleteAll_withEmpty() {
-    Ebean.saveAll(beans(0));
+    DB.saveAll(beans(0));
   }
 
   @Test
   public void saveAll_withNull() {
-    Ebean.saveAll(null);
+    DB.saveAll((Collection<?>)null);
   }
 
   @Test
   public void saveAll_withEmpty() {
-    Ebean.saveAll(beans(0));
+    DB.saveAll(beans(0));
   }
 
   @Test
   public void saveAll_withTransaction() {
 
     List<EBasicVer> someBeans = beans(3);
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     // act
     LoggedSqlCollector.start();

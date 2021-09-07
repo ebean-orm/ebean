@@ -2,7 +2,7 @@ package org.tests.inheritance.cache;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.cache.CInhOne;
 import org.tests.model.basic.cache.CInhRoot;
 import org.junit.jupiter.api.Test;
@@ -19,24 +19,24 @@ public class TestInheritanceCache extends BaseTestCase {
     one.setDriver("Jimmy");
     one.setNotes("Hello");
 
-    Ebean.save(one);
+    DB.save(one);
 
-    CInhRoot gotOne = Ebean.find(CInhRoot.class)
+    CInhRoot gotOne = DB.find(CInhRoot.class)
       .setId(one.getId())
       .findOne();
 
     assertThat(gotOne).isInstanceOf(CInhOne.class);
 
-    CInhRoot gotOneFromCache = Ebean.find(CInhRoot.class)
+    CInhRoot gotOneFromCache = DB.find(CInhRoot.class)
       .setId(one.getId())
       .findOne();
 
     assertThat(gotOneFromCache).isInstanceOf(CInhOne.class);
 
-    CInhRoot refOne = Ebean.getReference(CInhRoot.class, one.getId());
+    CInhRoot refOne = DB.getReference(CInhRoot.class, one.getId());
     assertThat(refOne).isInstanceOf(CInhOne.class);
 
-    CInhRoot refOneSub = Ebean.getReference(CInhOne.class, one.getId());
+    CInhRoot refOneSub = DB.getReference(CInhOne.class, one.getId());
     assertThat(refOneSub).isNotNull();
   }
 }

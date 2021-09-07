@@ -1,7 +1,7 @@
 package org.tests.model.basic.xtra;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -21,7 +21,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    try (Transaction txn = Ebean.beginTransaction())  {
+    try (Transaction txn = DB.beginTransaction())  {
       txn.setBatchMode(true);
 
       EdParent parent = new EdParent();
@@ -34,7 +34,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
       children.add(child);
       parent.setChildren(children);
 
-      Ebean.save(parent);
+      DB.save(parent);
 
       EdExtendedParent extendedParent = new EdExtendedParent();
       extendedParent.setName("My second computer");
@@ -52,12 +52,12 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
 
       // does not causes a flush as EdExtendedParent is same root as EdParent
       // so they get the same batch depth
-      Ebean.save(extendedParent);
+      DB.save(extendedParent);
 
       // insert statements for EdParent
       List<String> loggedSql1 = LoggedSqlCollector.start();
 
-      Ebean.commitTransaction();
+      DB.commitTransaction();
 
       assertEquals(0, loggedSql1.size());
 

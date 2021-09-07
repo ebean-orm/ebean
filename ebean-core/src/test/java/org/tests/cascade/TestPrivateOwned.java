@@ -1,7 +1,7 @@
 package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
@@ -26,9 +26,9 @@ public class TestPrivateOwned extends BaseTestCase {
     m0.addDetail(new TSDetail("m1 detail 1"));
     m0.addDetail(new TSDetail("m1 detail 2"));
 
-    Ebean.save(m0);
+    DB.save(m0);
 
-    TSMaster master = Ebean.find(TSMaster.class, m0.getId());
+    TSMaster master = DB.find(TSMaster.class, m0.getId());
     List<TSDetail> details = master.getDetails();
 
     TSDetail removedDetail = details.remove(1);
@@ -40,15 +40,15 @@ public class TestPrivateOwned extends BaseTestCase {
     assertTrue(modifyRemovals.size() == 1);
     assertTrue(modifyRemovals.contains(removedDetail));
 
-    Ebean.save(master);
+    DB.save(master);
 
-    TSMaster masterReload = Ebean.find(TSMaster.class, m0.getId());
+    TSMaster masterReload = DB.find(TSMaster.class, m0.getId());
     List<TSDetail> detailsReload = masterReload.getDetails();
 
     // the removed bean has really been removed
     assertTrue(detailsReload.size() == 1);
 
-    TSMaster master3 = Ebean.find(TSMaster.class, m0.getId());
+    TSMaster master3 = DB.find(TSMaster.class, m0.getId());
     List<TSDetail> details3 = master3.getDetails();
     details3.clear();
   }
@@ -63,23 +63,23 @@ public class TestPrivateOwned extends BaseTestCase {
     m0.addDetail(new TSDetail("m2 detail 1"));
     m0.addDetail(new TSDetail("m2 detail 2"));
 
-    Ebean.save(m0);
+    DB.save(m0);
     assertThat(m0.getDetails()).hasSize(2);
 
     LoggedSqlCollector.start();
     m0.getDetails().remove(0);
-    Ebean.save(m0);
+    DB.save(m0);
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(2);
     assertThat(loggedSql.get(0)).contains("delete from t_detail_with_other_namexxxyy where id=?");
     assertSqlBind(loggedSql.get(1));
 
-    TSMaster masterReload = Ebean.find(TSMaster.class, m0.getId());
+    TSMaster masterReload = DB.find(TSMaster.class, m0.getId());
     assertThat(masterReload.getDetails()).hasSize(1);
 
     LoggedSqlCollector.start();
-    Ebean.save(m0);
+    DB.save(m0);
     loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(0);
 

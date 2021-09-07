@@ -1,7 +1,7 @@
 package org.tests.model.basic.first;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 public class TestFirstSecond extends BaseTestCase {
@@ -11,17 +11,17 @@ public class TestFirstSecond extends BaseTestCase {
 
     First first = new First();
     first.setName("first");
-    Ebean.save(first);
+    DB.save(first);
 
     Second second = new Second();
     second.setName("Jim");
     second.setTitle("Sir");
     second.setFirst(first);
-    Ebean.save(second);
+    DB.save(second);
 
 
     second.getFirst().setName("changed");
-    Ebean.save(second);
-    Ebean.save(first);
+    DB.save(second);
+    DB.save(first);
   }
 }

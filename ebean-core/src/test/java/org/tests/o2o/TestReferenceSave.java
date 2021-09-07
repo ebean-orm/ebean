@@ -1,7 +1,7 @@
 package org.tests.o2o;
 
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 import org.tests.update.EPersonOnline;
@@ -15,12 +15,12 @@ public class TestReferenceSave {
   @Test
   public void test() {
 
-    Ebean.getDefaultServer();
+    DB.getDefault();
 
     LoggedSqlCollector.start();
 
-    EPersonOnline bean = Ebean.getReference(EPersonOnline.class, 1L);
-    Ebean.save(bean);
+    EPersonOnline bean = DB.getReference(EPersonOnline.class, 1L);
+    DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(0);

@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCar;
@@ -28,9 +28,9 @@ public class TestMultipleOneToOneIUD extends BaseTestCase {
     car.setName("test car");
     car.setEngine(engine);
 
-    try (Transaction txn = Ebean.beginTransaction()) {
-      Ebean.save(gearBox);
-      Ebean.save(car);
+    try (Transaction txn = DB.beginTransaction()) {
+      DB.save(gearBox);
+      DB.save(car);
 
       assertNotNull(car.getId());
       assertNotNull(engine.getEngineId());
@@ -38,7 +38,7 @@ public class TestMultipleOneToOneIUD extends BaseTestCase {
       txn.commit();
     }
 
-    OCar c2 = Ebean.find(OCar.class, car.getId());
+    OCar c2 = DB.find(OCar.class, car.getId());
     assertNotNull(c2);
     assertNotNull(c2.getEngine());
     // gearBox not assigned yet
@@ -46,10 +46,10 @@ public class TestMultipleOneToOneIUD extends BaseTestCase {
 
     // ok, assign gearBox
     c2.setGearBox(gearBox);
-    Ebean.save(c2);
+    DB.save(c2);
 
     // now all should be there...
-    OCar c3 = Ebean.find(OCar.class, car.getId());
+    OCar c3 = DB.find(OCar.class, car.getId());
     assertNotNull(c3);
     assertNotNull(c3.getEngine());
     assertNotNull(c3.getGearBox());

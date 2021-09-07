@@ -1,7 +1,7 @@
 package org.tests.aggregateformula;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
@@ -27,7 +27,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Contact> contacts = Ebean.find(Contact.class)
+    List<Contact> contacts = DB.find(Contact.class)
       .setDistinct(true)
       .select("lastName, min(customer)")
       .order("min(customer) asc nulls last")
@@ -51,7 +51,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Contact> contacts = Ebean.find(Contact.class)
+    List<Contact> contacts = DB.find(Contact.class)
       .select("lastName, min(customer)")
       .findList();
 
@@ -73,7 +73,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Contact> contacts = Ebean.find(Contact.class)
+    List<Contact> contacts = DB.find(Contact.class)
       .select("lastName, min(customer)")
       .fetchQuery("customer", "name, status")
       .findList();
@@ -102,7 +102,7 @@ public class TestAggregateFormula extends BaseTestCase {
     ResetBasicData.reset();
     LoggedSqlCollector.start();
 
-    List<Contact> contacts = Ebean.find(Contact.class)
+    List<Contact> contacts = DB.find(Contact.class)
       .select("lastName, min(customer)")
       .fetchQuery("customer", "name, status")
       .fetch("customer.billingAddress", "city, country")
@@ -137,7 +137,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .select("status, sum(id)")
       .findList();
 
@@ -158,7 +158,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .select("status, sum(id) as id")
       .findList();
 
@@ -179,7 +179,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Contact> contacts = Ebean.find(Contact.class)
+    List<Contact> contacts = DB.find(Contact.class)
       .select("customer, min(cretime)")
       .findList();
 
@@ -196,7 +196,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Contact> contacts = Ebean.find(Contact.class)
+    List<Contact> contacts = DB.find(Contact.class)
       .select("customer, min(cretime), max(updtime)")
       .findList();
 

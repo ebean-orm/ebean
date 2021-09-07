@@ -47,7 +47,7 @@ public class TestM2MVanilla extends BaseTestCase {
     user.setRoles(roleList);
 
     DB.save(user);
-    // Ebean.saveManyToManyAssociations(user, "roles");
+    // DB.saveManyToManyAssociations(user, "roles");
 
     MUser checkUser = DB.find(MUser.class, u0.getUserid());
     List<MRole> checkRoles = checkUser.getRoles();
@@ -57,7 +57,7 @@ public class TestM2MVanilla extends BaseTestCase {
     checkRoles.add(r3);
 
     DB.save(checkUser);
-    // Ebean.saveManyToManyAssociations(checkUser, "roles");
+    // DB.saveManyToManyAssociations(checkUser, "roles");
 
     MUser checkUser2 = DB.find(MUser.class, u0.getUserid());
     List<MRole> checkRoles2 = checkUser2.getRoles();

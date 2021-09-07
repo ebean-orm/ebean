@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.text.json;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -23,13 +23,13 @@ public class WriteJsonDirtyTest {
   public void test() throws IOException {
 
     ResetBasicData.reset();
-    List<Customer> customers = Ebean.find(Customer.class).findList();
+    List<Customer> customers = DB.find(Customer.class).findList();
 
-    Customer customer = Ebean.find(Customer.class).setId(customers.get(0).getId())
+    Customer customer = DB.find(Customer.class).setId(customers.get(0).getId())
       .setUseCache(false)
       .findOne();
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
 
     customer.setName("dirtyCustName");

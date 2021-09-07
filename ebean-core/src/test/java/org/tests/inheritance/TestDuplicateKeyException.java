@@ -2,7 +2,7 @@ package org.tests.inheritance;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.AttributeHolder;
 import org.tests.model.basic.ListAttribute;
@@ -24,25 +24,25 @@ public class TestDuplicateKeyException extends BaseTestCase {
     // Setup the data first
     final ListAttributeValue value1 = new ListAttributeValue();
 
-    Ebean.save(value1);
+    DB.save(value1);
 
     final ListAttribute listAttribute = new ListAttribute();
     listAttribute.add(value1);
-    Ebean.save(listAttribute);
+    DB.save(listAttribute);
 
 
     final AttributeHolder holder = new AttributeHolder();
     holder.add(listAttribute);
 
     try {
-      Ebean.execute(() -> {
-        //Ebean.currentTransaction().log("-- saving holder first time");
+      DB.execute(() -> {
+        //DB.currentTransaction().log("-- saving holder first time");
         // Alternatively turn off cascade Persist for this transaction
-        //Ebean.currentTransaction().setPersistCascade(false);
-        Ebean.save(holder);
-//Ebean.currentTransaction().log("-- saving holder second time");
+        //DB.currentTransaction().setPersistCascade(false);
+        DB.save(holder);
+//DB.currentTransaction().log("-- saving holder second time");
         // we don't get this far before failing
-        //Ebean.save(holder);
+        //DB.save(holder);
       });
     } catch (Exception e) {
       assertEquals(e.getMessage(), "test rollback");

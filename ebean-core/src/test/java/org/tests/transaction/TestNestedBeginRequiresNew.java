@@ -1,8 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
 import org.tests.model.basic.Country;
@@ -16,7 +16,7 @@ public class TestNestedBeginRequiresNew extends BaseTestCase {
 
   Logger logger = LoggerFactory.getLogger(TestNestedBeginRequiresNew.class);
 
-  EbeanServer server = Ebean.getServer(null);
+  Database server = DB.getDefault();
 
   @Test
   public void test() {

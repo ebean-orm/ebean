@@ -1,7 +1,7 @@
 package org.tests.query.orderby;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -35,7 +35,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
 
     // a query that ensures we are going to lazy load on the details
     List<Order> orders = query.findList();
@@ -59,7 +59,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkWithBuiltInManyBasic() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("details");
+    Query<Order> query = DB.find(Order.class).fetch("details");
     query.findList();
 
     String sql = query.getGeneratedSql();
@@ -69,7 +69,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkWithBuiltInMany() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("details").order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).fetch("details").order().desc("customer.name");
 
     query.findList();
 
@@ -82,7 +82,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkAppendId() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("shipments").order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).fetch("shipments").order().desc("customer.name");
 
     query.findList();
 
@@ -94,7 +94,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkNone() {
 
-    Query<Order> query = Ebean.find(Order.class).order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).order().desc("customer.name");
 
     query.findList();
 
@@ -108,7 +108,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkBoth() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
       .desc("customer.name, shipments.shipTime");
 
     query.findList();
@@ -120,7 +120,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkPrepend() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
       .desc("shipments.shipTime");
 
     query.findList();
@@ -132,7 +132,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkAlreadyIncluded() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
       .desc("id, shipments.shipTime");
 
     query.findList();
@@ -144,7 +144,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkAlreadyIncluded2() {
 
-    Query<Order> query = Ebean.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
       .desc("orderDate, id, shipments.shipTime");
 
     query.findList();

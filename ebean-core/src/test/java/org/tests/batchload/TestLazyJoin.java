@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
@@ -20,7 +20,7 @@ public class TestLazyJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status")
       .fetchLazy("customer", "name, status")
       .fetch("customer.contacts")

@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BeanWithTimeZone;
@@ -26,15 +26,15 @@ public class TestJsonBeanWithTimeZone extends BaseTestCase {
     bean.setName("foo");
     bean.setTimezone(TimeZone.getDefault());
 
-    JsonContext jsonContext = Ebean.json();
+    JsonContext jsonContext = DB.json();
     String jsonContent = jsonContext.toJson(bean);
 
     BeanWithTimeZone bean2 = jsonContext.toBean(BeanWithTimeZone.class, jsonContent);
 
     assertEquals(bean.getTimezone(), bean2.getTimezone());
 
-    Ebean.save(bean);
-    BeanWithTimeZone bean3 = Ebean.find(BeanWithTimeZone.class, bean.getId());
+    DB.save(bean);
+    BeanWithTimeZone bean3 = DB.find(BeanWithTimeZone.class, bean.getId());
 
     assertEquals(bean.getTimezone(), bean3.getTimezone());
   }

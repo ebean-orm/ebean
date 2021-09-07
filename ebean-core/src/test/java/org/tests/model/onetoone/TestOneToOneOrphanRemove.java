@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 
@@ -23,7 +23,7 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     OtoCustAddress address = new OtoCustAddress("line1", "line2");
 
     jack.setAddress(address);
-    Ebean.save(jack);
+    DB.save(jack);
 
     // set new address
     OtoCustAddress address2 = new OtoCustAddress("other1", "other2");
@@ -31,7 +31,7 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
 
     // Fail do to uniqueness constraint
     LoggedSqlCollector.start();
-    Ebean.save(jack);
+    DB.save(jack);
 
     List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(5);
@@ -42,7 +42,7 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     assertThat(sql.get(4)).contains("-- bind(");
 
     jack.setAddress(null);
-    Ebean.save(jack);
+    DB.save(jack);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
@@ -50,7 +50,7 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     assertSqlBind(sql.get(1));
     assertSql(sql.get(2)).contains("update oto_cust set version=? where cid=? and version=?");
 
-    OtoCustAddress foundAddress = Ebean.find(OtoCustAddress.class, address2.getAid());
+    OtoCustAddress foundAddress = DB.find(OtoCustAddress.class, address2.getAid());
     assertThat(foundAddress).isNull();
   }
 

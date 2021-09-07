@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.MNonUpdPropEntity;
 import org.junit.jupiter.api.Test;
 
@@ -14,12 +14,12 @@ public class TestNonUpdateProperty extends BaseTestCase {
     e.setName("name");
     e.setNote("note");
 
-    Ebean.save(e);
+    DB.save(e);
 
-    MNonUpdPropEntity e2 = Ebean.find(MNonUpdPropEntity.class, e.getId());
+    MNonUpdPropEntity e2 = DB.find(MNonUpdPropEntity.class, e.getId());
 
     e2.setName("mod");
-    Ebean.update(e2);
+    DB.update(e2);
 
   }
 }

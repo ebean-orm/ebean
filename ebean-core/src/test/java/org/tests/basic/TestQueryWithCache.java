@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
@@ -22,7 +22,7 @@ public class TestQueryWithCache extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Country> beanDescriptor = server.getBeanDescriptor(Country.class);
     CacheOptions cacheOptions = beanDescriptor.getCacheOptions();
 
@@ -36,19 +36,19 @@ public class TestQueryWithCache extends BaseTestCase {
     ServerCache beanCache = serverCacheManager.beanCache(Country.class);
     assertEquals(0, beanCache.size());
 
-    Country nz1 = Ebean.getReference(Country.class, "NZ");
+    Country nz1 = DB.getReference(Country.class, "NZ");
     assertEquals(0, beanCache.size());
 
     // has the effect of loading the cache via lazy loading
     nz1.getName();
     assertEquals(1, beanCache.size());
 
-    Country nz2 = Ebean.getReference(Country.class, "NZ");
-    Country nz2b = Ebean.getReference(Country.class, "NZ");
+    Country nz2 = DB.getReference(Country.class, "NZ");
+    Country nz2b = DB.getReference(Country.class, "NZ");
 
-    Country nz3 = Ebean.find(Country.class, "NZ");
+    Country nz3 = DB.find(Country.class, "NZ");
 
-    Country nz4 = Ebean.find(Country.class).setId("NZ").setAutoTune(false).setUseCache(false)
+    Country nz4 = DB.find(Country.class).setId("NZ").setAutoTune(false).setUseCache(false)
       .findOne();
 
     assertTrue(nz2 == nz2b);
@@ -62,9 +62,9 @@ public class TestQueryWithCache extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(Country.class, "NZ");
+    DB.find(Country.class, "NZ");
 
-    Query<Country> query = Ebean.find(Country.class).setId("NZ").setUseCache(false);
+    Query<Country> query = DB.find(Country.class).setId("NZ").setUseCache(false);
     query.findOne();
 
     assertSql(query).isNotNull();

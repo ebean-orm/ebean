@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -23,9 +23,9 @@ public class TestReferenceWithConstructorProperties extends BaseTestCase {
   public void test() {
 
     ResetBasicData.reset();
-    Order order = Ebean.getReference(Order.class, 1);
+    Order order = DB.getReference(Order.class, 1);
 
-    BeanState beanState = Ebean.getBeanState(order);
+    BeanState beanState = DB.getBeanState(order);
     Set<String> loadedProps = beanState.getLoadedProps();
 
     assertEquals(1, loadedProps.size());

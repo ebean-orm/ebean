@@ -1,6 +1,6 @@
 package org.tests.model.aggregation;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -11,11 +11,11 @@ public class MachineUseData {
 
   public static DOrg load() {
 
-    int count = Ebean.find(DMachineUse.class).findCount();
+    int count = DB.find(DMachineUse.class).findCount();
     if (count == 0) {
       return new MachineUseData().loadData();
     } else {
-      return Ebean.find(DOrg.class).where().eq("name", "org0").findOne();
+      return DB.find(DOrg.class).where().eq("name", "org0").findOne();
     }
   }
 

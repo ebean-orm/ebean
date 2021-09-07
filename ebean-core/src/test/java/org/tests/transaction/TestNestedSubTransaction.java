@@ -1,8 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.PersistenceContextScope;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
@@ -24,7 +24,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
   @Test
   public void ebeanServer_commitTransaction_expect_sameAsTransactionCommit() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     EBasic bean = new EBasic("x1");
 
@@ -46,7 +46,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
 
       try (Transaction txn2 = server.beginTransaction()) {
         bean.setName("barney");
-        Ebean.save(bean);
+        DB.save(bean);
         //txn2.commit();
         server.commitTransaction();
       }
@@ -69,7 +69,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
   @Test
   public void nestedUseSavepoint_doubleNested_rollbackCommit() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     EBasic bean = new EBasic("start2");
 
@@ -85,7 +85,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
 
         try (Transaction txn2 = server.beginTransaction()) {
           bean.setName("barney");
-          Ebean.save(bean);
+          DB.save(bean);
           txn2.commit();
         }
 
@@ -106,7 +106,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
   @Test
   public void nestedUseSavepoint_doubleNested_commitRollback() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     EBasic bean = new EBasic("start3");
 
@@ -122,7 +122,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
 
         try (Transaction txn2 = server.beginTransaction()) {
           bean.setName("barney3");
-          Ebean.save(bean);
+          DB.save(bean);
           txn2.rollback();
         }
 
@@ -143,7 +143,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
   @Test
   public void nestedUseSavepoint_nested_RequiresNew() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     EBasic bean = new EBasic("start4");
 
@@ -179,7 +179,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
   @Test
   public void nestedUseSavepoint() {
 
-    EbeanServer server = server();
+    Database server = server();
 
     EBasic bean = new EBasic("start1");
 
@@ -201,7 +201,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
 
       try (Transaction txn2 = server.beginTransaction()) {
         bean.setName("barney");
-        Ebean.save(bean);
+        DB.save(bean);
         txn2.rollback();
       }
 
@@ -219,6 +219,6 @@ public class TestNestedSubTransaction extends BaseTestCase {
   }
 
   private void cleanup(EBasic bean) {
-    Ebean.delete(EBasic.class, bean.getId());
+    DB.delete(EBasic.class, bean.getId());
   }
 }

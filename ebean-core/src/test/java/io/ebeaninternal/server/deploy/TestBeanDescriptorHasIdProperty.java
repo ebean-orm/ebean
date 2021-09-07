@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -24,7 +24,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
   SpiEbeanServer spiServer;
 
   public TestBeanDescriptorHasIdProperty() {
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     spiServer = (SpiEbeanServer) server;
   }
 

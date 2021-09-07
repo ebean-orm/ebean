@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -16,9 +16,9 @@ public class TestUpdateManyToOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> custs = Ebean.find(Customer.class).findList();
+    List<Customer> custs = DB.find(Customer.class).findList();
 
-    List<Order> orders = Ebean.find(Order.class).setMaxRows(1).findList();
+    List<Order> orders = DB.find(Order.class).setMaxRows(1).findList();
 
     Order order = orders.get(0);
     Customer customer = order.getCustomer();
@@ -31,10 +31,10 @@ public class TestUpdateManyToOne extends BaseTestCase {
       }
     }
     order.setCustomer(changeCust);
-    Ebean.save(order);
+    DB.save(order);
 
     order.setCustomer(customer);
-    Ebean.save(order);
+    DB.save(order);
 
   }
 }

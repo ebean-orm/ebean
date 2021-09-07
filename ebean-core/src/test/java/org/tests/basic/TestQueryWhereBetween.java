@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class TestQueryWhereBetween extends BaseTestCase {
 
     Timestamp t = new Timestamp(System.currentTimeMillis());
 
-    Query<Order> query = Ebean.find(Order.class).setAutoTune(false).where()
+    Query<Order> query = DB.find(Order.class).setAutoTune(false).where()
       .betweenProperties("cretime", "updtime", t).order().asc("orderDate").order().desc("id");
 
     query.findList();
@@ -88,7 +88,7 @@ public class TestQueryWhereBetween extends BaseTestCase {
 
     Timestamp t = new Timestamp(System.currentTimeMillis());
 
-    Query<Order> query = Ebean.find(Order.class).setAutoTune(false)
+    Query<Order> query = DB.find(Order.class).setAutoTune(false)
       .where()
       .le("cretime", t)
       .order().asc("orderDate")

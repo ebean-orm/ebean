@@ -2,7 +2,7 @@ package org.tests.inheritance;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.TIntChild;
 import org.tests.model.basic.TIntRoot;
 import org.junit.jupiter.api.Test;
@@ -29,18 +29,18 @@ public class TestIntInherit extends BaseTestCase {
     c2.setChildProperty("cp2");
 
 
-    Ebean.save(r);
-    Ebean.save(r2);
-    Ebean.save(c1);
-    Ebean.save(c2);
+    DB.save(r);
+    DB.save(r2);
+    DB.save(c1);
+    DB.save(c2);
 
-    TIntRoot result1 = Ebean.find(TIntRoot.class, r.getId());
+    TIntRoot result1 = DB.find(TIntRoot.class, r.getId());
     assertTrue(result1 instanceof TIntRoot);
 
-    TIntRoot ref3 = Ebean.getReference(TIntRoot.class, c1.getId());
+    TIntRoot ref3 = DB.getReference(TIntRoot.class, c1.getId());
     assertTrue(ref3 instanceof TIntRoot);
 
-    TIntRoot result3 = Ebean.find(TIntRoot.class, c1.getId());
+    TIntRoot result3 = DB.find(TIntRoot.class, c1.getId());
     assertTrue(result3 instanceof TIntChild);
 
   }

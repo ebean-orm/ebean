@@ -151,8 +151,8 @@ public class TestQueryFindIterate extends BaseTestCase {
     LoggedSqlCollector.start();
 
     // make sure we don't hit the L2 cache for order shipments
-    DB.getServerCacheManager().clear(Order.class);
-    DB.getServerCacheManager().clear(OrderShipment.class);
+    DB.cacheManager().clear(Order.class);
+    DB.cacheManager().clear(OrderShipment.class);
 
     DB.find(Order.class)
       .setLazyLoadBatchSize(10)

@@ -1,6 +1,6 @@
 package org.tests.timezone;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +59,7 @@ public class TzBeanTests {
     bean.setTs(nowTs);
     bean.setTstz(nowTs);
 
-    Ebean.save(bean);
+    DB.save(bean);
   }
 
   /**
@@ -77,7 +77,7 @@ public class TzBeanTests {
     // set the Calendar time zone to use in JDBC calls
     System.setProperty("ebean.dataTimeZone", "UTC");
 
-    List<TzBean> list = Ebean.find(TzBean.class)
+    List<TzBean> list = DB.find(TzBean.class)
       .findList();
 
     for (TzBean bean : list) {

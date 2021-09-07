@@ -1,6 +1,6 @@
 package org.tests.model.basic.xtra;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Transactional;
@@ -20,7 +20,7 @@ public class DummyDao {
   public void doSomething() {
 
     logger.info("  --- in DummyDao.doSomething() with TxType.REQUIRES_NEW");
-    Transaction txn = Ebean.currentTransaction();
+    Transaction txn = DB.currentTransaction();
     if (txn == null) {
       logger.error("  NO TRANSACTION ??");
     } else {
@@ -32,7 +32,7 @@ public class DummyDao {
   @Transactional(batch = PersistBatch.ALL, batchOnCascade = PersistBatch.ALL, batchSize = 99)
   private void doWithBatchOptionsSet() {
 
-    Transaction txn = Ebean.currentTransaction();
+    Transaction txn = DB.currentTransaction();
     assertTrue(txn.isBatchMode());
     assertTrue(txn.isBatchOnCascade());
     assertEquals(99, txn.getBatchSize());
@@ -42,7 +42,7 @@ public class DummyDao {
   @Transactional(batch = PersistBatch.ALL, batchOnCascade = PersistBatch.NONE, batchSize = 77)
   public void doOuterWithBatchOptionsSet() {
 
-    Transaction txn = Ebean.currentTransaction();
+    Transaction txn = DB.currentTransaction();
 
     assertTrue(txn.isBatchMode());
     assertFalse(txn.isBatchOnCascade());

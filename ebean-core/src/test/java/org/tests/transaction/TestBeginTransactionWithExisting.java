@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.TxIsolation;
 import org.junit.jupiter.api.Test;
@@ -28,9 +28,9 @@ public class TestBeginTransactionWithExisting extends BaseTestCase {
 
     assertEquals(Transaction.READ_COMMITTED, Connection.TRANSACTION_READ_COMMITTED);
     assertThrows(PersistenceException.class, () -> {
-      Transaction txn = Ebean.beginTransaction();
+      Transaction txn = DB.beginTransaction();
       try {
-        try (Transaction txn2 = Ebean.beginTransaction(TxIsolation.READ_COMMITED)) {
+        try (Transaction txn2 = DB.beginTransaction(TxIsolation.READ_COMMITED)) {
           fail("Expected persitenceException here");
         }
       } finally {

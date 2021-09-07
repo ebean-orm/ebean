@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,28 +20,28 @@ public class TestNestedTransaction extends BaseTestCase {
   @BeforeEach
   public void init() {
     bean = new EBasic("new");
-    Ebean.save(bean);
+    DB.save(bean);
   }
 
   private void assertClean() {
-    EBasic myBean = Ebean.find(EBasic.class, bean.getId());
+    EBasic myBean = DB.find(EBasic.class, bean.getId());
     assertThat(myBean.getName()).isEqualTo("new");
   }
 
   private void assertModified() {
-    EBasic myBean = Ebean.find(EBasic.class, bean.getId());
+    EBasic myBean = DB.find(EBasic.class, bean.getId());
     assertThat(myBean.getName()).isEqualTo("modified");
   }
 
   private void modify() {
     bean.setName("modified");
-    Ebean.save(bean);
+    DB.save(bean);
   }
 
   // ===== level 0 =======
   @Test
   public void testNested_0() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
       modify();
       // no commit
     }
@@ -50,7 +50,7 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_1() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
       modify();
       txn0.commit();
     }
@@ -60,8 +60,8 @@ public class TestNestedTransaction extends BaseTestCase {
   // ===== level 1 =======
   @Test
   public void testNested_00() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
         modify();
         // no commit
       }
@@ -72,8 +72,8 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_01() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
         modify();
         // no commit
       }
@@ -93,8 +93,8 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_10() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
         modify();
         txn1.commit();
       }
@@ -105,8 +105,8 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_11() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
         modify();
         txn1.commit();
       }
@@ -118,9 +118,9 @@ public class TestNestedTransaction extends BaseTestCase {
   // ===== level 2 =======
   @Test
   public void testNested_000() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           // no commit
         }
@@ -133,9 +133,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_001() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           // no commit
         }
@@ -148,9 +148,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_010() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           // no commit
         }
@@ -163,9 +163,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_011() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           // no commit
         }
@@ -178,9 +178,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_100() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           txn2.commit();
         }
@@ -193,9 +193,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_101() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           txn2.commit();
         }
@@ -208,9 +208,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_110() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           txn2.commit();
         }
@@ -223,9 +223,9 @@ public class TestNestedTransaction extends BaseTestCase {
 
   @Test
   public void testNested_111() {
-    try (Transaction txn0 = Ebean.beginTransaction()) {
-      try (Transaction txn1 = Ebean.beginTransaction()) {
-        try (Transaction txn2 = Ebean.beginTransaction()) {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      try (Transaction txn1 = DB.beginTransaction()) {
+        try (Transaction txn2 = DB.beginTransaction()) {
           modify();
           txn2.commit();
         }

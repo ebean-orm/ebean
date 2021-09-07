@@ -1,7 +1,7 @@
 package org.tests.insert;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.orderentity.OrderEntity;
 import org.tests.model.orderentity.OrderItemEntity;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class TestInsertOnStringKey extends BaseTestCase {
 
     orderEntity.setItems(toList(orderItemEntity));
 
-    Ebean.save(orderEntity);
+    DB.save(orderEntity);
 
   }
 

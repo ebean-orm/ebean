@@ -1,7 +1,7 @@
 package org.tests.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.json.EBasicJsonNodeVarchar;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +27,9 @@ public class TestJsonNodeVarchar extends BaseTestCase {
     bean.setName("one");
     bean.setContent(content);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicJsonNodeVarchar bean1 = Ebean.find(EBasicJsonNodeVarchar.class, bean.getId());
+    EBasicJsonNodeVarchar bean1 = DB.find(EBasicJsonNodeVarchar.class, bean.getId());
 
     assertEquals(bean.getId(), bean1.getId());
     assertEquals(bean.getName(), bean1.getName());
@@ -51,14 +51,14 @@ public class TestJsonNodeVarchar extends BaseTestCase {
     EBasicJsonNodeVarchar bean = new EBasicJsonNodeVarchar();
     bean.setName("lazyLoadTest");
     bean.setContent(content);
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicJsonNodeVarchar bean1 = Ebean.find(EBasicJsonNodeVarchar.class)
+    EBasicJsonNodeVarchar bean1 = DB.find(EBasicJsonNodeVarchar.class)
       .select("name")
       .setId(bean.getId())
       .findOne();
 
-    Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
+    Set<String> loadedProps = DB.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));
 

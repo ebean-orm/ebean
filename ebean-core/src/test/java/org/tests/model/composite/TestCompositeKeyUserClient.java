@@ -1,7 +1,7 @@
 package org.tests.model.composite;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -17,12 +17,12 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
     CkeUser user0 = new CkeUser();
     user0.setUserPK(new CkeUserKey(20, "sally"));
     user0.setName("sally");
-    Ebean.save(user0);
+    DB.save(user0);
 
     CkeUser user1 = new CkeUser();
     user1.setUserPK(new CkeUserKey(20, "frank"));
     user1.setName("hello");
-    Ebean.save(user1);
+    DB.save(user1);
 
     CkeClient client = new CkeClient();
     client.setNotes("try it");
@@ -31,12 +31,12 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.save(client);
+    DB.save(client);
 
     client.setNotes("update it");
     client.setUser(user0);
 
-    Ebean.save(client);
+    DB.save(client);
 
     List<String> sql = LoggedSqlCollector.stop();
 
@@ -44,7 +44,7 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
     assertSql(sql.get(0)).contains("insert into cke_client (cod_cpny, cod_client, notes, username) values (?,?,?,?)");
     assertSql(sql.get(1)).contains("update cke_client set notes=?, username=? where cod_cpny=? and cod_client=?");
 
-    Ebean.delete(client);
+    DB.delete(client);
 
   }
 }

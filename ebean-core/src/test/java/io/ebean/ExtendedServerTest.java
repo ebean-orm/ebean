@@ -17,7 +17,7 @@ public class ExtendedServerTest extends BaseTestCase {
 
   @AfterEach
   public void cleanup() {
-    Ebean.getDefaultServer()
+    DB.getDefault()
       .extended()
       .setClock(Clock.systemUTC());
   }
@@ -27,7 +27,7 @@ public class ExtendedServerTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Query<Customer> query = server.find(Customer.class)
       .where().startsWith("name", "Rob")
@@ -53,7 +53,7 @@ public class ExtendedServerTest extends BaseTestCase {
   @Test
   public void mockClock() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     final Instant snapshot = Instant.now();
     Instant backedSnapshot = snapshot.minus(1, ChronoUnit.DAYS);
     Clock snapshotClock = Clock.fixed(backedSnapshot, Clock.systemUTC().getZone());

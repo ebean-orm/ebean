@@ -1,7 +1,7 @@
 package org.tests.defaultvalues;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ public class TestDefaults extends BaseTestCase {
     }
 
     LoggedSqlCollector.start();
-    Ebean.save(main);
+    DB.save(main);
     final List<String> current = LoggedSqlCollector.current();
 
     assertThat(current).isNotEmpty();

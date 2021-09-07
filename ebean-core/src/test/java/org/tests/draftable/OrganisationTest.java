@@ -1,7 +1,7 @@
 package org.tests.draftable;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Document;
 import org.tests.model.draftable.DocumentMedia;
@@ -34,7 +34,7 @@ public class OrganisationTest {
     doc.save();
 
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Document draftDoc = server.find(Document.class)
       .asDraft()
@@ -74,18 +74,18 @@ public class OrganisationTest {
     doc.getMedia().add(createMedia("media2"));
     doc.save();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
 
     server.publish(Document.class, doc.getId(), null);
 
-    Document fetchDoc = Ebean.find(Document.class).setId(doc.getId()).asDraft().findOne();
+    Document fetchDoc = DB.find(Document.class).setId(doc.getId()).asDraft().findOne();
     List<DocumentMedia> media = fetchDoc.getMedia();
 
     assertThat(media.size()).isEqualTo(2);
 
 //    // delete one of the 'child' @DraftElement rows ...
-//    SqlUpdate sqlUpdate = Ebean.createSqlUpdate("delete from document_media_draft where id = ?");
+//    SqlUpdate sqlUpdate = DB.sqlUpdate("delete from document_media_draft where id = ?");
 //    sqlUpdate.setParameter(1, doc.getMedia().get(0).getId());
 //    sqlUpdate.execute();
 

@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.UUOne;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ public class TestLazyLoadNonExistantBean extends BaseTestCase {
   public void testSimple() {
 
     UUID uuid = UUID.randomUUID();
-    UUOne one = Ebean.getReference(UUOne.class, uuid);
+    UUOne one = DB.getReference(UUOne.class, uuid);
 
     try {
       // invoke lazy loading

@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -20,12 +20,12 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache beanCache = Ebean.getServerCacheManager().beanCache(Order.class);
+    ServerCache beanCache = DB.cacheManager().beanCache(Order.class);
     beanCache.clear();
 
-    Order order = Ebean.getReference(Order.class, 1);
+    Order order = DB.getReference(Order.class, 1);
 
-    assertTrue(Ebean.getBeanState(order).isReference());
+    assertTrue(DB.getBeanState(order).isReference());
 
     // invoke lazy loading
     Date orderDate = order.getOrderDate();
@@ -34,15 +34,15 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
     Customer customer = order.getCustomer();
     assertNotNull(customer);
 
-    assertFalse(Ebean.getBeanState(order).isReference());
+    assertFalse(DB.getBeanState(order).isReference());
     assertNotNull(order.getStatus());
     assertNotNull(order.getDetails());
-    assertNull(Ebean.getBeanState(order).getLoadedProps());
+    assertNull(DB.getBeanState(order).getLoadedProps());
 
     Status status = order.getStatus();
     assertTrue(status != Order.Status.SHIPPED);
     order.setStatus(Order.Status.SHIPPED);
-    Ebean.refresh(order);
+    DB.refresh(order);
 
     Status statusRefresh = order.getStatus();
     assertEquals(status, statusRefresh);

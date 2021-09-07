@@ -1,6 +1,6 @@
 package org.tests.query.other;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MNonEnum;
@@ -18,9 +18,9 @@ public class TestFindWhereUsingEnumerated extends TransactionalTestCase {
     e.setName("TheNonEnumIsEnd");
     e.setNote("note");
 
-    Ebean.save(e);
+    DB.save(e);
 
-    MNonUpdPropEntity unique = Ebean.find(MNonUpdPropEntity.class).where()
+    MNonUpdPropEntity unique = DB.find(MNonUpdPropEntity.class).where()
       .eq("nonEnum", MNonEnum.END)
       .eq("name", "TheNonEnumIsEnd")
       .findOne();

@@ -1,7 +1,7 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.AttributeHolder;
 import org.tests.model.basic.ListAttribute;
 import org.tests.model.basic.ListAttributeValue;
@@ -28,15 +28,15 @@ public class TestSkippable extends BaseTestCase {
     final ListAttributeValue value1 = new ListAttributeValue();
     final ListAttributeValue value2 = new ListAttributeValue();
 
-    Ebean.save(value1);
-    Ebean.save(value2);
+    DB.save(value1);
+    DB.save(value2);
 
     final ListAttribute listAttribute = new ListAttribute();
     listAttribute.add(value1);
-    Ebean.save(listAttribute);
+    DB.save(listAttribute);
     logger.info(" -- seeded data");
 
-    final ListAttribute listAttributeDB = Ebean.find(ListAttribute.class, listAttribute.getId());
+    final ListAttribute listAttributeDB = DB.find(ListAttribute.class, listAttribute.getId());
     assertNotNull(listAttributeDB);
 
     final ListAttributeValue value1_DB = listAttributeDB.getValues().iterator().next();
@@ -47,7 +47,7 @@ public class TestSkippable extends BaseTestCase {
     final AttributeHolder holder = new AttributeHolder();
     holder.add(listAttributeDB);
 
-    Ebean.save(holder);
+    DB.save(holder);
     logger.info(" -- saved holder");
 
     // Now change the M2M listAttribute.values and save the holder
@@ -57,11 +57,11 @@ public class TestSkippable extends BaseTestCase {
     listAttributeDB.add(value2);
 
     // Save the holder - should cascade down to the listAtribute and save the values
-    Ebean.save(holder);
+    DB.save(holder);
     logger.info(" -- M2M detected delete of value1 and add of value2 ?");
 
 
-    final ListAttribute listAttributeDB_2 = Ebean.find(ListAttribute.class, listAttributeDB.getId());
+    final ListAttribute listAttributeDB_2 = DB.find(ListAttribute.class, listAttributeDB.getId());
     assertNotNull(listAttributeDB_2);
     final ListAttributeValue value2_DB_2 = listAttributeDB_2.getValues().iterator().next();
 
@@ -69,7 +69,7 @@ public class TestSkippable extends BaseTestCase {
     assertEquals(value2.getId(), value2_DB_2.getId());
     assertTrue(value2.getId().equals(value2_DB_2.getId()));
 
-    Ebean.delete(listAttributeDB_2);
+    DB.delete(listAttributeDB_2);
 
   }
 }

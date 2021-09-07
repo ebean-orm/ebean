@@ -1,7 +1,7 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.CarAccessory;
@@ -23,9 +23,9 @@ public class TestInheritInsert extends BaseTestCase {
 
     Truck t = new Truck();
     t.setCapacity(10d);
-    Ebean.save(t);
+    DB.save(t);
 
-    Vehicle v = Ebean.find(Vehicle.class, t.getId());
+    Vehicle v = DB.find(Vehicle.class, t.getId());
     if (v instanceof Truck) {
       Truck t0 = (Truck) v;
       assertEquals(Double.valueOf(10d), t0.getCapacity());
@@ -39,9 +39,9 @@ public class TestInheritInsert extends BaseTestCase {
     driver.setName("Jim");
     driver.setVehicle(v);
 
-    Ebean.save(driver);
+    DB.save(driver);
 
-    VehicleDriver d1 = Ebean.find(VehicleDriver.class, driver.getId());
+    VehicleDriver d1 = DB.find(VehicleDriver.class, driver.getId());
     v = d1.getVehicle();
     if (v instanceof Truck) {
       Double capacity = ((Truck) v).getCapacity();
@@ -51,7 +51,7 @@ public class TestInheritInsert extends BaseTestCase {
       fail("v not a Truck?");
     }
 
-    List<VehicleDriver> list = Ebean.find(VehicleDriver.class).findList();
+    List<VehicleDriver> list = DB.find(VehicleDriver.class).findList();
     for (VehicleDriver vehicleDriver : list) {
       if (vehicleDriver.getVehicle() instanceof Truck) {
         Double capacity = ((Truck) vehicleDriver.getVehicle()).getCapacity();
@@ -65,14 +65,14 @@ public class TestInheritInsert extends BaseTestCase {
 
     Car car = new Car();
     car.setLicenseNumber("MARIOS_CAR_LICENSE");
-    Ebean.save(car);
+    DB.save(car);
 
     VehicleDriver driver = new VehicleDriver();
     driver.setName("Mario");
     driver.setVehicle(car);
-    Ebean.save(driver);
+    DB.save(driver);
 
-    Query<VehicleDriver> query = Ebean.find(VehicleDriver.class);
+    Query<VehicleDriver> query = DB.find(VehicleDriver.class);
     query.where().eq("vehicle.licenseNumber", "MARIOS_CAR_LICENSE");
     List<VehicleDriver> drivers = query.findList();
 
@@ -83,10 +83,10 @@ public class TestInheritInsert extends BaseTestCase {
     assertEquals("Mario", drivers.get(0).getName());
     assertEquals("MARIOS_CAR_LICENSE", drivers.get(0).getVehicle().getLicenseNumber());
 
-    Vehicle car2 = Ebean.find(Vehicle.class, car.getId());
+    Vehicle car2 = DB.find(Vehicle.class, car.getId());
 
     car2.setLicenseNumber("test");
-    Ebean.save(car);
+    DB.save(car);
 
   }
 
@@ -95,17 +95,17 @@ public class TestInheritInsert extends BaseTestCase {
 
     Car car = new Car();
     car.setLicenseNumber("ABC");
-    Ebean.save(car);
+    DB.save(car);
 
     CarFuse fuse = new CarFuse();
     fuse.setLocationCode("xdfg");
-    Ebean.save(fuse);
+    DB.save(fuse);
 
     CarAccessory accessory = new CarAccessory(car, fuse);
-    Ebean.save(accessory);
+    DB.save(accessory);
 
 
-    Query<Car> query = Ebean.find(Car.class)
+    Query<Car> query = DB.find(Car.class)
       .fetch("accessories")
       .where()
       .eq("id", car.getId())

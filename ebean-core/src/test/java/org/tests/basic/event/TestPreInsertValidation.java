@@ -2,7 +2,7 @@ package org.tests.basic.event;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.TWithPreInsert;
 import org.junit.jupiter.api.Test;
 
@@ -17,16 +17,16 @@ public class TestPreInsertValidation extends BaseTestCase {
     e.setTitle("Mister");
     // the perInsert should populate the
     // name with should not be null
-    Ebean.save(e);
+    DB.save(e);
 
     // the save worked and name set in preInsert
     assertNotNull(e.getId());
     assertNotNull(e.getName());
 
-    TWithPreInsert e1 = Ebean.find(TWithPreInsert.class, e.getId());
+    TWithPreInsert e1 = DB.find(TWithPreInsert.class, e.getId());
 
     e1.setTitle("Missus");
-    Ebean.save(e1);
+    DB.save(e1);
   }
 
   @Test
@@ -34,14 +34,14 @@ public class TestPreInsertValidation extends BaseTestCase {
 
     TWithPreInsert e = new TWithPreInsert();
     e.setName("BeanForUpdateTest");
-    Ebean.save(e);
+    DB.save(e);
 
     TWithPreInsert bean2 = new TWithPreInsert();
     bean2.setId(e.getId());
     bean2.setName("stateless-update-name");
     bean2.setTitle(null);
 
-    Ebean.update(bean2);
+    DB.update(bean2);
 
     // title set on preUpdate
     assertNotNull(bean2.getTitle());

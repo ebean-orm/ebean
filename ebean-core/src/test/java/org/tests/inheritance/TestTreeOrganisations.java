@@ -1,7 +1,7 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,9 +19,9 @@ public class TestTreeOrganisations extends BaseTestCase {
     node.setTitle("node");
 
     treeNode.setOrganizationNode(node);
-    Ebean.save(treeNode);
+    DB.save(treeNode);
 
-    treeNode = Ebean.find(OrganizationTreeNode.class, treeNode.getId());
+    treeNode = DB.find(OrganizationTreeNode.class, treeNode.getId());
     assertEquals(node, treeNode.getOrganizationNode());
 
   }

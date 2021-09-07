@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -21,7 +21,7 @@ public class TestQueryRawExpressionMany extends BaseTestCase {
 
     Integer quantity = 1;
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .where().raw("details.orderQty = ?", quantity)
       .query();
 

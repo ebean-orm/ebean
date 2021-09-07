@@ -2,7 +2,7 @@ package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
   private JtMonkey m2 = new JtMonkey("Uim3");
 
   private void initialInsert() {
-    Ebean.saveAll(Arrays.asList(troop, m0, m1, m2));
+    DB.saveAll(Arrays.asList(troop, m0, m1, m2));
   }
 
   @Test
@@ -35,7 +35,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
     troop.getMonkeys().add(m0);
     troop.getMonkeys().add(m1);
 
-    Ebean.save(troop);
+    DB.save(troop);
 
     List<String> sql = LoggedSqlCollector.current();
     if (isPersistBatchOnCascade()) {
@@ -56,7 +56,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
     assertThat(intersectionRows).isEqualTo(2);
 
     LoggedSqlCollector.current();
-    JtMonkeyGroup fetchTroop = Ebean.find(JtMonkeyGroup.class)
+    JtMonkeyGroup fetchTroop = DB.find(JtMonkeyGroup.class)
       .fetch("monkeys")
       .where().idEq(troop.getPid())
       .findOne();
@@ -68,7 +68,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
     assertSql(sql.get(0)).contains("from mkeygroup t0 left join mkeygroup_monkey t1z_ on t1z_.mkeygroup_pid = t0.pid left join monkey t1 on t1.mid = t1z_.monkey_mid where t0.pid = ?");
     assertSql(sql.get(0)).contains("select t0.pid, t0.name, t0.version, t1.mid, t1.name, t1.food_preference, t1.version");
 
-    Ebean.delete(troop);
+    DB.delete(troop);
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);

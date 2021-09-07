@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -24,19 +24,19 @@ public class TestOrderReportTotal extends BaseTestCase {
 
     RawSql rawSql = getRawSql();
 
-    Query<OrderAggregate> query = Ebean.createQuery(OrderAggregate.class);
+    Query<OrderAggregate> query = DB.createQuery(OrderAggregate.class);
 
     List<OrderAggregate> list = query.setRawSql(rawSql).findList();
     assertNotNull(list);
 
-    Query<OrderAggregate> q2 = Ebean.createQuery(OrderAggregate.class).setRawSql(rawSql);
+    Query<OrderAggregate> q2 = DB.createQuery(OrderAggregate.class).setRawSql(rawSql);
     q2.where().gt("id", 1);
     q2.having().gt("totalItems", 1);
 
     List<OrderAggregate> l2 = q2.findList();
     assertNotNull(l2);
 
-    Query<OrderAggregate> q3 = Ebean.createQuery(OrderAggregate.class).setRawSql(rawSql);
+    Query<OrderAggregate> q3 = DB.createQuery(OrderAggregate.class).setRawSql(rawSql);
     q3.where().eq("order_id", 1);
 
     OrderAggregate orderAggregate = q3.findOne();
@@ -57,7 +57,7 @@ public class TestOrderReportTotal extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    int detailsCount = Ebean.find(OrderDetail.class)
+    int detailsCount = DB.find(OrderDetail.class)
       .where()
       .gt("order.id", 2)
       .istartsWith("order.customer.name", "rob")

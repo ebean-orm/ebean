@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -28,7 +28,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class)
+    Query<Order> q = DB.find(Order.class)
       .setAutoTune(true)
       //.fetch("customer")
       //.fetch("customer.contacts")
@@ -68,7 +68,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
   private static void collectUsage() {
 
-    Ebean.getDefaultServer().autoTune().collectProfiling();
+    DB.getDefault().autoTune().collectProfiling();
   }
 
 }

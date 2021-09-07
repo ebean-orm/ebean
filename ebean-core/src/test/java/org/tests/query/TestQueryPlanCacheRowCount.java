@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -19,7 +19,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class).where().eq("status", Order.Status.NEW).ge("id", 1)
+    Query<Order> query = DB.find(Order.class).where().eq("status", Order.Status.NEW).ge("id", 1)
       .order().desc("id");
 
     int rc0 = query.findCount();
@@ -46,7 +46,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     }
 
     // should still hit query plan cache
-    Query<Order> query2 = Ebean.find(Order.class).where().eq("status", Order.Status.NEW)
+    Query<Order> query2 = DB.find(Order.class).where().eq("status", Order.Status.NEW)
       .ge("id", idGt).order().desc("id");
 
     int rc2 = query2.findCount();

@@ -1,7 +1,7 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.Query;
 import org.tests.model.basic.CKeyAssoc;
@@ -22,9 +22,9 @@ public class TestCKeyLazyLoad extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.find(CKeyDetail.class).delete();
-    Ebean.find(CKeyParent.class).delete();
-    Ebean.find(CKeyAssoc.class).delete();
+    DB.find(CKeyDetail.class).delete();
+    DB.find(CKeyParent.class).delete();
+    DB.find(CKeyAssoc.class).delete();
 
     CKeyParentId id = new CKeyParentId(1, "one");
 
@@ -38,7 +38,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     p.add(new CKeyDetail("somethine one"));
     p.add(new CKeyDetail("somethine two"));
 
-    Ebean.save(p);
+    DB.save(p);
 
     CKeyAssoc assoc2 = new CKeyAssoc();
     assoc2.setAssocOne("assocTwo");
@@ -52,18 +52,18 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     p2.add(new CKeyDetail("somethine one"));
     p2.add(new CKeyDetail("somethine two"));
 
-    Ebean.save(p2);
+    DB.save(p2);
 
     exerciseMaxRowsQuery_with_embeddedId();
 
     CKeyParentId searchId = new CKeyParentId(1, "one");
 
-    CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findOne();
+    CKeyParent found = DB.find(CKeyParent.class).where().idEq(searchId).findOne();
 
     assertNotNull(found);
     assertEquals(2, found.getDetails().size());
 
-    List<CKeyParent> list = Ebean.find(CKeyParent.class).findList();
+    List<CKeyParent> list = DB.find(CKeyParent.class).findList();
 
     assertThat(list.size()).isGreaterThan(1);
 
@@ -77,13 +77,13 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     idList.add(id);
     idList.add(id2);
 
-    Query<CKeyParent> queryIdIn = Ebean.find(CKeyParent.class).where().idIn(idList).query();
+    Query<CKeyParent> queryIdIn = DB.find(CKeyParent.class).where().idIn(idList).query();
 
     List<CKeyParent> idInTestList = queryIdIn.findList();
 
     assertThat(idInTestList.size()).isEqualTo(2);
 
-    List<CKeyParent> idInTestList2 = Ebean.find(CKeyParent.class).where().idIn(id, id2).findList();
+    List<CKeyParent> idInTestList2 = DB.find(CKeyParent.class).where().idIn(id, id2).findList();
     assertThat(idInTestList2).hasSameSizeAs(idInTestList);
   }
 
@@ -92,7 +92,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
    */
   private void exerciseMaxRowsQuery_with_embeddedId() {
 
-    PagedList<CKeyParent> siteUserPage = Ebean.find(CKeyParent.class).where()
+    PagedList<CKeyParent> siteUserPage = DB.find(CKeyParent.class).where()
       .order("name asc")
       .setMaxRows(10)
       .findPagedList();

@@ -254,8 +254,8 @@ public abstract class BaseTestCase {
     return (SpiEbeanServer) DB.getDefault();
   }
 
-  protected EbeanServer server() {
-    return Ebean.getDefaultServer();
+  protected Database server() {
+    return DB.getDefault();
   }
 
   protected void loadCountryCache() {

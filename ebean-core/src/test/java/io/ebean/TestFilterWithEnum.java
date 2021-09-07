@@ -15,9 +15,9 @@ public class TestFilterWithEnum extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> allOrders = Ebean.find(Order.class).findList();
+    List<Order> allOrders = DB.find(Order.class).findList();
 
-    Filter<Order> filter = Ebean.filter(Order.class);
+    Filter<Order> filter = DB.filter(Order.class);
     List<Order> newOrders = filter.eq("status", Order.Status.NEW).filter(allOrders);
 
     assertNotNull(newOrders);

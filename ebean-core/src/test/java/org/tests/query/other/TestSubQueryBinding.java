@@ -1,8 +1,8 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Expression;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
@@ -13,7 +13,7 @@ public class TestSubQueryBinding extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     Query<Customer> someCustomerIds = server.find(Customer.class).select("id").where().lt("id", 5).query();
 

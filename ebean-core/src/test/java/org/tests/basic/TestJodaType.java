@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -18,7 +18,7 @@ public class TestJodaType extends BaseTestCase {
   @Test
   public void test() {
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<TJodaEntity> beanDescriptor = server.getBeanDescriptor(TJodaEntity.class);
     BeanProperty beanProperty = beanDescriptor.getBeanProperty("localTime");
     ScalarType<?> scalarType = beanProperty.getScalarType();
@@ -33,9 +33,9 @@ public class TestJodaType extends BaseTestCase {
 
     TJodaEntity bean = new TJodaEntity();
     bean.setLocalTime(now);
-    Ebean.save(bean);
+    DB.save(bean);
 
-    TJodaEntity foundBean = Ebean.find(TJodaEntity.class, bean.getId());
+    TJodaEntity foundBean = DB.find(TJodaEntity.class, bean.getId());
 
     assertThat(foundBean.getLocalTime()).isEqualTo(bean.getLocalTime());
   }

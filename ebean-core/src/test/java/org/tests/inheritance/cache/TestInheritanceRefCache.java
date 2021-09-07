@@ -1,7 +1,7 @@
 package org.tests.inheritance.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.cache.CInhOne;
@@ -24,17 +24,17 @@ public class TestInheritanceRefCache extends BaseTestCase {
     one.setDriver("Jimmy");
     one.setNotes("Hello");
 
-    Ebean.save(one);
+    DB.save(one);
 
     CInhRef ref = new CInhRef();
     ref.setRef(one);
 
-    Ebean.save(ref);
+    DB.save(ref);
 
     Integer id = ref.getId();
 
     LoggedSqlCollector.start();
-    CInhRef gotRef = Ebean.find(CInhRef.class).setId(id).findOne();
+    CInhRef gotRef = DB.find(CInhRef.class).setId(id).findOne();
 
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
@@ -44,7 +44,7 @@ public class TestInheritanceRefCache extends BaseTestCase {
 
     // fetch again - from cache (but fetch second bean from cache)
     LoggedSqlCollector.start();
-    gotRef = Ebean.find(CInhRef.class).setId(id).findOne();
+    gotRef = DB.find(CInhRef.class).setId(id).findOne();
 
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
@@ -54,7 +54,7 @@ public class TestInheritanceRefCache extends BaseTestCase {
 
     // fetch again - both from cache
     LoggedSqlCollector.start();
-    gotRef = Ebean.find(CInhRef.class).setId(id).findOne();
+    gotRef = DB.find(CInhRef.class).setId(id).findOne();
 
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
@@ -72,34 +72,34 @@ public class TestInheritanceRefCache extends BaseTestCase {
     one.setLicenseNumber("O19");
     one.setDriver("Foo");
     one.setNotes("Hello");
-    Ebean.save(one);
+    DB.save(one);
 
     ids.add(one.getId());
 
     CInhTwo two = new CInhTwo();
     two.setLicenseNumber("T23");
     two.setAction("Test");
-    Ebean.save(two);
+    DB.save(two);
 
     ids.add(two.getId());
 
 
     LoggedSqlCollector.start();
 
-    Ebean.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
+    DB.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("from cinh_root");
 
     // try some cache finds
-    Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();
-    Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();
-    Ebean.find(CInhRoot.class).setUseQueryCache(true).findList();
+    DB.find(CInhRoot.class).setUseQueryCache(true).findList();
+    DB.find(CInhRoot.class).setUseQueryCache(true).findList();
+    DB.find(CInhRoot.class).setUseQueryCache(true).findList();
 
     LoggedSqlCollector.start();
 
-    Ebean.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
+    DB.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(0);

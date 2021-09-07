@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -22,7 +22,7 @@ public class TestSqlServerBatch extends BaseTestCase {
   @Test
   public void testBasicIdentityBatch() {
 
-    Transaction txn = Ebean.beginTransaction();
+    Transaction txn = DB.beginTransaction();
     try {
       txn.setBatchMode(true);
       txn.setBatchSize(3);
@@ -30,7 +30,7 @@ public class TestSqlServerBatch extends BaseTestCase {
       for (int i = 0; i < 10; i++) {
         ESimple model = new ESimple();
         model.setName("baz " + i);
-        Ebean.save(model);
+        DB.save(model);
       }
 
       txn.commit();
@@ -43,7 +43,7 @@ public class TestSqlServerBatch extends BaseTestCase {
   @Test
   public void testAggressiveBatch() {
 
-    Transaction txn = Ebean.beginTransaction();
+    Transaction txn = DB.beginTransaction();
     try {
       txn.setBatchMode(true);
       txn.setBatchSize(3);
@@ -61,7 +61,7 @@ public class TestSqlServerBatch extends BaseTestCase {
       for (int i = 0; i < 10; i++) {
         ESimple model = new ESimple();
         model.setName(i % 2 == 0 ? null : "foobar");
-        Ebean.save(model);
+        DB.save(model);
       }
 
       // do not commit

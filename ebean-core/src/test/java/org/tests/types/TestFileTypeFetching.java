@@ -2,7 +2,7 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.types.SomeFileBean;
 import org.junit.jupiter.api.Test;
 
@@ -25,13 +25,13 @@ public class TestFileTypeFetching extends BaseTestCase {
     SomeFileBean bean0 = new SomeFileBean();
     bean0.setName("one");
     bean0.setContent(file);
-    Ebean.save(bean0);
+    DB.save(bean0);
 
-    SomeFileBean bean1 = Ebean.find(SomeFileBean.class)
+    SomeFileBean bean1 = DB.find(SomeFileBean.class)
       .setId(bean0.getId())
       .findOne();
 
-    BeanState beanState = Ebean.getBeanState(bean1);
+    BeanState beanState = DB.getBeanState(bean1);
     Set<String> loadedProps = beanState.getLoadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));
@@ -45,16 +45,16 @@ public class TestFileTypeFetching extends BaseTestCase {
     statelessUpdateBean.setContent(file2);
 
     // perform stateless update (handy)
-    Ebean.update(statelessUpdateBean);
+    DB.update(statelessUpdateBean);
 
-    SomeFileBean bean2 = Ebean.find(SomeFileBean.class)
+    SomeFileBean bean2 = DB.find(SomeFileBean.class)
       .select("file")
       .setId(bean0.getId())
       .findOne();
 
     assertEquals(file2.length(), bean2.getContent().length());
 
-    Ebean.delete(bean1);
+    DB.delete(bean1);
   }
 
   private File getFile(String resource) {

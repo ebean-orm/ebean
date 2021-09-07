@@ -2,7 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.junit.jupiter.api.Test;
@@ -22,9 +22,9 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    ServerCache contactCache = Ebean.getServerCacheManager().beanCache(Contact.class);
+    ServerCache contactCache = DB.cacheManager().beanCache(Contact.class);
 
-    List<Contact> list = Ebean.find(Contact.class).setBeanCacheMode(CacheMode.PUT).findList();
+    List<Contact> list = DB.find(Contact.class).setBeanCacheMode(CacheMode.PUT).findList();
 
     assertTrue(contactCache.size() > 0);
 
@@ -38,11 +38,11 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     contactCache.statistics(true);
 
-    Contact c0 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findOne();
+    Contact c0 = DB.find(Contact.class).where().eq("email", emailToSearch).findOne();
 
     ServerCacheStatistics stats0 = contactCache.statistics(false);
 
-    Contact c1 = Ebean.find(Contact.class).where().eq("email", emailToSearch).findOne();
+    Contact c1 = DB.find(Contact.class).where().eq("email", emailToSearch).findOne();
 
     ServerCacheStatistics stats1 = contactCache.statistics(false);
 
@@ -53,10 +53,10 @@ public class TestCacheNaturalId extends BaseTestCase {
     assertEquals(2, stats1.getHitCount());
 
     c1.setEmail("mychangedemail@what.com");
-    Ebean.save(c1);
+    DB.save(c1);
     awaitL2Cache();
 
-    Contact c2 = Ebean.find(Contact.class).where().eq("email", "mychangedemail@what.com")
+    Contact c2 = DB.find(Contact.class).where().eq("email", "mychangedemail@what.com")
       .findOne();
 
     ServerCacheStatistics stats2 = contactCache.statistics(false);

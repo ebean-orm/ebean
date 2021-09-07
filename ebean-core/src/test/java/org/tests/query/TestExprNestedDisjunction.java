@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -18,7 +18,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
-    Query<Customer> q = Ebean.find(Customer.class).where()
+    Query<Customer> q = DB.find(Customer.class).where()
       .disjunction()
       .conjunction().startsWith("name", "r").eq("anniversary", onAfter).endJunction()
       .conjunction().eq("status", Customer.Status.ACTIVE).gt("id", 0).endJunction()
@@ -39,7 +39,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
-    Query<Customer> q = Ebean.find(Customer.class)
+    Query<Customer> q = DB.find(Customer.class)
       .where()
       .or()
       .and()
@@ -62,7 +62,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
-    Query<Customer> q = Ebean.find(Customer.class)
+    Query<Customer> q = DB.find(Customer.class)
       .where()
       .not()
       .gt("id", 1)
@@ -83,7 +83,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
-    Query<Customer> q = Ebean.find(Customer.class)
+    Query<Customer> q = DB.find(Customer.class)
       .where()
       .or()
       .eq("status", Customer.Status.ACTIVE)
@@ -105,7 +105,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
-    Query<Customer> q = Ebean.find(Customer.class)
+    Query<Customer> q = DB.find(Customer.class)
       .where()
       .or()
       .eq("status", Customer.Status.ACTIVE)

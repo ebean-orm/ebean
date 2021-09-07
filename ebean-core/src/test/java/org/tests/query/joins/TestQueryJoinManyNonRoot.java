@@ -1,7 +1,7 @@
 package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .select("id, status, orderDate")
       .where().gt("details.orderQty", 0)
       .findList();
@@ -40,7 +40,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class)
+    Query<Order> q = DB.find(Order.class)
       .fetch("customer")
       .fetch("customer.contacts")
       .where().gt("id", 0).query();
@@ -52,7 +52,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     assertTrue(sql.contains("join o_customer t1 on t1.id "));
     assertTrue(sql.contains("left join contact t2 on"));
 
-    Map<Integer, Order> ordersById = Ebean.find(Order.class).setMapKey("id").where().gt("id", 0).query().findMap();
+    Map<Integer, Order> ordersById = DB.find(Order.class).setMapKey("id").where().gt("id", 0).query().findMap();
     for (Order o: list) {
       int withoutFetch = ordersById.get(o.getId()).getCustomer().getContacts().size();
       int withFetch = o.getCustomer().getContacts().size();
@@ -75,7 +75,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class)
+    Query<Order> q = DB.find(Order.class)
       .fetch("details")
       .fetch("details.product")
       .fetch("customer")
@@ -99,7 +99,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class)
+    Query<Order> q = DB.find(Order.class)
       .fetch("customer")
       .fetch("customer.contacts")
       .fetchQuery("details")

@@ -1,8 +1,8 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ public class TestQueryCacheInsert extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     EBasicVer account = new EBasicVer("junk");
     server.save(account);
@@ -42,12 +42,12 @@ public class TestQueryCacheInsert extends BaseTestCase {
     EBasicVer doda = new EBasicVer("doda");
     doda.setDescription("OddButUniqueSillyExample");
 
-    Ebean.save(doda);
+    DB.save(doda);
 
-    ServerCache queryCache = Ebean.getServerCacheManager().queryCache(EBasicVer.class);
+    ServerCache queryCache = DB.cacheManager().queryCache(EBasicVer.class);
     queryCache.statistics(true);
 
-    Optional<EBasicVer> found0 = Ebean.find(EBasicVer.class)
+    Optional<EBasicVer> found0 = DB.find(EBasicVer.class)
       .where().eq("description", "OddButUniqueSillyExample")
       .setUseQueryCache(true)
       .findOneOrEmpty();
@@ -55,7 +55,7 @@ public class TestQueryCacheInsert extends BaseTestCase {
     assertTrue(found0.isPresent());
     assertHitMiss(0, 1, queryCache);
 
-    EBasicVer found1 = Ebean.find(EBasicVer.class)
+    EBasicVer found1 = DB.find(EBasicVer.class)
       .where().eq("description", "OddButUniqueSillyExample")
       .setUseQueryCache(true)
       .findOne();

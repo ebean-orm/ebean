@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
@@ -21,19 +21,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDiffHelpInsertSimple extends BaseTestCase {
 
-  private long firstTime = System.currentTimeMillis() - 10000;
+  private final long firstTime = System.currentTimeMillis() - 10000;
 
-  private EbeanServer server;
+  private final Database server;
 
-  private BeanDescriptor<Order> orderDesc;
+  private final BeanDescriptor<Order> orderDesc;
 
   public TestDiffHelpInsertSimple() {
-    server = Ebean.getServer(null);
+    server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
     orderDesc = spiServer.getBeanDescriptor(Order.class);
   }
 
-  private Order createBaseOrder(EbeanServer server) {
+  private Order createBaseOrder(Database server) {
     Order order1 = new Order();
     order1.setId(12);
     order1.setCretime(new Timestamp(firstTime));

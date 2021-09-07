@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteBeanVisitor;
 import io.ebean.text.json.JsonWriteOptions;
@@ -25,7 +25,7 @@ public class TestJsonWriteVisitor extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .select("id, name, status")
       .fetch("billingAddress", "line1, city")
       .fetch("billingAddress.country", "*")
@@ -33,7 +33,7 @@ public class TestJsonWriteVisitor extends BaseTestCase {
       .order().desc("id")
       .findList();
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setRootPathVisitor(new CustomerVisitor());

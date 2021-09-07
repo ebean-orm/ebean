@@ -2,7 +2,7 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -74,7 +74,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse("select\n id from\n o_customer").create();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .setRawSql(rawSql)
       .findList();
   }
@@ -242,7 +242,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals(2, columnMapping.getIndexPosition("scheduled"));
     assertEquals(3, columnMapping.getIndexPosition("completed"));
 
-    Query<ERawSqlAggBean> query = Ebean.find(ERawSqlAggBean.class)
+    Query<ERawSqlAggBean> query = DB.find(ERawSqlAggBean.class)
       .setRawSql(rawSql)
       .having().gt("total", 2)
       .query();

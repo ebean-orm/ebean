@@ -1,7 +1,7 @@
 package org.tests.model.inheritmany;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +19,9 @@ public class TestMediaInheritanceJoinToMany extends BaseTestCase {
     MProfile profileWithNoPic = new MProfile();
     profileWithNoPic.setName(name);
 
-    Ebean.save(profileWithNoPic);
+    DB.save(profileWithNoPic);
 
-    Query<MProfile> query = Ebean.find(MProfile.class).fetch("picture").where().eq("name", name).query();
+    Query<MProfile> query = DB.find(MProfile.class).fetch("picture").where().eq("name", name).query();
 
     // assert we get the profile with a null picture
     MProfile profile = query.findOne();

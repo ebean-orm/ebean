@@ -1,7 +1,7 @@
 package org.tests.query.embedded;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.ExpressionList;
 import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EEmbDatePeriod;
@@ -30,7 +30,7 @@ public class TestFilteringByEmbeddedInJoinedTable extends BaseTestCase {
     eEmbDatePeriod.setDate2(date2);
     outer1.setDatePeriod(eEmbDatePeriod);
 
-    Ebean.save(outer1);
+    DB.save(outer1);
     return outer1;
   }
 
@@ -48,20 +48,20 @@ public class TestFilteringByEmbeddedInJoinedTable extends BaseTestCase {
     EEmbInner inner1 = new EEmbInner();
     inner1.setOuter(outer1);
     inner1.setNomeInner("inner1-1");
-    Ebean.save(inner1);
+    DB.save(inner1);
 
     EEmbInner inner2 = new EEmbInner();
     // Setting outer1 also here
     inner2.setOuter(outer1);
     inner2.setNomeInner("inner2-1");
-    Ebean.save(inner2);
+    DB.save(inner2);
 
     EEmbInner inner3 = new EEmbInner();
     inner3.setOuter(outer3);
     inner3.setNomeInner("inner3-3");
-    Ebean.save(inner3);
+    DB.save(inner3);
 
-    ExpressionList<EEmbInner> el = Ebean.find(EEmbInner.class).where()
+    ExpressionList<EEmbInner> el = DB.find(EEmbInner.class).where()
       .eq("outer.datePeriod.date1", new Date(11111));
     List<EEmbInner> list = el.findList();
 

@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class TestLimitQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .setAutoTune(false)
       .setFirstRow(0)
       .setMaxRows(10)

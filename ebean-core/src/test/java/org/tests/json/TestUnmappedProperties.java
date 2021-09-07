@@ -1,7 +1,7 @@
 package org.tests.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.json.EBasicJsonUnmapped;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ public class TestUnmappedProperties extends BaseTestCase {
     bean.setUnmapped(unmapped);
 
 
-    String asJson = Ebean.json().toJson(bean);
+    String asJson = DB.json().toJson(bean);
 
     assertThat(asJson).contains("{\"name\":\"someName\",\"one\":42,\"nested\":{\"alpha\":\"aa\",\"beta\":\"bb\"}}");
 
@@ -40,7 +40,7 @@ public class TestUnmappedProperties extends BaseTestCase {
 
     String json = "{\"name\":\"someName\",\"one\":42,\"nested\":{\"alpha\":\"aa\",\"beta\":\"bb\"}}";
 
-    EBasicJsonUnmapped bean = Ebean.json().toBean(EBasicJsonUnmapped.class, json);
+    EBasicJsonUnmapped bean = DB.json().toBean(EBasicJsonUnmapped.class, json);
 
     assertThat(bean.getName()).isEqualTo("someName");
     assertThat(bean.getUnmapped().get("one")).isEqualTo(42L);

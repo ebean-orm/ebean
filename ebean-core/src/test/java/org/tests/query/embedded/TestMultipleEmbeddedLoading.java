@@ -1,8 +1,8 @@
 package org.tests.query.embedded;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
@@ -40,9 +40,9 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     invoice.setBillAddress(bill);
 
     // act: save and fetch
-    Ebean.save(invoice);
+    DB.save(invoice);
 
-    EInvoice invoice2 = Ebean.find(EInvoice.class, invoice.getId());
+    EInvoice invoice2 = DB.find(EInvoice.class, invoice.getId());
 
     // assert fetched bean populated as expected
     assertEquals(invoice.getId(), invoice2.getId());
@@ -54,18 +54,18 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     // act: only update one of the embedded fields
     invoice2.getBillAddress().setStreet("3 Pineapple St");
     // bean should be dirty
-    Ebean.save(invoice2);
+    DB.save(invoice2);
 
     awaitL2Cache();
 
-    EInvoice invoice3 = Ebean.find(EInvoice.class, invoice.getId());
+    EInvoice invoice3 = DB.find(EInvoice.class, invoice.getId());
 
     // assert field has updated value
     assertEquals("3 Pineapple St", invoice3.getBillAddress().getStreet());
 
 
     // fetch a partial
-    EInvoice invoicePartial = Ebean.find(EInvoice.class)
+    EInvoice invoicePartial = DB.find(EInvoice.class)
       .select("state, date")
       .where().idEq(invoice.getId())
       .findOne();
@@ -76,7 +76,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     assertNotNull(billAddress);
     assertEquals("3 Pineapple St", billAddress.getStreet());
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     ServerCacheManager serverCacheManager = server.cacheManager();
 
     // get cache, clear the cache and statistics
@@ -85,7 +85,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     beanCache.statistics(true);
 
     // fetch and load the cache
-    EInvoice invoice4 = Ebean.find(EInvoice.class, invoice.getId());
+    EInvoice invoice4 = DB.find(EInvoice.class, invoice.getId());
     assertNotNull(invoice4);
 
     ServerCacheStatistics statistics = beanCache.statistics(false);
@@ -94,7 +94,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     assertEquals(0, statistics.getHitCount());
 
     // fetch out of the cache this time
-    EInvoice invoice5 = Ebean.find(EInvoice.class, invoice.getId());
+    EInvoice invoice5 = DB.find(EInvoice.class, invoice.getId());
     assertNotNull(invoice5);
 
     statistics = beanCache.statistics(false);

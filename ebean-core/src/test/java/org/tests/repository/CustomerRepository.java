@@ -1,7 +1,7 @@
 package org.tests.repository;
 
 import io.ebean.BeanRepository;
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import org.tests.model.basic.Customer;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 public class CustomerRepository extends BeanRepository<Integer, Customer> {
 
   //@Inject
-  public CustomerRepository(EbeanServer server) {
+  public CustomerRepository(Database server) {
     super(Customer.class, server);
   }
 

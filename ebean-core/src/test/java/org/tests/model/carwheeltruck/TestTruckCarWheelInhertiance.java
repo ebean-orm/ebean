@@ -1,7 +1,7 @@
 package org.tests.model.carwheeltruck;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -17,7 +17,7 @@ public class TestTruckCarWheelInhertiance extends BaseTestCase {
     TWheel wheel = new TWheel();
     wheel.setOwner(truck);
 
-    Ebean.save(truck);
+    DB.save(truck);
 
     // This save() works ok...
 
@@ -26,7 +26,7 @@ public class TestTruckCarWheelInhertiance extends BaseTestCase {
     wheel.setOwner(truck);
 
     // And save() is called again
-    Ebean.save(truck);
+    DB.save(truck);
 
     // Then an exception is raised:
   }

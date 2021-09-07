@@ -2,7 +2,7 @@ package io.ebeaninternal.server.core;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Customer;
@@ -15,7 +15,7 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
   @Test
   public void getReference_noPC() {
-    Ebean.getReference(Customer.class, 42);
+    DB.getReference(Customer.class, 42);
   }
 
   @Test
@@ -23,9 +23,9 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.execute(() -> {
-      Customer loaded = Ebean.find(Customer.class, 1);
-      Customer reference = Ebean.getReference(Customer.class, 1);
+    DB.execute(() -> {
+      Customer loaded = DB.find(Customer.class, 1);
+      Customer reference = DB.getReference(Customer.class, 1);
       assertThat(loaded).isSameAs(reference);
     });
   }
@@ -36,14 +36,14 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
     Car car = new Car();
     car.setDriver("TestForRef");
-    Ebean.save(car);
+    DB.save(car);
 
-    Vehicle reference = Ebean.getReference(Vehicle.class, car.getId());
+    Vehicle reference = DB.getReference(Vehicle.class, car.getId());
 
     assertThat(reference).isInstanceOf(Car.class);
     assertThat(reference.getId()).isSameAs(car.getId());
 
-    Ebean.delete(car);
+    DB.delete(car);
   }
 
 
@@ -52,14 +52,14 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
     Car car = new Car();
     car.setDriver("TestForRef");
-    Ebean.save(car);
+    DB.save(car);
 
-    Ebean.execute(() -> {
-        Vehicle loaded = Ebean.find(Vehicle.class, car.getId());
-        Vehicle reference = Ebean.getReference(Vehicle.class, car.getId());
+    DB.execute(() -> {
+        Vehicle loaded = DB.find(Vehicle.class, car.getId());
+        Vehicle reference = DB.getReference(Vehicle.class, car.getId());
         assertThat(reference).isSameAs(loaded);
       }
     );
-    Ebean.delete(car);
+    DB.delete(car);
   }
 }

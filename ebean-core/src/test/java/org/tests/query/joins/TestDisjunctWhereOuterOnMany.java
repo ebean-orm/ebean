@@ -1,7 +1,7 @@
 package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
@@ -16,8 +16,8 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.deleteAll(Ebean.find(UUTwo.class).select("id").findList());
-    Ebean.deleteAll(Ebean.find(UUOne.class).select("id").findList());
+    DB.deleteAll(DB.find(UUTwo.class).select("id").findList());
+    DB.deleteAll(DB.find(UUOne.class).select("id").findList());
 
     // setup
     UUOne master1 = new UUOne();
@@ -30,13 +30,13 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
     UUOne master2 = new UUOne();
     master2.setName("testDisjOuter_2_name");
 
-    Ebean.save(master1);
-    Ebean.save(detail1);
-    Ebean.save(master2);
+    DB.save(master1);
+    DB.save(detail1);
+    DB.save(master2);
 
 
     // Have outer join so that "testDisjOuter_2_name" is found
-    Query<UUOne> query = Ebean.find(UUOne.class)
+    Query<UUOne> query = DB.find(UUOne.class)
       .where().disjunction()
       .eq("name", "testDisjOuter_2_name")
       .eq("comments.name", "testDisjOuter_CHILD_1")

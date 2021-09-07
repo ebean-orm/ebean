@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Trip;
@@ -32,7 +32,7 @@ public class TestJoinInheritance extends BaseTestCase {
   @Test
   public void testJoinHierarchyAssocOne() {
 
-    Ebean.createUpdate(Vehicle.class, "delete from vehicle");
+    DB.createUpdate(Vehicle.class, "delete from vehicle");
 
 
     Address address = new Address();
@@ -42,20 +42,20 @@ public class TestJoinInheritance extends BaseTestCase {
 
     address.setCretime(new Timestamp(new Date().getTime()));
 
-    Ebean.save(address);
+    DB.save(address);
 
     Car c = new Car();
     c.setLicenseNumber("C6788");
     c.setDriver("CarDriver");
     c.setRegistrationDate(new Date());
-    Ebean.save(c);
+    DB.save(c);
 
     VehicleDriver driver = new VehicleDriver();
 
     driver.setVehicle(c);
     driver.setAddress(address);
     driver.setLicenseIssuedOn(new Date());
-    Ebean.save(driver);
+    DB.save(driver);
 
     final String line1 = "Street1";
     final String line2 = "Street2";
@@ -67,13 +67,13 @@ public class TestJoinInheritance extends BaseTestCase {
       address1.setLine1(line1);
       address1.setLine2(line2);
       address1.setCity(city);
-      Ebean.save(address1);
+      DB.save(address1);
 
       Trip trip = new Trip();
       trip.setVehicleDriver(driver);
       trip.setAddress(address1);
       trip.setCretime(new Timestamp(new Date().getTime()));
-      Ebean.save(trip);
+      DB.save(trip);
     }
 
   }

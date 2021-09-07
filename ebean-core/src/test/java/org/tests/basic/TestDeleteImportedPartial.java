@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.PFile;
 import org.tests.model.basic.PFileContent;
 import org.junit.jupiter.api.Test;
@@ -15,18 +15,18 @@ public class TestDeleteImportedPartial extends BaseTestCase {
 
     PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
 
-    Ebean.save(persistentFile);
+    DB.save(persistentFile);
     Integer id = persistentFile.getId();
     Integer contentId = persistentFile.getFileContent().getId();
 
-    PFile partialPfile = Ebean.find(PFile.class).select("id").where().idEq(persistentFile.getId())
+    PFile partialPfile = DB.find(PFile.class).select("id").where().idEq(persistentFile.getId())
       .findOne();
 
     // should delete file and fileContent
-    Ebean.delete(partialPfile);
+    DB.delete(partialPfile);
 
-    PFile file1 = Ebean.find(PFile.class, id);
-    PFileContent content1 = Ebean.find(PFileContent.class, contentId);
+    PFile file1 = DB.find(PFile.class, id);
+    PFileContent content1 = DB.find(PFileContent.class, contentId);
 
     assertNull(file1);
     assertNull(content1);

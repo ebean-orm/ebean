@@ -38,7 +38,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class, "order by id limit 10");
+    Query<Customer> query = DB.createQuery(Customer.class, "order by id limit 10");
     query.findList();
 
     if (isSqlServer()) {
@@ -56,7 +56,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class, "order by id limit 10 offset 3");
+    Query<Customer> query = DB.createQuery(Customer.class, "order by id limit 10 offset 3");
     query.findList();
 
     if (isSqlServer()) {
@@ -74,7 +74,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class, "order by name");
+    Query<Customer> query = DB.createQuery(Customer.class, "order by name");
     query.setMaxRows(10);
     query.setFirstRow(3);
     query.findList();
@@ -99,7 +99,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class, "order by name");
+    Query<Customer> query = DB.createQuery(Customer.class, "order by name");
     query.setMaxRows(10);
     query.setFirstRow(3);
     query.orderById(true);
@@ -126,7 +126,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class);
+    Query<Customer> query = DB.createQuery(Customer.class);
     query.setMaxRows(10);
     query.setFirstRow(3);
     if (isSqlServer()) {
@@ -148,7 +148,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.createQuery(Customer.class);
+    Query<Customer> query = DB.createQuery(Customer.class);
     query.setMaxRows(10);
     query.findList();
 

@@ -1,7 +1,7 @@
 package org.tests.model.history;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,10 +13,10 @@ public class TestHistorySoftDeleteOneToOne extends BaseTestCase {
 
     HsdUser u1 = new HsdUser("u1");
 
-    Ebean.save(u1);
-    Ebean.delete(u1);
+    DB.save(u1);
+    DB.delete(u1);
 
-    HsdUser one = Ebean.find(HsdUser.class)
+    HsdUser one = DB.find(HsdUser.class)
       .setId(u1.getId())
       .setIncludeSoftDeletes()
       .findOne();

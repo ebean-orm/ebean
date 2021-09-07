@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -22,21 +22,21 @@ public class TestSavepoint extends BaseTestCase {
 
     EBasicVer basicVer = new EBasicVer("save1");
     basicVer.setOther("other1");
-    Ebean.save(basicVer);
+    DB.save(basicVer);
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
       Connection connection = transaction.getConnection();
       Savepoint savepoint = connection.setSavepoint();
 
       basicVer.setOther("changeOther");
-      Ebean.save(basicVer);
+      DB.save(basicVer);
 
       connection.rollback(savepoint);
       transaction.commit();
     }
 
-    EBasicVer found = Ebean.find(EBasicVer.class, basicVer.getId());
+    EBasicVer found = DB.find(EBasicVer.class, basicVer.getId());
     assertThat(found.getOther()).isEqualTo("other1");
 
   }
@@ -47,18 +47,18 @@ public class TestSavepoint extends BaseTestCase {
 
     EBasicVer basicVer = new EBasicVer("save2");
     basicVer.setOther("other2");
-    Ebean.save(basicVer);
+    DB.save(basicVer);
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
       transaction.setRollbackOnly();
 
       basicVer.setOther("changeOther");
-      Ebean.save(basicVer);
+      DB.save(basicVer);
 
       transaction.commit();
     }
 
-    EBasicVer found = Ebean.find(EBasicVer.class, basicVer.getId());
+    EBasicVer found = DB.find(EBasicVer.class, basicVer.getId());
     assertThat(found.getOther()).isEqualTo("other2");
 
   }

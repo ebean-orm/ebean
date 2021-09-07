@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,11 +23,11 @@ public class TestTextJsonInvokeLazy extends BaseTestCase {
   public void test() throws IOException {
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).select("name").findList();
+    List<Customer> list = DB.find(Customer.class).select("name").findList();
 
     JsonWriteOptions opt = JsonWriteOptions.parsePath("name, status");
 
-    JsonContext jsonContext = Ebean.json();
+    JsonContext jsonContext = DB.json();
     jsonContext.toJson(list, opt);
   }
 }

@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -16,7 +16,7 @@ public class TestImplicitJoinOnParentRelationship extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id, name")
       .where().eq("orders.details.product.name", "Desk")
       .query();
@@ -47,7 +47,7 @@ public class TestImplicitJoinOnParentRelationship extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id, name")
       .where().disjunction().eq("orders.details.product.name", "Desk").eq("id", 4).endJunction()
       .query();
@@ -68,7 +68,7 @@ public class TestImplicitJoinOnParentRelationship extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("id, name")
       .where().or().eq("orders.details.product.name", "Desk").eq("id", 4).endJunction()
       .query();

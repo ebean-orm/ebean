@@ -2,7 +2,7 @@ package io.ebeaninternal.server.core;
 
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
@@ -97,13 +97,13 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void when_fetchConfig_then_differentPlan() throws Exception {
 
-    DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
+    DefaultOrmQuery<Order> query1 = (DefaultOrmQuery<Order>) DB.find(Order.class)
       .select("status, shipDate")
       .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name");
 
 
-    DefaultOrmQuery<Order> query2 = (DefaultOrmQuery<Order>) Ebean.find(Order.class)
+    DefaultOrmQuery<Order> query2 = (DefaultOrmQuery<Order>) DB.find(Order.class)
       .select("status, shipDate")
       .fetch("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name");
@@ -114,7 +114,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_fetchJoins_expect_detailJoinsPreserveOrder() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
       .fetch("details");
@@ -128,7 +128,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_fetchJoinsAndWhere_expect_fetchJoinsOnlyInFetchPaths() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("details")
       .where().eq("customer.name", "rob").query();
@@ -142,7 +142,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_queryFetch_expect_getFetchPaths_doesNotIncludeQueryJoin() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
       .fetchQuery("details");
@@ -156,7 +156,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_queryFetch_expect_getFetchPaths_doesNotIncludeQueryJoin_via_fetchQuery() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
       .fetchQuery("details");
@@ -170,7 +170,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_lazyFetch_expect_getFetchPaths_doesNotIncludeQueryJoin() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
       .fetch("details", FetchConfig.ofLazy());
@@ -184,7 +184,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_lazyFetch_expect_getFetchPaths_doesNotIncludeQueryJoin_via_fetchLazy() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
       .fetchLazy("details");
@@ -198,7 +198,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_lazyFetchAndHasChildren_expect_getFetchPaths_doesNotIncludeJoinOrChild() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("customer", "name")
       .fetchLazy("details")
@@ -213,7 +213,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_fetchMany_expect_getFetchPaths_containsAllInOrder() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetch("details")
       .fetch("details.product")
@@ -228,7 +228,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void testJoinOrder_when_queryJoin_expect_getFetchPaths_excludesQueryJoinAndChildren() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status, orderDate")
       .fetchQuery("details")
       .fetch("details.product")
@@ -243,7 +243,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void test_removeJoinToMany_when_multipleManyPaths() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .fetch("details.product")
       .fetch("customer")
@@ -258,7 +258,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void test_removeAllJoinToMany_when_firstRow() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setFirstRow(1)
       .fetch("details") // many path
       .fetch("details.product")
@@ -274,7 +274,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void test_removeAllJoinToMany_when_maxRows() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setMaxRows(1)
       .fetch("details") // many path
       .fetch("details.product")
@@ -290,7 +290,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void test_filterMany_included() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .fetch("details.product")
       .fetch("customer")
@@ -307,7 +307,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void test_filterMany_excludedByOrdering() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetch("customer")
       .fetch("customer.contacts")
       .fetch("details")
@@ -324,7 +324,7 @@ public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
   @Test
   public void test_filterMany_excludedExplicitly() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .fetchQuery("details")
       .fetch("details.product")
       .fetch("customer")

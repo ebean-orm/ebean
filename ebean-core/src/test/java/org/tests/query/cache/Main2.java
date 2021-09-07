@@ -1,12 +1,12 @@
 package org.tests.query.cache;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 
 public class Main2 {
 
   public static void main(String[] args) {
     TestDistinct test = new TestDistinct();
-    Ebean.find(ContractCosts.class).where()
+    DB.find(ContractCosts.class).where()
     .in("position.contract.aclEntries.aclEntry.id",1L, 2L, 3L).findList(); // <-- will fix some cache issue?
     test.testMissingUnique();
 

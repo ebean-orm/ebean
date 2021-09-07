@@ -1,6 +1,6 @@
 package org.tests.json.transientproperties;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,14 +12,14 @@ public class TestTransientObjectProperty {
 
     String rawJson = "{\"name\":\"entityBeanName\",\"basic\":true,\"someBean\":{\"name\":\"transientBeanName\",\"baz\":\"foo\"}}";
 
-    EJsonTransientObject bean = Ebean.json().toBean(EJsonTransientObject.class, rawJson);
+    EJsonTransientObject bean = DB.json().toBean(EJsonTransientObject.class, rawJson);
 
     assertEquals("entityBeanName", bean.getName());
     assertEquals(true, bean.getBasic());
     assertEquals("transientBeanName", bean.getSomeBean().name);
     assertEquals("foo", bean.getSomeBean().baz);
 
-    String asJson = Ebean.json().toJson(bean);
+    String asJson = DB.json().toJson(bean);
 
     assertEquals(rawJson, asJson);
   }

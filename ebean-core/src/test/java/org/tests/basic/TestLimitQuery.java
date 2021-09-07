@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -27,7 +27,7 @@ public class TestLimitQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setAutoTune(false)
       .fetch("details")
       .where().gt("details.id", 0)
@@ -49,7 +49,7 @@ public class TestLimitQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setAutoTune(false)
       .fetch("details")
       .where().gt("details.id", 0)
@@ -72,7 +72,7 @@ public class TestLimitQuery extends BaseTestCase {
   public void testDefaults() {
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setAutoTune(false)
       .fetch("details")
       .where().gt("details.id", 0)
@@ -93,7 +93,7 @@ public class TestLimitQuery extends BaseTestCase {
   private void rob() {
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .setAutoTune(false)
       .fetch("details")
       .where().gt("details.id", 0)
@@ -117,7 +117,7 @@ public class TestLimitQuery extends BaseTestCase {
       assertTrue(hasLimit);
     }
 
-    query = Ebean.find(Order.class)
+    query = DB.find(Order.class)
       .setAutoTune(false)
       .fetch("details")
       .setMaxRows(10);

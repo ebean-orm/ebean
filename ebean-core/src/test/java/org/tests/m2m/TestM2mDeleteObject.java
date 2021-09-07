@@ -1,7 +1,7 @@
 package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.meta.MetaTimedMetric;
 import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.Permission;
@@ -22,9 +22,9 @@ public class TestM2mDeleteObject extends BaseTestCase {
 
     resetAllMetrics();
 
-    Ebean.createUpdate(Permission.class, "delete from Permission").setLabel("deleteAllPermissions").execute();
-    Ebean.createUpdate(Tenant.class, "delete from Tenant").execute();
-    Ebean.createUpdate(Role.class, "delete from Role").execute();
+    DB.createUpdate(Permission.class, "delete from Permission").setLabel("deleteAllPermissions").execute();
+    DB.createUpdate(Tenant.class, "delete from Tenant").execute();
+    DB.createUpdate(Role.class, "delete from Role").execute();
 
     List<MetaTimedMetric> sqlMetrics = sqlMetrics();
     assertThat(sqlMetrics).hasSize(1);
@@ -32,38 +32,38 @@ public class TestM2mDeleteObject extends BaseTestCase {
 
     Tenant t = new Tenant("tenant");
 
-    Ebean.save(t);
+    DB.save(t);
 
     Permission p1 = new Permission("p1");
     Permission p2 = new Permission("p2");
 
-    Ebean.save(p1);
-    Ebean.save(p2);
+    DB.save(p1);
+    DB.save(p2);
 
     Role role1 = new Role("role");
     role1.setTenant(t);
 
     Set<Permission> permissions = new HashSet<>();
-    List<Permission> permsList = Ebean.find(Permission.class).findList();
+    List<Permission> permsList = DB.find(Permission.class).findList();
     permissions.addAll(permsList);
 
     role1.setPermissions(permissions);
 
-    Ebean.save(role1);
+    DB.save(role1);
 
-    List<Tenant> tenantList = Ebean.find(Tenant.class).fetch("roles").findList();
-    List<Role> roleList = Ebean.find(Role.class).fetch("permissions").findList();
-    List<Permission> permissionList = Ebean.find(Permission.class).fetch("roles").findList();
+    List<Tenant> tenantList = DB.find(Tenant.class).fetch("roles").findList();
+    List<Role> roleList = DB.find(Role.class).fetch("permissions").findList();
+    List<Permission> permissionList = DB.find(Permission.class).fetch("roles").findList();
 
     assertEquals(1, tenantList.size());
     assertEquals(2, permissionList.size());
     assertEquals(1, roleList.size());
 
-    Ebean.delete(role1);
+    DB.delete(role1);
 
-    List<Tenant> tenantList2 = Ebean.find(Tenant.class).fetch("roles").findList();
-    List<Role> roleList2 = Ebean.find(Role.class).fetch("permissions").findList();
-    List<Permission> permissionList2 = Ebean.find(Permission.class).fetch("roles").findList();
+    List<Tenant> tenantList2 = DB.find(Tenant.class).fetch("roles").findList();
+    List<Role> roleList2 = DB.find(Role.class).fetch("permissions").findList();
+    List<Permission> permissionList2 = DB.find(Permission.class).fetch("roles").findList();
 
     assertEquals(0, roleList2.size());
     assertEquals(1, tenantList2.size());
@@ -76,19 +76,19 @@ public class TestM2mDeleteObject extends BaseTestCase {
 
     Permission p1 = new Permission("p1");
     Permission p2 = new Permission("p2");
-    Ebean.save(p1);
-    Ebean.save(p2);
+    DB.save(p1);
+    DB.save(p2);
 
     Role role1 = new Role("role");
 
     Set<Permission> permissions = new HashSet<>();
     permissions.add(p2);
     role1.setPermissions(permissions);
-    Ebean.save(role1);
+    DB.save(role1);
 
     // only deletes as not associated
-    Ebean.delete(p1);
+    DB.delete(p1);
     // delete cascades
-    Ebean.delete(role1);
+    DB.delete(role1);
   }
 }

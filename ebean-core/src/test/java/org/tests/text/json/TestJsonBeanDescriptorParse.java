@@ -3,7 +3,7 @@ package org.tests.text.json;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -22,7 +22,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
 
   @Test
   public void test() throws IOException {
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
 
@@ -36,7 +36,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     assertEquals(Integer.valueOf(123), customer.getId());
     assertEquals("Hello rob", customer.getName());
 
-    BeanState beanState = Ebean.getBeanState(customer);
+    BeanState beanState = DB.getBeanState(customer);
     Set<String> loadedProps = beanState.getLoadedProps();
 
     assertEquals(2, loadedProps.size());

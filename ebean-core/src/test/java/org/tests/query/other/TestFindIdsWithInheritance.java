@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
 import org.junit.jupiter.api.Test;
@@ -18,12 +18,12 @@ public class TestFindIdsWithInheritance extends BaseTestCase {
     Truck truck = new Truck();
     truck.setLicenseNumber("TK123");
 
-    Ebean.save(truck);
+    DB.save(truck);
 
-    List<Integer> ids = Ebean.find(Vehicle.class).findIds();
+    List<Integer> ids = DB.find(Vehicle.class).findIds();
     assertNotNull(ids);
 
-    Ebean.delete(truck);
+    DB.delete(truck);
   }
 
 }

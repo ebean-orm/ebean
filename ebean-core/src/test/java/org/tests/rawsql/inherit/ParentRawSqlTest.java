@@ -1,7 +1,7 @@
 package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +24,11 @@ public class ParentRawSqlTest extends BaseTestCase {
 
   @BeforeEach
   public void clearDb() {
-    Ebean.deleteAll(Ebean.find(Data.class).findList());
-    Ebean.deleteAll(Ebean.find(Parent.class).findList());
+    DB.deleteAll(DB.find(Data.class).findList());
+    DB.deleteAll(DB.find(Parent.class).findList());
     //@rob: this does not work as it does not clear the ManyToMany relations.
-//    Ebean.find(Data.class).delete();
-//    Ebean.find(Parent.class).delete();
+//    DB.find(Data.class).delete();
+//    DB.find(Parent.class).delete();
   }
 
   @Test
@@ -41,21 +41,21 @@ public class ParentRawSqlTest extends BaseTestCase {
 
     ChildA a = new ChildA(0, "PA");
     a.setData(exampleData);
-    Ebean.save(a);
+    DB.save(a);
 
     ChildB b = new ChildB(1, "PB");
     b.setData(exampleData);
-    Ebean.save(b);
+    DB.save(b);
 
     ChildA c = new ChildA(2, "PC");
     c.setData(exampleData);
-    Ebean.save(c);
+    DB.save(c);
 
     RawSql rawSql = RawSqlBuilder
       .parse("select type, id, val from rawinherit_parent where val > 1")
       .create();
 
-    List<Parent> partial = Ebean.find(Parent.class)
+    List<Parent> partial = DB.find(Parent.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -73,20 +73,20 @@ public class ParentRawSqlTest extends BaseTestCase {
 
     ChildA a = new ChildA(0, "PA");
     a.setData(exampleData);
-    Ebean.save(a);
+    DB.save(a);
 
     ChildB b = new ChildB(1, "PB");
     b.setData(exampleData);
-    Ebean.save(b);
+    DB.save(b);
 
     ChildA c = new ChildA(2, "PC");
     c.setData(exampleData);
-    Ebean.save(c);
+    DB.save(c);
 
     EUncle e1 = new EUncle();
     e1.setParent(b);
     e1.setName("fester");
-    Ebean.save(e1);
+    DB.save(e1);
 
     joinToInheritanceHierarchy_withAliasMapping();
     joinToInheritanceHierarchy_bug416();
@@ -112,7 +112,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .columnMapping("p_more", "parent.more")
       .create();
 
-    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql).findList();
+    List<EUncle> uncles = DB.find(EUncle.class).setRawSql(rawSql).findList();
 
     assertNotNull(uncles.get(0));
     Parent parent = uncles.get(0).getParent();
@@ -129,7 +129,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .columnMapping("p_id", "parent.id")
       .create();
 
-    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
+    List<EUncle> uncles = DB.find(EUncle.class).setRawSql(rawSql)
       .fetchQuery("parent")
       .findList();
 
@@ -148,7 +148,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .columnMapping("pid", "parent.id")
       .create();
 
-    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
+    List<EUncle> uncles = DB.find(EUncle.class).setRawSql(rawSql)
       .fetchQuery("parent")
       .findList();
 
@@ -164,7 +164,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .tableAliasMapping("p", "parent")
       .create();
 
-    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
+    List<EUncle> uncles = DB.find(EUncle.class).setRawSql(rawSql)
       .findList();
 
     assertNotNull(uncles.get(0));
@@ -183,7 +183,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .columnMapping("id", "parent.id")
       .create();
 
-    List<ParentAggregate> aggregates = Ebean.find(ParentAggregate.class).setRawSql(rawSql)
+    List<ParentAggregate> aggregates = DB.find(ParentAggregate.class).setRawSql(rawSql)
       .fetchQuery("parent")
       .findList();
 
@@ -207,7 +207,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .columnMapping("id", "parent.id")
       .create();
 
-    List<ParentAggregate> aggregates = Ebean.find(ParentAggregate.class).setRawSql(rawSql)
+    List<ParentAggregate> aggregates = DB.find(ParentAggregate.class).setRawSql(rawSql)
       .fetchQuery("parent")
       .findList();
 
@@ -233,7 +233,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .columnMappingIgnore("b") // extra ignore after
       .create();
 
-    List<ParentAggregate> aggregates = Ebean.find(ParentAggregate.class).setRawSql(rawSql)
+    List<ParentAggregate> aggregates = DB.find(ParentAggregate.class).setRawSql(rawSql)
       .fetchQuery("parent")
       .findList();
 

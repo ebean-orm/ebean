@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -23,7 +23,7 @@ public class TestWhereAnnotation extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .fetch("orders")
       .findList();
 
@@ -40,11 +40,11 @@ public class TestWhereAnnotation extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
 
     LoggedSqlCollector.start();
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .order().asc("id")
       .findList();
 

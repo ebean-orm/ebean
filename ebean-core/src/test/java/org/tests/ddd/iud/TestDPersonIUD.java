@@ -19,12 +19,12 @@ public class TestDPersonIUD {
 //
 //        p.setInterval(new Interval(System.currentTimeMillis()-20000, System.currentTimeMillis()));
 //
-//        Ebean.save(p);
+//        DB.save(p);
 //
 //        Oid<DPerson> id = p.getId();
 //        Assert.assertNotNull(id);
 //
-//        DPerson p2 = Ebean.find(DPerson.class)
+//        DPerson p2 = DB.find(DPerson.class)
 //            .setAutoTune(false)
 //            .where().idEq(id)
 //            .findOne();
@@ -37,7 +37,7 @@ public class TestDPersonIUD {
 //        Assert.assertEquals(NZD, p2.getCmoney().getCurrency());
 //
 //
-//        Query<DPerson> query = Ebean.find(DPerson.class)
+//        Query<DPerson> query = DB.find(DPerson.class)
 //            .setAutoTune(false)
 //            .where().gt("cmoney.amount",1)
 //            .query();

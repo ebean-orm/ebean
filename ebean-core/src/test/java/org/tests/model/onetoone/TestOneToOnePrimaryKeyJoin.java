@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
     OtoPrime prime = new OtoPrime("p" + desc);
     OtoPrimeExtra extra = new OtoPrimeExtra("e" + desc);
     prime.setExtra(extra);
-    Ebean.save(prime);
+    DB.save(prime);
     return prime;
   }
 
@@ -29,7 +29,7 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
     assertThat(p1.getExtra().getEid()).isEqualTo(p1.getPid()).as("Same id values");
 
 
-    Query<OtoPrime> query = Ebean.find(OtoPrime.class).setId(p1.getPid());
+    Query<OtoPrime> query = DB.find(OtoPrime.class).setId(p1.getPid());
 
     OtoPrime found = query.findOne();
 
@@ -39,7 +39,7 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
 
     assertThat(found.getName()).isEqualTo("p" + desc);
 
-    Query<OtoPrime> queryWithFetch = Ebean.find(OtoPrime.class)
+    Query<OtoPrime> queryWithFetch = DB.find(OtoPrime.class)
       .setId(p1.getPid())
       .fetch("extra");
 
@@ -60,20 +60,20 @@ public class TestOneToOnePrimaryKeyJoin extends BaseTestCase {
     OtoPrimeExtra extra = oneWith.getExtra();
     extra.setExtra("modified");
 
-    Ebean.save(oneWith);
+    DB.save(oneWith);
 
     extra.setExtra("mod2");
     oneWith.setName("mod2");
 
-    Ebean.save(oneWith);
+    DB.save(oneWith);
   }
 
   private void thenDelete(OtoPrime found) {
 
-    OtoPrime bean = Ebean.find(OtoPrime.class, found.getPid());
+    OtoPrime bean = DB.find(OtoPrime.class, found.getPid());
 
     LoggedSqlCollector.start();
-    Ebean.delete(bean);
+    DB.delete(bean);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(2);

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
 import io.ebeaninternal.server.core.CacheOptions;
@@ -61,18 +61,18 @@ public class BeanDescriptorTest extends BaseTestCase {
   public void createReference_with_inheritance() {
     Cat cat = new Cat();
     cat.setName("Puss");
-    Ebean.save(cat);
+    DB.save(cat);
 
     Dog dog = new Dog();
     dog.setRegistrationNumber("DOGGIE");
-    Ebean.save(dog);
+    DB.save(dog);
 
     AnimalShelter shelter = new AnimalShelter();
     shelter.setName("My Animal Shelter");
     shelter.getAnimals().add(cat);
     shelter.getAnimals().add(dog);
 
-    Ebean.save(shelter);
+    DB.save(shelter);
 
     BeanDescriptor<Animal> animalDesc = spiEbeanServer().getBeanDescriptor(Animal.class);
 

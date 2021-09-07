@@ -1,7 +1,7 @@
 package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
 import org.junit.jupiter.api.Test;
@@ -25,23 +25,23 @@ public class TestPrivateOwnedIgnoreTransientOrphan extends BaseTestCase {
     /** recovered after transient child ignored **/
     TSMaster master2 = null;
 
-    Ebean.save(master0);
+    DB.save(master0);
 
-    master1 = Ebean.find(master0.getClass(), master0.getId());
+    master1 = DB.find(master0.getClass(), master0.getId());
 
     // Add then remove a bean that was never saved (to the DB)
     master1.getDetails().add(new TSDetail());
     master1.getDetails().clear();
 
     try {
-      Ebean.save(master1);
+      DB.save(master1);
     } catch (OptimisticLockException exception) {
       // Occured when the "unsaved" bean was wrongly being deleted
       fail("Optimistic lock exception wrongly thrown: " + exception.getMessage());
       return;
     }
 
-    master2 = master1 = Ebean.find(master1.getClass(), master1.getId());
+    master2 = master1 = DB.find(master1.getClass(), master1.getId());
 
     assertTrue(master2.getDetails().isEmpty());
   }

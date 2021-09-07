@@ -151,10 +151,10 @@ public class TestSubQuery extends BaseTestCase {
    *
    * public void testInheritance1() { ResetBasicData.reset();
    *
-   * Query<Vehicle> sq = Ebean.createQuery(Vehicle.class) .select("id")
+   * Query<Vehicle> sq = DB.createQuery(Vehicle.class) .select("id")
    * .setAutoTune(false) .where() .query();
    *
-   * Query<VehicleDriver> pq = Ebean.find(VehicleDriver.class)
+   * Query<VehicleDriver> pq = DB.find(VehicleDriver.class)
    * .where().in("vehicle.id", sq) .query();
    *
    * pq.findList();

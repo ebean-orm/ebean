@@ -2,7 +2,7 @@ package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
 import org.tests.model.basic.Address;
@@ -24,10 +24,10 @@ public class TestQueryJoin extends BaseTestCase {
 
     // Need to make sure the customer cache is cleared for the later
     // asserts on the lazy loading
-    ServerCache custCache = Ebean.getServerCacheManager().beanCache(Customer.class);
+    ServerCache custCache = DB.cacheManager().beanCache(Customer.class);
     custCache.clear();
 
-    Query<Order> query = Ebean.find(Order.class).select("status")
+    Query<Order> query = DB.find(Order.class).select("status")
       .fetchLazy("customer", "name, status")
       .fetch("customer.contacts").order().asc("id");
 
@@ -36,7 +36,7 @@ public class TestQueryJoin extends BaseTestCase {
     // list.get(0).getShipDate();
 
     Order order = list.get(0);
-    BeanState beanStateOrder = Ebean.getBeanState(order);
+    BeanState beanStateOrder = DB.getBeanState(order);
     assertNotNull(beanStateOrder.getLoadedProps());
     // assertTrue(beanStateOrder.getLoadedProps().contains("id"));
     assertTrue(beanStateOrder.getLoadedProps().contains("status"));
@@ -44,7 +44,7 @@ public class TestQueryJoin extends BaseTestCase {
     assertTrue(beanStateOrder.getLoadedProps().contains("customer"));
 
     Customer customer = order.getCustomer();
-    BeanState beanStateCustomer = Ebean.getBeanState(customer);
+    BeanState beanStateCustomer = DB.getBeanState(customer);
     assertTrue(beanStateCustomer.isReference());
 
     customer.getName();

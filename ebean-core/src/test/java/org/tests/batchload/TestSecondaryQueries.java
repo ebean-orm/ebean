@@ -21,7 +21,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .select("status")
       .fetchQuery("customer", "name")
       .findList();
@@ -38,9 +38,9 @@ public class TestSecondaryQueries extends TransactionalTestCase {
   public void fetchLazy() {
 
     LoggedSqlCollector.start();
-    DB.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       .select("status")
       .fetchLazy("customer", "name")
       .setMaxRows(10)
@@ -75,7 +75,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
     LoggedSqlCollector.start();
 
     try (QueryIterator<Order> orders =
-           Ebean.find(Order.class).select("status")
+           DB.find(Order.class).select("status")
         .setMaxRows(10)
         .setUseCache(false)
         .findIterate()) {
@@ -100,7 +100,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
     Order testOrder = ResetBasicData.createOrderCustAndOrder("testSecQry10");
     Integer custId = testOrder.getCustomer().getId();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .select("name")
       .fetchQuery("contacts")
       .setId(custId);
@@ -124,7 +124,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
   @Test
   public void testManyToOneWithManyPlusOneToMany() {
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .select("status")
       .fetchQuery("customer", "name, status")
       .fetch("customer.contacts")

@@ -1,7 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
@@ -23,26 +23,26 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
 
     OCachedBean bean = new OCachedBean();
     bean.setName("cache-invalidation");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    OCachedBean bean0 = Ebean.find(OCachedBean.class, bean.getId());
+    OCachedBean bean0 = DB.find(OCachedBean.class, bean.getId());
     assertNotNull(bean0);
 
     // expect to hit the cache, no SQL
     LoggedSqlCollector.start();
-    OCachedBean bean1 = Ebean.find(OCachedBean.class, bean.getId());
+    OCachedBean bean1 = DB.find(OCachedBean.class, bean.getId());
     List<String> sql = LoggedSqlCollector.stop();
     assertNotNull(bean1);
     assertThat(sql).isEmpty();
 
     // delete the bean
-    int deleted = Ebean.createQuery(OCachedBean.class).where().eq("name", "cache-invalidation").delete();
+    int deleted = DB.createQuery(OCachedBean.class).where().eq("name", "cache-invalidation").delete();
 
     assertEquals(deleted, 1);
 
     // expect not to hit the cache, expect SQL
     LoggedSqlCollector.start();
-    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
+    OCachedBean bean2 = DB.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
     sql = LoggedSqlCollector.stop();
     assertNull(bean2);
     assertThat(sql).isNotEmpty();
@@ -53,26 +53,26 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
 
     OCachedBean bean = new OCachedBean();
     bean.setName("cache-invalidation-upd");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    OCachedBean bean0 = Ebean.find(OCachedBean.class, bean.getId());
+    OCachedBean bean0 = DB.find(OCachedBean.class, bean.getId());
     assertNotNull(bean0);
 
     // expect to hit the cache, no SQL
     LoggedSqlCollector.start();
-    OCachedBean bean1 = Ebean.find(OCachedBean.class, bean.getId());
+    OCachedBean bean1 = DB.find(OCachedBean.class, bean.getId());
     List<String> sql = LoggedSqlCollector.stop();
     assertNotNull(bean1);
     assertThat(sql).isEmpty();
 
     // update the bean
-    int updated = Ebean.update(OCachedBean.class).set("name", "updatedName").where().eq("name","cache-invalidation-upd").update();
+    int updated = DB.update(OCachedBean.class).set("name", "updatedName").where().eq("name","cache-invalidation-upd").update();
 
     assertEquals(updated, 1);
 
     // expect not to hit the cache, expect SQL
     LoggedSqlCollector.start();
-    OCachedBean bean2 = Ebean.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
+    OCachedBean bean2 = DB.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
     sql = LoggedSqlCollector.stop();
     assertNotNull(bean2);
     assertThat(sql).isNotEmpty();

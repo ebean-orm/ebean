@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeantest.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class TestOuterJoin extends BaseTestCase {
   public void testOuterOnNullQuery() throws Exception {
 
     LoggedSql.start();
-    List<Customer> list = Ebean.find(Customer.class).where()
+    List<Customer> list = DB.find(Customer.class).where()
         .isNull("orders")
         .le("id", 4) // ignore others than basicData
         .findList();
@@ -41,7 +41,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     // use OR construct
     LoggedSql.start();
-    list = Ebean.find(Customer.class).where()
+    list = DB.find(Customer.class).where()
         .or()
           .isNull("orders.details.product.name")
           .isNull("orders")
@@ -59,7 +59,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     // use AND construct
     LoggedSql.start();
-    list = Ebean.find(Customer.class).where()
+    list = DB.find(Customer.class).where()
         .and()
           .isNull("orders.details.product.name")
           .isNull("orders")
@@ -76,7 +76,7 @@ public class TestOuterJoin extends BaseTestCase {
     assertThat(list).hasSize(2);
 
     LoggedSql.start();
-    list = Ebean.find(Customer.class).where()
+    list = DB.find(Customer.class).where()
         .isNull("orders.details.product.name")
         .le("id", 4) // ignore others than basicData
         .findList();
@@ -93,7 +93,7 @@ public class TestOuterJoin extends BaseTestCase {
   public void testInnerOnNonNullQuery() throws Exception {
 
     LoggedSql.start();
-    List<Customer> list = Ebean.find(Customer.class).where()
+    List<Customer> list = DB.find(Customer.class).where()
         .isNotNull("orders")
         .le("id", 4) // ignore others than basicData
         .findList();
@@ -104,7 +104,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     // use OR construct
     LoggedSql.start();
-    list = Ebean.find(Customer.class).where()
+    list = DB.find(Customer.class).where()
         .or()
           .isNotNull("orders.details.product.name")
           .isNotNull("orders")
@@ -122,7 +122,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     // use AND construct
     LoggedSql.start();
-    list = Ebean.find(Customer.class).where()
+    list = DB.find(Customer.class).where()
         .and()
           .isNotNull("orders.details.product.name")
           .isNotNull("orders")
@@ -138,7 +138,7 @@ public class TestOuterJoin extends BaseTestCase {
 
 
     LoggedSql.start();
-    list = Ebean.find(Customer.class).where()
+    list = DB.find(Customer.class).where()
         .isNotNull("orders.details.product.name")
         .le("id", 4) // ignore others than basicData
         .findList();
@@ -154,7 +154,7 @@ public class TestOuterJoin extends BaseTestCase {
 
     LoggedSql.start();
 
-    List<Order> orders1 =  Ebean.find(Order.class).order("id").findList();
+    List<Order> orders1 =  DB.find(Order.class).order("id").findList();
 
     assertThat(LoggedSql.collect().get(0))
       .contains(" join o_customer") // ensure that we do not left join the customer
@@ -164,7 +164,7 @@ public class TestOuterJoin extends BaseTestCase {
     // now fetch "details" bean, which may be optional
     LoggedSql.start();
 
-    List<Order> orders2 =  Ebean.find(Order.class)
+    List<Order> orders2 =  DB.find(Order.class)
         .fetch("details", "id").order("id").findList();
 
     assertThat(LoggedSql.collect().get(0))

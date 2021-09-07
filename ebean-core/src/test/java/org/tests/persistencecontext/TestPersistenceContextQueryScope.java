@@ -2,7 +2,7 @@ package org.tests.persistencecontext;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
@@ -18,13 +18,13 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
   public void test() {
 
     EBasicVer bean = new EBasicVer("first");
-    Ebean.save(bean);
+    DB.save(bean);
 
-    //Ebean.getServerCacheManager().setCaching(EBasicVer.class, true);
+    //DB.cacheManager().setCaching(EBasicVer.class, true);
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      EBasicVer bean1 = Ebean.find(EBasicVer.class, bean.getId());
+      EBasicVer bean1 = DB.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
       int rowCount = DB.sqlUpdate("update e_basicver set name=? where id=?")
@@ -36,21 +36,21 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
 
       // fetch the bean again... but doesn't hit DB as it
       // is in the PersistenceContext which is transaction scoped
-      EBasicVer bean2 = Ebean.find(EBasicVer.class)
+      EBasicVer bean2 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .findOne();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
       // ... also explicitly not use bean cache
-      EBasicVer bean3 = Ebean.find(EBasicVer.class)
+      EBasicVer bean3 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .setPersistenceContextScope(QUERY)
         .findOne();
 
       // TRANsACTION scope ... same as bean2 and does not hit the DB
-      EBasicVer bean5 = Ebean.find(EBasicVer.class)
+      EBasicVer bean5 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .setPersistenceContextScope(TRANSACTION)
@@ -64,12 +64,12 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
       assertSame(bean1, bean5);
 
       assertEquals("second", bean3.getName());
-      Ebean.delete(bean3);
+      DB.delete(bean3);
 
-      Ebean.commitTransaction();
+      DB.commitTransaction();
 
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
   }
 }

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
@@ -64,7 +64,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .order().asc("id")
       .setMaxRows(1).findList();
 

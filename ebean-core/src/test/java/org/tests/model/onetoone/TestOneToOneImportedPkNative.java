@@ -1,8 +1,8 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,9 @@ public class TestOneToOneImportedPkNative extends BaseTestCase {
     master.setName("m2");
     master.setChild(child);
 
-    Ebean.save(master);
+    DB.save(master);
 
-    Query<OtoBMaster> query = Ebean.find(OtoBMaster.class)
+    Query<OtoBMaster> query = DB.find(OtoBMaster.class)
       //.select("name")
       .where().idEq(master.getId())
       .query();
@@ -53,12 +53,12 @@ public class TestOneToOneImportedPkNative extends BaseTestCase {
   @Test
   public void native_with_o2oAndImportedPrimaryKey() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     server.find(OtoBMaster.class).delete();
 
     OtoBMaster one = new OtoBMaster();
     one.setName("hello");
-    Ebean.save(one);
+    DB.save(one);
 
     OtoBMaster m = server.findNative(OtoBMaster.class, "select * from oto_bmaster").findOne();
 

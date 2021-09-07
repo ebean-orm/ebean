@@ -1,8 +1,8 @@
 package org.tests.persistencecontext;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.basic.EBasic;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ public class TestPersistenceContextOnUpdateDuringTxn extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     server.beginTransaction();
     try {

@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     Long groupId = 1L;
     Long userId = 1L;
 
-    Query<Conversation> query = Ebean.find(Conversation.class)
+    Query<Conversation> query = DB.find(Conversation.class)
       .where().eq("group.id", groupId)
       .disjunction()
       .conjunction()

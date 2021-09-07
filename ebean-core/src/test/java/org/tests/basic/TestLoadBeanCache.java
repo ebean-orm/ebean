@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class TestLoadBeanCache extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Map<String, Country> map = Ebean.find(Country.class)
+    Map<String, Country> map = DB.find(Country.class)
       .setLoadBeanCache(true)
       .setUseQueryCache(true)
       .setReadOnly(true)
@@ -27,7 +27,7 @@ public class TestLoadBeanCache extends BaseTestCase {
     Country loadedNz = map.get("NZ");
 
     // this will hit the cache
-    Country nz = Ebean.find(Country.class, "NZ");
+    Country nz = DB.find(Country.class, "NZ");
 
     assertTrue(loadedNz == nz);
   }

@@ -2,7 +2,7 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DuplicateKeyException;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -24,7 +24,7 @@ public class TestTransactionTryResources extends BaseTestCase {
 
     Document doc = new Document();
 
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
       doc.setTitle("tryWithResources");
       doc.setBody("stuff");
@@ -37,14 +37,14 @@ public class TestTransactionTryResources extends BaseTestCase {
     assertThat(document.isDraft()).isTrue();
 
     // cleanup
-    Ebean.delete(document);
+    DB.delete(document);
   }
 
   @Test
   @IgnorePlatform(Platform.ORACLE) // does not support uncommited reads
   public void tryWithResources_catch() {
     Document doc = null;
-    try (Transaction transaction = Ebean.beginTransaction()) {
+    try (Transaction transaction = DB.beginTransaction()) {
 
       doc = new Document();
       doc.setTitle("tryWithResources_catch");
@@ -75,8 +75,8 @@ public class TestTransactionTryResources extends BaseTestCase {
       assertThat(docs).hasSize(1);
       assertThat(doc).isNotNull();
       // Cleanup
-      Ebean.delete(Document.class, doc.getId());
-      Ebean.delete(Document.class, doc3.getId());
+      DB.delete(Document.class, doc.getId());
+      DB.delete(Document.class, doc3.getId());
     }
   }
 }

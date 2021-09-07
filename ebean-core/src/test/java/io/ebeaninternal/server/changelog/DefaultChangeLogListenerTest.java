@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.changelog;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.event.changelog.ChangeSet;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ public class DefaultChangeLogListenerTest extends BaseTestCase {
 
     DefaultChangeLogListener changeLogListener = new DefaultChangeLogListener();
 
-    EbeanServer defaultServer = Ebean.getDefaultServer();
+    Database defaultServer = DB.getDefault();
     changeLogListener.configure(defaultServer.pluginApi());
 
     ChangeSet changeSet = helper.createChangeSet("INT-001", 13);

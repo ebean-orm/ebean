@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -24,9 +24,9 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
 
-    Order order = Ebean.find(Order.class)
+    Order order = DB.find(Order.class)
       .setAutoTune(false)
       .setReadOnly(true)
       .setId(1)
@@ -34,7 +34,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
 
     assertNotNull(order);
-    assertTrue(Ebean.getBeanState(order).isReadOnly());
+    assertTrue(DB.getBeanState(order).isReadOnly());
 
     List<OrderDetail> details = order.getDetails();
     BeanCollection<?> bc = (BeanCollection<?>) details;
@@ -48,16 +48,16 @@ public class TestSharedInstancePropagation extends BaseTestCase {
     assertTrue(!bc.isEmpty());
     OrderDetail detail = details.get(0);
 
-    assertTrue(Ebean.getBeanState(detail).isReadOnly());
-    assertFalse(Ebean.getBeanState(detail).isReference());
+    assertTrue(DB.getBeanState(detail).isReadOnly());
+    assertFalse(DB.getBeanState(detail).isReference());
 
     Product product = detail.getProduct();
 
-    assertTrue(Ebean.getBeanState(product).isReadOnly());
+    assertTrue(DB.getBeanState(product).isReadOnly());
 
     // lazy load
     product.getName();
-    assertFalse(Ebean.getBeanState(product).isReference());
+    assertFalse(DB.getBeanState(product).isReference());
 
   }
 }

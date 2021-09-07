@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -19,9 +19,9 @@ public class TestQueryInAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).where().lt("id", 200).findList();
+    List<Customer> list = DB.find(Customer.class).where().lt("id", 200).findList();
 
-    Query<Order> query = Ebean.find(Order.class).where().in("customer", list).query();
+    Query<Order> query = DB.find(Order.class).where().in("customer", list).query();
 
     query.findList();
     String sql = query.getGeneratedSql();
@@ -36,9 +36,9 @@ public class TestQueryInAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).where().lt("id", 300).findList();
+    List<Customer> list = DB.find(Customer.class).where().lt("id", 300).findList();
 
-    Query<Order> query = Ebean.find(Order.class).where().isIn("customer", list).query();
+    Query<Order> query = DB.find(Order.class).where().isIn("customer", list).query();
 
     query.findList();
     String sql = query.getGeneratedSql();
@@ -53,9 +53,9 @@ public class TestQueryInAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).where().lt("id", 200).findList();
+    List<Customer> list = DB.find(Customer.class).where().lt("id", 200).findList();
 
-    Query<Order> query = Ebean.find(Order.class).where().notIn("customer", list).query();
+    Query<Order> query = DB.find(Order.class).where().notIn("customer", list).query();
 
     query.findList();
     String sql = query.getGeneratedSql();

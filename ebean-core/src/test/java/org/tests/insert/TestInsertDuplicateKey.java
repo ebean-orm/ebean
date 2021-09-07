@@ -2,7 +2,7 @@ package org.tests.insert;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DuplicateKeyException;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.Transactional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +64,7 @@ public class TestInsertDuplicateKey extends BaseTestCase {
 
     insertTheBatch_duplicateKey_catchAndContinue();
 
-    List<Document> found = Ebean.getDefaultServer()
+    List<Document> found = DB.getDefault()
       .find(Document.class)
       .asDraft()
       .where().startsWith("body", "insertTheBatch_duplicateKey_catchAndContinue")
@@ -90,14 +90,14 @@ public class TestInsertDuplicateKey extends BaseTestCase {
       doc2.save();
 
       // flush at this point, fails
-      Ebean.getDefaultServer().currentTransaction().flush();
+      DB.getDefault().currentTransaction().flush();
     } catch (DuplicateKeyException e) {
       log.info("duplicate failed but just continue" + e.getMessage());
       try {
         // typically we would use transaction.commitAndContinue()
         // ... this is a rollback and continue type scenario
         // ... more sensible to use a second transaction that do this
-        Ebean.getDefaultServer().currentTransaction().getConnection().rollback();
+        DB.getDefault().currentTransaction().getConnection().rollback();
       } catch (SQLException e1) {
         e1.printStackTrace();
       }

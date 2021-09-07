@@ -1,7 +1,7 @@
 package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.softdelete.ESoftDelRole;
 import org.tests.model.softdelete.ESoftDelUser;
 import org.ebeantest.LoggedSqlCollector;
@@ -19,18 +19,18 @@ public class TestSoftDeleteManyToMany extends BaseTestCase {
     ESoftDelRole role1 = new ESoftDelRole("role1");
     ESoftDelRole role2 = new ESoftDelRole("role2");
 
-    Ebean.save(role1);
-    Ebean.save(role2);
+    DB.save(role1);
+    DB.save(role2);
 
     ESoftDelUser user1 = new ESoftDelUser("user1");
     user1.getRoles().add(role1);
     user1.getRoles().add(role2);
 
-    Ebean.save(user1);
+    DB.save(user1);
 
 
     LoggedSqlCollector.start();
-    Ebean.delete(user1);
+    DB.delete(user1);
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 

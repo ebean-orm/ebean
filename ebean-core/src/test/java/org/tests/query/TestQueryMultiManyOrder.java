@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -19,7 +19,7 @@ public class TestQueryMultiManyOrder extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class).fetch("shipments").fetch("details")
+    Query<Order> q = DB.find(Order.class).fetch("shipments").fetch("details")
       .fetch("details.product").fetch("customer").where().gt("id", 0).query();
 
     List<Order> list = q.findList();

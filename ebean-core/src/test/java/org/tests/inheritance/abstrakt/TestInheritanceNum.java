@@ -1,7 +1,7 @@
 package org.tests.inheritance.abstrakt;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 public class TestInheritanceNum extends BaseTestCase {
@@ -13,6 +13,6 @@ public class TestInheritanceNum extends BaseTestCase {
     block.setName("ibe");
     block.setNotes("try it");
 
-    Ebean.save(block);
+    DB.save(block);
   }
 }

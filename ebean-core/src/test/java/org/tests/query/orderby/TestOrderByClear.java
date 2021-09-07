@@ -1,7 +1,7 @@
 package org.tests.query.orderby;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.OrderBy;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
@@ -18,7 +18,7 @@ public class TestOrderByClear extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class)
+    Query<Order> query = DB.find(Order.class)
       .order().asc("orderDate");
 
 

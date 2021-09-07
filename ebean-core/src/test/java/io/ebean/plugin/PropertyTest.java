@@ -1,7 +1,7 @@
 package io.ebean.plugin;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PropertyTest {
 
-  static EbeanServer server = Ebean.getDefaultServer();
+  static Database server = DB.getDefault();
 
   <T> BeanType<T> beanType(Class<T> cls) {
     return server.pluginApi().beanType(cls);

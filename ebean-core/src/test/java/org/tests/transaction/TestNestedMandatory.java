@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
@@ -40,7 +40,7 @@ public class TestNestedMandatory extends BaseTestCase {
 
     @Transactional(label = "outer")
     void doOuter() {
-      outerTxn = Ebean.currentTransaction();
+      outerTxn = DB.currentTransaction();
 
       log.info("outer start ...{}", outerTxn);
       new Inner().doInner();
@@ -52,7 +52,7 @@ public class TestNestedMandatory extends BaseTestCase {
 
     @Transactional(type = TxType.MANDATORY)
     void doInner() {
-      Transaction innerTxn = Ebean.currentTransaction();
+      Transaction innerTxn = DB.currentTransaction();
       log.info("inner ...{}", innerTxn);
 
       assertThat(innerTxn).isSameAs(outerTxn);

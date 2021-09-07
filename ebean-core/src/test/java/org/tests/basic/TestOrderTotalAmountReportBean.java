@@ -24,7 +24,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     RawSql rawSql = RawSqlBuilder.parse(sql).columnMapping("order_id", "order.id").create();
 
     List<OrderAggregate> l0 =
-      Ebean.find(OrderAggregate.class)
+      DB.find(OrderAggregate.class)
         .setRawSql(rawSql)
         .findList();
 
@@ -32,7 +32,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
       r0.toString();
     }
 
-    List<OrderAggregate> l2 = Ebean.createQuery(OrderAggregate.class)
+    List<OrderAggregate> l2 = DB.createQuery(OrderAggregate.class)
       .setRawSql(rawSql)
       .where().gt("order.id", 0)
       .having().lt("totalItems", 3).gt("totalAmount", 50).findList();
@@ -57,7 +57,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
       .columnMapping("order_id", "order.id")
       .create();
 
-    Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
+    Query<OrderAggregate> query = DB.find(OrderAggregate.class)
       .setRawSql(rawSql);
 
     query.findList();
@@ -79,7 +79,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
       .columnMapping("order_id", "order.id")
       .create();
 
-    Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
+    Query<OrderAggregate> query = DB.find(OrderAggregate.class)
       .setRawSql(rawSql);
 
     query.findList();

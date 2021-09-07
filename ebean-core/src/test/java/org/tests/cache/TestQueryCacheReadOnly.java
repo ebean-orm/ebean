@@ -2,8 +2,8 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 
 import org.tests.model.basic.EBasicVer;
@@ -20,7 +20,7 @@ public class TestQueryCacheReadOnly extends BaseTestCase {
   @Test
   public void testReadOnly() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     EBasicVer account = new EBasicVer("an other junk");
     server.save(account);
 
@@ -67,7 +67,7 @@ public class TestQueryCacheReadOnly extends BaseTestCase {
   @Test
   public void testNotReadOnly() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     EBasicVer account = new EBasicVer("an other junk");
     server.save(account);
 

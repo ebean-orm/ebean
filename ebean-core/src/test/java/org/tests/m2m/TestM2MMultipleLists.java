@@ -1,7 +1,7 @@
 package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.m2m.MailBox;
 import org.tests.model.m2m.MailUser;
 import org.junit.jupiter.api.Test;
@@ -20,9 +20,9 @@ public class TestM2MMultipleLists extends BaseTestCase {
     m1.setName("mailBox1");
 
     u.getInbox().add(m1);
-    Ebean.save(u);
+    DB.save(u);
 
-    u = Ebean.find(MailUser.class, u.getId());
+    u = DB.find(MailUser.class, u.getId());
 
     assertEquals(1, u.getInbox().size());
     assertEquals(0, u.getOutbox().size());

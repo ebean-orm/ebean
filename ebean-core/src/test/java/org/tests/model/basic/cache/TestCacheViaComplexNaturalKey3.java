@@ -2,7 +2,7 @@ package org.tests.model.basic.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Pairs;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
@@ -29,7 +29,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
   private static void insertSome() {
     if (!loadOnce) {
-      Ebean.find(OCachedNatKeyBean3.class).delete();
+      DB.find(OCachedNatKeyBean3.class).delete();
 
       List<String> stores = asList("abc", "def");
       for (String store : stores) {
@@ -46,11 +46,11 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   }
 
   private static void saveBean(String store, int code, String sku) {
-    Ebean.save(new OCachedNatKeyBean3(store, code, sku));
+    DB.save(new OCachedNatKeyBean3(store, code, sku));
   }
 
   private void clearCacheAndStatistics() {
-    Ebean.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
     clearStatistics();
   }
 
@@ -81,7 +81,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
   private void loadSomeIntoCache() {
 
-    Ebean.find(OCachedNatKeyBean3.class)
+    DB.find(OCachedNatKeyBean3.class)
       .setBeanCacheMode(CacheMode.PUT)
       .where()
       .ge("sku", "2")
@@ -102,7 +102,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Map<String,OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    Map<String,OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .eq("sku", "2")
@@ -131,7 +131,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Map<String,OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    Map<String,OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .eq("sku", "2")
@@ -160,7 +160,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Map<String,OCachedNatKeyBean3> map = Ebean.find(OCachedNatKeyBean3.class)
+    Map<String,OCachedNatKeyBean3> map = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .eq("sku", "2")
@@ -192,7 +192,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .in("code", codes)
@@ -225,7 +225,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .in("sku", skus)
@@ -255,7 +255,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", storeId)
       .in("sku", skus)
@@ -284,7 +284,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     loadSomeIntoCache();
 
     // simple case - no IN clause
-    OCachedNatKeyBean3 hit = Ebean.find(OCachedNatKeyBean3.class)
+    OCachedNatKeyBean3 hit = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .eq("sku", "2")
@@ -302,7 +302,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     setup();
 
-    OCachedNatKeyBean3 miss = Ebean.find(OCachedNatKeyBean3.class)
+    OCachedNatKeyBean3 miss = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "abc")
       .eq("sku", "2")
@@ -323,7 +323,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     setup();
 
-    OCachedNatKeyBean3 miss = Ebean.find(OCachedNatKeyBean3.class)
+    OCachedNatKeyBean3 miss = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "abc")
       .eq("sku", "2")
@@ -351,7 +351,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .inPairs(pairs)
@@ -394,7 +394,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    List<OCachedNatKeyBean3> list = Ebean.find(OCachedNatKeyBean3.class)
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
       .eq("store", "def")
       .inPairs(pairs)

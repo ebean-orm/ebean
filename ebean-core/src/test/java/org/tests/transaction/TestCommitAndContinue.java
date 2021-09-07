@@ -1,8 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -30,7 +30,7 @@ public class TestCommitAndContinue extends BaseTestCase {
     a.save();
 
     // commit at this point
-    Ebean.currentTransaction().commitAndContinue();
+    DB.currentTransaction().commitAndContinue();
 
     try {
       b.save();
@@ -40,10 +40,10 @@ public class TestCommitAndContinue extends BaseTestCase {
 
     } catch (IllegalStateException e) {
       // mark the transaction as rollback
-      Ebean.currentTransaction().setRollbackOnly();
+      DB.currentTransaction().setRollbackOnly();
 
       // use a different transaction to assert
-      EbeanServer server = Ebean.getDefaultServer();
+      Database server = DB.getDefault();
       try (Transaction anotherTxn = server.createTransaction()) {
         // success prior to commitAndContinue
         assertNotNull(server.find(MnyB.class, a.getId(), anotherTxn));
@@ -63,7 +63,7 @@ public class TestCommitAndContinue extends BaseTestCase {
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
       a.save();
@@ -111,7 +111,7 @@ public class TestCommitAndContinue extends BaseTestCase {
     a.save();
 
     // commit at this point
-    Ebean.currentTransaction().commitAndContinue();
+    DB.currentTransaction().commitAndContinue();
 
     try {
       b.save();
@@ -121,10 +121,10 @@ public class TestCommitAndContinue extends BaseTestCase {
 
     } catch (IllegalStateException e) {
       // mark the transaction as rollback
-      Ebean.currentTransaction().setRollbackOnly();
+      DB.currentTransaction().setRollbackOnly();
 
       // use a different transaction to do something useful
-      EbeanServer server = Ebean.getDefaultServer();
+      Database server = DB.getDefault();
       Transaction txn2 = server.createTransaction();
       try {
         server.save(c, txn2);
@@ -136,7 +136,7 @@ public class TestCommitAndContinue extends BaseTestCase {
 
     // asserts
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
     try (Transaction txnForAssert = server.createTransaction()) {
       // success prior to commitAndContinue
       assertNotNull(server.find(MnyB.class, a.getId(), txnForAssert));
@@ -156,7 +156,7 @@ public class TestCommitAndContinue extends BaseTestCase {
     MnyB b = new MnyB("b");
     MnyB c = new MnyB("c");
 
-    Transaction txn = Ebean.beginTransaction();
+    Transaction txn = DB.beginTransaction();
     try {
       a.save();
       txn.commitAndContinue();
@@ -181,7 +181,7 @@ public class TestCommitAndContinue extends BaseTestCase {
     new MnyB("a100").save();
     new MnyB("a101").save();
 
-    Ebean.currentTransaction().commitAndContinue();
+    DB.currentTransaction().commitAndContinue();
 
     new MnyB("a200").save();
     new MnyB("a201").save();

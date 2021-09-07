@@ -1,6 +1,6 @@
 package org.tests.transaction;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.Transactional;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class TransactionNotTerminatedAfterRollback {
     } catch (PersistenceException pe) {
       LOG.error("e: " + pe);
     }
-    List<User> users = Ebean.find(User.class).findList();
+    List<User> users = DB.find(User.class).findList();
     LOG.debug("users: {}", users);
     assertThat(users).isEmpty();
   }
@@ -38,8 +38,8 @@ public class TransactionNotTerminatedAfterRollback {
   @Transactional(rollbackFor = PersistenceException.class)
   public class UserService {
     public void create(User i) {
-      Ebean.save(i);
-      Ebean.save(new User(1L, "Peter")); // make it throw exception and rollback
+      DB.save(i);
+      DB.save(new User(1L, "Peter")); // make it throw exception and rollback
     }
   }
 

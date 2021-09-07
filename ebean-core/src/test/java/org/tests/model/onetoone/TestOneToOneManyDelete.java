@@ -1,6 +1,6 @@
 package org.tests.model.onetoone;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 public class TestOneToOneManyDelete {
@@ -24,9 +24,9 @@ public class TestOneToOneManyDelete {
       top.getManies().add(many);
     }
 
-    Ebean.save(top);
+    DB.save(top);
 
-    Ebean.delete(top);
+    DB.delete(top);
 
   }
 }

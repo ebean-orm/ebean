@@ -1,7 +1,7 @@
 package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
@@ -86,7 +86,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     });
   }
 
-  protected void testBatchOnCascadeIsExceptionSafe(EbeanServer server, Runnable failingOperation) {
+  protected void testBatchOnCascadeIsExceptionSafe(Database server, Runnable failingOperation) {
     Transaction txn = server.beginTransaction();
     try {
       assertThat(txn.isBatchMode()).isFalse();

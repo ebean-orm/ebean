@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.converstation.Conversation;
@@ -13,7 +13,7 @@ public class TestFetchPreference extends BaseTestCase {
   @Test
   public void fetchPreference_overrideOrder() {
 
-    Query<Conversation> query = Ebean.find(Conversation.class)
+    Query<Conversation> query = DB.find(Conversation.class)
       // FetchPreference overrides so participants is joined and messages query joined
       .fetch("messages")
       .fetch("participants");
@@ -27,7 +27,7 @@ public class TestFetchPreference extends BaseTestCase {
   @Test
   public void fetchPreference_sr() {
 
-    Query<Conversation> query = Ebean.find(Conversation.class)
+    Query<Conversation> query = DB.find(Conversation.class)
       // without FetchPreference this ToMany would be our first ToMany join
       // and participants would be query joined
       .fetch("group.users")
@@ -44,7 +44,7 @@ public class TestFetchPreference extends BaseTestCase {
   @Test
   public void fetchPreference_inOrder() {
 
-    Query<Conversation> query = Ebean.find(Conversation.class)
+    Query<Conversation> query = DB.find(Conversation.class)
       .fetch("participants")
       .fetch("messages");
 
@@ -56,7 +56,7 @@ public class TestFetchPreference extends BaseTestCase {
   @Test
   public void fetchQuery_onlyOneJoinCandidate() {
 
-    Query<Conversation> query = Ebean.find(Conversation.class)
+    Query<Conversation> query = DB.find(Conversation.class)
       .fetch("messages")
       .fetchQuery("participants");
 

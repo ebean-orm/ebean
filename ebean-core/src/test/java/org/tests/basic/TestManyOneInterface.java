@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.interfaces.Address;
 import org.tests.model.interfaces.IAddress;
@@ -22,8 +22,8 @@ public class TestManyOneInterface extends BaseTestCase {
 
     p.setDefaultAddress(a);
 
-    Ebean.save(a);
-    Ebean.save(p);
+    DB.save(a);
+    DB.save(p);
 
     //Assert.assertTrue();
 

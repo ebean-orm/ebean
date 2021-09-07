@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
 import org.tests.model.basic.Contact;
@@ -24,7 +24,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     ResetBasicData.reset();
 
     // test that join to order.details is not included in the initial query (included in query join)
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setAutoTune(false)
       .fetch("orders")
       .fetch("orders.details");
@@ -72,7 +72,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     ResetBasicData.reset();
 
     // test that join to order.details is not included
-    Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
+    Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .setAutoTune(false)
       .fetch("order")
       .fetch("order.details");
@@ -113,7 +113,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     ResetBasicData.reset();
 
     // test that join to order.details is not included
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setAutoTune(false)
       .fetch("customer")
       .fetch("customer.orders");
@@ -144,7 +144,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     ResetBasicData.reset();
 
     // test that join to order.details is not included
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .setAutoTune(false)
       .fetch("customer")
       .where().ilike("customer.name", "Rob%")

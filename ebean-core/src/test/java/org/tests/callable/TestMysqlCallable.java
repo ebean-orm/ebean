@@ -2,8 +2,8 @@ package org.tests.callable;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CallableSql;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.junit.jupiter.api.Disabled;
 import org.tests.model.basic.EBasic;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class TestMysqlCallable extends BaseTestCase {
   public void test() {
 
     // mysql specific test
-    EbeanServer server = Ebean.getServer("mysql");
+    Database server = DB.byName("mysql");
 
     EBasic basic = new EBasic();
     basic.setName("calling");

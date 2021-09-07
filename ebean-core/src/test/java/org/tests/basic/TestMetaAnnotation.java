@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.IgnorePlatform;
 import org.tests.model.basic.Address;
@@ -31,7 +31,7 @@ public class TestMetaAnnotation extends BaseTestCase {
 
     Address address = new Address();
     address.setLine1(spaces100);
-    Ebean.save(address);
+    DB.save(address);
   }
 
   /**
@@ -42,7 +42,7 @@ public class TestMetaAnnotation extends BaseTestCase {
 
     Address address = new Address();
     address.setLine2(spaces100);
-    Ebean.save(address);
+    DB.save(address);
   }
 
   /**
@@ -55,7 +55,7 @@ public class TestMetaAnnotation extends BaseTestCase {
     Address address = new Address();
     address.setLine1(spaces101);
     try {
-      Ebean.save(address);
+      DB.save(address);
       fail("Test failed, Could insert a too long string");
     } catch (PersistenceException e) {
       assertTrue(true);
@@ -72,7 +72,7 @@ public class TestMetaAnnotation extends BaseTestCase {
     Address address = new Address();
     address.setLine2(spaces101);
     try {
-      Ebean.save(address);
+      DB.save(address);
       fail("Test failed, Could insert a too long string");
     } catch (PersistenceException e) {
       assertTrue(true);

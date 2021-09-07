@@ -2,8 +2,8 @@ package org.tests.contructor;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.bean.EntityBean;
 import org.tests.model.basic.MProtectedConstructBean;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class TestProtectedConstructor extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     // check that we can construc a bean with a protected constructor
     MProtectedConstructBean bean = server.createEntityBean(MProtectedConstructBean.class);
@@ -29,7 +29,7 @@ public class TestProtectedConstructor extends BaseTestCase {
     Object newBeanInstance = entityBean._ebean_newInstance();
 
     assertNotNull(newBeanInstance);
-    BeanState beanState = Ebean.getBeanState(newBeanInstance);
+    BeanState beanState = DB.getBeanState(newBeanInstance);
     assertTrue(beanState.isNew());
     assertNotSame(entityBean, newBeanInstance);
 

@@ -1,8 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -25,7 +25,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
   @IgnorePlatform(Platform.HANA)
   public void test() {
 
-    EbeanServer ebeanServer = Ebean.getServer(null);
+    Database ebeanServer = DB.getDefault();
 
     LoggedSqlCollector.start();
 
@@ -58,7 +58,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
   private void testUpdates() {
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     List<UTMaster> list = server.find(UTMaster.class).fetch("details").findList();
 

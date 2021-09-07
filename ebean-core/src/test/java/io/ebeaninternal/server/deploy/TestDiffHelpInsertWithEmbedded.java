@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
@@ -17,12 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
 
-  private EbeanServer server;
-
-  private BeanDescriptor<EMain> emainDesc;
+  private final BeanDescriptor<EMain> emainDesc;
 
   public TestDiffHelpInsertWithEmbedded() {
-    server = Ebean.getServer(null);
+    Database server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
     emainDesc = spiServer.getBeanDescriptor(EMain.class);
   }
@@ -84,15 +82,13 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
   }
 
   private EMain createEMain() {
-
     EMain emain = new EMain();
     emain.setName("foo");
-    emain.setVersion(13l);
+    emain.setVersion(13L);
 
     Eembeddable embeddable = new Eembeddable();
     embeddable.setDescription("bar");
     emain.setEmbeddable(embeddable);
-
     return emain;
   }
 

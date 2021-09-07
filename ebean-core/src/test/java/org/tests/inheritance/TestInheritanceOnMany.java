@@ -1,7 +1,7 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.common.BeanList;
 import org.ebeantest.LoggedSqlCollector;
@@ -25,25 +25,25 @@ public class TestInheritanceOnMany extends BaseTestCase {
 
     Cat cat = new Cat();
     cat.setName("Puss");
-    Ebean.save(cat);
+    DB.save(cat);
 
     Dog dog = new Dog();
     dog.setRegistrationNumber("DOGGIE");
-    Ebean.save(dog);
+    DB.save(dog);
 
     BigDog bd = new BigDog();
     bd.setDogSize("large");
     bd.setRegistrationNumber("BG1");
-    Ebean.save(bd);
+    DB.save(bd);
 
     AnimalShelter shelter = new AnimalShelter();
     shelter.setName("My Animal Shelter");
     shelter.getAnimals().add(cat);
     shelter.getAnimals().add(dog);
 
-    Ebean.save(shelter);
+    DB.save(shelter);
 
-    AnimalShelter shelter2 = Ebean.find(AnimalShelter.class, shelter.getId());
+    AnimalShelter shelter2 = DB.find(AnimalShelter.class, shelter.getId());
     List<Animal> animals = shelter2.getAnimals();
 
     BeanList<?> beanList = (BeanList<?>) animals;
@@ -51,7 +51,7 @@ public class TestInheritanceOnMany extends BaseTestCase {
 
     assertNotNull(modifyListenMode);
 
-    assertNotNull(Ebean.find(Animal.class).findList());
+    assertNotNull(DB.find(Animal.class).findList());
   }
 
   @Test
@@ -59,12 +59,12 @@ public class TestInheritanceOnMany extends BaseTestCase {
 
     Dog dog = new Dog();
     dog.setRegistrationNumber("D2");
-    Ebean.save(dog);
+    DB.save(dog);
 
     LoggedSqlCollector.start();
     // Dog is concrete so we return as Dog even though
     // it could be a BigDog (so we are trusting the caller)
-    Dog ref = Ebean.getReference(Dog.class, dog.getId());
+    Dog ref = DB.getReference(Dog.class, dog.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).isEmpty();
@@ -80,10 +80,10 @@ public class TestInheritanceOnMany extends BaseTestCase {
     BigDog bd = new BigDog();
     bd.setDogSize("large");
     bd.setRegistrationNumber("BG2");
-    Ebean.save(bd);
+    DB.save(bd);
 
     LoggedSqlCollector.start();
-    BigDog bigDog = Ebean.getReference(BigDog.class, bd.getId());
+    BigDog bigDog = DB.getReference(BigDog.class, bd.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).isEmpty();
@@ -95,7 +95,7 @@ public class TestInheritanceOnMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
     // Animal is abstract so we hit the DB
-    Animal animal = Ebean.getReference(Animal.class, bd.getId());
+    Animal animal = DB.getReference(Animal.class, bd.getId());
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);

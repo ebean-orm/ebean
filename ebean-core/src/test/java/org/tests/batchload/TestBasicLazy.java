@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.FetchConfig;
 import io.ebean.Transaction;
@@ -27,7 +27,7 @@ public class TestBasicLazy extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
+    Order order = DB.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
       .findOne();
 
     assertNotNull(order);
@@ -46,14 +46,14 @@ public class TestBasicLazy extends BaseTestCase {
 
     // safety check to see if our customer we are going to use for the test has
     // some contacts
-    Customer c = Ebean.find(Customer.class).setId(1).findOne();
+    Customer c = DB.find(Customer.class).setId(1).findOne();
     assertNotNull(c.getContacts());
     assertTrue(!c.getContacts().isEmpty());
 
     // start transaction so we have a "long running" persistence context
-    Transaction tx = Ebean.beginTransaction();
+    Transaction tx = DB.beginTransaction();
     try {
-      List<Order> order = Ebean.find(Order.class).where(Expr.eq("customer.id", 1)).findList();
+      List<Order> order = DB.find(Order.class).where(Expr.eq("customer.id", 1)).findList();
 
       assertNotNull(order);
       assertTrue(!order.isEmpty());
@@ -75,7 +75,7 @@ public class TestBasicLazy extends BaseTestCase {
   public void testRaceCondition_Simple() throws Throwable {
     ResetBasicData.reset();
 
-    Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
+    Order order = DB.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
       .findOne();
 
     assertNotNull(order);
@@ -83,7 +83,7 @@ public class TestBasicLazy extends BaseTestCase {
     final Customer customer = order.getCustomer();
     assertNotNull(customer);
 
-    assertTrue(Ebean.getBeanState(customer).isReference());
+    assertTrue(DB.getBeanState(customer).isReference());
 
     final Throwable throwables[] = new Throwable[2];
     Thread t1 = new Thread() {
@@ -120,7 +120,7 @@ public class TestBasicLazy extends BaseTestCase {
       MyTestDataSourcePoolListener.SLEEP_AFTER_BORROW = 0;
     }
 
-    assertFalse(Ebean.getBeanState(customer).isReference());
+    assertFalse(DB.getBeanState(customer).isReference());
 
     if (throwables[0] != null) {
       throw throwables[0];
@@ -178,7 +178,7 @@ public class TestBasicLazy extends BaseTestCase {
     new FetchThread(tg, 2).start();
     new FetchThread(tg, 3).start();
 
-    orders = Ebean.find(Order.class).fetchLazy("customer").findList();
+    orders = DB.find(Order.class).fetchLazy("customer").findList();
     assertTrue(orders.size() >= 4);
 
     try {

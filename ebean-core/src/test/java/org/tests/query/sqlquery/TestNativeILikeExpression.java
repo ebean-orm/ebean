@@ -1,7 +1,7 @@
 package org.tests.query.sqlquery;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.plugin.SpiServer;
@@ -22,7 +22,7 @@ public class TestNativeILikeExpression extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .where().ilike("name", "rob")
       .query();
 

@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class TestEnhancementCollectionInitialisation extends BaseTestCase {
   @Test
   public void testListInitialisation() {
     Customer customer = new Customer();
-    BeanState beanState = Ebean.getBeanState(customer);
+    BeanState beanState = DB.getBeanState(customer);
     if (beanState != null) {
       List<Order> orders = customer.getOrders();
       assertNotNull(orders);

@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
@@ -26,11 +26,11 @@ public class TestTransactionalRequired extends BaseTestCase {
 
     outerTxn = null;
 
-    assertNull(Ebean.currentTransaction());
+    assertNull(DB.currentTransaction());
 
     new OuterTransactionalWithRequired().doOuter();
 
-    assertNull(Ebean.currentTransaction());
+    assertNull(DB.currentTransaction());
 
     assertNotNull(outerTxn);
     assertNotNull(innerTxn);
@@ -42,34 +42,34 @@ public class TestTransactionalRequired extends BaseTestCase {
   public void withOuterBegin() {
 
     outerTxn = null;
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      currentTxn = Ebean.currentTransaction();
+      currentTxn = DB.currentTransaction();
       assertNotNull(currentTxn);
       new OuterTransactionalWithRequired().doOuter();
 
       // the original transaction was restored
-      Transaction restored = Ebean.currentTransaction();
+      Transaction restored = DB.currentTransaction();
       assertSame(currentTxn, restored);
       assertSame(currentTxn, innerTxn);
       assertSame(currentTxn, outerTxn);
     } finally {
-      Ebean.endTransaction();
+      DB.endTransaction();
     }
 
-    assertNull(Ebean.currentTransaction());
+    assertNull(DB.currentTransaction());
   }
 
   class OuterTransactionalWithRequired {
 
     @Transactional(type = TxType.REQUIRED)
     void doOuter() {
-      outerTxn = Ebean.currentTransaction();
+      outerTxn = DB.currentTransaction();
       log.info("outer ...{}", outerTxn);
 
       new InTransactionalWithRequired().doInner();
 
-      Transaction current = Ebean.currentTransaction();
+      Transaction current = DB.currentTransaction();
       assertSame(outerTxn, current);
     }
 
@@ -79,7 +79,7 @@ public class TestTransactionalRequired extends BaseTestCase {
 
     @Transactional(type = TxType.REQUIRED)
     void doInner() {
-      innerTxn = Ebean.currentTransaction();
+      innerTxn = DB.currentTransaction();
       log.info("inner ...{}", innerTxn);
     }
   }

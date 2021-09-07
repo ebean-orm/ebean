@@ -260,7 +260,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     assertThat(query.findCount()).isEqualTo(1);
 
     DB.find(Country.class).where().eq("name", "SecretName").delete();
-    //Ebean.getDefaultServer().getPluginApi().getBeanType(Country.class).clearQueryCache();
+    //DB.getDefault().getPluginApi().getBeanType(Country.class).clearQueryCache();
     assertThat(query.findList()).hasSize(0);
     assertThat(query.findCount()).isEqualTo(0);
   }

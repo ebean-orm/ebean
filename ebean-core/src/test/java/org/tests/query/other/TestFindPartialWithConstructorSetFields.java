@@ -2,7 +2,7 @@ package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class)
+    List<Order> list = DB.find(Order.class)
       .setLazyLoadBatchSize(100)
       .setUseCache(false)
       .select("shipDate")
@@ -30,7 +30,7 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
 
     // assert first bean is partially loaded
     Order order0 = list.get(0);
-    BeanState beanState = Ebean.getBeanState(order0);
+    BeanState beanState = DB.beanState(order0);
     Set<String> loadedProps = beanState.getLoadedProps();
     assertTrue(loadedProps.contains("shipDate"));
     assertTrue(!loadedProps.contains("status"));
@@ -43,7 +43,7 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
     // assert that these beans are fully loaded
     for (int i = 1; i < list.size(); i++) {
       Order order1 = list.get(1);
-      beanState = Ebean.getBeanState(order1);
+      beanState = DB.beanState(order1);
       loadedProps = beanState.getLoadedProps();
       assertNull(loadedProps);
     }

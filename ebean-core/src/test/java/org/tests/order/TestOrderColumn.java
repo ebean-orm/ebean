@@ -1,6 +1,6 @@
 package org.tests.order;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,9 @@ public class TestOrderColumn extends TransactionalTestCase {
       master.getChildren().add(child);
     }
 
-    Ebean.save(master);
+    DB.save(master);
 
-    final OrderMaster result = Ebean.find(OrderMaster.class).findOne();
+    final OrderMaster result = DB.find(OrderMaster.class).findOne();
 
     assertThat(result.getChildren()).hasSize(5);
     assertThat(result.getChildren()).extracting(OrderReferencedChild::getName).containsExactly("p0", "p1", "p2", "p3", "p4");
@@ -43,9 +43,9 @@ public class TestOrderColumn extends TransactionalTestCase {
       master.getChildren().add(child);
     }
 
-    Ebean.save(master);
+    DB.save(master);
 
-    OrderMaster result = Ebean.find(OrderMaster.class).findOne();
+    OrderMaster result = DB.find(OrderMaster.class).findOne();
 
     assertThat(result.getChildren()).hasSize(5);
     assertThat(master.getChildren()).extracting(OrderReferencedChild::getName).containsExactly("p0", "p1", "p2", "p3", "p4");
@@ -53,9 +53,9 @@ public class TestOrderColumn extends TransactionalTestCase {
     master.getChildren().sort(Comparator.comparing(OrderReferencedChild::getName).reversed());
     assertThat(master.getChildren()).extracting(OrderReferencedChild::getName).containsExactly("p4", "p3", "p2", "p1", "p0");
 
-    Ebean.save(master);
+    DB.save(master);
 
-    result = Ebean.find(OrderMaster.class).findOne();
+    result = DB.find(OrderMaster.class).findOne();
 
     assertThat(result.getChildren()).hasSize(5);
     assertThat(result.getChildren()).extracting(OrderReferencedChild::getName).containsExactly("p4", "p3", "p2", "p1", "p0");
@@ -77,9 +77,9 @@ public class TestOrderColumn extends TransactionalTestCase {
       master.getChildren().add(child);
     }
 
-    Ebean.save(master);
+    DB.save(master);
 
-    final OrderMaster result = Ebean.find(OrderMaster.class).findOne();
+    final OrderMaster result = DB.find(OrderMaster.class).findOne();
 
     final List<OrderReferencedChild> children = result.getChildren();
     assertThat(children).hasSize(5);
@@ -98,7 +98,7 @@ public class TestOrderColumn extends TransactionalTestCase {
     children.get(3).getToys().get(2).setTitle("tt32");
 
     LoggedSqlCollector.start();
-    Ebean.save(result);
+    DB.save(result);
     final List<String> sql = LoggedSqlCollector.current();
     assertThat(sql).hasSize(3);
 
@@ -123,9 +123,9 @@ public class TestOrderColumn extends TransactionalTestCase {
       master.getChildren().add(child);
     }
 
-    Ebean.save(master);
+    DB.save(master);
 
-    final OrderMaster result = Ebean.find(OrderMaster.class).findOne();
+    final OrderMaster result = DB.find(OrderMaster.class).findOne();
 
     final List<OrderReferencedChild> children = result.getChildren();
     assertThat(children).hasSize(5);
@@ -135,7 +135,7 @@ public class TestOrderColumn extends TransactionalTestCase {
     child.getToys().remove(1);
 
     LoggedSqlCollector.start();
-    Ebean.save(result);
+    DB.save(result);
     final List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(4);

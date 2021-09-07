@@ -2,7 +2,7 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.MyLobSize;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,13 @@ public class TestDefaultFetchLazy extends BaseTestCase {
     m.setMyCount(10);
     m.setMyLob("A big lob of data");
 
-    Ebean.save(m);
+    DB.save(m);
 
     assertNotNull(m.getId());
 
-    MyLobSize myLobSize = Ebean.find(MyLobSize.class, m.getId());
+    MyLobSize myLobSize = DB.find(MyLobSize.class, m.getId());
 
-    BeanState beanState = Ebean.getBeanState(myLobSize);
+    BeanState beanState = DB.getBeanState(myLobSize);
     Set<String> loadedProps = beanState.getLoadedProps();
 
     assertNotNull(loadedProps);
@@ -39,7 +39,7 @@ public class TestDefaultFetchLazy extends BaseTestCase {
     assertFalse(loadedProps.contains("myCount"));
 
     // the details is also tuned
-    Query<MyLobSize> queryMany = Ebean.find(MyLobSize.class).fetch("details")// ,"+query")
+    Query<MyLobSize> queryMany = DB.find(MyLobSize.class).fetch("details")// ,"+query")
       .where().gt("id", 0).query();
 
     queryMany.findList();

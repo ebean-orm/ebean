@@ -1,7 +1,7 @@
 package org.tests.query.cache;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.ExpressionList;
 import org.junit.jupiter.api.Test;
 
@@ -18,9 +18,9 @@ public class TestDistinct extends BaseTestCase {
   @Test
   public void testMissingUnique() {
     Acl acl = new Acl("1");
-    Ebean.save(acl);
+    DB.save(acl);
     Acl acl2 = new Acl("2");
-    Ebean.save(acl2);
+    DB.save(acl2);
     Contract contract = new Contract();
     AclContainerRelation rel1 = new AclContainerRelation();
     rel1.setAclEntry(acl);
@@ -33,10 +33,10 @@ public class TestDistinct extends BaseTestCase {
     Position pos = new Position();
     pos.setContract(contract);
     contract.getPositions().add(pos);
-    Ebean.save(contract);
+    DB.save(contract);
     ContractCosts cost = new ContractCosts();
     cost.setPosition(pos);
-    Ebean.save(cost);
+    DB.save(cost);
 
     //costsQuery(acl.getId(), acl2.getId()).findCount();
 
@@ -50,10 +50,10 @@ public class TestDistinct extends BaseTestCase {
   }
 
   public ExpressionList<Position> positionsQuery(final Long aclId) {
-    return Ebean.find(Position.class).where().eq("contract.aclEntries.aclEntry.id", aclId);
+    return DB.find(Position.class).where().eq("contract.aclEntries.aclEntry.id", aclId);
   }
 
   public ExpressionList<ContractCosts> costsQuery(final Long... aclId) {
-    return Ebean.find(ContractCosts.class).where().in("position.contract.aclEntries.aclEntry.id", aclId);
+    return DB.find(ContractCosts.class).where().in("position.contract.aclEntries.aclEntry.id", aclId);
   }
 }

@@ -1,7 +1,7 @@
 package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -21,7 +21,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
   @Test
   public void test() {
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Order> d = server.getBeanDescriptor(Order.class);
     ElPropertyValue elGetValue = d.getElGetValue("customer.contacts");
 
@@ -29,7 +29,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class)
+    List<Order> list = DB.find(Order.class)
       .fetch("customer")
       .fetchQuery("customer.contacts", "firstName")
       .fetch("customer.contacts.group")
@@ -47,7 +47,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
     // String oq =
     // "find order join customer join customer.contacts join details (+query(4),+lazy(5))";
-    // Query<Order> q = Ebean.createQuery(Order.class, oq);
+    // Query<Order> q = DB.createQuery(Order.class, oq);
     // q.setAutoTune(false);
     // List<Order> list2 = q.findList();
     //

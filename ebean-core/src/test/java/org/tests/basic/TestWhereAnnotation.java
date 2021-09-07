@@ -1,6 +1,6 @@
 package org.tests.basic;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.TransactionalTestCase;
 
@@ -21,12 +21,12 @@ public class TestWhereAnnotation extends TransactionalTestCase {
 
     Customer custTest = ResetBasicData.createCustAndOrder("testWhereAnn");
 
-    Customer customer = Ebean.find(Customer.class, custTest.getId());
+    Customer customer = DB.find(Customer.class, custTest.getId());
     List<Order> orders = customer.getOrders();
 
     assertTrue(!orders.isEmpty());
 
-    Query<Customer> q1 = Ebean.find(Customer.class).setUseCache(false).fetch("orders").where()
+    Query<Customer> q1 = DB.find(Customer.class).setUseCache(false).fetch("orders").where()
       .idEq(1).query();
 
     q1.findOne();

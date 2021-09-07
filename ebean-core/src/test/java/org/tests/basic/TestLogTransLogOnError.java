@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -21,18 +21,18 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
 
-      Ebean.find(Customer.class).findList();
-      Ebean.find(Order.class).where().gt("id", 1).findList();
+      DB.find(Customer.class).findList();
+      DB.find(Order.class).where().gt("id", 1).findList();
 
       EBasicVer newBean = new EBasicVer("aName");
       newBean.setDescription("something");
 
-      // Ebean.save(newBean);
+      // DB.save(newBean);
 
       // t.log("--- next query should error");
-      List<Customer> list = Ebean.find(Customer.class).where().eq("id", "NotAnInt!!").findList();
+      List<Customer> list = DB.find(Customer.class).where().eq("id", "NotAnInt!!").findList();
 
       assertEquals(0, list.size());
       // Get here with mysql?
@@ -49,8 +49,8 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    try (Transaction txn = Ebean.beginTransaction()) {
-      Ebean.find(Customer.class).findList();
+    try (Transaction txn = DB.beginTransaction()) {
+      DB.find(Customer.class).findList();
 
       EBasicVer newBean = new EBasicVer("aName");
       newBean
@@ -60,7 +60,7 @@ public class TestLogTransLogOnError extends BaseTestCase {
           + "dfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ");
 
       // t.log("--- next insert should error");
-      Ebean.save(newBean);
+      DB.save(newBean);
 
       // never get here
       assertTrue(false);

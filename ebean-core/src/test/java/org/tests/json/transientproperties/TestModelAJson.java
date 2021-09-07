@@ -1,6 +1,6 @@
 package org.tests.json.transientproperties;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.PathProperties;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ public class TestModelAJson {
 
     PathProperties pathProperties = PathProperties.parse("(a,list(oneField))");
 
-    String json = Ebean.json().toJson(a, pathProperties);
+    String json = DB.json().toJson(a, pathProperties);
 
     assertThat(json).isEqualTo("{\"a\":\"a\",\"list\":[{\"oneField\":1}]}");
 

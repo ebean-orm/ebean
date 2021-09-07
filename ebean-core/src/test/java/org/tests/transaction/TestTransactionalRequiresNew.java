@@ -1,8 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebean.annotation.Transactional;
@@ -30,11 +30,11 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
   public void basic() {
 
     outerTxn = null;
-    assertNull(Ebean.currentTransaction());
+    assertNull(DB.currentTransaction());
 
     new OuterTransactionalWithRequired().doOuter();
 
-    assertNull(Ebean.currentTransaction());
+    assertNull(DB.currentTransaction());
     assertNotNull(outerTxn);
   }
 
@@ -43,14 +43,14 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
 
     @Transactional
     void doOuter() {
-      outerTxn = Ebean.currentTransaction();
+      outerTxn = DB.currentTransaction();
       log.info("outer before ...{}", outerTxn);
       outerConn = outerTxn.getConnection();
 
       new InTransactionalWithRequiresNew().doInner();
 
       // restore the outerTxn
-      Transaction current = Ebean.currentTransaction();
+      Transaction current = DB.currentTransaction();
       log.info("outer after ...{}", current);
       assertSame(outerConn, current.getConnection());
     }
@@ -61,7 +61,7 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
 
     @Transactional(type = TxType.REQUIRES_NEW)
     void doInner() {
-      Transaction innerTxn = Ebean.currentTransaction();
+      Transaction innerTxn = DB.currentTransaction();
       log.info("inner ...{} {}", innerTxn);
 
       Connection connection = innerTxn.getConnection();
@@ -71,14 +71,14 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
 
   @Test
   public void testDifferentCreation1() {
-    EbeanServer server = server();
+    Database server = server();
     try(Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
-      Ebean.beginTransaction(TxScope.requiresNew());
+      DB.beginTransaction(TxScope.requiresNew());
       try {
-        Ebean.commitTransaction();
+        DB.commitTransaction();
       } finally {
-        Ebean.endTransaction();
+        DB.endTransaction();
       }
       assertThat(txn.toString()).isEqualTo(txnName);
     }
@@ -86,7 +86,7 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
 
   @Test
   public void testDifferentCreation2() {
-    EbeanServer server = server();
+    Database server = server();
     try (Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
       server.beginTransaction(TxScope.requiresNew());
@@ -101,10 +101,10 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
 
   @Test
   public void testDifferentCreation3() {
-    EbeanServer server = server();
+    Database server = server();
     try (Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
-      Transaction txn2 = Ebean.beginTransaction(TxScope.requiresNew());
+      Transaction txn2 = DB.beginTransaction(TxScope.requiresNew());
       try {
         txn2.commit();
       } finally {
@@ -116,7 +116,7 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
 
   @Test
   public void testDifferentCreation4() {
-    EbeanServer server = server();
+    Database server = server();
     try (Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
       server.beginTransaction(TxScope.requiresNew());

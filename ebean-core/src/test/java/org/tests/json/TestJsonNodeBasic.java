@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Order;
 import org.tests.model.json.EBasicJsonNode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,9 +38,9 @@ public class TestJsonNodeBasic extends BaseTestCase {
     bean.setName("one");
     bean.setContent(content);
 
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicJsonNode bean1 = Ebean.find(EBasicJsonNode.class, bean.getId());
+    EBasicJsonNode bean1 = DB.find(EBasicJsonNode.class, bean.getId());
 
     assertEquals(bean.getId(), bean1.getId());
     assertEquals(bean.getName(), bean1.getName());
@@ -49,15 +49,15 @@ public class TestJsonNodeBasic extends BaseTestCase {
     assertEquals(18L, bean1.getContent().get("docId").asLong());
 
     bean1.setName("just change name");
-    Ebean.save(bean1);
+    DB.save(bean1);
 
     JsonNode content1 = objectMapper.readTree(s1);
 
     bean1.setName("two");
     bean1.setContent(content1);
-    Ebean.save(bean1);
+    DB.save(bean1);
 
-    EBasicJsonNode bean2 = Ebean.find(EBasicJsonNode.class, bean.getId());
+    EBasicJsonNode bean2 = DB.find(EBasicJsonNode.class, bean.getId());
 
     // name changed and docId changed
     assertEquals("two", bean2.getName());
@@ -66,18 +66,18 @@ public class TestJsonNodeBasic extends BaseTestCase {
     // content persisted even though it has not changed (as it's loaded)
     // we can't do dirty detection on JsonNode (like we do on Map<String,Object>)
     bean1.setName("three");
-    Ebean.save(bean1);
+    DB.save(bean1);
 
-    EBasicJsonNode bean3 = Ebean.find(EBasicJsonNode.class, bean.getId());
+    EBasicJsonNode bean3 = DB.find(EBasicJsonNode.class, bean.getId());
 
     assertEquals("three", bean3.getName());
     assertEquals(99L, bean3.getContent().path("docId").asLong());
 
     // write whole bean with content as JSON
-    String fullBeanJson = Ebean.json().toJson(bean3);
+    String fullBeanJson = DB.json().toJson(bean3);
 
     // parse JSON into whole bean with content
-    EBasicJsonNode beanJsonRestored = Ebean.json().toBean(EBasicJsonNode.class, fullBeanJson);
+    EBasicJsonNode beanJsonRestored = DB.json().toBean(EBasicJsonNode.class, fullBeanJson);
 
     assertEquals(99L, beanJsonRestored.getContent().path("docId").asLong());
   }
@@ -94,14 +94,14 @@ public class TestJsonNodeBasic extends BaseTestCase {
     EBasicJsonNode bean = new EBasicJsonNode();
     bean.setName("lazyLoadTest");
     bean.setContent(content);
-    Ebean.save(bean);
+    DB.save(bean);
 
-    EBasicJsonNode bean1 = Ebean.find(EBasicJsonNode.class)
+    EBasicJsonNode bean1 = DB.find(EBasicJsonNode.class)
       .select("name")
       .setId(bean.getId())
       .findOne();
 
-    Set<String> loadedProps = Ebean.getBeanState(bean1).getLoadedProps();
+    Set<String> loadedProps = DB.getBeanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));
 

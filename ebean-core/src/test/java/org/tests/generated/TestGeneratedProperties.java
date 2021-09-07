@@ -1,7 +1,7 @@
 package org.tests.generated;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.EGenProps;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ public class TestGeneratedProperties extends BaseTestCase {
 
     EGenProps bean = new EGenProps();
     bean.setName("inserting");
-    Ebean.save(bean);
+    DB.save(bean);
 
     assertNotNull(bean.getId());
     assertNotNull(bean.getVersion());
@@ -38,13 +38,13 @@ public class TestGeneratedProperties extends BaseTestCase {
     assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
 
     bean.setName("updating...");
-    Ebean.save(bean);
+    DB.save(bean);
 
     assertThat(bean.getWhenModified()).isNotEqualTo(bean.getLongCreated());
     assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongUpdated());
     assertThat(bean.getInstantUpdated().toEpochMilli()).isEqualTo(bean.getLongUpdated());
     assertThat(bean.getInstantCreated().toEpochMilli()).isEqualTo(bean.getLongCreated());
 
-    Ebean.delete(bean);
+    DB.delete(bean);
   }
 }

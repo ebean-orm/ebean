@@ -1,7 +1,7 @@
 package org.tests.unitinternal;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.xtra.DummyDao;
@@ -42,7 +42,7 @@ public class TestTxTypeOnTransactional extends BaseTestCase {
     logger.info("-- testOptimisticException");
     EBasicVer v = new EBasicVer("occ");
     v.setDescription("blah");
-    Ebean.save(v);
+    DB.save(v);
 
     logger.info("-- OptimisticLockExceptionThrowingDao");
     OptimisticLockExceptionThrowingDao dao = new OptimisticLockExceptionThrowingDao();

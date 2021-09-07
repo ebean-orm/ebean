@@ -1,7 +1,7 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.update.objects.Child;
@@ -20,19 +20,19 @@ public class TestUpdateCircularSave extends BaseTestCase {
     long aId = createA();
     modifyPropertyToTrue(aId);
 
-    SiblingA siblingA = Ebean.find(SiblingA.class, aId);
+    SiblingA siblingA = DB.find(SiblingA.class, aId);
     assert siblingA != null;
     assertTrue(siblingA.getSiblingB().isTestProperty());
   }
 
   private void modifyPropertyToTrue(long aId) {
-    SiblingA siblingA = Ebean.find(SiblingA.class, aId);
+    SiblingA siblingA = DB.find(SiblingA.class, aId);
     assert siblingA != null;
 
     final SiblingB siblingB = siblingA.getSiblingB();
     siblingB.setTestProperty(true);
     // Will get optimistic lock as version is increased twice on B
-    Ebean.save(siblingB);
+    DB.save(siblingB);
   }
 
   private long createA() {
@@ -40,7 +40,7 @@ public class TestUpdateCircularSave extends BaseTestCase {
     SiblingB siblingB = new SiblingB();
     siblingA.setSiblingB(siblingB);
 
-    Ebean.save(siblingA);
+    DB.save(siblingA);
     return siblingA.getId();
   }
 
@@ -50,18 +50,18 @@ public class TestUpdateCircularSave extends BaseTestCase {
 
     long childId = createParentAndChild().getChild().getId();
 
-    Child child = Ebean.find(Child.class, childId);
+    Child child = DB.find(Child.class, childId);
     assert child != null;
 
     child.setTestProperty(true);
     final Parent parent = child.getParent();
-    Ebean.save(parent);
+    DB.save(parent);
 
     assertChildModified(childId);
   }
 
   private void assertChildModified(long childId) {
-    Parent parent = Ebean.find(Parent.class, childId);
+    Parent parent = DB.find(Parent.class, childId);
     assert parent != null;
     // Fails here because D was not saved even though C has cascade = ALL
     assertTrue(parent.getChild().isTestProperty());
@@ -73,7 +73,7 @@ public class TestUpdateCircularSave extends BaseTestCase {
     Child child = new Child();
     parent.setChild(child);
 
-    Ebean.save(parent);
+    DB.save(parent);
     return parent;
   }
 
@@ -82,11 +82,11 @@ public class TestUpdateCircularSave extends BaseTestCase {
   public void testFetchParentModifyChildSaveParent() {
     long parentId = createParentAndChild().getId();
 
-    Parent parent = Ebean.find(Parent.class, parentId);
+    Parent parent = DB.find(Parent.class, parentId);
     assert parent != null;
 
     parent.getChild().setTestProperty(true);
-    Ebean.save(parent);
+    DB.save(parent);
 
     assertChildModified(parent.getChild().getId());
   }

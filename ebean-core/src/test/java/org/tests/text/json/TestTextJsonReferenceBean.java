@@ -2,7 +2,7 @@ package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
@@ -26,13 +26,13 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
-    JsonContext jsonContext = Ebean.json();
+    JsonContext jsonContext = DB.json();
 
-    Product product = Ebean.getReference(Product.class, 1);
+    Product product = DB.getReference(Product.class, 1);
 
-    BeanState beanState0 = Ebean.getBeanState(product);
+    BeanState beanState0 = DB.getBeanState(product);
     if (!beanState0.isReference()) {
       // got a cached value from beanCache
 
@@ -46,7 +46,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       EntityBean eb = (EntityBean) refProd;
       prodDesc.isReference(eb._ebean_getIntercept());
 
-      BeanState beanState = Ebean.getBeanState(refProd);
+      BeanState beanState = DB.getBeanState(refProd);
       assertTrue(beanState.isNew());
 
       String name = refProd.getName();
@@ -58,7 +58,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       assertNotNull(name2);
     }
 
-    List<Order> orders = Ebean.find(Order.class)
+    List<Order> orders = DB.find(Order.class)
       // .setUseCache(false)
       .select("status, orderDate, shipDate, customer").fetch("details", "*")
       // .fetch("details.product","id")

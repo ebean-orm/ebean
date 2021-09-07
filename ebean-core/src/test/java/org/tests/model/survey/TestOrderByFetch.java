@@ -1,7 +1,7 @@
 package org.tests.model.survey;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -38,9 +38,9 @@ public class TestOrderByFetch extends BaseTestCase {
     questionListGroup2.add(question(2));
     group2.setQuestions(questionListGroup2);
 
-    Ebean.save(survey);
+    DB.save(survey);
 
-    Survey foundSurvey = Ebean.find(Survey.class)
+    Survey foundSurvey = DB.find(Survey.class)
       .setDisableLazyLoading(true)
       .fetch("categories")
       .fetch("categories.groups")

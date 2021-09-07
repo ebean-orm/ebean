@@ -3,8 +3,8 @@ package org.tests.inheritance;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.model.CalculationResult;
 import org.tests.inheritance.model.Configurations;
@@ -21,7 +21,7 @@ public class TestInheritanceJoins extends BaseTestCase {
   @Test
   public void testAssocOne() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     ProductConfiguration pc = new ProductConfiguration();
     pc.setName("PC1");
@@ -41,7 +41,7 @@ public class TestInheritanceJoins extends BaseTestCase {
   @Test
   public void assocOne_when_null() {
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     GroupConfiguration gc = new GroupConfiguration();
     gc.setName("GC1");
@@ -66,7 +66,7 @@ public class TestInheritanceJoins extends BaseTestCase {
 
 		/* Ensures the fetch join to a property with inheritance work as a left join */
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     final ProductConfiguration pc = new ProductConfiguration();
     pc.setName("PC1");
@@ -84,7 +84,7 @@ public class TestInheritanceJoins extends BaseTestCase {
   public void testAssocMany() {
     Configurations configurations = new Configurations();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     server.save(configurations);
 
@@ -107,7 +107,7 @@ public class TestInheritanceJoins extends BaseTestCase {
   public void testAssocManyWithNoneRelated() {
     Configurations configurations = new Configurations();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     server.save(configurations);
 

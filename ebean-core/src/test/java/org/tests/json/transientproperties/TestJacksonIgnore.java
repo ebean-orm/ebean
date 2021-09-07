@@ -1,6 +1,6 @@
 package org.tests.json.transientproperties;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,12 +15,12 @@ public class TestJacksonIgnore {
     bean.setName("foo");
     bean.setBasic(Boolean.TRUE);
 
-    String asJson = Ebean.json().toJson(bean);
+    String asJson = DB.json().toJson(bean);
 
     // ignored on write
     assertFalse(asJson.contains("basic"));
 
-    EJsonJacksonIgnore bean1 = Ebean.json().toBean(EJsonJacksonIgnore.class, asJson);
+    EJsonJacksonIgnore bean1 = DB.json().toBean(EJsonJacksonIgnore.class, asJson);
 
     assertNull(bean1.getBasic());
     assertEquals(bean.getId(), bean1.getId());
@@ -29,7 +29,7 @@ public class TestJacksonIgnore {
     // ignored on read
     String jsonFull = "{\"id\":99,\"name\":\"foo\",\"basic\":true}";
 
-    bean1 = Ebean.json().toBean(EJsonJacksonIgnore.class, jsonFull);
+    bean1 = DB.json().toBean(EJsonJacksonIgnore.class, jsonFull);
 
     assertNull(bean1.getBasic());
     assertEquals(bean.getId(), bean1.getId());

@@ -2,7 +2,7 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ public class TestTransactionSkipCache extends BaseTestCase {
 
   private void findUseQueryCache() {
 
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .setUseQueryCache(true)
       .setBeanCacheMode(CacheMode.PUT)
       .where().startsWith("name", "Rob")
@@ -35,7 +35,7 @@ public class TestTransactionSkipCache extends BaseTestCase {
 
     setup();
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     try {
       transaction.setSkipCache(true);
 

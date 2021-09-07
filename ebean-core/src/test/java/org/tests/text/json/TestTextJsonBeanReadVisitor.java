@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -20,14 +20,14 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class)
+    List<Customer> list = DB.find(Customer.class)
       .select("id, name, status, shippingAddress")
       .fetch("billingAddress", "line1, city")
       .fetch("billingAddress.country", "*")
       .fetch("contacts", "firstName,email")
       .order().desc("id").findList();
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
 
 
     String s = json.toJson(list);

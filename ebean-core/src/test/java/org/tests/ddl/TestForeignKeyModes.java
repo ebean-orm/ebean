@@ -1,7 +1,7 @@
 package org.tests.ddl;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
@@ -17,15 +17,15 @@ public class TestForeignKeyModes extends BaseTestCase {
   public void none() {
 
     DfkOne one = new DfkOne("one");
-    Ebean.save(one);
+    DB.save(one);
 
     DfkNone none = new DfkNone("none", one);
-    Ebean.save(none);
+    DB.save(none);
 
     // fails unless there is no Foreign key ...
-    Ebean.delete(one);
+    DB.delete(one);
 
-    DfkNone found = Ebean.find(DfkNone.class, none.getId());
+    DfkNone found = DB.find(DfkNone.class, none.getId());
     assertThat(found).isNotNull();
     // we still reference one ... even though it does not exist anymore
     assertThat(found.getOne()).isNotNull();
@@ -36,15 +36,15 @@ public class TestForeignKeyModes extends BaseTestCase {
   public void noneViaJoin() {
 
     DfkOne one = new DfkOne("one2");
-    Ebean.save(one);
+    DB.save(one);
 
     DfkNoneViaJoin none = new DfkNoneViaJoin("none2", one);
-    Ebean.save(none);
+    DB.save(none);
 
     // fails unless there is no Foreign key ...
-    Ebean.delete(one);
+    DB.delete(one);
 
-    DfkNoneViaJoin found = Ebean.find(DfkNoneViaJoin.class, none.getId());
+    DfkNoneViaJoin found = DB.find(DfkNoneViaJoin.class, none.getId());
     assertThat(found).isNotNull();
     // we still reference one ... even though it does not exist anymore
     assertThat(found.getOne()).isNotNull();
@@ -53,7 +53,7 @@ public class TestForeignKeyModes extends BaseTestCase {
   @Test
   public void noneViaManyToMany() {
 
-    DfkOne one = Ebean.getReference(DfkOne.class, 999L);
+    DfkOne one = DB.getReference(DfkOne.class, 999L);
 
     DfkNoneViaMtoM none = new DfkNoneViaMtoM("none2");
     none.getOnes().add(one);
@@ -61,9 +61,9 @@ public class TestForeignKeyModes extends BaseTestCase {
     // Would normally fail as DfkOne id:999 is not actually in Database
     // and with the foreign key constraint on the intersection table the
     // insert into the intersection table would fail
-    Ebean.save(none);
+    DB.save(none);
 
-    DfkNoneViaMtoM found = Ebean.find(DfkNoneViaMtoM.class)
+    DfkNoneViaMtoM found = DB.find(DfkNoneViaMtoM.class)
       .setId(none.getId())
       .fetch("ones", "id")
       .findOne();
@@ -76,7 +76,7 @@ public class TestForeignKeyModes extends BaseTestCase {
     assertThat(found.getOnes()).hasSize(0);
 
     LoggedSqlCollector.start();
-    Ebean.delete(none);
+    DB.delete(none);
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(3);
@@ -90,15 +90,15 @@ public class TestForeignKeyModes extends BaseTestCase {
   public void setNullOnDelete() {
 
     DfkOne one = new DfkOne("one2");
-    Ebean.save(one);
+    DB.save(one);
 
     DfkSetNull other = new DfkSetNull("none", one);
-    Ebean.save(other);
+    DB.save(other);
 
     // success with ... fkey value set to null
-    Ebean.delete(one);
+    DB.delete(one);
 
-    DfkSetNull found = Ebean.find(DfkSetNull.class, other.getId());
+    DfkSetNull found = DB.find(DfkSetNull.class, other.getId());
     assertThat(found).isNotNull();
     assertThat(found.getOne()).isNull();
   }
@@ -115,18 +115,18 @@ public class TestForeignKeyModes extends BaseTestCase {
     one.getDetails().add(new DfkCascade("cascade2", one));
     one.getDetails().add(new DfkCascade("cascade3", one));
 
-    Ebean.save(one);
+    DB.save(one);
 
 
     LoggedSqlCollector.start();
-    Ebean.delete(one);
+    DB.delete(one);
 
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("delete from dfk_cascade_one where id=?");
 
-    DfkCascade found = Ebean.find(DfkCascade.class, other.getId());
+    DfkCascade found = DB.find(DfkCascade.class, other.getId());
     assertThat(found).isNull();
 
   }

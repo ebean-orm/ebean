@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
@@ -22,9 +22,9 @@ public class TestJsonMap extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> customers = Ebean.find(Customer.class).findList();
+    List<Customer> customers = DB.find(Customer.class).findList();
 
-    JsonContext jsonContext = Ebean.json();
+    JsonContext jsonContext = DB.json();
 
     JsonWriteOptions jsonWriteOptions = JsonWriteOptions.parsePath("(id,status,name)");
     String jsonString = jsonContext.toJson(customers, jsonWriteOptions);
@@ -41,9 +41,9 @@ public class TestJsonMap extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Map<String, Customer> map = Ebean.find(Customer.class).findMap();
+    Map<String, Customer> map = DB.find(Customer.class).findMap();
 
-    JsonContext jsonContext = Ebean.json();
+    JsonContext jsonContext = DB.json();
     JsonWriteOptions options = JsonWriteOptions.parsePath("(id,status,name)");
 
     jsonContext.toJson(map, options);
@@ -66,11 +66,11 @@ public class TestJsonMap extends BaseTestCase {
     PathProperties pathProperties =
       PathProperties.parse("(id,status,name,shippingAddress(id,line1,city),billingAddress(*),contacts(*))");
 
-    List<Customer> customers = Ebean.find(Customer.class)
+    List<Customer> customers = DB.find(Customer.class)
       .apply(pathProperties)
       .findList();
 
-    Ebean.json().toJson(customers, pathProperties);
+    DB.json().toJson(customers, pathProperties);
 
     // Assert.assertTrue(jsonString.indexOf("{\"1\":") > -1);
     // Assert.assertTrue(jsonString.indexOf("{\"id\":1,\"status\":\"NEW\",\"name\":\"Rob\"},")

@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebeaninternal.api.SpiQuery;
 
 public class OrmQueryRequestTestHelper {
 
-  static DefaultServer defaultServer = (DefaultServer) Ebean.getDefaultServer();
+  static DefaultServer defaultServer = (DefaultServer) DB.getDefault();
 
   /**
    * Create and return a OrmQueryRequest for the given query.

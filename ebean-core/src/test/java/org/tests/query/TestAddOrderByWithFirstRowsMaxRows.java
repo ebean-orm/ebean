@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.PagedList;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setFirstRow(3)
       .order().asc("id")
       .findList();
@@ -43,7 +43,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setMaxRows(10)
       .findList();
 
@@ -63,7 +63,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setFirstRow(3)
       .setMaxRows(10)
       .order().asc("id")
@@ -84,7 +84,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     // maxRows 1 with no first rows means Ebean does not automatically
     // add the order by id to the query
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setMaxRows(1)
       .findList();
 
@@ -102,7 +102,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     LoggedSqlCollector.start();
 
     PagedList<Order> pagedList =
-      Ebean.find(Order.class)
+      DB.find(Order.class)
         .setMaxRows(10)
         .findPagedList();
 
@@ -123,7 +123,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .setFirstRow(10)
       .setMaxRows(10)
       .order("id")
@@ -146,7 +146,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .order().asc("orderDate")
       .setMaxRows(10)
       .findPagedList()
@@ -165,7 +165,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Ebean.find(Order.class)
+    DB.find(Order.class)
       .order().asc("orderDate")
       .order().desc("id")
       .setMaxRows(10)

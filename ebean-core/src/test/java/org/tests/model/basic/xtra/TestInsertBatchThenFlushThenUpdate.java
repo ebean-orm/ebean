@@ -1,7 +1,7 @@
 package org.tests.model.basic.xtra;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -22,7 +22,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
   public void test() {
 
     LoggedSqlCollector.start();
-    try (Transaction txn = Ebean.beginTransaction()) {
+    try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
 
       EdParent parent = new EdParent();
@@ -35,7 +35,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       children.add(child);
       parent.setChildren(children);
 
-      Ebean.save(parent);
+      DB.save(parent);
 
       // nothing flushed yet
       assertThat(LoggedSqlCollector.start()).isEmpty();
@@ -46,12 +46,12 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       assertThat(loggedSql1).hasSize(4);
 
       parent.setName("MyDesk");
-      Ebean.save(parent);
+      DB.save(parent);
 
       // nothing flushed yet
       assertThat(LoggedSqlCollector.start()).isEmpty();
 
-      Ebean.commitTransaction();
+      DB.commitTransaction();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSqlCollector.start();

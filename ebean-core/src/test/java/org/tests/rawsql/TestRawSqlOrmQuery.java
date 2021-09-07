@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.FutureRowCount;
 import io.ebean.PagedList;
@@ -34,7 +34,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("r.id", "id")
       .columnMapping("r.name", "name").create();
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
@@ -60,7 +60,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse("select id, NAME from O_CUSTOMER ").create();
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
@@ -80,7 +80,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
         .columnMapping("r.name", "name")
         .create();
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     query.setRawSql(rawSql);
 
     int initialRowCount = query.findCount();
@@ -114,7 +114,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("r.name", "name")
       .create();
 
-    Query<Customer> query = Ebean.find(Customer.class);
+    Query<Customer> query = DB.find(Customer.class);
     query.setRawSql(rawSql);
 
     int initialRowCount = query.findCount();
@@ -145,7 +145,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("o.ship_date", "shipDate")
       .create();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
@@ -179,7 +179,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("o.ship_date", "shipDate")
       .create();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
     query.setRawSql(rawSql);
     query.orderById(true);
 
@@ -215,7 +215,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("o.ship_date", "shipDate")
       .create();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
@@ -247,7 +247,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("o.ship_date", "shipDate")
       .create();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
@@ -279,7 +279,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       .columnMapping("o.ship_date", "shipDate")
       .create();
 
-    Query<Order> query = Ebean.find(Order.class);
+    Query<Order> query = DB.find(Order.class);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);

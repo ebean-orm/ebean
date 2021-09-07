@@ -1,7 +1,7 @@
 package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.softdelete.ESoftDelBook;
 import org.tests.model.softdelete.ESoftDelUser;
@@ -18,28 +18,28 @@ public class TestSoftDeleteBook extends BaseTestCase {
 
     // Create users
     ESoftDelUser user1 = new ESoftDelUser("user1");
-    Ebean.save(user1);
+    DB.save(user1);
 
     ESoftDelUser user2 = new ESoftDelUser("user2");
-    Ebean.save(user2);
+    DB.save(user2);
 
     ESoftDelUser user3 = new ESoftDelUser("user3");
-    Ebean.save(user3);
+    DB.save(user3);
 
     // Create books
     ESoftDelBook book1 = new ESoftDelBook("book1");
     book1.setLendBy(user1);
     book1.setLendBys(Arrays.asList(user2, user3));
-    Ebean.save(book1);
+    DB.save(book1);
 
     ESoftDelBook book2 = new ESoftDelBook("book2");
     book2.setLendBy(user2);
     book2.setLendBys(Arrays.asList(user1, user3));
-    Ebean.save(book2);
+    DB.save(book2);
 
     // check if everything is stored correctly in DB
-    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findOne();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findOne();
+    book1 = DB.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findOne();
+    book2 = DB.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findOne();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2);
     assertThat(book2.getLendBys().size()).isEqualTo(2);
@@ -47,11 +47,11 @@ public class TestSoftDeleteBook extends BaseTestCase {
     assertThat(book2.getLendBy().getUserName()).isEqualTo("user2");
 
     // delete user 1
-    Ebean.delete(user1);
+    DB.delete(user1);
 
     // check if everything is still stored correctly in DB (softdeletes included)
-    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").setIncludeSoftDeletes().findOne();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").setIncludeSoftDeletes().findOne();
+    book1 = DB.find(ESoftDelBook.class).where().eq("bookTitle", "book1").setIncludeSoftDeletes().findOne();
+    book2 = DB.find(ESoftDelBook.class).where().eq("bookTitle", "book2").setIncludeSoftDeletes().findOne();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2);
     assertThat(book2.getLendBys().size()).isEqualTo(2);
@@ -60,8 +60,8 @@ public class TestSoftDeleteBook extends BaseTestCase {
 
 
     // check without softdeletes included
-    book1 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findOne();
-    book2 = Ebean.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findOne();
+    book1 = DB.find(ESoftDelBook.class).where().eq("bookTitle", "book1").findOne();
+    book2 = DB.find(ESoftDelBook.class).where().eq("bookTitle", "book2").findOne();
 
     assertThat(book1.getLendBys().size()).isEqualTo(2); // user2 & user3
     assertThat(book2.getLendBys().size()).isEqualTo(1); // user1 (deleted) & user3
@@ -83,21 +83,21 @@ public class TestSoftDeleteBook extends BaseTestCase {
 
     // Create users
     ESoftDelUser user1 = new ESoftDelUser("user1");
-    Ebean.save(user1);
+    DB.save(user1);
 
     ESoftDelUser user2 = new ESoftDelUser("user2");
-    Ebean.save(user2);
+    DB.save(user2);
 
     // Create books
     ESoftDelBook book1 = new ESoftDelBook("book3");
     book1.setLendBy(user1);
     book1.setLendBys(Arrays.asList(user1, user2));
-    Ebean.save(book1);
+    DB.save(book1);
 
-    Ebean.delete(user1);
-    Ebean.delete(user2);
+    DB.delete(user1);
+    DB.delete(user2);
 
-    Query<ESoftDelBook> query = Ebean.find(ESoftDelBook.class)
+    Query<ESoftDelBook> query = DB.find(ESoftDelBook.class)
       .setId(book1.getId())
       .fetch("lendBys");
 

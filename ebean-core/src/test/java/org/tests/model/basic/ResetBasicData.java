@@ -1,7 +1,7 @@
 package org.tests.model.basic;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.tests.model.basic.Order.Status;
 
 import java.sql.Date;
@@ -12,7 +12,7 @@ public class ResetBasicData {
 
   private static boolean runOnce;
 
-  private static EbeanServer server = Ebean.getServer(null);
+  private static Database server = DB.getDefault();
 
   public static synchronized void reset() {
 
@@ -57,7 +57,7 @@ public class ResetBasicData {
 
 
   public void deleteAll() {
-    Ebean.execute(() -> {
+    DB.execute(() -> {
 
       // orm update use bean name and bean properties
       server.sqlUpdate("delete from o_cached_bean_child").execute();
@@ -134,7 +134,7 @@ public class ResetBasicData {
 
   public void insertTestCustAndOrders() {
 
-    Ebean.execute(() -> {
+    DB.execute(() -> {
       Customer cust1 = insertCustomer("Rob");
       Customer cust2 = insertCustomerNoAddress();
       insertCustomerFiona();
@@ -173,7 +173,7 @@ public class ResetBasicData {
     c.addContact(createContact("Fiona", "Black"));
     c.addContact(createContact("Tracy", "Red"));
 
-    Ebean.save(c);
+    DB.save(c);
     return c;
   }
 
@@ -190,7 +190,7 @@ public class ResetBasicData {
     c.setName(name);
     c.setStatus(Customer.Status.ACTIVE);
 
-    Ebean.save(c);
+    DB.save(c);
     return c;
   }
 
@@ -201,13 +201,13 @@ public class ResetBasicData {
     c.setStatus(Customer.Status.NEW);
     c.addContact(createContact("Jack", "Black"));
 
-    Ebean.save(c);
+    DB.save(c);
     return c;
   }
 
   private static Customer insertCustomer(String name) {
     Customer c = createCustomer(name, "1 Banana St", "P.O.Box 1234", 1, null);
-    Ebean.save(c);
+    DB.save(c);
     return c;
   }
 
@@ -237,7 +237,7 @@ public class ResetBasicData {
       shippingAddr.setLine1(shippingStreet);
       shippingAddr.setLine2("Sandringham");
       shippingAddr.setCity("Auckland");
-      shippingAddr.setCountry(Ebean.getReference(Country.class, "NZ"));
+      shippingAddr.setCountry(DB.getReference(Country.class, "NZ"));
 
       c.setShippingAddress(shippingAddr);
     }
@@ -247,7 +247,7 @@ public class ResetBasicData {
       billingAddr.setLine1(billingStreet);
       billingAddr.setLine2("St Lukes");
       billingAddr.setCity("Auckland");
-      billingAddr.setCountry(Ebean.getReference(Country.class, "NZ"));
+      billingAddr.setCountry(DB.getReference(Country.class, "NZ"));
 
       c.setBillingAddress(billingAddr);
     }
@@ -257,9 +257,9 @@ public class ResetBasicData {
 
   private Order createOrder1(Customer customer) {
 
-    Product product1 = Ebean.getReference(Product.class, 1);
-    Product product2 = Ebean.getReference(Product.class, 2);
-    Product product3 = Ebean.getReference(Product.class, 3);
+    Product product1 = DB.getReference(Product.class, 1);
+    Product product2 = DB.getReference(Product.class, 2);
+    Product product3 = DB.getReference(Product.class, 3);
 
 
     Order order = new Order();
@@ -275,13 +275,13 @@ public class ResetBasicData {
 
     order.addShipment(new OrderShipment());
 
-    Ebean.save(order);
+    DB.save(order);
     return order;
   }
 
   private void createOrder2(Customer customer) {
 
-    Product product1 = Ebean.getReference(Product.class, 1);
+    Product product1 = DB.getReference(Product.class, 1);
 
     Order order = new Order();
     order.setStatus(Status.SHIPPED);
@@ -294,13 +294,13 @@ public class ResetBasicData {
 
     order.addShipment(new OrderShipment());
 
-    Ebean.save(order);
+    DB.save(order);
   }
 
   private void createOrder3(Customer customer) {
 
-    Product product1 = Ebean.getReference(Product.class, 1);
-    Product product3 = Ebean.getReference(Product.class, 3);
+    Product product1 = DB.getReference(Product.class, 1);
+    Product product3 = DB.getReference(Product.class, 3);
 
     Order order = new Order();
     order.setStatus(Status.COMPLETE);
@@ -315,7 +315,7 @@ public class ResetBasicData {
 
     order.addShipment(new OrderShipment());
 
-    Ebean.save(order);
+    DB.save(order);
   }
 
   private void createOrder4(Customer customer) {
@@ -326,7 +326,7 @@ public class ResetBasicData {
 
     order.addShipment(new OrderShipment());
 
-    Ebean.save(order);
+    DB.save(order);
   }
 
   private void createOrder5(Customer customer) {
@@ -336,6 +336,6 @@ public class ResetBasicData {
     order.setOrderDate(Date.valueOf("2018-06-28"));
     order.addShipment(new OrderShipment());
 
-    Ebean.save(order);
+    DB.save(order);
   }
 }

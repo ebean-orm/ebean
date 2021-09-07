@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
@@ -15,7 +15,7 @@ public class TestErrorBindLog extends BaseTestCase {
   public void test() {
 
     try {
-      Ebean.find(Order.class).where().gt("id", "JUNK").findList();
+      DB.find(Order.class).where().gt("id", "JUNK").findList();
 
     } catch (PersistenceException e) {
       String msg = e.getMessage();

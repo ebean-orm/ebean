@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -15,7 +15,7 @@ public class TestFindOneOrEmpty extends BaseTestCase {
   @Test
   public void empty() {
 
-    Optional<Customer> willBeEmpty = Ebean.find(Customer.class)
+    Optional<Customer> willBeEmpty = DB.find(Customer.class)
       .setId(Integer.MAX_VALUE)
       .findOneOrEmpty();
 
@@ -27,7 +27,7 @@ public class TestFindOneOrEmpty extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Optional<Customer> customer = Ebean.find(Customer.class)
+    Optional<Customer> customer = DB.find(Customer.class)
       .setId(1)
       .findOneOrEmpty();
 

@@ -1,7 +1,7 @@
 package org.tests.model.bridge;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,8 +16,8 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
     BUser user = new BUser("Rob");
     BSite site = new BSite("avaje.org");
 
-    Ebean.save(user);
-    Ebean.save(site);
+    DB.save(user);
+    DB.save(site);
 
     insertUpdateBridgeA(user, site);
     insertUpdateBridgeB(user, site);
@@ -30,12 +30,12 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
   private void insertUpdateBridgeA(BUser user, BSite site) {
 
     BSiteUserA access = new BSiteUserA(BAccessLevel.ONE, site, user);
-    Ebean.save(access);
+    DB.save(access);
 
     access.setAccessLevel(BAccessLevel.TWO);
-    Ebean.save(access);
+    DB.save(access);
 
-    List<BSiteUserA> list = Ebean.find(BSiteUserA.class).findList();
+    List<BSiteUserA> list = DB.find(BSiteUserA.class).findList();
     assertThat(list).isNotEmpty();
 
     for (BSiteUserA bridge : list) {
@@ -43,10 +43,10 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
       assertThat(bridge.getId().userId).isEqualTo(bridge.getUser().id);
     }
 
-    BSiteUserA found = Ebean.find(BSiteUserA.class, new BSiteUserA.Id(site.id, user.id));
+    BSiteUserA found = DB.find(BSiteUserA.class, new BSiteUserA.Id(site.id, user.id));
     found.setAccessLevel(BAccessLevel.THREE);
 
-    Ebean.save(found);
+    DB.save(found);
   }
 
   /**
@@ -55,12 +55,12 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
   private void insertUpdateBridgeB(BUser user, BSite site) {
 
     BSiteUserB access = new BSiteUserB(BAccessLevel.ONE, site, user);
-    Ebean.save(access);
+    DB.save(access);
 
     access.setAccessLevel(BAccessLevel.TWO);
-    Ebean.save(access);
+    DB.save(access);
 
-    List<BSiteUserB> list = Ebean.find(BSiteUserB.class).findList();
+    List<BSiteUserB> list = DB.find(BSiteUserB.class).findList();
     assertThat(list).isNotEmpty();
 
     for (BSiteUserB bridge : list) {
@@ -75,12 +75,12 @@ public class TestExplicitM2MBridgeTable extends BaseTestCase {
   private void insertUpdateBridgeC(BUser user, BSite site) {
 
     BSiteUserC access = new BSiteUserC(BAccessLevel.ONE, site, user);
-    Ebean.save(access);
+    DB.save(access);
 
     access.setAccessLevel(BAccessLevel.TWO);
-    Ebean.save(access);
+    DB.save(access);
 
-    List<BSiteUserC> list = Ebean.find(BSiteUserC.class).findList();
+    List<BSiteUserC> list = DB.find(BSiteUserC.class).findList();
     assertThat(list).isNotEmpty();
 
     for (BSiteUserC bridge : list) {

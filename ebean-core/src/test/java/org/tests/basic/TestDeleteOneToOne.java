@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.PersistentFile;
 import org.tests.model.basic.PersistentFileContent;
 import org.junit.jupiter.api.Test;
@@ -16,15 +16,15 @@ public class TestDeleteOneToOne extends BaseTestCase {
     PersistentFile persistentFile = new PersistentFile("test.txt", new PersistentFileContent(
       "test".getBytes()));
 
-    Ebean.save(persistentFile);
+    DB.save(persistentFile);
     Integer id = persistentFile.getId();
     Integer contentId = persistentFile.getPersistentFileContent().getId();
 
     // should delete file and fileContent
-    Ebean.delete(PersistentFile.class, id);
+    DB.delete(PersistentFile.class, id);
 
-    PersistentFile file1 = Ebean.find(PersistentFile.class, id);
-    PersistentFileContent content1 = Ebean.find(PersistentFileContent.class, contentId);
+    PersistentFile file1 = DB.find(PersistentFile.class, id);
+    PersistentFileContent content1 = DB.find(PersistentFileContent.class, contentId);
 
     assertNull(file1);
     assertNull(content1);
@@ -38,11 +38,11 @@ public class TestDeleteOneToOne extends BaseTestCase {
   // c.addContact(new Contact("Fiona", "Black"));
   // c.addContact(new Contact("Tracy", "Red"));
   //
-  // Ebean.save(c);
+  // DB.save(c);
   //
-  // Ebean.delete(Customer.class, c.getId());
+  // DB.delete(Customer.class, c.getId());
   //
-  // Customer deletedCustomer = Ebean.find(Customer.class, c.getId());
+  // Customer deletedCustomer = DB.find(Customer.class, c.getId());
   //
   // assertNull(deletedCustomer);
   //

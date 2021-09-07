@@ -1,8 +1,8 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.Query;
 import org.tests.model.composite.RCustomer;
 import org.tests.model.composite.RCustomerKey;
@@ -30,7 +30,7 @@ public class TestCKeyIdInExpression extends BaseTestCase {
     rCustomer.setKey(customerKey);
     rCustomer.setDescription("some foo for ms sql server");
 
-    Ebean.save(rCustomer);
+    DB.save(rCustomer);
 
     ROrderPK k0 = new ROrderPK("compa", 100);
     ROrder rOrder = new ROrder();
@@ -38,14 +38,14 @@ public class TestCKeyIdInExpression extends BaseTestCase {
     rOrder.setOrderPK(k0);
     rOrder.setItem("Chair");
 
-    Ebean.save(rOrder);
+    DB.save(rOrder);
   }
 
   //@Test
   public void notRanAutomatically() {
 
     //EbeanServer server = CreateIdExpandedFormServer.create();
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     ROrderPK k0 = new ROrderPK("compa", 100);
     ROrderPK k1 = new ROrderPK("compa", 101);

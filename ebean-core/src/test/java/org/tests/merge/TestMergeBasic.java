@@ -1,7 +1,7 @@
 package org.tests.merge;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
 import org.ebeantest.LoggedSqlCollector;
@@ -18,13 +18,13 @@ public class TestMergeBasic extends BaseTestCase {
 
 
   private UUOne rebuildViaJson(UUOne input) {
-    String asJson = Ebean.json().toJson(input);
-    return Ebean.json().toBean(UUOne.class, asJson);
+    String asJson = DB.json().toJson(input);
+    return DB.json().toBean(UUOne.class, asJson);
   }
 
   private UUOne build() {
     UUOne uuOne = buildGraph();
-    Ebean.save(uuOne);
+    DB.save(uuOne);
     return rebuildViaJson(uuOne);
   }
 
@@ -45,7 +45,7 @@ public class TestMergeBasic extends BaseTestCase {
       .build();
 
     LoggedSqlCollector.start();
-    Ebean.merge(one, options);
+    DB.merge(one, options);
 
 
     List<String> sql = LoggedSqlCollector.stop();
@@ -93,7 +93,7 @@ public class TestMergeBasic extends BaseTestCase {
       .build();
 
     LoggedSqlCollector.start();
-    Ebean.merge(one, options);
+    DB.merge(one, options);
 
 
     List<String> sql = LoggedSqlCollector.stop();

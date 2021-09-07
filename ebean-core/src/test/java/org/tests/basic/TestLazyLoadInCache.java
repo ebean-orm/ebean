@@ -3,7 +3,7 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.CacheMode;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
@@ -22,7 +22,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Map<Integer, Customer> map = Ebean.find(Customer.class)
+    Map<Integer, Customer> map = DB.find(Customer.class)
       .select("id, name")
       .setBeanCacheMode(CacheMode.PUT)
       .setReadOnly(true)
@@ -35,14 +35,14 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     Customer cust1 = map.get(id);
 
-    Customer cust1B = Ebean.find(Customer.class)
+    Customer cust1B = DB.find(Customer.class)
       .setReadOnly(true)
       .setId(id)
       .findOne();
 
     assertTrue(cust1 != cust1B);
 
-    Set<String> loadedProps = Ebean.getBeanState(cust1).getLoadedProps();
+    Set<String> loadedProps = DB.getBeanState(cust1).getLoadedProps();
 
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("status"));
@@ -51,7 +51,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     // a readOnly reference
     Address billingAddress = cust1.getBillingAddress();
-    BeanState billAddrState = Ebean.getBeanState(billingAddress);
+    BeanState billAddrState = DB.beanState(billingAddress);
     assertTrue(billAddrState.isReference());
     assertTrue(billAddrState.isReadOnly());
 

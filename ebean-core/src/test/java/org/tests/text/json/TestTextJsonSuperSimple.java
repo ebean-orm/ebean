@@ -1,8 +1,8 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -20,10 +20,10 @@ public class TestTextJsonSuperSimple extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).select("id, name").order().desc("id")
+    List<Customer> list = DB.find(Customer.class).select("id, name").order().desc("id")
       .findList();
 
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     JsonContext json = server.json();
 

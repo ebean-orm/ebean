@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -19,7 +19,7 @@ public class TestCollectionLoadedStatus extends BaseTestCase {
   @Test
   public void test() {
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Customer> custDesc = server.getBeanDescriptor(Customer.class);
 
     Customer customer = new Customer();

@@ -1,7 +1,7 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.compositekeys.db.CaoBean;
 import org.tests.compositekeys.db.CaoKey;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ public class TestCaoCompositeKeyWithAnnotationOverrides extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.deleteAll(Ebean.find(CaoBean.class).findList());
+    DB.deleteAll(DB.find(CaoBean.class).findList());
 
     CaoKey key = new CaoKey();
     key.setCustomer(123);
@@ -21,7 +21,7 @@ public class TestCaoCompositeKeyWithAnnotationOverrides extends BaseTestCase {
     bean.setKey(key);
     bean.setDescription("some desc");
 
-    Ebean.save(bean);
+    DB.save(bean);
   }
 
 }

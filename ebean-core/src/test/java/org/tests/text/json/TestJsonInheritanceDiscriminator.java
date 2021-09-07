@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Animal;
@@ -21,9 +21,9 @@ public class TestJsonInheritanceDiscriminator extends BaseTestCase {
     Cat cat = new Cat();
     cat.setName("Gemma");
 
-    Ebean.save(cat);
+    DB.save(cat);
 
-    JsonContext json = Ebean.json();
+    JsonContext json = DB.json();
     String jsonContent = json.toJson(cat);
 
     Cat cat2 = json.toBean(Cat.class, jsonContent);
@@ -44,9 +44,9 @@ public class TestJsonInheritanceDiscriminator extends BaseTestCase {
     dog.setRegistrationNumber("ABC123");
     dog.setDateOfBirth(new Date(System.currentTimeMillis()));
 
-    Ebean.save(dog);
+    DB.save(dog);
 
-    List<Animal> animals = Ebean.find(Animal.class).findList();
+    List<Animal> animals = DB.find(Animal.class).findList();
 
     String listJson = json.toJson(animals);
 

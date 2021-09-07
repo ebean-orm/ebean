@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -17,7 +17,7 @@ public class BeanDescriptor_whenCreatedPropertyTest extends BaseTestCase {
   @Test
   public void test() {
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getDefaultServer();
+    SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
     BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
 

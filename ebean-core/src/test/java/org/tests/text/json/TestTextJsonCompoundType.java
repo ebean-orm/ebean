@@ -31,7 +31,7 @@ public class TestTextJsonCompoundType extends BaseTestCase {
 //    p.setSalary(new Money("12200"));
 //    p.setCmoney(new CMoney(new Money("12"), NZD));
 //
-//    JsonContext jsonContext = Ebean.createJsonContext();
+//    JsonContext jsonContext = DB.json();
 //
 //    String jsonString = jsonContext.toJson(p, true);
 //    System.out.println(jsonString);

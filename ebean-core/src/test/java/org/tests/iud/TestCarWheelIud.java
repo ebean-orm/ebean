@@ -2,7 +2,7 @@ package org.tests.iud;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.PagedList;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -51,12 +51,12 @@ public class TestCarWheelIud extends BaseTestCase {
 
     car.setWheels(wheels);
 
-    Ebean.save(car);
+    DB.save(car);
 
     // And I'm trying to delete this entry with code:
-    Car car2 = Ebean.find(Car.class, car.getId());
+    Car car2 = DB.find(Car.class, car.getId());
 
-    Ebean.delete(car2);
+    DB.delete(car2);
 
   }
 

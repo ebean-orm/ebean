@@ -1,7 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class TestManyToManyLazyLoading extends BaseTestCase {
 
     createData();
 
-    List<MUser> users = Ebean.find(MUser.class).findList();
+    List<MUser> users = DB.find(MUser.class).findList();
 
     for (MUser user : users) {
       List<MRole> roles = user.getRoles();
@@ -28,14 +28,14 @@ public class TestManyToManyLazyLoading extends BaseTestCase {
     MRole r0 = new MRole("r0");
     MRole r1 = new MRole("r1");
 
-    Ebean.save(r0);
-    Ebean.save(r1);
+    DB.save(r0);
+    DB.save(r1);
 
     MUser u0 = new MUser("usr0");
     u0.addRole(r0);
     u0.addRole(r1);
 
-    Ebean.save(u0);
+    DB.save(u0);
   }
 
 }

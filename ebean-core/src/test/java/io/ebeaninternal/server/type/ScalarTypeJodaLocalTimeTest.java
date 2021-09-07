@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.TJodaEntity;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -55,8 +55,8 @@ public class ScalarTypeJodaLocalTimeTest {
     bean.setId(42);
     bean.setLocalTime(now);
 
-    String json = Ebean.json().toJson(bean);
-    TJodaEntity bean1 = Ebean.json().toBean(TJodaEntity.class, json);
+    String json = DB.json().toJson(bean);
+    TJodaEntity bean1 = DB.json().toBean(TJodaEntity.class, json);
 
     assertEquals(bean1.getLocalTime(), now);
   }

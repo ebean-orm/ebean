@@ -1,7 +1,7 @@
 package org.tests.model.m2o;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
@@ -28,7 +28,7 @@ public class TestManyToOneAsOne extends BaseTestCase {
 
     Addr junk = new Addr();
     junk.setName("junk");
-    Ebean.save(junk);
+    DB.save(junk);
 
     Empl emp = new Empl();
     emp.setName("My Name");
@@ -37,17 +37,17 @@ public class TestManyToOneAsOne extends BaseTestCase {
     address.setName("home");
     emp.getAddresses().add(address);
 
-    // if I do an interim Ebean.save here it works
-    //Ebean.save(emp);
+    // if I do an interim DB.save here it works
+    //DB.save(emp);
     address.setEmployee(emp);
     emp.setDefaultAddress(address);
 
-    Ebean.save(emp);
+    DB.save(emp);
 
     assertThat(emp.getDefaultAddress().getId()).isNotNull();
     assertThat(address.getEmployee().getId()).isNotNull();
 
-    Empl foundEmpl = Ebean.find(Empl.class, emp.getId());
+    Empl foundEmpl = DB.find(Empl.class, emp.getId());
     assertThat(foundEmpl.getDefaultAddress().getId()).isEqualTo(address.getId());
   }
 }

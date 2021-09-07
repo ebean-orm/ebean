@@ -1,7 +1,7 @@
 package org.tests.query.aggregation;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebeantest.LoggedSql;
 import org.ebeantest.LoggedSqlCollector;
@@ -28,24 +28,24 @@ public class TestAggregationCount extends BaseTestCase {
     one.getLogs().add(new TEventMany("all", 1, 10));
     one.getLogs().add(new TEventMany("be", 2, 12.2));
     one.getLogs().add(new TEventMany("add", 3, 13));
-    Ebean.save(one);
+    DB.save(one);
 
     TEventOne two = new TEventOne("second", TEventOne.Status.AA);
     two.getLogs().add(new TEventMany("at", 10, 10));
     two.getLogs().add(new TEventMany("add", 30, 13));
     two.getLogs().add(new TEventMany("alf", 30, 13));
-    Ebean.save(two);
+    DB.save(two);
 
     TEventOne three = new TEventOne("thrird", TEventOne.Status.BB);
-    Ebean.save(three);
+    DB.save(three);
     three.setName("third");
-    Ebean.save(three);
+    DB.save(three);
   }
 
   @Test
   public void testBaseSelect() {
 
-    Query<TEventOne> query = Ebean.find(TEventOne.class);
+    Query<TEventOne> query = DB.find(TEventOne.class);
     List<TEventOne> list = query.findList();
 
     String sql = sqlOf(query, 5);
@@ -67,7 +67,7 @@ public class TestAggregationCount extends BaseTestCase {
     LoggedSqlCollector.start();
 
     int count =
-      Ebean.find(TEventOne.class)
+      DB.find(TEventOne.class)
         .where().isNotNull("name")
         .findCount();
 
@@ -80,7 +80,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testNonAggregationLazyLoading() {
 
-    Query<TEventOne> query = Ebean.find(TEventOne.class).select("id");
+    Query<TEventOne> query = DB.find(TEventOne.class).select("id");
     List<TEventOne> list = query.findList();
 
     String sql = sqlOf(query, 5);
@@ -94,7 +94,7 @@ public class TestAggregationCount extends BaseTestCase {
 
   @Test
   public void findCount_withHaving() {
-    Query<TEventOne> query = Ebean.find(TEventOne.class)
+    Query<TEventOne> query = DB.find(TEventOne.class)
       //.select("id, totalUnits")
       .having()
       .ge("totalUnits", 1)
@@ -111,7 +111,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testFull() {
 
-    Query<TEventOne> query2 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query2 = DB.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount")
       .where()
       .startsWith("logs.description", "a")
@@ -140,7 +140,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testOrderByTotal() {
 
-    Query<TEventOne> query = Ebean.find(TEventOne.class)
+    Query<TEventOne> query = DB.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount")
       .order().asc("totalUnits").order().asc("name");
 
@@ -161,7 +161,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testSelectSome() {
 
-    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query0 = DB.find(TEventOne.class)
       .select("name, count, totalUnits");
 
     query0.findList();
@@ -173,7 +173,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testSelectOnly() {
 
-    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query0 = DB.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount");
 
     query0.findList();
@@ -185,7 +185,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testSelectWhere() {
 
-    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query0 = DB.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount")
       .where().gt("logs.description", "a").query();
 
@@ -198,7 +198,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testSelectHavingOrderBy() {
 
-    Query<TEventOne> query1 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query1 = DB.find(TEventOne.class)
       .select("name, count, totalUnits, totalAmount")
       .having().ge("count", 1)
       .order().asc("name");
@@ -210,7 +210,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testSelectWithFetch() {
 
-    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query0 = DB.find(TEventOne.class)
       .select("name, count")
       .fetch("event", "name");
 
@@ -223,7 +223,7 @@ public class TestAggregationCount extends BaseTestCase {
   @Test
   public void testTopLevelAggregation() {
 
-    Query<TEventOne> query0 = Ebean.find(TEventOne.class)
+    Query<TEventOne> query0 = DB.find(TEventOne.class)
       .select("status, maxVersion")
       .where().isNotNull("name")
       .having().ge("maxVersion", 1)
@@ -259,7 +259,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query0 = Ebean.find(Order.class)
+    Query<Order> query0 = DB.find(Order.class)
       .select("max(updtime)")
       .where().eq("status", Order.Status.NEW)
       .query();
@@ -270,7 +270,7 @@ public class TestAggregationCount extends BaseTestCase {
     String sql = sqlOf(query0, 5);
     assertThat(sql).contains("select max(t0.updtime) from o_order t0");
 
-    Timestamp maxNotNew = Ebean.find(Order.class)
+    Timestamp maxNotNew = DB.find(Order.class)
       .select("max(updtime)")
       .where().ne("status", Order.Status.NEW)
       .findSingleAttribute();
@@ -284,7 +284,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<OrderDetail> query = Ebean.find(OrderDetail.class)
+    Query<OrderDetail> query = DB.find(OrderDetail.class)
       .select("max(orderQty)");
 
     Integer maxOrderQty = query.findSingleAttribute();
@@ -299,7 +299,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<OrderDetail> query = Ebean.find(OrderDetail.class)
+    Query<OrderDetail> query = DB.find(OrderDetail.class)
       .select("min(orderQty)");
 
     Integer minOrderQty = query.findSingleAttribute();
@@ -314,7 +314,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("max(lastName)");
 
     String maxName = query.findSingleAttribute();
@@ -329,7 +329,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("min(firstName)");
 
     String minName = query.findSingleAttribute();
@@ -345,7 +345,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("count(lastName)");
 
     Long count = query.findSingleAttribute();
@@ -360,7 +360,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Contact> query = Ebean.find(Contact.class)
+    Query<Contact> query = DB.find(Contact.class)
       .select("count(distinct lastName)");
 
     Long count = query.findSingleAttribute();
@@ -378,7 +378,7 @@ public class TestAggregationCount extends BaseTestCase {
     LoggedSqlCollector.start();
 
     String maxLastName =
-      Ebean.find(Contact.class)
+      DB.find(Contact.class)
         .select("max(lastName)")
         .where().isNull("phone")
         .findSingleAttribute();
@@ -397,7 +397,7 @@ public class TestAggregationCount extends BaseTestCase {
     LoggedSqlCollector.start();
 
     Long count =
-      Ebean.find(Contact.class)
+      DB.find(Contact.class)
         .select("count(distinct lastName)")
         .where().isEmpty("notes")
         .findSingleAttribute();
@@ -417,7 +417,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     List<String> names =
 
-      Ebean.find(Contact.class)
+      DB.find(Contact.class)
         .select(concat("lastName",", ","firstName"))
         .where().isNull("phone")
         .order().asc("lastName")
@@ -438,7 +438,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     List<String> names =
 
-      Ebean.find(Contact.class)
+      DB.find(Contact.class)
         .select(concat("updtime",", ","firstName")+"::String")
         .where().isNull("phone")
         .order().asc("lastName")
@@ -459,7 +459,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     Instant instant =
 
-      Ebean.find(Contact.class)
+      DB.find(Contact.class)
         .select("max(updtime)::Instant")
         .where().isNull("phone")
         .findSingleAttribute();
@@ -480,7 +480,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     List<Contact> contacts =
 
-      Ebean.find(Contact.class)
+      DB.find(Contact.class)
         .select("email, " + concat("lastName",", ","firstName") + " as lastName")
         .where().isNull("phone")
         .order().asc("lastName")

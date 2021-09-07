@@ -1,7 +1,7 @@
 package org.tests.model.inheritexposedtype.test;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.inheritexposedtype.IXPhoto;
 import org.junit.jupiter.api.Test;
 
@@ -12,14 +12,14 @@ public class TestInheritExposeDtype extends BaseTestCase {
 
     IXPhoto p = new IXPhoto();
     p.setName("the name");
-    Ebean.save(p);
+    DB.save(p);
 
     // update
     p.setName("new name");
-    Ebean.save(p);
+    DB.save(p);
 
     // delete
-    Ebean.delete(p);
+    DB.delete(p);
 
   }
 }

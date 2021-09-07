@@ -1,7 +1,7 @@
 package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
@@ -18,39 +18,39 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
   @Test
   public void test() {
 
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
 
       MRole r1 = new MRole();
       r1.setRoleName("role1B");
-      Ebean.save(r1);
+      DB.save(r1);
 
       MRole r2 = new MRole();
       r2.setRoleName("role2specialB");
-      Ebean.save(r2);
+      DB.save(r2);
 
       MRole r3 = new MRole();
       r3.setRoleName("role3B");
-      Ebean.save(r3);
+      DB.save(r3);
 
       MUser u0 = new MUser();
       u0.setUserName("user0B");
       u0.addRole(r1);
       u0.addRole(r2);
 
-      Ebean.save(u0);
+      DB.save(u0);
 
       MUser u1 = new MUser();
       u1.setUserName("user1B");
       u1.addRole(r1);
 
-      Ebean.save(u1);
+      DB.save(u1);
 
       queryOrExpression(r2.getRoleid());
 
       queryDisjunction(r2.getRoleid());
 
-      Query<MUser> query = Ebean.find(MUser.class)
+      Query<MUser> query = DB.find(MUser.class)
         .where().disjunction()
         .eq("roles.roleName", "role2specialB") // user0
         .eq("roles.roleName", "role3B") // nobody
@@ -64,13 +64,13 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
       assertThat(sql).contains(".role_name = ?");
 
     } finally {
-      Ebean.rollbackTransaction();
+      DB.rollbackTransaction();
     }
   }
 
   private void queryDisjunction(Integer roleid) {
 
-    Query<MUser> query = Ebean.find(MUser.class)
+    Query<MUser> query = DB.find(MUser.class)
       .where().or()
       .eq("userName", "user0B")
       .eq("roles.roleid", roleid)
@@ -85,9 +85,9 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
   @Test
   public void testSelectOneToOneDisjunction() {
-    Ebean.beginTransaction();
+    DB.beginTransaction();
     try {
-      Query<Wheel> query = Ebean.find(Wheel.class)
+      Query<Wheel> query = DB.find(Wheel.class)
               .select("id")
               .where().or()
               .ge("tire.id", 100)
@@ -97,13 +97,13 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
       String sql = sqlOf(query);
       assertThat(sql).contains("join");
     } finally {
-      Ebean.rollbackTransaction();
+      DB.rollbackTransaction();
     }
   }
 
   private void queryOrExpression(Integer roleid) {
 
-    Query<MUser> query = Ebean.find(MUser.class)
+    Query<MUser> query = DB.find(MUser.class)
       .where().or(
         Expr.eq("userName", "user0B"),
         Expr.eq("roles.roleid", roleid)

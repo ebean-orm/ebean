@@ -22,12 +22,12 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select id, name from o_customer";
 
-    Query<Customer> query = Ebean.findNative(Customer.class, nativeSql);
+    Query<Customer> query = DB.findNative(Customer.class, nativeSql);
 
     List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
 
-    BeanState beanState = Ebean.getBeanState(customers.get(0));
+    BeanState beanState = DB.getBeanState(customers.get(0));
     assertThat(beanState.getLoadedProps()).contains("id", "name");
   }
 
@@ -37,12 +37,12 @@ public class TestNativeSqlBasic extends BaseTestCase {
     ResetBasicData.reset();
 
     String nativeSql = "select * from o_customer";
-    Query<Customer> query = Ebean.findNative(Customer.class, nativeSql);
+    Query<Customer> query = DB.findNative(Customer.class, nativeSql);
 
     List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
 
-    BeanState beanState = Ebean.getBeanState(customers.get(0));
+    BeanState beanState = DB.getBeanState(customers.get(0));
     assertThat(beanState.getLoadedProps().size()).isGreaterThan(10);
   }
 
@@ -52,7 +52,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
     ResetBasicData.reset();
 
     String nativeSql = "select c.*, b.city from o_customer c join o_address b on b.id = c.billing_address_id";
-    Query<Customer> query = Ebean.findNative(Customer.class, nativeSql);
+    Query<Customer> query = DB.findNative(Customer.class, nativeSql);
 
     List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
@@ -65,13 +65,13 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select id, name from o_customer where id > :some";
 
-    Query<Customer> query = Ebean.findNative(Customer.class, nativeSql);
+    Query<Customer> query = DB.findNative(Customer.class, nativeSql);
     query.setParameter("some", 1);
 
     List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
 
-    Query<Customer> query2 = Ebean.findNative(Customer.class, nativeSql);
+    Query<Customer> query2 = DB.findNative(Customer.class, nativeSql);
     query2.setParameter("some", 2);
 
     List<Customer> customers2 = query2.findList();
@@ -85,7 +85,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select id, name from o_customer where id > :some";
 
-    Query<Customer> query = Ebean.findNative(Customer.class, nativeSql)
+    Query<Customer> query = DB.findNative(Customer.class, nativeSql)
       .setParameter("some", 1)
       .setMaxRows(10);
 
@@ -103,7 +103,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select id, name from o_customer where id > :some";
 
-    Query<Customer> query = Ebean.findNative(Customer.class, nativeSql)
+    Query<Customer> query = DB.findNative(Customer.class, nativeSql)
       .setParameter("some", 1)
       .setFirstRow(20)
       .setMaxRows(10);
@@ -123,7 +123,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select id, name from o_customer where id > ?";
 
-    List<Customer> customers = Ebean.findNative(Customer.class, nativeSql)
+    List<Customer> customers = DB.findNative(Customer.class, nativeSql)
       .setParameter(1)
       .findList();
 
@@ -143,7 +143,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select o.id, o.status, c.id, c.name, c.version from o_order o join o_customer c on c.id = o.kcustomer_id ";
 
-    List<Order> orders = Ebean.findNative(Order.class, nativeSql)
+    List<Order> orders = DB.findNative(Order.class, nativeSql)
       .findList();
 
     for (Order order : orders) {
@@ -155,10 +155,10 @@ public class TestNativeSqlBasic extends BaseTestCase {
   @Test
   public void partialAssocIncludingOracle() {
     ResetBasicData.reset();
-    DB.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
 
     String nativeSql = "select o.id, o.status, o.kcustomer_id from o_order o";
-    List<Order> orders = Ebean.findNative(Order.class, nativeSql)
+    List<Order> orders = DB.findNative(Order.class, nativeSql)
       .findList();
 
     LoggedSqlCollector.start();
@@ -186,14 +186,14 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select * from o_customer where id > ?";
     List<Customer> customers =
-        Ebean.findNative(Customer.class, nativeSql)
+        DB.findNative(Customer.class, nativeSql)
         .setParameter(1)
         .fetchQuery("contacts")
         .findList();
 
     assertThat(customers).isNotEmpty();
 
-    BeanState beanState = Ebean.getBeanState(customers.get(0));
+    BeanState beanState = DB.getBeanState(customers.get(0));
     assertThat(beanState.getLoadedProps().size()).isGreaterThan(10);
   }
 
@@ -204,12 +204,12 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     String nativeSql = "select c.id, 'foo' as name from o_customer c";
     List<Customer> customers =
-      Ebean.findNative(Customer.class, nativeSql)
+      DB.findNative(Customer.class, nativeSql)
         .findList();
 
     assertThat(customers).isNotEmpty();
 
-    BeanState beanState = Ebean.getBeanState(customers.get(0));
+    BeanState beanState = DB.getBeanState(customers.get(0));
     assertThat(beanState.getLoadedProps()).contains("id", "name");
   }
 }

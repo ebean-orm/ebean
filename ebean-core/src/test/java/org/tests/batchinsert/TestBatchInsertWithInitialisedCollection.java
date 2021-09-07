@@ -1,7 +1,7 @@
 package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
 import org.junit.jupiter.api.Test;
@@ -28,11 +28,11 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Transaction txn = Ebean.beginTransaction();
+    Transaction txn = DB.beginTransaction();
     try {
       txn.setBatchMode(true);
 
-      Ebean.saveAll(list);
+      DB.saveAll(list);
       txn.commit();
 
     } finally {

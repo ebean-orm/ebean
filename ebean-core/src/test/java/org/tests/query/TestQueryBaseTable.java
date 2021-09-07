@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
@@ -23,16 +23,16 @@ public class TestQueryBaseTable extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    Customer one = Ebean.find(Customer.class)
+    Customer one = DB.find(Customer.class)
       .setBaseTable("O_CUSTOMER")
       .where().startsWith("name", "Rob")
       .findOne();
 
-    Customer two = Ebean.find(Customer.class)
+    Customer two = DB.find(Customer.class)
       .where().startsWith("name", "Rob")
       .findOne();
 
-    Customer three = Ebean.find(Customer.class)
+    Customer three = DB.find(Customer.class)
       .setBaseTable("O_CUSTOMER")
       .where().startsWith("name", "Fiona")
       .findOne();

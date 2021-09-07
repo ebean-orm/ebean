@@ -1,8 +1,8 @@
 package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.model.GroupConfiguration;
 import org.tests.inheritance.model.ProductConfiguration;
@@ -13,7 +13,7 @@ public class TestInheritanceDiscriminatorQueryCache extends BaseTestCase {
 
   @Test
   public void testDiscriminatorQueryCache() {
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     ProductConfiguration pc1 = new ProductConfiguration();
     pc1.setName("PC1");

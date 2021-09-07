@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
@@ -17,8 +17,8 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
   @Test
   public void testOnDeleted() {
 
-    Ebean.deleteAll(Ebean.find(UUTwo.class).findList());
-    Ebean.deleteAll(Ebean.find(UUOne.class).findList());
+    DB.deleteAll(DB.find(UUTwo.class).findList());
+    DB.deleteAll(DB.find(UUOne.class).findList());
 
     UUOne oneA = new UUOne();
     oneA.setName("oneA");
@@ -38,13 +38,13 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     twoC.setName("two-bld-C");
     twoC.setMaster(oneB);
 
-    Ebean.save(oneA);
-    Ebean.save(oneB);
-    Ebean.save(two);
-    Ebean.save(twoB);
-    Ebean.save(twoC);
+    DB.save(oneA);
+    DB.save(oneB);
+    DB.save(two);
+    DB.save(twoB);
+    DB.save(twoC);
 
-    List<UUTwo> list = Ebean.find(UUTwo.class)
+    List<UUTwo> list = DB.find(UUTwo.class)
       .fetchLazy("master")
       .where().startsWith("name", "two-bld-")
       .order("name")
@@ -53,12 +53,12 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     // delete a bean that will be batch lazy loaded but
     // is NOT the bean that will invoke the lazy loading
     // (in this case it is the second bean in the list).
-    int deletedCount = Ebean.delete(UUOne.class, oneB.getId());
+    int deletedCount = DB.delete(UUOne.class, oneB.getId());
     assertEquals(1, deletedCount);
 
     for (UUTwo u : list) {
       u.getMaster();
-      //BeanState beanState = Ebean.getBeanState(master);
+      //BeanState beanState = DB.getBeanState(master);
       //assertTrue(beanState.isReference());
     }
 

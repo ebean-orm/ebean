@@ -1,7 +1,7 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -20,7 +20,7 @@ public class TestOneToManyCorrectGrouping extends BaseTestCase {
   public void test() {
 
     ResetBasicData.reset();
-    Query<Customer> customerQuery = Ebean.find(Customer.class)
+    Query<Customer> customerQuery = DB.find(Customer.class)
       .fetch("orders")
       .where().le("id", 2)
       .query();

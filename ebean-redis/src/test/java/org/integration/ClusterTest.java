@@ -39,14 +39,14 @@ public class ClusterTest {
     Person foo = new Person("Someone");
     foo.save();
 
-    DB.getServerCacheManager().clearAll();
+    DB.cacheManager().clearAll();
     DB.getDefault().metaInfo().resetAllMetrics();
     other.metaInfo().resetAllMetrics();
 
     Person fooA = DB.find(Person.class, foo.getId());
     Person fooB = other.find(Person.class, foo.getId());
 
-    DuelCache dualCacheA = (DuelCache) DB.getServerCacheManager().beanCache(Person.class);
+    DuelCache dualCacheA = (DuelCache) DB.cacheManager().beanCache(Person.class);
     assertCounts(dualCacheA, 0, 1, 0, 1);
     fooA = DB.find(Person.class, foo.getId());
     assertCounts(dualCacheA, 1, 1, 0, 1);

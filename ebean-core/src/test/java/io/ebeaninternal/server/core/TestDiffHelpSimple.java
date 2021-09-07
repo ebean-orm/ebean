@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.ValuePair;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -23,16 +23,16 @@ public class TestDiffHelpSimple extends BaseTestCase {
   long firstTime = System.currentTimeMillis() - 10000;
   long secondTime = System.currentTimeMillis();
 
-  EbeanServer server;
+  Database server;
   BeanDescriptor<Order> orderDesc;
 
   public TestDiffHelpSimple() {
-    server = Ebean.getServer(null);
+    server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
     orderDesc = spiServer.getBeanDescriptor(Order.class);
   }
 
-  private Order createBaseOrder(EbeanServer server) {
+  private Order createBaseOrder(Database server) {
     Order order1 = new Order();
     order1.setId(12);
     order1.setCretime(new Timestamp(firstTime));

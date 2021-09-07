@@ -1,7 +1,7 @@
 package org.tests.unidirectional;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class TestUniDirectional extends BaseTestCase {
     m.addDetail(new UTDetail("d12", 3, 5.50));
     m.addDetail(new UTDetail("d13", 5, 1.0));
 
-    Ebean.save(m);
+    DB.save(m);
 
     assertNotNull(m.getId());
     assertNotNull(m.getVersion());
@@ -36,18 +36,18 @@ public class TestUniDirectional extends BaseTestCase {
     UTDetail d4 = new UTDetail("d14", 2, 3.0);
     m.addDetail(d4);
 
-    Ebean.save(m);
+    DB.save(m);
 
     assertNotNull(d4.getId());
     Integer d4ver = d4.getVersion();
     assertNotNull(d4ver);
 
     d4.setName("d14Upd");
-    Ebean.save(d4);
+    DB.save(d4);
     Integer d4ver2 = d4.getVersion();
     assertNotNull(d4ver2);
     assertEquals((d4ver + 1), d4ver2.intValue());
 
-    Ebean.delete(d4);
+    DB.delete(d4);
   }
 }

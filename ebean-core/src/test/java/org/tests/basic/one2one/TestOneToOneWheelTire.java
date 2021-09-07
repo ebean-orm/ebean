@@ -1,7 +1,7 @@
 package org.tests.basic.one2one;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
 public class TestOneToOneWheelTire extends BaseTestCase {
@@ -14,9 +14,9 @@ public class TestOneToOneWheelTire extends BaseTestCase {
     t.setWheel(w);
     w.setTire(t);
 
-    Ebean.save(t);
+    DB.save(t);
 
-    Ebean.delete(t);
+    DB.delete(t);
   }
 
 }

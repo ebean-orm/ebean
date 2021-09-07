@@ -29,11 +29,11 @@ public class TestSaveWithDaylightSavings extends BaseTestCase {
 //      EBasic e = new EBasic();
 //      e.setSomeDate(daylightSavingDate);
 //
-//      Ebean.save(e);
+//      DB.save(e);
 //      Assert.assertNotNull(e.getId());
 //
 //      // Reload the entity from database
-//      EBasic e2 = Ebean.find(EBasic.class, e.getId());
+//      EBasic e2 = DB.find(EBasic.class, e.getId());
 //
 //      long diffMillis = e2.getSomeDate().getTime() - e.getSomeDate().getTime();
 //
@@ -58,7 +58,7 @@ public class TestSaveWithDaylightSavings extends BaseTestCase {
 //    // For it to fail, the time has to match the time at which the daylight saving changes
 //    // are applied in that time zone. Therefore specify it explicitly.
 //
-//    EbeanServer server = Ebean.getServer(null);
+//    Database server = DB.getDefault();
 //
 //    Transaction transaction = server.createTransaction();
 //    Connection connection = transaction.getConnection();

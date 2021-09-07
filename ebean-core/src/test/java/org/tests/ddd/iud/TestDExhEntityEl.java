@@ -19,7 +19,7 @@ public class TestDExhEntityEl {
 //        DExhEntity p = new DExhEntity();
 //        p.setExhange(exh);
 //
-//        SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
+//        SpiEbeanServer server = (SpiEbeanServer)DB.getDefault();
 //
 //        BeanDescriptor<DExhEntity> descriptor = server.getBeanDescriptor(DExhEntity.class);
 //

@@ -1,7 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
@@ -13,10 +13,10 @@ public class TestBatchLazyMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Order order2 = Ebean.getReference(Order.class, 1);
+    Order order2 = DB.getReference(Order.class, 1);
     order2.getOrderDate();
 
-//		List<Order> list = Ebean.find(Order.class)
+//		List<Order> list = DB.find(Order.class)
 //			//.join("details")
 //			//.join("details", "+fetchquery")
 //			.findList();

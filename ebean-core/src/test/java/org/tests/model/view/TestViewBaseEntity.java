@@ -1,7 +1,7 @@
 package org.tests.model.view;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -19,7 +19,7 @@ public class TestViewBaseEntity extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<EOrderAgg> query = Ebean.find(EOrderAgg.class)
+    Query<EOrderAgg> query = DB.find(EOrderAgg.class)
       .where().gt("orderTotal", 20)
       .query();
 
@@ -34,7 +34,7 @@ public class TestViewBaseEntity extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<EOrderAgg> query = Ebean.find(EOrderAgg.class)
+    Query<EOrderAgg> query = DB.find(EOrderAgg.class)
       //.fetch("order", "id")
       .where().gt("orderTotal", 20)
       .query();
@@ -52,7 +52,7 @@ public class TestViewBaseEntity extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<EOrderAgg> query = Ebean.find(EOrderAgg.class)
+    Query<EOrderAgg> query = DB.find(EOrderAgg.class)
       .fetch("order")
       .fetch("order.details")
       .where().gt("orderTotal", 20)

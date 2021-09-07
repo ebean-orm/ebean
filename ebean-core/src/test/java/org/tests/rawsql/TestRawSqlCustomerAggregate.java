@@ -1,7 +1,7 @@
 package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
@@ -25,7 +25,7 @@ public class TestRawSqlCustomerAggregate extends BaseTestCase {
         "select c.customer_id, count(*) as totalContacts from contact c  group by c.customer_id")
       .columnMapping("c.customer_id", "customer.id").create();
 
-    Query<CustomerAggregate> query = Ebean.find(CustomerAggregate.class);
+    Query<CustomerAggregate> query = DB.find(CustomerAggregate.class);
     query.setRawSql(rawSql);
     query.where().ge("customer.id", 1);
 
