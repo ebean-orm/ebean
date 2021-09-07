@@ -63,7 +63,7 @@ public interface BeanDocType<T> {
    * build and replace the embedded list.
    */
   default FetchPath embeddedManyRoot(String path) {
-    return getEmbedded(path);
+    return getEmbeddedManyRoot(path);
   }
 
   /**
