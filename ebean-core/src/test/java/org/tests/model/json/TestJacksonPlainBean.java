@@ -29,8 +29,9 @@ public class TestJacksonPlainBean extends BaseTestCase {
     final EBasicPlain found = DB.find(EBasicPlain.class, bean.getId());
     found.setAttr("n2");
     DB.save(found);
-    expectedSql(1, "update ebasic_plain set attr=?, version=? where id=? and version=?");
-
+    if (!isMySql()) {
+      expectedSql(1, "update ebasic_plain set attr=?, version=? where id=? and version=?");
+    }
     LoggedSql.stop();
   }
 

@@ -79,6 +79,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(found2.getPlainValue().getName()).isEqualTo("b");
   }
 
+  @IgnorePlatform(Platform.MYSQL)
   @Test
   public void updateIncludesJsonColumn_when_loadedAndNotDirtyAware() {
     PlainBean contentBean = new PlainBean("a", 42);
@@ -141,6 +142,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     LoggedSql.stop();
   }
 
+  @IgnorePlatform(Platform.MYSQL)
   @Test
   public void updateIncludesJsonColumn_when_list_loadedAndNotDirtyAware() {
     PlainBean contentBean = new PlainBean("a", 42);

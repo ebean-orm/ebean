@@ -31,12 +31,9 @@ public class TestDbJson_List extends BaseTestCase {
 
   @Test
   public void insert() {
-
     bean.setName("stuff");
-
     bean.getTags().add("one");
     bean.getTags().add("two");
-
     bean.getFlags().add(42L);
     bean.getFlags().add(43L);
     bean.getFlags().add(44L);
@@ -114,7 +111,9 @@ public class TestDbJson_List extends BaseTestCase {
 
     // we don't update the phone numbers (as they are not dirty)
     // plain_bean=?, no longer included with dirty detection
-    assertSql(sql.get(0)).contains("update ebasic_json_list set name=?, version=? where");
+    if (!isMySql()) {
+      assertSql(sql.get(0)).contains("update ebasic_json_list set name=?, version=? where");
+    }
   }
 
   private void update_when_dirty() {
