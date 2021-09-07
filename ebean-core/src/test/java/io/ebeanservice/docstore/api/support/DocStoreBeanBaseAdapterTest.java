@@ -31,8 +31,8 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
 
     TDAdapter<Order> adapter = new TDAdapter<>(orderDesc, deployDesc);
 
-    assertThat(adapter.getIndexName()).isEqualTo("order");
-    assertThat(adapter.getIndexType()).isEqualTo("order");
+    assertThat(adapter.indexName()).isEqualTo("order");
+    assertThat(adapter.indexType()).isEqualTo("order");
     assertThat(adapter.getQueueId()).isEqualTo("order");
   }
 

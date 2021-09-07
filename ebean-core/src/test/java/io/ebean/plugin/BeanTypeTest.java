@@ -114,7 +114,7 @@ public class BeanTypeTest {
   public void docStore_getEmbedded() {
 
     BeanDocType<Order> orderDocType = beanType(Order.class).docStore();
-    FetchPath customer = orderDocType.getEmbedded("customer");
+    FetchPath customer = orderDocType.embedded("customer");
     assertThat(customer).isNotNull();
     assertThat(customer.getProperties(null)).contains("id", "name");
   }
@@ -124,10 +124,10 @@ public class BeanTypeTest {
 
     BeanDocType<Order> orderDocType = beanType(Order.class).docStore();
 
-    FetchPath detailsPath = orderDocType.getEmbedded("details");
+    FetchPath detailsPath = orderDocType.embedded("details");
     assertThat(detailsPath).isNotNull();
 
-    FetchPath detailsRoot = orderDocType.getEmbeddedManyRoot("details");
+    FetchPath detailsRoot = orderDocType.embeddedManyRoot("details");
     assertThat(detailsRoot).isNotNull();
     assertThat(detailsRoot.getProperties(null)).containsExactly("id", "details");
     assertThat(detailsRoot.hasPath("details")).isTrue();
@@ -143,15 +143,15 @@ public class BeanTypeTest {
   @Test
   public void getDocStoreIndexType() {
 
-    assertThat(beanType(Order.class).docStore().getIndexType()).isEqualTo("order");
-    assertThat(beanType(Customer.class).docStore().getIndexType()).isEqualTo("customer");
+    assertThat(beanType(Order.class).docStore().indexType()).isEqualTo("order");
+    assertThat(beanType(Customer.class).docStore().indexType()).isEqualTo("customer");
   }
 
   @Test
   public void getDocStoreIndexName() {
 
-    assertThat(beanType(Order.class).docStore().getIndexType()).isEqualTo("order");
-    assertThat(beanType(Customer.class).docStore().getIndexType()).isEqualTo("customer");
+    assertThat(beanType(Order.class).docStore().indexType()).isEqualTo("order");
+    assertThat(beanType(Customer.class).docStore().indexType()).isEqualTo("customer");
   }
 
   @Test
@@ -159,7 +159,7 @@ public class BeanTypeTest {
 
     FetchPath parse = PathProperties.parse("id,name");
 
-    FetchPath nestedCustomer = beanType(Order.class).docStore().getEmbedded("customer");
+    FetchPath nestedCustomer = beanType(Order.class).docStore().embedded("customer");
     assertThat(nestedCustomer.toString()).isEqualTo(parse.toString());
   }
 
