@@ -36,7 +36,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
 
     assertThat(db).isNotNull();
 
-    // test server shutdown and restart using the same ServerConfig
+    // test server shutdown and restart using the same DatabaseConfig
     db.shutdown(true, false);
 
     Database restartedServer = DatabaseFactory.create(config);

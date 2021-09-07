@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.BaseTestCase;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.core.type.ScalarType;
 import io.ebean.server.type.MyDayOfWeek;
@@ -99,38 +99,36 @@ public class TestTypeManager extends BaseTestCase {
   public void testWithConfig() {
     DefaultTypeManager typeManager1 = createTypeManager();
     ScalarType<?> type1 = typeManager1.createEnumScalarType(MySex.class, null);
-    assertThat(type1 instanceof ScalarTypeEnumStandard.OrdinalEnum);
+    assertThat(type1).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class);
     //
     DefaultTypeManager typeManager2 = createTypeManagerDefaultEnumTypeString();
     ScalarType<?> type2 = typeManager2.createEnumScalarType(MySex.class, null);
-    assertThat(type2 instanceof ScalarTypeEnumStandard.StringEnum);
+    assertThat(type2).isInstanceOf(ScalarTypeEnumStandard.StringEnum.class);
     //
     DefaultTypeManager typeManager3 = createTypeManagerDefaultEnumTypeString();
     ScalarType<?> type3 = typeManager3.createEnumScalarType(MySex.class, EnumType.ORDINAL);
-    assertThat(type3 instanceof ScalarTypeEnumStandard.OrdinalEnum);
+    assertThat(type3).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class);
   }
 
   private DefaultTypeManager createTypeManager() {
-
-    ServerConfig serverConfig = new ServerConfig();
-    serverConfig.setDatabasePlatform(new H2Platform());
+    DatabaseConfig config = new DatabaseConfig();
+    config.setDatabasePlatform(new H2Platform());
 
     BootupClasses bootupClasses = new BootupClasses();
     bootupClasses.getAttributeConverters().add(MoneyTypeConverter.class);
 
-    return new DefaultTypeManager(serverConfig, bootupClasses);
+    return new DefaultTypeManager(config, bootupClasses);
   }
 
   private DefaultTypeManager createTypeManagerDefaultEnumTypeString() {
-
-    ServerConfig serverConfig = new ServerConfig();
-    serverConfig.setDatabasePlatform(new H2Platform());
-    serverConfig.setDefaultEnumType(EnumType.STRING);
+    DatabaseConfig config = new DatabaseConfig();
+    config.setDatabasePlatform(new H2Platform());
+    config.setDefaultEnumType(EnumType.STRING);
 
     BootupClasses bootupClasses = new BootupClasses();
     bootupClasses.getAttributeConverters().add(MoneyTypeConverter.class);
 
-    return new DefaultTypeManager(serverConfig, bootupClasses);
+    return new DefaultTypeManager(config, bootupClasses);
   }
 
   /**

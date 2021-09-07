@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.MatchingNamingConvention;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
@@ -55,33 +55,32 @@ public class DatabasePlatformTest extends BaseTestCase {
   @Test
   public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(true);
     config.setNamingConvention(new MatchingNamingConvention());
 
     DatabasePlatform dbPlatform = new SqlServer17Platform();
     dbPlatform.configure(config.getPlatformConfig(), config.isAllQuotedIdentifiers());
 
-    assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"[order]");
-    assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"),"[order]");
-    assertEquals(dbPlatform.convertQuotedIdentifiers("firstName"),"[firstName]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("order"), "[order]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"), "[order]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("firstName"), "[firstName]");
   }
 
   @Test
   public void convertQuotedIdentifiers() {
-
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     DatabasePlatform dbPlatform = new SqlServer17Platform();
     dbPlatform.configure(config.getPlatformConfig(), config.isAllQuotedIdentifiers());
 
-    assertEquals(dbPlatform.convertQuotedIdentifiers("order"),"order");
-    assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"),"[order]");
-    assertEquals(dbPlatform.convertQuotedIdentifiers("firstName"),"firstName");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("order"), "order");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("`order`"), "[order]");
+    assertEquals(dbPlatform.convertQuotedIdentifiers("firstName"), "firstName");
 
-    assertEquals(dbPlatform.unQuote("order"),"order");
-    assertEquals(dbPlatform.unQuote("[order]"),"order");
-    assertEquals(dbPlatform.unQuote("[firstName]"),"firstName");
+    assertEquals(dbPlatform.unQuote("order"), "order");
+    assertEquals(dbPlatform.unQuote("[order]"), "order");
+    assertEquals(dbPlatform.unQuote("[firstName]"), "firstName");
   }
 
   @Test

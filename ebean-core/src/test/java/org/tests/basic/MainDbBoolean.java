@@ -1,10 +1,10 @@
 package org.tests.basic;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.Query;
 import io.ebean.SqlRow;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.datasource.DataSourceConfig;
 import org.tests.model.basic.TOne;
@@ -13,8 +13,8 @@ import org.tests.model.basic.TSMaster;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Used to run some tests manually on a specific Database type.
@@ -22,13 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MainDbBoolean {
 
   public static void main(String[] args) {
-
     MainDbBoolean me = new MainDbBoolean();
 
-    EbeanServer server = me.createEbeanServer();
+    Database server = me.createEbeanServer();
     me.simpleCheck(server);
 
-    EbeanServer oraServer = me.createOracleEbeanServer();
+    Database oraServer = me.createOracleEbeanServer();
     me.simpleCheck(oraServer);
   }
 
@@ -36,9 +35,8 @@ public class MainDbBoolean {
    * Create a server for running small oracle specific tests manually.
    * DDL generation etc.
    */
-  private EbeanServer createOracleEbeanServer() {
-
-    ServerConfig c = new ServerConfig();
+  private Database createOracleEbeanServer() {
+    DatabaseConfig c = new DatabaseConfig();
     c.setName("ora");
     c.setDdlExtra(false);
 
@@ -67,13 +65,11 @@ public class MainDbBoolean {
     c.addClass(TSMaster.class);
     c.addClass(TSDetail.class);
 
-    return EbeanServerFactory.create(c);
-
+    return DatabaseFactory.create(c);
   }
 
-  private EbeanServer createEbeanServer() {
-
-    ServerConfig c = new ServerConfig();
+  private Database createEbeanServer() {
+    DatabaseConfig c = new DatabaseConfig();
     c.setName("pgtest");
     c.setDdlExtra(false);
 
@@ -98,15 +94,11 @@ public class MainDbBoolean {
     c.setDatabaseBooleanFalse("F");
 
     c.setDatabasePlatform(new PostgresPlatform());
-
     c.addClass(TOne.class);
-
-    return EbeanServerFactory.create(c);
-
+    return DatabaseFactory.create(c);
   }
 
-  private void simpleCheck(EbeanServer server) {
-
+  private void simpleCheck(Database server) {
     TOne o = new TOne();
     o.setName("banan");
     o.setDescription("this one is true");
@@ -127,27 +119,24 @@ public class MainDbBoolean {
       .order("id")
       .findList();
 
-    assertTrue(list.size() == 2);
+    assertThat(list).hasSize(2);
     assertTrue(list.get(0).isActive());
-    assertFalse(!list.get(0).isActive());
 
     String sql = "select id, name, active from t_oneb order by id";
     List<SqlRow> sqlRows = server.sqlQuery(sql).findList();
-    assertTrue(sqlRows.size() == 2);
+    assertThat(sqlRows).hasSize(2);
     Object active0 = sqlRows.get(0).get("active");
     Object active1 = sqlRows.get(1).get("active");
 
-    assertTrue("T".equals(active0));
-    assertTrue("F".equals(active1));
-
+    assertEquals("T", active0);
+    assertEquals("F", active1);
 
     Query<TOne> query = server.find(TOne.class)
       .setAutoTune(false)
       .order("id");
 
     int rc = query.findCount();
-    assertTrue(rc > 0);
-
+    assertThat(rc).isGreaterThan(0);
 
     System.out.println("done");
   }

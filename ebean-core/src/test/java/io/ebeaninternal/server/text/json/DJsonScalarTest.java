@@ -2,7 +2,7 @@ package io.ebeaninternal.server.text.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
@@ -22,8 +22,7 @@ public class DJsonScalarTest {
   private final DJsonScalar jsonScalar;
 
   public DJsonScalarTest() {
-
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.setDatabasePlatform(new H2Platform());
     DefaultTypeManager typeManager = new DefaultTypeManager(serverConfig, new BootupClasses());
     jsonScalar = new DJsonScalar(typeManager);
@@ -31,7 +30,6 @@ public class DJsonScalarTest {
 
   @Test
   public void writeBasicTypes() throws IOException {
-
     StringWriter writer = new StringWriter();
     JsonGenerator generator = createGenerator(writer);
 

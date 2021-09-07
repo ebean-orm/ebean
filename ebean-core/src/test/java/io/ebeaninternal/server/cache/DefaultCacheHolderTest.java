@@ -3,7 +3,7 @@ package io.ebeaninternal.server.cache;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.server.transaction.TableModState;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
@@ -14,13 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultCacheHolderTest {
 
-  private ThreadLocal<String> tenantId = new ThreadLocal<>();
+  private final ThreadLocal<String> tenantId = new ThreadLocal<>();
 
   private final ServerCacheFactory cacheFactory = new DefaultServerCacheFactory();
   private final ServerCacheOptions defaultOptions = new ServerCacheOptions();
 
   private CacheManagerOptions options() {
-    return new CacheManagerOptions(null, new ServerConfig(), true)
+    return new CacheManagerOptions(null, new DatabaseConfig(), true)
       .with(defaultOptions, defaultOptions)
       .with(cacheFactory, new TableModState());
   }
@@ -82,25 +82,22 @@ public class DefaultCacheHolderTest {
     assertThat(cache.get("1")).isEqualTo("value-for-tenant1");
     assertThat(cache.get("2")).isEqualTo("an other value-for-tenant1");
 
-    Exception exInThread[] = new Exception[1];
-    Thread t = new Thread() {
-      @Override
-      public void run() {
-        try {
-          assertThat(cache.get("1")).isNull();
-          tenantId.set("ten_2");
+    Exception[] exInThread = new Exception[1];
+    Thread t = new Thread(() -> {
+      try {
+        assertThat(cache.get("1")).isNull();
+        tenantId.set("ten_2");
 
-          cache.put("1", "value-for-tenant2");
-          cache.put("2", "an other value-for-tenant2");
+        cache.put("1", "value-for-tenant2");
+        cache.put("2", "an other value-for-tenant2");
 
-          tenantId.set(null);
+        tenantId.set(null);
 
-          cache.clear();
-        } catch (Exception e) {
-          exInThread[0] = e;
-        }
-      };
-    };
+        cache.clear();
+      } catch (Exception e) {
+        exInThread[0] = e;
+      }
+    });
 
     // do some async work
     t.start();

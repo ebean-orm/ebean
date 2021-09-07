@@ -2,7 +2,7 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultServerCacheManagerTest {
 
-  private ThreadLocal<String> tenantId = new ThreadLocal<>();
+  private final ThreadLocal<String> tenantId = new ThreadLocal<>();
 
   class TdTenPro implements CurrentTenantProvider {
 
@@ -23,17 +23,15 @@ public class DefaultServerCacheManagerTest {
     }
   }
 
-  private ClusterManager clusterManager = new ClusterManager(new ContainerConfig());
+  private final ClusterManager clusterManager = new ClusterManager(new ContainerConfig());
 
-  private DefaultServerCacheManager manager = new DefaultServerCacheManager(new CacheManagerOptions(clusterManager, new ServerConfig(), true));
+  private final DefaultServerCacheManager manager = new DefaultServerCacheManager(new CacheManagerOptions(clusterManager, new DatabaseConfig(), true));
 
-  private DefaultServerCacheManager multiTenantManager;
+  private final DefaultServerCacheManager multiTenantManager;
 
   public DefaultServerCacheManagerTest(){
-
-    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, new ServerConfig(), true);
+    CacheManagerOptions builder = new CacheManagerOptions(clusterManager, new DatabaseConfig(), true);
     builder.with(new TdTenPro());
-
     this.multiTenantManager = new DefaultServerCacheManager(builder);
   }
 

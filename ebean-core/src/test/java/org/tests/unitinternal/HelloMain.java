@@ -1,8 +1,8 @@
 package org.tests.unitinternal;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ public class HelloMain {
 
   public static void main(String[] args) {
     // ### Configuration Objects ###
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     DataSourceConfig dataSourceConfig = new DataSourceConfig();
 
     // ### Configuration Settings ###
@@ -37,7 +37,7 @@ public class HelloMain {
       serverConfig.addClass(TOne.class);
     }
 
-    EbeanServer eServer = EbeanServerFactory.createWithContextClassLoader(serverConfig, HelloMain.class.getClassLoader());
+    Database eServer = DatabaseFactory.createWithContextClassLoader(serverConfig, HelloMain.class.getClassLoader());
 
     long id = 1;
     TOne data = eServer.find(TOne.class, id);
@@ -49,7 +49,7 @@ public class HelloMain {
       System.out.println(String.format("############\n%s############", data.getName()));
     }
 
-    EbeanServerFactory.shutdown();
+    DatabaseFactory.shutdown();
   }
 
 }

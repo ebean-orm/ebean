@@ -42,7 +42,7 @@ public class ServerConfigSqlServerTest {
     assertThat(sqlServer).isNotNull();
     sqlServer.shutdown();
 
-//    javax.persistence.PersistenceException: java.lang.IllegalArgumentException: For SqlServer please choose the more specific sqlserver16 or sqlserver17 platform via ServerConfig.setDatabasePlatformName. Refer to issue #1340 for details
+//    javax.persistence.PersistenceException: java.lang.IllegalArgumentException: For SqlServer please choose the more specific sqlserver16 or sqlserver17 platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for details
 //
 //    at io.ebeaninternal.server.core.DatabasePlatformFactory.create(DatabasePlatformFactory.java:62)
 //    at io.ebeaninternal.server.core.DefaultContainer.setDatabasePlatform(DefaultContainer.java:266)
@@ -50,7 +50,6 @@ public class ServerConfigSqlServerTest {
 //    at io.ebeaninternal.server.core.DefaultContainer.createServer(DefaultContainer.java:45)
 //    at io.ebean.EbeanServerFactory.createInternal(EbeanServerFactory.java:109)
 //    at io.ebean.EbeanServerFactory.create(EbeanServerFactory.java:70)
-//    at io.ebean.config.ServerConfigSqlServerTest.need_explicitPlatform(ServerConfigSqlServerTest.java:35)
 
   }
 

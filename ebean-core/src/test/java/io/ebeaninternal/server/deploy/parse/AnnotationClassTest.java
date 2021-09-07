@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 public class AnnotationClassTest {
 
@@ -45,9 +43,8 @@ public class AnnotationClassTest {
     assertThat(columnNames[2]).isEqualTo("col3");
   }
 
-  @SuppressWarnings("unchecked")
-  private AnnotationClass createAnnotationClass(ServerConfig config) {
-
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private AnnotationClass createAnnotationClass(DatabaseConfig config) {
     DeployUtil deployUtil = new DeployUtil(new DefaultTypeManager(config, new BootupClasses()), config);
 
     DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, null, null));
@@ -55,10 +52,9 @@ public class AnnotationClassTest {
     return new AnnotationClass(deployBeanInfo, readAnnotationConfig);
   }
 
-  private ServerConfig sqlServerPlatform(boolean allQuotedIdentifiers) {
-
+  private DatabaseConfig sqlServerPlatform(boolean allQuotedIdentifiers) {
     SqlServer17Platform sqlServer17Platform = new SqlServer17Platform();
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setDatabasePlatform(sqlServer17Platform);
     config.setAllQuotedIdentifiers(allQuotedIdentifiers);
 

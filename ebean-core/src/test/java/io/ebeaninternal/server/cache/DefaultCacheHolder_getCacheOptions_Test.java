@@ -2,17 +2,17 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Article;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultCacheHolder_getCacheOptions_Test {
 
-  private DefaultCacheHolder cacheHolder;
+  private final DefaultCacheHolder cacheHolder;
 
   public DefaultCacheHolder_getCacheOptions_Test() {
 
@@ -20,7 +20,7 @@ public class DefaultCacheHolder_getCacheOptions_Test {
     defaultOptions.setMaxSize(10000);
     defaultOptions.setMaxSecsToLive(120);
 
-    CacheManagerOptions builder = new CacheManagerOptions(null, new ServerConfig(), true)
+    CacheManagerOptions builder = new CacheManagerOptions(null, new DatabaseConfig(), true)
       .with(defaultOptions, defaultOptions);
 
     this.cacheHolder = new DefaultCacheHolder(builder);
