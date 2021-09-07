@@ -12,8 +12,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLazyLoadInCache extends BaseTestCase {
 
@@ -29,7 +28,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
       .order().asc("id")
       .findMap();
 
-    assertTrue(!map.isEmpty());
+    assertFalse(map.isEmpty());
 
     Object id = map.keySet().iterator().next();
 
@@ -40,9 +39,9 @@ public class TestLazyLoadInCache extends BaseTestCase {
       .setId(id)
       .findOne();
 
-    assertTrue(cust1 != cust1B);
+    assertNotSame(cust1, cust1B);
 
-    Set<String> loadedProps = DB.beanState(cust1).getLoadedProps();
+    Set<String> loadedProps = DB.beanState(cust1).loadedProps();
 
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("status"));

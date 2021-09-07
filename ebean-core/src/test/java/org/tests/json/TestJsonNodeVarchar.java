@@ -36,7 +36,6 @@ public class TestJsonNodeVarchar extends BaseTestCase {
 
     assertEquals(bean.getContent().path("contentType").asText(), bean1.getContent().path("contentType").asText());
     assertEquals(18L, bean1.getContent().get("docId").asLong());
-
   }
 
   @Test
@@ -58,12 +57,10 @@ public class TestJsonNodeVarchar extends BaseTestCase {
       .setId(bean.getId())
       .findOne();
 
-    Set<String> loadedProps = DB.beanState(bean1).getLoadedProps();
+    Set<String> loadedProps = DB.beanState(bean1).loadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));
 
-    JsonNode lazyLoadedContent = bean1.getContent();
-    assertNotNull(lazyLoadedContent);
-
+    assertNotNull(bean1.getContent());
   }
 }

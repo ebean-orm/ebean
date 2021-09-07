@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryJoin extends BaseTestCase {
@@ -37,29 +38,24 @@ public class TestQueryJoin extends BaseTestCase {
 
     Order order = list.get(0);
     BeanState beanStateOrder = DB.beanState(order);
-    assertNotNull(beanStateOrder.getLoadedProps());
+    assertNotNull(beanStateOrder.loadedProps());
     // assertTrue(beanStateOrder.getLoadedProps().contains("id"));
-    assertTrue(beanStateOrder.getLoadedProps().contains("status"));
-    assertTrue(beanStateOrder.getLoadedProps().contains("shipments"));
-    assertTrue(beanStateOrder.getLoadedProps().contains("customer"));
+    assertThat(beanStateOrder.loadedProps()).contains("status", "shipments", "customer");
 
     Customer customer = order.getCustomer();
     BeanState beanStateCustomer = DB.beanState(customer);
     assertTrue(beanStateCustomer.isReference());
 
     customer.getName();
-    assertNotNull(beanStateCustomer.getLoadedProps());
-    assertTrue(beanStateCustomer.getLoadedProps().contains("name"));
-    assertTrue(beanStateCustomer.getLoadedProps().contains("status"));
-    assertFalse(beanStateCustomer.getLoadedProps().contains("billingAddress"));
+    assertNotNull(beanStateCustomer.loadedProps());
+    assertThat(beanStateCustomer.loadedProps()).contains("name", "status");
+    assertThat(beanStateCustomer.loadedProps()).doesNotContain("billingAddress");
 
     customer.getName();
 
     Address billingAddress = customer.getBillingAddress();
-    System.out.println(billingAddress);
     billingAddress.getLine1();
 
-    assertTrue(!list.isEmpty());
-
+    assertFalse(list.isEmpty());
   }
 }

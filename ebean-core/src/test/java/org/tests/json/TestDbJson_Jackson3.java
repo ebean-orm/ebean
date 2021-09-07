@@ -96,13 +96,13 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     found.setBeanList(null);
 
     BeanState state = DB.beanState(found);
-    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("name", "beanList");
+    assertThat(state.changedProps()).containsExactlyInAnyOrder("name", "beanList");
 
-    ValuePair pair = state.getDirtyValues().get("name");
+    ValuePair pair = state.dirtyValues().get("name");
     assertThat(pair.getNewValue()).isEqualTo("p1-mod");
     assertThat(pair.getOldValue()).isEqualTo("p1");
 
-    pair = state.getDirtyValues().get("beanList");
+    pair = state.dirtyValues().get("beanList");
     assertThat(pair.getNewValue()).isEqualTo(null);
     assertThat((List<PlainBean>) pair.getOldValue()).hasSize(1)
       .extracting(PlainBean::getName).containsExactly("a");
@@ -123,8 +123,8 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     assertThat(DB.beanState(found).isDirty()).isTrue();
 
     state = DB.beanState(found);
-    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainBean");
-    pair = state.getDirtyValues().get("plainBean");
+    assertThat(state.changedProps()).containsExactlyInAnyOrder("plainBean");
+    pair = state.dirtyValues().get("plainBean");
     assertThat(pair.getNewValue()).hasToString("name:b");
     assertThat(pair.getOldValue()).hasToString("name:a");
 
@@ -156,7 +156,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     found.getBeanList().get(0).setName("p1-mod");
 
     BeanState state = DB.beanState(found);
-    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("beanList");
+    assertThat(state.changedProps()).containsExactlyInAnyOrder("beanList");
   }
 
   @IgnorePlatform(Platform.MYSQL)
@@ -176,7 +176,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     // a new bean is not considered as dirty (thus have no changed props)
     assertThat(state.isDirty()).isFalse();
     assertThat(state.isNewOrDirty()).isTrue();
-    assertThat(state.getChangedProps()).isEmpty();
+    assertThat(state.changedProps()).isEmpty();
 
     bean.save();
 
@@ -185,19 +185,19 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     // a fresh loaded bean is also not considered as dirty
     assertThat(state.isDirty()).isFalse();
     assertThat(state.isNewOrDirty()).isFalse();
-    assertThat(state.getChangedProps()).isEmpty();
+    assertThat(state.changedProps()).isEmpty();
 
     bean.getPlainValue().setName("a"); // has SOURCE
 
     assertThat(state.isDirty()).isTrue();
-    assertThat(state.getChangedProps()).containsExactly("plainValue");
+    assertThat(state.changedProps()).containsExactly("plainValue");
 
     bean.getPlainValue2().setName("b");
-    assertThat(state.getChangedProps()).containsExactlyInAnyOrder("plainValue", "plainValue2");
+    assertThat(state.changedProps()).containsExactlyInAnyOrder("plainValue", "plainValue2");
 
     bean.getPlainValue3().setName("c"); // has mutationDetection = NONE
 
-    Map<String, ValuePair> dirtyValues = state.getDirtyValues();
+    Map<String, ValuePair> dirtyValues = state.dirtyValues();
     assertThat(dirtyValues).hasSize(2).containsKeys("plainValue", "plainValue2");
 
     assertThat(dirtyValues.get("plainValue")).hasToString("name:a,name:x"); // SOURCE -> origValue present
@@ -237,7 +237,7 @@ public class TestDbJson_Jackson3 extends BaseTestCase {
     bean.setPlainValue2(null);
     bean.setPlainValue3(null); // already null
     BeanState state = DB.beanState(bean);
-    assertThat(state.getDirtyValues()).hasSize(1).containsKey("plainValue2");
+    assertThat(state.dirtyValues()).hasSize(1).containsKey("plainValue2");
   }
 
   private void expectedSql(int i, String s) {

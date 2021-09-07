@@ -28,7 +28,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
     assertThat(customers).isNotEmpty();
 
     BeanState beanState = DB.beanState(customers.get(0));
-    assertThat(beanState.getLoadedProps()).contains("id", "name");
+    assertThat(beanState.loadedProps()).contains("id", "name");
   }
 
   @Test
@@ -43,7 +43,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
     assertThat(customers).isNotEmpty();
 
     BeanState beanState = DB.beanState(customers.get(0));
-    assertThat(beanState.getLoadedProps().size()).isGreaterThan(10);
+    assertThat(beanState.loadedProps().size()).isGreaterThan(10);
   }
 
   @Test
@@ -194,7 +194,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
     assertThat(customers).isNotEmpty();
 
     BeanState beanState = DB.beanState(customers.get(0));
-    assertThat(beanState.getLoadedProps().size()).isGreaterThan(10);
+    assertThat(beanState.loadedProps().size()).isGreaterThan(10);
   }
 
   @Test
@@ -210,6 +210,6 @@ public class TestNativeSqlBasic extends BaseTestCase {
     assertThat(customers).isNotEmpty();
 
     BeanState beanState = DB.beanState(customers.get(0));
-    assertThat(beanState.getLoadedProps()).contains("id", "name");
+    assertThat(beanState.loadedProps()).contains("id", "name");
   }
 }

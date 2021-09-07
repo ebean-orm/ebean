@@ -18,10 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDbJson_List extends BaseTestCase {
 
@@ -202,8 +199,7 @@ public class TestDbJson_List extends BaseTestCase {
         .setId(bean.getId())
         .findOne();
 
-      // never get here
-      assertTrue(false);
+      fail("never get here");
 
     } catch (PersistenceException e) {
       // query fails due to error loading invalid JSON content
@@ -215,7 +211,7 @@ public class TestDbJson_List extends BaseTestCase {
       .setAllowLoadErrors() // allow invalid JSON content
       .findOne();
 
-    Map<String, Exception> errors = server().beanState(bean).getLoadErrors();
+    Map<String, Exception> errors = server().beanState(bean).loadErrors();
 
     assertThat(errors).containsKey("beanMap").hasSize(1);
     assertThat(errors.values().iterator().next())

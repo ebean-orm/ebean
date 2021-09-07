@@ -37,7 +37,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     assertEquals("Hello rob", customer.getName());
 
     BeanState beanState = DB.beanState(customer);
-    Set<String> loadedProps = beanState.getLoadedProps();
+    Set<String> loadedProps = beanState.loadedProps();
 
     assertEquals(2, loadedProps.size());
     assertTrue(loadedProps.contains("id"));

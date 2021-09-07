@@ -37,7 +37,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     assertThat(postLoad.methodsCalled).hasSize(1);
     assertThat(postLoad.methodsCalled).containsExactly("postLoad");
-    assertThat(postLoad.beanState.getLoadedProps()).containsExactly("id", "name", "other");
+    assertThat(postLoad.beanState.loadedProps()).containsExactly("id", "name", "other");
     assertThat(postLoad.bean).isSameAs(found);
 
     db.delete(bean);

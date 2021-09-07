@@ -37,10 +37,10 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
     assertFalse(DB.beanState(order).isReference());
     assertNotNull(order.getStatus());
     assertNotNull(order.getDetails());
-    assertNull(DB.beanState(order).getLoadedProps());
+    assertNull(DB.beanState(order).loadedProps());
 
     Status status = order.getStatus();
-    assertTrue(status != Order.Status.SHIPPED);
+    assertNotSame(status, Status.SHIPPED);
     order.setStatus(Order.Status.SHIPPED);
     DB.refresh(order);
 

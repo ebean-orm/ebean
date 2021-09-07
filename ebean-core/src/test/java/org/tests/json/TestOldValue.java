@@ -48,7 +48,7 @@ public class TestOldValue extends BaseTestCase {
     bean.getIntMap().put("ik2",2006);
     ((ArrayNode)bean.getJsonNode()).add("Bar");
 
-    Map<String, ValuePair> dirty = DB.beanState(bean).getDirtyValues();
+    Map<String, ValuePair> dirty = DB.beanState(bean).dirtyValues();
     SoftAssertions softly = new SoftAssertions();
     softly.assertThat(dirty).hasSize(10);
 
@@ -83,7 +83,7 @@ public class TestOldValue extends BaseTestCase {
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
   @Disabled("Old value detection does not work for @DbArray")
-  public void testDbArrayOldValue() throws Exception {
+  public void testDbArrayOldValue() {
     EBasicOldValue bean = new EBasicOldValue();
 
     bean.getStringArr().add("sa1");
@@ -94,7 +94,7 @@ public class TestOldValue extends BaseTestCase {
 
     bean.getStringArr().add("sa2");
 
-    Map<String, ValuePair> dirty = DB.beanState(bean).getDirtyValues();
+    Map<String, ValuePair> dirty = DB.beanState(bean).dirtyValues();
     SoftAssertions softly = new SoftAssertions();
     softly.assertThat(dirty).hasSize(1);
 
@@ -102,6 +102,5 @@ public class TestOldValue extends BaseTestCase {
     softly.assertThat((List)dirty.get("stringArr").getNewValue()).containsExactly("sa1", "sa2");
 
     softly.assertAll();
-
   }
 }

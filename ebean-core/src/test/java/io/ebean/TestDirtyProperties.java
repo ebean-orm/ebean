@@ -35,11 +35,11 @@ public class TestDirtyProperties extends BaseTestCase {
 
     DefaultBeanState beanState = new DefaultBeanState(eb);
 
-    Set<String> changedProps = beanState.getChangedProps();
+    Set<String> changedProps = beanState.changedProps();
     assertEquals(1, changedProps.size());
     assertThat(changedProps).contains("name");
 
-    Map<String, ValuePair> dirtyValues = beanState.getDirtyValues();
+    Map<String, ValuePair> dirtyValues = beanState.dirtyValues();
     assertEquals(1, dirtyValues.size());
     assertThat(dirtyValues.keySet()).contains("name");
 
@@ -51,11 +51,11 @@ public class TestDirtyProperties extends BaseTestCase {
     Eembeddable embeddableRead = emain.getEmbeddable();
     embeddableRead.setDescription("embChanged");
 
-    Set<String> changedProps2 = beanState.getChangedProps();
+    Set<String> changedProps2 = beanState.changedProps();
     assertEquals(2, changedProps2.size());
     assertThat(changedProps2).contains("name", "embeddable.description");
 
-    Map<String, ValuePair> dirtyValues2 = beanState.getDirtyValues();
+    Map<String, ValuePair> dirtyValues2 = beanState.dirtyValues();
     assertEquals(2, dirtyValues2.size());
     assertThat(dirtyValues2.keySet()).contains("name", "embeddable.description");
 
@@ -92,13 +92,13 @@ public class TestDirtyProperties extends BaseTestCase {
 
     DefaultBeanState beanState = new DefaultBeanState(eb);
 
-    Set<String> changedProps2 = beanState.getChangedProps();
+    Set<String> changedProps2 = beanState.changedProps();
     assertEquals(2, changedProps2.size());
     assertThat(changedProps2).contains("name");
 
     assertThat(changedProps2).contains("embeddable");
 
-    Map<String, ValuePair> dirtyValues2 = beanState.getDirtyValues();
+    Map<String, ValuePair> dirtyValues2 = beanState.dirtyValues();
     assertEquals(2, dirtyValues2.size());
     assertThat(dirtyValues2.keySet()).contains("name", "embeddable");
 

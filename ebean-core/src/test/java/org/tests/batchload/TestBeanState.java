@@ -33,11 +33,11 @@ public class TestBeanState extends BaseTestCase {
     assertFalse(beanState.isNew());
     assertFalse(beanState.isDirty());
     assertFalse(beanState.isNewOrDirty());
-    assertNotNull(beanState.getLoadedProps());
+    assertNotNull(beanState.loadedProps());
 
     customer.setName("dirtyNameProp");
     assertTrue(beanState.isDirty());
-    assertThat(beanState.getChangedProps()).containsOnly("name");
+    assertThat(beanState.changedProps()).containsOnly("name");
 
     EntityBeanIntercept ebi = ((EntityBean) customer)._ebean_getIntercept();
     boolean[] dirtyProperties = ebi.getDirtyProperties();
@@ -51,7 +51,7 @@ public class TestBeanState extends BaseTestCase {
     customer.setStatus(Customer.Status.INACTIVE);
 
     assertTrue(beanState.isDirty());
-    assertThat(beanState.getChangedProps()).containsOnly("name", "status");
+    assertThat(beanState.changedProps()).containsOnly("name", "status");
   }
 
   @Test
@@ -80,10 +80,10 @@ public class TestBeanState extends BaseTestCase {
     Customer customer = DB.find(Customer.class).order("id").setMaxRows(1).findOne();
 
     BeanState beanState = DB.beanState(customer);
-    assertThat(beanState.getChangedProps()).isEmpty();
+    assertThat(beanState.changedProps()).isEmpty();
 
     customer.setContacts(new ArrayList<>());
-    assertThat(beanState.getChangedProps()).containsOnly("contacts");
+    assertThat(beanState.changedProps()).containsOnly("contacts");
   }
 
   @Test
@@ -92,18 +92,18 @@ public class TestBeanState extends BaseTestCase {
     Customer customer = new Customer();
 
     BeanState beanState = DB.beanState(customer);
-    assertThat(beanState.getChangedProps()).isEmpty();
+    assertThat(beanState.changedProps()).isEmpty();
 
     // when new state, then loaded
     customer.setContacts(new ArrayList<>());
-    assertThat(beanState.getChangedProps()).isEmpty();
-    assertThat(beanState.getLoadedProps()).containsOnly("contacts");
+    assertThat(beanState.changedProps()).isEmpty();
+    assertThat(beanState.loadedProps()).containsOnly("contacts");
 
     // set loaded state, then marked as changed
     beanState.setLoaded();
     customer.setContacts(new ArrayList<>());
-    assertThat(beanState.getLoadedProps()).containsOnly("contacts");
-    assertThat(beanState.getChangedProps()).containsOnly("contacts");
+    assertThat(beanState.loadedProps()).containsOnly("contacts");
+    assertThat(beanState.changedProps()).containsOnly("contacts");
   }
 
   @Test

@@ -26,7 +26,7 @@ public class TestReferenceWithConstructorProperties extends BaseTestCase {
     Order order = DB.reference(Order.class, 1);
 
     BeanState beanState = DB.beanState(order);
-    Set<String> loadedProps = beanState.getLoadedProps();
+    Set<String> loadedProps = beanState.loadedProps();
 
     assertEquals(1, loadedProps.size());
     assertTrue(beanState.isReference());

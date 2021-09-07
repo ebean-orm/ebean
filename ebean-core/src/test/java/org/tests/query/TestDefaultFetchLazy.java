@@ -28,7 +28,7 @@ public class TestDefaultFetchLazy extends BaseTestCase {
     MyLobSize myLobSize = DB.find(MyLobSize.class, m.getId());
 
     BeanState beanState = DB.beanState(myLobSize);
-    Set<String> loadedProps = beanState.getLoadedProps();
+    Set<String> loadedProps = beanState.loadedProps();
 
     assertNotNull(loadedProps);
     assertTrue(loadedProps.contains("id"));

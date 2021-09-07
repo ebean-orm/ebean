@@ -31,11 +31,11 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
 
 
     BeanState beanState = DB.beanState(user);
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name", "email");
 
     user.markPropertyUnset("email");
 
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name");
 
     LoggedSqlCollector.start();
     user.update();
@@ -55,12 +55,12 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setEmail("change@junk.com");
 
     BeanState beanState = DB.beanState(user);
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name", "email");
 
     // unset the loaded state for email
     ((EntityBean) user)._ebean_getIntercept().setPropertyLoaded("email", false);
 
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name");
   }
 
   @Test
@@ -73,11 +73,11 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setEmail("change@junk.com");
 
     BeanState beanState = DB.beanState(user);
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name", "email");
 
 
     user.markPropertyUnset("email");
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name");
   }
 
   @Test
@@ -90,10 +90,10 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setEmail("change@junk.com");
 
     BeanState beanState = DB.beanState(user);
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name", "email");
 
     DB.beanState(user).setPropertyLoaded("email", false);
-    assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
+    assertThat(beanState.loadedProps()).containsExactly("id", "name");
   }
 
   /**

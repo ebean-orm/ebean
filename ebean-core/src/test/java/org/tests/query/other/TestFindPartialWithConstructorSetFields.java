@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
 
@@ -31,10 +30,10 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
     // assert first bean is partially loaded
     Order order0 = list.get(0);
     BeanState beanState = DB.beanState(order0);
-    Set<String> loadedProps = beanState.getLoadedProps();
+    Set<String> loadedProps = beanState.loadedProps();
     assertTrue(loadedProps.contains("shipDate"));
-    assertTrue(!loadedProps.contains("status"));
-    assertTrue(!loadedProps.contains("orderDate"));
+    assertFalse(loadedProps.contains("status"));
+    assertFalse(loadedProps.contains("orderDate"));
 
     // invoke lazy loading
     order0.getStatus();
@@ -44,7 +43,7 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
     for (int i = 1; i < list.size(); i++) {
       Order order1 = list.get(1);
       beanState = DB.beanState(order1);
-      loadedProps = beanState.getLoadedProps();
+      loadedProps = beanState.loadedProps();
       assertNull(loadedProps);
     }
 

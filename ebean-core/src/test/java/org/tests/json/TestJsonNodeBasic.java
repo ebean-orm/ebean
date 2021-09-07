@@ -101,13 +101,11 @@ public class TestJsonNodeBasic extends BaseTestCase {
       .setId(bean.getId())
       .findOne();
 
-    Set<String> loadedProps = DB.beanState(bean1).getLoadedProps();
+    Set<String> loadedProps = DB.beanState(bean1).loadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));
 
-    JsonNode lazyLoadedContent = bean1.getContent();
-    assertNotNull(lazyLoadedContent);
-
+    assertNotNull(bean1.getContent());
   }
 
   @Test

@@ -1,7 +1,6 @@
 package org.tests.update;
 
 import io.ebean.DB;
-import io.ebean.DuplicateKeyException;
 import io.ebean.TransactionalTestCase;
 import io.ebeantest.LoggedSql;
 import org.junit.jupiter.api.Test;
@@ -266,7 +265,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
   }
 
   private boolean containsContacts(Customer cust) {
-    return DB.beanState(cust).getLoadedProps().contains("contacts");
+    return DB.beanState(cust).loadedProps().contains("contacts");
   }
 
   /**
