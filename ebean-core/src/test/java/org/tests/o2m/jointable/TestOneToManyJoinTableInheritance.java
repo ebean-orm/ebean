@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.config.dbplatform.IdType;
 
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.o2m.jointable.inheritance.ClassA;
 import org.tests.o2m.jointable.inheritance.ClassB;
 

@@ -2,10 +2,11 @@ package org.tests.config;
 
 import io.ebean.BaseTestCase;
 import io.ebean.config.TableName;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestTableName extends BaseTestCase {
 
@@ -31,26 +32,26 @@ public class TestTableName extends BaseTestCase {
   public void test() {
 
     TableName t = new TableName("a");
-    Assert.assertEquals("a", t.getName());
-    Assert.assertNull(t.getCatalog());
-    Assert.assertNull(t.getSchema());
+    assertEquals("a", t.getName());
+    assertNull(t.getCatalog());
+    assertNull(t.getSchema());
 
     t = new TableName("b.a");
-    Assert.assertEquals("a", t.getName());
-    Assert.assertEquals("b", t.getSchema());
-    Assert.assertNull(t.getCatalog());
+    assertEquals("a", t.getName());
+    assertEquals("b", t.getSchema());
+    assertNull(t.getCatalog());
 
     t = new TableName("c.b.a");
-    Assert.assertEquals("a", t.getName());
-    Assert.assertEquals("b", t.getSchema());
-    Assert.assertEquals("c", t.getCatalog());
+    assertEquals("a", t.getName());
+    assertEquals("b", t.getSchema());
+    assertEquals("c", t.getCatalog());
 
 //		try {
 //			TableName t2 = new TableName("d.c.b.a");
-//			Assert.assertNotNull(t2);
-//			Assert.assertTrue(false);
+//			assertNotNull(t2);
+//			assertTrue(false);
 //		} catch (RuntimeException e){
-//			Assert.assertTrue(true);
+//			assertTrue(true);
 //		}
 
 
@@ -60,8 +61,8 @@ public class TestTableName extends BaseTestCase {
 //		UnderscoreNamingConvention nc = new UnderscoreNamingConvention();
 //		TableName intTab = nc.getM2MJoinTableName(lhs, rhs);
 //
-//		Assert.assertNull(intTab.getCatalog());
-//		Assert.assertEquals("test", intTab.getSchema());
-//		Assert.assertEquals("oe_order_cust", intTab.getName());
+//		assertNull(intTab.getCatalog());
+//		assertEquals("test", intTab.getSchema());
+//		assertEquals("oe_order_cust", intTab.getName());
   }
 }

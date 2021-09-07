@@ -8,7 +8,7 @@ import io.ebean.TxScope;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Product;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

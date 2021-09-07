@@ -3,7 +3,7 @@ package org.tests.o2o;
 
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.update.EPersonOnline;
 
 import java.util.List;

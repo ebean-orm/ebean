@@ -2,13 +2,14 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTMaster;
 
 import javax.persistence.OptimisticLockException;
 import java.sql.Timestamp;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestIUDVanilla extends BaseTestCase {
 
@@ -19,8 +20,8 @@ public class TestIUDVanilla extends BaseTestCase {
 
     e0.save();
 
-    Assert.assertNotNull(e0.getId());
-    Assert.assertNotNull(e0.getLastUpdate());
+    assertNotNull(e0.getId());
+    assertNotNull(e0.getLastUpdate());
 
     Timestamp lastUpdate0 = e0.getLastUpdate();
 
@@ -28,8 +29,8 @@ public class TestIUDVanilla extends BaseTestCase {
     e0.save();
 
     Timestamp lastUpdate1 = e0.getLastUpdate();
-    Assert.assertNotNull(lastUpdate1);
-    Assert.assertNotSame(lastUpdate0, lastUpdate1);
+    assertNotNull(lastUpdate1);
+    assertNotSame(lastUpdate0, lastUpdate1);
 
     EBasicVer e2 = DB.getDefault().createEntityBean(EBasicVer.class);
 
@@ -69,14 +70,13 @@ public class TestIUDVanilla extends BaseTestCase {
     e3.update();
   }
 
-  @Test(expected = OptimisticLockException.class)
+  @Test
   public void modifyVersion_expect_optimisticLock() {
-
     UTMaster e0 = new UTMaster("save me");
     e0.save();
 
     // for this case we know 42 should throw OptimisticLockException
     e0.setVersion(42);
-    e0.update();
+    assertThrows(OptimisticLockException.class, () -> e0.update());
   }
 }

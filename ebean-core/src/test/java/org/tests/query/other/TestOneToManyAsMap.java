@@ -2,7 +2,7 @@ package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.map.MpRole;
 import org.tests.model.map.MpUser;
 
@@ -10,8 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestOneToManyAsMap extends BaseTestCase {
 

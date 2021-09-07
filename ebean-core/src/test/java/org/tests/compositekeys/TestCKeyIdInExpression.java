@@ -8,11 +8,12 @@ import org.tests.model.composite.RCustomer;
 import org.tests.model.composite.RCustomerKey;
 import org.tests.model.composite.ROrder;
 import org.tests.model.composite.ROrderPK;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCKeyIdInExpression extends BaseTestCase {
 
@@ -62,14 +63,14 @@ public class TestCKeyIdInExpression extends BaseTestCase {
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.contains("(t0.company=? and t0.order_number=?) or"));
+    assertTrue(sql.contains("(t0.company=? and t0.order_number=?) or"));
 
     Query<ROrder> query2 = server.find(ROrder.class).setId(k0);
 
     query2.findOne();
     sql = query2.getGeneratedSql();
-    Assert.assertTrue(sql.contains("t0.company = ? "));
-    Assert.assertTrue(sql.contains(" and t0.order_number = ?"));
+    assertTrue(sql.contains("t0.company = ? "));
+    assertTrue(sql.contains(" and t0.order_number = ?"));
 
     server.delete(ROrder.class, k0);
 

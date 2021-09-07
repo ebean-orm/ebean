@@ -7,12 +7,12 @@ import io.ebean.TransactionalTestCase;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestWhereAnnotation extends TransactionalTestCase {
 
@@ -24,7 +24,7 @@ public class TestWhereAnnotation extends TransactionalTestCase {
     Customer customer = Ebean.find(Customer.class, custTest.getId());
     List<Order> orders = customer.getOrders();
 
-    Assert.assertTrue(!orders.isEmpty());
+    assertTrue(!orders.isEmpty());
 
     Query<Customer> q1 = Ebean.find(Customer.class).setUseCache(false).fetch("orders").where()
       .idEq(1).query();

@@ -4,7 +4,7 @@ import io.ebean.*;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;

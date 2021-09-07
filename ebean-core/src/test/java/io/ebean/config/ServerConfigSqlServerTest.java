@@ -5,20 +5,19 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
-import javax.persistence.PersistenceException;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ServerConfigSqlServerTest {
 
-  @Ignore
+  @Disabled
   @ForPlatform({Platform.SQLSERVER})
-  @Test(expected = PersistenceException.class)
+  @Test //expected = PersistenceException.class
   public void need_explicitPlatform() {
 
     Properties props = props("some_sqlserver");
@@ -55,7 +54,7 @@ public class ServerConfigSqlServerTest {
 
   }
 
-  @Ignore
+  @Disabled
   @ForPlatform({Platform.SQLSERVER})
   @Test
   public void explicit_17() {
@@ -86,7 +85,7 @@ public class ServerConfigSqlServerTest {
     sqlServer.shutdown();
   }
 
-  @Ignore
+  @Disabled
   @ForPlatform({Platform.SQLSERVER})
   @Test
   public void explicit_16() {

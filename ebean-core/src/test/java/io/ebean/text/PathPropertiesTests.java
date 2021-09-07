@@ -3,7 +3,7 @@ package io.ebean.text;
 import io.ebean.DB;
 import io.ebean.FetchPath;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Customer;
@@ -12,9 +12,9 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PathPropertiesTests {
 

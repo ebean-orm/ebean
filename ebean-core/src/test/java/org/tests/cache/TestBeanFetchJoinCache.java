@@ -6,7 +6,7 @@ import io.ebean.FetchGroup;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;

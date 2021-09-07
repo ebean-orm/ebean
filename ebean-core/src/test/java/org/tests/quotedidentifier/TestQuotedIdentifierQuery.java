@@ -2,7 +2,7 @@ package org.tests.quotedidentifier;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BWithQIdent;
 
 public class TestQuotedIdentifierQuery extends BaseTestCase {

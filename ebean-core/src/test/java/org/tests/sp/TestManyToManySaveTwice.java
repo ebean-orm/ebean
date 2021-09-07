@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.sp.model.car.Car;
 import org.tests.sp.model.car.Door;
 import org.tests.sp.model.car.Wheel;
@@ -13,8 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestManyToManySaveTwice extends BaseTestCase {
 

@@ -5,8 +5,9 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import org.tests.model.basic.PFile;
 import org.tests.model.basic.PFileContent;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestConstructorPutfieldReplacement extends BaseTestCase {
 
@@ -21,9 +22,8 @@ public class TestConstructorPutfieldReplacement extends BaseTestCase {
     int namePos = ebi.findProperty("name");
     int fileContentPos = ebi.findProperty("fileContent");
 
-    Assert.assertTrue(ebi.isLoadedProperty(namePos));
-    Assert.assertTrue(ebi.isLoadedProperty(fileContentPos));
-
+    assertTrue(ebi.isLoadedProperty(namePos));
+    assertTrue(ebi.isLoadedProperty(fileContentPos));
   }
 
 }

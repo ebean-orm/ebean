@@ -5,9 +5,9 @@ import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.site.DataContainer;
 import org.tests.model.site.Site;
 import org.tests.model.site.SiteAddress;
@@ -21,12 +21,12 @@ public class TestMultiCascadeBatch extends BaseTestCase {
 
   private Transaction txn;
 
-  @Before
+  @BeforeEach
   public void before() {
     txn = Ebean.beginTransaction();
   }
 
-  @After
+  @AfterEach
   public void after() {
     if (txn != null) {
       txn.end();

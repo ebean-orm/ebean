@@ -1,7 +1,7 @@
 package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCreateTransactionWithIsolation extends BaseTestCase {
 

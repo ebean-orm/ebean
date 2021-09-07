@@ -4,8 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestConnectionCloseOnSqlerr extends BaseTestCase {
 
@@ -27,7 +28,7 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
           q0.findList();
         } catch (Exception e) {
           if (e.getMessage().contains("Unsuccessfully waited")) {
-            Assert.fail("No connections found while only one thread is running. (after " + i + " queries)");
+            fail();
           } else {
             e.printStackTrace();
           }
@@ -58,7 +59,7 @@ public class TestConnectionCloseOnSqlerr extends BaseTestCase {
           Ebean.commitTransaction();
         } catch (Exception e) {
           if (e.getMessage().contains("Unsuccessfully waited")) {
-            Assert.fail("No connections found while only one thread is running. (after " + i + " queries)");
+            fail("No connections found while only one thread is running. (after " + i + " queries)");
           } else {
             e.printStackTrace();
           }

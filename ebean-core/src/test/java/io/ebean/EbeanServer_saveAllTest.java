@@ -1,7 +1,7 @@
 package io.ebean;
 
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
 import java.util.ArrayList;

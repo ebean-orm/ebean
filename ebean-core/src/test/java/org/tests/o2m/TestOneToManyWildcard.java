@@ -1,7 +1,7 @@
 package org.tests.o2m;
 
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 

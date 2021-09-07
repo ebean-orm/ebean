@@ -1,11 +1,10 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.BaseTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class OrmQueryDetailParserTest extends BaseTestCase {
@@ -14,19 +13,18 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
     return new OrmQueryDetailParser(query).parse();
   }
 
-  @Test(expected = NullPointerException.class)
-  public void parse_when_nullString() throws Exception {
-    parse(null);
+  @Test
+  public void parse_when_nullString() {
+    assertThrows(NullPointerException.class, () -> parse(null));
   }
 
   @Test
-  public void parse_when_emptyString() throws Exception {
+  public void parse_when_emptyString() {
     assertTrue(parse("").isEmpty());
   }
 
   @Test
-  public void testParseBasic() throws Exception {
-
+  public void testParseBasic() {
     OrmQueryDetail detail = parse("select (id,name)");
 
     OrmQueryProperties root = detail.getChunk(null, false);
@@ -35,8 +33,7 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
   }
 
   @Test
-  public void testParseEmptySelect() throws Exception {
-
+  public void testParseEmptySelect() {
     OrmQueryDetail detail = parse("select  fetch customer (email)");
 
     OrmQueryProperties root = detail.getChunk(null, false);
@@ -49,8 +46,7 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
   }
 
   @Test
-  public void testParseSelectFetch() throws Exception {
-
+  public void testParseSelectFetch() {
     OrmQueryDetail detail = parse("select (id,name) fetch customer (email)");
 
     OrmQueryProperties root = detail.getChunk(null, false);
@@ -63,8 +59,7 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
   }
 
   @Test
-  public void testParseSelectFetchMore() throws Exception {
-
+  public void testParseSelectFetchMore() {
     OrmQueryDetail detail = parse("select (id,name) fetch customer (email) fetch details.product (sku,description)");
 
     OrmQueryProperties root = detail.getChunk(null, false);
@@ -81,8 +76,7 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
   }
 
   @Test
-  public void testParseWithPlusQuery() throws Exception {
-
+  public void testParseWithPlusQuery() {
     OrmQueryDetail detail = parse("select (id,name) fetch customer (+query,id,name,email)");
 
     OrmQueryProperties root = detail.getChunk(null, false);

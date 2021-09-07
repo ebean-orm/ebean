@@ -6,13 +6,12 @@ import io.ebean.EbeanServer;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.MyEBasicConfigStartup;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestExplicitInsert extends BaseTestCase {
 
@@ -54,11 +53,8 @@ public class TestExplicitInsert extends BaseTestCase {
 
     EbeanServer server = Ebean.getDefaultServer();
     server.insert(b);
-
-    Assert.assertNotNull(b.getId());
-
-    Assert.assertEquals(b.getId(), server.beanId(b));
-
+    assertNotNull(b.getId());
+    assertEquals(b.getId(), server.beanId(b));
 
     EBasic b2 = server.find(EBasic.class, b.getId());
     b2.setId(null);
@@ -66,8 +62,8 @@ public class TestExplicitInsert extends BaseTestCase {
     b2.setName("force insert");
     server.insert(b2);
 
-    Assert.assertNotNull(b2.getId());
-    Assert.assertTrue(!b.getId().equals(b2.getId()));
+    assertNotNull(b2.getId());
+    assertTrue(!b.getId().equals(b2.getId()));
 
     List<EBasic> list = server.find(EBasic.class).where().in("id", b.getId(), b2.getId()).findList();
 

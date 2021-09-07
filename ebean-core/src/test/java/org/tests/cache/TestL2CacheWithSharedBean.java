@@ -5,11 +5,10 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.FeatureDescription;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestL2CacheWithSharedBean extends BaseTestCase {
 
@@ -48,12 +47,12 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     // load the cache
     FeatureDescription fetchOne = Ebean.find(FeatureDescription.class, f1.getId());
-    Assert.assertNotNull(fetchOne);
+    assertNotNull(fetchOne);
     assertEquals(1, beanCache.statistics(false).getSize());
 
     FeatureDescription fetchTwo = Ebean.find(FeatureDescription.class, f1.getId());
     FeatureDescription fetchThree = Ebean.find(FeatureDescription.class, f1.getId());
-    Assert.assertSame(fetchTwo, fetchThree);
+    assertSame(fetchTwo, fetchThree);
 
     String description1 = fetchThree.getDescription();
     assertEquals("helloOne", description1);

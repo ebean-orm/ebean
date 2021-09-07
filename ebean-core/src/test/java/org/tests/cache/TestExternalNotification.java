@@ -7,10 +7,10 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestExternalNotification extends BaseTestCase {
 
@@ -55,7 +55,7 @@ public class TestExternalNotification extends BaseTestCase {
 
     loadCountryCache();
     int cacheSize = countryCache.size();
-    assertTrue("cacheSize: " + cacheSize, cacheSize > 0);
+    assertTrue(cacheSize > 0);
 
     SqlUpdate sqlUpdate = Ebean
       .createSqlUpdate("update o_country set name = :name where code = :code");

@@ -6,10 +6,10 @@ import io.ebean.CountedValue;
 import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
@@ -478,7 +478,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  @Ignore //don't know if ebean can handle this on many to many, as this means that the cartesian product is generated
+  @Disabled //don't know if ebean can handle this on many to many, as this means that the cartesian product is generated
   public void distinctFetchManyToManyInheritedBean() {
 
     ResetBasicData.reset();
@@ -758,7 +758,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setup() {
     MainEntity e1 = new MainEntity();
     e1.setId("1");
@@ -791,7 +791,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     DB.save(rel);
   }
 
-  @After
+  @AfterEach
   public void cleanup() {
     Ebean.find(MainEntityRelation.class).delete();
     Ebean.find(MainEntity.class).delete();

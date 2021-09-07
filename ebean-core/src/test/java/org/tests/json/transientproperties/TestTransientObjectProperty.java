@@ -1,9 +1,9 @@
 package org.tests.json.transientproperties;
 
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestTransientObjectProperty {
 

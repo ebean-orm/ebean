@@ -4,7 +4,7 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.converstation.User;
 
 import java.util.List;

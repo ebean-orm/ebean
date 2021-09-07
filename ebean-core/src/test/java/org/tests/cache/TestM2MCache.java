@@ -2,7 +2,7 @@ package org.tests.cache;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.cache.M2MCacheChild;
 import org.tests.model.cache.M2MCacheMaster;
 

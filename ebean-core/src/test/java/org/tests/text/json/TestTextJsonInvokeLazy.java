@@ -4,24 +4,23 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
 public class TestTextJsonInvokeLazy extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void clearBeanCache() {
     server().pluginApi().beanType(Customer.class).clearBeanCache();
   }
 
   @Test
   public void test() throws IOException {
-
     ResetBasicData.reset();
 
     List<Customer> list = Ebean.find(Customer.class).select("name").findList();

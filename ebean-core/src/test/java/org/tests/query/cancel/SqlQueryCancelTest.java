@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 import javax.persistence.PersistenceException;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
 import io.ebean.BaseTestCase;
@@ -69,7 +69,7 @@ public class SqlQueryCancelTest extends BaseTestCase {
 
   private final int timing = 20;
 
-  @BeforeClass
+  @BeforeAll
   public static void setupTestData() throws SQLException {
     for (int i = 0; i < 128; i++) {
       EBasic model = new EBasic("Basic " + i);

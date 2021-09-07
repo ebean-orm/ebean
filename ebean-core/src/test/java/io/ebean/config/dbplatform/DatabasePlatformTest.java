@@ -10,10 +10,10 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatabasePlatformTest extends BaseTestCase {
 

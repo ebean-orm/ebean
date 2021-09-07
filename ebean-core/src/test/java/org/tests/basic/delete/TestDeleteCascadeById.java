@@ -7,10 +7,12 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestDeleteCascadeById extends BaseTestCase {
 
@@ -24,13 +26,13 @@ public class TestDeleteCascadeById extends BaseTestCase {
     server.getBeanDescriptor(OrderDetail.class).cacheBeanPut(dummy);
 
     Customer cust = ResetBasicData.createCustAndOrder("DelCas");
-    Assert.assertNotNull(cust);
+    assertNotNull(cust);
 
     List<Order> orders = Ebean.find(Order.class).where().eq("customer", cust).findList();
 
-    Assert.assertEquals(1, orders.size());
+    assertEquals(1, orders.size());
     Order o = orders.get(0);
-    Assert.assertNotNull(o);
+    assertNotNull(o);
 
     // cleanup
     Ebean.delete(o);

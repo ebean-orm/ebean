@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.plugin.SpiServer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 

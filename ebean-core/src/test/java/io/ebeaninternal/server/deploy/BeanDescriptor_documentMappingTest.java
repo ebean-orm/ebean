@@ -5,7 +5,7 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyAdapter;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

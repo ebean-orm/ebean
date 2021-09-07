@@ -3,13 +3,13 @@ package org.tests.o2m;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestOneToManyNoMappedBy extends BaseTestCase {
 

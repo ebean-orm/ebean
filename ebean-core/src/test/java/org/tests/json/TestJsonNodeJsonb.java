@@ -5,12 +5,12 @@ import io.ebean.Ebean;
 import org.tests.model.json.EBasicJsonNodeJsonB;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJsonNodeJsonb extends BaseTestCase {
 

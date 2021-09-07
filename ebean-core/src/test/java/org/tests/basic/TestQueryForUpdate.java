@@ -9,7 +9,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ResetBasicData;
@@ -17,7 +17,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryForUpdate extends BaseTestCase {
 

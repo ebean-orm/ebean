@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.softdelete.ESoftDelBook;
 import org.tests.model.softdelete.ESoftDelUser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 

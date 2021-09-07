@@ -2,11 +2,11 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestRawSqlColumnParsing {
 

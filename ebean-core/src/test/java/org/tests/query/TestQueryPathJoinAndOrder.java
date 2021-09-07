@@ -4,10 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestQueryPathJoinAndOrder extends BaseTestCase {
 
@@ -19,7 +20,7 @@ public class TestQueryPathJoinAndOrder extends BaseTestCase {
     List<Customer> list = Ebean.find(Customer.class).select("id,name, status").fetch("contacts")
       .order().asc("id").order().desc("contacts.firstName").setMaxRows(3).findList();
 
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     // can't really assert that the contacts are batch loaded
     // via a secondary query join

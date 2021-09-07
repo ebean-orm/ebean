@@ -1,34 +1,31 @@
 package org.tests.cache;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryCacheCountry extends BaseTestCase {
 
-  private ServerCacheManager cacheManager = Ebean.getServerCacheManager();
-  private ServerCache queryCache = cacheManager.queryCache(Country.class);
-  private ServerCache beanCache = cacheManager.beanCache(Country.class);
+  private final ServerCacheManager cacheManager = DB.getServerCacheManager();
+  private final ServerCache queryCache = cacheManager.queryCache(Country.class);
+  private final ServerCache beanCache = cacheManager.beanCache(Country.class);
 
   private void clearCache() {
     queryCache.clear();
     beanCache.clear();
     queryCache.statistics(true);
   }
-
 
   @Test
   public void emptyQueryResult_expect_cached() {
@@ -142,7 +139,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     ServerCacheStatistics statistics = queryCache.statistics(false);
     assertEquals(1, statistics.getSize());
     assertEquals(1, statistics.getHitCount());
-    Assert.assertSame(countryList1, countryList0);
+    assertSame(countryList1, countryList0);
 
     Country nz = Ebean.find(Country.class, "NZ");
     nz.setName("New Zealandia");

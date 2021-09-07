@@ -6,10 +6,10 @@ import io.ebean.OrderBy;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderByClear extends BaseTestCase {
 
@@ -26,7 +26,7 @@ public class TestOrderByClear extends BaseTestCase {
     assertTrue(orderBy.containsProperty("orderDate"));
 
     orderBy.clear();
-    Assert.assertFalse(orderBy.containsProperty("orderDate"));
+    assertFalse(orderBy.containsProperty("orderDate"));
 
     orderBy.asc("shipDate");
     assertTrue(orderBy.containsProperty("shipDate"));

@@ -9,10 +9,12 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryFilterManyOnSecondary extends BaseTestCase {
 
@@ -31,7 +33,7 @@ public class TestQueryFilterManyOnSecondary extends BaseTestCase {
     for (Customer customer : list) {
       List<Order> orders = customer.getOrders();
       for (Order order : orders) {
-        Assert.assertEquals(Order.Status.NEW, order.getStatus());
+        assertEquals(Order.Status.NEW, order.getStatus());
       }
     }
 
@@ -55,7 +57,7 @@ public class TestQueryFilterManyOnSecondary extends BaseTestCase {
       for (OrderDetail orderDetail : details) {
         Product product = orderDetail.getProduct();
         String name = product.getName();
-        Assert.assertTrue(name.startsWith("C"));
+        assertTrue(name.startsWith("C"));
       }
     }
   }

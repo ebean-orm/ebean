@@ -14,7 +14,7 @@ import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.TSDetail;
@@ -24,7 +24,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBatchInsertFlush extends BaseTestCase {
 

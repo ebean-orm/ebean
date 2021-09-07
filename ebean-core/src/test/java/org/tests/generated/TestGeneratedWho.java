@@ -4,13 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.MyCurrentUserProvider;
 import org.tests.model.EWhoProps;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.generated.User;
 import org.tests.model.generated.WhoPropsOneToMany;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestGeneratedWho extends BaseTestCase {
 

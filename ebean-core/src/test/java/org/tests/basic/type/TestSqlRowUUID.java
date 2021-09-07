@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TUuidEntity;
 
 import java.util.Arrays;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestSqlRowUUID extends BaseTestCase {
 

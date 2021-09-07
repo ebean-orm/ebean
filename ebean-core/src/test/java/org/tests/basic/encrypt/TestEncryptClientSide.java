@@ -2,7 +2,7 @@ package org.tests.basic.encrypt;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncryptClient;
 
 import java.time.LocalDate;

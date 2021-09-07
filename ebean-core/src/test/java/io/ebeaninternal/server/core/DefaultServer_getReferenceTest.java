@@ -3,7 +3,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;

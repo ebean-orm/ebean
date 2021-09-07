@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BaseTestCase;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.BWithQIdent;
 import org.tests.model.basic.Customer;

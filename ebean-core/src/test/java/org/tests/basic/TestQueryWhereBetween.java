@@ -3,13 +3,14 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Timestamp;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryWhereBetween extends BaseTestCase {
 
@@ -29,10 +30,10 @@ public class TestQueryWhereBetween extends BaseTestCase {
     query.findList();
 
     String sql = query.getGeneratedSql();
-    Assert.assertTrue(sql.contains("between t0.cretime and t0.updtime"));
+    assertTrue(sql.contains("between t0.cretime and t0.updtime"));
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void doStuff() {
 

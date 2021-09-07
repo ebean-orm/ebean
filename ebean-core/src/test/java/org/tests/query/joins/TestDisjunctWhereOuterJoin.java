@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Expr;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.basic.one2one.Wheel;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;

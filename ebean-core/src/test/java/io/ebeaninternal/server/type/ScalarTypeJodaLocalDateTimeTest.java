@@ -3,11 +3,11 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.JsonConfig;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScalarTypeJodaLocalDateTimeTest {
 

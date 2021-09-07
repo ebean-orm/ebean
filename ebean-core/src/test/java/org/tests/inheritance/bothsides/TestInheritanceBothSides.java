@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;

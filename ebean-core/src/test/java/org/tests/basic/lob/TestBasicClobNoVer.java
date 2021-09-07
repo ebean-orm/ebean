@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobNoVer;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

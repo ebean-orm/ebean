@@ -6,18 +6,21 @@ import io.ebean.DataIntegrityException;
 import io.ebean.Ebean;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+
+import javax.persistence.PersistenceException;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestInsertDataIntegrityException extends BaseTestCase {
 
 
   @IgnorePlatform(Platform.NUODB)
-  @Test(expected = DataIntegrityException.class)
+  @Test
   public void insert_invalidForeignKey() {
-
     ResetBasicData.reset();
 
     // an invalid foreign key value
@@ -27,6 +30,6 @@ public class TestInsertDataIntegrityException extends BaseTestCase {
     order.setStatus(Order.Status.NEW);
     order.setCustomer(invalidCustomer);
 
-    DB.save(order);
+    assertThrows(DataIntegrityException.class, () -> DB.save(order));
   }
 }

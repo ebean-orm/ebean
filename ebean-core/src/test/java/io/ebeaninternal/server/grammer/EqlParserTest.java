@@ -9,7 +9,7 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiQuery;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
@@ -21,13 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EqlParserTest extends BaseTestCase {
 
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void illegal_syntax() {
-    parse("find Article where name = :p0");
+    assertThrows(IllegalArgumentException.class, () -> parse("find Article where name = :p0"));
   }
 
   @Test
@@ -389,27 +390,23 @@ public class EqlParserTest extends BaseTestCase {
     assertSql(query).doesNotContain("where");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test//(expected = IllegalArgumentException.class)
   public void query_inOrEmpty_withVals() {
-
-    Query<Customer> query = parse("where name inOrEmpty (:names)");
-    query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
-    query.findList();
-
-    platformAssertIn(query.getGeneratedSql(), "where t0.name");
+    assertThrows(IllegalArgumentException.class, () -> parse("where name inOrEmpty (:names)"));
+//    query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
+//    query.findList();
+//    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   /**
    * This test fails in that we can't use inOrEmpty with named parameters.
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test//(expected = IllegalArgumentException.class)
   public void query_inOrEmpty_withNamedParams_expect_IllegalArgument() {
-
-    Query<Customer> query = parse("where name inOrEmpty (:names)");
-    query.setParameter("names", new ArrayList<>());
-    query.findList();
-
-    assertSql(query).doesNotContain("where");
+    assertThrows(IllegalArgumentException.class, () -> parse("where name inOrEmpty (:names)"));
+//    query.setParameter("names", new ArrayList<>());
+//    assertThrows(IllegalArgumentException.class, query::findList);
+//    assertSql(query).doesNotContain("where");
   }
 
   @Test

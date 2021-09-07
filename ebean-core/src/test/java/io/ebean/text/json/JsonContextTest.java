@@ -3,7 +3,7 @@ package io.ebean.text.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import io.ebean.DB;
 import io.ebean.text.PathProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -15,11 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JsonContextTest {
 
@@ -201,9 +197,9 @@ public class JsonContextTest {
     generator.close();
 
     String jsonString = writer.toString();
-    assertTrue(jsonString, jsonString.startsWith("["));
-    assertTrue(jsonString, jsonString.endsWith("]"));
-    assertTrue(jsonString, jsonString.contains("{\"id\":1,\"name\":\"Jim\"}"));
+    assertThat(jsonString).startsWith("[");
+    assertThat(jsonString).endsWith("]");
+    assertThat(jsonString).contains("{\"id\":1,\"name\":\"Jim\"}");
   }
 
   @Test

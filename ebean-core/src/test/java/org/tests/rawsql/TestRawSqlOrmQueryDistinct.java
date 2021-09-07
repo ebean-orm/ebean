@@ -1,17 +1,13 @@
 package org.tests.rawsql;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.FetchConfig;
-import io.ebean.Query;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
+import io.ebean.*;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlOrmQueryDistinct extends BaseTestCase {
 
@@ -38,7 +34,7 @@ public class TestRawSqlOrmQueryDistinct extends BaseTestCase {
     query.filterMany("contacts").gt("lastName", "b");
 
     List<Customer> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 
 }

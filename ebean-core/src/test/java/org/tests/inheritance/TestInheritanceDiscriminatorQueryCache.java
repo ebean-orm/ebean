@@ -3,7 +3,7 @@ package org.tests.inheritance;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.inheritance.model.GroupConfiguration;
 import org.tests.inheritance.model.ProductConfiguration;
 

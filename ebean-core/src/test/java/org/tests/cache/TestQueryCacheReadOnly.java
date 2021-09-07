@@ -7,7 +7,7 @@ import io.ebean.EbeanServer;
 import io.ebean.Query;
 
 import org.tests.model.basic.EBasicVer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class TestQueryCacheReadOnly extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
     EBasicVer account = new EBasicVer("an other junk");
     server.save(account);
-    
+
     Query<EBasicVer> baseQuery = server.find(EBasicVer.class).setUseQueryCache(CacheMode.ON);
 
     List<EBasicVer> alist = baseQuery.findList();
@@ -82,10 +82,10 @@ public class TestQueryCacheReadOnly extends BaseTestCase {
 
     Map<String,EBasicVer> amap = baseQuery.setMapKey("name").findMap();
     assertThat(amap).isNotEmpty();
-    amap.clear(); 
+    amap.clear();
     amap = baseQuery.setMapKey("name").findMap();
     assertThat(amap).isNotEmpty();
-    amap.clear(); 
+    amap.clear();
 
     Set<EBasicVer> aset = baseQuery.findSet();
     assertThat(aset).isNotEmpty();

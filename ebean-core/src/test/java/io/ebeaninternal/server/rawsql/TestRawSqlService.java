@@ -2,7 +2,7 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.BaseTestCase;
 import io.ebean.SqlRow;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

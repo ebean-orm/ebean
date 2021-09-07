@@ -5,7 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Contact;
@@ -15,7 +15,7 @@ import java.sql.Date;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CachedBeanDataFromBeanTest extends BaseTestCase {
 

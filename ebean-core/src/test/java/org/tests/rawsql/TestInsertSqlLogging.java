@@ -5,12 +5,12 @@ import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiTransaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.idkeys.db.AuditLog;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestInsertSqlLogging extends BaseTestCase {
 

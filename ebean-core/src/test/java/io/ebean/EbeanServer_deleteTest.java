@@ -2,7 +2,7 @@ package io.ebean;
 
 import org.tests.model.basic.EBasicVer;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

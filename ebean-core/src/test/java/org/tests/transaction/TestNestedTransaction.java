@@ -3,8 +3,8 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.EBasic;
@@ -17,7 +17,7 @@ public class TestNestedTransaction extends BaseTestCase {
 
   private EBasic bean;
 
-  @Before
+  @BeforeEach
   public void init() {
     bean = new EBasic("new");
     Ebean.save(bean);

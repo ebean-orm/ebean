@@ -1,13 +1,10 @@
 package org.tests.model.uuidsibling;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SoftDeleteCascadeTest {
 
@@ -36,31 +33,15 @@ public class SoftDeleteCascadeTest {
 
     parent.refresh();
 
-    assertThat("Parent should have one child loaded",
-      parent.getChildren().size(),
-      is(1)
-    );
-
-    assertThat("Parent should have correct child loaded",
-      parent.getChildren().get(0).getId(),
-      is(child.getId())
-    );
-
-    assertThat("Child that was loaded should have its sibling available",
-      parent.getChildren().get(0).getChildSibling(),
-      not(nullValue())
-    );
-
-    assertThat(
-      "Child that was loaded should have loaded correct sibling",
-      parent.getChildren().get(0).getChildSibling().getId(),
-      is(childSibling.getId())
-    );
+    assertThat(parent.getChildren()).hasSize(1);
+    assertThat(parent.getChildren().get(0).getId()).isEqualTo(child.getId());
+    assertThat(parent.getChildren().get(0).getChildSibling()).isNotNull();
+    assertThat(parent.getChildren().get(0).getChildSibling().getId()).isEqualTo(childSibling.getId());
   }
 
   private void assertAfter(Long parentId, UUID childId, Long childSiblingId) {
-    assertThat(USibParent.find.byId(parentId), is(nullValue()));
-    assertThat(USibChild.find.byId(childId), is(nullValue()));
-    assertThat(USibChildSibling.find.byId(childSiblingId), is(nullValue()));
+    assertThat(USibParent.find.byId(parentId)).isNull();
+    assertThat(USibChild.find.byId(childId)).isNull();
+    assertThat(USibChildSibling.find.byId(childSiblingId)).isNull();
   }
 }

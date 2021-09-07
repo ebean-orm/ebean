@@ -11,7 +11,7 @@ import io.ebeaninternal.server.text.json.WriteJson;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base class to help json testing.

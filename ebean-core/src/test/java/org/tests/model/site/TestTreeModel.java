@@ -2,7 +2,7 @@ package org.tests.model.site;
 
 import io.ebean.BaseTestCase;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

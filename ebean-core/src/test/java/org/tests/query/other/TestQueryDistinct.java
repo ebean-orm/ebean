@@ -7,14 +7,12 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryDistinct extends BaseTestCase {
 

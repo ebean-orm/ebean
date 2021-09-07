@@ -2,14 +2,14 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.FetchConfig;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestQueryFetchJoinWithOrder extends BaseTestCase {
 
@@ -23,7 +23,7 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
       .order().asc("id")
       .order().desc("details.id").findList();
 
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     List<Order> list2 = Ebean.find(Order.class)
       .fetchQuery("customer")
@@ -32,7 +32,7 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
       .order().asc("customer.contacts.lastName")
       .findList();
 
-    Assert.assertNotNull(list2);
+    assertNotNull(list2);
 
     List<Customer> list3 = Ebean.find(Customer.class)
       .fetch("orders")
@@ -40,7 +40,7 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
       .order().desc("orders.id")
       .findList();
 
-    Assert.assertNotNull(list3);
+    assertNotNull(list3);
 
   }
 }

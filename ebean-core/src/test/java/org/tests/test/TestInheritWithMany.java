@@ -6,14 +6,15 @@ import io.ebean.EbeanServer;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.InheritInfo;
+import org.junit.jupiter.api.Test;
 import org.tests.model.inheritmany.IMRelated;
 import org.tests.model.inheritmany.IMRoot;
 import org.tests.model.inheritmany.IMRootOne;
 import org.tests.model.inheritmany.IMRootTwo;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class TestInheritWithMany extends BaseTestCase {
@@ -23,12 +24,12 @@ public class TestInheritWithMany extends BaseTestCase {
   public void test() {
 
     EbeanServer server = Ebean.getServer(null);
-    Assert.assertNotNull(server);
+    assertNotNull(server);
 
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
     BeanDescriptor<IMRoot> beanDescriptor = spiServer.getBeanDescriptor(IMRoot.class);
     InheritInfo inheritInfo = beanDescriptor.getInheritInfo();
-    Assert.assertNotNull(inheritInfo);
+    assertNotNull(inheritInfo);
 
 
     IMRootOne one = new IMRootOne();

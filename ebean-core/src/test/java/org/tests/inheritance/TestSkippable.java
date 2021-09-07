@@ -5,10 +5,11 @@ import io.ebean.Ebean;
 import org.tests.model.basic.AttributeHolder;
 import org.tests.model.basic.ListAttribute;
 import org.tests.model.basic.ListAttributeValue;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSkippable extends BaseTestCase {
 
@@ -36,10 +37,10 @@ public class TestSkippable extends BaseTestCase {
     logger.info(" -- seeded data");
 
     final ListAttribute listAttributeDB = Ebean.find(ListAttribute.class, listAttribute.getId());
-    Assert.assertNotNull(listAttributeDB);
+    assertNotNull(listAttributeDB);
 
     final ListAttributeValue value1_DB = listAttributeDB.getValues().iterator().next();
-    Assert.assertTrue(value1.getId().equals(value1_DB.getId()));
+    assertTrue(value1.getId().equals(value1_DB.getId()));
     logger.info(" -- asserted data in db");
 
 
@@ -61,12 +62,12 @@ public class TestSkippable extends BaseTestCase {
 
 
     final ListAttribute listAttributeDB_2 = Ebean.find(ListAttribute.class, listAttributeDB.getId());
-    Assert.assertNotNull(listAttributeDB_2);
+    assertNotNull(listAttributeDB_2);
     final ListAttributeValue value2_DB_2 = listAttributeDB_2.getValues().iterator().next();
 
 
-    Assert.assertEquals(value2.getId(), value2_DB_2.getId());
-    Assert.assertTrue("Cascade failed", value2.getId().equals(value2_DB_2.getId()));
+    assertEquals(value2.getId(), value2_DB_2.getId());
+    assertTrue(value2.getId().equals(value2_DB_2.getId()));
 
     Ebean.delete(listAttributeDB_2);
 

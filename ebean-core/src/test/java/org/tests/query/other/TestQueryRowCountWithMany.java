@@ -4,14 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestQueryRowCountWithMany extends BaseTestCase {
 

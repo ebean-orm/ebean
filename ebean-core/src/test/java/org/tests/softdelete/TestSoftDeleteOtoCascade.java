@@ -3,7 +3,7 @@ package org.tests.softdelete;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.ESoftDelOneA;
 import org.tests.model.softdelete.ESoftDelOneB;
 

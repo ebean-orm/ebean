@@ -1,8 +1,7 @@
 package io.ebeaninternal.server.executor;
 
-import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
 import java.util.concurrent.Future;
@@ -59,7 +58,7 @@ public class DefaultBackgroundExecutorTest {
   }
 
   @Test
-  @Ignore("test takes long time")
+  @Disabled("test takes long time")
   public void shutdown_when_running_expect_waitAndNiceShutdown() {
 
     DefaultBackgroundExecutor es = new DefaultBackgroundExecutor(1, 20, "test");
@@ -72,7 +71,7 @@ public class DefaultBackgroundExecutorTest {
   }
 
   @Test
-  @Ignore("test takes long time")
+  @Disabled("test takes long time")
   public void shutdown_when_rougeRunnable_expect_InterruptedException() {
 
     DefaultBackgroundExecutor es = new DefaultBackgroundExecutor(1, 10, "test");

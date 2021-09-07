@@ -2,7 +2,7 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.types.SomePeriodBean;
 
 import java.sql.Date;
@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestPeriodType extends BaseTestCase {
 

@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EPerson;
 import org.tests.model.json.PlainBean;

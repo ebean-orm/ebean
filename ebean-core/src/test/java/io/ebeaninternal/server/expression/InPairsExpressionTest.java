@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.Pairs;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InPairsExpressionTest extends BaseExpressionTest {
 

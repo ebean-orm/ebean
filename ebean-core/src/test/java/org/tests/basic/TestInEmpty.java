@@ -4,12 +4,12 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestInEmpty extends BaseTestCase {
 

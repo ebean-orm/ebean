@@ -11,8 +11,7 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlOrmQuery extends BaseTestCase {
 
@@ -41,7 +42,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.filterMany("contacts").gt("lastName", "b");
 
     List<Customer> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     // check also select count(*)
     LoggedSqlCollector.start();
@@ -64,7 +65,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.where().ilike("name", "r%");
 
     List<Customer> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 
   @Test
@@ -93,8 +94,8 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     int rowCount = query.findCount();
     FutureRowCount<Customer> futureRowCount = query.findFutureCount();
 
-    Assert.assertEquals(initialRowCount, rowCount);
-    Assert.assertEquals(initialRowCount, futureRowCount.get().intValue());
+    assertEquals(initialRowCount, rowCount);
+    assertEquals(initialRowCount, futureRowCount.get().intValue());
 
     // check that lazy loading still executes
     for (Customer customer : list) {
@@ -123,8 +124,8 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     List<Customer> list = page.getList();
     int rowCount = page.getTotalCount();
 
-    Assert.assertEquals(2, list.size());
-    Assert.assertEquals(initialRowCount, rowCount);
+    assertEquals(2, list.size());
+    assertEquals(initialRowCount, rowCount);
 
     // check that lazy loading executes
     for (Customer customer : list) {

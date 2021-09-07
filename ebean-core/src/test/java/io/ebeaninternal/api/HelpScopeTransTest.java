@@ -1,13 +1,14 @@
 package io.ebeaninternal.api;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.TxScope;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.UUOne;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class HelpScopeTransTest {
 
@@ -19,16 +20,16 @@ public class HelpScopeTransTest {
     HelpScopeTrans.enter(TxScope.required());
     HelpScopeTrans.enter(TxScope.required());
 
-    Ebean.find(Customer.class).findList();
+    DB.find(Customer.class).findList();
 
     HelpScopeTrans.enter(TxScope.required());
-    Ebean.find(Contact.class).findList();
+    DB.find(Contact.class).findList();
 
     HelpScopeTrans.exit(null, 1);
 
     UUOne one = new UUOne();
     one.setName("junk");
-    Ebean.save(one);
+    DB.save(one);
 
     HelpScopeTrans.exit(null, 1);
     HelpScopeTrans.exit(null, 1);
@@ -40,7 +41,7 @@ public class HelpScopeTransTest {
 
     try {
       HelpScopeTrans.enter(TxScope.required());
-      Assert.assertNull(Ebean.getDefaultServer().currentTransaction());
+      assertNull(DB.getDefault().currentTransaction());
       HelpScopeTrans.exit(null, 1);
     } finally {
       HelpScopeTrans.setEnabled(true);

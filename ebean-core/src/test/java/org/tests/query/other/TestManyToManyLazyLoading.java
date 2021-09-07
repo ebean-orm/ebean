@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

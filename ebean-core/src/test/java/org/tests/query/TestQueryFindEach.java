@@ -8,7 +8,7 @@ import io.ebean.annotation.Transactional;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Contact;
@@ -18,12 +18,13 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.o2m.OmBasicChild;
 import org.tests.o2m.OmBasicParent;
 
+import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryFindEach extends BaseTestCase {
 
@@ -59,7 +60,7 @@ public class TestQueryFindEach extends BaseTestCase {
 
   private void seedData() {
     for (int i = 0; i < 15; i++) {
-      EBasicLog log = new EBasicLog("findEachBatch "+i);
+      EBasicLog log = new EBasicLog("findEachBatch " + i);
       DB.save(log);
     }
   }
@@ -101,7 +102,7 @@ public class TestQueryFindEach extends BaseTestCase {
 
   private void findEachWithBatch(int batchSize) {
     DB.find(EBasicLog.class)
-      .where().startsWith("name","findEachBatch")
+      .where().startsWith("name", "findEachBatch")
       .findEach(batchSize, batch -> {
         int batchId = batchCount.incrementAndGet();
         int rows = rowCount.addAndGet(batch.size());
@@ -140,9 +141,8 @@ public class TestQueryFindEach extends BaseTestCase {
   /**
    * Test the behaviour when an exception is thrown inside the findVisit().
    */
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testVisitThrowingException() {
-
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -152,14 +152,13 @@ public class TestQueryFindEach extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findEach(customer -> {
-      counter.incrementAndGet();
-      if (counter.intValue() > 0) {
-        throw new IllegalStateException("cause a failure");
-      }
-    });
-
-    fail("Never get here - exception thrown");
+    assertThrows(IllegalStateException.class, () ->
+      query.findEach(customer -> {
+        counter.incrementAndGet();
+        if (counter.intValue() > 0) {
+          throw new IllegalStateException("cause a failure");
+        }
+      }));
   }
 
   @Test

@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebeantest.LoggedSql;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.inheritance.order.OrderMasterInheritance;
 import org.tests.inheritance.order.OrderedA;
 import org.tests.inheritance.order.OrderedB;

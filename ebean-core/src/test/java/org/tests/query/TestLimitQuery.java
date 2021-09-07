@@ -4,10 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLimitQuery extends BaseTestCase {
 
@@ -24,7 +25,7 @@ public class TestLimitQuery extends BaseTestCase {
       .findList();
 
     // should at least find the "Cust NoAddress" customer
-    Assert.assertTrue(!customers.isEmpty());
+    assertTrue(!customers.isEmpty());
 
   }
 }

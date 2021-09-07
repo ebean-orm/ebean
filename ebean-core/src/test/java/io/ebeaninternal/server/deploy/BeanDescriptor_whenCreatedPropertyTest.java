@@ -5,10 +5,10 @@ import io.ebean.Ebean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class BeanDescriptor_whenCreatedPropertyTest extends BaseTestCase {

@@ -3,11 +3,12 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestOrderTotalAmountSql extends BaseTestCase {
 
@@ -22,8 +23,8 @@ public class TestOrderTotalAmountSql extends BaseTestCase {
     for (SqlRow sqlRow : sqlRows) {
       Integer id = sqlRow.getInteger("order_id");
       Double amount = sqlRow.getDouble("total_amount");
-      Assert.assertNotNull("sqlRows: " + sqlRows, id);
-      Assert.assertNotNull("sqlRows: " + sqlRows, amount);
+      assertNotNull(id);
+      assertNotNull(amount);
     }
   }
 

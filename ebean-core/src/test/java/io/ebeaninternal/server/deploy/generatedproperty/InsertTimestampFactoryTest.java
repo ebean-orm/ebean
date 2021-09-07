@@ -2,14 +2,14 @@ package io.ebeaninternal.server.deploy.generatedproperty;
 
 import io.ebean.config.ClassLoadConfig;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InsertTimestampFactoryTest {
 

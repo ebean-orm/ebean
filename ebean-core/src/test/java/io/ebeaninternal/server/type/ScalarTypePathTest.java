@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.type;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScalarTypePathTest {
   private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();

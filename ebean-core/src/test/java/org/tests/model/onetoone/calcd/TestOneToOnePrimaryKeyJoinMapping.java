@@ -1,7 +1,7 @@
 package org.tests.model.onetoone.calcd;
 
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

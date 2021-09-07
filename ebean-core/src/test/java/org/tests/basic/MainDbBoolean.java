@@ -7,12 +7,14 @@ import io.ebean.SqlRow;
 import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.datasource.DataSourceConfig;
-import org.junit.Assert;
 import org.tests.model.basic.TOne;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Used to run some tests manually on a specific Database type.
@@ -125,18 +127,18 @@ public class MainDbBoolean {
       .order("id")
       .findList();
 
-    Assert.assertTrue(list.size() == 2);
-    Assert.assertTrue(list.get(0).isActive());
-    Assert.assertFalse(!list.get(0).isActive());
+    assertTrue(list.size() == 2);
+    assertTrue(list.get(0).isActive());
+    assertFalse(!list.get(0).isActive());
 
     String sql = "select id, name, active from t_oneb order by id";
     List<SqlRow> sqlRows = server.sqlQuery(sql).findList();
-    Assert.assertTrue(sqlRows.size() == 2);
+    assertTrue(sqlRows.size() == 2);
     Object active0 = sqlRows.get(0).get("active");
     Object active1 = sqlRows.get(1).get("active");
 
-    Assert.assertTrue("T".equals(active0));
-    Assert.assertTrue("F".equals(active1));
+    assertTrue("T".equals(active0));
+    assertTrue("F".equals(active1));
 
 
     Query<TOne> query = server.find(TOne.class)
@@ -144,7 +146,7 @@ public class MainDbBoolean {
       .order("id");
 
     int rc = query.findCount();
-    Assert.assertTrue(rc > 0);
+    assertTrue(rc > 0);
 
 
     System.out.println("done");

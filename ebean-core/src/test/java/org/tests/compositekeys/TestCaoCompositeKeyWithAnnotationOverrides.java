@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.compositekeys.db.CaoBean;
 import org.tests.compositekeys.db.CaoKey;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCaoCompositeKeyWithAnnotationOverrides extends BaseTestCase {
 

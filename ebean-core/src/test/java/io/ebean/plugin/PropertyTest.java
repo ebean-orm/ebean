@@ -4,7 +4,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -8,12 +8,12 @@ import io.ebean.Transaction;
 import io.ebean.TxScope;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestNestedSubTransaction extends BaseTestCase {
 

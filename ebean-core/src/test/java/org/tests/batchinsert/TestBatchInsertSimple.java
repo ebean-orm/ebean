@@ -8,7 +8,7 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 //import static org.assertj.core.api.Assertions.assertThat;
-//import static org.junit.Assert.assertNull;
+//import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestBatchInsertSimple extends BaseTestCase {
 
@@ -209,7 +209,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     return detail;
   }
 
-  @Test(expected = Test.None.class)// no exception expected
+  @Test
   public void npe_addBatch_withoutAnyBindParams() {
     try (Transaction txn = DB.beginTransaction()) {
       // don't write code like this please ...

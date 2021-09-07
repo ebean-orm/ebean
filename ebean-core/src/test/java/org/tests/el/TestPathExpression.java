@@ -8,9 +8,9 @@ import io.ebean.plugin.SpiServer;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestPathExpression {
 

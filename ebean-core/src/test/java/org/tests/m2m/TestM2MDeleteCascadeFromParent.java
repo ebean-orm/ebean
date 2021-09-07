@@ -3,12 +3,12 @@ package org.tests.m2m;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.MnyA;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyC;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestM2MDeleteCascadeFromParent extends BaseTestCase {
 

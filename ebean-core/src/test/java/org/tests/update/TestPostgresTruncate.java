@@ -1,15 +1,12 @@
 package org.tests.update;
 
 import io.ebean.BaseTestCase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPostgresTruncate extends BaseTestCase {
 
   @Test
   public void test() {
-
-    Assert.assertTrue(true);
     // EbeanServer server = Ebean.getServer(null);
     //
     // EBasic e = new EBasic();

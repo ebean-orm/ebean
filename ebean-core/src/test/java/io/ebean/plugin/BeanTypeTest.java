@@ -7,7 +7,7 @@ import io.ebean.Query;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.inheritance.Stockforecast;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Customer;
@@ -18,9 +18,7 @@ import org.tests.model.basic.Product;
 import org.tests.model.basic.Vehicle;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class BeanTypeTest {
@@ -57,15 +55,13 @@ public class BeanTypeTest {
     assertThat(productType.getBeanType()).isEqualTo(Product.class);
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void getTypeAtPath_when_simpleType() {
-
-    beanType(Order.class).getBeanTypeAtPath("status");
+    assertThrows(RuntimeException.class, () -> beanType(Order.class).getBeanTypeAtPath("status"));
   }
 
   @Test
   public void createBean() {
-
     assertThat(beanType(Order.class).createBean()).isNotNull();
   }
 
@@ -177,19 +173,19 @@ public class BeanTypeTest {
     assertThat(detail.getChunk("customer", false).getIncluded()).containsExactly("id", "name");
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void docStoreIndex() throws Exception {
-    beanType(Order.class).docStore().index(1, new Order(), null);
+  @Test
+  public void docStoreIndex() {
+    assertThrows(IllegalStateException.class, () -> beanType(Order.class).docStore().index(1, new Order(), null));
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void docStoreDeleteById() throws Exception {
-    beanType(Order.class).docStore().deleteById(1, null);
+  @Test
+  public void docStoreDeleteById() {
+    assertThrows(IllegalStateException.class, () -> beanType(Order.class).docStore().deleteById(1, null));
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void docStoreUpdateEmbedded() throws Exception {
-    beanType(Order.class).docStore().updateEmbedded(1, "customer", "someJson", null);
+  @Test
+  public void docStoreUpdateEmbedded() {
+    assertThrows(IllegalStateException.class, () -> beanType(Order.class).docStore().updateEmbedded(1, "customer", "someJson", null));
   }
 
   @Test

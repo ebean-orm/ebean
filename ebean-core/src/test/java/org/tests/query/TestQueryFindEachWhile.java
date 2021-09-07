@@ -4,15 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryFindEachWhile extends BaseTestCase {
 
@@ -41,9 +39,8 @@ public class TestQueryFindEachWhile extends BaseTestCase {
   /**
    * Test the behaviour when an exception is thrown inside the findVisit().
    */
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testVisitThrowingException() {
-
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class).setAutoTune(false)
@@ -52,14 +49,14 @@ public class TestQueryFindEachWhile extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findEachWhile(customer -> {
-      counter.incrementAndGet();
-      if (counter.intValue() > 0) {
-        throw new IllegalStateException("cause a failure");
-      }
-      return true;
-    });
-
-    fail("Never get here - exception thrown");
+    assertThrows(IllegalStateException.class, () -> {
+        query.findEachWhile(customer -> {
+          counter.incrementAndGet();
+          if (counter.intValue() > 0) {
+            throw new IllegalStateException("cause a failure");
+          }
+          return true;
+        });
+      });
   }
 }

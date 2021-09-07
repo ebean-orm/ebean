@@ -4,19 +4,14 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.TransactionalTestCase;
 import io.ebean.text.json.JsonContext;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.MRole;
-import org.tests.model.basic.MUser;
-import org.tests.model.basic.Order;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 import org.tests.model.basic.Order.Status;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.Product;
-import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
@@ -28,12 +23,12 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
     Customer c2 = Ebean.getReference(Customer.class, c0.getId());
     List<Order> orders = c2.getOrders();
 
-    Assert.assertEquals(1, orders.size());
+    assertEquals(1, orders.size());
 
     Order order = orders.get(0);
     int size = order.getDetails().size();
 
-    Assert.assertTrue(size >= 3);
+    assertTrue(size >= 3);
 
     Customer cref = Ebean.getReference(Customer.class, c0.getId());
     order.setCustomer(cref);
@@ -45,7 +40,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     // remove one of the details...
     OrderDetail removedDetail = order.getDetails().remove(2);
-    Assert.assertNotNull(removedDetail);
+    assertNotNull(removedDetail);
 
     Product p = Ebean.getReference(Product.class, 1);
     OrderDetail newDetail = new OrderDetail(p, 899, 12.12d);

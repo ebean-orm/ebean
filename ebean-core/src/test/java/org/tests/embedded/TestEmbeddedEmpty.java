@@ -1,7 +1,7 @@
 package org.tests.embedded;
 
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EAddressStatus;
 import org.tests.model.embedded.EPerson3;

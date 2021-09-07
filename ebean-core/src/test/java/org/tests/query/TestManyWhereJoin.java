@@ -7,7 +7,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

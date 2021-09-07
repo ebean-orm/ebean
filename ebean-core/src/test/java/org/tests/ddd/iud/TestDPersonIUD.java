@@ -1,10 +1,10 @@
 package org.tests.ddd.iud;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TestDPersonIUD extends TestCase {
+public class TestDPersonIUD {
 
-
+  @Test
   public void test() {
 
 //        GlobalProperties.put("classes", DPerson.class.toString());

@@ -3,13 +3,13 @@ package org.tests.model.selfref;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.PersistenceException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSelfRefExample extends BaseTestCase {
 

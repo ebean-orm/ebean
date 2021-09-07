@@ -2,7 +2,7 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestNpeOnDiscriminator extends BaseTestCase {
 

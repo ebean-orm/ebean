@@ -6,12 +6,12 @@ import io.ebean.EbeanServer;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobFetchEager;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestBasicClobFetchEager extends BaseTestCase {
 
@@ -42,7 +42,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
 
     // Assert query same as previous ...
     List<String> loggedSql = LoggedSqlCollector.stop();
-    Assert.assertEquals(1, loggedSql.size());
+    assertEquals(1, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 6)).contains(expectedSql);
 
 
@@ -64,7 +64,7 @@ public class TestBasicClobFetchEager extends BaseTestCase {
 
     // Test refresh function
 
-    Assert.assertEquals("initialClobValue", entity.getDescription());
+    assertEquals("initialClobValue", entity.getDescription());
 
     LoggedSqlCollector.start();
 
@@ -73,9 +73,9 @@ public class TestBasicClobFetchEager extends BaseTestCase {
 
     // Assert all properties fetched in refresh
     loggedSql = LoggedSqlCollector.stop();
-    Assert.assertEquals(1, loggedSql.size());
+    assertEquals(1, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 6)).contains(expectedSql);
-    Assert.assertEquals("modified", entity.getDescription());
+    assertEquals("modified", entity.getDescription());
 
   }
 

@@ -9,10 +9,11 @@ import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryJoin extends BaseTestCase {
 
@@ -36,21 +37,21 @@ public class TestQueryJoin extends BaseTestCase {
 
     Order order = list.get(0);
     BeanState beanStateOrder = Ebean.getBeanState(order);
-    Assert.assertNotNull(beanStateOrder.getLoadedProps());
-    // Assert.assertTrue(beanStateOrder.getLoadedProps().contains("id"));
-    Assert.assertTrue(beanStateOrder.getLoadedProps().contains("status"));
-    Assert.assertTrue(beanStateOrder.getLoadedProps().contains("shipments"));
-    Assert.assertTrue(beanStateOrder.getLoadedProps().contains("customer"));
+    assertNotNull(beanStateOrder.getLoadedProps());
+    // assertTrue(beanStateOrder.getLoadedProps().contains("id"));
+    assertTrue(beanStateOrder.getLoadedProps().contains("status"));
+    assertTrue(beanStateOrder.getLoadedProps().contains("shipments"));
+    assertTrue(beanStateOrder.getLoadedProps().contains("customer"));
 
     Customer customer = order.getCustomer();
     BeanState beanStateCustomer = Ebean.getBeanState(customer);
-    Assert.assertTrue(beanStateCustomer.isReference());
+    assertTrue(beanStateCustomer.isReference());
 
     customer.getName();
-    Assert.assertNotNull(beanStateCustomer.getLoadedProps());
-    Assert.assertTrue(beanStateCustomer.getLoadedProps().contains("name"));
-    Assert.assertTrue(beanStateCustomer.getLoadedProps().contains("status"));
-    Assert.assertFalse(beanStateCustomer.getLoadedProps().contains("billingAddress"));
+    assertNotNull(beanStateCustomer.getLoadedProps());
+    assertTrue(beanStateCustomer.getLoadedProps().contains("name"));
+    assertTrue(beanStateCustomer.getLoadedProps().contains("status"));
+    assertFalse(beanStateCustomer.getLoadedProps().contains("billingAddress"));
 
     customer.getName();
 
@@ -58,7 +59,7 @@ public class TestQueryJoin extends BaseTestCase {
     System.out.println(billingAddress);
     billingAddress.getLine1();
 
-    Assert.assertTrue(!list.isEmpty());
+    assertTrue(!list.isEmpty());
 
   }
 }

@@ -2,7 +2,7 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 

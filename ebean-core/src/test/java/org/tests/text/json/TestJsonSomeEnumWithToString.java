@@ -3,17 +3,18 @@ package org.tests.text.json;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.SomeEnum;
 import org.tests.model.basic.SomeEnumBean;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonSomeEnumWithToString extends BaseTestCase {
 
   @Test
-  public void testJsonConversion() throws IOException {
+  public void testJsonConversion() {
 
     SomeEnumBean bean = new SomeEnumBean();
     bean.setId(100l);
@@ -25,10 +26,9 @@ public class TestJsonSomeEnumWithToString extends BaseTestCase {
 
     SomeEnumBean bean2 = json.toBean(SomeEnumBean.class, jsonContent);
 
-    Assert.assertEquals(bean.getSomeEnum(), bean2.getSomeEnum());
-    Assert.assertEquals(bean.getName(), bean2.getName());
-    Assert.assertEquals(bean.getId(), bean2.getId());
-
+    assertEquals(bean.getSomeEnum(), bean2.getSomeEnum());
+    assertEquals(bean.getName(), bean2.getName());
+    assertEquals(bean.getId(), bean2.getId());
   }
 
 }

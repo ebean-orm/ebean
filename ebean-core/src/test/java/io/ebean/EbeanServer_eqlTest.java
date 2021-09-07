@@ -1,7 +1,7 @@
 package io.ebean;
 
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
@@ -9,6 +9,7 @@ import javax.persistence.PersistenceException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EbeanServer_eqlTest extends BaseTestCase {
 
@@ -187,16 +188,14 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     assertSql(query).contains("where t0.name like ");
   }
 
-  @Test(expected = PersistenceException.class)
+  @Test
   public void unboundNamedParams_expect_PersistenceException() {
-
     Query<Customer> query = server().createQuery(Customer.class, "where name = :name");
-    query.findOne();
+    assertThrows(PersistenceException.class, () ->query.findOne());
   }
 
   @Test
   public void namedQuery() {
-
     ResetBasicData.reset();
 
     Query<Customer> name = server().createNamedQuery(Customer.class, "name");

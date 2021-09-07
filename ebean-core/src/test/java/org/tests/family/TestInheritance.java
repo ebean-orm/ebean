@@ -7,16 +7,16 @@ import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.family.ChildPerson;
 import org.tests.model.family.GrandParentPerson;
 import org.tests.model.family.ParentPerson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class TestInheritance extends BaseTestCase {

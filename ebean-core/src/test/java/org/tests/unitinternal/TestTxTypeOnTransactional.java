@@ -6,12 +6,14 @@ import io.ebean.Transaction;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.xtra.DummyDao;
 import org.tests.model.basic.xtra.OptimisticLockExceptionThrowingDao;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.OptimisticLockException;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestTxTypeOnTransactional extends BaseTestCase {
 
@@ -47,11 +49,10 @@ public class TestTxTypeOnTransactional extends BaseTestCase {
     try {
       dao.doSomething(v);
       // never get here
-      Assert.assertTrue(false);
+      fail();
     } catch (OptimisticLockException e) {
       Transaction inMethodTransaction = dao.getInMethodTransaction();
-      boolean active = inMethodTransaction.isActive();
-      Assert.assertFalse(active);
+      assertFalse(inMethodTransaction.isActive());
     }
   }
 

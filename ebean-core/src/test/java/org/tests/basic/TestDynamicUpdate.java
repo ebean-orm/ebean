@@ -5,8 +5,9 @@ import io.ebean.BeanState;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import org.tests.model.embedded.EMain;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDynamicUpdate extends BaseTestCase {
 
@@ -22,7 +23,7 @@ public class TestDynamicUpdate extends BaseTestCase {
 
     server.save(b);
 
-    Assert.assertNotNull(b.getId());
+    assertNotNull(b.getId());
 
     // reload object und update the name
     EMain b2 = server.find(EMain.class, b.getId());
@@ -31,14 +32,14 @@ public class TestDynamicUpdate extends BaseTestCase {
 
     BeanState beanState = server.beanState(b2);
     boolean dirty = beanState.isDirty();
-    Assert.assertTrue(dirty);
+    assertTrue(dirty);
 
     server.save(b2);
 
     server.beginTransaction();
     try {
       EMain b3 = server.find(EMain.class, b.getId());
-      Assert.assertEquals("ABC", b3.getEmbeddable().getDescription());
+      assertEquals("ABC", b3.getEmbeddable().getDescription());
     } finally {
       server.endTransaction();
     }
@@ -48,6 +49,6 @@ public class TestDynamicUpdate extends BaseTestCase {
     server.save(b4);
 
     EMain b5 = server.find(EMain.class, b.getId());
-    Assert.assertEquals("123", b5.getEmbeddable().getDescription());
+    assertEquals("123", b5.getEmbeddable().getDescription());
   }
 }

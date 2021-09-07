@@ -3,10 +3,11 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.selfref.SelfParent;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSelfParent extends BaseTestCase {
 
@@ -39,10 +40,9 @@ public class TestSelfParent extends BaseTestCase {
 
     List<SelfParent> roots = Ebean.find(SelfParent.class).where().eq("parent", null).findList();
 
-    Assert.assertEquals(1, roots.size());
+    assertEquals(1, roots.size());
 
     printNode(roots.get(0));
-
   }
 
   public static void printNode(SelfParent o) {

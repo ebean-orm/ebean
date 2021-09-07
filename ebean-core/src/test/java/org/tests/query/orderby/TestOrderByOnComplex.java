@@ -3,14 +3,14 @@ package org.tests.query.orderby;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderByOnComplex extends BaseTestCase {
 
@@ -24,8 +24,7 @@ public class TestOrderByOnComplex extends BaseTestCase {
     query.findList();
 
     String sql = query.getGeneratedSql();
-    Assert.assertTrue(sql.contains("order by t0.kcustomer_id desc"));
-
+    assertTrue(sql.contains("order by t0.kcustomer_id desc"));
   }
 
   @Test

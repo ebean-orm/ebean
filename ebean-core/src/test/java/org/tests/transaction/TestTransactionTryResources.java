@@ -6,7 +6,7 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.draftable.Document;

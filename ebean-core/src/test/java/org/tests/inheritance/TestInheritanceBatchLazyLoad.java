@@ -4,7 +4,7 @@ import io.ebean.Ebean;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

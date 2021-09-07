@@ -2,7 +2,7 @@ package io.ebean;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.ServerConfigStartup;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UTDetail;
 
 import static org.assertj.core.api.Assertions.assertThat;

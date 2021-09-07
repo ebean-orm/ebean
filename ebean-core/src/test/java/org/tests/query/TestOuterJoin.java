@@ -3,8 +3,8 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebeantest.LoggedSql;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -21,11 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TestOuterJoin extends BaseTestCase {
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() {
     ResetBasicData.reset();
   }
-
 
   @Test
   public void testOuterOnNullQuery() throws Exception {

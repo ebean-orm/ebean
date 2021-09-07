@@ -2,15 +2,14 @@ package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestOneToOneCascadeSave extends BaseTestCase {
 
   @Test
   public void test() {
-
-
     OtoMaster master = new OtoMaster();
     master.setName("CName");
 
@@ -24,12 +23,11 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
 
     Ebean.save(master);
 
-    Assert.assertNotNull(child.getId());
+    assertNotNull(child.getId());
 
     OtoChild child2 = Ebean.find(OtoChild.class, child.getId());
     OtoMaster master2 = child2.getMaster();
-    Assert.assertNotNull(master2);
-
+    assertNotNull(master2);
   }
 
 }

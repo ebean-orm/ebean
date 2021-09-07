@@ -3,14 +3,13 @@ package org.tests.query.joins;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
 
@@ -54,8 +53,8 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
     // where (t0.name = ?  or u1.name = ? ) ;
     // --bind(testDisjOuter_2_name,testDisjOuter_CHILD_1)
 
-    Assert.assertEquals(2, list.size());
-    Assert.assertEquals(2, rowCount);
+    assertEquals(2, list.size());
+    assertEquals(2, rowCount);
 
     if (isPostgres()) {
       String expectedSql = "select distinct on (t0.id) t0.id, t0.name, t0.description, t0.version from uuone t0 left join uutwo u1 on u1.master_id = t0.id where (t0.name = ? or u1.name = ?)";

@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.search.Match;
 import io.ebean.search.MultiMatch;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TextExpressionListTest {
 

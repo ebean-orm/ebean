@@ -9,10 +9,12 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
@@ -23,7 +25,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
     BeanDescriptor<Order> d = server.getBeanDescriptor(Order.class);
     ElPropertyValue elGetValue = d.getElGetValue("customer.contacts");
 
-    Assert.assertTrue(elGetValue.containsMany());
+    assertTrue(elGetValue.containsMany());
 
     ResetBasicData.reset();
 
@@ -33,8 +35,8 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
       .fetch("customer.contacts.group")
       .where().lt("id", 3).findList();
 
-    Assert.assertNotNull(list);
-    Assert.assertTrue(!list.isEmpty());
+    assertNotNull(list);
+    assertTrue(!list.isEmpty());
 
     for (Order order : list) {
       List<Contact> contacts = order.getCustomer().getContacts();
@@ -49,7 +51,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
     // q.setAutoTune(false);
     // List<Order> list2 = q.findList();
     //
-    // Assert.assertTrue(list2.size() > 0);
+    // assertTrue(list2.size() > 0);
 
   }
 

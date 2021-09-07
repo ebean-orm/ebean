@@ -1,8 +1,7 @@
 package io.ebeaninternal.json;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,8 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ModifyAwareMapTest {
 
@@ -50,7 +48,7 @@ public class ModifyAwareMapTest {
     assertFalse(map.isMarkedDirty());
 
     map.put("A", "change");
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -60,7 +58,7 @@ public class ModifyAwareMapTest {
     assertFalse(map.isMarkedDirty());
 
     map.setMarkedDirty(true);
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -74,21 +72,21 @@ public class ModifyAwareMapTest {
   public void testIsEmpty() {
 
     assertFalse(createMap().isEmpty());
-    Assert.assertTrue(createEmptyMap().isEmpty());
+    assertTrue(createEmptyMap().isEmpty());
   }
 
   @Test
   public void testContainsKey() {
 
     ModifyAwareMap<String, String> map = createMap();
-    Assert.assertTrue(map.containsKey("A"));
+    assertTrue(map.containsKey("A"));
     assertFalse(map.containsKey("Z"));
   }
 
   @Test
   public void testContainsValue() {
     ModifyAwareMap<String, String> map = createMap();
-    Assert.assertTrue(map.containsValue("one"));
+    assertTrue(map.containsValue("one"));
     assertFalse(map.containsValue("junk"));
   }
 
@@ -98,7 +96,7 @@ public class ModifyAwareMapTest {
     ModifyAwareMap<String, String> map = createMap();
 
     assertEquals("two", map.get("B"));
-    Assert.assertNull(map.get("Z"));
+    assertNull(map.get("Z"));
     assertFalse(map.isMarkedDirty());
   }
 
@@ -109,7 +107,7 @@ public class ModifyAwareMapTest {
     assertFalse(map.isMarkedDirty());
 
     map.put("A", "mod");
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -119,7 +117,7 @@ public class ModifyAwareMapTest {
     assertFalse(map.isMarkedDirty());
 
     map.remove("A");
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -130,7 +128,7 @@ public class ModifyAwareMapTest {
 
     Map<String, String> other = new HashMap<>();
     map.putAll(other);
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -142,7 +140,7 @@ public class ModifyAwareMapTest {
     Map<String, String> other = new HashMap<>();
     other.put("A", "one");
     map.putAll(other);
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -152,7 +150,7 @@ public class ModifyAwareMapTest {
     assertFalse(map.isMarkedDirty());
 
     map.clear();
-    Assert.assertTrue(map.isMarkedDirty());
+    assertTrue(map.isMarkedDirty());
   }
 
   @Test
@@ -163,7 +161,7 @@ public class ModifyAwareMapTest {
 
     Set<String> keys = map.keySet();
     assertEquals(map.size(), keys.size());
-    Assert.assertTrue(keys.contains("A"));
+    assertTrue(keys.contains("A"));
     assertFalse(map.isMarkedDirty());
   }
 
@@ -175,7 +173,7 @@ public class ModifyAwareMapTest {
 
     Collection<String> values = map.values();
     assertEquals(map.size(), values.size());
-    Assert.assertTrue(values.contains("one"));
+    assertTrue(values.contains("one"));
     assertFalse(map.isMarkedDirty());
   }
 

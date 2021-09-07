@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.FutureIds;
 import io.ebean.FutureList;
 import io.ebean.FutureRowCount;
@@ -10,10 +10,11 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutionException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
@@ -22,7 +23,7 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Query<Customer> query = server.createQuery(Customer.class)
       .where().eq("doesNotExist", "this will fail")
@@ -35,11 +36,11 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     try {
       futureRowCount.get();
-      Assert.assertTrue("never get here as the SQL is invalid", false);
+      fail("never get here as the SQL is invalid");
 
     } catch (ExecutionException e) {
       // Confirm the Transaction has been rolled back
-      Assert.assertFalse("Underlying transaction was rolled back cleanly", t.isActive());
+      assertFalse(t.isActive());
     }
 
   }
@@ -49,7 +50,7 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Query<Customer> query = server.createQuery(Customer.class)
       .where().eq("doesNotExist", "this will fail")
@@ -62,11 +63,11 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     try {
       internalFuture.get();
-      Assert.assertTrue("never get here as the SQL is invalid", false);
+      fail("never get here as the SQL is invalid");
 
     } catch (ExecutionException e) {
       // Confirm the Transaction has been rolled back
-      Assert.assertFalse("Underlying transaction was rolled back cleanly", t.isActive());
+      assertFalse(t.isActive());
     }
 
   }
@@ -77,7 +78,7 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    EbeanServer server = Ebean.getDefaultServer();
+    Database server = DB.getDefault();
 
     Query<Customer> query = server.createQuery(Customer.class)
       .where().eq("doesNotExist", "this will fail")
@@ -90,11 +91,11 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
 
     try {
       internalFuture.get();
-      Assert.assertTrue("never get here as the SQL is invalid", false);
+      fail("never get here as the SQL is invalid");
 
     } catch (ExecutionException e) {
       // Confirm the Transaction has been rolled back
-      Assert.assertFalse("Underlying transaction was rolled back cleanly", t.isActive());
+      assertFalse(t.isActive());
     }
 
   }

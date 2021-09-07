@@ -5,7 +5,7 @@ import io.ebean.annotation.*;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeantest.LoggedSql;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;

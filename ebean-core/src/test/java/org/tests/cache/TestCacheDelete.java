@@ -2,11 +2,11 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
 import org.tests.model.basic.OCachedBeanChild;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test class testing deleting/invalidating of cached beans

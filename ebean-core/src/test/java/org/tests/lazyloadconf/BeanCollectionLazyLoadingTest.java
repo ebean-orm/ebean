@@ -2,7 +2,7 @@ package org.tests.lazyloadconf;
 
 import io.ebean.DB;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

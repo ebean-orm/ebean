@@ -11,13 +11,14 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestBasicLazy extends BaseTestCase {
 
@@ -29,15 +30,15 @@ public class TestBasicLazy extends BaseTestCase {
     Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
       .findOne();
 
-    Assert.assertNotNull(order);
+    assertNotNull(order);
 
     Customer customer = order.getCustomer();
-    Assert.assertNotNull(customer);
-    Assert.assertNotNull(customer.getName());
+    assertNotNull(customer);
+    assertNotNull(customer.getName());
 
     Address address = customer.getBillingAddress();
-    Assert.assertNotNull(address);
-    Assert.assertNotNull(address.getCity());
+    assertNotNull(address);
+    assertNotNull(address.getCity());
   }
 
   public void test_N1N() {
@@ -46,26 +47,26 @@ public class TestBasicLazy extends BaseTestCase {
     // safety check to see if our customer we are going to use for the test has
     // some contacts
     Customer c = Ebean.find(Customer.class).setId(1).findOne();
-    Assert.assertNotNull(c.getContacts());
-    Assert.assertTrue("no contacts on test customer 1", !c.getContacts().isEmpty());
+    assertNotNull(c.getContacts());
+    assertTrue(!c.getContacts().isEmpty());
 
     // start transaction so we have a "long running" persistence context
     Transaction tx = Ebean.beginTransaction();
     try {
       List<Order> order = Ebean.find(Order.class).where(Expr.eq("customer.id", 1)).findList();
 
-      Assert.assertNotNull(order);
-      Assert.assertTrue(!order.isEmpty());
+      assertNotNull(order);
+      assertTrue(!order.isEmpty());
 
       Customer customer = order.get(0).getCustomer();
-      Assert.assertNotNull(customer);
-      Assert.assertEquals(1, customer.getId().intValue());
+      assertNotNull(customer);
+      assertEquals(1, customer.getId().intValue());
 
       // this should lazily fetch the contacts
       List<Contact> contacts = customer.getContacts();
 
-      Assert.assertNotNull(contacts);
-      Assert.assertTrue("contacts not lazily fetched", !contacts.isEmpty());
+      assertNotNull(contacts);
+      assertTrue(!contacts.isEmpty());
     } finally {
       tx.commit();
     }
@@ -77,19 +78,19 @@ public class TestBasicLazy extends BaseTestCase {
     Order order = Ebean.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
       .findOne();
 
-    Assert.assertNotNull(order);
+    assertNotNull(order);
 
     final Customer customer = order.getCustomer();
-    Assert.assertNotNull(customer);
+    assertNotNull(customer);
 
-    Assert.assertTrue(Ebean.getBeanState(customer).isReference());
+    assertTrue(Ebean.getBeanState(customer).isReference());
 
     final Throwable throwables[] = new Throwable[2];
     Thread t1 = new Thread() {
       @Override
       public void run() {
         try {
-          Assert.assertNotNull(customer.getName());
+          assertNotNull(customer.getName());
         } catch (Throwable e) {
           throwables[0] = e;
         }
@@ -100,7 +101,7 @@ public class TestBasicLazy extends BaseTestCase {
       @Override
       public void run() {
         try {
-          Assert.assertNotNull(customer.getName());
+          assertNotNull(customer.getName());
         } catch (Throwable e) {
           throwables[1] = e;
         }
@@ -119,7 +120,7 @@ public class TestBasicLazy extends BaseTestCase {
       MyTestDataSourcePoolListener.SLEEP_AFTER_BORROW = 0;
     }
 
-    Assert.assertFalse(Ebean.getBeanState(customer).isReference());
+    assertFalse(Ebean.getBeanState(customer).isReference());
 
     if (throwables[0] != null) {
       throw throwables[0];
@@ -178,7 +179,7 @@ public class TestBasicLazy extends BaseTestCase {
     new FetchThread(tg, 3).start();
 
     orders = Ebean.find(Order.class).fetchLazy("customer").findList();
-    Assert.assertTrue(orders.size() >= 4);
+    assertTrue(orders.size() >= 4);
 
     try {
       MyTestDataSourcePoolListener.SLEEP_AFTER_BORROW = 2000;
@@ -200,7 +201,7 @@ public class TestBasicLazy extends BaseTestCase {
       for (Throwable exception : exceptions) {
         exception.printStackTrace();
       }
-      Assert.fail();
+      fail();
     }
   }
 }

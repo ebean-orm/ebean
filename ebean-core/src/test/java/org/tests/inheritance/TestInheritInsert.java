@@ -9,12 +9,12 @@ import org.tests.model.basic.CarFuse;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
 import org.tests.model.basic.VehicleDriver;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestInheritInsert extends BaseTestCase {
 
@@ -32,7 +32,7 @@ public class TestInheritInsert extends BaseTestCase {
       assertEquals(Double.valueOf(10d), ((Truck) v).getCapacity());
       assertNotNull(t0.getId());
     } else {
-      assertTrue("v not a Truck?", false);
+      fail();
     }
 
     VehicleDriver driver = new VehicleDriver();
@@ -48,7 +48,7 @@ public class TestInheritInsert extends BaseTestCase {
       assertEquals(Double.valueOf(10d), capacity);
       assertNotNull(v.getId());
     } else {
-      assertTrue("v not a Truck?", false);
+      fail("v not a Truck?");
     }
 
     List<VehicleDriver> list = Ebean.find(VehicleDriver.class).findList();

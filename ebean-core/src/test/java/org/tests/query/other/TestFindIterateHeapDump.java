@@ -3,10 +3,10 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import org.junit.jupiter.api.Disabled;
 import org.tests.model.basic.EBasic;
 import com.sun.management.HotSpotDiagnosticMXBean;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.management.MBeanServer;
 import java.io.File;
@@ -28,7 +28,7 @@ public class TestFindIterateHeapDump extends BaseTestCase {
   /**
    * Ignore this test generally - run it manually against MySQL specifically for Issue #56.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test() {
 

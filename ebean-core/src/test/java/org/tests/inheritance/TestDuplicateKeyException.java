@@ -3,11 +3,12 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.AttributeHolder;
 import org.tests.model.basic.ListAttribute;
 import org.tests.model.basic.ListAttributeValue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestDuplicateKeyException extends BaseTestCase {
 
@@ -44,7 +45,7 @@ public class TestDuplicateKeyException extends BaseTestCase {
         //Ebean.save(holder);
       });
     } catch (Exception e) {
-      Assert.assertEquals(e.getMessage(), "test rollback");
+      assertEquals(e.getMessage(), "test rollback");
     }
   }
 }

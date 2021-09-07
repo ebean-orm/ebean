@@ -8,7 +8,7 @@ import io.ebeaninternal.api.ScopedTransaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Customer;

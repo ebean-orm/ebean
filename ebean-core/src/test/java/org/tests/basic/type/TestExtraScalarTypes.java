@@ -3,15 +3,15 @@ package org.tests.basic.type;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.ESomeType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestExtraScalarTypes extends BaseTestCase {
 
@@ -31,9 +31,9 @@ public class TestExtraScalarTypes extends BaseTestCase {
 
     ESomeType e2 = Ebean.find(ESomeType.class).setAutoTune(false).setId(e.getId()).findOne();
 
-    Assert.assertNotNull(e2.getCurrency());
-    Assert.assertNotNull(e2.getLocale());
-    Assert.assertNotNull(e2.getTimeZone());
+    assertNotNull(e2.getCurrency());
+    assertNotNull(e2.getLocale());
+    assertNotNull(e2.getTimeZone());
 
     List<ESomeType> list = Ebean.find(ESomeType.class)
       .setAutoTune(false).where()

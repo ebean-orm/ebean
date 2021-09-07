@@ -3,12 +3,12 @@ package org.tests.batchload;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.FetchConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestSecondQueryNoRows extends BaseTestCase {
 

@@ -1,9 +1,10 @@
 package org.tests.update;
 
 import io.ebean.DB;
+import io.ebean.DuplicateKeyException;
 import io.ebean.TransactionalTestCase;
 import io.ebeantest.LoggedSql;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -17,11 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestStatelessUpdate extends TransactionalTestCase {
 
@@ -79,20 +76,18 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     assertThat(sql.get(0)).contains("update e_basic set name=?, description=? where id=?; -- bind(updateWithNull,null,");
   }
 
-  @Test(expected = EntityNotFoundException.class)
+  @Test
   public void update_NoRowsUpdated_expect_EntityNotFoundException() {
-
     EBasic basic = new EBasic();
     basic.setId(999999999);
     basic.setName("something");
     basic.setStatus(Status.ACTIVE);
 
-    DB.update(basic);
+    assertThrows(EntityNotFoundException.class, () -> DB.update(basic));
   }
 
   @Test
   public void delete_NoRowsDeleted_expect_false() {
-
     EBasic basic = new EBasic();
     basic.setId(999999999);
     basic.setName("something");
@@ -189,7 +184,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     // assert null list was ignored (missing children not deleted)
     assertNotNull(result.getContacts());
-    assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+    assertFalse(result.getContacts().isEmpty());
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("update o_customer set name=?, updtime=? where id=?;");
   }
@@ -231,14 +226,13 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     // assert empty bean list was ignore (missing children not deleted)
     assertNotNull(result.getContacts());
-    assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+    assertFalse(result.getContacts().isEmpty());
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("update o_customer set name=?, updtime=? where id=?;");
   }
 
   @Test
   public void testStatelessUpdateDeleteChildrenForNonBeanCollection() {
-
     // arrange
     Contact contact = new Contact();
     contact.setFirstName("wobu :P");

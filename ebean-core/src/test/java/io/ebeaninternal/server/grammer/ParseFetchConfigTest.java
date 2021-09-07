@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.grammer;
 
 import io.ebean.FetchConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ParseFetchConfigTest {
 

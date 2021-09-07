@@ -4,12 +4,12 @@ import io.ebean.config.ContainerConfig;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.cluster.ClusterManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultServerCacheManagerTest {
 

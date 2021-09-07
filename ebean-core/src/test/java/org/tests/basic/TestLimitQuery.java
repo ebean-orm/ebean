@@ -3,14 +3,15 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class TestLimitQuery extends BaseTestCase {
@@ -62,8 +63,8 @@ public class TestLimitQuery extends BaseTestCase {
     boolean hasOffset = sql.contains("offset");
 
     if (isH2()) {
-      Assert.assertTrue(sql, hasLimit);
-      Assert.assertFalse(sql, hasOffset);
+      assertTrue(hasLimit);
+      assertFalse(hasOffset);
     }
   }
 
@@ -84,8 +85,8 @@ public class TestLimitQuery extends BaseTestCase {
     boolean hasOffset = sql.contains("offset");
 
     if (isH2()) {
-      Assert.assertFalse(hasLimit);
-      Assert.assertFalse(hasOffset);
+      assertFalse(hasLimit);
+      assertFalse(hasOffset);
     }
   }
 
@@ -101,7 +102,7 @@ public class TestLimitQuery extends BaseTestCase {
 
     List<Order> list = query.findList();
 
-    Assert.assertTrue("sz > 0", !list.isEmpty());
+    assertTrue(!list.isEmpty());
 
     String sql = query.getGeneratedSql();
     boolean hasDetailsJoin = sql.contains("join o_order_detail");
@@ -109,11 +110,11 @@ public class TestLimitQuery extends BaseTestCase {
     boolean hasSelectedDetails = sql.contains("od.id,");
     boolean hasDistinct = sql.contains("select distinct");
 
-    Assert.assertTrue(hasDetailsJoin);
-    Assert.assertFalse(hasSelectedDetails);
-    Assert.assertTrue(hasDistinct);
+    assertTrue(hasDetailsJoin);
+    assertFalse(hasSelectedDetails);
+    assertTrue(hasDistinct);
     if (isH2()) {
-      Assert.assertTrue(hasLimit);
+      assertTrue(hasLimit);
     }
 
     query = Ebean.find(Order.class)
@@ -129,11 +130,11 @@ public class TestLimitQuery extends BaseTestCase {
     hasSelectedDetails = sql.contains("od.id");
     hasDistinct = sql.contains("select distinct");
 
-    Assert.assertFalse("no join with maxRows", hasDetailsJoin);
-    Assert.assertFalse(hasSelectedDetails);
-    Assert.assertFalse(hasDistinct);
+    assertFalse(hasDetailsJoin);
+    assertFalse(hasSelectedDetails);
+    assertFalse(hasDistinct);
     if (isH2()) {
-      Assert.assertTrue(hasLimit);
+      assertTrue(hasLimit);
     }
   }
 }

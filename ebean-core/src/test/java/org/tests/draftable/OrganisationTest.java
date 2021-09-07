@@ -2,7 +2,7 @@ package org.tests.draftable;
 
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Document;
 import org.tests.model.draftable.DocumentMedia;
 import org.tests.model.draftable.Organisation;
@@ -10,8 +10,8 @@ import org.tests.model.draftable.Organisation;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class OrganisationTest {
 

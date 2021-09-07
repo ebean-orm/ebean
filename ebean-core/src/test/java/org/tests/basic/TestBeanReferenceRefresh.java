@@ -7,10 +7,11 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestBeanReferenceRefresh extends BaseTestCase {
 
@@ -24,27 +25,27 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
 
     Order order = Ebean.getReference(Order.class, 1);
 
-    Assert.assertTrue(Ebean.getBeanState(order).isReference());
+    assertTrue(Ebean.getBeanState(order).isReference());
 
     // invoke lazy loading
     Date orderDate = order.getOrderDate();
-    Assert.assertNotNull(orderDate);
+    assertNotNull(orderDate);
 
     Customer customer = order.getCustomer();
-    Assert.assertNotNull(customer);
+    assertNotNull(customer);
 
-    Assert.assertFalse(Ebean.getBeanState(order).isReference());
-    Assert.assertNotNull(order.getStatus());
-    Assert.assertNotNull(order.getDetails());
-    Assert.assertNull(Ebean.getBeanState(order).getLoadedProps());
+    assertFalse(Ebean.getBeanState(order).isReference());
+    assertNotNull(order.getStatus());
+    assertNotNull(order.getDetails());
+    assertNull(Ebean.getBeanState(order).getLoadedProps());
 
     Status status = order.getStatus();
-    Assert.assertTrue(status != Order.Status.SHIPPED);
+    assertTrue(status != Order.Status.SHIPPED);
     order.setStatus(Order.Status.SHIPPED);
     Ebean.refresh(order);
 
     Status statusRefresh = order.getStatus();
-    Assert.assertEquals(status, statusRefresh);
+    assertEquals(status, statusRefresh);
 
   }
 

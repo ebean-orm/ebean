@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 

@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.common.BeanList;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Animal;
 import org.tests.model.basic.AnimalShelter;
 import org.tests.model.basic.BigDog;
@@ -15,8 +15,8 @@ import org.tests.model.basic.Dog;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestInheritanceOnMany extends BaseTestCase {
 

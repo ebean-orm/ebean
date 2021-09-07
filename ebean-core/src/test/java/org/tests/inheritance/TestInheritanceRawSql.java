@@ -4,8 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
 import org.tests.model.basic.VehicleLeaseLong;
@@ -15,6 +14,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestInheritanceRawSql extends BaseTestCase {
 
@@ -38,13 +39,13 @@ public class TestInheritanceRawSql extends BaseTestCase {
       .setParameter("id", truck.getId())
       .findList();
 
-    Assert.assertEquals(1, list.size());
+    assertEquals(1, list.size());
 
     Vehicle vehicle2 = list.get(0);
-    Assert.assertTrue(vehicle2 instanceof Truck);
+    assertTrue(vehicle2 instanceof Truck);
 
     Truck truck2 = (Truck) vehicle2;
-    Assert.assertEquals("ASB23", truck2.getLicenseNumber());
+    assertEquals("ASB23", truck2.getLicenseNumber());
 
     // invoke lazy loading and set the capacity
     truck2.setCapacity(30D);

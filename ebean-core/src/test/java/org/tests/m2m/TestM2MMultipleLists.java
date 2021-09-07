@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.m2m.MailBox;
 import org.tests.model.m2m.MailUser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestM2MMultipleLists extends BaseTestCase {
 

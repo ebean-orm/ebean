@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.event.changelog.ChangeSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DefaultChangeLogListenerTest extends BaseTestCase {
 

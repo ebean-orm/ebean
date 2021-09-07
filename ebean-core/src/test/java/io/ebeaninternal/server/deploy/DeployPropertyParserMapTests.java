@@ -1,10 +1,11 @@
 package io.ebeaninternal.server.deploy;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DeployPropertyParserMapTests {
 
@@ -19,7 +20,7 @@ public class DeployPropertyParserMapTests {
     DeployPropertyParserMap parser = new DeployPropertyParserMap(map);
 
     String output = parser.parse("(lower(customer.name) like ? escape'' or id > ?)");
-    Assert.assertEquals("(lower(t1.name) like ? escape'' or t0.id > ?)", output);
+    assertEquals("(lower(t1.name) like ? escape'' or t0.id > ?)", output);
   }
 
 }

@@ -7,10 +7,10 @@ import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultChangeLogRegisterTest extends BaseTestCase {
 

@@ -2,11 +2,10 @@ package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.FetchConfig;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Data;
@@ -17,13 +16,13 @@ import org.tests.inherit.ParentAggregate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParentRawSqlTest extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void clearDb() {
     Ebean.deleteAll(Ebean.find(Data.class).findList());
     Ebean.deleteAll(Ebean.find(Parent.class).findList());

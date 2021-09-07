@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.text.json.JsonContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
 import java.util.List;

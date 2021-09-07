@@ -7,10 +7,11 @@ import io.ebean.TransactionalTestCase;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderByAnnotation extends TransactionalTestCase {
 
@@ -22,8 +23,7 @@ public class TestOrderByAnnotation extends TransactionalTestCase {
     Customer customer = Ebean.find(Customer.class, custTest.getId());
     List<Order> orders = customer.getOrders();
 
-    Assert.assertTrue(!orders.isEmpty());
-
+    assertTrue(!orders.isEmpty());
 
     Query<Order> q1 = Ebean.find(Order.class)
       .fetch("details");
@@ -32,6 +32,6 @@ public class TestOrderByAnnotation extends TransactionalTestCase {
 
     String s1 = q1.getGeneratedSql();
 
-    Assert.assertTrue(s1.contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc"));
+    assertTrue(s1.contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc"));
   }
 }

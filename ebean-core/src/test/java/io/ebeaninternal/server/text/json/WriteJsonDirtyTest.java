@@ -8,14 +8,14 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WriteJsonDirtyTest {
 

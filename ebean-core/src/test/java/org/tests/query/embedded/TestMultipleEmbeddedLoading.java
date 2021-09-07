@@ -9,13 +9,13 @@ import io.ebean.cache.ServerCacheStatistics;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EInvoice;
 import org.tests.model.embedded.EInvoice.State;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestMultipleEmbeddedLoading extends BaseTestCase {
 

@@ -2,12 +2,12 @@ package io.ebean.config;
 
 import io.avaje.config.Config;
 import io.ebean.annotation.Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PropertiesWrapperTest {
 
@@ -66,14 +66,14 @@ public class PropertiesWrapperTest {
     assertEquals(42, pw.getInt("someInt", 99));
     assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
     assertEquals(home + "/hello", pw.get("somePath", null));
-    assertEquals(tmpDir, "/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
+    assertEquals("/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
 
     pw = new PropertiesWrapper(evalCopy, null);
 
     assertEquals(42, pw.getInt("someInt", 99));
     assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
     assertEquals(home + "/hello", pw.get("somePath", null));
-    assertEquals(tmpDir, "/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
+    assertEquals("/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
   }
 
 }

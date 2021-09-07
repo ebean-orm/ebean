@@ -8,13 +8,13 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
@@ -36,7 +36,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
 
-    assertTrue("has rows", !list.isEmpty());
+    assertTrue(!list.isEmpty());
     String mainSql = sqlOf(query);
     assertThat(mainSql).contains("from o_customer t0 ");
     assertThat(mainSql).contains("left join o_order t1 on t1.kcustomer_id = t0.id");
@@ -78,7 +78,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .fetch("order.details");
 
     List<OrderShipment> shipList = shipQuery.findList();
-    assertTrue("has rows", !shipList.isEmpty());
+    assertTrue(!shipList.isEmpty());
 
     String generatedSql = shipQuery.getGeneratedSql();
 
@@ -119,7 +119,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .fetch("customer.orders");
 
     List<Contact> shipList = query.findList();
-    assertTrue("has rows", !shipList.isEmpty());
+    assertTrue(!shipList.isEmpty());
 
     String generatedSql = query.getGeneratedSql();
 
@@ -151,7 +151,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .query();
 
     List<Contact> list = query.findList();
-    assertTrue("has rows", !list.isEmpty());
+    assertTrue(!list.isEmpty());
 
     String generatedSql = query.getGeneratedSql();
 

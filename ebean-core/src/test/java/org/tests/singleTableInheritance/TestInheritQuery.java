@@ -8,10 +8,11 @@ import org.tests.singleTableInheritance.model.Warehouse;
 import org.tests.singleTableInheritance.model.Zone;
 import org.tests.singleTableInheritance.model.ZoneExternal;
 import org.tests.singleTableInheritance.model.ZoneInternal;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestInheritQuery extends BaseTestCase {
 
@@ -33,13 +34,13 @@ public class TestInheritQuery extends BaseTestCase {
     // Ebean.find(PalletLocation.class).where().eq("zone.id",
     // zone.getId()).findList();
 
-    Assert.assertNotNull(locations);
-    Assert.assertEquals(1, locations.size());
+    assertNotNull(locations);
+    assertEquals(1, locations.size());
     PalletLocation rereadLoc = locations.get(0);
-    Assert.assertTrue(rereadLoc instanceof PalletLocation);
+    assertTrue(rereadLoc instanceof PalletLocation);
     Zone rereadZone = rereadLoc.getZone();
-    Assert.assertNotNull(rereadZone);
-    Assert.assertTrue(rereadZone instanceof ZoneExternal);
+    assertNotNull(rereadZone);
+    assertTrue(rereadZone instanceof ZoneExternal);
   }
 
   @SuppressWarnings("unlikely-arg-type")
@@ -66,26 +67,26 @@ public class TestInheritQuery extends BaseTestCase {
     // query abstract class on attribute (root of heirarchy)
     List<Zone> zones = Ebean.find(Zone.class).where().startsWith("attribute", "some zone").findList();
     // select t0.type c0, t0.ID c1, t0.attribute c2, t0.attribute c3 from zones t0 where t0.attribute like ? ; --bind(some zone%)
-    Assert.assertEquals(2, zones.size());
-    Assert.assertTrue(zones.contains(zoneInt));
-    Assert.assertTrue(zones.contains(zoneExt));
+    assertEquals(2, zones.size());
+    assertTrue(zones.contains(zoneInt));
+    assertTrue(zones.contains(zoneExt));
 
     // query internal zones only
     // discriminator is in WHERE clause where it belongs
     List<ZoneInternal> internalZones = Ebean.find(ZoneInternal.class).where().startsWith("attribute", "some zone").findList();
     // select t0.type c0, t0.ID c1, t0.attribute c2 from zones t0 where t0.type = 'INT'  and t0.attribute like ? ; --bind(some zone%)
-    Assert.assertEquals(1, internalZones.size());
-    Assert.assertTrue(internalZones.contains(zoneInt));
-    Assert.assertFalse(internalZones.contains(zoneExt));
-    Assert.assertTrue(internalZones.get(0) instanceof ZoneInternal);
+    assertEquals(1, internalZones.size());
+    assertTrue(internalZones.contains(zoneInt));
+    assertFalse(internalZones.contains(zoneExt));
+    assertTrue(internalZones.get(0) instanceof ZoneInternal);
 
     // query external zones only
     List<ZoneExternal> externalZones = Ebean.find(ZoneExternal.class).where().startsWith("attribute", "some zone").findList();
     // select t0.type c0, t0.ID c1, t0.attribute c2 from zones t0 where t0.type = 'EXT'  and t0.attribute like ? ; --bind(some zone%)
-    Assert.assertEquals(1, externalZones.size());
-    Assert.assertTrue(externalZones.contains(zoneExt));
-    Assert.assertFalse(externalZones.contains(zoneInt));
-    Assert.assertTrue(externalZones.get(0) instanceof ZoneExternal);
+    assertEquals(1, externalZones.size());
+    assertTrue(externalZones.contains(zoneExt));
+    assertFalse(externalZones.contains(zoneInt));
+    assertTrue(externalZones.get(0) instanceof ZoneExternal);
 
     // parents with children of Zones and subclasses
 
@@ -98,10 +99,10 @@ public class TestInheritQuery extends BaseTestCase {
     // parent with many-to-one, doesn't put in discriminator, why not, PK sufficient?
     // eager join
     Warehouse wh2 = Ebean.find(Warehouse.class, wh.getId());
-    Assert.assertNotNull(wh2);
-    Assert.assertEquals(wh.getId(), wh2.getId());
-    Assert.assertEquals(wh.getOfficeZone(), wh2.getOfficeZone());
-    Assert.assertEquals(wh.getOfficeZone().getAttribute(), wh2.getOfficeZone().getAttribute());
+    assertNotNull(wh2);
+    assertEquals(wh.getId(), wh2.getId());
+    assertEquals(wh.getOfficeZone(), wh2.getOfficeZone());
+    assertEquals(wh.getOfficeZone().getAttribute(), wh2.getOfficeZone().getAttribute());
 
     // before the fix, next assertion runs this lazy query:
 
@@ -114,8 +115,8 @@ public class TestInheritQuery extends BaseTestCase {
 
     // this works here because we have at least one shipping zone
 
-    Assert.assertEquals(1, wh2.getShippingZones().size());
-    Assert.assertTrue(wh2.getShippingZones().contains(zoneExt));
+    assertEquals(1, wh2.getShippingZones().size());
+    assertTrue(wh2.getShippingZones().contains(zoneExt));
 
     // set optional concrete to null to set stage for failure
     wh.setOfficeZone(null);
@@ -126,7 +127,7 @@ public class TestInheritQuery extends BaseTestCase {
       .where().eq("id", wh.getId())
       .findOne();
 
-    Assert.assertNotNull(wh2);
+    assertNotNull(wh2);
     // discriminator is used here, should be in join
     // assuming this "manual" fetch is equivalent to autofetch (i.e., autofetch should work the same way)
     // before Daryl's fix
@@ -138,24 +139,24 @@ public class TestInheritQuery extends BaseTestCase {
       .where().eq("id", wh.getId())
       .findOne();
     // key assertion #1 - fails due to left join with discriminator in WHERE
-    Assert.assertNotNull(wh2);
+    assertNotNull(wh2);
 
     // clear children to set the stage for left join failure
     wh.getShippingZones().clear();
     Ebean.save(wh);
 
     wh2 = Ebean.find(Warehouse.class, wh.getId());
-    Assert.assertNotNull(wh2);
-    Assert.assertEquals(wh.getId(), wh2.getId());
-    Assert.assertEquals(0, wh.getShippingZones().size());
+    assertNotNull(wh2);
+    assertEquals(wh.getId(), wh2.getId());
+    assertEquals(0, wh.getShippingZones().size());
 
     // query with lazy load of abstract children
     wh = Ebean.find(Warehouse.class)
       .where().eq("id", wh.getId())
       .findOne();
-    Assert.assertNotNull(wh);
-    Assert.assertEquals(wh.getId(), wh2.getId());
-    Assert.assertEquals(0, wh.getShippingZones().size());
+    assertNotNull(wh);
+    assertEquals(wh.getId(), wh2.getId());
+    assertEquals(0, wh.getShippingZones().size());
 
     // query with fetch of abstract children
     wh = Ebean.find(Warehouse.class)
@@ -163,9 +164,9 @@ public class TestInheritQuery extends BaseTestCase {
       .where().eq("id", wh.getId())
       .findOne();
     // key assertion #2 - fails due to left join with discriminator in WHERE
-    Assert.assertNotNull(wh);
-    Assert.assertEquals(wh.getId(), wh2.getId());
-    Assert.assertEquals(0, wh.getShippingZones().size());
+    assertNotNull(wh);
+    assertEquals(wh.getId(), wh2.getId());
+    assertEquals(0, wh.getShippingZones().size());
 
 
   }

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.profile;
 
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

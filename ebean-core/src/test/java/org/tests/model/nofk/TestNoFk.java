@@ -6,21 +6,21 @@ import io.ebean.Ebean;
 import io.ebean.SqlRow;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestNoFk extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void setup() {
     // Reset t
     Ebean.find(EFileNoFk.class).delete();
@@ -334,7 +334,7 @@ public class TestNoFk extends BaseTestCase {
 
 
   @Test
-  @Ignore("this would be a bonus task :)")
+  @Disabled("this would be a bonus task :)")
   public void testLazyLoadUser500() {
     // user 500 does not exist in DB
     EUserNoFk owner = Ebean.find(EUserNoFk.class, 500);
@@ -360,7 +360,7 @@ public class TestNoFk extends BaseTestCase {
   }
 
   @Test
-  @Ignore("Bonus Task 2")
+  @Disabled("Bonus Task 2")
   public void testM2mLazyLoadFile() {
     List<EFileNoFk> files = Ebean.find(EFileNoFk.class).findList();
     assertThat(files).hasSize(2);

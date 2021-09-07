@@ -2,7 +2,7 @@ package org.tests.model.prnt;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPrinterStateIssue extends BaseTestCase {
 

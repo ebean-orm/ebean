@@ -5,7 +5,7 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheRegion;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PersonCacheTests {
 

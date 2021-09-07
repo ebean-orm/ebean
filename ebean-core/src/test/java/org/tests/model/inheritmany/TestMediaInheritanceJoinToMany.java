@@ -3,10 +3,11 @@ package org.tests.model.inheritmany;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestMediaInheritanceJoinToMany extends BaseTestCase {
 
@@ -24,7 +25,7 @@ public class TestMediaInheritanceJoinToMany extends BaseTestCase {
 
     // assert we get the profile with a null picture
     MProfile profile = query.findOne();
-    Assert.assertNotNull(profile);
+    assertNotNull(profile);
 
     String generatedSql = query.getGeneratedSql();
     assertSql(generatedSql).contains("select t0.id, t0.name, t1.type, t1.id, t1.url, t1.note from mprofile t0 left join mmedia t1 on t1.id = t0.picture_id and t1.type = 'Picture' where t0.name = ?");

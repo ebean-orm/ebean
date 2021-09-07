@@ -6,7 +6,7 @@ import io.ebean.EbeanServer;
 import io.ebean.Expression;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestSubQueryBinding extends BaseTestCase {
 

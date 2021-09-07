@@ -1,9 +1,10 @@
 package org.tests.enhancement;
 
 import io.ebean.BaseTestCase;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Product;
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Note take care if you run this test in an IDE with a debugger as that can trigger the equals and
@@ -22,12 +23,12 @@ public class TestEnhancementEquals extends BaseTestCase {
     Product product2 = new Product();
     product2.setId(345);
 
-    Assert.assertEquals("equal based on id", product1, product2);
-    Assert.assertEquals("hashCode equal based on id", product1.hashCode(), product2.hashCode());
+    assertEquals(product1, product2);
+    assertEquals(product1.hashCode(), product2.hashCode());
 
     product2.setName("kumera");
-    Assert.assertEquals("still equal based on identity", product1, product2);
-    Assert.assertEquals("still hashCode equal based on id", product1.hashCode(), product2.hashCode());
+    assertEquals(product1, product2);
+    assertEquals(product1.hashCode(), product2.hashCode());
   }
 
 
@@ -42,13 +43,13 @@ public class TestEnhancementEquals extends BaseTestCase {
     product1.setId(345);
     int hashcode2 = product1.hashCode();
 
-    Assert.assertEquals("hashCode can't change", hashcode1, hashcode2);
+    assertEquals(hashcode1, hashcode2);
 
     Product product2 = new Product();
     product2.setId(345);
 
-    Assert.assertFalse("Not equal now", product1.equals(product2));
-    Assert.assertTrue("Different hashCode", product1.hashCode() != product2.hashCode());
+    assertNotEquals(product1, product2);
+    assertTrue(product1.hashCode() != product2.hashCode());
   }
 
 }

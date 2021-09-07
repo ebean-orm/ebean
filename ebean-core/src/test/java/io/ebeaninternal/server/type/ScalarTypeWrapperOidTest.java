@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.ivo.Oid;
 import org.tests.model.ivo.converter.OidTypeConverter;
 

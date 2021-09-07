@@ -4,8 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.TOne;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestSeqBatch extends BaseTestCase {
 
@@ -16,15 +17,11 @@ public class TestSeqBatch extends BaseTestCase {
     }
 
     BeanDescriptor<TOne> d = spiEbeanServer().getBeanDescriptor(TOne.class);
-
     Object id = d.nextId(null);
-    Assert.assertNotNull(id);
-    // System.out.println(id);
-
+    assertNotNull(id);
     for (int i = 0; i < 16; i++) {
       Object id2 = d.nextId(null);
-      Assert.assertNotNull(id2);
-      // System.out.println(id2);
+      assertNotNull(id2);
     }
   }
 

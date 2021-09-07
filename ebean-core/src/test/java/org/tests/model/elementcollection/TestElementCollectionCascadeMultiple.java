@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.Transactional;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

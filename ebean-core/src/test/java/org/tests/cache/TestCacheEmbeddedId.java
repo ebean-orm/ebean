@@ -2,11 +2,11 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.CKeyParentId;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestCacheEmbeddedId extends BaseTestCase {
 

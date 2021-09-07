@@ -3,9 +3,9 @@ package io.ebeaninternal.server.cache;
 import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultServerCacheTest {
 

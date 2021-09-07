@@ -1,14 +1,16 @@
 package org.tests.model.basic.xtra;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import org.tests.model.basic.EBasicVer;
-import org.junit.Assert;
 
 import javax.persistence.PersistenceException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class OptimisticLockExceptionThrowingDao {
 
@@ -16,8 +18,7 @@ public class OptimisticLockExceptionThrowingDao {
 
   @Transactional
   public void doSomething(EBasicVer v) {
-
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     inMethodTransaction = server.currentTransaction();
 
@@ -25,15 +26,15 @@ public class OptimisticLockExceptionThrowingDao {
     SqlUpdate u = server.sqlUpdate("update e_basicver set last_update = last_update+1 where id = ?");
     u.setParameter(1, v.getId());
     int count = server.execute(u, t);
-    Assert.assertEquals(1, count);
+    assertEquals(1, count);
 
     t.commit();
 
     v.setName("some change");
     try {
-      Ebean.save(v);
+      DB.save(v);
       // never get here
-      Assert.assertTrue(false);
+      fail();
     } catch (PersistenceException e) {
       throw e;
     }

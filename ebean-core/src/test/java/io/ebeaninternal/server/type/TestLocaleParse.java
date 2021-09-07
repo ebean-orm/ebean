@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.type;
 
-import io.ebeaninternal.server.type.ScalarTypeLocale;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestLocaleParse {
 
@@ -14,36 +14,34 @@ public class TestLocaleParse {
     // Examples: "en", "de_DE", "_GB", "en_US_WIN", "de__POSIX", "fr__MAC"
 
     Locale l = parse("en");
-    Assert.assertEquals("en", l.getLanguage());
+    assertEquals("en", l.getLanguage());
 
     l = parse("de_DE");
-    Assert.assertEquals("de", l.getLanguage());
-    Assert.assertEquals("DE", l.getCountry());
+    assertEquals("de", l.getLanguage());
+    assertEquals("DE", l.getCountry());
 
     l = parse("en_US_WIN");
-    Assert.assertEquals("en", l.getLanguage());
-    Assert.assertEquals("US", l.getCountry());
-    Assert.assertEquals("WIN", l.getVariant());
+    assertEquals("en", l.getLanguage());
+    assertEquals("US", l.getCountry());
+    assertEquals("WIN", l.getVariant());
 
     l = parse("_GB");
-    Assert.assertEquals("", l.getLanguage());
-    Assert.assertEquals("GB", l.getCountry());
-    Assert.assertEquals("", l.getVariant());
+    assertEquals("", l.getLanguage());
+    assertEquals("GB", l.getCountry());
+    assertEquals("", l.getVariant());
 
     l = parse("fr__MAC");
-    Assert.assertEquals("fr", l.getLanguage());
-    Assert.assertEquals("", l.getCountry());
-    Assert.assertEquals("MAC", l.getVariant());
+    assertEquals("fr", l.getLanguage());
+    assertEquals("", l.getCountry());
+    assertEquals("MAC", l.getVariant());
 
     l = parse("de__POSIX");
-    Assert.assertEquals("de", l.getLanguage());
-    Assert.assertEquals("", l.getCountry());
-    Assert.assertEquals("POSIX", l.getVariant());
+    assertEquals("de", l.getLanguage());
+    assertEquals("", l.getCountry());
+    assertEquals("POSIX", l.getVariant());
   }
 
   private Locale parse(String value) {
-
-    ScalarTypeLocale st = new ScalarTypeLocale();
-    return (Locale) st.parse(value);
+    return new ScalarTypeLocale().parse(value);
   }
 }

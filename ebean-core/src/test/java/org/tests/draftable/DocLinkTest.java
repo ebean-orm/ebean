@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Doc;
 import org.tests.model.draftable.Link;
 
@@ -14,7 +14,8 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DocLinkTest extends BaseTestCase {
 
@@ -102,11 +103,11 @@ public class DocLinkTest extends BaseTestCase {
 
     try {
       Ebean.deletePermanent(live);
-      assertTrue("never get here", false);
+      fail("never get here");
 
     } catch (PersistenceException e) {
       // assert nice message when trying to delete live bean
-      assertThat(e.getMessage().contains("Explicit Delete is not allowed on a 'live' bean - only draft beans"));
+      assertThat(e.getMessage()).contains("Explicit Delete is not allowed on a 'live' bean - only draft beans");
     }
   }
 
@@ -148,7 +149,7 @@ public class DocLinkTest extends BaseTestCase {
     // Expect a nice
     try {
       live.save();
-      assertTrue("Never get here", false);
+      fail("Never get here");
 
     } catch (PersistenceException e) {
       // we want to assert the message is nice and meaningful (and not a optimistic locking exception etc)
@@ -158,7 +159,6 @@ public class DocLinkTest extends BaseTestCase {
 
   @Test
   public void testDirtyState() {
-
     Timestamp when = new Timestamp(System.currentTimeMillis());
     String comment = "Really interesting";
 

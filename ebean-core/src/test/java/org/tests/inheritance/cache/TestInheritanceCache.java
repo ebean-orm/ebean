@@ -5,7 +5,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.cache.CInhOne;
 import org.tests.model.basic.cache.CInhRoot;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

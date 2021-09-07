@@ -1,13 +1,14 @@
 package org.tests.genkey;
 
 import io.ebean.Ebean;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TOne;
-import junit.framework.TestCase;
-import org.junit.Assert;
 
-public class TestGeneratedKeys extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+public class TestGeneratedKeys {
 
+  @Test
   public void testJdbcBatchInsert() {
 
     TOne c = new TOne();
@@ -26,11 +27,10 @@ public class TestGeneratedKeys extends TestCase {
       Ebean.commitTransaction();
     }
     Integer id = c.getId();
-    Assert.assertNotNull("Get Id back after insert", id);
+    assertNotNull(id);
 
     Integer id1 = c1.getId();
-    Assert.assertNotNull("Get Id back after insert", id1);
-
+    assertNotNull(id1);
   }
 
 }

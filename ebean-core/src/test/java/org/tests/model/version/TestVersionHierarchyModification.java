@@ -2,15 +2,15 @@ package org.tests.model.version;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestVersionHierarchyModification extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void setup() {
     final VersionParent parent = new VersionParent();
     parent.setName("vParent");
@@ -42,7 +42,7 @@ public class TestVersionHierarchyModification extends BaseTestCase {
     Ebean.save(parent);
   }
 
-  @After
+  @AfterEach
   public void cleanUp() {
     Ebean.find(VersionParent.class).delete();
   }

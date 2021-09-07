@@ -9,7 +9,7 @@ import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.persist.BatchControl;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicWithUniqueCon;
 import org.tests.model.basic.EOptOneB;
 import org.tests.model.basic.EOptOneC;

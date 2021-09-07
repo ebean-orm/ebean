@@ -1,12 +1,13 @@
 package org.tests.unitinternal;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TestNamingConvention extends TestCase {
+public class TestNamingConvention {
 
   /**
    * Test dummy method to allow rest to be commented out.
    */
+  @Test
   public void testDummy() {
 
   }

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashSet;

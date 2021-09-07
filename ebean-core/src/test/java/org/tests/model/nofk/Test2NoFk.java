@@ -5,21 +5,21 @@ import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // test that simulates relations with @formula
 public class Test2NoFk extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void setup() {
     // Reset t
     DB.truncate(EFile2NoFk.class, EUserNoFk.class, EUserNoFkSoftDel.class);

@@ -4,12 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
 
@@ -38,9 +39,8 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
       Product shadow1 = server.find(Product.class, prod1.getId());
       Product shadow2 = server.find(Product.class, prod2.getId());
 
-      Assert.assertNull(shadow1);
-      Assert.assertNull(shadow2);
-
+      assertNull(shadow1);
+      assertNull(shadow2);
     }
 
     // cleanup

@@ -7,7 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.UTDetail;
@@ -15,7 +15,7 @@ import org.tests.model.basic.UTMaster;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestBatchPersistCascade extends BaseTestCase {
 

@@ -2,7 +2,7 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

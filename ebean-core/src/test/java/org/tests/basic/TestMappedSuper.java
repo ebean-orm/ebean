@@ -3,8 +3,9 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TMapSuperEntity;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestMappedSuper extends BaseTestCase {
 
@@ -22,7 +23,7 @@ public class TestMappedSuper extends BaseTestCase {
       .select("id, name, myint, someObject, bananan")
       .findOne();
 
-    Assert.assertNotNull(e2);
+    assertNotNull(e2);
 
     TMapSuperEntity eSaveDelete = new TMapSuperEntity();
     eSaveDelete.setName("babana");

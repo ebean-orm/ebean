@@ -3,11 +3,12 @@ package org.tests.basic.encrypt;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncryptBinary;
 
 import java.sql.Timestamp;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestEncryptBinary extends BaseTestCase {
 
@@ -38,7 +39,7 @@ public class TestEncryptBinary extends BaseTestCase {
 
     e1.getDescription();
 
-    Assert.assertEquals(t0, t1);
+    assertEquals(t0, t1);
 
     e1.setName("testmod");
     e1.setDescription("moddesc");

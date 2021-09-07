@@ -6,13 +6,13 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestQueryDisableLazyLoad extends BaseTestCase {
 

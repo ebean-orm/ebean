@@ -6,11 +6,13 @@ import io.ebean.TransactionalTestCase;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestDeleteByIdCollection extends TransactionalTestCase {
 
@@ -28,8 +30,8 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     Customer c0Back = Ebean.find(Customer.class, c0.getId());
     Customer c1Back = Ebean.find(Customer.class, "" + c1.getId());
 
-    Assert.assertNotNull(c0Back);
-    Assert.assertNotNull(c1Back);
+    assertNotNull(c0Back);
+    assertNotNull(c1Back);
 
     List<String> ids = new ArrayList<>();
     // also test id type conversion
@@ -43,8 +45,8 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     c0Back = Ebean.find(Customer.class, c0.getId());
     c1Back = Ebean.find(Customer.class, "" + c1.getId());
 
-    Assert.assertNull(c0Back);
-    Assert.assertNull(c1Back);
+    assertNull(c0Back);
+    assertNull(c1Back);
   }
 
   @Test
@@ -58,8 +60,8 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     Order o0Back = Ebean.find(Order.class, order0.getId());
     Order o1Back = Ebean.find(Order.class, order1.getId());
 
-    Assert.assertNotNull(o0Back);
-    Assert.assertNotNull(o1Back);
+    assertNotNull(o0Back);
+    assertNotNull(o1Back);
 
 
     List<Object> ids = new ArrayList<>();
@@ -73,8 +75,8 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     o0Back = Ebean.find(Order.class, order0.getId());
     o1Back = Ebean.find(Order.class, order1.getId());
 
-    Assert.assertNull(o0Back);
-    Assert.assertNull(o1Back);
+    assertNull(o0Back);
+    assertNull(o1Back);
   }
 
 }

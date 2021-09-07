@@ -5,8 +5,8 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebeantest.LoggedSql;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAggregationCount extends BaseTestCase {
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() {
     TEventOne one = new TEventOne("first", TEventOne.Status.AA);
     one.getLogs().add(new TEventMany("all", 1, 10));

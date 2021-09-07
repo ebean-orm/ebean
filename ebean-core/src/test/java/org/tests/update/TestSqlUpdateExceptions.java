@@ -5,11 +5,12 @@ import io.ebean.DB;
 import io.ebean.DuplicateKeyException;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestSqlUpdateExceptions extends BaseTestCase {
 
@@ -32,9 +33,8 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
     assertThat(foundId).isEqualTo(id);
   }
 
-  @Test(expected = DuplicateKeyException.class)
+  @Test
   public void duplicateKey() {
-
     UUID id = UUID.randomUUID();
 
     SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
@@ -46,12 +46,11 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
     sqlUpdate.setParameter(1, id);
     sqlUpdate.setParameter(2, "fail");
     sqlUpdate.setParameter(3, 1);
-    sqlUpdate.execute();
+    assertThrows(DuplicateKeyException.class, sqlUpdate::execute);
   }
 
-  @Test(expected = DuplicateKeyException.class)
+  @Test
   public void duplicateKey_executeNow() {
-
     UUID id = UUID.randomUUID();
 
     SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
@@ -63,51 +62,50 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
     sqlUpdate.setParameter(1, id);
     sqlUpdate.setParameter(2, "fail");
     sqlUpdate.setParameter(3, 1);
-    sqlUpdate.executeNow();
+    assertThrows(DuplicateKeyException.class, sqlUpdate::executeNow);
   }
 
-  @Test(expected = DuplicateKeyException.class)
+  @Test
   public void duplicateKey_inBatch() {
-
     UUID id = UUID.randomUUID();
+    assertThrows(DuplicateKeyException.class, () -> {
+      try (Transaction transaction = DB.beginTransaction()) {
 
-    try (Transaction transaction = DB.beginTransaction()) {
+        SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
+        sqlUpdate.setParameter(1, id);
+        sqlUpdate.setParameter(2, "hi in batch");
+        sqlUpdate.setParameter(3, 1);
+        sqlUpdate.addBatch();
 
-      SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
-      sqlUpdate.setParameter(1, id);
-      sqlUpdate.setParameter(2, "hi in batch");
-      sqlUpdate.setParameter(3, 1);
-      sqlUpdate.addBatch();
+        sqlUpdate.setParameter(1, id);
+        sqlUpdate.setParameter(2, "fail in batch");
+        sqlUpdate.setParameter(3, 1);
+        sqlUpdate.addBatch();
 
-      sqlUpdate.setParameter(1, id);
-      sqlUpdate.setParameter(2, "fail in batch");
-      sqlUpdate.setParameter(3, 1);
-      sqlUpdate.addBatch();
-
-      transaction.commit();
-    }
+        transaction.commit();
+      }
+    });
   }
 
-  @Test(expected = DuplicateKeyException.class)
+  @Test
   public void duplicateKey_executeBatch() {
-
     UUID id = UUID.randomUUID();
+    assertThrows(DuplicateKeyException.class, () -> {
+      try (Transaction transaction = DB.beginTransaction()) {
+        SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
+        sqlUpdate.setParameter(1, id);
+        sqlUpdate.setParameter(2, "hi in batch");
+        sqlUpdate.setParameter(3, 1);
+        sqlUpdate.addBatch();
 
-    try (Transaction transaction = DB.beginTransaction()) {
+        sqlUpdate.setParameter(1, id);
+        sqlUpdate.setParameter(2, "fail in batch");
+        sqlUpdate.setParameter(3, 1);
+        sqlUpdate.addBatch();
 
-      SqlUpdate sqlUpdate = DB.sqlUpdate(sql);
-      sqlUpdate.setParameter(1, id);
-      sqlUpdate.setParameter(2, "hi in batch");
-      sqlUpdate.setParameter(3, 1);
-      sqlUpdate.addBatch();
-
-      sqlUpdate.setParameter(1, id);
-      sqlUpdate.setParameter(2, "fail in batch");
-      sqlUpdate.setParameter(3, 1);
-      sqlUpdate.addBatch();
-
-      sqlUpdate.executeBatch();
-      transaction.commit();
-    }
+        sqlUpdate.executeBatch();
+        transaction.commit();
+      }
+    });
   }
 }

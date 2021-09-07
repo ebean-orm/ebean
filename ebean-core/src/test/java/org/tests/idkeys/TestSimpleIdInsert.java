@@ -1,22 +1,22 @@
 package org.tests.idkeys;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ESimple;
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestSimpleIdInsert extends BaseTestCase {
 
   @Test
   public void test() {
-
     ESimple e = new ESimple();
     e.setName("name");
 
-    Ebean.save(e);
+    DB.save(e);
 
-    Assert.assertNotNull(e.getId());
+    assertNotNull(e.getId());
 
   }
 

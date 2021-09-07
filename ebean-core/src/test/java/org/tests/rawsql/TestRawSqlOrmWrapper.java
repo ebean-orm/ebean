@@ -9,10 +9,11 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderAggregate;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlOrmWrapper extends BaseTestCase {
 
@@ -39,7 +40,7 @@ public class TestRawSqlOrmWrapper extends BaseTestCase {
       .where().gt("order.id", 0).having().gt("totalAmount", 20);
 
     List<OrderAggregate> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     output(list);
 

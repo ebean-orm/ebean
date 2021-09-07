@@ -6,16 +6,17 @@ import io.ebean.EbeanServer;
 import io.ebean.ValuePair;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDiffHelpSimple extends BaseTestCase {
 
@@ -58,14 +59,14 @@ public class TestDiffHelpSimple extends BaseTestCase {
 
     Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
-    Assert.assertEquals(5, diff.size());
+    assertEquals(5, diff.size());
 
     Set<String> keySet = diff.keySet();
-    Assert.assertTrue(keySet.contains("cretime"));
-    Assert.assertTrue(keySet.contains("status"));
-    Assert.assertTrue(keySet.contains("shipDate"));
-    Assert.assertTrue(keySet.contains("orderDate"));
-    Assert.assertTrue(keySet.contains("customer.id"));
+    assertTrue(keySet.contains("cretime"));
+    assertTrue(keySet.contains("status"));
+    assertTrue(keySet.contains("shipDate"));
+    assertTrue(keySet.contains("orderDate"));
+    assertTrue(keySet.contains("customer.id"));
   }
 
   @Test
@@ -84,16 +85,16 @@ public class TestDiffHelpSimple extends BaseTestCase {
 
     Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
-    Assert.assertEquals(5, diff.size());
+    assertEquals(5, diff.size());
 
     Set<String> keySet = diff.keySet();
-    Assert.assertTrue(keySet.contains("cretime"));
-    Assert.assertTrue(keySet.contains("status"));
-    Assert.assertTrue(keySet.contains("shipDate"));
-    Assert.assertTrue(keySet.contains("orderDate"));
-    Assert.assertTrue(keySet.contains("customer.id"));
-    Assert.assertEquals(2133, diff.get("customer.id").getOldValue());
-    Assert.assertEquals(1234, diff.get("customer.id").getNewValue());
+    assertTrue(keySet.contains("cretime"));
+    assertTrue(keySet.contains("status"));
+    assertTrue(keySet.contains("shipDate"));
+    assertTrue(keySet.contains("orderDate"));
+    assertTrue(keySet.contains("customer.id"));
+    assertEquals(2133, diff.get("customer.id").getOldValue());
+    assertEquals(1234, diff.get("customer.id").getNewValue());
   }
 
   @Test
@@ -105,7 +106,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
 
     Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
-    Assert.assertEquals(0, diff.size());
+    assertEquals(0, diff.size());
   }
 
   @Test
@@ -120,17 +121,17 @@ public class TestDiffHelpSimple extends BaseTestCase {
 
     Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
-    Assert.assertEquals(3, diff.size());
+    assertEquals(3, diff.size());
 
     Set<String> keySet = diff.keySet();
-    Assert.assertTrue(keySet.contains("status"));
-    Assert.assertTrue(keySet.contains("customer.id"));
-    Assert.assertTrue(keySet.contains("shipDate"));
+    assertTrue(keySet.contains("status"));
+    assertTrue(keySet.contains("customer.id"));
+    assertTrue(keySet.contains("shipDate"));
 
     ValuePair shipDatePair = diff.get("shipDate");
-    Assert.assertEquals(order1.getShipDate(), shipDatePair.getNewValue());
-    Assert.assertEquals(order2.getShipDate(), shipDatePair.getOldValue());
-    Assert.assertNull(shipDatePair.getOldValue());
+    assertEquals(order1.getShipDate(), shipDatePair.getNewValue());
+    assertEquals(order2.getShipDate(), shipDatePair.getOldValue());
+    assertNull(shipDatePair.getOldValue());
   }
 
 
@@ -145,14 +146,14 @@ public class TestDiffHelpSimple extends BaseTestCase {
 
     Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     Set<String> keySet = diff.keySet();
-    Assert.assertTrue(keySet.contains("shipDate"));
+    assertTrue(keySet.contains("shipDate"));
 
     ValuePair shipDatePair = diff.get("shipDate");
-    Assert.assertEquals(order1.getShipDate(), shipDatePair.getNewValue());
-    Assert.assertEquals(order2.getShipDate(), shipDatePair.getOldValue());
-    Assert.assertNull(shipDatePair.getNewValue());
+    assertEquals(order1.getShipDate(), shipDatePair.getNewValue());
+    assertEquals(order2.getShipDate(), shipDatePair.getOldValue());
+    assertNull(shipDatePair.getNewValue());
   }
 
   @Test
@@ -166,6 +167,6 @@ public class TestDiffHelpSimple extends BaseTestCase {
 
     Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
-    Assert.assertEquals(0, diff.size());
+    assertEquals(0, diff.size());
   }
 }

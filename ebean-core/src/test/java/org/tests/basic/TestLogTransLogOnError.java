@@ -3,14 +3,16 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLogTransLogOnError extends BaseTestCase {
 
@@ -32,14 +34,14 @@ public class TestLogTransLogOnError extends BaseTestCase {
       // t.log("--- next query should error");
       List<Customer> list = Ebean.find(Customer.class).where().eq("id", "NotAnInt!!").findList();
 
-      Assert.assertEquals(0, list.size());
+      assertEquals(0, list.size());
       // Get here with mysql?
-      // Assert.assertTrue(false);
+      // assertTrue(false);
       txn.commit();
 
     } catch (RuntimeException e) {
       // e.printStackTrace();
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
   }
 
@@ -61,12 +63,12 @@ public class TestLogTransLogOnError extends BaseTestCase {
       Ebean.save(newBean);
 
       // never get here
-      Assert.assertTrue(false);
+      assertTrue(false);
       txn.commit();
 
     } catch (RuntimeException e) {
       // e.printStackTrace();
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
   }
 }

@@ -7,10 +7,12 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestDeleteByIdList extends BaseTestCase {
 
@@ -24,13 +26,13 @@ public class TestDeleteByIdList extends BaseTestCase {
     server.getBeanDescriptor(OrderDetail.class).cacheBeanPut(dummy);
 
     Customer c0 = ResetBasicData.createCustAndOrder("DelIdList-0");
-    Assert.assertNotNull(c0);
+    assertNotNull(c0);
 
     Customer c1 = ResetBasicData.createCustAndOrder("DelIdList-1");
 
     List<Object> orderIds = Ebean.find(Order.class).where().in("customer", c0, c1).findIds();
 
-    Assert.assertEquals(2, orderIds.size());
+    assertEquals(2, orderIds.size());
 
     Ebean.deleteAll(Order.class, orderIds);
     Ebean.delete(c0);

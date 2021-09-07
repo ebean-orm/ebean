@@ -4,12 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestM2MDeleteWithCascade extends BaseTestCase {
 
@@ -34,19 +36,19 @@ public class TestM2MDeleteWithCascade extends BaseTestCase {
     Ebean.delete(u0);
 
     MUser notThere = Ebean.find(MUser.class, u0.getUserid());
-    Assert.assertNull("been deleted", notThere);
+    assertNull(notThere);
 
     List<Object> roleIds = new ArrayList<>();
     Collections.addAll(roleIds, r0.getRoleid(), r1.getRoleid());
 
     int rc = Ebean.find(MRole.class).where().idIn(roleIds).findCount();
 
-    Assert.assertEquals("roles not deleted", 2, rc);
+    assertEquals(2, rc);
 
     Ebean.deleteAll(roles);
 
     rc = Ebean.find(MRole.class).where().idIn(roleIds).findCount();
 
-    Assert.assertEquals("roles deleted now", 0, rc);
+    assertEquals(0, rc);
   }
 }

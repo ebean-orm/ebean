@@ -6,8 +6,8 @@ import io.ebean.annotation.Identity;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Read more at https://groups.google.com/forum/#!topic/ebean/VD1MV2-LrOc
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
 
 
-  @Before
+  @BeforeEach
   public void before() {
 
     // remove all the User records first

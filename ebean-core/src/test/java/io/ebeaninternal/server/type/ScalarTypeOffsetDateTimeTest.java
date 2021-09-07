@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
@@ -9,9 +9,9 @@ import java.time.ZoneOffset;
 import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ScalarTypeOffsetDateTimeTest {
 

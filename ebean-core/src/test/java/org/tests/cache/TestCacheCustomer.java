@@ -3,8 +3,7 @@ package org.tests.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.Ebean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
@@ -12,6 +11,8 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCacheCustomer extends BaseTestCase {
 
@@ -42,7 +43,7 @@ public class TestCacheCustomer extends BaseTestCase {
     List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
       .findList();
 
-    Assert.assertTrue(list.size() > 1);
+    assertTrue(list.size() > 1);
 
     for (Customer customer : list) {
       Address billingAddress = customer.getBillingAddress();

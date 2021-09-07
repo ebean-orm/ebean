@@ -4,8 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.plugin.Property;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Document;
 
 import java.util.Set;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestInsertCheckUnique extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void clearDb() {
     DB.find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
     DB.find(Document.class).asDraft().where().isNull("title").delete();

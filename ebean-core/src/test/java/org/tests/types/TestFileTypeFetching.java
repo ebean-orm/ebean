@@ -4,13 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
 import org.tests.model.types.SomeFileBean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestFileTypeFetching extends BaseTestCase {
 

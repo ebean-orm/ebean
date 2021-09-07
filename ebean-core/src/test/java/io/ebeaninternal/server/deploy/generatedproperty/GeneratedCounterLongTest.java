@@ -3,10 +3,13 @@ package io.ebeaninternal.server.deploy.generatedproperty;
 import io.ebean.BaseTestCase;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
+import java.util.EmptyStackException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class GeneratedCounterLongTest extends BaseTestCase {
@@ -15,16 +18,14 @@ public class GeneratedCounterLongTest extends BaseTestCase {
 
   private BeanProperty version = getBeanDescriptor(Customer.class).getBeanProperty("version");
 
-  @Test(expected = IllegalStateException.class)
-  public void when_null_expect_IllegalStateException() throws Exception {
-
+  @Test
+  public void when_null_expect_IllegalStateException() {
     Customer customer = new Customer();
-    counter.getUpdateValue(version, (EntityBean)customer, System.currentTimeMillis());
+    assertThrows(IllegalStateException.class, () -> counter.getUpdateValue(version, (EntityBean)customer, System.currentTimeMillis()));
   }
 
   @Test
-  public void when_set_expect_incremented() throws Exception {
-
+  public void when_set_expect_incremented() {
     Customer customer = new Customer();
     customer.setVersion(7L);
     Object value = counter.getUpdateValue(version, (EntityBean) customer, System.currentTimeMillis());

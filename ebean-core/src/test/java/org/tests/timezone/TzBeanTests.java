@@ -1,8 +1,8 @@
 package org.tests.timezone;
 
 import io.ebean.Ebean;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,7 +35,7 @@ public class TzBeanTests {
   /**
    * Run this 5 times with different modes.
    */
-  @Ignore
+  @Disabled
   @Test
   public void insert_one_at_a_time() {
 
@@ -65,7 +65,7 @@ public class TzBeanTests {
   /**
    * In separate JVM/execution fetch the beans with various timezones etc.
    */
-  @Ignore
+  @Disabled
   @Test
   public void fetch_beans() {
 

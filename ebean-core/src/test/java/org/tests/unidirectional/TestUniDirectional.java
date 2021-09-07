@@ -4,10 +4,12 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestUniDirectional extends BaseTestCase {
 
@@ -22,13 +24,13 @@ public class TestUniDirectional extends BaseTestCase {
 
     Ebean.save(m);
 
-    Assert.assertNotNull(m.getId());
-    Assert.assertNotNull(m.getVersion());
+    assertNotNull(m.getId());
+    assertNotNull(m.getVersion());
 
     List<UTDetail> details = m.getDetails();
     for (UTDetail utDetail : details) {
-      Assert.assertNotNull(utDetail.getId());
-      Assert.assertNotNull(utDetail.getVersion());
+      assertNotNull(utDetail.getId());
+      assertNotNull(utDetail.getVersion());
     }
 
     UTDetail d4 = new UTDetail("d14", 2, 3.0);
@@ -36,15 +38,15 @@ public class TestUniDirectional extends BaseTestCase {
 
     Ebean.save(m);
 
-    Assert.assertNotNull(d4.getId());
+    assertNotNull(d4.getId());
     Integer d4ver = d4.getVersion();
-    Assert.assertNotNull(d4ver);
+    assertNotNull(d4ver);
 
     d4.setName("d14Upd");
     Ebean.save(d4);
     Integer d4ver2 = d4.getVersion();
-    Assert.assertNotNull(d4ver2);
-    Assert.assertEquals((d4ver + 1), d4ver2.intValue());
+    assertNotNull(d4ver2);
+    assertEquals((d4ver + 1), d4ver2.intValue());
 
     Ebean.delete(d4);
   }

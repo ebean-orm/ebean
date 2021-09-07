@@ -8,7 +8,7 @@ import io.ebean.config.TenantMode;
 import io.ebean.config.TenantSchemaProvider;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.sql.DataSource;

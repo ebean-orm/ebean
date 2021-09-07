@@ -6,8 +6,8 @@ import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ public class MultiTenantPartitionTest extends BaseTestCase {
     server.saveAll(tenants());
   }
 
-  @AfterClass
+  @AfterAll
   public static void shutdown() {
     server.shutdown();
   }

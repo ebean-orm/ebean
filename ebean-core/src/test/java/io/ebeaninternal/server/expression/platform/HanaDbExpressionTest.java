@@ -3,9 +3,9 @@ package io.ebeaninternal.server.expression.platform;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.expression.Op;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HanaDbExpressionTest {
   private HanaDbExpression expression = new HanaDbExpression();

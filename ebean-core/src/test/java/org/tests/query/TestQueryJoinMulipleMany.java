@@ -5,10 +5,11 @@ import io.ebean.Ebean;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestQueryJoinMulipleMany extends BaseTestCase {
 
@@ -20,7 +21,7 @@ public class TestQueryJoinMulipleMany extends BaseTestCase {
     List<Order> list = Ebean.find(Order.class).fetch("customer").fetch("customer.contacts").where()
       .gt("id", 0).findList();
 
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     for (Order order : list) {
       List<Contact> contacts = order.getCustomer().getContacts();

@@ -4,8 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
 import org.tests.model.basic.EBasicEnumId;
@@ -13,8 +12,9 @@ import org.tests.model.basic.EBasicEnumInt;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestEnumValueAnnotation extends BaseTestCase {
 
@@ -65,7 +65,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     try {
       b = DB.find(EBasicEnumId.class, b.getStatus());
     } catch (java.lang.IllegalArgumentException iae) {
-      Assert.fail("The use of an enum as id should work : " + iae.getLocalizedMessage());
+      fail("The use of an enum as id should work : " + iae.getLocalizedMessage());
     }
 
     assertEquals(EBasicEnumId.Status.NEW, b.getStatus());

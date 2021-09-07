@@ -4,8 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.PersistentFile;
 import org.tests.model.basic.PersistentFileContent;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestDeleteOneToOne extends BaseTestCase {
 
@@ -25,9 +26,8 @@ public class TestDeleteOneToOne extends BaseTestCase {
     PersistentFile file1 = Ebean.find(PersistentFile.class, id);
     PersistentFileContent content1 = Ebean.find(PersistentFileContent.class, contentId);
 
-    Assert.assertNull(file1);
-    Assert.assertNull(content1);
-
+    assertNull(file1);
+    assertNull(content1);
   }
 
   // public void testDeleteMany() {
@@ -44,7 +44,7 @@ public class TestDeleteOneToOne extends BaseTestCase {
   //
   // Customer deletedCustomer = Ebean.find(Customer.class, c.getId());
   //
-  // Assert.assertNull(deletedCustomer);
+  // assertNull(deletedCustomer);
   //
   // }
 }

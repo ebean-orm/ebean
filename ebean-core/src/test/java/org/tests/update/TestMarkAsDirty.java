@@ -3,10 +3,12 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.EBasicVer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
+
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestMarkAsDirty extends BaseTestCase {
 
@@ -17,7 +19,7 @@ public class TestMarkAsDirty extends BaseTestCase {
     Ebean.save(bean);
 
     Timestamp lastUpdate = bean.getLastUpdate();
-    Assert.assertNotNull(lastUpdate);
+    assertNotNull(lastUpdate);
 
     Thread.sleep(100);
 
@@ -26,8 +28,8 @@ public class TestMarkAsDirty extends BaseTestCase {
     Ebean.save(bean);
 
     Timestamp lastUpdate2 = bean.getLastUpdate();
-    Assert.assertNotNull(lastUpdate2);
-    Assert.assertNotEquals(lastUpdate, lastUpdate2);
+    assertNotNull(lastUpdate2);
+    assertNotEquals(lastUpdate, lastUpdate2);
 
   }
 

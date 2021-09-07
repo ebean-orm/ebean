@@ -4,8 +4,9 @@ package org.tests.basic.event;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TWithPreInsert;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestPreInsertValidation extends BaseTestCase {
 
@@ -19,8 +20,8 @@ public class TestPreInsertValidation extends BaseTestCase {
     Ebean.save(e);
 
     // the save worked and name set in preInsert
-    Assert.assertNotNull(e.getId());
-    Assert.assertNotNull(e.getName());
+    assertNotNull(e.getId());
+    assertNotNull(e.getName());
 
     TWithPreInsert e1 = Ebean.find(TWithPreInsert.class, e.getId());
 
@@ -43,7 +44,7 @@ public class TestPreInsertValidation extends BaseTestCase {
     Ebean.update(bean2);
 
     // title set on preUpdate
-    Assert.assertNotNull(bean2.getTitle());
+    assertNotNull(bean2.getTitle());
   }
 
 }

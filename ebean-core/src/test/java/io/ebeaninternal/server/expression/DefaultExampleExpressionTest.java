@@ -8,7 +8,7 @@ import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;

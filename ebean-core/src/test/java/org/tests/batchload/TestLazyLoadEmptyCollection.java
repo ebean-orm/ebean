@@ -6,7 +6,7 @@ import io.ebean.TransactionalTestCase;
 
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

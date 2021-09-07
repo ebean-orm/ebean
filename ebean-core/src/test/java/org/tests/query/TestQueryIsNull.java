@@ -6,7 +6,7 @@ import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.m2m.Role;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 import static org.assertj.core.api.Assertions.assertThat;

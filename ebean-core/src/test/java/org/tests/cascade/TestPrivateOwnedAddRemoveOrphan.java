@@ -4,8 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestPrivateOwnedAddRemoveOrphan extends BaseTestCase {
 
@@ -28,6 +29,6 @@ public class TestPrivateOwnedAddRemoveOrphan extends BaseTestCase {
 
     TSMaster master2 = Ebean.find(master1.getClass(), master1.getId());
 
-    Assert.assertTrue(master2.getDetails().isEmpty());
+    assertTrue(master2.getDetails().isEmpty());
   }
 }

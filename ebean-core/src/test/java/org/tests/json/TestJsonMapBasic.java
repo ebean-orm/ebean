@@ -6,7 +6,7 @@ import io.ebean.Query;
 import io.ebean.text.json.EJson;
 import io.ebeantest.LoggedSql;
 import org.tests.model.json.EBasicJsonMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonMapDetail;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonMapBasic extends BaseTestCase {
 

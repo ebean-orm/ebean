@@ -1,11 +1,11 @@
 package org.tests.idkeys;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TOne;
 
 import io.ebean.BaseTestCase;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.SQLException;
 import java.util.List;

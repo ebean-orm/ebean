@@ -7,14 +7,14 @@ import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Data;
 import org.tests.inherit.Parent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ParentQueryTest extends BaseTestCase {
 

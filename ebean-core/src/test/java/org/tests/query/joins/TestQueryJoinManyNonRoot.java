@@ -2,19 +2,16 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.FetchConfig;
 import io.ebean.Query;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
@@ -59,10 +56,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     for (Order o: list) {
       int withoutFetch = ordersById.get(o.getId()).getCustomer().getContacts().size();
       int withFetch = o.getCustomer().getContacts().size();
-      assertEquals(String.format("order.customer.contacts for order %d did not match. " +
-              "Items without fetch: %d, with fetch: %d", o.getId(), withoutFetch, withFetch),
-              withoutFetch,
-              withFetch);
+      assertEquals(withoutFetch, withFetch);
     }
 
 
@@ -96,7 +90,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     assertTrue(sql.contains("left join o_order_detail "));
     assertTrue(sql.contains("left join o_product "));
 
-    Assert.assertFalse(sql.contains("left join contact"));
+    assertFalse(sql.contains("left join contact"));
 
   }
 
@@ -123,8 +117,8 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     assertTrue(sql.contains("join o_customer t1 on t1.id "));
     assertTrue(sql.contains("left join contact "));
 
-    Assert.assertFalse(sql.contains("left join o_order_detail "));
-    Assert.assertFalse(sql.contains("left join o_product "));
+    assertFalse(sql.contains("left join o_order_detail "));
+    assertFalse(sql.contains("left join o_product "));
 
   }
 

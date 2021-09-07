@@ -2,13 +2,14 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
 
@@ -32,7 +33,7 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
     List<Contact> contacts = c1.getContacts();
     int sz = contacts.size();
 
-    Assert.assertTrue(sz == 0);
+    assertTrue(sz == 0);
 
     // cleanup
     Ebean.delete(c1);

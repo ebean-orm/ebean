@@ -7,10 +7,11 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlAsKeyword extends BaseTestCase {
 
@@ -39,8 +40,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
     query.where().ilike("name", "r%");
 
     List<Customer> list = query.findList();
-    Assert.assertNotNull(list);
-
+    assertNotNull(list);
 
     // try valid query with no spaces
     rawSql =
@@ -53,7 +53,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
     query.where().ilike("name", "r%");
 
     list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     rawSql =
       RawSqlBuilder
@@ -64,7 +64,7 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
     query.where().ilike("name", "r%");
 
     list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     // this will barf - expecting the AS keyword now
     rawSql =
@@ -76,6 +76,6 @@ public class TestRawSqlAsKeyword extends BaseTestCase {
     query.where().ilike("name", "r%");
 
     list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 }

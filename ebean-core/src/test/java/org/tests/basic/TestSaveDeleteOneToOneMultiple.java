@@ -4,8 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.PFile;
 import org.tests.model.basic.PFileContent;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestSaveDeleteOneToOneMultiple extends BaseTestCase {
 
@@ -28,10 +29,8 @@ public class TestSaveDeleteOneToOneMultiple extends BaseTestCase {
 
     PFileContent persistentFileContent = persistentFile.getFileContent();
 
-    Assert.assertNotNull(persistentFileContent);
-
-    Assert.assertNotNull("load byte content", persistentFileContent.getContent());
-
+    assertNotNull(persistentFileContent);
+    assertNotNull(persistentFileContent.getContent());
     Ebean.delete(persistentFile);
   }
 }

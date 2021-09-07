@@ -2,7 +2,7 @@ package io.ebean;
 
 import io.ebean.service.SpiFetchGroupQuery;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;

@@ -4,7 +4,7 @@ import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.csv.DefaultCsvCallback;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import java.io.File;

@@ -1,13 +1,13 @@
 package io.ebeaninternal.server.type;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DecimalUtilsTest {
 

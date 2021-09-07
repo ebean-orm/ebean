@@ -6,7 +6,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
 import io.ebean.meta.MetaTimedMetric;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

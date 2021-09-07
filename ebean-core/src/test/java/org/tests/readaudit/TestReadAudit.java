@@ -12,9 +12,9 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.event.readaudit.ReadEvent;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.EBasicChangeLog;
 
@@ -39,7 +39,7 @@ public class TestReadAudit extends BaseTestCase {
   Long id1;
   Long id2;
 
-  @Before
+  @BeforeEach
   public void setup() {
     server = createServer();
 
@@ -61,7 +61,7 @@ public class TestReadAudit extends BaseTestCase {
     server.save(ar);
   }
 
-  @After
+  @AfterEach
   public void shutdown() {
     server.shutdown();
   }

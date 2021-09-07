@@ -6,9 +6,9 @@ import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.ResetBasicData;
 
@@ -19,12 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DtoQueryFromOrmTest extends BaseTestCase {
 
-  @BeforeClass
+  @BeforeAll
   public static void resetStats() {
     DB.getDefault().metaInfo().resetAllMetrics();
   }
 
-  @AfterClass
+  @AfterAll
   public static void reportStats() {
     ServerMetrics metrics = DB.getDefault().metaInfo().collectMetrics();
     for (MetaQueryMetric metric : metrics.queryMetrics()) {

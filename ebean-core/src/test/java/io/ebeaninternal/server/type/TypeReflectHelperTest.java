@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.ScalarTypeConverter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.Oid;

@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
 

@@ -6,12 +6,13 @@ import io.ebean.EbeanServer;
 import io.ebean.ValuePair;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDiffHelpWithEmbedded extends BaseTestCase {
 
@@ -34,12 +35,12 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     emain2.getEmbeddable().setDescription("baz");
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     ValuePair valuePair = diff.get("embeddable.description");
 
-    Assert.assertNotNull(valuePair);
-    Assert.assertEquals("bar", valuePair.getNewValue());
-    Assert.assertEquals("baz", valuePair.getOldValue());
+    assertNotNull(valuePair);
+    assertEquals("bar", valuePair.getNewValue());
+    assertEquals("baz", valuePair.getOldValue());
   }
 
   /**
@@ -57,12 +58,12 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
 
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     ValuePair valuePair = diff.get("embeddable.description");
 
-    Assert.assertNotNull(valuePair);
-    Assert.assertEquals("bar", valuePair.getNewValue());
-    Assert.assertEquals("baz", valuePair.getOldValue());
+    assertNotNull(valuePair);
+    assertEquals("bar", valuePair.getNewValue());
+    assertEquals("baz", valuePair.getOldValue());
   }
 
   @Test
@@ -73,12 +74,12 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     emain2.getEmbeddable().setDescription("baz");
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     ValuePair valuePair = diff.get("embeddable.description");
 
-    Assert.assertNotNull(valuePair);
-    Assert.assertEquals("bar", valuePair.getNewValue());
-    Assert.assertEquals("baz", valuePair.getOldValue());
+    assertNotNull(valuePair);
+    assertEquals("bar", valuePair.getNewValue());
+    assertEquals("baz", valuePair.getOldValue());
   }
 
   @Test
@@ -89,12 +90,12 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     EMain emain2 = createEMain();
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     ValuePair valuePair = diff.get("embeddable.description");
 
-    Assert.assertNotNull(valuePair);
-    Assert.assertNull(valuePair.getNewValue());
-    Assert.assertEquals("bar", valuePair.getOldValue());
+    assertNotNull(valuePair);
+    assertNull(valuePair.getNewValue());
+    assertEquals("bar", valuePair.getOldValue());
   }
 
   @Test
@@ -105,12 +106,12 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     emain2.setEmbeddable(null);
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     ValuePair valuePair = diff.get("embeddable.description");
 
-    Assert.assertNotNull(valuePair);
-    Assert.assertNull(valuePair.getOldValue());
-    Assert.assertEquals("bar", valuePair.getNewValue());
+    assertNotNull(valuePair);
+    assertNull(valuePair.getOldValue());
+    assertEquals("bar", valuePair.getNewValue());
   }
 
   @Test
@@ -121,12 +122,12 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     emain2.setEmbeddable(null);
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(1, diff.size());
+    assertEquals(1, diff.size());
     ValuePair valuePair = diff.get("embeddable.description");
 
-    Assert.assertNotNull(valuePair);
-    Assert.assertNull(valuePair.getOldValue());
-    Assert.assertEquals("bar", valuePair.getNewValue());
+    assertNotNull(valuePair);
+    assertNull(valuePair.getOldValue());
+    assertEquals("bar", valuePair.getNewValue());
   }
 
   @Test
@@ -138,7 +139,7 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     emain2.setEmbeddable(null);
 
     Map<String, ValuePair> diff = DiffHelp.diff(emain1, emain2, emainDesc);
-    Assert.assertEquals(0, diff.size());
+    assertEquals(0, diff.size());
   }
 
   private EMain createEMain() {

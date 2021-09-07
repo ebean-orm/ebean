@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

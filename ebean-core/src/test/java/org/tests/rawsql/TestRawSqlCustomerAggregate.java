@@ -7,10 +7,11 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.tests.model.basic.CustomerAggregate;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlCustomerAggregate extends BaseTestCase {
 
@@ -29,6 +30,6 @@ public class TestRawSqlCustomerAggregate extends BaseTestCase {
     query.where().ge("customer.id", 1);
 
     List<CustomerAggregate> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 }

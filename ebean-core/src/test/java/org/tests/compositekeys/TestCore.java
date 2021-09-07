@@ -4,21 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.Transaction;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.tests.compositekeys.db.Item;
-import org.tests.compositekeys.db.ItemKey;
-import org.tests.compositekeys.db.Region;
-import org.tests.compositekeys.db.RegionKey;
-import org.tests.compositekeys.db.SubType;
-import org.tests.compositekeys.db.SubTypeKey;
-import org.tests.compositekeys.db.Type;
-import org.tests.compositekeys.db.TypeKey;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.tests.compositekeys.db.*;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test some of the Avaje core functionality in conjunction with composite keys like
@@ -29,9 +22,8 @@ import java.util.List;
  */
 public class TestCore extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-
     Ebean.createUpdate(Item.class, "delete from Item").execute();
     Ebean.createUpdate(Region.class, "delete from Region").execute();
     Ebean.createUpdate(Type.class, "delete from Type").execute();

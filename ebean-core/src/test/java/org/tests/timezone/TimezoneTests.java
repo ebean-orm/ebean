@@ -2,8 +2,8 @@ package org.tests.timezone;
 
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +23,7 @@ public class TimezoneTests {
   public TimezoneTests() {
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void rawJdbc() throws SQLException {
 

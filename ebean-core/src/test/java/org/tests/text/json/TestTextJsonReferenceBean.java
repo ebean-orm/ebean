@@ -8,15 +8,16 @@ import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTextJsonReferenceBean extends BaseTestCase {
 
@@ -46,16 +47,15 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       prodDesc.isReference(eb._ebean_getIntercept());
 
       BeanState beanState = Ebean.getBeanState(refProd);
-      Assert.assertTrue(beanState.isNew());
+      assertTrue(beanState.isNew());
 
       String name = refProd.getName();
-      Assert.assertNull(name);
+      assertNull(name);
 
       // Set to be 'loaded' to invoke lazy loading
       beanState.setLoaded();
       String name2 = refProd.getName();
-      Assert.assertNotNull(name2);
-
+      assertNotNull(name2);
     }
 
     List<Order> orders = Ebean.find(Order.class)
@@ -75,9 +75,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     BeanDescriptor<Customer> custDesc = server.getBeanDescriptor(Customer.class);
 
-    Assert.assertTrue(custDesc.isReference(((EntityBean) customer)._ebean_getIntercept()));
-
-
+    assertTrue(custDesc.isReference(((EntityBean) customer)._ebean_getIntercept()));
   }
 
 }

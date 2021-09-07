@@ -2,16 +2,13 @@ package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.FetchConfig;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLazyJoin2 extends BaseTestCase {
 
@@ -33,7 +30,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     Order o0 = l0.get(0);
     Customer c0 = o0.getCustomer();
     List<Contact> contacts = c0.getContacts();
-    Assert.assertTrue(!contacts.isEmpty());
+    assertTrue(!contacts.isEmpty());
 
     // query 1) find order (status, shipDate)
     // query 2) find orderDetail (quantity, price) join product (sku, name)
@@ -57,7 +54,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     // in the customer (not just name and status)
     Address billingAddress = customer.getBillingAddress();
 
-    Assert.assertNotNull(billingAddress);
+    assertNotNull(billingAddress);
 
     List<Order> list = Ebean.find(Order.class).fetchLazy("customer", "name")
       .fetch("customer.contacts", "contactName, phone, email").fetch("customer.shippingAddress")
@@ -67,7 +64,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     Customer customer2 = order2.getCustomer();
     // customer2.getStatus();
     String name = customer2.getName();
-    Assert.assertNotNull(name);
+    assertNotNull(name);
 
   }
 

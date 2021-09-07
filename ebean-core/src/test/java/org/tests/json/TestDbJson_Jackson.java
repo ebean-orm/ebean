@@ -3,7 +3,7 @@ package org.tests.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonJackson;
 import org.tests.model.json.EBasicJsonJackson2;
 import org.tests.model.json.LongJacksonType;

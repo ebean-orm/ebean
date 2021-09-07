@@ -5,9 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
@@ -18,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class TestOrderByWithDistinct extends BaseTestCase {
@@ -135,8 +134,8 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     // where u1.role_name = ?
     // order by t1.name, t0.user_name; --bind(A)
 
-    Assert.assertEquals(1, list.size());
-    Assert.assertEquals(user1, list.get(0));
+    assertEquals(1, list.size());
+    assertEquals(user1, list.get(0));
     String generatedSql = query.getGeneratedSql();
     if (isPostgres()) {
       assertThat(generatedSql).contains("select distinct on (t1.name, t0.user_name, t0.userid) t0.userid"); // using distinct
@@ -161,8 +160,8 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .order("userType.name").query();
     list = query.findList();
 
-    Assert.assertEquals(1, list.size());
-    Assert.assertEquals(user1, list.get(0));
+    assertEquals(1, list.size());
+    assertEquals(user1, list.get(0));
 
     // select distinct t0.userid c0, t0.user_name c1, t1.id c2, t1.name c3
     // from muser t0

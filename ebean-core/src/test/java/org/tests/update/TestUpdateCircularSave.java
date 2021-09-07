@@ -2,15 +2,15 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.update.objects.Child;
 import org.tests.update.objects.Parent;
 import org.tests.update.objects.SiblingA;
 import org.tests.update.objects.SiblingB;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestUpdateCircularSave extends BaseTestCase {
 
@@ -44,7 +44,7 @@ public class TestUpdateCircularSave extends BaseTestCase {
     return siblingA.getId();
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void testFetchChildModifyChildSaveParent() {
 

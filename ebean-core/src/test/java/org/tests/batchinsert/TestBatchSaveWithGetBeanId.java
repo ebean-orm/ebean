@@ -6,10 +6,10 @@ import io.ebean.EbeanServer;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBatchSaveWithGetBeanId extends BaseTestCase {
 

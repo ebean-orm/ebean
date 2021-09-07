@@ -7,8 +7,7 @@ import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.cache.EColAB;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryCache extends BaseTestCase {
 
@@ -224,10 +224,10 @@ public class TestQueryCache extends BaseTestCase {
       .ilike("name", "Rob").findList();
 
     BeanCollection<Customer> bc = (BeanCollection<Customer>) list;
-    Assert.assertTrue(bc.isReadOnly());
-    Assert.assertFalse(bc.isEmpty());
-    Assert.assertTrue(!list.isEmpty());
-    Assert.assertTrue(DB.beanState(list.get(0)).isReadOnly());
+    assertTrue(bc.isReadOnly());
+    assertFalse(bc.isEmpty());
+    assertTrue(!list.isEmpty());
+    assertTrue(DB.beanState(list.get(0)).isReadOnly());
 
     List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
       .ilike("name", "Rob").findList();
@@ -236,25 +236,22 @@ public class TestQueryCache extends BaseTestCase {
       // .setReadOnly(true)
       .where().ilike("name", "Rob").findList();
 
-    Assert.assertSame(list, list2);
+    assertSame(list, list2);
 
     // readOnly defaults to true for query cache
-    Assert.assertSame(list, list2B);
-
-
-
+    assertSame(list, list2B);
 
     List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
         .ilike("name", "Rob").findList();
 
-    Assert.assertNotSame(list, list3);
+    assertNotSame(list, list3);
     BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
-    Assert.assertFalse(bc3.isReadOnly());
-    Assert.assertFalse(bc3.isEmpty());
-    Assert.assertTrue(list3.size() > 0);
+    assertFalse(bc3.isReadOnly());
+    assertFalse(bc3.isEmpty());
+    assertTrue(list3.size() > 0);
     // TODO: At this stage setReadOnly(false) does create a shallow copy of the List/Set/Map, but does not
     // change the read only state in the entities.
-    // Assert.assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
+    // assertFalse(Ebean.getBeanState(list3.get(0)).isReadOnly());
 
   }
 

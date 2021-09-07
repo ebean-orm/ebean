@@ -3,8 +3,8 @@ package org.tests.query.autotune;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ProfileLocation;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class TestAutoTuneProfiling extends BaseTestCase {
 
-  @Ignore
+  @Disabled
   @Test
   public void test() {
 

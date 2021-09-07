@@ -9,7 +9,7 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.expression.BaseExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import java.sql.Timestamp;

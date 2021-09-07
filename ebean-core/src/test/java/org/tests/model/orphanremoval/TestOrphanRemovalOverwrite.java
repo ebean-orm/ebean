@@ -1,12 +1,12 @@
 package org.tests.model.orphanremoval;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestOrphanRemovalOverwrite {
 
@@ -29,9 +29,8 @@ public class TestOrphanRemovalOverwrite {
     // Refreshing here generates new objects for the associated children that are referred to by the parent.
     parent.refresh();
 
-    assertNotNull("The children should now have Ids as they are persisted to the db.", childList.get(0).getId());
-    assertEquals("The children should have the same Id as the ones on the parent.",
-      childList.get(0).getId(), parent.getChildren().get(0).getId());
-    assertEquals("The children should therefore equal the children on the parent.", childList, parent.getChildren());
+    assertNotNull(childList.get(0).getId());
+    assertEquals(childList.get(0).getId(), parent.getChildren().get(0).getId());
+    assertEquals(childList, parent.getChildren());
   }
 }

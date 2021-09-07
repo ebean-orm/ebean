@@ -3,7 +3,7 @@ package org.tests.text.json;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Animal;
 import org.tests.model.basic.Cat;
 import org.tests.model.basic.Dog;
@@ -11,7 +11,7 @@ import org.tests.model.basic.Dog;
 import java.sql.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 

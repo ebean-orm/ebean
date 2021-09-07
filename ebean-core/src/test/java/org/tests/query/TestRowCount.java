@@ -3,7 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -11,7 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestRowCount extends BaseTestCase {
 
@@ -37,13 +37,12 @@ public class TestRowCount extends BaseTestCase {
       order.getStatus();
     }
 
-    assertEquals("same rc to ids.size() ", rc, ids.size());
-    assertEquals("same rc to list.size()", rc, list.size());
+    assertEquals(rc, ids.size());
+    assertEquals(rc, list.size());
   }
 
   @Test
   public void find_count_distinct_singleProperty() {
-
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)

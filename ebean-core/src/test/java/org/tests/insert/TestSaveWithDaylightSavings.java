@@ -1,7 +1,7 @@
 package org.tests.insert;
 
 import io.ebean.BaseTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 

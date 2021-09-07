@@ -2,24 +2,23 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.ebeantest.LoggedSqlCollector;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.family.ChildPerson;
 import org.tests.model.family.ParentPerson;
-import org.ebeantest.LoggedSqlCollector;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.sql.Date;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestQueryJoinOnFormula extends BaseTestCase {
 
-
-  @Before
+  @BeforeEach
   public void init() {
     ResetBasicData.reset();
   }

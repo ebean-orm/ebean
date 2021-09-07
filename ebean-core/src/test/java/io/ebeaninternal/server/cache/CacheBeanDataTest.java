@@ -13,12 +13,12 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Customer.Status;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EPerson;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CacheBeanDataTest extends BaseTestCase {
 

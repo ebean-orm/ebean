@@ -4,11 +4,11 @@ import io.ebean.Ebean;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.json.JsonWriteOptions;
 import org.tests.model.json.EBasicJsonMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonExcludeEmptyMap {
 

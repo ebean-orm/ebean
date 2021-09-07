@@ -2,7 +2,7 @@ package org.tests.model.interfaces;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestSelfMany extends BaseTestCase {
 

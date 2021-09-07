@@ -8,7 +8,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ValidationGroupSomething;
 
 import javax.persistence.Entity;
@@ -25,9 +25,9 @@ import java.util.Set;
 
 import static io.ebean.annotation.Platform.H2;
 import static io.ebean.annotation.Platform.POSTGRES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class TestAnnotationBase extends BaseTestCase {

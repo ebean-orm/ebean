@@ -11,7 +11,7 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;

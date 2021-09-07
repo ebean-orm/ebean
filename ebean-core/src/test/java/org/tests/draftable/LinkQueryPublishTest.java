@@ -5,7 +5,7 @@ import io.ebean.EbeanServer;
 import io.ebean.PagedList;
 import io.ebean.Query;
 import org.tests.model.draftable.Link;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

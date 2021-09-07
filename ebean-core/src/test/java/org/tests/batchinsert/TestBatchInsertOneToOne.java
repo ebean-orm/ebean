@@ -3,7 +3,7 @@ package org.tests.batchinsert;
 import io.ebean.Ebean;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Transactional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.batchinsert.o2o.MeterAddressData;
 import org.tests.batchinsert.o2o.MeterContractData;
 import org.tests.batchinsert.o2o.MeterSpecialNeedsClient;

@@ -4,8 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAggregationTopLevel extends BaseTestCase {
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() {
     loadData();
   }

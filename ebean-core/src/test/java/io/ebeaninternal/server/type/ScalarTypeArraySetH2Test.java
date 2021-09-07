@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.DB;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.json.EJson;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringReader;

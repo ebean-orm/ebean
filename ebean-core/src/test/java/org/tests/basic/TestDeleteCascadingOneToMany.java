@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Article;
 import org.tests.model.basic.Section;
 import org.tests.model.basic.SubSection;

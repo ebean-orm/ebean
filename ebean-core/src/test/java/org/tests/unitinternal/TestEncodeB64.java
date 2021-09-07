@@ -1,9 +1,9 @@
 package org.tests.unitinternal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.ebean.util.EncodeB64.enc;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestEncodeB64 {
 

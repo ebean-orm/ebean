@@ -5,8 +5,8 @@ import io.ebean.DuplicateKeyException;
 import io.ebean.Ebean;
 import io.ebean.annotation.Transactional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.draftable.Document;
@@ -15,46 +15,47 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestInsertDuplicateKey extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(TestInsertDuplicateKey.class);
 
-  @Before
+  @BeforeEach
   public void clearDb() {
     server().find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
   }
 
-  @Test(expected = DuplicateKeyException.class)
+  @Test
   public void insert_duplicateKey() {
-
     Document doc1 = new Document();
     doc1.setTitle("ThisIsAUniqueKey");
     doc1.setBody("one");
-
     doc1.save();
 
-    Document doc2 = new Document();
-    doc2.setTitle("ThisIsAUniqueKey");
-    doc2.setBody("clashes with doc1");
+    assertThrows(DuplicateKeyException.class, () -> {
+      Document doc2 = new Document();
+      doc2.setTitle("ThisIsAUniqueKey");
+      doc2.setBody("clashes with doc1");
+      doc2.save();
+    });
+  }
 
-    doc2.save();
+  @Test
+  public void insertBatch_duplicateKey() {
+    assertThrows(DuplicateKeyException.class, this::insertBatch_duplicateKey_action);
   }
 
   @Transactional(batchSize = 100)
-  @Test(expected = DuplicateKeyException.class)
-  public void insertBatch_duplicateKey() {
-
+  void insertBatch_duplicateKey_action() {
     Document doc1 = new Document();
     doc1.setTitle("ThisIsASecondUniqueKey");
     doc1.setBody("one");
-
     doc1.save();
 
     Document doc2 = new Document();
     doc2.setTitle("ThisIsASecondUniqueKey");
     doc2.setBody("clash when batch flushed");
-
     doc2.save();
   }
 

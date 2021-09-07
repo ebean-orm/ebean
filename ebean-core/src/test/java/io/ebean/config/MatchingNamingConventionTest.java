@@ -2,12 +2,12 @@ package io.ebean.config;
 
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MatchingNamingConventionTest {
 

@@ -4,7 +4,7 @@ import io.ebean.DB;
 import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.text.PathProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 

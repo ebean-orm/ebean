@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import org.joda.time.Period;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

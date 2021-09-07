@@ -8,7 +8,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncrypt;
 import org.tests.model.basic.EBasicEncryptRelate;
 
@@ -16,7 +16,7 @@ import java.sql.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestEncrypt extends BaseTestCase {
 

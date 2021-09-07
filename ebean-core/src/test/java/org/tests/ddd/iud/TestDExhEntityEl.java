@@ -1,9 +1,10 @@
 package org.tests.ddd.iud;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TestDExhEntityEl extends TestCase {
+public class TestDExhEntityEl {
 
+  @Test
   public void test() {
 
 //        GlobalProperties.put("classes", DExhEntity.class.toString());

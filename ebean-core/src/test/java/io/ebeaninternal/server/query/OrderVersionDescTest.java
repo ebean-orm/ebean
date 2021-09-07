@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.Version;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OrderVersionDescTest {
 

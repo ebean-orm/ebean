@@ -4,13 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.text.json.JsonContext;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestTextJsonSuperSimple extends BaseTestCase {
 
@@ -31,7 +32,7 @@ public class TestTextJsonSuperSimple extends BaseTestCase {
 
       String s = json.toJson(customer);
       int statusPos = s.indexOf("status");
-      Assert.assertEquals(-1, statusPos);
+      assertEquals(-1, statusPos);
     }
 
   }

@@ -9,7 +9,7 @@ import io.ebean.Version;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebeantest.LoggedSql;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.converstation.User;

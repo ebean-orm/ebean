@@ -9,8 +9,8 @@ import io.ebean.Update;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebeaninternal.server.cache.CachedManyIds;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
@@ -24,10 +24,10 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCacheCollectionIds extends BaseTestCase {
 
@@ -303,10 +303,10 @@ public class TestCacheCollectionIds extends BaseTestCase {
     assertEquals(2, dummyCountries.size());
 
     // assert that the cache contains the expected entry
-    assertEquals("countries cache now loaded with 1 entry", 1, cachedBeanCountriesCache.size());
+    assertEquals(1, cachedBeanCountriesCache.size());
     CachedManyIds dummyEntry = (CachedManyIds) cachedBeanCountriesCache.get(dummyLoad.getId());
     assertNotNull(dummyEntry);
-    assertEquals("2 ids in the entry", 2, dummyEntry.getIdList().size());
+    assertEquals(2, dummyEntry.getIdList().size());
     assertTrue(dummyEntry.getIdList().contains("NZ"));
     assertTrue(dummyEntry.getIdList().contains("AU"));
 
@@ -320,7 +320,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     Ebean.update(update);
     awaitL2Cache();
 
-    assertEquals("countries entry still there (but updated)", 1, cachedBeanCountriesCache.size());
+    assertEquals(1, cachedBeanCountriesCache.size());
 
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(update.getId());
 
@@ -369,7 +369,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
    * When doing an ORM update the collection cache must be cleared.
    */
   @Test
-  @Ignore
+  @Disabled
   public void testClearingCollectionCacheOnORMUpdate() {
     // arrange
     ResetBasicData.reset();
@@ -404,7 +404,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
    * This is true for all changes insert,update, delete. Tested for delete here.
    */
   @Test
-  @Ignore
+  @Disabled
   public void testClearingCollectionCacheOnExternalModification() {
     // arrange
     ResetBasicData.reset();

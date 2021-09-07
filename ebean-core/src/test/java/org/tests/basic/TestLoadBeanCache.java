@@ -4,10 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLoadBeanCache extends BaseTestCase {
 
@@ -28,6 +29,6 @@ public class TestLoadBeanCache extends BaseTestCase {
     // this will hit the cache
     Country nz = Ebean.find(Country.class, "NZ");
 
-    Assert.assertTrue(loadedNz == nz);
+    assertTrue(loadedNz == nz);
   }
 }

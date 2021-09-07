@@ -3,25 +3,24 @@ package org.tests.text.json;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BeanWithTimeZone;
-import org.junit.Assert;
-import org.junit.Test;
 
-import java.io.IOException;
 import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonBeanWithTimeZone extends BaseTestCase {
 
   @Test
-  public void testSimple() throws IOException {
-
+  public void testSimple() {
     TimeZone defaultTimeZone = TimeZone.getDefault();
 
     TimeZone.getAvailableIDs(defaultTimeZone.getRawOffset());
 
     String id = defaultTimeZone.getID();
     TimeZone timeZone = TimeZone.getTimeZone(id);
-    Assert.assertEquals(defaultTimeZone, timeZone);
+    assertEquals(defaultTimeZone, timeZone);
 
     BeanWithTimeZone bean = new BeanWithTimeZone();
     bean.setName("foo");
@@ -32,13 +31,12 @@ public class TestJsonBeanWithTimeZone extends BaseTestCase {
 
     BeanWithTimeZone bean2 = jsonContext.toBean(BeanWithTimeZone.class, jsonContent);
 
-    Assert.assertEquals(bean.getTimezone(), bean2.getTimezone());
+    assertEquals(bean.getTimezone(), bean2.getTimezone());
 
     Ebean.save(bean);
     BeanWithTimeZone bean3 = Ebean.find(BeanWithTimeZone.class, bean.getId());
 
-    Assert.assertEquals(bean.getTimezone(), bean3.getTimezone());
-
+    assertEquals(bean.getTimezone(), bean3.getTimezone());
   }
 
 }

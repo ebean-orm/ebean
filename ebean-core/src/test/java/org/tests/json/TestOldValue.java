@@ -1,16 +1,14 @@
 package org.tests.json;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ValuePair;
-
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicOldValue;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -18,11 +16,9 @@ import java.util.Set;
 
 public class TestOldValue extends BaseTestCase {
 
-
-
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
-  public void testDbJsonOldValue() throws Exception {
+  public void testDbJsonOldValue() {
     EBasicOldValue bean = new EBasicOldValue();
     JsonNodeFactory jnf = new JsonNodeFactory(false);
 
@@ -86,7 +82,7 @@ public class TestOldValue extends BaseTestCase {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Test
-  @Ignore("Old value detection does not work for @DbArray")
+  @Disabled("Old value detection does not work for @DbArray")
   public void testDbArrayOldValue() throws Exception {
     EBasicOldValue bean = new EBasicOldValue();
 
@@ -97,8 +93,6 @@ public class TestOldValue extends BaseTestCase {
     bean = DB.find(EBasicOldValue.class, bean.getId());
 
     bean.getStringArr().add("sa2");
-
-
 
     Map<String, ValuePair> dirty = DB.beanState(bean).getDirtyValues();
     SoftAssertions softly = new SoftAssertions();

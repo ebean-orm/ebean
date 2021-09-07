@@ -6,20 +6,18 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.text.PathProperties;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLazyForeignKeys extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void prepare() {
     MainEntity ent1 = new MainEntity();
     ent1.setId("ent1");
@@ -37,7 +35,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
     DB.save(rel1);
   }
 
-  @After
+  @AfterEach
   public void cleanup() {
     DB.find(MainEntity.class).delete();
     DB.find(MainEntityRelation.class).delete();

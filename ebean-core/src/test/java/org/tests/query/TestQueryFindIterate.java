@@ -4,10 +4,12 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.plugin.SpiServer;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
@@ -19,10 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryFindIterate extends BaseTestCase {
 
@@ -173,14 +172,14 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
-    assertEquals("Got SQL: " + loggedSql, 2, loggedSql.size());
+    assertEquals(2, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty"));
     assertThat(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
   }
 
-  @Test(expected = PersistenceException.class)
+  @ForPlatform(Platform.H2)
+  @Test
   public void testWithExceptionInQuery() {
-
     ResetBasicData.reset();
 
     // intentionally a query with incorrect type binding
@@ -190,21 +189,11 @@ public class TestQueryFindIterate extends BaseTestCase {
       .setMaxRows(2).query();
 
     // this throws an exception immediately
-    query.findEach(bean -> {
-
-    });
-
-    if (!DB.getDefault().name().equals("h2")) {
-      // MySql allows the query with type conversion?
-      throw new PersistenceException("H2 does expected thing but MySql does not");
-    }
-    fail("Never get here as exception thrown");
+    assertThrows(PersistenceException.class, () -> query.findEach(bean -> { }));
   }
 
-
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testWithExceptionInLoop() {
-
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -212,11 +201,12 @@ public class TestQueryFindIterate extends BaseTestCase {
       .where().gt("id", 0)
       .setMaxRows(2).query();
 
-    query.findEach(customer -> {
-      if (customer != null) {
-        throw new IllegalStateException("cause an exception");
-      }
-    });
+    assertThrows(IllegalStateException.class, () ->
+      query.findEach(customer -> {
+        if (customer != null) {
+          throw new IllegalStateException("cause an exception");
+        }
+      }));
   }
 
   @Test
@@ -267,7 +257,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     assertFalse(queryIterator.hasNext());
     assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns);
-    try  {
+    try {
       queryIterator.next();
       fail("noSuchElementException expected");
     } catch (NoSuchElementException e) {

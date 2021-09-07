@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.DocPropertyType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 

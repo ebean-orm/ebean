@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebeaninternal.json.ModifyAwareList;
 import io.ebeaninternal.json.ModifyAwareSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ModifyAwareListTest {

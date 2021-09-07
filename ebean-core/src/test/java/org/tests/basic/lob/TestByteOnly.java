@@ -3,7 +3,7 @@ package org.tests.basic.lob;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TBytesOnly;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestByteOnly extends BaseTestCase {
 

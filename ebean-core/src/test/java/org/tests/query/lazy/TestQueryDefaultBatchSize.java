@@ -8,7 +8,7 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

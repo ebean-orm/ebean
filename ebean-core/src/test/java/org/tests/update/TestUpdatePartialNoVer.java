@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestUpdatePartialNoVer extends BaseTestCase {
 

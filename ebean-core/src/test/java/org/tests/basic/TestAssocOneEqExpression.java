@@ -7,8 +7,9 @@ import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestAssocOneEqExpression extends BaseTestCase {
 
@@ -26,7 +27,7 @@ public class TestAssocOneEqExpression extends BaseTestCase {
 
     query.findList();
     String sql = query.getGeneratedSql();
-    Assert.assertTrue(sql.contains("where t0.kcustomer_id = ?"));
+    assertTrue(sql.contains("where t0.kcustomer_id = ?"));
 
     Address b = new Address();
     b.setId(1);
@@ -37,7 +38,7 @@ public class TestAssocOneEqExpression extends BaseTestCase {
 
     q2.findList();
     sql = q2.getGeneratedSql();
-    Assert.assertTrue(sql.contains("where t1.billing_address_id = ?"));
+    assertTrue(sql.contains("where t1.billing_address_id = ?"));
 
   }
 }

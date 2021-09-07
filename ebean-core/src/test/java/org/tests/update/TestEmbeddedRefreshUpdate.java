@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import org.tests.model.embedded.EEmbDatePeriod;
 import org.tests.model.embedded.EEmbInner;
 import org.tests.model.embedded.EEmbOuter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 

@@ -1,10 +1,10 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.config.dbplatform.hana.HanaHistorySupport;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class HanaHistorySupportTest {
 

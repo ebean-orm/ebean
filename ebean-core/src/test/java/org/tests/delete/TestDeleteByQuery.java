@@ -8,7 +8,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BBookmarkUser;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;

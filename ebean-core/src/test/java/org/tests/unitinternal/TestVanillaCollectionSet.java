@@ -5,10 +5,12 @@ import io.ebean.Ebean;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.EVanillaCollection;
 import org.tests.model.basic.EVanillaCollectionDetail;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestVanillaCollectionSet extends BaseTestCase {
 
@@ -21,17 +23,17 @@ public class TestVanillaCollectionSet extends BaseTestCase {
 
     EVanillaCollection c2 = Ebean.find(EVanillaCollection.class, c.getId());
 
-    Assert.assertNotNull(c2);
+    assertNotNull(c2);
 
     List<EVanillaCollectionDetail> details = c2.getDetails();
-    Assert.assertNotNull(details);
+    assertNotNull(details);
 
-    Assert.assertTrue("Is BeanCollection", details instanceof BeanCollection<?>);
+    assertTrue(details instanceof BeanCollection<?>);
 
     BeanCollection<?> bc = (BeanCollection<?>) details;
-    Assert.assertTrue(!bc.isPopulated());
-    Assert.assertNotNull(bc.getOwnerBean());
-    Assert.assertNotNull(bc.getPropertyName());
+    assertTrue(!bc.isPopulated());
+    assertNotNull(bc.getOwnerBean());
+    assertNotNull(bc.getPropertyName());
   }
 
 }

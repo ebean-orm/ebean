@@ -4,8 +4,8 @@ import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.cache.ServerCacheType;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
@@ -33,7 +33,7 @@ public class DefaultServerCache_RunEvictionTest {
     this.cache = createCache();
   }
 
-  @Ignore("test takes long time")
+  @Disabled("test takes long time")
   @Test
   public void runEvict() throws InterruptedException {
 

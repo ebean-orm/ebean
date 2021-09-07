@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.text.TextException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalTime;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeLocalTimeWithNanosTest {
 
@@ -62,36 +62,30 @@ public class ScalarTypeLocalTimeWithNanosTest {
 
   @Test
   public void testFormatValue() throws Exception {
-
     LocalTime localTime = LocalTime.of(9, 23, 45);
     String formatted = type.formatValue(localTime);
     assertEquals("09:23:45", formatted);
   }
 
   @Test
-  public void testParse() throws Exception {
-
+  public void testParse() {
     LocalTime localTime = LocalTime.of(9, 23, 45);
     LocalTime val1 = type.parse("09:23:45");
     assertEquals(localTime, val1);
   }
 
   @Test
-  public void testIsDateTimeCapable() throws Exception {
-
+  public void testIsDateTimeCapable() {
     assertFalse(type.isDateTimeCapable());
   }
 
-  @Test(expected = TextException.class)
-  public void testConvertFromMillis() throws Exception {
-
-    type.convertFromMillis(1234);
+  @Test
+  public void testConvertFromMillis() {
+    assertThrows(TextException.class, () -> type.convertFromMillis(1234));
   }
 
   @Test
   public void testJsonRead() throws Exception {
-
-
     LocalTime localTime = LocalTime.of(9, 23, 45);
 
     JsonTester<LocalTime> jsonTester = new JsonTester<>(type);

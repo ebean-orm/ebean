@@ -6,7 +6,7 @@ import io.ebean.Transaction;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyC;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import javax.persistence.PersistenceException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBeanStateReset extends BaseTestCase {
 

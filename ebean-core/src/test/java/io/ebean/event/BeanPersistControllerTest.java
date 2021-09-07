@@ -5,7 +5,7 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;

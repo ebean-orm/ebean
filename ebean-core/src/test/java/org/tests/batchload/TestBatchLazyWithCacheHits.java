@@ -6,14 +6,14 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.tests.model.basic.UUOne;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBatchLazyWithCacheHits extends BaseTestCase {
 

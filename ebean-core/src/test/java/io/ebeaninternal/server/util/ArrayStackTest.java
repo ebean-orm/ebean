@@ -1,17 +1,17 @@
 package io.ebeaninternal.server.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.EmptyStackException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class ArrayStackTest {
 
   @Test
-  public void testPushPop() throws Exception {
-
+  public void testPushPop() {
     ArrayStack<String> stack = new ArrayStack<>();
     stack.push("1");
     stack.push("2");
@@ -23,8 +23,7 @@ public class ArrayStackTest {
   }
 
   @Test
-  public void testPushPop_given_stackInitialSizeExceeded() throws Exception {
-
+  public void testPushPop_given_stackInitialSizeExceeded() {
     ArrayStack<String> stack = new ArrayStack<>(2);
     stack.push("1");
     stack.push("2");
@@ -35,34 +34,28 @@ public class ArrayStackTest {
     assertThat(stack.pop()).isEqualTo("1");
   }
 
-  @Test(expected = EmptyStackException.class)
-  public void testPop_given_emptyStack_throws() throws Exception {
-
+  @Test
+  public void testPop_given_emptyStack_throws() {
     ArrayStack<String> stack = new ArrayStack<>();
-    stack.pop();
-  }
-
-  @Test(expected = EmptyStackException.class)
-  public void testPeek_given_empty_throws() throws Exception {
-
-    ArrayStack<String> stack = new ArrayStack<>();
-
-    assertThat(stack.peek());
+    assertThrows(EmptyStackException.class, stack::pop);
   }
 
   @Test
-  public void testPeek_given_notEmpty() throws Exception {
+  public void testPeek_given_empty_throws() {
+    ArrayStack<String> stack = new ArrayStack<>();
+    assertThrows(EmptyStackException.class, stack::peek);
+  }
 
+  @Test
+  public void testPeek_given_notEmpty() {
     ArrayStack<String> stack = new ArrayStack<>();
     stack.push("1");
     assertThat(stack.peek()).isEqualTo("1");
   }
 
   @Test
-  public void testPeekWithNull() throws Exception {
-
+  public void testPeekWithNull() {
     ArrayStack<String> stack = new ArrayStack<>();
-
     assertThat(stack.peekWithNull()).isNull();
 
     stack.push("1");
@@ -70,8 +63,7 @@ public class ArrayStackTest {
   }
 
   @Test
-  public void testIsEmpty() throws Exception {
-
+  public void testIsEmpty() {
     ArrayStack<String> stack = new ArrayStack<>();
     assertThat(stack.isEmpty()).isTrue();
 
@@ -80,8 +72,7 @@ public class ArrayStackTest {
   }
 
   @Test
-  public void testSize() throws Exception {
-
+  public void testSize() {
     ArrayStack<String> stack = new ArrayStack<>();
     assertThat(stack.size()).isEqualTo(0);
 
@@ -92,8 +83,7 @@ public class ArrayStackTest {
   }
 
   @Test
-  public void testContains() throws Exception {
-
+  public void testContains() {
     ArrayStack<String> stack = new ArrayStack<>();
     stack.push("1");
 

@@ -3,13 +3,13 @@ package org.tests.persistencecontext;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
 import static io.ebean.PersistenceContextScope.QUERY;
 import static io.ebean.PersistenceContextScope.TRANSACTION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 
 public class TestPersistenceContextQueryScope extends BaseTestCase {

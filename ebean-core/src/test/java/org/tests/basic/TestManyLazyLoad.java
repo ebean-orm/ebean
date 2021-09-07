@@ -5,12 +5,12 @@ import io.ebean.Ebean;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestManyLazyLoad extends BaseTestCase {
 
@@ -22,7 +22,7 @@ public class TestManyLazyLoad extends BaseTestCase {
     awaitL2Cache();
 
     List<Order> list = Ebean.find(Order.class).order().asc("id").findList();
-    assertTrue(list.size() + " > 0", !list.isEmpty());
+    assertFalse(list.isEmpty());
 
     // just use the first one
     Order order = list.get(0);
@@ -38,7 +38,7 @@ public class TestManyLazyLoad extends BaseTestCase {
 
     // lazy load the details
     int sz = details.size();
-    assertTrue(sz + " > 0", sz > 0);
+    assertTrue(sz > 0);
 
     OrderDetail orderDetail = details.get(0);
     Order o = orderDetail.getOrder();
@@ -55,7 +55,7 @@ public class TestManyLazyLoad extends BaseTestCase {
 
     // lazy load the details
     int sz2 = details2.size();
-    assertTrue(sz2 + " > 0", sz2 > 0);
+    assertTrue(sz2 > 0);
 
     Order o2 = details2.get(0).getOrder();
     assertSame(o2, order2);

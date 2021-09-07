@@ -6,12 +6,12 @@ import io.ebean.annotation.Platform;
 import io.ebean.annotation.IgnorePlatform;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.metaannotation.SizeMedium;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.PersistenceException;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Very simple test case to check if Ebean recognizes meta-annotation correctly.

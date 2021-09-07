@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebeaninternal.json.ModifyAwareMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypePostgresHstoreTest {
 
@@ -22,17 +22,17 @@ public class ScalarTypePostgresHstoreTest {
   JsonFactory jsonFactory = new JsonFactory();
 
   @Test
-  public void testIsMutable() throws Exception {
+  public void testIsMutable() {
     assertTrue(hstore.isMutable());
   }
 
   @Test
-  public void testIsDateTimeCapable() throws Exception {
+  public void testIsDateTimeCapable() {
     assertFalse(hstore.isDateTimeCapable());
   }
 
   @Test
-  public void testIsDirty() throws Exception {
+  public void testIsDirty() {
     Map<String, Object> emptyMap = new HashMap<>();
     assertTrue(hstore.isDirty(emptyMap));
 
@@ -44,25 +44,25 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testParse() throws Exception {
+  public void testParse() {
     Map<String, Object> map = (Map<String, Object>) hstore.parse("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   @SuppressWarnings("unchecked")
-  public void testParseDateTime() throws Exception {
-    Map<String, Object> map = (Map<String, Object>) hstore.convertFromMillis(1234L);
-    assertEquals(1, map.size());
-    assertEquals("rob", map.get("name"));
+  public void testParseDateTime() {
+    assertThrows(RuntimeException.class, () -> {
+      Map<String, Object> map = (Map<String, Object>) hstore.convertFromMillis(1234L);
+      assertEquals(1, map.size());
+      assertEquals("rob", map.get("name"));
+    });
   }
 
   @Test
   public void testJsonWrite() throws Exception {
-
     Map<String, Object> map = new LinkedHashMap<>();
-
     assertEquals("{\"key\":{}}", generateJson(map));
 
     map.put("name", "rob");
@@ -74,7 +74,6 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testJsonRead() throws Exception {
-
     Map<String, Object> map = parseHstore("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));

@@ -2,7 +2,7 @@ package org.tests.transaction;
 
 import io.ebean.Ebean;
 import io.ebean.annotation.Transactional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +12,9 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Table;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * It shows the issue that the user record does NOT rolback when there is an exception thrown
@@ -31,7 +32,7 @@ public class TransactionNotTerminatedAfterRollback {
     }
     List<User> users = Ebean.find(User.class).findList();
     LOG.debug("users: {}", users);
-    assertTrue("users should be empty", users.isEmpty());
+    assertThat(users).isEmpty();
   }
 
   @Transactional(rollbackFor = PersistenceException.class)

@@ -7,9 +7,9 @@ import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistListener;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.tests.model.basic.EBasic;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BeanDescriptor_registerTest {
 

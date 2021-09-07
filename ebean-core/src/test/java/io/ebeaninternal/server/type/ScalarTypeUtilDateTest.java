@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Date;

@@ -3,7 +3,7 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.converstation.Conversation;
 
 import static org.assertj.core.api.Assertions.assertThat;

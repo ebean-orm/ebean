@@ -6,7 +6,7 @@ import io.ebean.Transaction;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Country;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test class testing deleting/invalidating of cached beans

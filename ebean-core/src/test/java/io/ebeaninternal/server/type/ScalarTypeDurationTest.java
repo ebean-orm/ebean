@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.text.TextException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeDurationTest {
 
@@ -75,22 +75,19 @@ public class ScalarTypeDurationTest {
   }
 
   @Test
-  public void testParse() throws Exception {
-
+  public void testParse() {
     Duration duration = type.parse("PT20M34S");
     assertEquals(Duration.ofSeconds(1234), duration);
   }
 
   @Test
-  public void testIsDateTimeCapable() throws Exception {
-
+  public void testIsDateTimeCapable() {
     assertFalse(type.isDateTimeCapable());
   }
 
-  @Test(expected = TextException.class)
-  public void testConvertFromMillis() throws Exception {
-
-    type.convertFromMillis(1000);
+  @Test
+  public void testConvertFromMillis() {
+    assertThrows(TextException.class, () -> type.convertFromMillis(1000));
   }
 
   @Test

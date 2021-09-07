@@ -4,22 +4,20 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestOrderByWithDistinctTake2 extends BaseTestCase {
 
   @Test
   public void testRegex() {
-
     String test = "helloasc asc ASC desc DESC boodesc desc ASC";
 
     test = test.replaceAll("(?i)\\b asc\\b|\\b desc\\b", "");
-    Assert.assertEquals("helloasc boodesc", test);
+    assertEquals("helloasc boodesc", test);
   }
-
 
   @Test
   public void test() {

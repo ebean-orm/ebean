@@ -2,10 +2,10 @@ package org.tests.inheritance.cascadedelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestInheritanceDeleteCascade extends BaseTestCase {
 

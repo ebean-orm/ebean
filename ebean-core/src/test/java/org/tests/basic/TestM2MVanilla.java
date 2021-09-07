@@ -3,13 +3,14 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestM2MVanilla extends BaseTestCase {
 
@@ -50,8 +51,8 @@ public class TestM2MVanilla extends BaseTestCase {
 
     MUser checkUser = DB.find(MUser.class, u0.getUserid());
     List<MRole> checkRoles = checkUser.getRoles();
-    Assert.assertNotNull(checkRoles);
-    Assert.assertEquals(2, checkRoles.size());
+    assertNotNull(checkRoles);
+    assertEquals(2, checkRoles.size());
 
     checkRoles.add(r3);
 
@@ -60,8 +61,8 @@ public class TestM2MVanilla extends BaseTestCase {
 
     MUser checkUser2 = DB.find(MUser.class, u0.getUserid());
     List<MRole> checkRoles2 = checkUser2.getRoles();
-    Assert.assertNotNull(checkRoles2);
-    Assert.assertEquals("added a role", 3, checkRoles2.size());
+    assertNotNull(checkRoles2);
+    assertEquals(3, checkRoles2.size());
 
     Query<MUser> rolesQuery0 = DB.find(MUser.class).where().eq("roles", r1).query();
 
@@ -70,7 +71,7 @@ public class TestM2MVanilla extends BaseTestCase {
     Query<MUser> rolesQuery = DB.find(MUser.class).where().in("roles", roleList).query();
 
     List<MUser> userInRolesList = rolesQuery.findList();
-    Assert.assertTrue(!userInRolesList.isEmpty());
+    assertTrue(!userInRolesList.isEmpty());
 
     List<MUser> list = DB.find(MUser.class)
       .where().in("roles", roleList)
@@ -79,7 +80,7 @@ public class TestM2MVanilla extends BaseTestCase {
 
     MUser mUser = list.get(0);
     List<MRole> roles = mUser.getRoles();
-    Assert.assertEquals(1, roles.size());
+    assertEquals(1, roles.size());
 
     checkRoles2.remove(0);
     checkRoles2.remove(0);
@@ -87,11 +88,10 @@ public class TestM2MVanilla extends BaseTestCase {
 
     checkUser2 = DB.find(MUser.class, u0.getUserid());
     checkRoles2 = checkUser2.getRoles();
-    Assert.assertNotNull(checkRoles2);
-    Assert.assertEquals("added a role", 1, checkRoles2.size());
+    assertNotNull(checkRoles2);
+    assertEquals(1, checkRoles2.size());
 
     DB.delete(checkUser2);
-
   }
 
 }

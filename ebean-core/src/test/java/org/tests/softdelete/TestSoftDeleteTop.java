@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.Transaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.ESoftDelMid;
 import org.tests.model.softdelete.ESoftDelTop;
 import org.tests.model.softdelete.ESoftDelUp;

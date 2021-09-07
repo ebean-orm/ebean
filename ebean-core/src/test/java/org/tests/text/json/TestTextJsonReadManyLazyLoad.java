@@ -5,18 +5,19 @@ import io.ebean.Ebean;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
   @Test
-  public void test_lazyLoadBoth() throws IOException {
+  public void test_lazyLoadBoth() {
 
     ResetBasicData.reset();
 
@@ -31,9 +32,8 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     o.setPathProperties(pp);
 
     String s = json.toJson(list, o);
-    Assert.assertTrue(s.contains("\"contacts\""));
-    Assert.assertTrue(s.contains("\"name\""));
-
+    assertTrue(s.contains("\"contacts\""));
+    assertTrue(s.contains("\"name\""));
   }
 
   @Test
@@ -52,13 +52,12 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     o.setPathProperties(pp);
 
     String s = json.toJson(list, o);
-    Assert.assertTrue(s.contains("\"contacts\""));
-    Assert.assertTrue(s.contains("\"name\""));
-
+    assertTrue(s.contains("\"contacts\""));
+    assertTrue(s.contains("\"name\""));
   }
 
   @Test
-  public void test_lazyLoadContacts() throws IOException {
+  public void test_lazyLoadContacts() {
 
     ResetBasicData.reset();
 
@@ -74,9 +73,8 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     o.setPathProperties(pp);
 
     String s = json.toJson(list, o);
-    Assert.assertTrue(s.contains("\"contacts\""));
-    Assert.assertTrue(s.contains("\"name\""));
-
+    assertTrue(s.contains("\"contacts\""));
+    assertTrue(s.contains("\"name\""));
   }
 
 }

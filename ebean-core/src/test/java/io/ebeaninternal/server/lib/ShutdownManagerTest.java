@@ -2,18 +2,17 @@ package io.ebeaninternal.server.lib;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.event.ShutdownManager;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ShutdownManagerTest extends BaseTestCase {
 
   /**
    * Run this test manually. Most typical when we want the application code to control shutdown.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test_disableShutdownHook_shutdownManually() {
     // disable hook to make sure app code controls when shutdown is executed
@@ -28,7 +27,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   /**
    * Run this test manually.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test_shutdownHook() {
     DB.getDefault(); // shutdown fired via shutdown hook, default behaviour
@@ -37,7 +36,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   /**
    * Run this test manually.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test_disableShutdownHook() {
     DB.getDefault();
@@ -47,7 +46,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   /**
    * Run this test manually.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test_shutdownManually() {
     DB.getDefault();
@@ -59,7 +58,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   /**
    * Run this test manually.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test_deregisterShutdownHook() {
     DB.getDefault();
@@ -69,7 +68,7 @@ public class ShutdownManagerTest extends BaseTestCase {
   /**
    * Run this test manually.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test_noShutdownHook() {
     System.setProperty("ebean.registerShutdownHook", "false");

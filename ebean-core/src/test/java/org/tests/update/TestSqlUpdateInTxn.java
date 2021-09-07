@@ -6,13 +6,13 @@ import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.meta.MetaTimedMetric;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.idkeys.db.AuditLog;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSqlUpdateInTxn extends BaseTestCase {
 
@@ -143,7 +143,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     Ebean.save(log);
 
     AuditLog log2 = Ebean.find(AuditLog.class, log.getId());
-    Assert.assertEquals("foo", log2.getDescription());
+    assertEquals("foo", log2.getDescription());
 
     final Long id = log2.getId();
     final String updateDml = "update audit_log set description = :desc where id = :id";
@@ -159,8 +159,8 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     updateMod.execute();
 
     AuditLog log3 = Ebean.find(AuditLog.class, log.getId());
-    Assert.assertEquals("foo2", log3.getDescription());
-    Assert.assertEquals("mod0", log3.getModifiedDescription());
+    assertEquals("foo2", log3.getDescription());
+    assertEquals("mod0", log3.getModifiedDescription());
 
     Ebean.execute(() -> {
       SqlUpdate update = Ebean.createSqlUpdate(updateDml);
@@ -174,8 +174,8 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     });
 
     AuditLog log4 = Ebean.find(AuditLog.class, log.getId());
-    Assert.assertEquals("foo3", log4.getDescription());
-    Assert.assertEquals("mod1", log4.getModifiedDescription());
+    assertEquals("foo3", log4.getDescription());
+    assertEquals("mod1", log4.getModifiedDescription());
 
 
     Ebean.beginTransaction();
@@ -194,8 +194,8 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
       Ebean.endTransaction();
     }
     AuditLog log5 = Ebean.find(AuditLog.class, log.getId());
-    Assert.assertEquals("foo4", log5.getDescription());
-    Assert.assertEquals("mod2", log5.getModifiedDescription());
+    assertEquals("foo4", log5.getDescription());
+    assertEquals("mod2", log5.getModifiedDescription());
 
   }
 

@@ -5,7 +5,7 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestM2MCascadeOne extends BaseTestCase {
 

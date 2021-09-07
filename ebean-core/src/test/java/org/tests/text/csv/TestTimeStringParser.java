@@ -2,10 +2,11 @@ package org.tests.text.csv;
 
 import io.ebean.BaseTestCase;
 import io.ebean.text.TimeStringParser;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Time;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTimeStringParser extends BaseTestCase {
 
@@ -13,10 +14,10 @@ public class TestTimeStringParser extends BaseTestCase {
   public void testSimple() {
 
     Time t = (Time) TimeStringParser.get().parse("12:00");
-    Assert.assertNotNull(t);
+    assertNotNull(t);
 
     t = (Time) TimeStringParser.get().parse("12:00:12");
-    Assert.assertNotNull(t);
+    assertNotNull(t);
 
     expectError("12");
     expectError("12:");
@@ -29,9 +30,9 @@ public class TestTimeStringParser extends BaseTestCase {
   private void expectError(String value) {
     try {
       TimeStringParser.get().parse(value);
-      Assert.assertTrue(false);
+      fail();
     } catch (IllegalArgumentException e) {
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
   }
 }

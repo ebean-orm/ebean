@@ -2,10 +2,11 @@ package org.tests.saveassociation;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSaveAssociation extends BaseTestCase {
 
@@ -25,8 +26,7 @@ public class TestSaveAssociation extends BaseTestCase {
     TSMaster m0Check = Ebean.find(TSMaster.class).fetch("details").where().idEq(m0.getId())
       .findOne();
 
-    Assert.assertEquals(2, m0Check.getDetails().size());
-
+    assertEquals(2, m0Check.getDetails().size());
   }
 
 }

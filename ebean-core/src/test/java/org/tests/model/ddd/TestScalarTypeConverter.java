@@ -1,7 +1,7 @@
 package org.tests.model.ddd;
 
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.ivo.Oid;
 import org.tests.model.ivo.converter.AnEnumType;
 

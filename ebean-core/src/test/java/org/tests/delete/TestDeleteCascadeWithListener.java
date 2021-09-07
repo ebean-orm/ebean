@@ -3,7 +3,7 @@ package org.tests.delete;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

@@ -5,10 +5,12 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryMultiManyOrder extends BaseTestCase {
 
@@ -23,12 +25,12 @@ public class TestQueryMultiManyOrder extends BaseTestCase {
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
 
-    Assert.assertTrue(!list.isEmpty());
-    Assert.assertTrue(sql.contains("join o_customer "));
+    assertTrue(!list.isEmpty());
+    assertTrue(sql.contains("join o_customer "));
 
-    Assert.assertFalse(sql.contains("left join contact "));
-    Assert.assertFalse(sql.contains("left join o_order_detail "));
-    Assert.assertFalse(sql.contains("left join o_product "));
+    assertFalse(sql.contains("left join contact "));
+    assertFalse(sql.contains("left join o_order_detail "));
+    assertFalse(sql.contains("left join o_product "));
 
   }
 }

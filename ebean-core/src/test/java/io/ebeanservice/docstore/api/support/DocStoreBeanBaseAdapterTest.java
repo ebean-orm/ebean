@@ -10,7 +10,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 

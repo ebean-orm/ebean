@@ -1,7 +1,7 @@
 package io.ebean;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.tests.model.basic.ResetBasicData;
 
 /**
@@ -16,15 +16,15 @@ import org.tests.model.basic.ResetBasicData;
  */
 public abstract class TransactionalTestCase extends BaseTestCase {
 
-  @Before
+  @BeforeEach
   public void startTransaction() {
     ResetBasicData.reset();
-    Ebean.beginTransaction();
+    DB.beginTransaction();
   }
 
-  @After
+  @AfterEach
   public void endTransaction() {
-    Ebean.rollbackTransaction();
-    Ebean.endTransaction();
+    DB.rollbackTransaction();
+    DB.endTransaction();
   }
 }

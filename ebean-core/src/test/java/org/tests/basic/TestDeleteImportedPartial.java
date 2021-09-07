@@ -4,8 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.PFile;
 import org.tests.model.basic.PFileContent;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestDeleteImportedPartial extends BaseTestCase {
 
@@ -27,8 +28,7 @@ public class TestDeleteImportedPartial extends BaseTestCase {
     PFile file1 = Ebean.find(PFile.class, id);
     PFileContent content1 = Ebean.find(PFileContent.class, contentId);
 
-    Assert.assertNull(file1);
-    Assert.assertNull(content1);
-
+    assertNull(file1);
+    assertNull(content1);
   }
 }

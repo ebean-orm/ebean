@@ -4,10 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
 import org.tests.model.basic.EBasicVer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestInsertQueryUpdate extends BaseTestCase {
 
@@ -25,7 +26,7 @@ public class TestInsertQueryUpdate extends BaseTestCase {
 
     BeanState beanState = Ebean.getBeanState(e1);
     Set<String> loadedProps = beanState.getLoadedProps();
-    Assert.assertFalse(loadedProps.contains("description"));
+    assertFalse(loadedProps.contains("description"));
     //lastUpdate
 
     e1.setName("name1");

@@ -9,15 +9,15 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiTransaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class DefaultTransactionThreadLocalTest extends BaseTestCase {
 

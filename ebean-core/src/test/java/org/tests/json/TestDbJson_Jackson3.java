@@ -7,7 +7,7 @@ import io.ebean.ValuePair;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import io.ebeantest.LoggedSql;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonJackson3;
 import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.EBasicJsonMulti;

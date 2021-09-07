@@ -1,6 +1,6 @@
 package org.tests.mockito;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.tests.model.aggregation.DOrg;
 import org.tests.model.basic.PersistentFile;

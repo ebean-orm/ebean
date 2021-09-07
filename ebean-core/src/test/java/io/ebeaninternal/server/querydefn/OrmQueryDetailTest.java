@@ -3,10 +3,10 @@ package io.ebeaninternal.server.querydefn;
 import io.ebean.BaseTestCase;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrmQueryDetailTest extends BaseTestCase {
 

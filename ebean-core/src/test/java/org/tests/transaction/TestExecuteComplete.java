@@ -10,12 +10,12 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebeaninternal.api.SpiTransaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestExecuteComplete extends BaseTestCase {
 

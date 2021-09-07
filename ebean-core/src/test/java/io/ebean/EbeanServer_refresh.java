@@ -1,6 +1,6 @@
 package io.ebean;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EbeanServer_refresh {
 

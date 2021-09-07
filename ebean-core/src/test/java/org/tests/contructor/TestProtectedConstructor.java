@@ -6,8 +6,9 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.bean.EntityBean;
 import org.tests.model.basic.MProtectedConstructBean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestProtectedConstructor extends BaseTestCase {
 
@@ -18,7 +19,7 @@ public class TestProtectedConstructor extends BaseTestCase {
 
     // check that we can construc a bean with a protected constructor
     MProtectedConstructBean bean = server.createEntityBean(MProtectedConstructBean.class);
-    Assert.assertNotNull(bean);
+    assertNotNull(bean);
 
     // Note1 that the enhancement ClassAdapterEntity line 239 makes a default constructor publically accessible
     // Note2 the ClassAdpater will call DefaultConstructor.add() to add a default constructor if it doesn't exist
@@ -27,10 +28,10 @@ public class TestProtectedConstructor extends BaseTestCase {
     EntityBean entityBean = (EntityBean) bean;
     Object newBeanInstance = entityBean._ebean_newInstance();
 
-    Assert.assertNotNull(newBeanInstance);
+    assertNotNull(newBeanInstance);
     BeanState beanState = Ebean.getBeanState(newBeanInstance);
-    Assert.assertTrue(beanState.isNew());
-    Assert.assertNotSame(entityBean, newBeanInstance);
+    assertTrue(beanState.isNew());
+    assertNotSame(entityBean, newBeanInstance);
 
   }
 

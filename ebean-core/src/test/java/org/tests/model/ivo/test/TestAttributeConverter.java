@@ -2,7 +2,7 @@ package org.tests.model.ivo.test;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.ivo.ESomeConvertType;
 import org.tests.model.ivo.Money;
 

@@ -7,7 +7,7 @@ import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
 import io.ebean.text.PathProperties;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

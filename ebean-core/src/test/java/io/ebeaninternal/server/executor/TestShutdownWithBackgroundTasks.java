@@ -4,14 +4,14 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 public class TestShutdownWithBackgroundTasks extends BaseTestCase {
 
   @Test
-  @Ignore
+  @Disabled
   public void test() {
 
     Database server = DB.getDefault();

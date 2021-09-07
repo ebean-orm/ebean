@@ -1,13 +1,12 @@
 package io.ebeaninternal.server.type;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.MonthDay;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeMonthDayTest {
 
@@ -40,8 +39,7 @@ public class ScalarTypeMonthDayTest {
   }
 
   @Test
-  public void testFormatParse() throws Exception {
-
+  public void testFormatParse() {
     MonthDay value = MonthDay.of(4, 29);
     String val1 = type.formatValue(value);
     MonthDay monthDay = type.parse(val1);
@@ -50,27 +48,21 @@ public class ScalarTypeMonthDayTest {
     assertEquals(value, monthDay);
   }
 
-
   @Test
-  public void testIsDateTimeCapable() throws Exception {
+  public void testIsDateTimeCapable() {
     assertFalse(type.isDateTimeCapable());
   }
 
-  @Test(expected = RuntimeException.class)
-  public void testConvertFromMillis() throws Exception {
-    type.convertFromMillis(1203);
+  @Test
+  public void testConvertFromMillis() {
+    assertThrows(RuntimeException.class, () -> type.convertFromMillis(1203));
   }
 
   @Test
   public void testJson() throws Exception {
-
     MonthDay value = MonthDay.of(4, 29);
     JsonTester<MonthDay> jsonTester = new JsonTester<>(type);
     jsonTester.test(value);
   }
 
-  @Test
-  public void testReadWriteData() throws Exception {
-
-  }
 }

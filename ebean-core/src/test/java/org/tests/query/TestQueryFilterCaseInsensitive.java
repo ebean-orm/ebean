@@ -2,8 +2,8 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryFilterCaseInsensitive extends BaseTestCase {
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() {
     ResetBasicData.reset();
   }

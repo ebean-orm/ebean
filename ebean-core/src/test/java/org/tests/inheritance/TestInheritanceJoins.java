@@ -5,8 +5,7 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.inheritance.model.CalculationResult;
 import org.tests.inheritance.model.Configurations;
 import org.tests.inheritance.model.GroupConfiguration;
@@ -14,6 +13,8 @@ import org.tests.inheritance.model.ProductConfiguration;
 
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestInheritanceJoins extends BaseTestCase {
 
@@ -57,7 +58,7 @@ public class TestInheritanceJoins extends BaseTestCase {
     CalculationResult result = server.find(CalculationResult.class, r.getId());
 
     GroupConfiguration group = result.getGroupConfiguration();
-    Assert.assertEquals(group.getId(), gc.getId());
+    assertEquals(group.getId(), gc.getId());
   }
 
   @Test
@@ -99,7 +100,7 @@ public class TestInheritanceJoins extends BaseTestCase {
 
     List<GroupConfiguration> groups = configurationsQueried.getGroupConfigurations();
 
-    Assert.assertTrue(!groups.isEmpty());
+    assertTrue(!groups.isEmpty());
   }
 
   @Test
@@ -112,7 +113,7 @@ public class TestInheritanceJoins extends BaseTestCase {
 
     Configurations configurationsQueried = server.find(Configurations.class).fetch("groupConfigurations").where().idEq(configurations.getId()).findOne();
 
-    Assert.assertNotNull(configurationsQueried);
+    assertNotNull(configurationsQueried);
   }
 
   @Test
@@ -132,8 +133,8 @@ public class TestInheritanceJoins extends BaseTestCase {
 
     Configurations configurationsQueried = database.find(Configurations.class).fetch("groupConfigurations").fetch("productConfigurations").where().idEq(configurations.getId()).findOne();
 
-    Assert.assertEquals(Collections.singletonList(gc), configurationsQueried.getGroupConfigurations());
-    Assert.assertEquals(Collections.singletonList(pc), configurationsQueried.getProductConfigurations());
+    assertEquals(Collections.singletonList(gc), configurationsQueried.getGroupConfigurations());
+    assertEquals(Collections.singletonList(pc), configurationsQueried.getProductConfigurations());
   }
 
 }

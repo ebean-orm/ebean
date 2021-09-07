@@ -8,7 +8,7 @@ import io.ebean.annotation.Transactional;
 import io.ebean.config.dbplatform.IdType;
 
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyTopic;
 import org.tests.model.m2m.Role;

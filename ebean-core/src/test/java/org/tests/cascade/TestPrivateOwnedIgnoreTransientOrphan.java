@@ -4,10 +4,12 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.OptimisticLockException;
+
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestPrivateOwnedIgnoreTransientOrphan extends BaseTestCase {
 
@@ -35,12 +37,12 @@ public class TestPrivateOwnedIgnoreTransientOrphan extends BaseTestCase {
       Ebean.save(master1);
     } catch (OptimisticLockException exception) {
       // Occured when the "unsaved" bean was wrongly being deleted
-      Assert.fail("Optimistic lock exception wrongly thrown: " + exception.getMessage());
+      fail("Optimistic lock exception wrongly thrown: " + exception.getMessage());
       return;
     }
 
     master2 = master1 = Ebean.find(master1.getClass(), master1.getId());
 
-    Assert.assertTrue(master2.getDetails().isEmpty());
+    assertTrue(master2.getDetails().isEmpty());
   }
 }

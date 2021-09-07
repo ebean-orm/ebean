@@ -7,10 +7,10 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.tests.model.basic.MyAdHoc;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestMyAdHocSqlSelect extends BaseTestCase {
 

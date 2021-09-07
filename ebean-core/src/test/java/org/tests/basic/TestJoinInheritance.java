@@ -7,7 +7,7 @@ import org.tests.model.basic.Car;
 import org.tests.model.basic.Trip;
 import org.tests.model.basic.Vehicle;
 import org.tests.model.basic.VehicleDriver;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.Date;

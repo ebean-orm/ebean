@@ -2,7 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.Expr;
 import io.ebean.Expression;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;

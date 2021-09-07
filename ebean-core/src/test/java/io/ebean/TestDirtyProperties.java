@@ -5,11 +5,13 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.server.core.DefaultBeanState;
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDirtyProperties extends BaseTestCase {
 
@@ -34,34 +36,32 @@ public class TestDirtyProperties extends BaseTestCase {
     DefaultBeanState beanState = new DefaultBeanState(eb);
 
     Set<String> changedProps = beanState.getChangedProps();
-    Assert.assertEquals(1, changedProps.size());
-    Assert.assertTrue(changedProps.contains("name"));
+    assertEquals(1, changedProps.size());
+    assertThat(changedProps).contains("name");
 
     Map<String, ValuePair> dirtyValues = beanState.getDirtyValues();
-    Assert.assertEquals(1, dirtyValues.size());
-    Assert.assertTrue(dirtyValues.keySet().contains("name"));
+    assertEquals(1, dirtyValues.size());
+    assertThat(dirtyValues.keySet()).contains("name");
 
     ValuePair valuePair = dirtyValues.get("name");
-    Assert.assertNotNull(valuePair);
-    Assert.assertEquals("changedFoo", valuePair.getNewValue());
-    Assert.assertEquals("foo", valuePair.getOldValue());
+    assertNotNull(valuePair);
+    assertEquals("changedFoo", valuePair.getNewValue());
+    assertEquals("foo", valuePair.getOldValue());
 
     Eembeddable embeddableRead = emain.getEmbeddable();
     embeddableRead.setDescription("embChanged");
 
     Set<String> changedProps2 = beanState.getChangedProps();
-    Assert.assertEquals(2, changedProps2.size());
-    Assert.assertTrue(changedProps2.contains("name"));
-    Assert.assertTrue(changedProps2.contains("embeddable.description"));
+    assertEquals(2, changedProps2.size());
+    assertThat(changedProps2).contains("name", "embeddable.description");
 
     Map<String, ValuePair> dirtyValues2 = beanState.getDirtyValues();
-    Assert.assertEquals(2, dirtyValues2.size());
-    Assert.assertTrue(dirtyValues2.keySet().contains("name"));
-    Assert.assertTrue(dirtyValues2.keySet().contains("embeddable.description"));
+    assertEquals(2, dirtyValues2.size());
+    assertThat(dirtyValues2.keySet()).contains("name", "embeddable.description");
 
     ValuePair valuePair2 = dirtyValues2.get("embeddable.description");
-    Assert.assertEquals("embChanged", valuePair2.getNewValue());
-    Assert.assertEquals("bar", valuePair2.getOldValue());
+    assertEquals("embChanged", valuePair2.getNewValue());
+    assertEquals("bar", valuePair2.getOldValue());
   }
 
 
@@ -83,31 +83,29 @@ public class TestDirtyProperties extends BaseTestCase {
 
     emain.setName("changedFoo");
 
-    Assert.assertSame(embeddable, emain.getEmbeddable());
+    assertSame(embeddable, emain.getEmbeddable());
 
     Eembeddable embeddable2 = setEmbeddedBean(emain, "changeEmbeddedInstance");
-    Assert.assertSame(embeddable2, emain.getEmbeddable());
-    Assert.assertNotSame(embeddable, emain.getEmbeddable());
+    assertSame(embeddable2, emain.getEmbeddable());
+    assertNotSame(embeddable, emain.getEmbeddable());
 
 
     DefaultBeanState beanState = new DefaultBeanState(eb);
 
     Set<String> changedProps2 = beanState.getChangedProps();
-    Assert.assertEquals(2, changedProps2.size());
-    Assert.assertTrue(changedProps2.contains("name"));
+    assertEquals(2, changedProps2.size());
+    assertThat(changedProps2).contains("name");
 
-    Assert.assertTrue("The whole bean instance has changed", changedProps2.contains("embeddable"));
+    assertThat(changedProps2).contains("embeddable");
 
     Map<String, ValuePair> dirtyValues2 = beanState.getDirtyValues();
-    Assert.assertEquals(2, dirtyValues2.size());
-    Assert.assertTrue(dirtyValues2.keySet().contains("name"));
-    Assert.assertTrue(dirtyValues2.keySet().contains("embeddable"));
+    assertEquals(2, dirtyValues2.size());
+    assertThat(dirtyValues2.keySet()).contains("name", "embeddable");
 
 
     ValuePair valuePair2 = dirtyValues2.get("embeddable");
-    Assert.assertSame(embeddable2, valuePair2.getNewValue());
-    Assert.assertSame(embeddable, valuePair2.getOldValue());
-
+    assertSame(embeddable2, valuePair2.getNewValue());
+    assertSame(embeddable, valuePair2.getOldValue());
   }
 
 
@@ -128,7 +126,7 @@ public class TestDirtyProperties extends BaseTestCase {
 
     // hooks the embeddable bean back to the owner
     int embeddablePropertyIndex = ebi.findProperty("embeddable");
-    Assert.assertTrue(embeddablePropertyIndex > -1);
+    assertThat(embeddablePropertyIndex).isGreaterThan(-1);
     ((EntityBean) embeddable)._ebean_getIntercept().setEmbeddedOwner(owner, embeddablePropertyIndex);
     return embeddable;
   }

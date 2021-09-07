@@ -3,17 +3,17 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import java.sql.Types;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestTransient extends BaseTestCase {
 
@@ -31,7 +31,7 @@ public class TestTransient extends BaseTestCase {
     assertNotNull(c);
 
     BeanState beanState = DB.beanState(c);
-    assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
+    assertFalse(beanState.isNewOrDirty());
 
     c.getLock().tryLock();
     try {
@@ -43,7 +43,7 @@ public class TestTransient extends BaseTestCase {
     Boolean selected = c.getSelected();
     assertNotNull(selected);
 
-    assertFalse("not new or dirty as transient", beanState.isNewOrDirty());
+    assertFalse(beanState.isNewOrDirty());
 
     DB.save(c);
 
@@ -51,13 +51,13 @@ public class TestTransient extends BaseTestCase {
     assertNotNull(selected);
 
     c.setName("Modified");
-    assertTrue("dirty now", beanState.isNewOrDirty());
+    assertTrue(beanState.isNewOrDirty());
 
     selected = c.getSelected();
     assertNotNull(selected);
 
     DB.save(c);
-    assertFalse("Not dirty after save", beanState.isNewOrDirty());
+    assertFalse(beanState.isNewOrDirty());
 
     selected = c.getSelected();
     assertNotNull(selected);

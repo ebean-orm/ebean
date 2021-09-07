@@ -7,7 +7,7 @@ import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.type.DefaultTypeManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 

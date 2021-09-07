@@ -3,8 +3,7 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -15,7 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestReadOnlyPropagation extends BaseTestCase {
 
@@ -30,61 +30,61 @@ public class TestReadOnlyPropagation extends BaseTestCase {
       .setId(1)
       .findOne();
 
-    Assert.assertTrue(DB.beanState(order).isReadOnly());
+    assertTrue(DB.beanState(order).isReadOnly());
 
 
     Customer customer = order.getCustomer();
-    Assert.assertTrue(DB.beanState(customer).isReadOnly());
+    assertTrue(DB.beanState(customer).isReadOnly());
 
     Address billingAddress = customer.getBillingAddress();
     assertNotNull(billingAddress);
-    Assert.assertTrue(DB.beanState(billingAddress).isReadOnly());
+    assertTrue(DB.beanState(billingAddress).isReadOnly());
 
 
     List<OrderDetail> details = order.getDetails();
     BeanCollection<?> bc = (BeanCollection<?>) details;
 
-    Assert.assertTrue(bc.isReadOnly());
-    Assert.assertTrue(!bc.isPopulated());
+    assertTrue(bc.isReadOnly());
+    assertTrue(!bc.isPopulated());
 
     bc.size();
-    Assert.assertTrue(!bc.isEmpty());
-    Assert.assertTrue(bc.isReadOnly());
-    Assert.assertTrue(bc.isPopulated());
+    assertTrue(!bc.isEmpty());
+    assertTrue(bc.isReadOnly());
+    assertTrue(bc.isPopulated());
     try {
       details.add(new OrderDetail());
-      Assert.assertTrue(false);
+      assertTrue(false);
     } catch (IllegalStateException e) {
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
     try {
       details.remove(0);
-      Assert.assertTrue(false);
+      assertTrue(false);
     } catch (IllegalStateException e) {
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
     try {
       Iterator<OrderDetail> it = details.iterator();
       it.next();
       it.remove();
-      Assert.assertTrue(false);
+      assertTrue(false);
     } catch (IllegalStateException e) {
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
     try {
       ListIterator<OrderDetail> it = details.listIterator();
       it.next();
       it.remove();
-      Assert.assertTrue(false);
+      assertTrue(false);
     } catch (IllegalStateException e) {
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
     try {
       List<OrderDetail> subList = details.subList(0, 1);
       subList.remove(0);
-      Assert.assertTrue(false);
+      assertTrue(false);
     } catch (UnsupportedOperationException e) {
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
 
 

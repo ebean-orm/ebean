@@ -8,19 +8,11 @@ import io.ebean.DatabaseFactory;
 import io.ebean.annotation.ChangeLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanPersistRequest;
-import io.ebean.event.changelog.BeanChange;
-import io.ebean.event.changelog.ChangeLogFilter;
-import io.ebean.event.changelog.ChangeLogListener;
-import io.ebean.event.changelog.ChangeLogPrepare;
-import io.ebean.event.changelog.ChangeLogRegister;
-import io.ebean.event.changelog.ChangeSet;
-import io.ebean.event.changelog.ChangeType;
-import io.ebean.event.changelog.TxnState;
+import io.ebean.event.changelog.*;
 import io.ebeantest.LoggedSql;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicChangeLog;
 import org.tests.model.json.PlainBean;
 
@@ -28,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestChangeLog extends BaseTestCase {
 
@@ -40,12 +32,12 @@ public class TestChangeLog extends BaseTestCase {
 
   Database server;
 
-  @Before
+  @BeforeEach
   public void setup() {
     server = createServer();
   }
 
-  @After
+  @AfterEach
   public void shutdown() {
     server.shutdown();
   }
@@ -133,7 +125,7 @@ public class TestChangeLog extends BaseTestCase {
     assertThat(change.getEvent()).isEqualTo(ChangeType.DELETE);
     assertThat(change.getData()).isNull();
   }
-  
+
   @Test
   public void testWithJsonMutationDetection() {
 
@@ -142,23 +134,23 @@ public class TestChangeLog extends BaseTestCase {
     bean.setShortDescription("hello");
     PlainBean jsonBean = new PlainBean();
     bean.setPlainBean(jsonBean);
-    jsonBean.setName("A");    
+    jsonBean.setName("A");
     server.save(bean);
-    
+
     BeanChange change = firstChange();
     assertThat(change.getEvent()).isEqualTo(ChangeType.INSERT);
-    
+
     jsonBean.setName("B");
     LoggedSql.start();
     server.save(bean);
     assertThat(LoggedSql.stop()).isNotEmpty();
-    
+
     change = firstChange();
     assertThat(change.getEvent()).isEqualTo(ChangeType.UPDATE);
     assertThat(change.getData()).contains("\"plainBean\":{\"name\":\"B\"");
     assertThat(change.getOldData()).contains("\"plainBean\":{\"name\":\"A\"");
   }
-  
+
   @Test
   public void testMutationWithCache() throws Exception {
     EBasicChangeLog bean = new EBasicChangeLog();

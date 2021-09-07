@@ -4,7 +4,7 @@ import io.ebean.Ebean;
 import io.ebean.PagedList;
 import io.ebean.TransactionalTestCase;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.onetoone.album.Cover;
 
 import java.util.ArrayList;

@@ -5,11 +5,11 @@ import io.ebean.Ebean;
 import io.ebeaninternal.api.SpiTransaction;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestDeleteFromPersistenceContext extends BaseTestCase {
 
@@ -37,7 +37,7 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
       Ebean.delete(bean2);
 
       Object bean5 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
-      assertNull("Bean is deleted from PersistenceContext", bean5);
+      assertNull(bean5);
 
       Ebean.commitTransaction();
 
@@ -46,12 +46,11 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
     }
 
     EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findOne();
-    assertNull("Bean where id eq is not found " + bean6, bean6);
+    assertNull(bean6);
 
     awaitL2Cache();
     EBasicVer bean7 = Ebean.find(EBasicVer.class, bean.getId());
-    assertNull("Bean is not expected to be found? " + bean7, bean7);
-
+    assertNull(bean7);
   }
 
 }

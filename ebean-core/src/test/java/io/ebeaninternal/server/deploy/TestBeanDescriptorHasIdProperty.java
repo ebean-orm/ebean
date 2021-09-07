@@ -10,14 +10,14 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.composite.RCustomer;
 import org.tests.model.composite.RCustomerKey;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.UserInterestLive;
 import org.tests.model.embedded.UserInterestLiveKey;
 
 import java.sql.Timestamp;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 

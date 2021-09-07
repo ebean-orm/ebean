@@ -7,7 +7,7 @@ import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;

@@ -1,13 +1,14 @@
 package io.ebean.common;
 
 import io.ebean.bean.BeanCollection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
 import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class BeanMapTest {
@@ -189,33 +190,32 @@ public class BeanMapTest {
     assertThat(map.getModifyAdditions()).isEmpty();
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void keySet_add_whenModifyListening() {
     BeanMap<String, EBasic> map = newModifyListeningMap();
-    map.keySet().add("3");
+    assertThrows(UnsupportedOperationException.class, () -> map.keySet().add("3"));
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void keySet_add() {
     BeanMap<String, Object> map = new BeanMap<>();
-    map.keySet().add("3");
+    assertThrows(UnsupportedOperationException.class, () ->map.keySet().add("3"));
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void keySet_addAll_whenModifyListening() {
     BeanMap<String, EBasic> map = newModifyListeningMap();
-    map.keySet().addAll(asList("3", "4"));
+    assertThrows(UnsupportedOperationException.class, () -> map.keySet().addAll(asList("3", "4")));
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void keySet_addAll() {
     BeanMap<String, Object> map = new BeanMap<>();
-    map.keySet().addAll(asList("3", "4"));
+    assertThrows(UnsupportedOperationException.class, () -> map.keySet().addAll(asList("3", "4")));
   }
 
   @Test
   public void keySet_remove() {
-
     BeanMap<String, Object> map = new BeanMap<>();
     map.put("1", object1);
     map.put("2", object2);
@@ -233,7 +233,6 @@ public class BeanMapTest {
 
   @Test
   public void keySet_clear() {
-
     BeanMap<String, Object> map = new BeanMap<>();
     map.put("1", object1);
     map.put("2", object2);
@@ -315,23 +314,24 @@ public class BeanMapTest {
     assertThat(map.getModifyRemovals()).containsOnly(object1, object4);
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void values_add() {
     BeanMap<String, EBasic> map = new BeanMap<>();
-    map.values().add(object3);
+    assertThrows(UnsupportedOperationException.class, () -> map.values().add(object3));
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void values_addAll() {
     BeanMap<String, EBasic> map = new BeanMap<>();
-    map.values().addAll(asList(object3, object5));
+    assertThrows(UnsupportedOperationException.class, () -> map.values().addAll(asList(object3, object5)));
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void entrySet_add() {
-    newModifyListeningMap()
+    assertThrows(UnsupportedOperationException.class, () ->
+      newModifyListeningMap()
       .entrySet()
-      .add(new AbstractMap.SimpleEntry<>("3", object3));
+      .add(new AbstractMap.SimpleEntry<>("3", object3)));
   }
 
   @Test

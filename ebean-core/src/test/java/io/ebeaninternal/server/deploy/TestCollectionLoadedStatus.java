@@ -6,12 +6,13 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiEbeanServer;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCollectionLoadedStatus extends BaseTestCase {
 
@@ -26,16 +27,16 @@ public class TestCollectionLoadedStatus extends BaseTestCase {
     EntityBeanIntercept ebi = eb._ebean_getIntercept();
 
     BeanProperty contactsProperty = custDesc.getBeanProperty("contacts");
-    Assert.assertFalse(ebi.isLoadedProperty(contactsProperty.getPropertyIndex()));
+    assertFalse(ebi.isLoadedProperty(contactsProperty.getPropertyIndex()));
 
     Object contactsViaInternal = contactsProperty.getValue(eb);
-    Assert.assertNull(contactsViaInternal);
-    Assert.assertFalse(ebi.isLoadedProperty(contactsProperty.getPropertyIndex()));
+    assertNull(contactsViaInternal);
+    assertFalse(ebi.isLoadedProperty(contactsProperty.getPropertyIndex()));
 
     List<Contact> contacts = customer.getContacts();
-    Assert.assertNotNull(contacts);
-    Assert.assertTrue(contacts instanceof BeanCollection);
-    Assert.assertTrue(ebi.isLoadedProperty(contactsProperty.getPropertyIndex()));
+    assertNotNull(contacts);
+    assertTrue(contacts instanceof BeanCollection);
+    assertTrue(ebi.isLoadedProperty(contactsProperty.getPropertyIndex()));
   }
 
 }

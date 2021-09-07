@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.types.SomeNewTypesBean;
 
 import java.io.File;
@@ -26,9 +26,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestNewTypes extends BaseTestCase {
 

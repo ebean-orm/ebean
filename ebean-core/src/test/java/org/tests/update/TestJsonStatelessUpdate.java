@@ -6,10 +6,11 @@ import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonStatelessUpdate extends BaseTestCase {
 
@@ -40,9 +41,9 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
 
     UUTwo two2 = jsonContext.toBean(UUTwo.class, jsonString);
 
-    Assert.assertEquals(twoX.getId(), two2.getId());
-    Assert.assertEquals("twoNameModified", two2.getName());
-    Assert.assertEquals("oneNameModified", two2.getMaster().getName());
+    assertEquals(twoX.getId(), two2.getId());
+    assertEquals("twoNameModified", two2.getName());
+    assertEquals("oneNameModified", two2.getMaster().getName());
 
     // The update below cascades to also save "master" and that fails
     // as it thinks it should INSERT master rather than UPDATE master
@@ -54,8 +55,8 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     // confirm the properties where updated as expected
     UUTwo twoConfirm = Ebean.find(UUTwo.class, two.getId());
 
-    Assert.assertEquals("twoNameModified", twoConfirm.getName());
-    Assert.assertEquals("oneNameModified", twoConfirm.getMaster().getName());
+    assertEquals("twoNameModified", twoConfirm.getName());
+    assertEquals("oneNameModified", twoConfirm.getMaster().getName());
 
   }
 

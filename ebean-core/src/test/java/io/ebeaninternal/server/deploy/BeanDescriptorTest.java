@@ -8,7 +8,7 @@ import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
 import org.tests.model.bridge.BSite;
 import org.tests.model.bridge.BUser;
@@ -16,7 +16,7 @@ import org.tests.model.bridge.BUser;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

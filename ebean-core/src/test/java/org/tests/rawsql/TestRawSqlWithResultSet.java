@@ -8,7 +8,7 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.Transaction;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

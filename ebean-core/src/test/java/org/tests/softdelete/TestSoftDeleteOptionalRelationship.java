@@ -6,7 +6,7 @@ import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
 import org.tests.model.softdelete.ESoftDelMid;
 import io.ebean.Finder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.ESoftDelY;
 import org.tests.model.softdelete.ESoftDelZ;
 
@@ -60,7 +60,7 @@ public class TestSoftDeleteOptionalRelationship extends BaseTestCase {
 
     final List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
-    if (isSqlServer()) {
+    if (isSqlServer() || isMySql() || isMariaDB()) {
       assertThat(sql.get(0)).contains("left join esoft_del_z t1 on t1.id = t0.organization_id and t1.deleted = 0 where");
     } else {
       assertThat(sql.get(0)).contains("left join esoft_del_z t1 on t1.id = t0.organization_id and t1.deleted = false where");

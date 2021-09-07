@@ -3,14 +3,14 @@ package org.tests.cascade;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestCascadeOrphanStatelessUpdate extends BaseTestCase {
 

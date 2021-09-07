@@ -2,11 +2,12 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
 import javax.persistence.PersistenceException;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestErrorBindLog extends BaseTestCase {
 
@@ -19,10 +20,10 @@ public class TestErrorBindLog extends BaseTestCase {
     } catch (PersistenceException e) {
       String msg = e.getMessage();
       if (isHana()) {
-        Assert.assertTrue(msg.contains("Error with property[1] dt[12]data[JUNK]"));
+        assertTrue(msg.contains("Error with property[1] dt[12]data[JUNK]"));
       }
       else {
-        Assert.assertTrue(msg.contains("Bind values:"));
+        assertTrue(msg.contains("Bind values:"));
       }
     }
   }

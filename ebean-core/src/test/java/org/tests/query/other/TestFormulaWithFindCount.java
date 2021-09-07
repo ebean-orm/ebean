@@ -6,10 +6,12 @@ import io.ebean.EbeanServer;
 import io.ebean.ExpressionList;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestFormulaWithFindCount extends BaseTestCase {
 
@@ -26,12 +28,12 @@ public class TestFormulaWithFindCount extends BaseTestCase {
 
     for (Order order : list) {
       Double amount = order.getTotalAmount();
-      Assert.assertNotNull(amount);
+      assertNotNull(amount);
     }
 
     ExpressionList<Order> expressionList = server.find(Order.class).where().gt("totalAmount", 1d);
     int rowCount = expressionList.findCount();
-    Assert.assertEquals(list.size(), rowCount);
+    assertEquals(list.size(), rowCount);
   }
 
 }

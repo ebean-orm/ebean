@@ -5,8 +5,10 @@ import io.ebean.Ebean;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestPersistenceContext extends BaseTestCase {
 
@@ -29,7 +31,7 @@ public class TestPersistenceContext extends BaseTestCase {
 
       // not the same instance ...as a different
       // persistence context
-      Assert.assertTrue(order != oBefore);
+      assertTrue(order != oBefore);
 
 
       // finds an existing bean in the persistence context
@@ -38,8 +40,8 @@ public class TestPersistenceContext extends BaseTestCase {
       Order o3 = Ebean.getReference(Order.class, 1);
 
       // all the same instance
-      Assert.assertTrue(order == o2);
-      Assert.assertTrue(order == o3);
+      assertTrue(order == o2);
+      assertTrue(order == o3);
 
     } finally {
       Ebean.endTransaction();
@@ -49,8 +51,8 @@ public class TestPersistenceContext extends BaseTestCase {
     // persistence context
     Order oAfter = Ebean.find(Order.class, 1);
 
-    Assert.assertTrue(oAfter != oBefore);
-    Assert.assertTrue(oAfter != order);
+    assertTrue(oAfter != oBefore);
+    assertTrue(oAfter != order);
 
     // start a persistence context
     Ebean.beginTransaction();
@@ -68,9 +70,8 @@ public class TestPersistenceContext extends BaseTestCase {
       Order order2 = Ebean.find(Order.class, orderId);
       Customer customer2 = order2.getCustomer();
 
-      Assert.assertEquals(customer.getId(), customer2.getId());
-
-      Assert.assertTrue(customer == customer2);
+      assertEquals(customer.getId(), customer2.getId());
+      assertTrue(customer == customer2);
 
     } finally {
       Ebean.endTransaction();

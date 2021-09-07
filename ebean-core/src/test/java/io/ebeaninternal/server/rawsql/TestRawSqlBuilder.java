@@ -12,7 +12,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebeaninternal.server.core.DefaultServer;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicClob;
 import org.tests.model.basic.PersistentFileContent;
@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestRawSqlBuilder extends BaseTestCase {
 

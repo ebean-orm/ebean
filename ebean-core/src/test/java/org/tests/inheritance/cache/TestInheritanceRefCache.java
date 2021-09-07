@@ -3,7 +3,7 @@ package org.tests.inheritance.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.cache.CInhOne;
 import org.tests.model.basic.cache.CInhRef;
 import org.tests.model.basic.cache.CInhRoot;

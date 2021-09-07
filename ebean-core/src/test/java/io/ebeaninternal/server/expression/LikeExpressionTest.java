@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.LikeType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

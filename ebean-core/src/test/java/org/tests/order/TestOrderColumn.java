@@ -3,7 +3,7 @@ package org.tests.order;
 import io.ebean.Ebean;
 import io.ebean.TransactionalTestCase;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 import java.util.List;

@@ -4,7 +4,7 @@ import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EWithInetAddr;
 
 import java.net.InetAddress;
@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestInetAddressType extends TransactionalTestCase {
 

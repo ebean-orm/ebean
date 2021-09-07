@@ -3,8 +3,7 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -12,6 +11,8 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestWhereAnnotation extends BaseTestCase {
 
@@ -28,10 +29,10 @@ public class TestWhereAnnotation extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
-    Assert.assertEquals(1, loggedSql.size());
+    assertEquals(1, loggedSql.size());
 
     String sql = loggedSql.get(0);
-    Assert.assertTrue(sql.contains("t1.order_date is not null"));
+    assertTrue(sql.contains("t1.order_date is not null"));
   }
 
   @Test

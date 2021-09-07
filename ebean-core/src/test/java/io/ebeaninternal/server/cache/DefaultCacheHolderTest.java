@@ -5,7 +5,7 @@ import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.transaction.TableModState;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 

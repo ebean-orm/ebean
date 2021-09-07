@@ -4,10 +4,10 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Testclass that ensures the correct behaviour of SqlUpdate in combination with batching.

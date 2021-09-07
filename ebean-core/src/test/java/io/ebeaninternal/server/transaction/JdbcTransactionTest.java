@@ -5,7 +5,7 @@ import io.ebean.Transaction;
 import io.ebean.TransactionCallbackAdapter;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;

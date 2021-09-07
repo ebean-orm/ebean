@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -17,9 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryFindPagedList extends BaseTestCase {
 
@@ -37,15 +35,14 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertThat(empty.getDisplayXtoYofZ("a", "b")).isEqualTo("");
   }
 
-  @Test(expected = PersistenceException.class)
+  @Test
   public void test_noMaxRows() {
-
-    Ebean.find(Order.class).findPagedList();
+    assertThrows(PersistenceException.class, () ->
+      Ebean.find(Order.class).findPagedList());
   }
 
   @Test
   public void test_maxRows_NoCount() {
-
     ResetBasicData.reset();
 
     PagedList<Order> pagedList = Ebean.find(Order.class)
@@ -59,7 +56,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertTrue(!orders.isEmpty());
     List<String> loggedSql = LoggedSqlCollector.stop();
 
-    assertEquals("Only 1 SQL statement, no count query", 1, loggedSql.size());
+    assertEquals(1, loggedSql.size());
   }
 
 
@@ -167,7 +164,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertTrue(!orders.isEmpty());
     List<String> loggedSql = LoggedSqlCollector.stop();
 
-    assertEquals("Only 1 SQL statement, no count query", 1, loggedSql.size());
+    assertEquals(1, loggedSql.size());
   }
 
   @Test

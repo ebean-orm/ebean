@@ -6,7 +6,7 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.idkeys.db.GenKeyIdentity;
 import org.tests.idkeys.db.GenKeySequence;
 
@@ -14,9 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestGeneratedKeys extends BaseTestCase {
 

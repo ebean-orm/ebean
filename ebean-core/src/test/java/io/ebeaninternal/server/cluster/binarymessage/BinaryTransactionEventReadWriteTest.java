@@ -12,7 +12,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.transaction.BeanPersistIds;
 import io.ebeaninternal.server.transaction.RemoteTableMod;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import java.io.IOException;

@@ -6,7 +6,7 @@ import io.ebean.EbeanServer;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.Expr;
 import io.ebean.Expression;
 import io.ebean.Junction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class JunctionExpressionTest extends BaseExpressionTest {
 

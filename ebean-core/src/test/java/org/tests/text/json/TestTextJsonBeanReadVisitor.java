@@ -3,14 +3,15 @@ package org.tests.text.json;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.text.json.JsonContext;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
@@ -36,7 +37,7 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
     StringReader reader = new StringReader(s);
     List<Customer> mList2 = json.toList(Customer.class, reader);
 
-    Assert.assertEquals(mList.size(), mList2.size());
+    assertEquals(mList.size(), mList2.size());
   }
 
 

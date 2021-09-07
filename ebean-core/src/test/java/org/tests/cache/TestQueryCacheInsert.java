@@ -5,15 +5,15 @@ import io.ebean.Ebean;
 import io.ebean.EbeanServer;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryCacheInsert extends BaseTestCase {
 

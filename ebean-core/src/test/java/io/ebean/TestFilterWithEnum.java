@@ -1,11 +1,12 @@
 package io.ebean;
 
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestFilterWithEnum extends BaseTestCase {
 
@@ -19,8 +20,7 @@ public class TestFilterWithEnum extends BaseTestCase {
     Filter<Order> filter = Ebean.filter(Order.class);
     List<Order> newOrders = filter.eq("status", Order.Status.NEW).filter(allOrders);
 
-    Assert.assertNotNull(newOrders);
-
+    assertNotNull(newOrders);
   }
 
 }

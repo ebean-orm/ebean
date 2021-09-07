@@ -7,13 +7,13 @@ import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.m2m.MnyB;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestCommitAndContinue extends BaseTestCase {
 

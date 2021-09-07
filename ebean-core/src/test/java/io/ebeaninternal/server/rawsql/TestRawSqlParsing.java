@@ -8,7 +8,7 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.rawsql.A2Customer;
@@ -17,7 +17,7 @@ import org.tests.rawsql.ACustomer;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestRawSqlParsing extends BaseTestCase {
 
@@ -37,7 +37,7 @@ public class TestRawSqlParsing extends BaseTestCase {
     Sql rs = ((SpiRawSql)rawSql).getSql();
 
     String s = rs.toString();
-    assertTrue(s, s.contains("[order_id, sum"));
+    assertTrue(s.contains("[order_id, sum"));
   }
 
   @Test

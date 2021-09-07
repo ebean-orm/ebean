@@ -8,10 +8,10 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import org.tests.model.basic.TJodaEntity;
 import org.joda.time.LocalTime;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestJodaType extends BaseTestCase {
 
@@ -23,7 +23,7 @@ public class TestJodaType extends BaseTestCase {
     BeanProperty beanProperty = beanDescriptor.getBeanProperty("localTime");
     ScalarType<?> scalarType = beanProperty.getScalarType();
 
-    Assert.assertNotNull(scalarType);
+    assertNotNull(scalarType);
   }
 
   @Test

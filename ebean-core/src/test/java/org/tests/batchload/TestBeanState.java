@@ -5,7 +5,7 @@ import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestBeanState extends BaseTestCase {
@@ -106,9 +106,8 @@ public class TestBeanState extends BaseTestCase {
     assertThat(beanState.getChangedProps()).containsOnly("contacts");
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void readOnly_when_setManyProperty() {
-
     Customer customer = new Customer();
     customer.setContacts(new ArrayList<>());
 
@@ -117,13 +116,11 @@ public class TestBeanState extends BaseTestCase {
     beanState.setReadOnly(true);
 
     // act, try to mutate read only bean
-    customer.setContacts(new ArrayList<>());
+    assertThrows(IllegalStateException.class, () -> customer.setContacts(new ArrayList<>()));
   }
 
-
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void readOnly_when_setProperty() {
-
     Customer customer = new Customer();
     customer.setName("a");
 
@@ -132,6 +129,6 @@ public class TestBeanState extends BaseTestCase {
     beanState.setReadOnly(true);
 
     // act, try to mutate read only bean
-    customer.setName("b");
+    assertThrows(IllegalStateException.class, () -> customer.setName("b"));
   }
 }

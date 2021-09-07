@@ -7,7 +7,7 @@ import io.ebean.FetchConfig;
 import io.ebean.Query;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;

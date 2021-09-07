@@ -3,11 +3,13 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Transaction;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCar;
 import org.tests.model.basic.OEngine;
 import org.tests.model.basic.OGearBox;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestMultipleOneToOneIUD extends BaseTestCase {
 
@@ -30,17 +32,17 @@ public class TestMultipleOneToOneIUD extends BaseTestCase {
       Ebean.save(gearBox);
       Ebean.save(car);
 
-      Assert.assertNotNull(car.getId());
-      Assert.assertNotNull(engine.getEngineId());
-      Assert.assertNotNull(gearBox.getId());
+      assertNotNull(car.getId());
+      assertNotNull(engine.getEngineId());
+      assertNotNull(gearBox.getId());
       txn.commit();
     }
 
     OCar c2 = Ebean.find(OCar.class, car.getId());
-    Assert.assertNotNull(c2);
-    Assert.assertNotNull(c2.getEngine());
+    assertNotNull(c2);
+    assertNotNull(c2.getEngine());
     // gearBox not assigned yet
-    Assert.assertNull(c2.getGearBox());
+    assertNull(c2.getGearBox());
 
     // ok, assign gearBox
     c2.setGearBox(gearBox);
@@ -48,9 +50,9 @@ public class TestMultipleOneToOneIUD extends BaseTestCase {
 
     // now all should be there...
     OCar c3 = Ebean.find(OCar.class, car.getId());
-    Assert.assertNotNull(c3);
-    Assert.assertNotNull(c3.getEngine());
-    Assert.assertNotNull(c3.getGearBox());
+    assertNotNull(c3);
+    assertNotNull(c3.getEngine());
+    assertNotNull(c3.getGearBox());
 
   }
 }

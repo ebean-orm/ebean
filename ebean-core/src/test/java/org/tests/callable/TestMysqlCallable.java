@@ -4,11 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.CallableSql;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import org.junit.jupiter.api.Disabled;
 import org.tests.model.basic.EBasic;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestMysqlCallable extends BaseTestCase {
 
@@ -28,7 +28,7 @@ public class TestMysqlCallable extends BaseTestCase {
   /**
    * Only run this test manually against MySQL with the above stored procedure.
    */
-  @Ignore
+  @Disabled
   @Test
   public void test() {
 

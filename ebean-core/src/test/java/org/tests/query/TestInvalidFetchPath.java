@@ -1,34 +1,35 @@
 package org.tests.query;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
+import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
-import org.junit.Test;
 
 import javax.persistence.PersistenceException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class TestInvalidFetchPath extends BaseTestCase {
 
-  @Test(expected = PersistenceException.class)
+  @Test
   public void invalidFetchPathAndProperties_expect_error() {
-
-    Ebean.find(Customer.class)
-      .fetch("notValidPath", "notHaveProps")
-      .findList();
+    assertThrows(PersistenceException.class, () ->
+      DB.find(Customer.class)
+        .fetch("notValidPath", "notHaveProps")
+        .findList());
   }
 
-  @Test(expected = PersistenceException.class)
+  @Test
   public void invalidFetchPath_expect_error() {
-
-    Ebean.find(Customer.class)
-      .fetch("notValidPath")
-      .findList();
+    assertThrows(PersistenceException.class, () ->
+      DB.find(Customer.class)
+        .fetch("notValidPath")
+        .findList());
   }
 
   @Test
   public void fetchWithInvalidPropertyName_expect_allowed() {
-
-    Ebean.find(Customer.class)
+    DB.find(Customer.class)
       .fetch("billingAddress", "invalidPropertyName")
       .findList();
   }

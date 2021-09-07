@@ -3,10 +3,11 @@ package org.tests.model.selfref;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.Ebean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestTextJsonSelfRef extends BaseTestCase {
 
@@ -39,7 +40,7 @@ public class TestTextJsonSelfRef extends BaseTestCase {
     // Check that there are no 'reference' beans here
     for (SelfRefCustomer cust : customers) {
       BeanState beanState = Ebean.getBeanState(cust);
-      Assert.assertFalse(beanState.isReference());
+      assertFalse(beanState.isReference());
     }
 
 //    JsonWriteOptions options = JsonWriteOptions.parsePath("(id,name,referredBy(id))");

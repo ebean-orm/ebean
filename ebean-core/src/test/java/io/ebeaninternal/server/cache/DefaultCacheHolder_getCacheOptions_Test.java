@@ -6,9 +6,9 @@ import io.ebean.config.ServerConfig;
 import org.tests.model.basic.Article;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Product;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultCacheHolder_getCacheOptions_Test {
 

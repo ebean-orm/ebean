@@ -8,13 +8,13 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.json.JsonContext;
 import org.tests.model.ddd.DPerson;
 import org.tests.model.ivo.Money;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Currency;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDPersonEl {
 

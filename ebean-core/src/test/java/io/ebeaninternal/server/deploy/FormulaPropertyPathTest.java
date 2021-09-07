@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
 import io.ebeaninternal.server.query.STreeProperty;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;

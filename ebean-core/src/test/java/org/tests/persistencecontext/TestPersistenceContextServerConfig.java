@@ -9,12 +9,12 @@ import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestPersistenceContextServerConfig extends BaseTestCase {
 

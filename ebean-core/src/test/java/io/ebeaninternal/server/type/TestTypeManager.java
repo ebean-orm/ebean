@@ -8,11 +8,7 @@ import io.ebean.server.type.MyDayOfWeek;
 import io.ebean.server.type.MyEnum;
 import io.ebean.server.type.MySex;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.type.DefaultTypeManager;
-import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.ScalarTypeEnumStandard;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.converter.MoneyTypeConverter;
 
@@ -21,7 +17,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestTypeManager extends BaseTestCase {
 
@@ -51,7 +49,7 @@ public class TestTypeManager extends BaseTestCase {
 
     try {
       typeManager.createEnumScalarType(MyEnum.class, EnumType.STRING);
-      assertTrue("never get here",false);
+      fail("never get here");
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
     }
@@ -81,7 +79,7 @@ public class TestTypeManager extends BaseTestCase {
 
     try {
       typeManager.createEnumScalarType(MyDayOfWeek.class, EnumType.ORDINAL);
-      assertTrue("never get here",false);
+      fail("never get here");
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
     }
@@ -89,14 +87,12 @@ public class TestTypeManager extends BaseTestCase {
 
   @Test
   public void test() {
-
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> scalarType = typeManager.getScalarType(Money.class);
-    assertTrue(scalarType.getJdbcType() == Types.DECIMAL);
-    assertTrue(!scalarType.isJdbcNative());
-    Assert.assertEquals(Money.class, scalarType.getType());
-
+    assertEquals(Types.DECIMAL, scalarType.getJdbcType());
+    assertFalse(scalarType.isJdbcNative());
+    assertEquals(Money.class, scalarType.getType());
   }
 
   @Test

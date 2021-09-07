@@ -7,7 +7,7 @@ import io.ebean.Ebean;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 

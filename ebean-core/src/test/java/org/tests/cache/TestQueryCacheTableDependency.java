@@ -6,7 +6,7 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;

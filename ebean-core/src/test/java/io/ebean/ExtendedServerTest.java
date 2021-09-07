@@ -1,7 +1,8 @@
 package io.ebean;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExtendedServerTest extends BaseTestCase {
 
-  @After
+  @AfterEach
   public void cleanup() {
     Ebean.getDefaultServer()
       .extended()

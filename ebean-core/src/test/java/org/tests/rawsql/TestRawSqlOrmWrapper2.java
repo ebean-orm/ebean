@@ -9,10 +9,11 @@ import io.ebean.RawSqlBuilder;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderAggregate;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlOrmWrapper2 extends BaseTestCase {
 
@@ -36,13 +37,12 @@ public class TestRawSqlOrmWrapper2 extends BaseTestCase {
       .order().desc("totalAmount").setMaxRows(10);
 
     List<OrderAggregate> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     for (OrderAggregate oa : list) {
       oa.getTotalAmount();
       Order order = oa.getOrder();
       order.getId();
     }
-
   }
 }

@@ -5,12 +5,12 @@ import io.ebean.Ebean;
 import io.ebean.ExpressionList;
 import io.ebeaninternal.api.SpiExpression;
 import org.tests.model.basic.Order;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PrepareDocNestedTest extends BaseTestCase {
   @Test

@@ -3,7 +3,7 @@ package org.tests.query.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.ExpressionList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;

@@ -2,9 +2,9 @@ package org.tests.basic;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ESimple;
 
 import java.util.List;
@@ -17,13 +17,13 @@ public class TestQueryUsingDatabase {
   public static final ESimple RECORD1 = new ESimple();
   public static final ESimple RECORD2 = new ESimple();
 
-  @Before
+  @BeforeEach
   public void setupNonDefaultDatabase() {
     DB.byName(SOME_OTHER_DB_NAME).insert(RECORD1);
     DB.byName(SOME_OTHER_DB_NAME).insert(RECORD2);
   }
 
-  @After
+  @AfterEach
   public void shutdown() {
     DB.byName(SOME_OTHER_DB_NAME).shutdown();
   }

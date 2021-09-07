@@ -6,7 +6,7 @@ import io.ebean.config.ServerConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.type.DefaultTypeManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;

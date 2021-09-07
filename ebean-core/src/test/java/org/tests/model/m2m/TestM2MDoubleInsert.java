@@ -1,7 +1,7 @@
 package org.tests.model.m2m;
 
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestM2MDoubleInsert {
 

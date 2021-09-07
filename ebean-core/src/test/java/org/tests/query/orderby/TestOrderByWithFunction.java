@@ -5,8 +5,9 @@ import io.ebean.Ebean;
 import io.ebean.Query;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderByWithFunction extends BaseTestCase {
 
@@ -18,12 +19,12 @@ public class TestOrderByWithFunction extends BaseTestCase {
     if (isSqlServer()) {
       length = "len";
     }
-    
+
     Query<Customer> query = Ebean.find(Customer.class).order(length + "(name),name");
 
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.contains("order by " + length + "(t0.name)"));
+    assertTrue(sql.contains("order by " + length + "(t0.name)"));
   }
 }

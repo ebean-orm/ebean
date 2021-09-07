@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.PagedList;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.carwheel.Car;
 import org.tests.model.carwheel.Tire;
 import org.tests.model.carwheel.Wheel;

@@ -7,8 +7,8 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.h2.H2Platform;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.draftable.BasicDraftableBean;
 
@@ -18,7 +18,7 @@ public class PlatformNoGeneratedKeysTest {
 
   static Database server = testH2Server();
 
-  @AfterClass
+  @AfterAll
   public static void shutdown() {
     server.shutdown();
   }

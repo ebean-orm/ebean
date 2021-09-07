@@ -2,8 +2,10 @@ package org.tests.model.basic.mapsuper;
 
 import io.ebean.BaseTestCase;
 import io.ebean.bean.EntityBean;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestMapSuperEquals extends BaseTestCase {
 
@@ -23,10 +25,10 @@ public class TestMapSuperEquals extends BaseTestCase {
 
       a.setId(456l);
 
-      Assert.assertTrue("equals By Id value on enhanced mapped super", a.equals(b));
-      Assert.assertTrue(b.equals(a));
-      Assert.assertTrue(!a.equals(c));
-      Assert.assertTrue(!b.equals(c));
+      assertEquals(a, b);
+      assertEquals(b, a);
+      assertNotEquals(a, c);
+      assertNotEquals(b, c);
 
     } else {
       System.out.println("--- ok, not running TestMapSuperEquals test");

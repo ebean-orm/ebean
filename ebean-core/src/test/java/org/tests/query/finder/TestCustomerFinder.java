@@ -11,7 +11,7 @@ import io.ebean.meta.QueryPlanRequest;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.meta.SortMetric;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ResetBasicData;
@@ -19,7 +19,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCustomerFinder extends BaseTestCase {
 

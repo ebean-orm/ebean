@@ -1,8 +1,9 @@
 package org.tests.inheritance.cache;
 
 import io.ebean.DB;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestInheritCacheRefLoad {
 
@@ -29,17 +30,17 @@ public class TestInheritCacheRefLoad {
     // 2 - Read Data (no Cache Hit)
     //=========================================================================
     Class streetClass = reloadCustomer(customer, false);  //returns Street -> OK
-    Assert.assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
+    assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
     streetClass = reloadCustomer(customer, false);  //returns Street -> OK
-    Assert.assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
+    assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
 
     //=========================================================================
     // 3 - Read Data (L2-Cache Hit)
     //=========================================================================
     streetClass = reloadCustomer(customer, true); //returns Street -> OK
-    Assert.assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
+    assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
     streetClass = reloadCustomer(customer, true); //returns StreetParent -> NOT OK
-    Assert.assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
+    assertEquals("org.tests.inheritance.cache.CIStreet", streetClass.getName());
   }
 
 

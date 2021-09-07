@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.text.TextException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Year;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeYearTest {
 
@@ -64,33 +64,28 @@ public class ScalarTypeYearTest {
 
   @Test
   public void testFormatValue() throws Exception {
-
     String formatted = type.formatValue(Year.of(2013));
     assertEquals("2013", formatted);
   }
 
   @Test
-  public void testParse() throws Exception {
-
+  public void testParse() {
     Year year = type.parse("2013");
     assertEquals(Year.of(2013), year);
   }
 
   @Test
-  public void testIsDateTimeCapable() throws Exception {
-
+  public void testIsDateTimeCapable() {
     assertFalse(type.isDateTimeCapable());
   }
 
-  @Test(expected = TextException.class)
-  public void testConvertFromMillis() throws Exception {
-
-    type.convertFromMillis(1000);
+  @Test
+  public void testConvertFromMillis() {
+    assertThrows(TextException.class, () -> type.convertFromMillis(1000));
   }
 
   @Test
   public void testJson() throws Exception {
-
     JsonTester<Year> jsonTester = new JsonTester<>(type);
     jsonTester.test(Year.of(2013));
   }

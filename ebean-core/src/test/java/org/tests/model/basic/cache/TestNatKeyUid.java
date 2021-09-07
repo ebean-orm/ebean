@@ -4,13 +4,13 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.cache.ServerCacheStatistics;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestNatKeyUid extends BaseTestCase {
 

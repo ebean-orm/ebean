@@ -3,8 +3,7 @@ package org.tests.m2m;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.meta.MetaTimedMetric;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.Permission;
 import org.tests.model.m2m.Role;
 import org.tests.model.m2m.Tenant;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestM2mDeleteObject extends BaseTestCase {
 
@@ -55,9 +55,9 @@ public class TestM2mDeleteObject extends BaseTestCase {
     List<Role> roleList = Ebean.find(Role.class).fetch("permissions").findList();
     List<Permission> permissionList = Ebean.find(Permission.class).fetch("roles").findList();
 
-    Assert.assertEquals(1, tenantList.size());
-    Assert.assertEquals(2, permissionList.size());
-    Assert.assertEquals(1, roleList.size());
+    assertEquals(1, tenantList.size());
+    assertEquals(2, permissionList.size());
+    assertEquals(1, roleList.size());
 
     Ebean.delete(role1);
 
@@ -65,9 +65,9 @@ public class TestM2mDeleteObject extends BaseTestCase {
     List<Role> roleList2 = Ebean.find(Role.class).fetch("permissions").findList();
     List<Permission> permissionList2 = Ebean.find(Permission.class).fetch("roles").findList();
 
-    Assert.assertEquals(0, roleList2.size());
-    Assert.assertEquals(1, tenantList2.size());
-    Assert.assertEquals(2, permissionList2.size());
+    assertEquals(0, roleList2.size());
+    assertEquals(1, tenantList2.size());
+    assertEquals(2, permissionList2.size());
   }
 
 

@@ -3,14 +3,14 @@ package io.ebeaninternal.server.type;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBinaryUUID extends BaseTestCase {
 

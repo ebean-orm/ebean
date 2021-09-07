@@ -3,7 +3,7 @@ package org.tests.iud;
 import io.avaje.moduuid.ModUUID;
 import io.ebean.BaseTestCase;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

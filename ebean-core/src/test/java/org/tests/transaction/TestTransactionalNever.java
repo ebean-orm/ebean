@@ -5,11 +5,13 @@ import io.ebean.Ebean;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTransactionalNever extends BaseTestCase {
 
@@ -23,9 +25,9 @@ public class TestTransactionalNever extends BaseTestCase {
     new SomeTransactionalWithNever().doStuff();
   }
 
-  @Test(expected = PersistenceException.class)
+  @Test
   public void testBarfOnExisting() {
-    doWithTransaction();
+    assertThrows(PersistenceException.class, this::doWithTransaction);
   }
 
   class SomeTransactionalWithNever {

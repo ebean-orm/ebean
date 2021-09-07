@@ -10,7 +10,7 @@ import io.ebeantest.LoggedSql;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +40,7 @@ public class TestFetchId extends BaseTestCase {
     List<Object> idList = futureIds.get();
     assertThat(idList).isNotEmpty();
   }
-  
+
   @Test
   public void testFetchIdWithExists() throws InterruptedException, ExecutionException {
 
@@ -62,7 +62,7 @@ public class TestFetchId extends BaseTestCase {
     List<Object> idList = futureIds.get();
     assertThat(idList).isNotEmpty();
   }
-  
+
   @Test
   public void testFetchIdWithOrderFormula() throws InterruptedException, ExecutionException {
 

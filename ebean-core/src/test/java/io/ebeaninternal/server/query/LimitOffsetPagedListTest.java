@@ -3,10 +3,10 @@ package io.ebeaninternal.server.query;
 import io.ebean.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LimitOffsetPagedListTest extends BaseTestCase {
 

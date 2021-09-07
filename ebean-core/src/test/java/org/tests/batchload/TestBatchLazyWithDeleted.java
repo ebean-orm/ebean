@@ -2,14 +2,15 @@ package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
-import io.ebean.FetchConfig;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestBatchLazyWithDeleted extends BaseTestCase {
 
@@ -53,12 +54,12 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     // is NOT the bean that will invoke the lazy loading
     // (in this case it is the second bean in the list).
     int deletedCount = Ebean.delete(UUOne.class, oneB.getId());
-    Assert.assertEquals(1, deletedCount);
+    assertEquals(1, deletedCount);
 
     for (UUTwo u : list) {
       u.getMaster();
       //BeanState beanState = Ebean.getBeanState(master);
-      //Assert.assertTrue(beanState.isReference());
+      //assertTrue(beanState.isReference());
     }
 
     // invoke lazy loading on the second 'master' bean
@@ -73,10 +74,10 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     // it was removed from the "lazy load context" earlier
     try {
       list.get(2).getMaster().getName();
-      Assert.assertTrue(false);
+      assertTrue(false);
     } catch (EntityNotFoundException e) {
       // this bean was deleted and lazy loading failed
-      Assert.assertTrue(true);
+      assertTrue(true);
     }
 
 

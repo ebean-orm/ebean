@@ -5,7 +5,7 @@ package org.tests.text.json;
 //import org.junit.Assert;
 
 import io.ebean.BaseTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 //
 //import com.avaje.ebean.Ebean;

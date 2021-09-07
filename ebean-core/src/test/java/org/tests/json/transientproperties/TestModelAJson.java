@@ -2,7 +2,7 @@ package org.tests.json.transientproperties;
 
 import io.ebean.Ebean;
 import io.ebean.text.PathProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 

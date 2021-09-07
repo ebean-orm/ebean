@@ -2,10 +2,11 @@ package io.ebeaninternal.server.type;
 
 import io.ebeaninternal.server.type.ScalarTypeEnumStandard.OrdinalEnum;
 import io.ebeaninternal.server.type.ScalarTypeEnumStandard.StringEnum;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.Assert;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestEnumToBeanType {
 
@@ -25,14 +26,13 @@ public class TestEnumToBeanType {
 
 
     Object approved = stringEnum.toBeanType(Order.Status.APPROVED);
-    Assert.assertTrue(approved == Order.Status.APPROVED);
+    assertEquals(approved, Order.Status.APPROVED);
 
     approved = ordinalEnum.toBeanType(Order.Status.APPROVED);
-    Assert.assertTrue(approved == Order.Status.APPROVED);
+    assertEquals(approved, Order.Status.APPROVED);
 
     Object active = withMapping.toBeanType(Customer.Status.ACTIVE);
-    Assert.assertTrue(active == Customer.Status.ACTIVE);
-
+    assertEquals(active, Customer.Status.ACTIVE);
   }
 
 }

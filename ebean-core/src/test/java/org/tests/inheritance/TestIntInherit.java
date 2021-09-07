@@ -5,8 +5,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TIntChild;
 import org.tests.model.basic.TIntRoot;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestIntInherit extends BaseTestCase {
 
@@ -34,13 +35,13 @@ public class TestIntInherit extends BaseTestCase {
     Ebean.save(c2);
 
     TIntRoot result1 = Ebean.find(TIntRoot.class, r.getId());
-    Assert.assertTrue(result1 instanceof TIntRoot);
+    assertTrue(result1 instanceof TIntRoot);
 
     TIntRoot ref3 = Ebean.getReference(TIntRoot.class, c1.getId());
-    Assert.assertTrue(ref3 instanceof TIntRoot);
+    assertTrue(ref3 instanceof TIntRoot);
 
     TIntRoot result3 = Ebean.find(TIntRoot.class, c1.getId());
-    Assert.assertTrue(result3 instanceof TIntChild);
+    assertTrue(result3 instanceof TIntChild);
 
   }
 

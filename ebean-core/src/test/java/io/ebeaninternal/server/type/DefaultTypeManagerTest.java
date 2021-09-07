@@ -4,7 +4,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.array.IntEnum;
 import org.tests.model.array.VarcharEnum;
 import org.tests.model.basic.Car;
@@ -14,8 +14,8 @@ import java.time.DayOfWeek;
 import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultTypeManagerTest {
 

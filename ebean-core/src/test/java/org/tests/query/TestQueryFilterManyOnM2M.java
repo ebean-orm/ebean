@@ -3,7 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.MUser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestQueryFilterManyOnM2M extends BaseTestCase {
 

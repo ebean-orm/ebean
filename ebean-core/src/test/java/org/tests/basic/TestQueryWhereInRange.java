@@ -3,7 +3,7 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 

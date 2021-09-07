@@ -1,7 +1,7 @@
 package org.tests.model.map;
 
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Map;

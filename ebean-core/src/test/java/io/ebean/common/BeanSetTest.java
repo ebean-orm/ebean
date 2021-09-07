@@ -1,7 +1,7 @@
 package io.ebean.common;
 
 import io.ebean.bean.BeanCollection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

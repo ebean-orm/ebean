@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebeaninternal.server.core.PersistRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

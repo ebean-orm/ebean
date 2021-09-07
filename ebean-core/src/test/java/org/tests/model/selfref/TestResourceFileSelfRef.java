@@ -3,7 +3,7 @@ package org.tests.model.selfref;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestResourceFileSelfRef extends BaseTestCase {
 

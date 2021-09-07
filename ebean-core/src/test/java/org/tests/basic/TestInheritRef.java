@@ -5,10 +5,12 @@ import io.ebean.Ebean;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestInheritRef extends BaseTestCase {
 
@@ -33,7 +35,7 @@ public class TestInheritRef extends BaseTestCase {
         .setAutoTune(false)
         .findList();
 
-      Assert.assertTrue(!list.isEmpty());
+      assertTrue(!list.isEmpty());
 
       Truck foundTruck = null;
       int found = 0;
@@ -48,8 +50,8 @@ public class TestInheritRef extends BaseTestCase {
         }
       }
 
-      Assert.assertEquals(1, found);
-      Assert.assertTrue(foundTruck.getCapacity() == 20D);
+      assertEquals(1, found);
+      assertTrue(foundTruck.getCapacity() == 20D);
 
     } finally {
       Ebean.rollbackTransaction();

@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.CacheMode;
 import io.ebean.Ebean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -12,8 +12,8 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestLazyLoadInCache extends BaseTestCase {
 

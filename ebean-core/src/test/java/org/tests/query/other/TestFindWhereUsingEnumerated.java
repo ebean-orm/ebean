@@ -2,7 +2,7 @@ package org.tests.query.other;
 
 import io.ebean.Ebean;
 import io.ebean.TransactionalTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MNonEnum;
 import org.tests.model.basic.MNonUpdPropEntity;
 

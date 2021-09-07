@@ -4,14 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import io.ebean.Query;
 import io.ebean.Transaction;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestManyWhereJoinM2M extends BaseTestCase {
 
@@ -60,10 +60,10 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
     query.findList();
 
     String sql = query.getGeneratedSql();
-    Assert.assertTrue(sql.contains("select distinct"));
-    Assert.assertTrue(sql.contains("left join mrole "));
-    Assert.assertTrue(sql.contains("join mrole "));
-    Assert.assertTrue(sql.contains(".role_name = ?"));
+    assertTrue(sql.contains("select distinct"));
+    assertTrue(sql.contains("left join mrole "));
+    assertTrue(sql.contains("join mrole "));
+    assertTrue(sql.contains(".role_name = ?"));
 
     isEmpty();
     isNotEmpty();

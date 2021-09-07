@@ -6,8 +6,8 @@ import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.ebeantest.LoggedSqlCollector;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MnocRole;
 import org.tests.model.basic.MnocUser;
 
@@ -22,7 +22,7 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
   private static MnocRole r1 = new MnocRole("r1");
   private static MnocRole r2 = new MnocRole("r2");
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() {
     DB.save(r0);
     DB.save(r1);

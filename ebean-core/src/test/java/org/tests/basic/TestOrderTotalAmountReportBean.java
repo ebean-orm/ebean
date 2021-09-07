@@ -1,19 +1,13 @@
 package org.tests.basic;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.Query;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+import io.ebean.*;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OrderAggregate;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderTotalAmountReportBean extends BaseTestCase {
 
@@ -44,7 +38,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
       .having().lt("totalItems", 3).gt("totalAmount", 50).findList();
 
     for (OrderAggregate r2 : l2) {
-      Assert.assertTrue(r2.getTotalItems() < 3);
+      assertTrue(r2.getTotalItems() < 3);
     }
 
   }

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
 import org.joda.time.LocalDate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.Date;

@@ -3,8 +3,9 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.Ebean;
 import org.tests.model.basic.TMapSuperEntity;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestDeletePartialNoVersion extends BaseTestCase {
 
@@ -22,7 +23,7 @@ public class TestDeletePartialNoVersion extends BaseTestCase {
       .select("id, name")
       .findOne();
 
-    Assert.assertNotNull(e2);
+    assertNotNull(e2);
 
     e2.setName("banaban2");
     Ebean.save(e2);
@@ -44,7 +45,7 @@ public class TestDeletePartialNoVersion extends BaseTestCase {
       .select("id, name, version")
       .findOne();
 
-    Assert.assertNotNull(e2);
+    assertNotNull(e2);
 
     e2.setName("banaban2two");
     Ebean.save(e2);

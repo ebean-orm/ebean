@@ -13,13 +13,13 @@ import io.ebean.annotation.Platform;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestRawSqlNamedParams extends BaseTestCase {
 
@@ -39,8 +39,7 @@ public class TestRawSqlNamedParams extends BaseTestCase {
     query.where().lt("id", 1000);
 
     List<Customer> list = query.findList();
-
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 
   @Test
