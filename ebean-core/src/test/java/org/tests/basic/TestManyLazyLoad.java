@@ -28,7 +28,7 @@ public class TestManyLazyLoad extends BaseTestCase {
     Order order = list.get(0);
 
     // get it as a reference
-    Order order1 = DB.getReference(Order.class, order.getId());
+    Order order1 = DB.reference(Order.class, order.getId());
     assertNotNull(order1);
 
     Date orderDate = order1.getOrderDate();
@@ -48,7 +48,7 @@ public class TestManyLazyLoad extends BaseTestCase {
     DB.find(OrderDetail.class, orderDetail.getId());
 
     // change order... list before a scalar property
-    Order order2 = DB.getReference(Order.class, order.getId());
+    Order order2 = DB.reference(Order.class, order.getId());
     assertNotNull(order2);
 
     List<OrderDetail> details2 = order2.getDetails();

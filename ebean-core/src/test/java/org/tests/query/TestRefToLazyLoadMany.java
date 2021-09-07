@@ -28,7 +28,7 @@ public class TestRefToLazyLoadMany extends BaseTestCase {
     // now lazy load the contacts
     contacts2.size();
 
-    Customer c2 = DB.getReference(Customer.class, c.getId());
+    Customer c2 = DB.reference(Customer.class, c.getId());
 
     // we only "loaded" the contacts BeanList and not all of c2
     List<Contact> contacts = c2.getContacts();

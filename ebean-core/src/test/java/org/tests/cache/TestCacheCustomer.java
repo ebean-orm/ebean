@@ -21,7 +21,7 @@ public class TestCacheCustomer extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Country nz = DB.getReference(Country.class, "NZ");
+    Country nz = DB.reference(Country.class, "NZ");
     Address address = new Address();
     address.setLine1("Some Place");
     address.setCity("Auckland");

@@ -14,7 +14,7 @@ public class TestPview extends BaseTestCase {
   @Test
   public void test() {
 
-    Wview wview = DB.getReference(Wview.class, UUID.randomUUID());
+    Wview wview = DB.reference(Wview.class, UUID.randomUUID());
 
     Query<Paggview> query = DB.find(Paggview.class);
     query.select("amount");

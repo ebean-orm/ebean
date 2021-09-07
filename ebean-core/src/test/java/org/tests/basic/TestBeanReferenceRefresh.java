@@ -23,7 +23,7 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
     ServerCache beanCache = DB.cacheManager().beanCache(Order.class);
     beanCache.clear();
 
-    Order order = DB.getReference(Order.class, 1);
+    Order order = DB.reference(Order.class, 1);
 
     assertTrue(DB.beanState(order).isReference());
 

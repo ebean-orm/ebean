@@ -64,7 +64,7 @@ public class TestInheritanceOnMany extends BaseTestCase {
     LoggedSqlCollector.start();
     // Dog is concrete so we return as Dog even though
     // it could be a BigDog (so we are trusting the caller)
-    Dog ref = DB.getReference(Dog.class, dog.getId());
+    Dog ref = DB.reference(Dog.class, dog.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).isEmpty();
@@ -83,7 +83,7 @@ public class TestInheritanceOnMany extends BaseTestCase {
     DB.save(bd);
 
     LoggedSqlCollector.start();
-    BigDog bigDog = DB.getReference(BigDog.class, bd.getId());
+    BigDog bigDog = DB.reference(BigDog.class, bd.getId());
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).isEmpty();
@@ -95,7 +95,7 @@ public class TestInheritanceOnMany extends BaseTestCase {
 
     LoggedSqlCollector.start();
     // Animal is abstract so we hit the DB
-    Animal animal = DB.getReference(Animal.class, bd.getId());
+    Animal animal = DB.reference(Animal.class, bd.getId());
 
     sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);

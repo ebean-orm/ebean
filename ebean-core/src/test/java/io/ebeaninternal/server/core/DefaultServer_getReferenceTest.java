@@ -15,7 +15,7 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
   @Test
   public void getReference_noPC() {
-    DB.getReference(Customer.class, 42);
+    DB.reference(Customer.class, 42);
   }
 
   @Test
@@ -25,7 +25,7 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
     DB.execute(() -> {
       Customer loaded = DB.find(Customer.class, 1);
-      Customer reference = DB.getReference(Customer.class, 1);
+      Customer reference = DB.reference(Customer.class, 1);
       assertThat(loaded).isSameAs(reference);
     });
   }
@@ -38,7 +38,7 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
     car.setDriver("TestForRef");
     DB.save(car);
 
-    Vehicle reference = DB.getReference(Vehicle.class, car.getId());
+    Vehicle reference = DB.reference(Vehicle.class, car.getId());
 
     assertThat(reference).isInstanceOf(Car.class);
     assertThat(reference.getId()).isSameAs(car.getId());
@@ -56,7 +56,7 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
 
     DB.execute(() -> {
         Vehicle loaded = DB.find(Vehicle.class, car.getId());
-        Vehicle reference = DB.getReference(Vehicle.class, car.getId());
+        Vehicle reference = DB.reference(Vehicle.class, car.getId());
         assertThat(reference).isSameAs(loaded);
       }
     );

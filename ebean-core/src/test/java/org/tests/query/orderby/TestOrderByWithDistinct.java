@@ -43,7 +43,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
   @IgnorePlatform({Platform.MYSQL, Platform.MARIADB, Platform.SQLSERVER, Platform.NUODB}) // do not support nulls first/last
   public void testDistinctOn() {
 
-    MRole role = DB.getReference(MRole.class, 1);
+    MRole role = DB.reference(MRole.class, 1);
 
     Query<MUser> query = DB.find(MUser.class)
       .where()

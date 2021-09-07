@@ -24,7 +24,7 @@ public class TestInsertDataIntegrityException extends BaseTestCase {
     ResetBasicData.reset();
 
     // an invalid foreign key value
-    Customer invalidCustomer = DB.getReference(Customer.class, 900000);
+    Customer invalidCustomer = DB.reference(Customer.class, 900000);
 
     Order order = new Order();
     order.setStatus(Order.Status.NEW);

@@ -23,7 +23,7 @@ public class TestReferenceWithConstructorProperties extends BaseTestCase {
   public void test() {
 
     ResetBasicData.reset();
-    Order order = DB.getReference(Order.class, 1);
+    Order order = DB.reference(Order.class, 1);
 
     BeanState beanState = DB.beanState(order);
     Set<String> loadedProps = beanState.getLoadedProps();

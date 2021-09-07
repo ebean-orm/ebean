@@ -37,7 +37,7 @@ public class TestPersistenceContext extends BaseTestCase {
       // finds an existing bean in the persistence context
       // ... so doesn't even execute a query
       Order o2 = DB.find(Order.class, 1);
-      Order o3 = DB.getReference(Order.class, 1);
+      Order o3 = DB.reference(Order.class, 1);
 
       // all the same instance
       assertTrue(order == o2);

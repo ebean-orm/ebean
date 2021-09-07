@@ -53,7 +53,7 @@ public class TestForeignKeyModes extends BaseTestCase {
   @Test
   public void noneViaManyToMany() {
 
-    DfkOne one = DB.getReference(DfkOne.class, 999L);
+    DfkOne one = DB.reference(DfkOne.class, 999L);
 
     DfkNoneViaMtoM none = new DfkNoneViaMtoM("none2");
     none.getOnes().add(one);

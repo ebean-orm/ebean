@@ -37,7 +37,7 @@ public class TestIntInherit extends BaseTestCase {
     TIntRoot result1 = DB.find(TIntRoot.class, r.getId());
     assertTrue(result1 instanceof TIntRoot);
 
-    TIntRoot ref3 = DB.getReference(TIntRoot.class, c1.getId());
+    TIntRoot ref3 = DB.reference(TIntRoot.class, c1.getId());
     assertTrue(ref3 instanceof TIntRoot);
 
     TIntRoot result3 = DB.find(TIntRoot.class, c1.getId());

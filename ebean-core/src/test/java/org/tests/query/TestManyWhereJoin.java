@@ -118,7 +118,7 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Product product = DB.getReference(Product.class, 1L);
+    Product product = DB.reference(Product.class, 1L);
 
     Query<Order> query = DB.find(Order.class)
       //.fetch("details")
@@ -152,7 +152,7 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Product product = DB.getReference(Product.class, 1L);
+    Product product = DB.reference(Product.class, 1L);
 
     Query<Order> query = DB.find(Order.class)
       .fetch("details")

@@ -30,7 +30,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     JsonContext jsonContext = DB.json();
 
-    Product product = DB.getReference(Product.class, 1);
+    Product product = DB.reference(Product.class, 1);
 
     BeanState beanState0 = DB.beanState(product);
     if (!beanState0.isReference()) {

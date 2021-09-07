@@ -16,7 +16,7 @@ public class TestLazyLoadNonExistentBean extends BaseTestCase {
   public void testSimple() {
 
     UUID uuid = UUID.randomUUID();
-    UUOne one = DB.getReference(UUOne.class, uuid);
+    UUOne one = DB.reference(UUOne.class, uuid);
 
     try {
       // invoke lazy loading

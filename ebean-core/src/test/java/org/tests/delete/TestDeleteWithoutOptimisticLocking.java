@@ -17,13 +17,13 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
   public void testSimpleBeanDelete_missingBean_returnsFalse() {
 
     // delete by by without version loaded ... should not throw OptimisticLockException
-    Contact ref = DB.getReference(Contact.class, 999999);
+    Contact ref = DB.reference(Contact.class, 999999);
     assertThat(DB.delete(ref)).isFalse();
 
     assertThat(DB.delete(Contact.class, 999999)).isEqualTo(0);
 
     // same as above but using Model.delete()
-    Group modelRef = DB.getReference(Group.class, 999999);
+    Group modelRef = DB.reference(Group.class, 999999);
     assertThat(modelRef.delete()).isFalse();
   }
 
@@ -33,7 +33,7 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
     EBasicVer basic = new EBasicVer("DelTest");
     DB.save(basic);
 
-    EBasicVer basicRef = DB.getReference(EBasicVer.class, basic.getId());
+    EBasicVer basicRef = DB.reference(EBasicVer.class, basic.getId());
     assertThat(DB.delete(basicRef)).isTrue();
   }
 
@@ -50,10 +50,10 @@ public class TestDeleteWithoutOptimisticLocking extends BaseTestCase {
       transaction.setBatchMode(true);
 
       // returns true even though the delete has not occurred yet
-      assertThat(server.delete(DB.getReference(EBasicVer.class, basic.getId()), transaction)).isTrue();
+      assertThat(server.delete(DB.reference(EBasicVer.class, basic.getId()), transaction)).isTrue();
 
       // returns true even though the bean does not exist
-      assertThat(server.delete(DB.getReference(EBasicVer.class, 999999), transaction)).isTrue();
+      assertThat(server.delete(DB.reference(EBasicVer.class, 999999), transaction)).isTrue();
 
       transaction.commit();
 

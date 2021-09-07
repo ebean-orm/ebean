@@ -19,7 +19,7 @@ public class TestReferenceSave {
 
     LoggedSqlCollector.start();
 
-    EPersonOnline bean = DB.getReference(EPersonOnline.class, 1L);
+    EPersonOnline bean = DB.reference(EPersonOnline.class, 1L);
     DB.save(bean);
 
     List<String> sql = LoggedSqlCollector.current();

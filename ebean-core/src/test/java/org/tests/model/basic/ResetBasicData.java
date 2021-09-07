@@ -237,7 +237,7 @@ public class ResetBasicData {
       shippingAddr.setLine1(shippingStreet);
       shippingAddr.setLine2("Sandringham");
       shippingAddr.setCity("Auckland");
-      shippingAddr.setCountry(DB.getReference(Country.class, "NZ"));
+      shippingAddr.setCountry(DB.reference(Country.class, "NZ"));
 
       c.setShippingAddress(shippingAddr);
     }
@@ -247,7 +247,7 @@ public class ResetBasicData {
       billingAddr.setLine1(billingStreet);
       billingAddr.setLine2("St Lukes");
       billingAddr.setCity("Auckland");
-      billingAddr.setCountry(DB.getReference(Country.class, "NZ"));
+      billingAddr.setCountry(DB.reference(Country.class, "NZ"));
 
       c.setBillingAddress(billingAddr);
     }
@@ -257,9 +257,9 @@ public class ResetBasicData {
 
   private Order createOrder1(Customer customer) {
 
-    Product product1 = DB.getReference(Product.class, 1);
-    Product product2 = DB.getReference(Product.class, 2);
-    Product product3 = DB.getReference(Product.class, 3);
+    Product product1 = DB.reference(Product.class, 1);
+    Product product2 = DB.reference(Product.class, 2);
+    Product product3 = DB.reference(Product.class, 3);
 
 
     Order order = new Order();
@@ -281,7 +281,7 @@ public class ResetBasicData {
 
   private void createOrder2(Customer customer) {
 
-    Product product1 = DB.getReference(Product.class, 1);
+    Product product1 = DB.reference(Product.class, 1);
 
     Order order = new Order();
     order.setStatus(Status.SHIPPED);
@@ -299,8 +299,8 @@ public class ResetBasicData {
 
   private void createOrder3(Customer customer) {
 
-    Product product1 = DB.getReference(Product.class, 1);
-    Product product3 = DB.getReference(Product.class, 3);
+    Product product1 = DB.reference(Product.class, 1);
+    Product product3 = DB.reference(Product.class, 3);
 
     Order order = new Order();
     order.setStatus(Status.COMPLETE);

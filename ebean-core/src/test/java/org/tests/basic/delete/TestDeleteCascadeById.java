@@ -21,7 +21,7 @@ public class TestDeleteCascadeById extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    OrderDetail dummy = DB.getReference(OrderDetail.class, 1);
+    OrderDetail dummy = DB.reference(OrderDetail.class, 1);
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     server.getBeanDescriptor(OrderDetail.class).cacheBeanPut(dummy);
 

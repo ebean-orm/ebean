@@ -33,10 +33,10 @@ public class TestInheritanceCache extends BaseTestCase {
 
     assertThat(gotOneFromCache).isInstanceOf(CInhOne.class);
 
-    CInhRoot refOne = DB.getReference(CInhRoot.class, one.getId());
+    CInhRoot refOne = DB.reference(CInhRoot.class, one.getId());
     assertThat(refOne).isInstanceOf(CInhOne.class);
 
-    CInhRoot refOneSub = DB.getReference(CInhOne.class, one.getId());
+    CInhRoot refOneSub = DB.reference(CInhOne.class, one.getId());
     assertThat(refOneSub).isNotNull();
   }
 }

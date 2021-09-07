@@ -20,7 +20,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     Customer c0 = ResetBasicData.createCustAndOrder("Test Json");
 
-    Customer c2 = DB.getReference(Customer.class, c0.getId());
+    Customer c2 = DB.reference(Customer.class, c0.getId());
     List<Order> orders = c2.getOrders();
 
     assertEquals(1, orders.size());
@@ -30,7 +30,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     assertTrue(size >= 3);
 
-    Customer cref = DB.getReference(Customer.class, c0.getId());
+    Customer cref = DB.reference(Customer.class, c0.getId());
     order.setCustomer(cref);
     order.setStatus(Status.SHIPPED);
 
@@ -42,7 +42,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
     OrderDetail removedDetail = order.getDetails().remove(2);
     assertNotNull(removedDetail);
 
-    Product p = DB.getReference(Product.class, 1);
+    Product p = DB.reference(Product.class, 1);
     OrderDetail newDetail = new OrderDetail(p, 899, 12.12d);
     // newDetail.setOrder(order);
     order.addDetail(newDetail);

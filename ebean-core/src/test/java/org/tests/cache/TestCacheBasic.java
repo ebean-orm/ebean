@@ -26,13 +26,13 @@ public class TestCacheBasic extends BaseTestCase {
     // reset the statistics
     countryCache.statistics(true);
 
-    Country c0 = DB.getReference(Country.class, "NZ");
+    Country c0 = DB.reference(Country.class, "NZ");
     ServerCacheStatistics statistics = countryCache.statistics(false);
     long hc = statistics.getHitCount();
     assertEquals(1, hc);
     assertNotNull(c0);
 
-    // Country c1 = DB.getReference(Country.class, "NZ");
+    // Country c1 = DB.reference(Country.class, "NZ");
     // assertEquals(2, countryCache.getStatistics(false).getHitCount());
     // //assertEquals(100,
     // countryCache.getStatistics(false).getHitRatio());
@@ -62,7 +62,7 @@ public class TestCacheBasic extends BaseTestCase {
     //
     // assertTrue(countryCache.getStatistics(false).getHitCount() > 0);
     //
-    // //Country c3 = DB.getReference(Country.class, "NZ");
+    // //Country c3 = DB.reference(Country.class, "NZ");
     // //Country c4 = DB.find(Country.class, "NZ");
     //
     //
@@ -134,7 +134,7 @@ public class TestCacheBasic extends BaseTestCase {
     // assertEquals("0 country in cache", 0, countryCache.size());
     //
     // // reference doesn't load cache yet
-    // Country c11 = DB.getReference(Country.class, "NZ");
+    // Country c11 = DB.reference(Country.class, "NZ");
     //
     // // still 0 in cache
     // assertEquals("0 country in cache", 0, countryCache.size());

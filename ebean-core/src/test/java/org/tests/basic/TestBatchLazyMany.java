@@ -13,7 +13,7 @@ public class TestBatchLazyMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Order order2 = DB.getReference(Order.class, 1);
+    Order order2 = DB.reference(Order.class, 1);
     order2.getOrderDate();
 
 //		List<Order> list = DB.find(Order.class)

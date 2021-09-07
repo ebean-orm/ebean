@@ -36,15 +36,15 @@ public class TestQueryWithCache extends BaseTestCase {
     ServerCache beanCache = serverCacheManager.beanCache(Country.class);
     assertEquals(0, beanCache.size());
 
-    Country nz1 = DB.getReference(Country.class, "NZ");
+    Country nz1 = DB.reference(Country.class, "NZ");
     assertEquals(0, beanCache.size());
 
     // has the effect of loading the cache via lazy loading
     nz1.getName();
     assertEquals(1, beanCache.size());
 
-    Country nz2 = DB.getReference(Country.class, "NZ");
-    Country nz2b = DB.getReference(Country.class, "NZ");
+    Country nz2 = DB.reference(Country.class, "NZ");
+    Country nz2b = DB.reference(Country.class, "NZ");
 
     Country nz3 = DB.find(Country.class, "NZ");
 

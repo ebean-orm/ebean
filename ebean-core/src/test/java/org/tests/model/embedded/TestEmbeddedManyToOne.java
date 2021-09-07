@@ -24,7 +24,7 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
 
     DB.getDefault().cacheManager().clearAll();
 
-    Country nz = DB.getReference(Country.class, "NZ");
+    Country nz = DB.reference(Country.class, "NZ");
 
     EAddr addr = new EAddr("Foo", "Bar", nz);
     EPerAddr perAddr = new EPerAddr("Embed", addr);
