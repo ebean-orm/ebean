@@ -2,6 +2,7 @@ package org.tests.query.cancel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -35,7 +36,7 @@ import io.ebean.annotation.Platform;
  * query.cancel();
  * query.findList();
  * </pre>
- *
+ * <p>
  * The query was caneled before executing. In this case we do hit the DB driver
  * <br/>
  * <br/>
@@ -49,12 +50,12 @@ import io.ebean.annotation.Platform;
  *     ...finding            query.cancel();
  *      ...JDBC-Exception
  * </pre>
- *
+ * <p>
  * The test tries to simulate a slow query by installing the
  * {@link SlowDownEBasic} 'SELECT' trigger. The trigger can be configured to
  * wait 3 * <code>timing</code> ms and a second thread will cancel the query in
  * <code>timing</code> ms.
- *
+ * <p>
  * in this case, we expect a JDBC exception from the driver. <br/>
  * <br/>
  * NOTE:<br/>
@@ -63,7 +64,6 @@ import io.ebean.annotation.Platform;
  * queries like findCount or findOne, because they only return one row.
  *
  * @author Roland Praml, FOCONIS AG
- *
  */
 public class SqlQueryCancelTest extends BaseTestCase {
 
@@ -84,7 +84,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
   public void cancelSqlQueryAtBegin() throws SQLException {
     doCancelSqlAtBegin(SqlQuery::findList);
     doCancelSqlAtBegin(SqlQuery::findOne);
-    doCancelSqlAtBegin(q -> q.findEach(e -> {}));
+    doCancelSqlAtBegin(q -> q.findEach(e -> {
+    }));
     doCancelSqlAtBegin(q -> q.findEachWhile(e -> true));
   }
 
@@ -95,7 +96,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelSqlDuringRun(SqlQuery::findList);
     // doCancelSqlDuringRun(q -> q.setMaxRows(1).findOne());
     // findOne cannot be tested, as H2 does the cancel check every 128 rows only
-    doCancelSqlDuringRun(q -> q.findEach(e -> {}));
+    doCancelSqlDuringRun(q -> q.findEach(e -> {
+    }));
     doCancelSqlDuringRun(q -> q.findEachWhile(e -> true));
   }
 
@@ -117,9 +119,10 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelOrmAtBegin(q -> q.select("name").findSingleAttribute());
     doCancelOrmAtBegin(q -> q.select("name").findSingleAttributeList());
     doCancelOrmAtBegin(Query::findStream);
-   //  testDuringRun(Query::findVersions);
+    //  testDuringRun(Query::findVersions);
     // EBasic has no history support, but it should work if @History is added
-    doCancelOrmAtBegin(q -> q.findEach(e -> {}));
+    doCancelOrmAtBegin(q -> q.findEach(e -> {
+    }));
     doCancelOrmAtBegin(q -> q.findEachWhile(e -> true));
   }
 
@@ -142,9 +145,10 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelOrmDuringRun(q -> q.select("name").findSingleAttribute());
     doCancelOrmDuringRun(q -> q.select("name").findSingleAttributeList());
     doCancelOrmDuringRun(Query::findStream);
-   //  testDuringRun(Query::findVersions);
+    //  testDuringRun(Query::findVersions);
     // EBasic has no history support, but it should work if @History is added
-    doCancelOrmDuringRun(q -> q.findEach(e -> {}));
+    doCancelOrmDuringRun(q -> q.findEach(e -> {
+    }));
     doCancelOrmDuringRun(q -> q.findEachWhile(e -> true));
   }
 
@@ -160,7 +164,7 @@ public class SqlQueryCancelTest extends BaseTestCase {
 
     // We might have 100 entities in a buffer. So we must iterate through all.
     assertThatThrownBy(() -> {
-      while(iter.hasNext()) iter.next();
+      while (iter.hasNext()) iter.next();
     })
       .isInstanceOf(PersistenceException.class)
       .hasMessageContaining("Query was cancelled");
@@ -173,7 +177,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelOrmDtoAtBegin(DtoQuery::findList);
     doCancelOrmDtoAtBegin(DtoQuery::findOne);
     doCancelOrmDtoAtBegin(DtoQuery::findStream);
-    doCancelOrmDtoAtBegin(q -> q.findEach(e -> {}));
+    doCancelOrmDtoAtBegin(q -> q.findEach(e -> {
+    }));
     doCancelOrmDtoAtBegin(q -> q.findEachWhile(e -> true));
   }
 
@@ -186,23 +191,27 @@ public class SqlQueryCancelTest extends BaseTestCase {
     // doCancelOrmDtoDuringRun(q -> q.setMaxRows(1).findOne());
     // findOne cannot be tested, as H2 does the cancel check every 128 rows only
     doCancelOrmDtoDuringRun(DtoQuery::findStream);
-    doCancelOrmDtoDuringRun(q -> q.findEach(e -> {}));
+    doCancelOrmDtoDuringRun(q -> q.findEach(e -> {
+    }));
     doCancelOrmDtoDuringRun(q -> q.findEachWhile(e -> true));
   }
 
   @Test
-  public void cancelOrmDtoDuringIterate() throws SQLException {
-
+  public void cancelOrmDtoDuringIterate() {
     DtoQuery<EBasicDto> query = DB.find(EBasic.class).select("id,status").asDto(EBasicDto.class);
 
     QueryIterator<EBasicDto> iter = query.findIterate();
     assertThat(iter.hasNext()).isTrue();
     query.cancel();
-    assertThat(iter.next()).isNotNull();
+    if (isMariaDB()) {
+      assertThrows(PersistenceException.class, iter::next);
+    } else {
+      assertThat(iter.next()).isNotNull();
+    }
 
     // We might have 100 entities in a buffer. So we must iterate through all.
     assertThatThrownBy(() -> {
-      while(iter.hasNext()) iter.next();
+      while (iter.hasNext()) iter.next();
     })
       .isInstanceOf(PersistenceException.class)
       .hasMessageContaining("Query was cancelled");
@@ -215,7 +224,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     doCancelSqlDtoAtBegin(DtoQuery::findList);
     doCancelSqlDtoAtBegin(DtoQuery::findOne);
     doCancelSqlDtoAtBegin(DtoQuery::findStream);
-    doCancelSqlDtoAtBegin(q -> q.findEach(e -> {}));
+    doCancelSqlDtoAtBegin(q -> q.findEach(e -> {
+    }));
     doCancelSqlDtoAtBegin(q -> q.findEachWhile(e -> true));
   }
 
@@ -228,7 +238,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     // doCancelSqlDtoDuringRun(q -> q.setMaxRows(1).findOne());
     // findOne cannot be tested, as H2 does the cancel check every 128 rows only
     doCancelSqlDtoDuringRun(DtoQuery::findStream);
-    doCancelSqlDtoDuringRun(q -> q.findEach(e -> {}));
+    doCancelSqlDtoDuringRun(q -> q.findEach(e -> {
+    }));
     doCancelSqlDtoDuringRun(q -> q.findEachWhile(e -> true));
   }
 
@@ -244,7 +255,7 @@ public class SqlQueryCancelTest extends BaseTestCase {
 
     // We might have 100 entities in a buffer. So we must iterate through all.
     assertThatThrownBy(() -> {
-      while(iter.hasNext()) iter.next();
+      while (iter.hasNext()) iter.next();
     })
       .isInstanceOf(PersistenceException.class)
       .hasMessageContaining("Query was cancelled");
@@ -254,8 +265,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     SqlQuery query = DB.sqlQuery("select * from e_basic");
     query.cancel();
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("Query was cancelled");
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("Query was cancelled");
   }
 
   private void doCancelSqlDuringRun(Consumer<SqlQuery> test) throws SQLException {
@@ -264,16 +275,16 @@ public class SqlQueryCancelTest extends BaseTestCase {
     SqlQuery query = DB.sqlQuery("select * from e_basic");
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
+      .isInstanceOf(PersistenceException.class)
+      .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
   }
 
   private void doCancelOrmAtBegin(Consumer<Query<EBasic>> test) throws SQLException {
     Query<EBasic> query = DB.find(EBasic.class);
     query.cancel();
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("Query was cancelled");
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("Query was cancelled");
   }
 
   private void doCancelOrmDuringRun(Consumer<Query<EBasic>> test) throws SQLException {
@@ -284,8 +295,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     Query<EBasic> query = DB.find(EBasic.class);
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
+      .isInstanceOf(PersistenceException.class)
+      .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
   }
 
   private void doCancelOrmFutureDuringRun(Function<Query<EBasic>, Future<?>> test) throws SQLException, InterruptedException, ExecutionException {
@@ -309,8 +320,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     DtoQuery<EBasicDto> query = DB.find(EBasic.class).select("id,status").asDto(EBasicDto.class);
     query.cancel();
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("Query was cancelled");
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("Query was cancelled");
   }
 
   private void doCancelOrmDtoDuringRun(Consumer<DtoQuery<EBasicDto>> test) throws SQLException {
@@ -320,16 +331,16 @@ public class SqlQueryCancelTest extends BaseTestCase {
     DtoQuery<EBasicDto> query = DB.find(EBasic.class).select("id,status").asDto(EBasicDto.class);
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
+      .isInstanceOf(PersistenceException.class)
+      .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
   }
 
   private void doCancelSqlDtoAtBegin(Consumer<DtoQuery<EBasicDto>> test) throws SQLException {
     DtoQuery<EBasicDto> query = DB.findDto(EBasicDto.class, "select id, status from e_basic");
     query.cancel();
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("Query was cancelled");
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("Query was cancelled");
   }
 
   private void doCancelSqlDtoDuringRun(Consumer<DtoQuery<EBasicDto>> test) throws SQLException {
@@ -339,8 +350,8 @@ public class SqlQueryCancelTest extends BaseTestCase {
     DtoQuery<EBasicDto> query = DB.findDto(EBasicDto.class, "select id, status from e_basic");
     executeDelayed(query::cancel);
     assertThatThrownBy(() -> test.accept(query))
-        .isInstanceOf(PersistenceException.class)
-        .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
+      .isInstanceOf(PersistenceException.class)
+      .hasCauseInstanceOf(org.h2.jdbc.JdbcSQLTimeoutException.class);
   }
 
   private void executeDelayed(Runnable r) throws SQLException {
