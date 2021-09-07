@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.cluster.binarymessage;
 
 import io.ebean.BaseTestCase;
-import io.ebean.Database;
 import io.ebean.EbeanServer;
 import io.ebeaninternal.api.TDSpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
@@ -26,11 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
-  private BeanDescriptor<Customer> customerBeanDescriptor = getBeanDescriptor(Customer.class);
-
-  private TDEbeanServer mockEbeanServer = new TDEbeanServer();
-
-  private BinaryTransactionEventReader reader = new BinaryTransactionEventReader(new TDServerLookup());
+  private final BeanDescriptor<Customer> customerBeanDescriptor = getBeanDescriptor(Customer.class);
+  private final TDEbeanServer mockEbeanServer = new TDEbeanServer();
+  private final BinaryTransactionEventReader reader = new BinaryTransactionEventReader(new TDServerLookup());
 
   @Override
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
@@ -80,7 +77,6 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
   @Test
   public void readWrite_RemoteTableMod() throws IOException {
-
     RemoteTransactionEvent event = new RemoteTransactionEvent("db");
 
     Set<String> tables = new HashSet<>();
@@ -96,7 +92,6 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
   }
 
   class TDServerLookup implements ServerLookup {
-
     @Override
     public EbeanServer getServer(String name) {
       return mockEbeanServer;

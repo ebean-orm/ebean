@@ -1,6 +1,6 @@
 package org.tests.model.basic.mapsuper;
 
-import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.WhenCreated;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @MappedSuperclass
 public class MapSuperNoId {
 
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp whenCreated;
 
   @Version

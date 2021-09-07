@@ -17,7 +17,7 @@ public class TestM2MVanilla extends BaseTestCase {
   @Test
   public void testVanilla() {
 
-    DB.createSqlUpdate("delete from mrole_muser").execute();
+    DB.sqlUpdate("delete from mrole_muser").execute();
     DB.sqlUpdate("delete from mrole").execute();
     DB.sqlUpdate("delete from muser").execute();
 

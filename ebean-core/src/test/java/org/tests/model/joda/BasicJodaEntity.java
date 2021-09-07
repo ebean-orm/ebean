@@ -1,7 +1,7 @@
 package org.tests.model.joda;
 
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.UpdatedTimestamp;
+import io.ebean.annotation.WhenCreated;
+import io.ebean.annotation.WhenModified;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
@@ -19,10 +19,10 @@ public class BasicJodaEntity {
 
   String name;
 
-  @CreatedTimestamp
+  @WhenCreated
   LocalDateTime created;
 
-  @UpdatedTimestamp
+  @WhenModified
   DateTime updated;
 
   Period period;

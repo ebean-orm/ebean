@@ -1,6 +1,6 @@
 package org.tests.model.noid;
 
-import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.WhenCreated;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,7 +14,7 @@ public class NoIdBean {
 
   String subject;
 
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp whenCreated;
 
   public String getName() {

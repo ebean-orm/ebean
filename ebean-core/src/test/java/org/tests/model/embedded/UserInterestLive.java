@@ -1,7 +1,7 @@
 package org.tests.model.embedded;
 
 import io.ebean.Model;
-import io.ebean.annotation.CreatedTimestamp;
+import io.ebean.annotation.WhenCreated;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -13,7 +13,7 @@ public class UserInterestLive extends Model {
   @EmbeddedId
   private final UserInterestLiveKey key;
 
-  @CreatedTimestamp
+  @WhenCreated
   private Date createdAt;
 
   public UserInterestLive(UserInterestLiveKey key) {

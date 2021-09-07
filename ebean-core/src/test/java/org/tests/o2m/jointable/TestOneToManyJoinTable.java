@@ -50,7 +50,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     long intersectionRows = DB.sqlQuery("select count(*) as total from troop_monkey where troop_pid = ?")
       .setParameter(1, troop.getPid())
-      .findSingleLong();
+      .mapToScalar(Long.class).findOne();
 
     assertThat(intersectionRows).isEqualTo(2L);
 

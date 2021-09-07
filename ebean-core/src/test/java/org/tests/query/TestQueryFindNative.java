@@ -124,7 +124,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     List<Integer> ids = DB.sqlQuery(sql)
       .setParameter(1, "J%")
-      .findSingleAttributeList(Integer.class);
+      .mapToScalar(Integer.class).findList();
 
     List<Integer> idsScalar =
       server()

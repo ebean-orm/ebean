@@ -17,11 +17,11 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
       SqlUpdate delete;
 
       sql = "delete from td_child";
-      delete = DB.createSqlUpdate(sql);
+      delete = DB.sqlUpdate(sql);
       delete.execute();
 
       sql = "delete from td_parent";
-      delete = DB.createSqlUpdate(sql);
+      delete = DB.sqlUpdate(sql);
       delete.execute();
 
       EdParent parent = new EdParent();

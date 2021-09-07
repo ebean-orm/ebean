@@ -1,7 +1,7 @@
 package org.tests.inheritance.company.domain;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
+import io.ebean.DB;
+import io.ebean.Database;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,8 +13,7 @@ public class TestInheritAbstract {
 
   @Test
   public void testMe() {
-
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     List<AbstractBar> list0 = server.find(AbstractBar.class)
       .findList();

@@ -30,7 +30,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     Transaction txn = server().beginTransaction();
     try {
       EBasicWithUniqueCon v2 = createEntityWithName("conflict", "after");
-      txn.flushBatch();
+      txn.flush();
       Savepoint sp = txn.getConnection().setSavepoint();
       try {
         server().save(v2); // unique key violation

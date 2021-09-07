@@ -1,18 +1,18 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
+import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,13 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BaseTableDdlTest {
 
-  private ServerConfig serverConfig = new ServerConfig();
-
-  private PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
+  private final DatabaseConfig serverConfig = new DatabaseConfig();
+  private final PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
 
   @Test
   public void testAlterColumn() throws IOException {
-
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite write = new DdlWrite();

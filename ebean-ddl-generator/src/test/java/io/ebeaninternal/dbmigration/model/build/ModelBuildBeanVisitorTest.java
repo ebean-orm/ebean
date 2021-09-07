@@ -34,7 +34,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
 
     ModelContainer model = new ModelContainer();
 
-    DbConstraintNaming constraintNaming = defaultServer.getServerConfig().getConstraintNaming();
+    DbConstraintNaming constraintNaming = defaultServer.config().getConstraintNaming();
     constraintNaming.setMaxLength(new DefaultConstraintMaxLength(60));
     ModelBuildContext ctx = new ModelBuildContext(model, new H2Platform(), constraintNaming, true);
 
