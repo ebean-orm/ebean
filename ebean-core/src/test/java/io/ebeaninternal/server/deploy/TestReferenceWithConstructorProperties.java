@@ -25,7 +25,7 @@ public class TestReferenceWithConstructorProperties extends BaseTestCase {
     ResetBasicData.reset();
     Order order = DB.getReference(Order.class, 1);
 
-    BeanState beanState = DB.getBeanState(order);
+    BeanState beanState = DB.beanState(order);
     Set<String> loadedProps = beanState.getLoadedProps();
 
     assertEquals(1, loadedProps.size());

@@ -34,7 +34,7 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
         .findOne();
 
       foundOrder.setStatus(Order.Status.APPROVED);
-      assertTrue(DB.getBeanState(foundOrder).isDirty());
+      assertTrue(DB.beanState(foundOrder).isDirty());
 
       Customer foundCustomer = DB.find(Customer.class)
         .where().eq("id", customer.getId())
@@ -46,7 +46,7 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
       Order order1 = foundCustomer.getOrders().get(0);
 
       assertSame(foundOrder, order1);
-      assertTrue(DB.getBeanState(foundOrder).isDirty());
+      assertTrue(DB.beanState(foundOrder).isDirty());
 
     } finally {
       DB.endTransaction();

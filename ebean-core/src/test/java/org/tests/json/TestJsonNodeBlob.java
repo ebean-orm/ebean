@@ -58,7 +58,7 @@ public class TestJsonNodeBlob extends BaseTestCase {
       .setId(bean.getId())
       .findOne();
 
-    Set<String> loadedProps = DB.getBeanState(bean1).getLoadedProps();
+    Set<String> loadedProps = DB.beanState(bean1).getLoadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));
 

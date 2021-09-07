@@ -34,7 +34,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
 
     assertNotNull(order);
-    assertTrue(DB.getBeanState(order).isReadOnly());
+    assertTrue(DB.beanState(order).isReadOnly());
 
     List<OrderDetail> details = order.getDetails();
     BeanCollection<?> bc = (BeanCollection<?>) details;
@@ -48,16 +48,16 @@ public class TestSharedInstancePropagation extends BaseTestCase {
     assertTrue(!bc.isEmpty());
     OrderDetail detail = details.get(0);
 
-    assertTrue(DB.getBeanState(detail).isReadOnly());
-    assertFalse(DB.getBeanState(detail).isReference());
+    assertTrue(DB.beanState(detail).isReadOnly());
+    assertFalse(DB.beanState(detail).isReference());
 
     Product product = detail.getProduct();
 
-    assertTrue(DB.getBeanState(product).isReadOnly());
+    assertTrue(DB.beanState(product).isReadOnly());
 
     // lazy load
     product.getName();
-    assertFalse(DB.getBeanState(product).isReference());
+    assertFalse(DB.beanState(product).isReference());
 
   }
 }

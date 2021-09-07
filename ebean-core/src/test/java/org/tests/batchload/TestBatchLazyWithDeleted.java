@@ -58,7 +58,7 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
 
     for (UUTwo u : list) {
       u.getMaster();
-      //BeanState beanState = DB.getBeanState(master);
+      //BeanState beanState = DB.beanState(master);
       //assertTrue(beanState.isReference());
     }
 

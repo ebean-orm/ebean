@@ -25,7 +25,7 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
 
     Order order = DB.getReference(Order.class, 1);
 
-    assertTrue(DB.getBeanState(order).isReference());
+    assertTrue(DB.beanState(order).isReference());
 
     // invoke lazy loading
     Date orderDate = order.getOrderDate();
@@ -34,10 +34,10 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
     Customer customer = order.getCustomer();
     assertNotNull(customer);
 
-    assertFalse(DB.getBeanState(order).isReference());
+    assertFalse(DB.beanState(order).isReference());
     assertNotNull(order.getStatus());
     assertNotNull(order.getDetails());
-    assertNull(DB.getBeanState(order).getLoadedProps());
+    assertNull(DB.beanState(order).getLoadedProps());
 
     Status status = order.getStatus();
     assertTrue(status != Order.Status.SHIPPED);

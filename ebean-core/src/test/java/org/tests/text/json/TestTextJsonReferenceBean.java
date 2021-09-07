@@ -32,7 +32,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     Product product = DB.getReference(Product.class, 1);
 
-    BeanState beanState0 = DB.getBeanState(product);
+    BeanState beanState0 = DB.beanState(product);
     if (!beanState0.isReference()) {
       // got a cached value from beanCache
 
@@ -46,7 +46,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       EntityBean eb = (EntityBean) refProd;
       prodDesc.isReference(eb._ebean_getIntercept());
 
-      BeanState beanState = DB.getBeanState(refProd);
+      BeanState beanState = DB.beanState(refProd);
       assertTrue(beanState.isNew());
 
       String name = refProd.getName();

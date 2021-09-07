@@ -44,7 +44,7 @@ public class TestL2DirtyFlagOnLazyLoad extends BaseTestCase {
       assertNotNull(bean2);
       assertEquals("findById", bean2.getName());
       bean2.setName("something");
-      BeanState beanState = DB.getBeanState(bean2);
+      BeanState beanState = DB.beanState(bean2);
       assertTrue(beanState.isDirty());
       //bean2.getChildren().size();
       bean2.someRichObjectMethod();

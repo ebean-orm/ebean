@@ -91,7 +91,7 @@ public class TestCacheBasic extends BaseTestCase {
     // assertTrue("these 2 are different",c5 != c6);
     //
     // // by default readOnly based on deployment annotation
-    // assertTrue("read only",DB.getBeanState(c6).isReadOnly());
+    // assertTrue("read only",DB.beanState(c6).isReadOnly());
     //
     // try {
     // // can't modify a readOnly bean
@@ -107,7 +107,7 @@ public class TestCacheBasic extends BaseTestCase {
     // .findOne();
     //
     // // Explicitly NOT readOnly
-    // assertFalse("NOT read only",DB.getBeanState(c8).isReadOnly());
+    // assertFalse("NOT read only",DB.beanState(c8).isReadOnly());
     //
     // assertEquals("1 countries in cache", 1, countryCache.size());
     // c8.setName("Nu Zilund");
@@ -122,12 +122,12 @@ public class TestCacheBasic extends BaseTestCase {
     // .findOne();
     //
     // // Find loads cache ...
-    // assertFalse(DB.getBeanState(c9).isReadOnly());
+    // assertFalse(DB.beanState(c9).isReadOnly());
     // assertTrue(countryCache.size() > 0);
     //
     // Country c10 = DB.find(Country.class,"NZ");
     //
-    // assertTrue(DB.getBeanState(c10).isReadOnly());
+    // assertTrue(DB.beanState(c10).isReadOnly());
     // assertTrue(countryCache.size() > 0);
     //
     // DB.cacheManager().clear(Country.class);

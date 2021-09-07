@@ -83,7 +83,7 @@ public class TestBasicLazy extends BaseTestCase {
     final Customer customer = order.getCustomer();
     assertNotNull(customer);
 
-    assertTrue(DB.getBeanState(customer).isReference());
+    assertTrue(DB.beanState(customer).isReference());
 
     final Throwable throwables[] = new Throwable[2];
     Thread t1 = new Thread() {
@@ -120,7 +120,7 @@ public class TestBasicLazy extends BaseTestCase {
       MyTestDataSourcePoolListener.SLEEP_AFTER_BORROW = 0;
     }
 
-    assertFalse(DB.getBeanState(customer).isReference());
+    assertFalse(DB.beanState(customer).isReference());
 
     if (throwables[0] != null) {
       throw throwables[0];

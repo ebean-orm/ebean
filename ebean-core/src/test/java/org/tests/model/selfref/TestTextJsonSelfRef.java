@@ -39,7 +39,7 @@ public class TestTextJsonSelfRef extends BaseTestCase {
 
     // Check that there are no 'reference' beans here
     for (SelfRefCustomer cust : customers) {
-      BeanState beanState = DB.getBeanState(cust);
+      BeanState beanState = DB.beanState(cust);
       assertFalse(beanState.isReference());
     }
 

@@ -29,7 +29,7 @@ public class TestProtectedConstructor extends BaseTestCase {
     Object newBeanInstance = entityBean._ebean_newInstance();
 
     assertNotNull(newBeanInstance);
-    BeanState beanState = DB.getBeanState(newBeanInstance);
+    BeanState beanState = DB.beanState(newBeanInstance);
     assertTrue(beanState.isNew());
     assertNotSame(entityBean, newBeanInstance);
 

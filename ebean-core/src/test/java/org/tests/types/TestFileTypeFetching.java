@@ -31,7 +31,7 @@ public class TestFileTypeFetching extends BaseTestCase {
       .setId(bean0.getId())
       .findOne();
 
-    BeanState beanState = DB.getBeanState(bean1);
+    BeanState beanState = DB.beanState(bean1);
     Set<String> loadedProps = beanState.getLoadedProps();
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("content"));

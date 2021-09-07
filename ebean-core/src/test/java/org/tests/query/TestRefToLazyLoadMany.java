@@ -23,7 +23,7 @@ public class TestRefToLazyLoadMany extends BaseTestCase {
     Customer c = custList.get(0);
 
     List<Contact> contacts2 = c.getContacts();
-    assertEquals(3, DB.getBeanState(c).getLoadedProps().size());
+    assertEquals(3, DB.beanState(c).getLoadedProps().size());
 
     // now lazy load the contacts
     contacts2.size();
@@ -32,7 +32,7 @@ public class TestRefToLazyLoadMany extends BaseTestCase {
 
     // we only "loaded" the contacts BeanList and not all of c2
     List<Contact> contacts = c2.getContacts();
-    // Set<String> loadedProps = DB.getBeanState(c2).getLoadedProps();
+    // Set<String> loadedProps = DB.beanState(c2).getLoadedProps();
     // assertEquals(1, loadedProps.size());
 
     // now lazy load the contacts

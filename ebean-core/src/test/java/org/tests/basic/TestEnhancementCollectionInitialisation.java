@@ -17,7 +17,7 @@ public class TestEnhancementCollectionInitialisation extends BaseTestCase {
   @Test
   public void testListInitialisation() {
     Customer customer = new Customer();
-    BeanState beanState = DB.getBeanState(customer);
+    BeanState beanState = DB.beanState(customer);
     if (beanState != null) {
       List<Order> orders = customer.getOrders();
       assertNotNull(orders);

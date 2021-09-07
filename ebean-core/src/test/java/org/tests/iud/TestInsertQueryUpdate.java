@@ -24,7 +24,7 @@ public class TestInsertQueryUpdate extends BaseTestCase {
       .setId(e0.getId())
       .findOne();
 
-    BeanState beanState = DB.getBeanState(e1);
+    BeanState beanState = DB.beanState(e1);
     Set<String> loadedProps = beanState.getLoadedProps();
     assertFalse(loadedProps.contains("description"));
     //lastUpdate

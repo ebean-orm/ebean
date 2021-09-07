@@ -42,7 +42,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     assertTrue(cust1 != cust1B);
 
-    Set<String> loadedProps = DB.getBeanState(cust1).getLoadedProps();
+    Set<String> loadedProps = DB.beanState(cust1).getLoadedProps();
 
     assertTrue(loadedProps.contains("name"));
     assertFalse(loadedProps.contains("status"));

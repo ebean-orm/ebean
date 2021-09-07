@@ -30,7 +30,7 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setEmail("change@junk.com");
 
 
-    BeanState beanState = DB.getBeanState(user);
+    BeanState beanState = DB.beanState(user);
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
 
     user.markPropertyUnset("email");
@@ -54,7 +54,7 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setName("name mod");
     user.setEmail("change@junk.com");
 
-    BeanState beanState = DB.getBeanState(user);
+    BeanState beanState = DB.beanState(user);
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
 
     // unset the loaded state for email
@@ -72,7 +72,7 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setName("name mod");
     user.setEmail("change@junk.com");
 
-    BeanState beanState = DB.getBeanState(user);
+    BeanState beanState = DB.beanState(user);
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
 
 
@@ -89,10 +89,10 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     user.setName("name mod");
     user.setEmail("change@junk.com");
 
-    BeanState beanState = DB.getBeanState(user);
+    BeanState beanState = DB.beanState(user);
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name", "email");
 
-    DB.getBeanState(user).setPropertyLoaded("email", false);
+    DB.beanState(user).setPropertyLoaded("email", false);
     assertThat(beanState.getLoadedProps()).containsExactly("id", "name");
   }
 

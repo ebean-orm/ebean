@@ -54,7 +54,7 @@ public class TestPrinterStateIssue extends BaseTestCase {
     state1.setFlags(7L);
 
 
-//    BeanState beanState = DB.getBeanState(printer1);
+//    BeanState beanState = DB.beanState(printer1);
 //    Set<String> changedProps = beanState.getChangedProps();
 //    System.out.println("changed: "+changedProps);
 

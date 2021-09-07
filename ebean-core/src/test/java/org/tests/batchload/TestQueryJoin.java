@@ -36,7 +36,7 @@ public class TestQueryJoin extends BaseTestCase {
     // list.get(0).getShipDate();
 
     Order order = list.get(0);
-    BeanState beanStateOrder = DB.getBeanState(order);
+    BeanState beanStateOrder = DB.beanState(order);
     assertNotNull(beanStateOrder.getLoadedProps());
     // assertTrue(beanStateOrder.getLoadedProps().contains("id"));
     assertTrue(beanStateOrder.getLoadedProps().contains("status"));
@@ -44,7 +44,7 @@ public class TestQueryJoin extends BaseTestCase {
     assertTrue(beanStateOrder.getLoadedProps().contains("customer"));
 
     Customer customer = order.getCustomer();
-    BeanState beanStateCustomer = DB.getBeanState(customer);
+    BeanState beanStateCustomer = DB.beanState(customer);
     assertTrue(beanStateCustomer.isReference());
 
     customer.getName();

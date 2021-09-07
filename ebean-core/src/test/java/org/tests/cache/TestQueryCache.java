@@ -251,7 +251,7 @@ public class TestQueryCache extends BaseTestCase {
     assertTrue(list3.size() > 0);
     // TODO: At this stage setReadOnly(false) does create a shallow copy of the List/Set/Map, but does not
     // change the read only state in the entities.
-    // assertFalse(DB.getBeanState(list3.get(0)).isReadOnly());
+    // assertFalse(DB.beanState(list3.get(0)).isReadOnly());
 
   }
 

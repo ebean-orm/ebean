@@ -37,7 +37,7 @@ public class TestBeanStateReset extends BaseTestCase {
     } catch (PersistenceException e) {
       logger.info("expected error " + e.getMessage());
 
-      DB.getBeanState(b).resetForInsert();
+      DB.beanState(b).resetForInsert();
       b.getCs().clear();
 
       LoggedSqlCollector.start();
