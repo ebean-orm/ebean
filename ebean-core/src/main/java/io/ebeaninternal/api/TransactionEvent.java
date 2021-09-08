@@ -114,7 +114,7 @@ public final class TransactionEvent implements Serializable {
     }
     if (eventTables != null && !eventTables.isEmpty()) {
       // notify cache with table based changes
-      BeanDescriptorManager dm = manager.getBeanDescriptorManager();
+      BeanDescriptorManager dm = manager.descriptorManager();
       for (TransactionEventTable.TableIUD tableIUD : eventTables.values()) {
         dm.cacheNotify(tableIUD, changeSet);
       }

@@ -356,12 +356,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public DataSource dataSource() {
-    return transactionManager.getDataSource();
+    return transactionManager.dataSource();
   }
 
   @Override
   public DataSource readOnlyDataSource() {
-    return transactionManager.getReadOnlyDataSource();
+    return transactionManager.readOnlyDataSource();
   }
 
   @Override
@@ -694,7 +694,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     BeanDescriptor desc = descriptor(type);
     id = desc.convertId(id);
     PersistenceContext pc = null;
-    SpiTransaction t = transactionManager.getActive();
+    SpiTransaction t = transactionManager.active();
     if (t != null) {
       pc = t.getPersistenceContext();
       Object existing = desc.contextGet(pc, id);
@@ -795,7 +795,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction currentServerTransaction() {
-    return transactionManager.getActive();
+    return transactionManager.active();
   }
 
   @Override
@@ -824,7 +824,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Transaction currentTransaction() {
-    return transactionManager.getActive();
+    return transactionManager.active();
   }
 
   @Override
@@ -844,7 +844,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void endTransaction() {
-    Transaction transaction = transactionManager.getInScope();
+    Transaction transaction = transactionManager.inScope();
     if (transaction != null) {
       transaction.end();
     }
@@ -2211,7 +2211,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t != null) {
       return new ObtainedTransaction((SpiTransaction) t);
     }
-    SpiTransaction trans = transactionManager.getActive();
+    SpiTransaction trans = transactionManager.active();
     if (trans != null) {
       return new ObtainedTransaction(trans);
     }

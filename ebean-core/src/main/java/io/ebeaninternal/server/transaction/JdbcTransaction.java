@@ -208,7 +208,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
         this.batchMode = manager.isPersistBatch();
         this.batchOnCascadeMode = manager.isPersistBatchOnCascade();
-        this.onQueryOnly = manager.getOnQueryOnly();
+        this.onQueryOnly = manager.onQueryOnly();
       }
 
       checkAutoCommit(connection);

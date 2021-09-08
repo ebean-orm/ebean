@@ -50,7 +50,7 @@ final class PostCommitProcessing {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
-    this.serverName = manager.getServerName();
+    this.serverName = manager.name();
     this.txnDocStoreMode = DocStoreMode.IGNORE;
     this.txnDocStoreBatchSize = 0;
     this.event = event;
@@ -66,7 +66,7 @@ final class PostCommitProcessing {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
-    this.serverName = manager.getServerName();
+    this.serverName = manager.name();
     this.txnDocStoreMode = transaction.getDocStoreMode();
     this.txnDocStoreBatchSize = transaction.getDocStoreBatchSize();
     this.event = transaction.getEvent();
@@ -162,7 +162,7 @@ final class PostCommitProcessing {
     }
     TransactionEventTable eventTables = event.getEventTables();
     if (eventTables != null && !eventTables.isEmpty()) {
-      BulkEventListenerMap map = manager.getBulkEventListenerMap();
+      BulkEventListenerMap map = manager.bulkEventListenerMap();
       for (TableIUD tableIUD : eventTables.values()) {
         map.process(tableIUD);
       }
