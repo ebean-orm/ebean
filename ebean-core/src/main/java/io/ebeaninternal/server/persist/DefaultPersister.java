@@ -175,7 +175,7 @@ public final class DefaultPersister implements Persister {
   public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
 
     Class<T> beanType = query.getBeanType();
-    BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
+    BeanDescriptor<T> desc = server.descriptor(beanType);
 
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
@@ -220,7 +220,7 @@ public final class DefaultPersister implements Persister {
   public <T> List<T> publish(Query<T> query, Transaction transaction) {
 
     Class<T> beanType = query.getBeanType();
-    BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
+    BeanDescriptor<T> desc = server.descriptor(beanType);
 
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 

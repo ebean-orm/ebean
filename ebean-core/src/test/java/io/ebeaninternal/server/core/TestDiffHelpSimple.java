@@ -29,7 +29,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
   public TestDiffHelpSimple() {
     server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
-    orderDesc = spiServer.getBeanDescriptor(Order.class);
+    orderDesc = spiServer.descriptor(Order.class);
   }
 
   private Order createBaseOrder(Database server) {

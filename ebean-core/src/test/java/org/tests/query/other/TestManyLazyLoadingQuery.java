@@ -25,7 +25,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
-    BeanDescriptor<Order> descOrder = server.getBeanDescriptor(Order.class);
+    BeanDescriptor<Order> descOrder = server.descriptor(Order.class);
     BeanPropertyAssocMany<?> beanProperty = (BeanPropertyAssocMany<?>) descOrder.beanProperty("details");
 
     List<Object> parentIds = new ArrayList<>();

@@ -24,7 +24,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
   @Test
   public void extract() {
 
-    BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> desc = server.descriptor(Customer.class);
 
     Date largeDate = new Date(9223372036825200000L);
 
@@ -56,7 +56,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     car.setDriver("Jimmy");
     car.setNotes("some notes");
 
-    BeanDescriptor<Car> carDesc = server.getBeanDescriptor(Car.class);
+    BeanDescriptor<Car> carDesc = server.descriptor(Car.class);
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(carDesc, (EntityBean) car);
 
     Car newCar = new Car();

@@ -54,7 +54,7 @@ final class DefaultBeanLoader {
   private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, boolean onlyIds) {
     EntityBeanIntercept ebi = parentBean._ebean_getIntercept();
     PersistenceContext pc = ebi.getPersistenceContext();
-    BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
+    BeanDescriptor<?> parentDesc = server.descriptor(parentBean.getClass());
     BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.beanProperty(propertyName);
     BeanCollection<?> beanCollection = null;
     ExpressionList<?> filterMany = null;
@@ -176,7 +176,7 @@ final class DefaultBeanLoader {
       pc = null;
     }
 
-    BeanDescriptor<?> desc = server.getBeanDescriptor(bean.getClass());
+    BeanDescriptor<?> desc = server.descriptor(bean.getClass());
     if (EntityType.EMBEDDED == desc.entityType()) {
       // lazy loading on an embedded bean property
       EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();

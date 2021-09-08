@@ -27,7 +27,7 @@ public class TestInheritWithMany extends BaseTestCase {
     assertNotNull(server);
 
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
-    BeanDescriptor<IMRoot> beanDescriptor = spiServer.getBeanDescriptor(IMRoot.class);
+    BeanDescriptor<IMRoot> beanDescriptor = spiServer.descriptor(IMRoot.class);
     InheritInfo inheritInfo = beanDescriptor.inheritInfo();
     assertNotNull(inheritInfo);
 

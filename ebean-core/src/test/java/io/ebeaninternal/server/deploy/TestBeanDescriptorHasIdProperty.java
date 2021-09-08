@@ -31,7 +31,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
   @Test
   public void testHasId() {
 
-    BeanDescriptor<Order> beanDescriptor = spiServer.getBeanDescriptor(Order.class);
+    BeanDescriptor<Order> beanDescriptor = spiServer.descriptor(Order.class);
     assertNotNull(beanDescriptor.idProperty());
     assertEquals("id", beanDescriptor.idProperty().name());
 
@@ -54,7 +54,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
   @Test
   public void testIsReference() {
 
-    BeanDescriptor<Customer> beanDescriptor = spiServer.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> beanDescriptor = spiServer.descriptor(Customer.class);
 
     Customer order = new Customer();
     EntityBeanIntercept ebi = getIntercept(order);
@@ -69,7 +69,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 
   @Test
   public void isReference_withGeneratedOnInsertOnlyProperty_expect_false() {
-    BeanDescriptor<UserInterestLive> descriptor = spiServer.getBeanDescriptor(UserInterestLive.class);
+    BeanDescriptor<UserInterestLive> descriptor = spiServer.descriptor(UserInterestLive.class);
     UserInterestLive bean = new UserInterestLive(new UserInterestLiveKey(1L, 2L));
     EntityBeanIntercept ebi = getIntercept(bean);
     assertFalse(descriptor.referenceIdPropertyOnly(ebi));
@@ -78,7 +78,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
   @Test
   public void test_getIdForJson() {
 
-    BeanDescriptor<Order> orderDesc = spiServer.getBeanDescriptor(Order.class);
+    BeanDescriptor<Order> orderDesc = spiServer.descriptor(Order.class);
 
     Order order = new Order();
     order.setId(42);
@@ -96,7 +96,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
     RCustomer rCustomer = new RCustomer();
     rCustomer.setKey(key);
 
-    BeanDescriptor<RCustomer> rcustDesc = spiServer.getBeanDescriptor(RCustomer.class);
+    BeanDescriptor<RCustomer> rcustDesc = spiServer.descriptor(RCustomer.class);
 
     @SuppressWarnings("unchecked")
     Map<String, Object> idForJson = (Map<String, Object>) rcustDesc.idForJson(rCustomer);

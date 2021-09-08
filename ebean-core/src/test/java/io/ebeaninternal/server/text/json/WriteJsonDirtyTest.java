@@ -30,7 +30,7 @@ public class WriteJsonDirtyTest {
       .findOne();
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
-    BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> descriptor = server.descriptor(Customer.class);
 
     customer.setName("dirtyCustName");
     customer.setAnniversary(new Date(System.currentTimeMillis()));

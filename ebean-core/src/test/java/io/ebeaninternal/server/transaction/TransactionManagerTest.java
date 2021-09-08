@@ -28,7 +28,7 @@ public class TransactionManagerTest extends BaseTestCase {
 
     SpiEbeanServer server = spiEbeanServer();
 
-    SpiTransactionManager transactionManager = server.getTransactionManager();
+    SpiTransactionManager transactionManager = server.transactionManager();
 
     DataSource dataSource = transactionManager.getDataSource();
     Connection connection = dataSource.getConnection();

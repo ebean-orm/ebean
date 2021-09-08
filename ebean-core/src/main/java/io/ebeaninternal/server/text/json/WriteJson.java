@@ -600,7 +600,7 @@ public final class WriteJson implements SpiJsonWriter {
   }
 
   private <T> BeanDescriptor<T> getDescriptor(Class<T> cls) {
-    BeanDescriptor<T> d = server.getBeanDescriptor(cls);
+    BeanDescriptor<T> d = server.descriptor(cls);
     if (d == null) {
       throw new RuntimeException("No BeanDescriptor found for " + cls);
     }

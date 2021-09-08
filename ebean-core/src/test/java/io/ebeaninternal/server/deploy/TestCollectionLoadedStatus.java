@@ -20,7 +20,7 @@ public class TestCollectionLoadedStatus extends BaseTestCase {
   public void test() {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
-    BeanDescriptor<Customer> custDesc = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> custDesc = server.descriptor(Customer.class);
 
     Customer customer = new Customer();
     EntityBean eb = (EntityBean) customer;

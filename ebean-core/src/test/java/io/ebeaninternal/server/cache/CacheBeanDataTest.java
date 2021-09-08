@@ -26,7 +26,7 @@ public class CacheBeanDataTest extends BaseTestCase {
   public void extract_load_on_customer() {
 
     SpiEbeanServer server = spiEbeanServer();
-    BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> desc = server.descriptor(Customer.class);
 
     Customer c = new Customer();
     c.setId(98989);
@@ -78,7 +78,7 @@ public class CacheBeanDataTest extends BaseTestCase {
   public void extract_load_withEmbeddedBean() {
 
     SpiEbeanServer server = spiEbeanServer();
-    BeanDescriptor<EPerson> desc = server.getBeanDescriptor(EPerson.class);
+    BeanDescriptor<EPerson> desc = server.descriptor(EPerson.class);
     BeanPropertyAssocOne<?> addressBeanProperty = (BeanPropertyAssocOne<?>) desc.beanProperty("address");
 
     EAddress address = new EAddress();

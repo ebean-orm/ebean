@@ -24,7 +24,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
   public void test() throws IOException {
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
-    BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> descriptor = server.descriptor(Customer.class);
 
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
     JsonParser parser = server.json().createParser(reader);

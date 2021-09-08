@@ -19,7 +19,7 @@ public class BeanDescriptor_whenCreatedPropertyTest extends BaseTestCase {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
 
-    BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> desc = server.descriptor(Customer.class);
 
     BeanProperty whenCreatedProperty = desc.whenCreatedProperty();
     assertEquals("cretime", whenCreatedProperty.dbColumn());
@@ -28,7 +28,7 @@ public class BeanDescriptor_whenCreatedPropertyTest extends BaseTestCase {
     assertEquals("updtime", whenModifiedProperty.dbColumn());
 
 
-    BeanDescriptor<EBasic> eBasicDesc = server.getBeanDescriptor(EBasic.class);
+    BeanDescriptor<EBasic> eBasicDesc = server.descriptor(EBasic.class);
     assertNull(eBasicDesc.whenCreatedProperty());
     assertNull(eBasicDesc.whenModifiedProperty());
   }

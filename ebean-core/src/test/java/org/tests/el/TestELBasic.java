@@ -21,7 +21,7 @@ public class TestELBasic extends BaseTestCase {
   public void testEl() {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
-    BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> descriptor = server.descriptor(Customer.class);
 
     ElPropertyDeploy elId = descriptor.elPropertyDeploy("id");
     assertTrue(elId instanceof BeanProperty);

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BeanPropertyAssocManyTest extends BaseTestCase {
 
-  private BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
+  private BeanDescriptor<Customer> customerDesc = spiEbeanServer().descriptor(Customer.class);
 
   @SuppressWarnings("unchecked")
   private BeanPropertyAssocMany<Customer> contacts() {

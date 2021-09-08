@@ -104,7 +104,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public DataTimeZone getDataTimeZone() {
+  public DataTimeZone dataTimeZone() {
     return null;
   }
 
@@ -139,7 +139,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query) {
+  public PersistenceContextScope persistenceContextScope(SpiQuery<?> query) {
     return null;
   }
 
@@ -149,12 +149,12 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public ReadAuditLogger getReadAuditLogger() {
+  public ReadAuditLogger readAuditLogger() {
     return null;
   }
 
   @Override
-  public ReadAuditPrepare getReadAuditPrepare() {
+  public ReadAuditPrepare readAuditPrepare() {
     return null;
   }
 
@@ -164,32 +164,32 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId) {
+  public BeanDescriptor<?> descriptorByQueueId(String queueId) {
     return null;
   }
 
   @Override
-  public SpiTransactionManager getTransactionManager() {
+  public SpiTransactionManager transactionManager() {
     return null;
   }
 
   @Override
-  public List<BeanDescriptor<?>> getBeanDescriptors() {
+  public List<BeanDescriptor<?>> descriptors() {
     return null;
   }
 
   @Override
-  public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type) {
+  public <T> BeanDescriptor<T> descriptor(Class<T> type) {
     return null;
   }
 
   @Override
-  public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {
+  public BeanDescriptor<?> descriptorById(String descriptorId) {
     return null;
   }
 
   @Override
-  public List<BeanDescriptor<?>> getBeanDescriptors(String tableName) {
+  public List<BeanDescriptor<?>> descriptors(String tableName) {
     return null;
   }
 
@@ -277,7 +277,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public int getLazyLoadBatchSize() {
+  public int lazyLoadBatchSize() {
     return 0;
   }
 

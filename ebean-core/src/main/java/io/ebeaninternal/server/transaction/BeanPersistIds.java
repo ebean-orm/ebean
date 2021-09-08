@@ -47,7 +47,7 @@ public final class BeanPersistIds implements BinaryWritable {
 
   public static BeanPersistIds readBinaryMessage(SpiEbeanServer server, BinaryReadContext input) throws IOException {
 
-    BeanDescriptor<?> desc = server.getBeanDescriptorById(input.readUTF());
+    BeanDescriptor<?> desc = server.descriptorById(input.readUTF());
     BeanPersistIds bp = new BeanPersistIds(desc);
     bp.read(input);
     return bp;

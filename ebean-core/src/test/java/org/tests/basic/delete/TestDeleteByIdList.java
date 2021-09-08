@@ -23,7 +23,7 @@ public class TestDeleteByIdList extends BaseTestCase {
 
     OrderDetail dummy = DB.reference(OrderDetail.class, 1);
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
-    server.getBeanDescriptor(OrderDetail.class).cacheBeanPut(dummy);
+    server.descriptor(OrderDetail.class).cacheBeanPut(dummy);
 
     Customer c0 = ResetBasicData.createCustAndOrder("DelIdList-0");
     assertNotNull(c0);

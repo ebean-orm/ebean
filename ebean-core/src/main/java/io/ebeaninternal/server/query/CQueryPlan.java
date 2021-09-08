@@ -86,7 +86,7 @@ public class CQueryPlan implements SpiQueryPlan {
    */
   CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
     this.server = request.server();
-    this.dataTimeZone = server.getDataTimeZone();
+    this.dataTimeZone = server.dataTimeZone();
     this.beanType = request.descriptor().type();
     this.planKey = request.queryPlanKey();
     SpiQuery<?> query = request.query();
@@ -111,7 +111,7 @@ public class CQueryPlan implements SpiQueryPlan {
    */
   CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, String logWhereSql) {
     this.server = request.server();
-    this.dataTimeZone = server.getDataTimeZone();
+    this.dataTimeZone = server.dataTimeZone();
     this.beanType = request.descriptor().type();
     SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();

@@ -122,6 +122,6 @@ public abstract class BeanRequest {
    * Return the DataTimeZone to use.
    */
   public DataTimeZone dataTimeZone() {
-    return server.getDataTimeZone();
+    return server.dataTimeZone();
   }
 }

@@ -325,7 +325,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (ctx != null) return ctx;
 
     // determine the scope (from the query and then server)
-    PersistenceContextScope scope = server.getPersistenceContextScope(query);
+    PersistenceContextScope scope = server.persistenceContextScope(query);
     if (scope == PersistenceContextScope.QUERY || t == null) {
       return new DefaultPersistenceContext();
     }
@@ -745,7 +745,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public int lazyLoadBatchSize() {
     int batchSize = query.getLazyLoadBatchSize();
-    return (batchSize > 0) ? batchSize : server.getLazyLoadBatchSize();
+    return (batchSize > 0) ? batchSize : server.lazyLoadBatchSize();
   }
 
   /**

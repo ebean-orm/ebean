@@ -23,7 +23,7 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) create();
     try {
       Query<EBasicVer> query = ebeanServer.find(EBasicVer.class);
-      PersistenceContextScope scope = ebeanServer.getPersistenceContextScope((SpiQuery<?>) query);
+      PersistenceContextScope scope = ebeanServer.persistenceContextScope((SpiQuery<?>) query);
 
       assertEquals(PersistenceContextScope.QUERY, scope);
     } finally {

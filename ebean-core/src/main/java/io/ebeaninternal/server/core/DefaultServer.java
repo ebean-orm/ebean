@@ -295,7 +295,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int getLazyLoadBatchSize() {
+  public int lazyLoadBatchSize() {
     return lazyLoadBatchSize;
   }
 
@@ -320,7 +320,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public DataTimeZone getDataTimeZone() {
+  public DataTimeZone dataTimeZone() {
     return dataTimeZone;
   }
 
@@ -365,12 +365,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ReadAuditPrepare getReadAuditPrepare() {
+  public ReadAuditPrepare readAuditPrepare() {
     return readAuditPrepare;
   }
 
   @Override
-  public ReadAuditLogger getReadAuditLogger() {
+  public ReadAuditLogger readAuditLogger() {
     return readAuditLogger;
   }
 
@@ -595,7 +595,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (a == null) {
       return null;
     }
-    BeanDescriptor<?> desc = getBeanDescriptor(a.getClass());
+    BeanDescriptor<?> desc = descriptor(a.getClass());
     return DiffHelp.diff(a, b, desc);
   }
 
@@ -628,7 +628,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public void truncate(Class<?>... types) {
     List<String> tableNames = new ArrayList<>();
     for (Class<?> type : types) {
-      tableNames.add(getBeanDescriptor(type).baseTable());
+      tableNames.add(descriptor(type).baseTable());
     }
     truncate(tableNames.toArray(new String[0]));
   }
@@ -659,7 +659,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void clearQueryStatistics() {
-    for (BeanDescriptor<?> desc : getBeanDescriptors()) {
+    for (BeanDescriptor<?> desc : descriptors()) {
       desc.clearQueryStatistics();
     }
   }
@@ -674,7 +674,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T createEntityBean(Class<T> type) {
-    return getBeanDescriptor(type).createBean();
+    return descriptor(type).createBean();
   }
 
   /**
@@ -691,7 +691,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (id == null) {
       throw new NullPointerException("The id is null");
     }
-    BeanDescriptor desc = getBeanDescriptor(type);
+    BeanDescriptor desc = descriptor(type);
     id = desc.convertId(id);
     PersistenceContext pc = null;
     SpiTransaction t = transactionManager.getActive();
@@ -852,7 +852,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Object nextId(Class<?> beanType) {
-    BeanDescriptor<?> desc = getBeanDescriptor(beanType);
+    BeanDescriptor<?> desc = descriptor(beanType);
     return desc.nextId(null);
   }
 
@@ -871,7 +871,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // use first bean in the list as the correct type
     Class<T> beanType = (Class<T>) list.get(0).getClass();
-    BeanDescriptor<T> beanDescriptor = getBeanDescriptor(beanType);
+    BeanDescriptor<T> beanDescriptor = descriptor(beanType);
     if (beanDescriptor == null) {
       throw new PersistenceException("BeanDescriptor not found, is [" + beanType + "] an entity bean?");
     }
@@ -880,7 +880,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Set<String> validateQuery(Query<T> query) {
-    BeanDescriptor<T> beanDescriptor = getBeanDescriptor(query.getBeanType());
+    BeanDescriptor<T> beanDescriptor = descriptor(query.getBeanType());
     if (beanDescriptor == null) {
       throw new PersistenceException("BeanDescriptor not found, is [" + query.getBeanType() + "] an entity bean?");
     }
@@ -889,7 +889,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Filter<T> filter(Class<T> beanType) {
-    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
+    BeanDescriptor<T> desc = descriptor(beanType);
     if (desc == null) {
       String m = beanType.getName() + " is NOT an Entity Bean registered with this server?";
       throw new PersistenceException(m);
@@ -899,7 +899,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-    BeanDescriptor<T> descriptor = getBeanDescriptor(beanType);
+    BeanDescriptor<T> descriptor = descriptor(beanType);
     if (descriptor == null) {
       throw new NullPointerException("BeanDescriptor for " + beanType.getName() + " not found");
     }
@@ -923,7 +923,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void merge(Object bean, MergeOptions options, Transaction transaction) {
-    BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
+    BeanDescriptor<?> desc = descriptor(bean.getClass());
     if (desc == null) {
       throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -937,7 +937,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
-    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
+    BeanDescriptor<T> desc = descriptor(beanType);
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -948,7 +948,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {
-    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
+    BeanDescriptor<T> desc = descriptor(beanType);
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -974,7 +974,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> DefaultOrmQuery<T> createQuery(Class<T> beanType) {
-    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
+    BeanDescriptor<T> desc = descriptor(beanType);
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -983,7 +983,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
-    BeanDescriptor<?> desc = getBeanDescriptor(beanType);
+    BeanDescriptor<?> desc = descriptor(beanType);
     if (desc == null) {
       String m = beanType.getName() + " is NOT an Entity Bean registered with this server?";
       throw new PersistenceException(m);
@@ -1134,14 +1134,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return true if transactions PersistenceContext should be used.
    */
   private <T> boolean useTransactionPersistenceContext(SpiQuery<T> query) {
-    return PersistenceContextScope.TRANSACTION == getPersistenceContextScope(query);
+    return PersistenceContextScope.TRANSACTION == persistenceContextScope(query);
   }
 
   /**
    * Return the PersistenceContextScope to use defined at query or server level.
    */
   @Override
-  public PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query) {
+  public PersistenceContextScope persistenceContextScope(SpiQuery<?> query) {
     PersistenceContextScope scope = query.getPersistenceContextScope();
     return (scope != null) ? scope : defaultPersistenceContextScope;
   }
@@ -2048,7 +2048,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return all the BeanDescriptors.
    */
   @Override
-  public List<BeanDescriptor<?>> getBeanDescriptors() {
+  public List<BeanDescriptor<?>> descriptors() {
     return beanDescriptorManager.getBeanDescriptorList();
   }
 
@@ -2056,7 +2056,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the transaction manager.
    */
   @Override
-  public SpiTransactionManager getTransactionManager() {
+  public SpiTransactionManager transactionManager() {
     return transactionManager;
   }
 
@@ -2075,13 +2075,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public boolean isSupportedType(java.lang.reflect.Type genericType) {
     TypeInfo typeInfo = ParamTypeHelper.getTypeInfo(genericType);
-    return typeInfo != null && getBeanDescriptor(typeInfo.getBeanType()) != null;
+    return typeInfo != null && descriptor(typeInfo.getBeanType()) != null;
   }
 
   @Override
   public Object beanId(Object bean, Object id) {
     EntityBean eb = checkEntityBean(bean);
-    BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
+    BeanDescriptor<?> desc = descriptor(bean.getClass());
     if (desc == null) {
       throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -2091,7 +2091,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Object beanId(Object bean) {
     EntityBean eb = checkEntityBean(bean);
-    BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
+    BeanDescriptor<?> desc = descriptor(bean.getClass());
     if (desc == null) {
       throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -2102,7 +2102,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the BeanDescriptor for a given type of bean.
    */
   @Override
-  public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> beanClass) {
+  public <T> BeanDescriptor<T> descriptor(Class<T> beanClass) {
     return beanDescriptorManager.getBeanDescriptor(beanClass);
   }
 
@@ -2110,7 +2110,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the BeanDescriptor's for a given table name.
    */
   @Override
-  public List<BeanDescriptor<?>> getBeanDescriptors(String tableName) {
+  public List<BeanDescriptor<?>> descriptors(String tableName) {
     return beanDescriptorManager.getBeanDescriptors(tableName);
   }
 
@@ -2119,7 +2119,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<? extends BeanType<?>> beanTypes() {
-    return getBeanDescriptors();
+    return descriptors();
   }
 
   /**
@@ -2132,11 +2132,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public BeanType<?> beanTypeForQueueId(String queueId) {
-    return getBeanDescriptorByQueueId(queueId);
+    return descriptorByQueueId(queueId);
   }
 
   @Override
-  public BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId) {
+  public BeanDescriptor<?> descriptorByQueueId(String queueId) {
     return beanDescriptorManager.getBeanDescriptorByQueueId(queueId);
   }
 
@@ -2145,14 +2145,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> BeanType<T> beanType(Class<T> beanType) {
-    return getBeanDescriptor(beanType);
+    return descriptor(beanType);
   }
 
   /**
    * Return the BeanDescriptor using its class name.
    */
   @Override
-  public BeanDescriptor<?> getBeanDescriptorById(String beanClassName) {
+  public BeanDescriptor<?> descriptorById(String beanClassName) {
     return beanDescriptorManager.getBeanDescriptorByClassName(beanClassName);
   }
 
@@ -2278,7 +2278,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     EntityBean entityBean = checkEntityBean(bean);
-    BeanDescriptor<?> beanDesc = getBeanDescriptor(entityBean.getClass());
+    BeanDescriptor<?> beanDesc = descriptor(entityBean.getClass());
     BeanProperty idProperty = beanDesc.idProperty();
     // if the ID of the Property is null we are unable to check uniqueness
     if (idProperty == null) {

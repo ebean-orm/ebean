@@ -16,7 +16,7 @@ public class TestSeqBatch extends BaseTestCase {
       return;
     }
 
-    BeanDescriptor<TOne> d = spiEbeanServer().getBeanDescriptor(TOne.class);
+    BeanDescriptor<TOne> d = spiEbeanServer().descriptor(TOne.class);
     Object id = d.nextId(null);
     assertNotNull(id);
     for (int i = 0; i < 16; i++) {

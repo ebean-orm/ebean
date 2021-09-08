@@ -759,14 +759,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the ReadAuditLogger for logging read audit events.
    */
   public ReadAuditLogger readAuditLogger() {
-    return ebeanServer.getReadAuditLogger();
+    return ebeanServer.readAuditLogger();
   }
 
   /**
    * Return the ReadAuditPrepare for preparing read audit events prior to logging.
    */
   private ReadAuditPrepare readAuditPrepare() {
-    return ebeanServer.getReadAuditPrepare();
+    return ebeanServer.readAuditPrepare();
   }
 
   public boolean isChangeLog() {

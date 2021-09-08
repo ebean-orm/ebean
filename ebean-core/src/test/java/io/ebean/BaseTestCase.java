@@ -38,7 +38,7 @@ public abstract class BaseTestCase {
 
   @AfterEach
   public void checkForLeak(TestInfo testInfo) {
-    TransactionScopeManager scope = spiEbeanServer().getTransactionManager().scope();
+    TransactionScopeManager scope = spiEbeanServer().transactionManager().scope();
     SpiTransaction trans = scope.getInScope();
     if (trans != null) {
       String msg = getClass().getSimpleName() + "." + testInfo.getDisplayName() + " did not clear threadScope:" + trans;
@@ -99,7 +99,7 @@ public abstract class BaseTestCase {
   }
 
   protected SpiTransaction getInScopeTransaction() {
-    return spiEbeanServer().getTransactionManager().scope().getInScope();
+    return spiEbeanServer().transactionManager().scope().getInScope();
   }
 
   /**
@@ -235,7 +235,7 @@ public abstract class BaseTestCase {
   }
 
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
-    return spiEbeanServer().getBeanDescriptor(cls);
+    return spiEbeanServer().descriptor(cls);
   }
 
   protected <T> ServerCacheStatistics getBeanCacheStats(Class<T> cls, boolean reset) {

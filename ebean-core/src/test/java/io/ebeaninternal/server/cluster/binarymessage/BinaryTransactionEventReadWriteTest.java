@@ -100,7 +100,7 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
   class TDEbeanServer extends TDSpiEbeanServer {
     @Override
-    public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {
+    public BeanDescriptor<?> descriptorById(String descriptorId) {
       return customerBeanDescriptor;
     }
   }

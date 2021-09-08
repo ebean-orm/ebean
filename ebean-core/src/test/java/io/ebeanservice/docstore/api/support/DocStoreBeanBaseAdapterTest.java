@@ -25,7 +25,7 @@ public class DocStoreBeanBaseAdapterTest extends BaseTestCase {
   public void test_basic_construction() throws Exception {
 
     SpiEbeanServer server = spiEbeanServer();
-    BeanDescriptor<Order> orderDesc = server.getBeanDescriptor(Order.class);
+    BeanDescriptor<Order> orderDesc = server.descriptor(Order.class);
 
     DeployBeanDescriptor<Order> deployDesc = (DeployBeanDescriptor<Order>) mock(DeployBeanDescriptor.class);
 

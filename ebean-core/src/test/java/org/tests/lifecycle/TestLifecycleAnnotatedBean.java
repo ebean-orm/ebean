@@ -2,7 +2,6 @@ package org.tests.lifecycle;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.EBasicWithLifecycle;
@@ -167,7 +166,7 @@ public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
     DB.save(bean);
 
-    BeanDescriptor<EBasicWithLifecycle> desc = ((SpiEbeanServer) server()).getBeanDescriptor(EBasicWithLifecycle.class);
+    BeanDescriptor<EBasicWithLifecycle> desc = ((SpiEbeanServer) server()).descriptor(EBasicWithLifecycle.class);
     EBasicWithLifecycle loaded = desc.createReference(false, false, bean.getId(), null);
 
     // Here you see the big difference.

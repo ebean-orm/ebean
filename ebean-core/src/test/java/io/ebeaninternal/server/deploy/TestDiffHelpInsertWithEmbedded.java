@@ -22,7 +22,7 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
   public TestDiffHelpInsertWithEmbedded() {
     Database server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
-    emainDesc = spiServer.getBeanDescriptor(EMain.class);
+    emainDesc = spiServer.descriptor(EMain.class);
   }
 
   @Test

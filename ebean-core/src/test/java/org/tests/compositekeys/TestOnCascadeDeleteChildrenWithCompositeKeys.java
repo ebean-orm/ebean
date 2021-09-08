@@ -79,7 +79,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     SpiEbeanServer spiServer = (SpiEbeanServer) DB.getDefault();
 
     BeanDescriptor<TestOnCascadeDeleteChildrenWithCompositeKeys.User> beanDescriptor =
-      spiServer.getBeanDescriptor(TestOnCascadeDeleteChildrenWithCompositeKeys.User.class);
+      spiServer.descriptor(TestOnCascadeDeleteChildrenWithCompositeKeys.User.class);
 
     BeanPropertyAssocMany<?> beanProperty = (BeanPropertyAssocMany<?>) beanDescriptor.beanProperty("userRoles");
 

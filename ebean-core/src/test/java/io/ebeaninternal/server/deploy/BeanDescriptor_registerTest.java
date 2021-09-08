@@ -27,7 +27,7 @@ public class BeanDescriptor_registerTest {
 
     SpiEbeanServer ebeanServer = (SpiEbeanServer)DatabaseFactory.create(config);
     try {
-      BeanDescriptor<EBasic> desc = ebeanServer.getBeanDescriptor(EBasic.class);
+      BeanDescriptor<EBasic> desc = ebeanServer.descriptor(EBasic.class);
       persistListenerRegistrationTests(desc);
       persistControllerRegistrationTests(desc);
     } finally {

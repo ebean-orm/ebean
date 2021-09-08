@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 public class BeanDescriptorTest extends BaseTestCase {
 
-  private BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
+  private BeanDescriptor<Customer> customerDesc = spiEbeanServer().descriptor(Customer.class);
 
   @Test
   public void createReference() {
@@ -74,7 +74,7 @@ public class BeanDescriptorTest extends BaseTestCase {
 
     DB.save(shelter);
 
-    BeanDescriptor<Animal> animalDesc = spiEbeanServer().getBeanDescriptor(Animal.class);
+    BeanDescriptor<Animal> animalDesc = spiEbeanServer().descriptor(Animal.class);
 
     Animal bean = animalDesc.createReference(Boolean.FALSE, false, dog.getId(), null);
     assertThat(bean.getId()).isEqualTo(dog.getId());
@@ -142,7 +142,7 @@ public class BeanDescriptorTest extends BaseTestCase {
   @Test
   public void isIdTypeExternal_when_externalId() {
 
-    BeanDescriptor<Country> countryDesc = spiEbeanServer().getBeanDescriptor(Country.class);
+    BeanDescriptor<Country> countryDesc = spiEbeanServer().descriptor(Country.class);
     assertThat(countryDesc.isIdGeneratedValue()).isFalse();
   }
 
@@ -155,21 +155,21 @@ public class BeanDescriptorTest extends BaseTestCase {
   @Test
   public void isIdTypeExternal_when_explicitGeneratedValue() {
 
-    BeanDescriptor<Contact> desc = spiEbeanServer().getBeanDescriptor(Contact.class);
+    BeanDescriptor<Contact> desc = spiEbeanServer().descriptor(Contact.class);
     assertThat(desc.isIdGeneratedValue()).isTrue();
   }
 
   @Test
   public void isIdTypeExternal_when_uuidGenerator_and_generatedValue() {
 
-    BeanDescriptor<BSite> desc = spiEbeanServer().getBeanDescriptor(BSite.class);
+    BeanDescriptor<BSite> desc = spiEbeanServer().descriptor(BSite.class);
     assertThat(desc.isIdGeneratedValue()).isTrue();
   }
 
   @Test
   public void isIdTypeExternal_when_uuidGenerator_and_noGeneratedValue() {
 
-    BeanDescriptor<BUser> desc = spiEbeanServer().getBeanDescriptor(BUser.class);
+    BeanDescriptor<BUser> desc = spiEbeanServer().descriptor(BUser.class);
     assertThat(desc.isIdGeneratedValue()).isFalse();
   }
 }

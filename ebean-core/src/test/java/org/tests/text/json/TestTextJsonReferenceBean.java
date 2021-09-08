@@ -42,7 +42,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
       Product refProd = jsonContext.toBean(Product.class, jsonString);
 
-      BeanDescriptor<Product> prodDesc = server.getBeanDescriptor(Product.class);
+      BeanDescriptor<Product> prodDesc = server.descriptor(Product.class);
       EntityBean eb = (EntityBean) refProd;
       prodDesc.isReference(eb._ebean_getIntercept());
 
@@ -73,7 +73,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
     Order o2 = jsonContext.toBean(Order.class, jsonOrder);
     Customer customer = o2.getCustomer();
 
-    BeanDescriptor<Customer> custDesc = server.getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> custDesc = server.descriptor(Customer.class);
 
     assertTrue(custDesc.isReference(((EntityBean) customer)._ebean_getIntercept()));
   }

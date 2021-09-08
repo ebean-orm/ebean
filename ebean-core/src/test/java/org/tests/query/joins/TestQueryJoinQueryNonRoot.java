@@ -21,7 +21,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
   public void test() {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
-    BeanDescriptor<Order> d = server.getBeanDescriptor(Order.class);
+    BeanDescriptor<Order> d = server.descriptor(Order.class);
     ElPropertyValue elGetValue = d.elGetValue("customer.contacts");
 
     assertTrue(elGetValue.containsMany());

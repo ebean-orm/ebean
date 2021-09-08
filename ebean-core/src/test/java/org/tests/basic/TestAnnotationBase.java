@@ -210,28 +210,28 @@ public class TestAnnotationBase extends BaseTestCase {
 
   @Test
   public void testFindMaxSize() throws SecurityException {
-    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
+    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().descriptor(TestAnnotationBaseEntity.class);
     BeanProperty bp = descriptor.findProperty("constraintAnnotation");
     assertEquals(40, bp.dbLength());
   }
 
   @Test
   public void testFindJakartaMaxSize() throws SecurityException {
-    BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestJakartaAnnotationBaseEntity.class);
+    BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().descriptor(TestJakartaAnnotationBaseEntity.class);
     BeanProperty bp = descriptor.findProperty("constraintAnnotation");
     assertEquals(40, bp.dbLength());
   }
 
   @Test
   public void annotationClassIndexes() throws SecurityException {
-    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
+    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().descriptor(TestAnnotationBaseEntity.class);
     final IndexDefinition[] indexDefinitions = descriptor.indexDefinitions();
     assertEquals(3, indexDefinitions.length);
   }
 
   @Test
   public void testNotNullWithGroup() throws SecurityException {
-    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
+    BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().descriptor(TestAnnotationBaseEntity.class);
 
     BeanProperty bp = descriptor.findProperty("null1");
     assertFalse(bp.isNullable());
@@ -245,7 +245,7 @@ public class TestAnnotationBase extends BaseTestCase {
 
   @Test
   public void testJakartaNotNullWithGroup() throws SecurityException {
-    BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestJakartaAnnotationBaseEntity.class);
+    BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().descriptor(TestJakartaAnnotationBaseEntity.class);
 
     BeanProperty bp = descriptor.findProperty("null1");
     assertFalse(bp.isNullable());

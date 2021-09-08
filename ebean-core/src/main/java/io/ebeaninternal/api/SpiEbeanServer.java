@@ -63,7 +63,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * Return the PersistenceContextScope to use defined at query or server level.
    */
-  PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query);
+  PersistenceContextScope persistenceContextScope(SpiQuery<?> query);
 
   /**
    * Clear the query execution statistics.
@@ -73,32 +73,32 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * Return the transaction manager.
    */
-  SpiTransactionManager getTransactionManager();
+  SpiTransactionManager transactionManager();
 
   /**
    * Return all the descriptors.
    */
-  List<BeanDescriptor<?>> getBeanDescriptors();
+  List<BeanDescriptor<?>> descriptors();
 
   /**
    * Return the BeanDescriptor for a given type of bean.
    */
-  <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type);
+  <T> BeanDescriptor<T> descriptor(Class<T> type);
 
   /**
    * Return BeanDescriptor using it's unique id.
    */
-  BeanDescriptor<?> getBeanDescriptorById(String className);
+  BeanDescriptor<?> descriptorById(String className);
 
   /**
    * Return BeanDescriptor using it's unique doc store queueId.
    */
-  BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId);
+  BeanDescriptor<?> descriptorByQueueId(String queueId);
 
   /**
    * Return BeanDescriptors mapped to this table.
    */
-  List<BeanDescriptor<?>> getBeanDescriptors(String tableName);
+  List<BeanDescriptor<?>> descriptors(String tableName);
 
   /**
    * Process committed changes from another framework.
@@ -170,7 +170,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * Return the default batch size for lazy loading.
    */
-  int getLazyLoadBatchSize();
+  int lazyLoadBatchSize();
 
   /**
    * Return true if the type is known as an Entity or Xml type or a List Set or
@@ -181,18 +181,18 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * Return the ReadAuditLogger to use for logging all read audit events.
    */
-  ReadAuditLogger getReadAuditLogger();
+  ReadAuditLogger readAuditLogger();
 
   /**
    * Return the ReadAuditPrepare used to populate the read audit events with
    * user context information (user id, user ip address etc).
    */
-  ReadAuditPrepare getReadAuditPrepare();
+  ReadAuditPrepare readAuditPrepare();
 
   /**
    * Return the DataTimeZone to use when reading/writing timestamps via JDBC.
    */
-  DataTimeZone getDataTimeZone();
+  DataTimeZone dataTimeZone();
 
   /**
    * Check for slow query event.
