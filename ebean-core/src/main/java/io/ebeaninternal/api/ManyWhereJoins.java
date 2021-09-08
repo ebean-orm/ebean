@@ -52,7 +52,7 @@ public final class ManyWhereJoins implements Serializable {
     String join = elProp.getElPrefix();
     BeanProperty p = elProp.getBeanProperty();
     if (p instanceof BeanPropertyAssocMany<?>) {
-      join = addManyToJoin(join, p.getName());
+      join = addManyToJoin(join, p.name());
     }
     if (join != null) {
       addJoin(join);

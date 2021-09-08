@@ -284,7 +284,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   protected BeanProperty(BeanProperty source, BeanPropertyOverride override) {
     this.descriptor = source.descriptor;
     this.propertyIndex = source.propertyIndex;
-    this.name = source.getName();
+    this.name = source.name();
     this.dbColumn = override.getDbColumn();
     this.nullable = override.isDbNullable();
     this.dbLength = override.getDbLength();
@@ -337,7 +337,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.dbType = source.getDbType(true);
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
-    this.propertyType = source.getPropertyType();
+    this.propertyType = source.type();
     this.field = source.getField();
     this.docOptions = source.docOptions;
     this.unmappedJson = source.unmappedJson;
@@ -356,7 +356,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public void initialise(BeanDescriptorInitContext initContext) {
     // do nothing for normal BeanProperty
     if (!isTransient && scalarType == null) {
-      throw new RuntimeException("No ScalarType assigned to " + descriptor.fullName() + "." + getName());
+      throw new RuntimeException("No ScalarType assigned to " + descriptor.fullName() + "." + name());
     }
   }
 
@@ -572,7 +572,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public Property getProperty() {
+  public Property property() {
     return this;
   }
 
@@ -756,7 +756,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public Object getVal(Object bean) {
+  public Object value(Object bean) {
     return getValue((EntityBean) bean);
   }
 
@@ -817,7 +817,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   @Override
   @Nonnull
-  public String getName() {
+  public String name() {
     return name;
   }
 
@@ -829,7 +829,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public String getElName() {
+  public String elName() {
     return name;
   }
 
@@ -855,13 +855,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public Object[] getAssocIdValues(EntityBean bean) {
+  public Object[] assocIdValues(EntityBean bean) {
     // Returns null as not an AssocOne.
     return null;
   }
 
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
+  public String assocIdExpression(String prefix, String operator) {
     // Returns null as not an AssocOne.
     return null;
   }
@@ -939,7 +939,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public StringParser getStringParser() {
+  public StringParser stringParser() {
     return scalarType;
   }
 
@@ -949,7 +949,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();
   }
 
@@ -1303,7 +1303,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   @Override
   @Nonnull
-  public Class<?> getPropertyType() {
+  public Class<?> type() {
     return propertyType;
   }
 

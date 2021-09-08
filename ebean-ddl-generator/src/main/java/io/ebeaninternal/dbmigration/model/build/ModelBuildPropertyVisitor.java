@@ -199,9 +199,9 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {
       // compound foreign key
-      String refTable = p.getTargetDescriptor().getBaseTable();
-      String fkName = foreignKeyConstraintName(p.getName());
-      String fkIndex = foreignKeyIndexName(p.getName());
+      String refTable = p.getTargetDescriptor().baseTable();
+      String fkName = foreignKeyConstraintName(p.name());
+      String fkIndex = foreignKeyIndexName(p.name());
       compoundKey = new MCompoundForeignKey(fkName, refTable, fkIndex);
       table.addForeignKey(compoundKey);
     }
@@ -253,7 +253,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
       } else {
         String[] cols = indexSetAdd(toColumnNames(modelColumns));
-        String uqName = uniqueConstraintName(p.getName());
+        String uqName = uniqueConstraintName(p.name());
         table.addUniqueConstraint(new MCompoundUniqueConstraint(cols, uqName));
       }
     }
@@ -307,7 +307,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     if (checkConstraintValues != null) {
       if (beanDescriptor.hasInheritance()) {
         InheritInfo inheritInfo = beanDescriptor.getInheritInfo();
-        inheritInfo.appendCheckConstraintValues(p.getName(), checkConstraintValues);
+        inheritInfo.appendCheckConstraintValues(p.name(), checkConstraintValues);
       }
       col.setCheckConstraint(buildCheckConstraint(p.getDbColumn(), checkConstraintValues));
       col.setCheckConstraintName(checkConstraintName(col.getName()));

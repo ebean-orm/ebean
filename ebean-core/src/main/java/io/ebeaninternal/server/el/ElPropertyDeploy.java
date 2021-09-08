@@ -53,12 +53,12 @@ public interface ElPropertyDeploy {
   /**
    * Return the name of the property.
    */
-  String getName();
+  String name();
 
   /**
    * The ElPrefix plus name.
    */
-  String getElName();
+  String elName();
 
   /**
    * Return the deployment db column for this property.

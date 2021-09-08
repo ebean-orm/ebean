@@ -113,7 +113,7 @@ public final class IdInExpression extends NonPrepareExpression {
         request.append(descriptor.getIdBinderInLHSSql());
         request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
       } else {
-        request.append(idBinder.getBeanProperty().getName());
+        request.append(idBinder.getBeanProperty().name());
         request.appendInExpression(false, idCollection);
       }
     }

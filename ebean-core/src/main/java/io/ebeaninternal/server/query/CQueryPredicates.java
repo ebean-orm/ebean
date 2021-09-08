@@ -212,7 +212,7 @@ public final class CQueryPredicates {
 
     BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (manyProperty != null) {
-      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.getName(), false);
+      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.name(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
       if (filterManyExpr != null) {
         this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
@@ -337,7 +337,7 @@ public final class CQueryPredicates {
     // check for default ordering on the many property...
     String manyOrderBy = manyProp.getFetchOrderBy();
     if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.getName(), manyOrderBy);
+      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy);
     }
 
     if (request.isFindById()) {
@@ -353,7 +353,7 @@ public final class CQueryPredicates {
     // we need to make sure their is an order by on the
     // top level first (to ensure master/detail construction).
 
-    int manyPos = orderBy.indexOf(manyProp.getName());
+    int manyPos = orderBy.indexOf(manyProp.name());
     int idPos = orderBy.indexOf(" " + orderById);
 
     if (manyPos == -1) {
@@ -370,9 +370,9 @@ public final class CQueryPredicates {
     if (idPos <= -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.getName();
+        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name();
         msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
-        msg += " must come before the many property [" + manyProp.getName() + "] in the orderBy.";
+        msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
 
         logger.warn(msg);

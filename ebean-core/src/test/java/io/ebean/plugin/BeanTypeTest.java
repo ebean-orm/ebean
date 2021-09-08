@@ -72,7 +72,7 @@ public class BeanTypeTest {
     order.setStatus(Order.Status.APPROVED);
     Property statusProperty = beanType(Order.class).property("status");
 
-    assertThat(statusProperty.getVal(order)).isEqualTo(order.getStatus());
+    assertThat(statusProperty.value(order)).isEqualTo(order.getStatus());
   }
 
   @Test

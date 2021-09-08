@@ -86,7 +86,7 @@ final class MergeHandler {
     query.setBeanCacheMode(CacheMode.OFF);
     query.setPersistenceContextScope(PersistenceContextScope.QUERY);
     query.setId(desc.getId(bean));
-    query.select(desc.idProperty().getName());
+    query.select(desc.idProperty().name());
 
     for (String path : paths) {
       MergeNode node = buildNode(path);

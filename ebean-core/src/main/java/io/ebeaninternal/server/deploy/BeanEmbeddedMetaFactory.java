@@ -34,7 +34,7 @@ final class BeanEmbeddedMetaFactory {
     BeanProperty[] embeddedProperties = new BeanProperty[sourceProperties.length];
 
     for (int i = 0; i < sourceProperties.length; i++) {
-      String propertyName = sourceProperties[i].getName();
+      String propertyName = sourceProperties[i].name();
       Column column = propColMap.get(propertyName);
       String dbColumn = dbColumn(columnPrefix, column, sourceProperties[i]);
       boolean dbNullable = dbNullable(column, sourceProperties[i]);

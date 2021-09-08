@@ -28,10 +28,10 @@ public class PropertyTest {
     order.setStatus(Order.Status.APPROVED);
 
     Property statusProperty = beanType(Order.class).property("status");
-    assertThat(statusProperty.getVal(order)).isEqualTo(order.getStatus());
+    assertThat(statusProperty.value(order)).isEqualTo(order.getStatus());
 
     Property customerProperty = beanType(Order.class).property("customer");
-    assertThat(customerProperty.getVal(order)).isEqualTo(customer);
+    assertThat(customerProperty.value(order)).isEqualTo(customer);
   }
 
   @Test
@@ -49,8 +49,8 @@ public class PropertyTest {
 
   @Test
   public void name() {
-    assertThat(beanType(Order.class).property("status").getName()).isEqualTo("status");
-    assertThat(beanType(Order.class).property("customer").getName()).isEqualTo("customer");
-    assertThat(beanType(Order.class).property("details").getName()).isEqualTo("details");
+    assertThat(beanType(Order.class).property("status").name()).isEqualTo("status");
+    assertThat(beanType(Order.class).property("customer").name()).isEqualTo("customer");
+    assertThat(beanType(Order.class).property("details").name()).isEqualTo("details");
   }
 }

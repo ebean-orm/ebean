@@ -136,12 +136,12 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
   @Override
-  public String getElName() {
+  public String elName() {
     return expression;
   }
 
@@ -171,15 +171,15 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public Object[] getAssocIdValues(EntityBean bean) {
+  public Object[] assocIdValues(EntityBean bean) {
     // Don't navigate the object graph as bean
     // is assumed to be the appropriate type
-    return lastElPropertyValue.getAssocIdValues(bean);
+    return lastElPropertyValue.assocIdValues(bean);
   }
 
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
-    return lastElPropertyValue.getAssocIdExpression(expression, operator);
+  public String assocIdExpression(String prefix, String operator) {
+    return lastElPropertyValue.assocIdExpression(expression, operator);
   }
 
   @Override
@@ -198,7 +198,7 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public Property getProperty() {
+  public Property property() {
     return lastBeanProperty;
   }
 
@@ -234,7 +234,7 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();
   }
 
@@ -244,7 +244,7 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public StringParser getStringParser() {
+  public StringParser stringParser() {
     return scalarType;
   }
 

@@ -64,13 +64,13 @@ final class BindableEncryptedProperty implements Bindable {
 
     if (!bindEncryptDataFirst) {
       // H2 encrypt function ... different parameter order
-      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");
+      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.name() + "=****");
     }
     request.bindNoLog(value, prop);
 
     if (bindEncryptDataFirst) {
       // MySql, Postgres, Oracle
-      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");
+      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.name() + "=****");
     }
   }
 

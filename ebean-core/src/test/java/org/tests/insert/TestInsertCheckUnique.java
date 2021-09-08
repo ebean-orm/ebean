@@ -95,8 +95,8 @@ public class TestInsertCheckUnique extends BaseTestCase {
         StringBuilder msg = new StringBuilder();
 
         properties.forEach((it)-> {
-          Object propertyValue = it.getVal(doc2);
-          String propertyName = it.getName();
+          Object propertyValue = it.value(doc2);
+          String propertyName = it.name();
           msg.append(" property["+propertyName+"] value["+propertyValue+"]");
         });
 

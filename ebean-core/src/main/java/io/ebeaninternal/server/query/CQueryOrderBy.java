@@ -63,7 +63,7 @@ final class CQueryOrderBy {
     if (beanProperty instanceof BeanPropertyAssoc<?>) {
       BeanPropertyAssoc<?> ap = (BeanPropertyAssoc<?>) beanProperty;
       IdBinder idBinder = ap.getTargetDescriptor().getIdBinder();
-      return idBinder.getOrderBy(el.getElName(), p.isAscending());
+      return idBinder.getOrderBy(el.elName(), p.isAscending());
     }
 
     return p.toStringFormat();

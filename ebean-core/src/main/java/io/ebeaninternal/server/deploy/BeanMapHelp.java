@@ -30,7 +30,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   BeanMapHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
     this.targetDescriptor = many.getTargetDescriptor();
-    this.propertyName = many.getName();
+    this.propertyName = many.name();
     this.beanProperty = targetDescriptor.getBeanProperty(many.getMapKey());
   }
 

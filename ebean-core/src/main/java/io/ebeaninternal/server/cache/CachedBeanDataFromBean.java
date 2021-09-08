@@ -19,7 +19,7 @@ public final class CachedBeanDataFromBean {
     if (idProperty != null) {
       int propertyIndex = idProperty.getPropertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
-        data.put(idProperty.getName(), idProperty.getCacheDataValue(bean));
+        data.put(idProperty.name(), idProperty.getCacheDataValue(bean));
       }
     }
 
@@ -27,15 +27,15 @@ public final class CachedBeanDataFromBean {
     final boolean dirty = ebi.isDirty();
     for (BeanProperty prop : desc.propertiesNonMany()) {
       if (dirty && ebi.isDirtyProperty(prop.getPropertyIndex())) {
-        data.put(prop.getName(), prop.getCacheDataValueOrig(ebi));
+        data.put(prop.name(), prop.getCacheDataValueOrig(ebi));
       } else if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
-        data.put(prop.getName(), prop.getCacheDataValue(bean));
+        data.put(prop.name(), prop.getCacheDataValue(bean));
       }
     }
 
     for (BeanPropertyAssocMany<?> prop : desc.propertiesMany()) {
       if (prop.isElementCollection()) {
-        data.put(prop.getName(), prop.getCacheDataValue(bean));
+        data.put(prop.name(), prop.getCacheDataValue(bean));
       }
     }
 

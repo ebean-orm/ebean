@@ -36,9 +36,9 @@ public final class CachedBeanDataToBean {
   }
 
   private static void loadProperty(EntityBean bean, CachedBeanData cacheBeanData, EntityBeanIntercept ebi, BeanProperty prop, PersistenceContext context) {
-    if (cacheBeanData.isLoaded(prop.getName())) {
+    if (cacheBeanData.isLoaded(prop.name())) {
       if (!ebi.isLoadedProperty(prop.getPropertyIndex())) {
-        Object value = cacheBeanData.getData(prop.getName());
+        Object value = cacheBeanData.getData(prop.name());
         prop.setCacheDataValue(bean, value, context);
       }
     }

@@ -90,7 +90,7 @@ public final class DeployBeanPropertyLists {
         discProperty = null;
       }
       BeanProperty beanProp = createBeanProperty(owner, prop);
-      propertyMap.put(beanProp.getName(), beanProp);
+      propertyMap.put(beanProp.name(), beanProp);
     }
 
     int order = 0;
@@ -102,13 +102,13 @@ public final class DeployBeanPropertyLists {
     if (orderColumn != null) {
       orderColumn.setDeployOrder(order);
       allocateToList(orderColumn);
-      propertyMap.put(orderColumn.getName(), orderColumn);
+      propertyMap.put(orderColumn.name(), orderColumn);
     }
 
     if (discProperty != null) {
       // put the discriminator property into the property map only
       // (after the real properties have been organised into their lists)
-      propertyMap.put(discProperty.getName(), discProperty);
+      propertyMap.put(discProperty.name(), discProperty);
     }
   }
 

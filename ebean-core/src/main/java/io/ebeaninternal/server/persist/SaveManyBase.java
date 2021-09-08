@@ -72,7 +72,7 @@ abstract class SaveManyBase implements SaveMany {
       if (request.isNotifyCache()) {
         try {
           String asJson = many.jsonWriteCollection(value);
-          request.addCollectionChange(many.getName(), asJson);
+          request.addCollectionChange(many.name(), asJson);
         } catch (IOException e) {
           log.error("Error build element collection entry for L2 cache", e);
         }

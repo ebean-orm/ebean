@@ -506,7 +506,7 @@ public final class WriteJson implements SpiJsonWriter {
         return true;
       if (currentIncludeProps != null) {
         // explicitly controlled by pathProperties
-        return currentIncludeProps.contains(prop.getName());
+        return currentIncludeProps.contains(prop.name());
       } else {
         // include only loaded properties
         return currentBean._ebean_getIntercept().isLoadedProperty(prop.getPropertyIndex());
@@ -518,7 +518,7 @@ public final class WriteJson implements SpiJsonWriter {
         return false;
       } else if (!explicitAllProps && currentIncludeProps != null) {
         // explicitly controlled by pathProperties
-        return currentIncludeProps.contains(prop.getName());
+        return currentIncludeProps.contains(prop.name());
       } else {
         // by default include transient properties
         return true;

@@ -139,7 +139,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   private Map<String, String> createPathMap(String prefix, STreeType desc) {
     HashMap<String, String> m = new HashMap<>();
     for (STreePropertyAssocMany many : desc.propsMany()) {
-      String name = many.getName();
+      String name = many.name();
       m.put(name, getPath(prefix, name));
     }
     return m;

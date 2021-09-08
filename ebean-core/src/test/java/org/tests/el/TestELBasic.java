@@ -32,14 +32,14 @@ public class TestELBasic extends BaseTestCase {
     ElPropertyDeploy elBillAddressId = descriptor.getElPropertyDeploy("billingAddress.id");
     assertTrue(elBillAddressId instanceof BeanFkeyProperty);
     assertEquals("billing_address_id", elBillAddressId.getDbColumn());
-    assertEquals("billingAddress.id", elBillAddressId.getName());
+    assertEquals("billingAddress.id", elBillAddressId.name());
     assertNull(elBillAddressId.getElPrefix());
 
 
     ElPropertyDeploy elBillAddressCity = descriptor.getElPropertyDeploy("billingAddress.city");
     assertTrue(elBillAddressCity instanceof ElPropertyChain);
     assertEquals("billingAddress", elBillAddressCity.getElPrefix());
-    assertEquals("city", elBillAddressCity.getName());
+    assertEquals("city", elBillAddressCity.name());
     assertEquals("${billingAddress}city", elBillAddressCity.getElPlaceholder(false));
     assertEquals("city", elBillAddressCity.getDbColumn());
 
@@ -52,7 +52,7 @@ public class TestELBasic extends BaseTestCase {
     ElPropertyDeploy elOrderStatus = descriptor.getElPropertyDeploy("orders.status");
     assertTrue(elOrderStatus instanceof ElPropertyChain);
     assertEquals("orders", elOrderStatus.getElPrefix());
-    assertEquals("status", elOrderStatus.getName());
+    assertEquals("status", elOrderStatus.name());
     assertEquals("${orders}status", elOrderStatus.getElPlaceholder(false));
     assertEquals("status", elOrderStatus.getDbColumn());
 

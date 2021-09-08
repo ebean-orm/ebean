@@ -33,10 +33,10 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 
     BeanDescriptor<Order> beanDescriptor = spiServer.getBeanDescriptor(Order.class);
     assertNotNull(beanDescriptor.idProperty());
-    assertEquals("id", beanDescriptor.idProperty().getName());
+    assertEquals("id", beanDescriptor.idProperty().name());
 
     assertNotNull(beanDescriptor.getVersionProperty());
-    assertEquals("updtime", beanDescriptor.getVersionProperty().getName());
+    assertEquals("updtime", beanDescriptor.getVersionProperty().name());
 
     Order order = new Order();
 

@@ -37,7 +37,15 @@ public interface ExpressionPath {
   /**
    * Return the default StringParser for the scalar property.
    */
-  StringParser getStringParser();
+  StringParser stringParser();
+
+  /**
+   * Deprecated migrate to stringParser().
+   */
+  @Deprecated
+  default StringParser getStringParser() {
+    return stringParser();
+  }
 
   /**
    * For DateTime capable scalar types convert the long systemTimeMillis into
@@ -54,7 +62,15 @@ public interface ExpressionPath {
   /**
    * Return the underlying JDBC type or 0 if this is not a scalar type.
    */
-  int getJdbcType();
+  int jdbcType();
+
+  /**
+   * Deprecated migrate to jdbcType().
+   */
+  @Deprecated
+  default int getJdbcType() {
+    return jdbcType();
+  }
 
   /**
    * Return true if this is an ManyToOne or OneToOne associated bean property.
@@ -67,20 +83,52 @@ public interface ExpressionPath {
    * Typically used to produce id = ? expression strings.
    * </p>
    */
-  String getAssocIdExpression(String propName, String bindOperator);
+  String assocIdExpression(String propName, String bindOperator);
+
+  /**
+   * Deprecated migrate to assocIdExpression().
+   */
+  @Deprecated
+  default String getAssocIdExpression(String propName, String bindOperator) {
+    return assocIdExpression(propName, bindOperator);
+  }
 
   /**
    * Return the Id values for the given bean value.
    */
-  Object[] getAssocIdValues(EntityBean bean);
+  Object[] assocIdValues(EntityBean bean);
+
+  /**
+   * Deprecated migrate to assocIdValues().
+   */
+  @Deprecated
+  default Object[] getAssocIdValues(EntityBean bean) {
+    return assocIdValues(bean);
+  }
 
   /**
    * Return the underlying bean property.
    */
-  Property getProperty();
+  Property property();
+
+  /**
+   * Deprecated migrate to property().
+   */
+  @Deprecated
+  default Property getProperty() {
+    return property();
+  }
 
   /**
    * The ElPrefix plus name.
    */
-  String getElName();
+  String elName();
+
+  /**
+   * Deprecated migrate to elName().
+   */
+  @Deprecated
+  default String getElName() {
+    return elName();
+  }
 }

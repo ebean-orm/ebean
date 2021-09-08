@@ -87,12 +87,12 @@ final class BeanDescriptorDraftHelp<T> {
   void draftQueryOptimise(Query<T> query) {
     for (BeanPropertyAssocOne<?> anOne : desc.propertiesOne()) {
       if (anOne.getTargetDescriptor().isDraftableElement()) {
-        query.fetch(anOne.getName());
+        query.fetch(anOne.name());
       }
     }
     for (BeanPropertyAssocMany<?> aMany : desc.propertiesMany()) {
       if (aMany.getTargetDescriptor().isDraftableElement()) {
-        query.fetch(aMany.getName());
+        query.fetch(aMany.name());
       }
     }
   }

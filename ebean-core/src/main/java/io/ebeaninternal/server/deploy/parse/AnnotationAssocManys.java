@@ -198,7 +198,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty localId = localTable.getIdProperty();
       if (localId != null) {
         // add foreign key based on convention
-        String fkColName = namingConvention.getForeignKey(descriptor.getBaseTable(), localId.getName());
+        String fkColName = namingConvention.getForeignKey(descriptor.getBaseTable(), localId.name());
         prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkColName));
       }
     }

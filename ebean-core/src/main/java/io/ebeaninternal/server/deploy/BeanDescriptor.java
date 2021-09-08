@@ -380,8 +380,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       this.propertiesIndex = new BeanProperty[0];
     } else {
       EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
-      this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
-      this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
+      this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.name());
+      this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.name());
       this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
       this.propertiesIndex = new BeanProperty[ebi.getPropertyLength()];
       for (int i = 0; i < propertiesIndex.length; i++) {
@@ -913,7 +913,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * foreign keys don't require an extra join.
    */
   public void add(BeanFkeyProperty fkey) {
-    elDeployCache.put(fkey.getName(), fkey);
+    elDeployCache.put(fkey.name(), fkey);
   }
 
   void initialiseFkeys() {
@@ -1639,7 +1639,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public BeanPropertyAssocMany<?> getManyProperty(SpiQuery<?> query) {
     OrmQueryDetail detail = query.getDetail();
     for (BeanPropertyAssocMany<?> many : propertiesMany) {
-      if (detail.includesPath(many.getName())) {
+      if (detail.includesPath(many.name())) {
         return many;
       }
     }
@@ -2094,7 +2094,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the Id property name or null if no Id property exists.
    */
   public String getIdName() {
-    return (idProperty == null) ? null : idProperty.getName();
+    return (idProperty == null) ? null : idProperty.name();
   }
 
   /**
@@ -2220,7 +2220,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (!ebi.isLoadedProperty(many.getPropertyIndex())) {
         BeanCollection<?> ref = many.createReferenceIfNull(bean);
         if (ref != null && !ref.isRegisteredWithLoadContext()) {
-          String path = SplitName.add(prefix, many.getName());
+          String path = SplitName.add(prefix, many.name());
           loadContext.register(path, many, ref);
         }
       }
@@ -2416,7 +2416,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (assocProperty != null) {
       String relativePath = assocProperty.getTargetDescriptor().findBeanPath(schemaName, tableName, columnName);
       if (relativePath != null) {
-        return SplitName.add(assocProperty.getName(), relativePath);
+        return SplitName.add(assocProperty.name(), relativePath);
       }
     }
     return null;
@@ -2825,7 +2825,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   @Override
   public void inheritanceLoad(SqlBeanLoad sqlBeanLoad, STreeProperty property, DbReadContext ctx) {
-    BeanProperty p = getBeanProperty(property.getName());
+    BeanProperty p = getBeanProperty(property.name());
     if (p != null) {
       p.load(sqlBeanLoad);
     } else {
@@ -3026,7 +3026,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       final Set<String> included = rootProps.getIncluded();
       if (included != null) {
         for (BeanProperty property : propertiesAggregate) {
-          if (included.contains(property.getName())) {
+          if (included.contains(property.name())) {
             return true;
           }
         }
@@ -3176,8 +3176,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * provides unique ordering of the rows (so that the paging is predicable).
    */
   public void appendOrderById(SpiQuery<T> query) {
-    if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.getName())) {
-      query.order().asc(idProperty.getName());
+    if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.name())) {
+      query.order().asc(idProperty.name());
     }
   }
 

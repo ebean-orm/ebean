@@ -117,7 +117,7 @@ final class InExpression extends AbstractExpression {
       List<Object> idList = new ArrayList<>();
       for (Object bindValue : bindValues) {
         // extract the id values from the bean
-        Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
+        Object[] ids = prop.assocIdValues((EntityBean) bindValue);
         if (ids != null) {
           Collections.addAll(idList, ids);
         }

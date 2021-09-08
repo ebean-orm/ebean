@@ -66,7 +66,7 @@ final class NullExpression extends AbstractExpression {
 
     String nullExpr = notNull ? " is not null" : " is null";
     if (elProperty != null && elProperty.isAssocId()) {
-      request.append(elProperty.getAssocIdExpression(propName, nullExpr));
+      request.append(elProperty.assocIdExpression(propName, nullExpr));
     } else {
       request.append(propName).append(nullExpr);
     }

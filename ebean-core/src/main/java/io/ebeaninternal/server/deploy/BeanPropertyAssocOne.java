@@ -79,7 +79,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       embeddedProps = overrideMeta.getProperties();
       embeddedPropsMap = new HashMap<>();
       for (BeanProperty embeddedProp : embeddedProps) {
-        embeddedPropsMap.put(embeddedProp.getName(), embeddedProp);
+        embeddedPropsMap.put(embeddedProp.name(), embeddedProp);
       }
     } else {
       embeddedProps = null;
@@ -175,13 +175,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   void cacheClear() {
     if (cacheNotifyRelationship) {
-      targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
+      targetDescriptor.cacheManyPropClear(relationshipProperty.name());
     }
   }
 
   void cacheClear(CacheChangeSet changeSet) {
     if (cacheNotifyRelationship) {
-      changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
+      changeSet.addManyClear(targetDescriptor, relationshipProperty.name());
     }
   }
 
@@ -191,13 +191,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   void cacheDelete(boolean clear, EntityBean bean, CacheChangeSet changeSet) {
     if (cacheNotifyRelationship) {
       if (clear) {
-        changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
+        changeSet.addManyClear(targetDescriptor, relationshipProperty.name());
       } else {
         Object assocBean = getValue(bean);
         if (assocBean != null) {
           Object parentId = targetDescriptor.id(assocBean);
           if (parentId != null) {
-            changeSet.addManyRemove(targetDescriptor, relationshipProperty.getName(), parentId);
+            changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), parentId);
           }
         }
       }
@@ -268,7 +268,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private List<Object> findIdsByParentId(Object parentId, Transaction t) {
     String rawWhere = deriveWhereParentIdSql(false);
     SpiEbeanServer server = server();
-    Query<?> q = server.find(getPropertyType());
+    Query<?> q = server.find(type());
     bindParentIdEq(rawWhere, parentId, q);
     return server.findIds(q, t);
   }
@@ -278,7 +278,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     String inClause = getIdBinder().getIdInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
     SpiEbeanServer server = server();
-    Query<?> q = server.find(getPropertyType());
+    Query<?> q = server.find(type());
     bindParentIdsIn(expr, parentIds, q);
     return server.findIds(q, t);
   }
@@ -301,7 +301,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         String basePath = SplitName.add(prefix, name);
         if (dbColumn != null) {
           BeanProperty idProperty = target.idProperty();
-          desc.registerColumn(dbColumn, SplitName.add(basePath, idProperty.getName()));
+          desc.registerColumn(dbColumn, SplitName.add(basePath, idProperty.name()));
         }
         desc.registerTable(target.baseTable(), this);
       }
@@ -399,7 +399,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public Class<?> getTargetType() {
-    return getPropertyType();
+    return type();
   }
 
   /**
@@ -485,7 +485,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Return the Id values from the given bean.
    */
   @Override
-  public Object[] getAssocIdValues(EntityBean bean) {
+  public Object[] assocIdValues(EntityBean bean) {
     return targetDescriptor.getIdBinder().getIdValues(bean);
   }
 
@@ -493,7 +493,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Return the Id expression to add to where clause etc.
    */
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
+  public String assocIdExpression(String prefix, String operator) {
     return targetDescriptor.getIdBinder().getAssocOneIdExpr(prefix, operator);
   }
 

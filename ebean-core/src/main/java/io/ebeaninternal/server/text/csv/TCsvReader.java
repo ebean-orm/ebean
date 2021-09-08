@@ -129,7 +129,7 @@ public class TCsvReader<T> implements CsvReader<T> {
       throw new TextException("Property " + propertyName + " is not DateTime capable");
     }
     if (dateTimeFormat == null) {
-      dateTimeFormat = getDefaultDateTimeFormat(elProp.getJdbcType());
+      dateTimeFormat = getDefaultDateTimeFormat(elProp.jdbcType());
     }
 
     if (locale == null) {
@@ -162,7 +162,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
     ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (parser == null) {
-      parser = elProp.getStringParser();
+      parser = elProp.stringParser();
     }
     CsvColumn column = new CsvColumn(elProp, parser);
     columnList.add(column);
@@ -240,10 +240,10 @@ public class TCsvReader<T> implements CsvReader<T> {
         throw new TextException("Property [" + aLine + "] not found");
       }
 
-      if (Types.TIME == elProp.getJdbcType()) {
+      if (Types.TIME == elProp.jdbcType()) {
         addProperty(aLine, TIME_PARSER);
 
-      } else if (isDateTimeType(elProp.getJdbcType())) {
+      } else if (isDateTimeType(elProp.jdbcType())) {
         addDateTime(aLine, null, null);
 
       } else if (elProp.isAssocProperty()) {

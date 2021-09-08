@@ -76,7 +76,7 @@ public class ProfileOriginNodeUsage {
               // (which is the default for Lob's so typical).
             } else {
               addedToPath = true;
-              pathProps.addToPath(path, beanProp.getName());
+              pathProps.addToPath(path, beanProp.name());
             }
           }
         }
@@ -86,14 +86,14 @@ public class ProfileOriginNodeUsage {
         BeanProperty versionProp = desc.getVersionProperty();
         if (versionProp != null) {
           addedToPath = true;
-          pathProps.addToPath(path, versionProp.getName());
+          pathProps.addToPath(path, versionProp.name());
         }
       }
 
       if (toOneIdProperty != null && !addedToPath) {
         // add ToOne property to parent path
         ElPropertyValue assocOne = rootDesc.getElGetValue(path);
-        pathProps.addToPath(SplitName.parent(path), assocOne.getName());
+        pathProps.addToPath(SplitName.parent(path), assocOne.name());
       }
     } finally {
       lock.unlock();

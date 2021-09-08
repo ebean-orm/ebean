@@ -226,7 +226,7 @@ public final class SqlTreeBuilder {
     List<SqlTreeNode> myJoinList = new ArrayList<>();
     List<STreePropertyAssocOne> extraProps = new ArrayList<>();
     for (STreePropertyAssocOne one : desc.propsOne()) {
-      String propPrefix = SplitName.add(prefix, one.getName());
+      String propPrefix = SplitName.add(prefix, one.name());
       if (isIncludeBean(propPrefix)) {
         selectIncludes.add(propPrefix);
         if (!one.hasForeignKey()) {
@@ -237,7 +237,7 @@ public final class SqlTreeBuilder {
     }
 
     for (STreePropertyAssocMany many : desc.propsMany()) {
-      String propPrefix = SplitName.add(prefix, many.getName());
+      String propPrefix = SplitName.add(prefix, many.name());
       if (isIncludeMany(propPrefix, many)) {
         selectIncludes.add(propPrefix);
         buildSelectChain(propPrefix, many, many.target(), myJoinList);
@@ -413,7 +413,7 @@ public final class SqlTreeBuilder {
           } else {
             logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
           }
-        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.getName()))) {
+        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.name()))) {
           // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
         } else {
@@ -440,7 +440,7 @@ public final class SqlTreeBuilder {
         // included as a bean join. With a bean join
         // the property should be excluded as the bean
         // join has its own node in the SqlTree.
-        if (!queryProps.isIncludedBeanJoin(p.getName())) {
+        if (!queryProps.isIncludedBeanJoin(p.name())) {
           // include the property... which basically
           // means include the foreign key column(s)
           selectProps.add(p);
@@ -497,7 +497,7 @@ public final class SqlTreeBuilder {
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
       if (queryProps != null
-        && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+        && queryProps.isIncludedBeanJoin(propertyAssocOne.name())
         && propertyAssocOne.hasForeignKey()
         && !propertyAssocOne.isFormula()) {
         // if it is a joined bean with FK constraint... then don't add the property

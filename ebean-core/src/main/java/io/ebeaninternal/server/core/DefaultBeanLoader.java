@@ -93,18 +93,18 @@ final class DefaultBeanLoader {
 
     query.select(parentDesc.getIdBinder().getIdProperty());
     if (onlyIds) {
-      query.fetch(many.getName(), many.getTargetIdProperty());
+      query.fetch(many.name(), many.getTargetIdProperty());
     } else {
-      query.fetch(many.getName());
+      query.fetch(many.name());
     }
     if (filterMany != null) {
-      query.setFilterMany(many.getName(), filterMany);
+      query.setFilterMany(many.name(), filterMany);
     }
 
     query.where().idEq(parentId);
     query.setBeanCacheMode(CacheMode.OFF);
     query.setMode(Mode.LAZYLOAD_MANY);
-    query.setLazyLoadManyPath(many.getName());
+    query.setLazyLoadManyPath(many.name());
     query.setPersistenceContext(pc);
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);

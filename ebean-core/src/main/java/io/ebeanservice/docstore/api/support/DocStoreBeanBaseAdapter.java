@@ -178,7 +178,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
           BeanProperty idProperty = targetDesc.idProperty();
           if (idProperty != null) {
             // embedded beans don't have id property
-            String fullPath = path + "." + idProperty.getName();
+            String fullPath = path + "." + idProperty.name();
             targetDesc.docStoreAdapter().registerInvalidationPath(desc.docStoreQueueId(), fullPath, pathProp.getProperties());
           }
         }

@@ -1341,7 +1341,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
             BeanProperty property = beanDescriptor.propertyByIndex(i);
             if (property.isCacheDataInclude()) {
               Object val = property.getCacheDataValue(bean);
-              changes.put(property.getName(), val);
+              changes.put(property.name(), val);
               if (property.isNaturalKey()) {
                 updateNaturalKey = true;
                 String valStr = (val == null) ? null : val.toString();

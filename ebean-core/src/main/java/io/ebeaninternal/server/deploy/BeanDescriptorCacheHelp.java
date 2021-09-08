@@ -282,7 +282,7 @@ final class BeanDescriptorCacheHelp<T> {
       // held as part of the bean cache so skip
       return false;
     }
-    CachedManyIds entry = manyPropGet(parentId, many.getName());
+    CachedManyIds entry = manyPropGet(parentId, many.name());
     if (entry == null) {
       // not in cache so return unsuccessful
       return false;
@@ -316,7 +316,7 @@ final class BeanDescriptorCacheHelp<T> {
           // add as JSON to bean cache
           String asJson = many.jsonWriteCollection(details);
           Map<String, Object> changes = new HashMap<>();
-          changes.put(many.getName(), asJson);
+          changes.put(many.name(), asJson);
 
           CachedBeanData newData = data.update(changes, data.getVersion());
           if (beanLog.isDebugEnabled()) {
@@ -330,7 +330,7 @@ final class BeanDescriptorCacheHelp<T> {
     } else {
       CachedManyIds entry = createManyIds(many, details);
       if (entry != null) {
-        cachePutManyIds(parentId, many.getName(), entry);
+        cachePutManyIds(parentId, many.name(), entry);
       }
     }
   }
@@ -845,7 +845,7 @@ final class BeanDescriptorCacheHelp<T> {
           Object details = many.getValue(updateRequest.entityBean());
           CachedManyIds entry = createManyIds(many, details);
           if (entry != null) {
-            changeSet.addManyPut(desc, many.getName(), id, entry);
+            changeSet.addManyPut(desc, many.name(), id, entry);
           }
         }
       }

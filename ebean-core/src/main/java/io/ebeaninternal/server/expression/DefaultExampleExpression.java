@@ -276,7 +276,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
       if (!beanProperty.isTransient()) {
         Object value = beanProperty.getValue(bean);
         if (value != null) {
-          String propName = SplitName.add(prefix, beanProperty.getName());
+          String propName = SplitName.add(prefix, beanProperty.name());
           if (beanProperty.isScalar()) {
             if (value instanceof String) {
               list.add(new LikeExpression(propName, value, caseInsensitive, likeType));

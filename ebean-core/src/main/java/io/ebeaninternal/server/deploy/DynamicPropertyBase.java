@@ -24,7 +24,7 @@ abstract class DynamicPropertyBase implements STreeProperty {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 

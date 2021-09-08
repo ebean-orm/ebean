@@ -177,7 +177,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (childMasterProperty != null) {
       BeanProperty masterId = childMasterProperty.getTargetDescriptor().idProperty();
       if (masterId != null) { // in docstore only, the master-id may be not available
-        childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
+        childMasterIdProperty = childMasterProperty.name() + "." + masterId.name();
       }
     }
   }
@@ -209,7 +209,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @SuppressWarnings("rawtypes")
   public Collection getRawCollection(EntityBean bean) {
-    return help.underlying(getVal(bean));
+    return help.underlying(value(bean));
   }
 
   /**
@@ -217,11 +217,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public void merge(EntityBean bean, EntityBean existing) {
-    Object existingCollection = getVal(existing);
+    Object existingCollection = value(existing);
     if (existingCollection instanceof BeanCollection<?>) {
       BeanCollection<?> toBC = (BeanCollection<?>) existingCollection;
       if (!toBC.isPopulated()) {
-        Object fromCollection = getVal(bean);
+        Object fromCollection = value(bean);
         if (fromCollection instanceof BeanCollection<?>) {
           BeanCollection<?> fromBC = (BeanCollection<?>) fromCollection;
           if (fromBC.isPopulated()) {
@@ -454,7 +454,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Return the Id values from the given bean.
    */
   @Override
-  public Object[] getAssocIdValues(EntityBean bean) {
+  public Object[] assocIdValues(EntityBean bean) {
     return targetDescriptor.getIdBinder().getIdValues(bean);
   }
 
@@ -462,7 +462,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Return the Id expression to add to where clause etc.
    */
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
+  public String assocIdExpression(String prefix, String operator) {
     return targetDescriptor.getIdBinder().getAssocOneIdExpr(prefix, operator);
   }
 
@@ -702,7 +702,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     for (BeanPropertyAssocOne<?> prop : targetDesc.propertiesOne()) {
       if (mappedBy != null) {
         // match using mappedBy as property name
-        if (mappedBy.equalsIgnoreCase(prop.getName())) {
+        if (mappedBy.equalsIgnoreCase(prop.name())) {
           return prop;
         }
       } else {
@@ -723,7 +723,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     // search for the property
     BeanDescriptor<?> targetDesc = getTargetDescriptor();
     for (BeanProperty prop : targetDesc.propertiesAll()) {
-      if (mapKey.equalsIgnoreCase(prop.getName())) {
+      if (mapKey.equalsIgnoreCase(prop.name())) {
         return prop;
       }
     }

@@ -44,8 +44,8 @@ public final class SimpleExpression extends AbstractValueExpression {
     }
     ExpressionPath prop = context.getExpressionPath(propName);
     if (prop != null && prop.isAssocId()) {
-      String idName = prop.getAssocIdExpression(propName, "");
-      Object[] ids = prop.getAssocIdValues((EntityBean) value());
+      String idName = prop.assocIdExpression(propName, "");
+      Object[] ids = prop.assocIdValues((EntityBean) value());
       if (ids == null || ids.length != 1) {
         throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + Arrays.toString(ids));
       }
@@ -73,7 +73,7 @@ public final class SimpleExpression extends AbstractValueExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        Object[] ids = prop.getAssocIdValues((EntityBean) value());
+        Object[] ids = prop.assocIdValues((EntityBean) value());
         if (ids != null) {
           for (Object id : ids) {
             request.addBindValue(id);
@@ -101,7 +101,7 @@ public final class SimpleExpression extends AbstractValueExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        request.append(prop.getAssocIdExpression(propName, type.bind()));
+        request.append(prop.assocIdExpression(propName, type.bind()));
         return;
       }
       if (prop.isDbEncrypted()) {

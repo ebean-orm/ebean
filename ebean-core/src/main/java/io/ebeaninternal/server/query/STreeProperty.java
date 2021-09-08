@@ -17,7 +17,7 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   /**
    * Return the property name.
    */
-  String getName();
+  String name();
 
   /**
    * Return the full property name (for error messages).

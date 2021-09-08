@@ -39,7 +39,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
 
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> collection) {
-    String path = fullPath + "." + many.getName();
+    String path = fullPath + "." + many.name();
     parent.register(path, many, collection);
   }
 

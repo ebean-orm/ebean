@@ -106,12 +106,12 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
   @Override
-  public String getElName() {
+  public String elName() {
     return name;
   }
 
@@ -119,7 +119,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public Object[] getAssocIdValues(EntityBean value) {
+  public Object[] assocIdValues(EntityBean value) {
     return null;
   }
 
@@ -127,7 +127,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
+  public String assocIdExpression(String prefix, String operator) {
     return null;
   }
 
@@ -186,7 +186,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return 0;
   }
 
@@ -201,7 +201,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public StringParser getStringParser() {
+  public StringParser stringParser() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
@@ -226,7 +226,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public Property getProperty() {
+  public Property property() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 

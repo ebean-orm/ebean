@@ -72,7 +72,7 @@ abstract class MergeNode {
    */
   final void addSelectId(Query<?> query) {
     BeanProperty idProperty = targetDescriptor.idProperty();
-    query.fetch(fullPath, idProperty.getName());
+    query.fetch(fullPath, idProperty.name());
   }
 
   /**

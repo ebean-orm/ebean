@@ -470,7 +470,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (mapKey == null) {
       BeanProperty idProp = beanDescriptor.idProperty();
       if (idProp != null) {
-        query.setMapKey(idProp.getName());
+        query.setMapKey(idProp.name());
       } else {
         throw new PersistenceException("No mapKey specified for query");
       }

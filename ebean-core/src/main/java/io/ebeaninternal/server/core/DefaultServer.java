@@ -713,7 +713,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.getName()).setId(id).findOne();
+    return find(type).select(idProp.name()).setId(id).findOne();
   }
 
   @Override
@@ -2284,7 +2284,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (idProperty == null) {
       return Collections.emptySet();
     }
-    Object id = idProperty.getVal(entityBean);
+    Object id = idProperty.value(entityBean);
     if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not new
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
@@ -2311,14 +2311,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     ExpressionList<?> exprList = query.where();
     if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
-      exprList.ne(idProperty.getName(), idProperty.getVal(entityBean));
+      exprList.ne(idProperty.name(), idProperty.value(entityBean));
     }
     for (Property prop : props) {
-      Object value = prop.getVal(entityBean);
+      Object value = prop.value(entityBean);
       if (value == null) {
         return null;
       }
-      exprList.eq(prop.getName(), value);
+      exprList.eq(prop.name(), value);
     }
     if (findCount(query, transaction) > 0) {
       Set<Property> ret = new LinkedHashSet<>();

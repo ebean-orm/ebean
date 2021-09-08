@@ -70,7 +70,7 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!subQuery) {
       // add discriminator column
-      String relativePrefix = ctx.getRelativePrefix(property.getName());
+      String relativePrefix = ctx.getRelativePrefix(property.name());
       String tableAlias = ctx.getTableAlias(relativePrefix);
       ctx.appendColumn(tableAlias, property.targetInheritInfo.getDiscriminatorColumn());
     }

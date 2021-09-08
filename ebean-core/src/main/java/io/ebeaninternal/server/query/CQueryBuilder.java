@@ -479,7 +479,7 @@ final class CQueryBuilder {
     // check if @Id property included in RawSql
     boolean rawNoId = true;
     BeanProperty idProperty = descriptor.idProperty();
-    if (idProperty != null && columnMapping.contains(idProperty.getName())) {
+    if (idProperty != null && columnMapping.contains(idProperty.name())) {
       // contains the @Id property for the root level bean
       rawNoId = false;
     }
