@@ -71,7 +71,7 @@ abstract class MergeNode {
    * Add to the query to fetch the Ids values for the foreign keys basically.
    */
   final void addSelectId(Query<?> query) {
-    BeanProperty idProperty = targetDescriptor.getIdProperty();
+    BeanProperty idProperty = targetDescriptor.idProperty();
     query.fetch(fullPath, idProperty.getName());
   }
 

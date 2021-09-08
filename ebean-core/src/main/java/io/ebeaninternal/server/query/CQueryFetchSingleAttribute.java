@@ -66,7 +66,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindAttr exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
-      .append("] type[").append(desc.getName())
+      .append("] type[").append(desc.name())
       .append("] predicates[").append(predicates.getLogWhereSql())
       .append("] bind[").append(bindLog).append("]");
     return sb.toString();
@@ -168,7 +168,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   public void profile() {
     getTransaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
   Set<String> getDependentTables() {

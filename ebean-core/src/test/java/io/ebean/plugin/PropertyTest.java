@@ -27,30 +27,30 @@ public class PropertyTest {
     order.setCustomer(customer);
     order.setStatus(Order.Status.APPROVED);
 
-    Property statusProperty = beanType(Order.class).getProperty("status");
+    Property statusProperty = beanType(Order.class).property("status");
     assertThat(statusProperty.getVal(order)).isEqualTo(order.getStatus());
 
-    Property customerProperty = beanType(Order.class).getProperty("customer");
+    Property customerProperty = beanType(Order.class).property("customer");
     assertThat(customerProperty.getVal(order)).isEqualTo(customer);
   }
 
   @Test
   public void isMany_when_not() {
 
-    assertThat(beanType(Order.class).getProperty("status").isMany()).isFalse();
-    assertThat(beanType(Order.class).getProperty("customer").isMany()).isFalse();
+    assertThat(beanType(Order.class).property("status").isMany()).isFalse();
+    assertThat(beanType(Order.class).property("customer").isMany()).isFalse();
   }
 
   @Test
   public void isMany_when_true() {
 
-    assertThat(beanType(Order.class).getProperty("details").isMany()).isTrue();
+    assertThat(beanType(Order.class).property("details").isMany()).isTrue();
   }
 
   @Test
   public void name() {
-    assertThat(beanType(Order.class).getProperty("status").getName()).isEqualTo("status");
-    assertThat(beanType(Order.class).getProperty("customer").getName()).isEqualTo("customer");
-    assertThat(beanType(Order.class).getProperty("details").getName()).isEqualTo("details");
+    assertThat(beanType(Order.class).property("status").getName()).isEqualTo("status");
+    assertThat(beanType(Order.class).property("customer").getName()).isEqualTo("customer");
+    assertThat(beanType(Order.class).property("details").getName()).isEqualTo("details");
   }
 }

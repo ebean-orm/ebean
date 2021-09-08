@@ -26,12 +26,12 @@ public class SpiServerTest extends BaseTestCase {
     SpiServer pluginApi = defaultServer.pluginApi();
 
     BeanType<Customer> beanType = pluginApi.beanType(Customer.class);
-    assertEquals("o_customer", beanType.getBaseTable());
+    assertEquals("o_customer", beanType.baseTable());
     assertNotNull(pluginApi.databasePlatform());
-    assertNull(beanType.getFindController());
-    assertNotNull(beanType.getPersistController());
-    assertNull(beanType.getPersistListener());
-    assertNull(beanType.getQueryAdapter());
+    assertNull(beanType.findController());
+    assertNotNull(beanType.persistController());
+    assertNull(beanType.persistListener());
+    assertNull(beanType.queryAdapter());
 
     assertTrue(beanType.isValidExpression("name"));
     assertTrue(beanType.isValidExpression("contacts.firstName"));
@@ -43,7 +43,7 @@ public class SpiServerTest extends BaseTestCase {
     Customer customer = new Customer();
     customer.setId(42);
 
-    assertEquals(42, beanType.beanId(customer));
+    assertEquals(42, beanType.id(customer));
 
     List<? extends BeanType<?>> beanTypes = pluginApi.beanTypes("o_customer");
     assertEquals(2, beanTypes.size());

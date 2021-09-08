@@ -129,7 +129,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
           // limit JoinColumn mapping to the @Id / primary key
           TableJoinColumn[] columns = tableJoin.columns();
           String foreignJoinColumn = columns[0].getForeignDbColumn();
-          String foreignIdColumn = targetDescriptor.getIdProperty().getDbColumn();
+          String foreignIdColumn = targetDescriptor.idProperty().getDbColumn();
           if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
             throw new PersistenceException("Mapping limitation - @JoinColumn on " + getFullBeanName() + " needs to map to a primary key as per Issue #529 "
               + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
@@ -137,7 +137,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         }
       } else {
         exportedProperties = createExported();
-        String delStmt = "delete from " + targetDescriptor.getBaseTable() + " where ";
+        String delStmt = "delete from " + targetDescriptor.baseTable() + " where ";
         deleteByParentIdSql = delStmt + deriveWhereParentIdSql(false);
         deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true);
       }
@@ -195,7 +195,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       } else {
         Object assocBean = getValue(bean);
         if (assocBean != null) {
-          Object parentId = targetDescriptor.beanId(assocBean);
+          Object parentId = targetDescriptor.id(assocBean);
           if (parentId != null) {
             changeSet.addManyRemove(targetDescriptor, relationshipProperty.getName(), parentId);
           }
@@ -300,10 +300,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         BeanDescriptor<T> target = getTargetDescriptor();
         String basePath = SplitName.add(prefix, name);
         if (dbColumn != null) {
-          BeanProperty idProperty = target.getIdProperty();
+          BeanProperty idProperty = target.idProperty();
           desc.registerColumn(dbColumn, SplitName.add(basePath, idProperty.getName()));
         }
-        desc.registerTable(target.getBaseTable(), this);
+        desc.registerTable(target.baseTable(), this);
       }
     }
   }
@@ -383,7 +383,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       oldBean = (EntityBean) oldEmb;
 
       BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
-      BeanProperty idProperty = targetDescriptor.getIdProperty();
+      BeanProperty idProperty = targetDescriptor.idProperty();
 
       Object newId = (newBean == null) ? null : idProperty.getValue(newBean);
       Object oldId = (oldBean == null) ? null : idProperty.getValue(oldBean);
@@ -424,13 +424,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     } else if (targetInheritInfo != null) {
       return createCacheBeanId(ap);
     } else {
-      return targetDescriptor.getIdProperty().getCacheDataValue((EntityBean) ap);
+      return targetDescriptor.idProperty().getCacheDataValue((EntityBean) ap);
     }
   }
 
   private Object createCacheBeanId(Object bean) {
     final BeanDescriptor<?> desc = targetDescriptor.descOf(bean.getClass());
-    final Object id = desc.getIdProperty().getCacheDataValue((EntityBean) bean);
+    final Object id = desc.idProperty().getCacheDataValue((EntityBean) bean);
     return new CachedBeanId(desc.getDiscValue(), id);
   }
 
@@ -463,7 +463,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context) {
     if (id instanceof String) {
-      id = desc.getIdProperty().scalarType.parse((String) id);
+      id = desc.idProperty().scalarType.parse((String) id);
     }
     Object bean = desc.contextGet(context, id);
     if (bean == null) {
@@ -474,11 +474,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public ScalarDataReader<?> getIdReader() {
-    return targetDescriptor.getIdProperty();
+    return targetDescriptor.idProperty();
   }
 
   ScalarType<?> getIdScalarType() {
-    return targetDescriptor.getIdProperty().scalarType;
+    return targetDescriptor.idProperty().scalarType;
   }
 
   /**
@@ -565,7 +565,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Create the array of ExportedProperty used to build reference objects.
    */
   private ExportedProperty[] createExported() {
-    BeanProperty idProp = descriptor.getIdProperty();
+    BeanProperty idProp = descriptor.idProperty();
     ArrayList<ExportedProperty> list = new ArrayList<>();
     if (idProp != null && idProp.isEmbedded()) {
       BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) idProp;
@@ -598,7 +598,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
       if (primaryKeyExport) {
-        descriptor.getIdProperty().appendSelect(ctx, subQuery);
+        descriptor.idProperty().appendSelect(ctx, subQuery);
       } else {
         localHelp.appendSelect(ctx, subQuery);
       }
@@ -744,7 +744,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Just write the Id property of the ToOne property.
    */
   private void jsonWriteTargetId(SpiJsonWriter writeJson, EntityBean childBean) throws IOException {
-    BeanProperty idProperty = targetDescriptor.getIdProperty();
+    BeanProperty idProperty = targetDescriptor.idProperty();
     if (idProperty != null) {
       writeJson.writeStartObject(name);
       idProperty.jsonWriteForInsert(writeJson, childBean);

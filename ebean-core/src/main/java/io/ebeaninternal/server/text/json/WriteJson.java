@@ -529,7 +529,7 @@ public final class WriteJson implements SpiJsonWriter {
     public void write(WriteJson writeJson) {
 
       try {
-        BeanProperty beanProp = desc.getIdProperty();
+        BeanProperty beanProp = desc.idProperty();
         if (beanProp != null) {
           if (isIncludeProperty(beanProp)) {
             beanProp.jsonWrite(writeJson, currentBean);

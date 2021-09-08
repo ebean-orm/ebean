@@ -22,42 +22,42 @@ public class ExpressionPathTest {
   public void containsMany_when_many() throws Exception {
 
     BeanType<Order> beanType = beanType(Order.class);
-    assertThat(beanType.getExpressionPath("details").containsMany()).isTrue();
+    assertThat(beanType.expressionPath("details").containsMany()).isTrue();
   }
 
   @Test
   public void containsMany_when_manyChild() throws Exception {
 
     BeanType<Order> beanType = beanType(Order.class);
-    assertThat(beanType.getExpressionPath("details.id").containsMany()).isTrue();
+    assertThat(beanType.expressionPath("details.id").containsMany()).isTrue();
   }
 
   @Test
   public void containsMany_when_manyGrandChild() throws Exception {
 
     BeanType<Order> beanType = beanType(Order.class);
-    assertThat(beanType.getExpressionPath("details.product.sku").containsMany()).isTrue();
+    assertThat(beanType.expressionPath("details.product.sku").containsMany()).isTrue();
   }
 
   @Test
   public void containsMany_when_one() throws Exception {
 
     BeanType<Order> beanType = beanType(Order.class);
-    assertThat(beanType.getExpressionPath("customer.name").containsMany()).isFalse();
+    assertThat(beanType.expressionPath("customer.name").containsMany()).isFalse();
   }
 
   @Test
   public void containsMany_when_oneWithMany() throws Exception {
 
     BeanType<Order> beanType = beanType(Order.class);
-    assertThat(beanType.getExpressionPath("customer.contacts").containsMany()).isTrue();
+    assertThat(beanType.expressionPath("customer.contacts").containsMany()).isTrue();
   }
 
   @Test
   public void containsMany_when_oneWithManyChild() throws Exception {
 
     BeanType<Order> beanType = beanType(Order.class);
-    assertThat(beanType.getExpressionPath("customer.contacts.firstName").containsMany()).isTrue();
+    assertThat(beanType.expressionPath("customer.contacts.firstName").containsMany()).isTrue();
   }
 
   @Test
@@ -65,7 +65,7 @@ public class ExpressionPathTest {
 
     BeanType<Order> beanType = beanType(Order.class);
     Order order = new Order();
-    beanType.getExpressionPath("id").pathSet(order, 42);
+    beanType.expressionPath("id").pathSet(order, 42);
     assertThat(order.getId()).isEqualTo(42);
   }
 
@@ -74,7 +74,7 @@ public class ExpressionPathTest {
 
     BeanType<Order> beanType = beanType(Order.class);
     Order order = new Order();
-    beanType.getExpressionPath("customer.name").pathSet(order, "Rob");
+    beanType.expressionPath("customer.name").pathSet(order, "Rob");
     assertThat(order.getCustomer().getName()).isEqualTo("Rob");
   }
 
@@ -94,7 +94,7 @@ public class ExpressionPathTest {
     customer = server.find(Customer.class, customer.getId());
     assertThat(customer.getName()).isEqualTo("foo");
 
-    customerBeanType.getExpressionPath("name").pathSet(customer, "bar");
+    customerBeanType.expressionPath("name").pathSet(customer, "bar");
     server.save(customer);
 
     customer = server.find(Customer.class, customer.getId());
@@ -108,7 +108,7 @@ public class ExpressionPathTest {
 
     order = server.find(Order.class, order.getId());
 
-    ExpressionPath customerNamePath = orderBeanType.getExpressionPath("customer.name");
+    ExpressionPath customerNamePath = orderBeanType.expressionPath("customer.name");
     assertThat(customerNamePath.pathGet(order)).isEqualTo("bar");
 
     customerNamePath.pathSet(order, "baz");

@@ -66,7 +66,7 @@ final class BeanDescriptorDraftHelp<T> {
     }
     EntityBean draft = (EntityBean) draftBean;
     EntityBean live = (EntityBean) liveBean;
-    BeanProperty idProperty = desc.getIdProperty();
+    BeanProperty idProperty = desc.idProperty();
     if (idProperty != null) {
       idProperty.publish(draft, live);
     }

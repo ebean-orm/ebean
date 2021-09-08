@@ -48,7 +48,7 @@ final class InsertMeta {
     this.allExcludeDraftOnly = all.excludeDraftOnly();
     this.shadowFKey = shadowFKey;
 
-    String tableName = desc.getBaseTable();
+    String tableName = desc.baseTable();
     String draftTableName = desc.getDraftTable();
     this.sqlWithId = genSql(false, tableName, false);
     this.sqlDraftWithId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlWithId;

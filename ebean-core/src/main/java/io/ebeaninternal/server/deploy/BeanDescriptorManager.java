@@ -433,7 +433,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    */
   private void readTableToDescriptor() {
     for (BeanDescriptor<?> desc : descMap.values()) {
-      String baseTable = desc.getBaseTable();
+      String baseTable = desc.baseTable();
       if (baseTable != null) {
         baseTable = baseTable.toLowerCase();
         List<BeanDescriptor<?>> list = tableToDescMap.computeIfAbsent(baseTable, k -> new ArrayList<>(1));
@@ -508,7 +508,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     for (BeanDescriptor<?> d : descMap.values()) {
       d.initLast();
       if (!d.isEmbedded()) {
-        beanManagerMap.put(d.getFullName(), beanManagerFactory.create(d));
+        beanManagerMap.put(d.fullName(), beanManagerFactory.create(d));
         checkForValidEmbeddedId(d);
       }
     }
@@ -519,12 +519,12 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     if (idBinder instanceof IdBinderEmbedded) {
       IdBinderEmbedded embId = (IdBinderEmbedded) idBinder;
       BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
-      Class<?> idType = idBeanDescriptor.getBeanType();
+      Class<?> idType = idBeanDescriptor.type();
       try {
         idType.getDeclaredMethod("hashCode");
         idType.getDeclaredMethod("equals", Object.class);
       } catch (NoSuchMethodException e) {
-        checkMissingHashCodeOrEquals(e, idType, d.getBeanType());
+        checkMissingHashCodeOrEquals(e, idType, d.type());
       }
     }
   }
@@ -597,9 +597,9 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   private void registerBeanDescriptor(DeployBeanInfo<?> info) {
     BeanDescriptor<?> desc = new BeanDescriptor<>(this, info.getDescriptor());
-    descMap.put(desc.getBeanType().getName(), desc);
+    descMap.put(desc.type().getName(), desc);
     if (desc.isDocStoreMapped()) {
-      descQueueMap.put(desc.getDocStoreQueueId(), desc);
+      descQueueMap.put(desc.docStoreQueueId(), desc);
     }
     for (BeanPropertyAssocMany<?> many : desc.propertiesMany()) {
       if (many.isElementCollection()) {
@@ -1517,7 +1517,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
     @Override
     public int compare(BeanDescriptor<?> o1, BeanDescriptor<?> o2) {
-      return o1.getName().compareTo(o2.getName());
+      return o1.name().compareTo(o2.name());
     }
   }
 }

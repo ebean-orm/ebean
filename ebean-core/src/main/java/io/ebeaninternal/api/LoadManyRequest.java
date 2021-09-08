@@ -49,7 +49,7 @@ public final class LoadManyRequest extends LoadRequest {
 
   @Override
   public Class<?> beanType() {
-    return loadContext.getBeanDescriptor().getBeanType();
+    return loadContext.getBeanDescriptor().type();
   }
 
   public String description() {

@@ -145,7 +145,7 @@ final class BeanDescriptorJsonHelp<T> {
       desc.setUnmappedJson(bean, unmappedProperties);
     }
     Object contextBean = null;
-    Object id = desc.beanId(bean);
+    Object id = desc.id(bean);
     if (!isNullOrZero(id)) {
       // check if the bean has already been loaded
       contextBean = readJson.persistenceContextPutIfAbsent(id, bean, desc);

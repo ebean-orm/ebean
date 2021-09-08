@@ -31,33 +31,33 @@ public class BeanTypeTest {
 
   @Test
   public void getBeanType() {
-    assertThat(beanType(Order.class).getBeanType()).isEqualTo(Order.class);
+    assertThat(beanType(Order.class).type()).isEqualTo(Order.class);
   }
 
   @Test
   public void getTypeAtPath_when_ManyToOne() {
     BeanType<Order> orderType = beanType(Order.class);
-    BeanType<?> customerType = orderType.getBeanTypeAtPath("customer");
-    assertThat(customerType.getBeanType()).isEqualTo(Customer.class);
+    BeanType<?> customerType = orderType.beanTypeAtPath("customer");
+    assertThat(customerType.type()).isEqualTo(Customer.class);
   }
 
   @Test
   public void getTypeAtPath_when_OneToMany() {
     BeanType<Order> orderType = beanType(Order.class);
-    BeanType<?> detailsType = orderType.getBeanTypeAtPath("details");
-    assertThat(detailsType.getBeanType()).isEqualTo(OrderDetail.class);
+    BeanType<?> detailsType = orderType.beanTypeAtPath("details");
+    assertThat(detailsType.type()).isEqualTo(OrderDetail.class);
   }
 
   @Test
   public void getTypeAtPath_when_nested() {
     BeanType<Order> orderType = beanType(Order.class);
-    BeanType<?> productType = orderType.getBeanTypeAtPath("details.product");
-    assertThat(productType.getBeanType()).isEqualTo(Product.class);
+    BeanType<?> productType = orderType.beanTypeAtPath("details.product");
+    assertThat(productType.type()).isEqualTo(Product.class);
   }
 
   @Test
   public void getTypeAtPath_when_simpleType() {
-    assertThrows(RuntimeException.class, () -> beanType(Order.class).getBeanTypeAtPath("status"));
+    assertThrows(RuntimeException.class, () -> beanType(Order.class).beanTypeAtPath("status"));
   }
 
   @Test
@@ -70,7 +70,7 @@ public class BeanTypeTest {
 
     Order order = new Order();
     order.setStatus(Order.Status.APPROVED);
-    Property statusProperty = beanType(Order.class).getProperty("status");
+    Property statusProperty = beanType(Order.class).property("status");
 
     assertThat(statusProperty.getVal(order)).isEqualTo(order.getStatus());
   }
@@ -78,7 +78,7 @@ public class BeanTypeTest {
   @Test
   public void getBaseTable() {
 
-    assertThat(beanType(Order.class).getBaseTable()).isEqualTo("o_order");
+    assertThat(beanType(Order.class).baseTable()).isEqualTo("o_order");
   }
 
   @Test
@@ -87,7 +87,7 @@ public class BeanTypeTest {
     Order order = new Order();
     order.setId(42);
 
-    Object id1 = beanType(Order.class).beanId(order);
+    Object id1 = beanType(Order.class).id(order);
     assertThat(id1).isEqualTo(order.getId());
   }
 
@@ -95,7 +95,7 @@ public class BeanTypeTest {
   public void setBeanId() {
 
     Order order = new Order();
-    beanType(Order.class).setBeanId(order, 42);
+    beanType(Order.class).setId(order, 42);
 
     assertThat(42).isEqualTo(order.getId());
   }
@@ -106,8 +106,8 @@ public class BeanTypeTest {
     assertThat(beanType(Order.class).isDocStoreMapped()).isFalse();
     assertThat(beanType(Person.class).isDocStoreMapped()).isFalse();
 
-    assertThat(beanType(Order.class).getDocMapping()).isNotNull();
-    assertThat(beanType(Person.class).getDocMapping()).isNull();
+    assertThat(beanType(Order.class).docMapping()).isNotNull();
+    assertThat(beanType(Person.class).docMapping()).isNull();
   }
 
   @Test
@@ -136,8 +136,8 @@ public class BeanTypeTest {
   @Test
   public void getDocStoreQueueId() {
 
-    assertThat(beanType(Order.class).getDocStoreQueueId()).isEqualTo("order");
-    assertThat(beanType(Customer.class).getDocStoreQueueId()).isEqualTo("customer");
+    assertThat(beanType(Order.class).docStoreQueueId()).isEqualTo("order");
+    assertThat(beanType(Customer.class).docStoreQueueId()).isEqualTo("customer");
   }
 
   @Test
@@ -205,12 +205,12 @@ public class BeanTypeTest {
 
   @Test
   public void getDiscColumn_when_default() {
-    assertEquals(beanType(Car.class).getDiscColumn(), "dtype");
+    assertEquals(beanType(Car.class).discColumn(), "dtype");
   }
 
   @Test
   public void getDiscColumn_when_set() {
-    assertEquals(beanType(Stockforecast.class).getDiscColumn(), "type");
+    assertEquals(beanType(Stockforecast.class).discColumn(), "type");
   }
 
   @Test

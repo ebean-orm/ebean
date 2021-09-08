@@ -94,7 +94,7 @@ public final class BeanPersistIds implements BinaryWritable {
     StringBuilder sb = new StringBuilder();
     sb.append("BeanIds[");
     if (beanDescriptor != null) {
-      sb.append(beanDescriptor.getFullName());
+      sb.append(beanDescriptor.fullName());
     } else {
       sb.append("descId:").append(descriptorId);
     }

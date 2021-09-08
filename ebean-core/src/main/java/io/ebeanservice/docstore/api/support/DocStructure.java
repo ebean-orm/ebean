@@ -87,7 +87,7 @@ public class DocStructure {
     BeanDescriptor<?> targetDesc = embProp.getTargetDescriptor();
 
     PathProperties manyRootPath = new PathProperties();
-    manyRootPath.addToPath(null, targetDesc.getIdProperty().getName());
+    manyRootPath.addToPath(null, targetDesc.idProperty().getName());
     manyRootPath.addNested(prop, embedded.get(prop));
 
     manyRoot.put(prop, manyRootPath);

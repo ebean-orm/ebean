@@ -39,42 +39,42 @@ public class BeanDescriptor_registerTest {
 
     Controller1 controller1 = new Controller1();
 
-    assertNull(desc.getPersistController());
+    assertNull(desc.persistController());
     desc.register(controller1);
-    assertSame(controller1, desc.getPersistController());
+    assertSame(controller1, desc.persistController());
 
     Controller2 controller2 = new Controller2();
     desc.register(controller2);
 
-    assertEquals(2, ((ChainedBeanPersistController) desc.getPersistController()).size());
+    assertEquals(2, ((ChainedBeanPersistController) desc.persistController()).size());
 
     desc.deregister(controller1);
-    assertEquals(1, ((ChainedBeanPersistController) desc.getPersistController()).size());
+    assertEquals(1, ((ChainedBeanPersistController) desc.persistController()).size());
 
     desc.deregister(controller2);
-    assertEquals(0, ((ChainedBeanPersistController) desc.getPersistController()).size());
+    assertEquals(0, ((ChainedBeanPersistController) desc.persistController()).size());
   }
 
   private void persistListenerRegistrationTests(BeanDescriptor<EBasic> desc) {
 
     Listener1 listener1 = new Listener1();
 
-    assertNull(desc.getPersistListener());
+    assertNull(desc.persistListener());
     desc.register(listener1);
-    assertSame(listener1, desc.getPersistListener());
+    assertSame(listener1, desc.persistListener());
 
     Listener2 listener2 = new Listener2();
     desc.register(listener2);
 
-    BeanPersistListener persistListener = desc.getPersistListener();
+    BeanPersistListener persistListener = desc.persistListener();
     assertTrue(persistListener instanceof ChainedBeanPersistListener);
     assertEquals(2, ((ChainedBeanPersistListener) persistListener).size());
 
     desc.deregister(listener1);
-    assertEquals(1, ((ChainedBeanPersistListener) desc.getPersistListener()).size());
+    assertEquals(1, ((ChainedBeanPersistListener) desc.persistListener()).size());
 
     desc.deregister(listener2);
-    assertEquals(0, ((ChainedBeanPersistListener) desc.getPersistListener()).size());
+    assertEquals(0, ((ChainedBeanPersistListener) desc.persistListener()).size());
   }
 
   public static class Listener1 extends AbstractBeanPersistListener {

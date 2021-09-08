@@ -217,22 +217,22 @@ public class TestNewTypes extends BaseTestCase {
   private void testSetGetPath(SomeNewTypesBean refBean) {
     SomeNewTypesBean testBean = new SomeNewTypesBean();
     BeanType<SomeNewTypesBean> beanType = DB.getDefault().pluginApi().beanType(SomeNewTypesBean.class);
-    ExpressionPath localDate = beanType.getExpressionPath("localDate");
-    ExpressionPath localDateTime = beanType.getExpressionPath("localDateTime");
-    ExpressionPath offsetDateTime = beanType.getExpressionPath("offsetDateTime");
-    ExpressionPath zonedDateTime = beanType.getExpressionPath("zonedDateTime");
-    ExpressionPath localTime = beanType.getExpressionPath("localTime");
-    ExpressionPath instant = beanType.getExpressionPath("instant");
-    ExpressionPath year = beanType.getExpressionPath("year");
-    ExpressionPath month = beanType.getExpressionPath("month");
-    ExpressionPath dayOfWeek = beanType.getExpressionPath("dayOfWeek");
-    ExpressionPath zoneId = beanType.getExpressionPath("zoneId");
-    ExpressionPath zoneOffset = beanType.getExpressionPath("zoneOffset");
-    ExpressionPath yearMonth = beanType.getExpressionPath("yearMonth");
-    ExpressionPath monthDay = beanType.getExpressionPath("monthDay");
-    ExpressionPath path = beanType.getExpressionPath("path");
-    ExpressionPath period = beanType.getExpressionPath("period");
-    ExpressionPath duration = beanType.getExpressionPath("duration");
+    ExpressionPath localDate = beanType.expressionPath("localDate");
+    ExpressionPath localDateTime = beanType.expressionPath("localDateTime");
+    ExpressionPath offsetDateTime = beanType.expressionPath("offsetDateTime");
+    ExpressionPath zonedDateTime = beanType.expressionPath("zonedDateTime");
+    ExpressionPath localTime = beanType.expressionPath("localTime");
+    ExpressionPath instant = beanType.expressionPath("instant");
+    ExpressionPath year = beanType.expressionPath("year");
+    ExpressionPath month = beanType.expressionPath("month");
+    ExpressionPath dayOfWeek = beanType.expressionPath("dayOfWeek");
+    ExpressionPath zoneId = beanType.expressionPath("zoneId");
+    ExpressionPath zoneOffset = beanType.expressionPath("zoneOffset");
+    ExpressionPath yearMonth = beanType.expressionPath("yearMonth");
+    ExpressionPath monthDay = beanType.expressionPath("monthDay");
+    ExpressionPath path = beanType.expressionPath("path");
+    ExpressionPath period = beanType.expressionPath("period");
+    ExpressionPath duration = beanType.expressionPath("duration");
 
     localDate.pathSet(testBean, refBean.getLocalDate());
     assertThat(localDate.pathGet(testBean)).isEqualTo(refBean.getLocalDate());

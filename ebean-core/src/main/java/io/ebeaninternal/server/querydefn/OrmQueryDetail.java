@@ -309,7 +309,7 @@ public final class OrmQueryDetail implements Serializable {
         if (parentProp == null) {
           ElPropertyValue el = d.getElGetValue(parentPath);
           if (el == null) {
-            throw new PersistenceException("Path [" + parentPath + "] not valid from " + d.getFullName());
+            throw new PersistenceException("Path [" + parentPath + "] not valid from " + d.fullName());
           }
           // add a missing parent path just fetching the Id property
           BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.getBeanProperty();
@@ -372,7 +372,7 @@ public final class OrmQueryDetail implements Serializable {
       String fetchPath = entry.getKey();
       ElPropertyDeploy elProp = desc.getElPropertyDeploy(fetchPath);
       if (elProp == null) {
-        throw new PersistenceException("Invalid fetch path " + fetchPath + " from " + desc.getFullName());
+        throw new PersistenceException("Invalid fetch path " + fetchPath + " from " + desc.fullName());
       }
       entries.add(new FetchEntry(idx++, fetchPath, elProp, entry.getValue()));
     }

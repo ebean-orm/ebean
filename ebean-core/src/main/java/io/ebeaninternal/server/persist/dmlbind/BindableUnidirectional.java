@@ -56,7 +56,7 @@ public final class BindableUnidirectional implements Bindable {
     PersistRequestBean<?> persistRequest = request.getPersistRequest();
     Object parentBean = persistRequest.parentBean();
     if (parentBean == null) {
-      Class<?> localType = desc.getBeanType();
+      Class<?> localType = desc.type();
       Class<?> targetType = unidirectional.getTargetType();
 
       String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";

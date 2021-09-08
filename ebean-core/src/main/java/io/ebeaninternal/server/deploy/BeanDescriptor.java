@@ -999,12 +999,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the queueId used to uniquely identify this type when queuing an index updateAdd.
    */
   @Override
-  public String getDocStoreQueueId() {
+  public String docStoreQueueId() {
     return docStoreQueueId;
   }
 
   @Override
-  public DocumentMapping getDocMapping() {
+  public DocumentMapping docMapping() {
     return docMapping;
   }
 
@@ -1067,7 +1067,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public String rootName() {
     if (inheritInfo != null && !inheritInfo.isRoot()) {
-      return inheritInfo.getRoot().desc().getName();
+      return inheritInfo.getRoot().desc().name();
     }
     return name;
   }
@@ -1597,7 +1597,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the 'when modified' property if there is one defined.
    */
   @Override
-  public BeanProperty getWhenModifiedProperty() {
+  public BeanProperty whenModifiedProperty() {
     return whenModifiedProperty;
   }
 
@@ -1605,7 +1605,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the 'when created' property if there is one defined.
    */
   @Override
-  public BeanProperty getWhenCreatedProperty() {
+  public BeanProperty whenCreatedProperty() {
     return whenCreatedProperty;
   }
 
@@ -1747,7 +1747,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   private EntityBean createEntityBean(boolean isNew) {
     if (prototypeEntityBean == null) {
-      throw new UnsupportedOperationException("cannot create entity bean for abstract entity " + getName());
+      throw new UnsupportedOperationException("cannot create entity bean for abstract entity " + name());
     }
     try {
       EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
@@ -1911,7 +1911,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public BeanType<?> getBeanTypeAtPath(String path) {
+  public BeanType<?> beanTypeAtPath(String path) {
     return getBeanDescriptor(path);
   }
 
@@ -1931,7 +1931,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         path = splitBegin[1];
         result = assocProp.getTargetDescriptor();
       } else {
-        throw new PersistenceException("Invalid path " + path + " from " + result.getFullName());
+        throw new PersistenceException("Invalid path " + path + " from " + result.fullName());
       }
     }
   }
@@ -2000,7 +2000,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   @Override
   @Nonnull
-  public Class<T> getBeanType() {
+  public Class<T> type() {
     return beanType;
   }
 
@@ -2012,7 +2012,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   @Override
   @Nonnull
-  public String getFullName() {
+  public String fullName() {
     return fullName;
   }
 
@@ -2021,7 +2021,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   @Override
   @Nonnull
-  public String getName() {
+  public String name() {
     return name;
   }
 
@@ -2122,7 +2122,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public Object beanId(Object bean) {
+  public Object id(Object bean) {
     return getId((EntityBean) bean);
   }
 
@@ -2168,7 +2168,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Set the bean id value converting if necessary.
    */
   @Override
-  public void setBeanId(T bean, Object idValue) {
+  public void setId(T bean, Object idValue) {
     idBinder.convertSetId(idValue, (EntityBean) bean);
   }
 
@@ -2190,7 +2190,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public Property getProperty(String propName) {
+  public Property property(String propName) {
     return findProperty(propName);
   }
 
@@ -2342,7 +2342,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public ExpressionPath getExpressionPath(String path) {
+  public ExpressionPath expressionPath(String path) {
     return getElGetValue(path);
   }
 
@@ -2520,7 +2520,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public String getDiscColumn() {
+  public String discColumn() {
     return inheritInfo.getDiscriminatorColumn();
   }
 
@@ -2562,7 +2562,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the beanListener.
    */
   @Override
-  public BeanPersistListener getPersistListener() {
+  public BeanPersistListener persistListener() {
     return persistListener;
   }
 
@@ -2577,7 +2577,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the find controller (SPI interface).
    */
   @Override
-  public BeanFindController getFindController() {
+  public BeanFindController findController() {
     return beanFinder;
   }
 
@@ -2585,7 +2585,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the BeanQueryAdapter or null if none is defined.
    */
   @Override
-  public BeanQueryAdapter getQueryAdapter() {
+  public BeanQueryAdapter queryAdapter() {
     return queryAdapter;
   }
 
@@ -2661,7 +2661,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the Controller.
    */
   @Override
-  public BeanPersistController getPersistController() {
+  public BeanPersistController persistController() {
     return persistController;
   }
 
@@ -2712,7 +2712,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the base table. Only properties mapped to the base table are by default persisted.
    */
   @Override
-  public String getBaseTable() {
+  public String baseTable() {
     return baseTable;
   }
 
@@ -2776,7 +2776,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void markAsDeleted(EntityBean bean) {
     if (softDeleteProperty == null) {
       Object id = getId(bean);
-      logger.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", getName(), id);
+      logger.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", name(), id);
       bean._ebean_getIntercept().setLazyLoadFailure(id);
     } else {
       setSoftDeleteValue(bean);
@@ -2803,7 +2803,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public boolean isEmbeddedPath(String propertyPath) {
     ElPropertyDeploy elProp = getElPropertyDeploy(propertyPath);
     if (elProp == null) {
-      throw new PersistenceException("Invalid path " + propertyPath + " from " + getFullName());
+      throw new PersistenceException("Invalid path " + propertyPath + " from " + fullName());
     }
     return elProp.getBeanProperty().isEmbedded();
   }
@@ -2929,7 +2929,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the identity generation type.
    */
   @Override
-  public IdType getIdType() {
+  public IdType idType() {
     return idType;
   }
 
@@ -3050,7 +3050,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public BeanProperty getIdProperty() {
+  public BeanProperty idProperty() {
     return idProperty;
   }
 
@@ -3382,7 +3382,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public List<BeanType<?>> getInheritanceChildren() {
+  public List<BeanType<?>> inheritanceChildren() {
     if (hasInheritance()) {
       return getInheritInfo().getChildren()
         .stream()
@@ -3394,7 +3394,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  public BeanType<?> getInheritanceParent() {
+  public BeanType<?> inheritanceParent() {
     return getInheritInfo() == null ? null : getInheritInfo().getParent().desc();
   }
 

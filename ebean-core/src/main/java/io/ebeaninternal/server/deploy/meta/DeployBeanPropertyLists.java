@@ -184,7 +184,7 @@ public final class DeployBeanPropertyLists {
     }
     if (prop.isId()) {
       if (id != null) {
-        throw new IllegalStateException("More that one @Id property on " + desc.getFullName() + " ?");
+        throw new IllegalStateException("More that one @Id property on " + desc.fullName() + " ?");
       }
       id = prop;
       return;

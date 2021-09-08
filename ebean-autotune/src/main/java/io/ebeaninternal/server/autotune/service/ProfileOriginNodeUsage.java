@@ -45,7 +45,7 @@ public class ProfileOriginNodeUsage {
       if (path != null) {
         ElPropertyValue elGetValue = rootDesc.getElGetValue(path);
         if (elGetValue == null) {
-          logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.getName());
+          logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
           return;
         } else {
           BeanProperty beanProperty = elGetValue.getBeanProperty();
@@ -61,7 +61,7 @@ public class ProfileOriginNodeUsage {
       for (String propName : aggregateUsed) {
         BeanProperty beanProp = desc.findPropertyFromPath(propName);
         if (beanProp == null) {
-          logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.getName());
+          logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.name());
 
         } else {
           if (beanProp.isId()) {

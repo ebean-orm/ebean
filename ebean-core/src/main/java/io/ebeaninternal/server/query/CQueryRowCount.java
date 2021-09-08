@@ -56,7 +56,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindCount exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
-      .append("] type[").append(desc.getFullName())
+      .append("] type[").append(desc.fullName())
       .append("] predicates[").append(predicates.getLogWhereSql())
       .append("] bind[").append(bindLog).append("]");
 
@@ -137,7 +137,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   public void profile() {
     getTransaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
   Set<String> getDependentTables() {

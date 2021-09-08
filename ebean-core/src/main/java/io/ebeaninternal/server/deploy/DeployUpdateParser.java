@@ -73,8 +73,8 @@ public final class DeployUpdateParser extends DeployParser {
 
   @Override
   public String getDeployWord(String expression) {
-    if (expression.equalsIgnoreCase(beanDescriptor.getName())) {
-      return beanDescriptor.getBaseTable();
+    if (expression.equalsIgnoreCase(beanDescriptor.name())) {
+      return beanDescriptor.baseTable();
     }
     ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
     return elProp != null ? elProp.getDbColumn() : null;

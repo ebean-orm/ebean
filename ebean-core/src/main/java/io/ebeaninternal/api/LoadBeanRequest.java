@@ -48,7 +48,7 @@ public final class LoadBeanRequest extends LoadRequest {
 
   @Override
   public Class<?> beanType() {
-    return loadBuffer.descriptor().getBeanType();
+    return loadBuffer.descriptor().type();
   }
 
   public String description() {
@@ -108,7 +108,7 @@ public final class LoadBeanRequest extends LoadRequest {
     BeanDescriptor<?> desc = loadBuffer.descriptor();
     // collect Ids and maybe load bean cache
     for (Object bean : list) {
-      loadedIds.add(desc.beanId(bean));
+      loadedIds.add(desc.id(bean));
     }
     if (loadCache) {
       desc.cacheBeanPutAll(list);

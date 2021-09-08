@@ -22,24 +22,56 @@ public interface BeanType<T> {
    * Return the short name of the bean type.
    */
   @Nonnull
-  String getName();
+  String name();
+
+  /**
+   * Deprecated migrate to name().
+   */
+  @Deprecated
+  default String getName() {
+    return name();
+  }
 
   /**
    * Return the full name of the bean type.
    */
   @Nonnull
-  String getFullName();
+  String fullName();
+
+  /**
+   * Deprecated migrate to fullName().
+   */
+  @Deprecated
+  default String getFullName() {
+    return fullName();
+  }
 
   /**
    * Return the class type this BeanDescriptor describes.
    */
   @Nonnull
-  Class<T> getBeanType();
+  Class<T> type();
+
+  /**
+   * Deprecated migrate to type().
+   */
+  @Deprecated
+  default Class<T> getBeanType() {
+    return type();
+  }
 
   /**
    * Return the type bean for an OneToMany or ManyToOne or ManyToMany property.
    */
-  BeanType<?> getBeanTypeAtPath(String propertyName);
+  BeanType<?> beanTypeAtPath(String propertyName);
+
+  /**
+   * Deprecated migrate to beanTypeAtPath().
+   */
+  @Deprecated
+  default BeanType<?> getBeanTypeAtPath(String propertyName) {
+    return beanTypeAtPath(propertyName);
+  }
 
   /**
    * Return all the properties for this bean type.
@@ -50,22 +82,54 @@ public interface BeanType<T> {
   /**
    * Return the Id property.
    */
-  Property getIdProperty();
+  Property idProperty();
+
+  /**
+   * Deprecated migrate to idProperty().
+   */
+  @Deprecated
+  default Property getIdProperty() {
+    return idProperty();
+  }
 
   /**
    * Return the when modified property if there is one defined.
    */
-  Property getWhenModifiedProperty();
+  Property whenModifiedProperty();
+
+  /**
+   * Deprecated migrate to idProperty().
+   */
+  @Deprecated
+  default Property getWhenModifiedProperty() {
+    return whenModifiedProperty();
+  }
 
   /**
    * Return the when created property if there is one defined.
    */
-  Property getWhenCreatedProperty();
+  Property whenCreatedProperty();
+
+  /**
+   * Deprecated migrate to idProperty().
+   */
+  @Deprecated
+  default Property getWhenCreatedProperty() {
+    return whenCreatedProperty();
+  }
 
   /**
    * Return the Property to read values from a bean.
    */
-  Property getProperty(String propertyName);
+  Property property(String propertyName);
+
+  /**
+   * Deprecated migrate to property().
+   */
+  @Deprecated
+  default Property getProperty(String propertyName) {
+    return property(propertyName);
+  }
 
   /**
    * Return the ExpressionPath for a given property path.
@@ -73,7 +137,15 @@ public interface BeanType<T> {
    * This can return a property or nested property path.
    * </p>
    */
-  ExpressionPath getExpressionPath(String path);
+  ExpressionPath expressionPath(String path);
+
+  /**
+   * Deprecated migrate to expressionPath().
+   */
+  @Deprecated
+  default ExpressionPath getExpressionPath(String path) {
+    return expressionPath(path);
+  }
 
   /**
    * Return true if the property is a valid known property or path for the given bean type.
@@ -108,7 +180,15 @@ public interface BeanType<T> {
   /**
    * Return the base table this bean type maps to.
    */
-  String getBaseTable();
+  String baseTable();
+
+  /**
+   * Deprecated migrate to baseTable().
+   */
+  @Deprecated
+  default String getBaseTable() {
+    return baseTable();
+  }
 
   /**
    * Create a new instance of the bean.
@@ -118,10 +198,18 @@ public interface BeanType<T> {
   /**
    * Return the bean id. This is the same as getBeanId() but without the generic type.
    */
-  Object beanId(Object bean);
+  Object id(Object bean);
 
   /**
-   * Deprecated migrate to beanId()
+   * Deprecated migrate to id()
+   */
+  @Deprecated
+  default Object beanId(Object bean) {
+    return id(bean);
+  }
+
+  /**
+   * Deprecated migrate to id()
    */
   @Deprecated
   Object getBeanId(T bean);
@@ -129,32 +217,80 @@ public interface BeanType<T> {
   /**
    * Set the id value to the bean.
    */
-  void setBeanId(T bean, Object idValue);
+  void setId(T bean, Object idValue);
+
+  /**
+   * Deprecated migrate to setId()
+   */
+  @Deprecated
+  default void setBeanId(T bean, Object idValue) {
+    setId(bean, idValue);
+  }
 
   /**
    * Return the bean persist controller.
    */
-  BeanPersistController getPersistController();
+  BeanPersistController persistController();
+
+  /**
+   * Deprecated migrate to persistController()
+   */
+  @Deprecated
+  default BeanPersistController getPersistController() {
+    return persistController();
+  }
 
   /**
    * Return the bean persist listener.
    */
-  BeanPersistListener getPersistListener();
+  BeanPersistListener persistListener();
+
+  /**
+   * Deprecated migrate to persistListener()
+   */
+  @Deprecated
+  default BeanPersistListener getPersistListener() {
+    return persistListener();
+  }
 
   /**
    * Return the beanFinder. Usually null unless overriding the finder.
    */
-  BeanFindController getFindController();
+  BeanFindController findController();
+
+  /**
+   * Deprecated migrate to findController()
+   */
+  @Deprecated
+  default BeanFindController getFindController() {
+    return findController();
+  }
 
   /**
    * Return the BeanQueryAdapter or null if none is defined.
    */
-  BeanQueryAdapter getQueryAdapter();
+  BeanQueryAdapter queryAdapter();
+
+  /**
+   * Deprecated migrate to queryAdapter()
+   */
+  @Deprecated
+  default BeanQueryAdapter getQueryAdapter() {
+    return queryAdapter();
+  }
 
   /**
    * Return the identity generation type.
    */
-  IdType getIdType();
+  IdType idType();
+
+  /**
+   * Deprecated migrate to idType()
+   */
+  @Deprecated
+  default IdType getIdType() {
+    return idType();
+  }
 
   /**
    * Return true if this bean type has doc store backing.
@@ -168,12 +304,28 @@ public interface BeanType<T> {
    * for the document store.
    * </p>
    */
-  DocMapping getDocMapping();
+  DocMapping docMapping();
+
+  /**
+   * Deprecated migrate to docMapping()
+   */
+  @Deprecated
+  default DocMapping getDocMapping() {
+    return docMapping();
+  }
 
   /**
    * Return the doc store queueId for this bean type.
    */
-  String getDocStoreQueueId();
+  String docStoreQueueId();
+
+  /**
+   * Deprecated migrate to docStoreQueueId()
+   */
+  @Deprecated
+  default String getDocStoreQueueId() {
+    return docStoreQueueId();
+  }
 
   /**
    * Return the doc store support for this bean type.\
@@ -204,12 +356,28 @@ public interface BeanType<T> {
   /**
    * Returns all direct children of this beantype
    */
-  List<BeanType<?>> getInheritanceChildren();
+  List<BeanType<?>> inheritanceChildren();
 
   /**
-   * Returns the parent in inheritance hiearchy
+   * Deprecated migrate to inheritanceChildren()
    */
-  BeanType<?> getInheritanceParent();
+  @Deprecated
+  default List<BeanType<?>> getInheritanceChildren() {
+    return inheritanceChildren();
+  }
+
+  /**
+   * Returns the parent in inheritance hierarchy
+   */
+  BeanType<?> inheritanceParent();
+
+  /**
+   * Deprecated migrate to inheritanceParent()
+   */
+  @Deprecated
+  default BeanType<?> getInheritanceParent() {
+    return inheritanceParent();
+  }
 
   /**
    * Visit all children recursively
@@ -219,7 +387,15 @@ public interface BeanType<T> {
   /**
    * Return the discriminator column.
    */
-  String getDiscColumn();
+  String discColumn();
+
+  /**
+   * Deprecated migrate to discColumn()
+   */
+  @Deprecated
+  default String getDiscColumn() {
+    return discColumn();
+  }
 
   /**
    * Create a bean given the discriminator value.

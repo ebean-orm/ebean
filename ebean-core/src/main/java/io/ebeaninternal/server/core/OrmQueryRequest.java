@@ -190,7 +190,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Run BeanQueryAdapter preQuery() if needed.
    */
   private void adapterPreQuery() {
-    BeanQueryAdapter queryAdapter = beanDescriptor.getQueryAdapter();
+    BeanQueryAdapter queryAdapter = beanDescriptor.queryAdapter();
     if (queryAdapter != null) {
       queryAdapter.preQuery(this);
     }
@@ -468,7 +468,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public <K> Map<K, T> findMap() {
     String mapKey = query.getMapKey();
     if (mapKey == null) {
-      BeanProperty idProp = beanDescriptor.getIdProperty();
+      BeanProperty idProp = beanDescriptor.idProperty();
       if (idProp != null) {
         query.setMapKey(idProp.getName());
       } else {

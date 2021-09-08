@@ -175,11 +175,11 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
         String path = pathProp.getPath();
         if (path != null) {
           BeanDescriptor<?> targetDesc = desc.getBeanDescriptor(path);
-          BeanProperty idProperty = targetDesc.getIdProperty();
+          BeanProperty idProperty = targetDesc.idProperty();
           if (idProperty != null) {
             // embedded beans don't have id property
             String fullPath = path + "." + idProperty.getName();
-            targetDesc.docStoreAdapter().registerInvalidationPath(desc.getDocStoreQueueId(), fullPath, pathProp.getProperties());
+            targetDesc.docStoreAdapter().registerInvalidationPath(desc.docStoreQueueId(), fullPath, pathProp.getProperties());
           }
         }
       }
@@ -323,7 +323,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the supplied value or default to the bean name lower case.
    */
   protected String derive(BeanType<?> desc, String suppliedValue) {
-    return (suppliedValue != null && !suppliedValue.isEmpty()) ? suppliedValue : desc.getName().toLowerCase();
+    return (suppliedValue != null && !suppliedValue.isEmpty()) ? suppliedValue : desc.name().toLowerCase();
   }
 
   @Override

@@ -17,7 +17,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTestCase {
 
     BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
 
-    DocumentMapping documentMapping = desc.getDocMapping();
+    DocumentMapping documentMapping = desc.docMapping();
 
     DocPropertyMapping properties = documentMapping.getProperties();
 
@@ -29,7 +29,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTestCase {
 
     BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
 
-    DocumentMapping documentMapping = desc.getDocMapping();
+    DocumentMapping documentMapping = desc.docMapping();
 
     DocPropertyMapping properties = documentMapping.getProperties();
 

@@ -14,7 +14,6 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
-import io.ebean.text.TextException;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
@@ -50,7 +49,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -269,7 +267,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       s = s.replace("${ta}", "${}");
       if (dbEncrypted) {
         s = dbEncryptFunction.getDecryptSql(s);
-        String namedParam = ":encryptkey_" + descriptor.getBaseTable() + "___" + dbColumn;
+        String namedParam = ":encryptkey_" + descriptor.baseTable() + "___" + dbColumn;
         s = s.replace("?", namedParam);
       }
     }
@@ -329,7 +327,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.dbMigrationInfos = source.dbMigrationInfos;
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
-    this.local = owningType.equals(descriptor.getBeanType());
+    this.local = owningType.equals(descriptor.type());
     this.version = source.isVersion();
     this.embedded = source.isEmbedded();
     this.id = source.isId();
@@ -358,7 +356,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public void initialise(BeanDescriptorInitContext initContext) {
     // do nothing for normal BeanProperty
     if (!isTransient && scalarType == null) {
-      throw new RuntimeException("No ScalarType assigned to " + descriptor.getFullName() + "." + getName());
+      throw new RuntimeException("No ScalarType assigned to " + descriptor.fullName() + "." + getName());
     }
   }
 
@@ -920,7 +918,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   @Override
   public String getFullBeanName() {
-    return descriptor.getFullName() + "." + name;
+    return descriptor.fullName() + "." + name;
   }
 
   /**

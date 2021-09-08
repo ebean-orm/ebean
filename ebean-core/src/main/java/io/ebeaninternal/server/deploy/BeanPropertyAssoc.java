@@ -284,7 +284,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   public boolean hasId(EntityBean bean) {
     BeanDescriptor<?> targetDesc = getTargetDescriptor();
-    BeanProperty idProp = targetDesc.getIdProperty();
+    BeanProperty idProp = targetDesc.idProperty();
     // all the unique properties are non-null
     return idProp == null || idProp.getValue(bean) != null;
   }
@@ -422,7 +422,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * descriptor back to local database columns in the TableJoin.
    */
   ImportedId createImportedId(BeanPropertyAssoc<?> owner, BeanDescriptor<?> target, TableJoin join) {
-    BeanProperty idProp = target.getIdProperty();
+    BeanProperty idProp = target.idProperty();
     BeanProperty[] others = target.propertiesBaseScalar();
     if (descriptor.isRawSqlBased()) {
       String dbColumn = owner.getDbColumn();

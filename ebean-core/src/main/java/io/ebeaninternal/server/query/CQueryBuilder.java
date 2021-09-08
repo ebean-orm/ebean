@@ -145,7 +145,7 @@ final class CQueryBuilder {
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
     StringBuilder sb = new StringBuilder(200);
-    sb.append("update ").append(request.descriptor().getBaseTable());
+    sb.append("update ").append(request.descriptor().baseTable());
     if (rootTableAlias != null) {
       sb.append(" ").append(rootTableAlias);
     }
@@ -361,7 +361,7 @@ final class CQueryBuilder {
     BeanDescriptor<T> desc = request.descriptor();
     if (desc.isReadAuditing()) {
       // log the query plan based bean type (i.e. ignoring query disabling for logging the sql/plan)
-      desc.getReadAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.getFullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
+      desc.getReadAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
     }
     // cache the query plan because we can reuse it and also
     // gather query performance statistics based on it.
@@ -465,7 +465,7 @@ final class CQueryBuilder {
           }
         }
         if (el == null) {
-          throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
+          throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.fullName());
         }
         addRawColumnMapping(pathProps, column, propertyName, el);
       }
@@ -478,7 +478,7 @@ final class CQueryBuilder {
     }
     // check if @Id property included in RawSql
     boolean rawNoId = true;
-    BeanProperty idProperty = descriptor.getIdProperty();
+    BeanProperty idProperty = descriptor.idProperty();
     if (idProperty != null && columnMapping.contains(idProperty.getName())) {
       // contains the @Id property for the root level bean
       rawNoId = false;
@@ -583,7 +583,7 @@ final class CQueryBuilder {
           sb.append("r1.attribute_, count(*) from (select ");
           if (distinct) {
             sb.append("distinct t0.");
-            sb.append(request.descriptor().getIdProperty().getDbColumn()).append(", ");
+            sb.append(request.descriptor().idProperty().getDbColumn()).append(", ");
           }
           sb.append(select.getSelectSql()).append(" as attribute_");
         } else {
@@ -663,7 +663,7 @@ final class CQueryBuilder {
         BeanDescriptor<?> desc = request.descriptor();
         String idSql = desc.getIdBinderIdSql(query.getAlias());
         if (idSql.isEmpty()) {
-          throw new IllegalStateException("Executing FindById query on entity bean " + desc.getName()
+          throw new IllegalStateException("Executing FindById query on entity bean " + desc.name()
             + " that doesn't have an @Id property??");
         }
         if (updateStatement) {

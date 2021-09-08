@@ -29,7 +29,7 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
     EAddr addr = new EAddr("Foo", "Bar", nz);
     EPerAddr perAddr = new EPerAddr("Embed", addr);
 
-    Property country = embType.getProperty("country");
+    Property country = embType.property("country");
     Object val = country.getVal(addr);
 
     assertThat(val).isSameAs(nz);

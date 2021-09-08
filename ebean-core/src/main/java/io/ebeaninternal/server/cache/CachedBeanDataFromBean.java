@@ -15,7 +15,7 @@ public final class CachedBeanDataFromBean {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
     Map<String, Object> data = new LinkedHashMap<>();
 
-    BeanProperty idProperty = desc.getIdProperty();
+    BeanProperty idProperty = desc.idProperty();
     if (idProperty != null) {
       int propertyIndex = idProperty.getPropertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
@@ -54,7 +54,7 @@ public final class CachedBeanDataFromBean {
 
     // create a readOnly sharable instance by copying the data
     EntityBean sharableBean = desc.createEntityBean();
-    BeanProperty idProp = desc.getIdProperty();
+    BeanProperty idProp = desc.idProperty();
     if (idProp != null) {
       Object v = idProp.getValue(bean);
       idProp.setValue(sharableBean, v);

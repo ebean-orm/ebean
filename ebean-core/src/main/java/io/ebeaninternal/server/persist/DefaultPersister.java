@@ -180,7 +180,7 @@ public final class DefaultPersister implements Persister {
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
     List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
-    PUB.debug("draftRestore [{}] count[{}]", desc.getName(), liveBeans.size());
+    PUB.debug("draftRestore [{}] count[{}]", desc.name(), liveBeans.size());
     if (liveBeans.isEmpty()) {
       return Collections.emptyList();
     }
@@ -194,11 +194,11 @@ public final class DefaultPersister implements Persister {
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
 
-      PUB.trace("draftRestore bean [{}] id[{}]", desc.getName(), draftHandler.getId());
+      PUB.trace("draftRestore bean [{}] id[{}]", desc.name(), draftHandler.getId());
       update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, Flags.RECURSE));
     }
 
-    PUB.debug("draftRestore - complete for [{}]", desc.getName());
+    PUB.debug("draftRestore - complete for [{}]", desc.name());
     return draftHandler.getDrafts();
   }
 
@@ -208,7 +208,7 @@ public final class DefaultPersister implements Persister {
   private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
     List<Object> idList = new ArrayList<>(beans.size());
     for (T liveBean : beans) {
-      idList.add(desc.beanId(liveBean));
+      idList.add(desc.id(liveBean));
     }
     return idList;
   }
@@ -225,7 +225,7 @@ public final class DefaultPersister implements Persister {
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
     List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
-    PUB.debug("publish [{}] count[{}]", desc.getName(), draftBeans.size());
+    PUB.debug("publish [{}] count[{}]", desc.name(), draftBeans.size());
     if (draftBeans.isEmpty()) {
       return Collections.emptyList();
     }
@@ -243,7 +243,7 @@ public final class DefaultPersister implements Persister {
       draftHandler.resetDraft(draftBean);
 
       Type persistType = draftHandler.isInsert() ? Type.INSERT : Type.UPDATE;
-      PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftHandler.getId(), persistType);
+      PUB.trace("publish bean [{}] id[{}] type[{}]", desc.name(), draftHandler.getId(), persistType);
 
       PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, Flags.PUBLISH_RECURSE);
       if (persistType == Type.INSERT) {
@@ -255,7 +255,7 @@ public final class DefaultPersister implements Persister {
 
     draftHandler.updateDrafts(transaction, mgr);
 
-    PUB.debug("publish - complete for [{}]", desc.getName());
+    PUB.debug("publish - complete for [{}]", desc.name());
     return livePublish;
   }
 
@@ -336,7 +336,7 @@ public final class DefaultPersister implements Persister {
 
       List<Object> ids = getBeanIds(desc, sourceBeans);
 
-      Query<T> destQuery = server.find(desc.getBeanType()).where().idIn(ids).query();
+      Query<T> destQuery = server.find(desc.type()).where().idIn(ids).query();
       if (asDraft) {
         destQuery.asDraft();
       }
@@ -348,7 +348,7 @@ public final class DefaultPersister implements Persister {
      * Publish/restore the values from the sourceBean to the matching destination bean.
      */
     T publishToDestinationBean(T sourceBean) {
-      id = desc.beanId(sourceBean);
+      id = desc.id(sourceBean);
       T destBean = destBeans.get(id);
       insert = (destBean == null);
       // apply changes from liveBean to draftBean
@@ -714,7 +714,7 @@ public final class DefaultPersister implements Persister {
         if (idList != null) {
           q.where().idIn(idList);
           if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of " + descriptor.getName() + " ids[" + idList + "] requires fetch of foreign key values");
+            t.logSummary("-- DeleteById of " + descriptor.name() + " ids[" + idList + "] requires fetch of foreign key values");
           }
           List<?> beanList = server.findList(q, t);
           deleteList(beanList, t, deleteMode, false);
@@ -723,7 +723,7 @@ public final class DefaultPersister implements Persister {
         } else {
           q.where().idEq(id);
           if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of " + descriptor.getName() + " id[" + id + "] requires fetch of foreign key values");
+            t.logSummary("-- DeleteById of " + descriptor.name() + " id[" + id + "] requires fetch of foreign key values");
           }
           EntityBean bean = (EntityBean) server.findOne(q, t);
           if (bean == null) {
@@ -793,9 +793,9 @@ public final class DefaultPersister implements Persister {
     SqlUpdate deleteById = descriptor.deleteById(id, idList, deleteMode);
     if (t.isLogSummary()) {
       if (idList != null) {
-        t.logSummary("-- Deleting " + descriptor.getName() + " Ids: " + idList);
+        t.logSummary("-- Deleting " + descriptor.name() + " Ids: " + idList);
       } else {
-        t.logSummary("-- Deleting " + descriptor.getName() + " Id: " + id);
+        t.logSummary("-- Deleting " + descriptor.name() + " Id: " + id);
       }
     }
 
@@ -823,9 +823,9 @@ public final class DefaultPersister implements Persister {
 
   private void notifyDeleteById(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction) {
 
-    BeanPersistController controller = descriptor.getPersistController();
+    BeanPersistController controller = descriptor.persistController();
     if (controller != null) {
-      DeleteIdRequest request = new DeleteIdRequest(server, transaction, descriptor.getBeanType(), id);
+      DeleteIdRequest request = new DeleteIdRequest(server, transaction, descriptor.type(), id);
       if (idList == null) {
         controller.preDelete(request);
       } else {
@@ -843,7 +843,7 @@ public final class DefaultPersister implements Persister {
    */
   private Query<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete, DeleteMode deleteMode) {
 
-    Query<?> q = server.createQuery(desc.getBeanType());
+    Query<?> q = server.createQuery(desc.type());
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropImportDelete : propImportDelete) {
       sb.append(aPropImportDelete.getName()).append(",");

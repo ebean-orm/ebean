@@ -564,7 +564,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   public void profile() {
     getTransaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), loadedBeanCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.getProfileId());
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
@@ -637,7 +637,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
    * Return the short bean name.
    */
   String getBeanName() {
-    return desc.getName();
+    return desc.name();
   }
 
   /**

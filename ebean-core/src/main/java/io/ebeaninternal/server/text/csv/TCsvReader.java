@@ -124,7 +124,7 @@ public class TCsvReader<T> implements CsvReader<T> {
   @Override
   public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
 
-    ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
+    ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (!elProp.isDateTimeCapable()) {
       throw new TextException("Property " + propertyName + " is not DateTime capable");
     }
@@ -160,7 +160,7 @@ public class TCsvReader<T> implements CsvReader<T> {
   @Override
   public void addProperty(String propertyName, StringParser parser) {
 
-    ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
+    ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (parser == null) {
       parser = elProp.getStringParser();
     }

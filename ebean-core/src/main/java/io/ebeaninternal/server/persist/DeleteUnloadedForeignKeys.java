@@ -50,7 +50,7 @@ final class DeleteUnloadedForeignKeys {
   void queryForeignKeys() {
 
     BeanDescriptor<?> descriptor = request.descriptor();
-    SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.getBeanType());
+    SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.type());
 
     Object id = request.beanId();
 
@@ -69,7 +69,7 @@ final class DeleteUnloadedForeignKeys {
 
     SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
-      t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
+      t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.name() + " id:" + id);
     }
     beanWithForeignKeys = (EntityBean) server.findOne(q, t);
   }

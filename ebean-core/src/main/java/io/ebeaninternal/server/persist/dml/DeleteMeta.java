@@ -23,7 +23,7 @@ final class DeleteMeta extends BaseMeta {
   DeleteMeta(BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
     super(id, version, tenantId);
 
-    String tableName = desc.getBaseTable();
+    String tableName = desc.baseTable();
     this.sqlNone = genSql(ConcurrencyMode.NONE, tableName);
     this.sqlVersion = genSql(ConcurrencyMode.VERSION, tableName);
     if (desc.isDraftable()) {

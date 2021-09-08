@@ -15,7 +15,7 @@ public interface STreeType {
   /**
    * Return the bean short name.
    */
-  String getName();
+  String name();
 
   /**
    * Return true if the underlying type has an Id property.

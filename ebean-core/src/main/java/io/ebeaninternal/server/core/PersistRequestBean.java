@@ -150,10 +150,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.intercept = entityBean._ebean_getIntercept();
     this.beanManager = mgr;
     this.beanDescriptor = mgr.getBeanDescriptor();
-    this.beanPersistListener = beanDescriptor.getPersistListener();
+    this.beanPersistListener = beanDescriptor.persistListener();
     this.bean = bean;
     this.parentBean = parentBean;
-    this.controller = beanDescriptor.getPersistController();
+    this.controller = beanDescriptor.persistController();
     this.type = type;
     this.docStoreMode = calcDocStoreMode(transaction, type);
     this.flags = flags;
@@ -199,7 +199,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public void profile(long offset, int flushCount) {
-    profileBase(type.profileEventId, offset, beanDescriptor.getName(), flushCount);
+    profileBase(type.profileEventId, offset, beanDescriptor.name(), flushCount);
   }
 
   /**
@@ -495,10 +495,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       case INSERT:
       case UPDATE:
       case DELETE_SOFT:
-        docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
+        docStoreUpdates.queueIndex(beanDescriptor.docStoreQueueId(), idValue);
         break;
       case DELETE:
-        docStoreUpdates.queueDelete(beanDescriptor.getDocStoreQueueId(), idValue);
+        docStoreUpdates.queueDelete(beanDescriptor.docStoreQueueId(), idValue);
         break;
       default:
         throw new IllegalStateException("Invalid type " + type);
@@ -618,7 +618,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * </p>
    */
   public String fullName() {
-    return beanDescriptor.getFullName();
+    return beanDescriptor.fullName();
   }
 
   /**
@@ -937,7 +937,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void logSummaryMessage() {
     String draft = (beanDescriptor.isDraftable() && !publish) ? " draft[true]" : "";
-    String name = beanDescriptor.getName();
+    String name = beanDescriptor.name();
     switch (type) {
       case INSERT:
         transaction.logSummary("Inserted [" + name + "] [" + idValue + "]" + draft);
@@ -1101,9 +1101,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       }
       case QUEUE: {
         if (type == Type.DELETE) {
-          docStoreUpdates.queueDelete(beanDescriptor.getDocStoreQueueId(), idValue);
+          docStoreUpdates.queueDelete(beanDescriptor.docStoreQueueId(), idValue);
         } else {
-          docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
+          docStoreUpdates.queueIndex(beanDescriptor.docStoreQueueId(), idValue);
         }
       }
       break;
@@ -1170,7 +1170,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the table to update depending if the request is a 'publish' one or normal.
    */
   public String updateTable() {
-    return publish ? beanDescriptor.getBaseTable() : beanDescriptor.getDraftTable();
+    return publish ? beanDescriptor.baseTable() : beanDescriptor.getDraftTable();
   }
 
   /**
@@ -1280,7 +1280,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   @Override
   public void profile() {
-    profileBase(type.profileEventId, profileOffset, beanDescriptor.getName(), 1);
+    profileBase(type.profileEventId, profileOffset, beanDescriptor.name(), 1);
   }
 
   /**

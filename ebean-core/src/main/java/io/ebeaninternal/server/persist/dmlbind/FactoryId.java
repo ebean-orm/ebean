@@ -13,7 +13,7 @@ public final class FactoryId {
    * Add uniqueId properties.
    */
   public BindableId createId(BeanDescriptor<?> desc) {
-    BeanProperty id = desc.getIdProperty();
+    BeanProperty id = desc.idProperty();
     if (id == null) {
       return new BindableIdEmpty();
     }

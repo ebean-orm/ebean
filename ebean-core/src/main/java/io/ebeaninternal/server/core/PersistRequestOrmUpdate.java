@@ -26,7 +26,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
 
   @Override
   public void profile(long offset, int flushCount) {
-    profileBase(EVT_ORMUPDATE, offset, beanDescriptor.getName(), flushCount);
+    profileBase(EVT_ORMUPDATE, offset, beanDescriptor.name(), flushCount);
   }
 
   public BeanDescriptor<?> descriptor() {

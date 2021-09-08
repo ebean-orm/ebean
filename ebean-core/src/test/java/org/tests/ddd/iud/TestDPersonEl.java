@@ -46,7 +46,7 @@ public class TestDPersonEl {
 
     EntityBean entityBean = (EntityBean) p;
 
-    ExpressionPath elSalary = descriptor.getExpressionPath("salary");
+    ExpressionPath elSalary = descriptor.expressionPath("salary");
 
     Object money = elSalary.pathGet(entityBean);
 

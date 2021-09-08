@@ -57,7 +57,7 @@ final class BatchedBeanHolder {
    */
   BatchedBeanHolder(BatchControl control, BeanDescriptor<?> beanDescriptor, int order) {
     this.control = control;
-    this.shortDesc = beanDescriptor.getName() + ":" + order;
+    this.shortDesc = beanDescriptor.name() + ":" + order;
     this.order = order;
   }
 

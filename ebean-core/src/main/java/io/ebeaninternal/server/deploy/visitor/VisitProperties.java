@@ -21,7 +21,7 @@ public class VisitProperties {
   }
 
   protected void visitProperties(BeanDescriptor<?> desc, BeanPropertyVisitor propertyVisitor) {
-    BeanProperty idProp = desc.getIdProperty();
+    BeanProperty idProp = desc.idProperty();
     if (idProp != null) {
       visit(propertyVisitor, idProp);
     }

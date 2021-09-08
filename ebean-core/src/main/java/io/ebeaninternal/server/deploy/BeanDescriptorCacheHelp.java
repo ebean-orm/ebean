@@ -124,7 +124,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
         logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
-          desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
+          desc.fullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
   }
@@ -352,7 +352,7 @@ final class BeanDescriptorCacheHelp<T> {
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
     List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
-      idList.add(targetDescriptor.beanId(bean));
+      idList.add(targetDescriptor.id(bean));
     }
     return new CachedManyIds(idList);
   }
@@ -375,7 +375,7 @@ final class BeanDescriptorCacheHelp<T> {
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
       T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
-      result.add(bean, desc.beanId(bean));
+      result.add(bean, desc.id(bean));
     }
     return result;
   }
@@ -773,7 +773,7 @@ final class BeanDescriptorCacheHelp<T> {
 
   void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
     if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
-      transaction.getEvent().add(desc.getBaseTable(), false, update, !update);
+      transaction.getEvent().add(desc.baseTable(), false, update, !update);
     }
   }
 
@@ -816,7 +816,7 @@ final class BeanDescriptorCacheHelp<T> {
     } else {
       queryCacheClear(changeSet);
       cacheDeleteImported(false, insertRequest.entityBean(), changeSet);
-      changeSet.addBeanInsert(desc.getBaseTable());
+      changeSet.addBeanInsert(desc.baseTable());
     }
   }
 

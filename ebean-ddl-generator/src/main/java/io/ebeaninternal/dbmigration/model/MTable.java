@@ -89,14 +89,14 @@ public class MTable {
   private final List<String> droppedColumns = new ArrayList<>();
 
   public MTable(BeanDescriptor<?> descriptor) {
-    this.name = descriptor.getBaseTable();
+    this.name = descriptor.baseTable();
     this.identityMode = descriptor.getIdentityMode();
     this.storageEngine = descriptor.getStorageEngine();
     this.partitionMeta = descriptor.getPartitionMeta();
     this.comment = descriptor.getDbComment();
     if (descriptor.isHistorySupport()) {
       withHistory = true;
-      BeanProperty whenCreated = descriptor.getWhenCreatedProperty();
+      BeanProperty whenCreated = descriptor.whenCreatedProperty();
       if (whenCreated != null) {
         whenCreatedColumn = whenCreated.getDbColumn();
       }

@@ -81,7 +81,7 @@ final class DefaultBeanLoader {
       }
     }
 
-    SpiQuery<?> query = server.createQuery(parentDesc.getBeanType());
+    SpiQuery<?> query = server.createQuery(parentDesc.type());
     if (refresh) {
       // populate a new collection
       BeanCollection<?> emptyCollection = many.createEmpty(parentBean);
@@ -203,7 +203,7 @@ final class DefaultBeanLoader {
       }
     }
 
-    SpiQuery<?> query = server.createQuery(desc.getBeanType());
+    SpiQuery<?> query = server.createQuery(desc.type());
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();
@@ -236,7 +236,7 @@ final class DefaultBeanLoader {
 
     Object dbBean = query.findOne();
     if (dbBean == null) {
-      throw new EntityNotFoundException("Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.getBeanType() + "]");
+      throw new EntityNotFoundException("Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.type() + "]");
     }
     desc.resetManyProperties(dbBean);
   }

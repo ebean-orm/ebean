@@ -175,7 +175,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   void initialisePostTarget() {
     if (childMasterProperty != null) {
-      BeanProperty masterId = childMasterProperty.getTargetDescriptor().getIdProperty();
+      BeanProperty masterId = childMasterProperty.getTargetDescriptor().idProperty();
       if (masterId != null) { // in docstore only, the master-id may be not available
         childMasterIdProperty = childMasterProperty.getName() + "." + masterId.getName();
       }
@@ -200,7 +200,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   @Override
   public void registerColumn(BeanDescriptor<?> desc, String prefix) {
     if (targetDescriptor != null) {
-      desc.registerTable(targetDescriptor.getBaseTable(), this);
+      desc.registerTable(targetDescriptor.baseTable(), this);
     }
   }
 
@@ -654,7 +654,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Create the array of ExportedProperty used to build reference objects.
    */
   private ExportedProperty[] createExported() {
-    BeanProperty idProp = descriptor.getIdProperty();
+    BeanProperty idProp = descriptor.idProperty();
     ArrayList<ExportedProperty> list = new ArrayList<>();
     if (idProp != null && idProp.isEmbedded()) {
       BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) idProp;
@@ -697,7 +697,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       return null;
     }
     // search for the property, to see if it exists
-    Class<?> beanType = descriptor.getBeanType();
+    Class<?> beanType = descriptor.type();
     BeanDescriptor<?> targetDesc = getTargetDescriptor();
     for (BeanPropertyAssocOne<?> prop : targetDesc.propertiesOne()) {
       if (mappedBy != null) {
@@ -727,8 +727,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         return prop;
       }
     }
-    String from = descriptor.getFullName();
-    String to = targetDesc.getFullName();
+    String from = descriptor.fullName();
+    String to = targetDesc.fullName();
     throw new PersistenceException(from + ": Could not find mapKey property [" + mapKey + "] on [" + to + "]");
   }
 
@@ -777,7 +777,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   public void intersectionBind(SqlUpdate sql, EntityBean parentBean, EntityBean other) {
     if (embeddedExportedProperties) {
-      BeanProperty idProp = descriptor.getIdProperty();
+      BeanProperty idProp = descriptor.idProperty();
       parentBean = (EntityBean) idProp.getValue(parentBean);
     }
     for (ExportedProperty exportedProperty : exportedProperties) {
@@ -788,7 +788,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   private void buildExport(IntersectionRow row, EntityBean parentBean) {
     if (embeddedExportedProperties) {
-      BeanProperty idProp = descriptor.getIdProperty();
+      BeanProperty idProp = descriptor.idProperty();
       parentBean = (EntityBean) idProp.getValue(parentBean);
     }
     for (ExportedProperty exportedProperty : exportedProperties) {
@@ -869,7 +869,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     draftVal.size();
     Collection<T> actualDetails = draftVal.getActualDetails();
     for (T bean : actualDetails) {
-      Object id = targetDescriptor.beanId(bean);
+      Object id = targetDescriptor.id(bean);
       T liveBean = liveBeansAsMap.remove(id);
 
       if (isManyToMany()) {
@@ -899,7 +899,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     Collection<?> liveBeans = liveVal.getActualDetails();
     Map<Object, T> liveMap = new LinkedHashMap<>();
     for (Object liveBean : liveBeans) {
-      Object id = targetDescriptor.beanId(liveBean);
+      Object id = targetDescriptor.id(liveBean);
       liveMap.put(id, (T) liveBean);
     }
     return liveMap;

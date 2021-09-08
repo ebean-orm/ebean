@@ -628,7 +628,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public void truncate(Class<?>... types) {
     List<String> tableNames = new ArrayList<>();
     for (Class<?> type : types) {
-      tableNames.add(getBeanDescriptor(type).getBaseTable());
+      tableNames.add(getBeanDescriptor(type).baseTable());
     }
     truncate(tableNames.toArray(new String[0]));
   }
@@ -707,7 +707,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (inheritInfo == null || inheritInfo.isConcrete()) {
       return (T) desc.contextRef(pc, null, false, id);
     }
-    BeanProperty idProp = desc.getIdProperty();
+    BeanProperty idProp = desc.idProperty();
     if (idProp == null) {
       throw new PersistenceException("No ID properties for this type? " + desc);
     }
@@ -988,7 +988,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       String m = beanType.getName() + " is NOT an Entity Bean registered with this server?";
       throw new PersistenceException(m);
     }
-    return new DefaultOrmUpdate<>(beanType, this, desc.getBaseTable(), ormUpdate);
+    return new DefaultOrmUpdate<>(beanType, this, desc.baseTable(), ormUpdate);
   }
 
   @Override
@@ -2279,7 +2279,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     EntityBean entityBean = checkEntityBean(bean);
     BeanDescriptor<?> beanDesc = getBeanDescriptor(entityBean.getClass());
-    BeanProperty idProperty = beanDesc.getIdProperty();
+    BeanProperty idProperty = beanDesc.idProperty();
     // if the ID of the Property is null we are unable to check uniqueness
     if (idProperty == null) {
       return Collections.emptySet();
@@ -2306,7 +2306,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
   private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, Transaction transaction) {
-    BeanProperty idProperty = beanDesc.getIdProperty();
+    BeanProperty idProperty = beanDesc.idProperty();
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
     ExpressionList<?> exprList = query.where();
     if (!entityBean._ebean_getIntercept().isNew()) {

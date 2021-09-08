@@ -63,7 +63,7 @@ public final class DeleteByIdMap {
   }
 
   private BeanPersistIds getPersistIds(BeanDescriptor<?> desc) {
-    String beanType = desc.getFullName();
+    String beanType = desc.fullName();
     return beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
   }
 
@@ -77,7 +77,7 @@ public final class DeleteByIdMap {
       if (DocStoreMode.IGNORE != mode) {
         // Add to queue or bulk update entries
         boolean queue = (DocStoreMode.QUEUE == mode);
-        String queueId = desc.getDocStoreQueueId();
+        String queueId = desc.docStoreQueueId();
         List<Object> idValues = deleteIds.getIds();
         if (idValues != null) {
           for (Object idValue : idValues) {

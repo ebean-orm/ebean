@@ -87,7 +87,7 @@ public final class DLoadContext implements LoadContext {
 
   private ObjectGraphOrigin initOrigin() {
     CallOrigin callOrigin = ebeanServer.createCallOrigin();
-    return new ObjectGraphOrigin(0, callOrigin, rootDescriptor.getFullName());
+    return new ObjectGraphOrigin(0, callOrigin, rootDescriptor.fullName());
   }
 
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
@@ -295,7 +295,7 @@ public final class DLoadContext implements LoadContext {
   }
 
   DLoadBeanContext getBeanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
-    String key = path + ":" + property.getTargetDescriptor().getName();
+    String key = path + ":" + property.getTargetDescriptor().name();
     return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path, null));
   }
 

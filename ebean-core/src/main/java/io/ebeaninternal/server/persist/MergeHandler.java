@@ -82,11 +82,11 @@ final class MergeHandler {
    * We use the Id values to determine what are inserts, updates and deletes as part of the merge.
    */
   private EntityBean fetchOutline(Set<String> paths) {
-    Query<?> query = server.find(desc.getBeanType());
+    Query<?> query = server.find(desc.type());
     query.setBeanCacheMode(CacheMode.OFF);
     query.setPersistenceContextScope(PersistenceContextScope.QUERY);
     query.setId(desc.getId(bean));
-    query.select(desc.getIdProperty().getName());
+    query.select(desc.idProperty().getName());
 
     for (String path : paths) {
       MergeNode node = buildNode(path);
@@ -128,7 +128,7 @@ final class MergeHandler {
   static MergeNode createMergeNode(String fullPath, BeanDescriptor<?> targetDesc, String path) {
     BeanProperty prop = targetDesc.getBeanProperty(path);
     if (!(prop instanceof BeanPropertyAssoc)) {
-      throw new PersistenceException("merge path [" + path + "] is not a ToMany or ToOne property of " + targetDesc.getFullName());
+      throw new PersistenceException("merge path [" + path + "] is not a ToMany or ToOne property of " + targetDesc.fullName());
     }
     if (prop instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> assocMany = (BeanPropertyAssocMany<?>) prop;

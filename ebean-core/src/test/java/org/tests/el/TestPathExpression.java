@@ -22,9 +22,9 @@ public class TestPathExpression {
   public TestPathExpression() {
     SpiServer server = DB.getDefault().pluginApi();
     beanType = server.beanType(Customer.class);
-    billingId = beanType.getExpressionPath("billingAddress.id");
-    line1 = beanType.getExpressionPath("billingAddress.line1");
-    city = beanType.getExpressionPath("billingAddress.city");
+    billingId = beanType.expressionPath("billingAddress.id");
+    line1 = beanType.expressionPath("billingAddress.line1");
+    city = beanType.expressionPath("billingAddress.city");
   }
 
   @Test
@@ -35,11 +35,11 @@ public class TestPathExpression {
     city.pathSet(c1, "Auckland");
     billingId.pathSet(c1, 4);
 
-    beanType.getExpressionPath("id").pathSet(c1, 42L);
-    beanType.getExpressionPath("name").pathSet(c1, "jimmy");
-    beanType.getExpressionPath("status").pathSet(c1, "ACTIVE");
-    beanType.getExpressionPath("billingAddress.country.code").pathSet(c1, "NZ");
-    beanType.getExpressionPath("billingAddress.country.name").pathSet(c1, "New Zealand");
+    beanType.expressionPath("id").pathSet(c1, 42L);
+    beanType.expressionPath("name").pathSet(c1, "jimmy");
+    beanType.expressionPath("status").pathSet(c1, "ACTIVE");
+    beanType.expressionPath("billingAddress.country.code").pathSet(c1, "NZ");
+    beanType.expressionPath("billingAddress.country.name").pathSet(c1, "New Zealand");
 
 
     assertEquals(c1.getId(), Integer.valueOf(42));
@@ -75,7 +75,7 @@ public class TestPathExpression {
     assertEquals(billingId.pathGet(e0), Integer.valueOf("12"));
 
 
-    assertEquals(beanType.getExpressionPath("billingAddress.country.code").pathGet(e0), "NZ");
-    assertEquals(beanType.getExpressionPath("billingAddress.country.name").pathGet(e0), "New Zealand");
+    assertEquals(beanType.expressionPath("billingAddress.country.code").pathGet(e0), "NZ");
+    assertEquals(beanType.expressionPath("billingAddress.country.name").pathGet(e0), "New Zealand");
   }
 }

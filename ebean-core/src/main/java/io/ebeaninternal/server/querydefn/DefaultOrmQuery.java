@@ -165,7 +165,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.rootBeanDescriptor = desc;
-    this.beanType = desc.getBeanType();
+    this.beanType = desc.type();
     this.server = server;
     this.orderById = server.config().isDefaultOrderById();
     this.disableLazyLoading = server.config().isDisableLazyLoading();
@@ -1688,7 +1688,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
 
   @Override
   public Class<? extends T> getInheritType() {
-    return beanDescriptor.getBeanType();
+    return beanDescriptor.type();
   }
 
   @SuppressWarnings("unchecked")
