@@ -166,8 +166,8 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
-    return lastElPropertyValue.getAssocIsEmpty(request, path);
+  public String assocIsEmpty(SpiExpressionRequest request, String path) {
+    return lastElPropertyValue.assocIsEmpty(request, path);
   }
 
   @Override
@@ -183,13 +183,13 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getAssocIdInExpr(String prefix) {
-    return lastElPropertyValue.getAssocIdInExpr(prefix);
+  public String assocIdInExpr(String prefix) {
+    return lastElPropertyValue.assocIdInExpr(prefix);
   }
 
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
-    return lastElPropertyValue.getAssocIdInValueExpr(not, size);
+  public String assocIdInValueExpr(boolean not, int size) {
+    return lastElPropertyValue.assocIdInValueExpr(not, size);
   }
 
   @Override

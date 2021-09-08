@@ -501,7 +501,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Return the logical id value expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
+  public String assocIdInValueExpr(boolean not, int size) {
     return targetDescriptor.getIdBinder().getIdInValueExpr(not, size);
   }
 
@@ -509,7 +509,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Return the logical id in expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocIdInExpr(String prefix) {
     return targetDescriptor.getIdBinder().getAssocIdInExpr(prefix);
   }
 

@@ -544,7 +544,9 @@ public interface Transaction extends AutoCloseable {
    * Deprecated migrate to connection().
    */
   @Deprecated
-  Connection getConnection();
+  default Connection getConnection() {
+    return connection();
+  }
 
   /**
    * Add table modification information to the TransactionEvent.

@@ -135,7 +135,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocIdInExpr(String prefix) {
     return null;
   }
 
@@ -143,12 +143,12 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
+  public String assocIdInValueExpr(boolean not, int size) {
     return null;
   }
 
   @Override
-  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+  public String assocIsEmpty(SpiExpressionRequest request, String path) {
     throw new RuntimeException("Not Supported or Expected");
   }
 

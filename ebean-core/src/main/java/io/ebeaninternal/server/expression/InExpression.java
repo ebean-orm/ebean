@@ -145,8 +145,8 @@ final class InExpression extends AbstractExpression {
     }
 
     if (prop != null) {
-      request.append(prop.getAssocIdInExpr(propName));
-      request.append(prop.getAssocIdInValueExpr(not, bindValues.size()));
+      request.append(prop.assocIdInExpr(propName));
+      request.append(prop.assocIdInValueExpr(not, bindValues.size()));
     } else {
       request.append(propName);
       request.appendInExpression(not, bindValues);

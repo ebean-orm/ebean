@@ -410,7 +410,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
-  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+  public String assocIsEmpty(SpiExpressionRequest request, String path) {
     boolean softDelete = targetDescriptor.isSoftDelete();
     boolean needsX2Table = softDelete || getExtraWhere() != null;
     StringBuilder sb = new StringBuilder(50);
@@ -470,7 +470,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Return the logical id value expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
+  public String assocIdInValueExpr(boolean not, int size) {
     return targetDescriptor.getIdBinder().getIdInValueExpr(not, size);
   }
 
@@ -478,7 +478,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Return the logical id in expression taking into account embedded id's.
    */
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocIdInExpr(String prefix) {
     return targetDescriptor.getIdBinder().getAssocIdInExpr(prefix);
   }
 

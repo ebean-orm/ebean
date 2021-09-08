@@ -849,7 +849,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+  public String assocIsEmpty(SpiExpressionRequest request, String path) {
     // overridden in BanePropertyAssocMany
     throw new RuntimeException("Not Supported or Expected");
   }
@@ -867,13 +867,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocIdInExpr(String prefix) {
     // Returns null as not an AssocOne.
     return null;
   }
 
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
+  public String assocIdInValueExpr(boolean not, int size) {
     // Returns null as not an AssocOne.
     return null;
   }
