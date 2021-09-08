@@ -73,7 +73,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     @Override
     public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
-      sb.append(",").append(p.getDbColumn());
+      sb.append(",").append(p.dbColumn());
       colCount++;
     }
 
@@ -84,7 +84,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     @Override
     public void visitScalar(BeanProperty p, boolean allowNonNull) {
-      sb.append(",").append(p.getDbColumn());
+      sb.append(",").append(p.dbColumn());
       colCount++;
     }
 

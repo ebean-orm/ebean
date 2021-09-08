@@ -129,7 +129,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   @Override
-  public int getFetchPreference() {
+  public int fetchPreference() {
     return fetchPreference;
   }
 
@@ -425,7 +425,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     BeanProperty idProp = target.idProperty();
     BeanProperty[] others = target.propertiesBaseScalar();
     if (descriptor.isRawSqlBased()) {
-      String dbColumn = owner.getDbColumn();
+      String dbColumn = owner.dbColumn();
       return new ImportedIdSimple(owner, dbColumn, null, idProp, 0);
     }
     if (idProp == null) {
@@ -466,16 +466,16 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     boolean insertable = col.isInsertable();
     boolean updateable = col.isUpdateable();
     for (int j = 0; j < props.length; j++) {
-      if (props[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
+      if (props[j].dbColumn().equalsIgnoreCase(matchColumn)) {
         return new ImportedIdSimple(owner, localColumn, localSqlFormula, props[j], j, insertable, updateable);
       }
     }
     for (int j = 0; j < others.length; j++) {
-      if (others[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
+      if (others[j].dbColumn().equalsIgnoreCase(matchColumn)) {
         return new ImportedIdSimple(owner, localColumn, localSqlFormula, others[j], j + props.length, insertable, updateable);
       }
     }
-    String msg = "Error with the Join on [" + getFullBeanName()
+    String msg = "Error with the Join on [" + fullName()
       + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
       + " Perhaps an error in a @JoinColumn";
     throw new PersistenceException(msg);
@@ -566,7 +566,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       }
     }
 
-    String msg = "Error with the Join on [" + getFullBeanName()
+    String msg = "Error with the Join on [" + fullName()
       + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
       + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped? "
       + " or a @JoinColumn needs an explicit referencedColumnName specified?";

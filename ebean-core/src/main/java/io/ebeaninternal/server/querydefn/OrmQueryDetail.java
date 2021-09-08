@@ -312,7 +312,7 @@ public final class OrmQueryDetail implements Serializable {
             throw new PersistenceException("Path [" + parentPath + "] not valid from " + d.fullName());
           }
           // add a missing parent path just fetching the Id property
-          BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.getBeanProperty();
+          BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.beanProperty();
           if (addId) {
             parentProp = new OrmQueryProperties(parentPath, assocOne.getTargetIdProperty());
           } else {
@@ -549,8 +549,8 @@ public final class OrmQueryDetail implements Serializable {
      */
     @Override
     public int compareTo(FetchEntry other) {
-      int fp = elProp.getFetchPreference();
-      int op = other.elProp.getFetchPreference();
+      int fp = elProp.fetchPreference();
+      int op = other.elProp.fetchPreference();
       if (fp == op) {
         return Integer.compare(index, other.index);
       } else {

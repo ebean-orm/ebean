@@ -429,7 +429,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public String getEncryptKeyAsString() {
+  public String encryptKeyAsString() {
     return getEncryptKey().getStringValue();
   }
 
@@ -441,11 +441,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the SQL for the column including decryption function and column alias.
    */
   private String getDecryptSqlWithColumnAlias(String tableAlias) {
-    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.getDbColumn()) + ENC_PREFIX + tableAlias + "_" + this.getDbColumn();
+    return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.dbColumn()) + ENC_PREFIX + tableAlias + "_" + this.dbColumn();
   }
 
   @Override
-  public int getFetchPreference() {
+  public int fetchPreference() {
     // return some decently high value - override on ToMany property
     return 1000;
   }
@@ -567,7 +567,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
+  public BeanProperty beanProperty() {
     return this;
   }
 
@@ -904,12 +904,12 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public String getElPlaceholder(boolean encrypted) {
+  public String elPlaceholder(boolean encrypted) {
     return encrypted ? elPlaceHolderEncrypted : elPlaceHolder;
   }
 
   @Override
-  public String getElPrefix() {
+  public String elPrefix() {
     return elPrefix;
   }
 
@@ -917,7 +917,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the full name of this property.
    */
   @Override
-  public String getFullBeanName() {
+  public String fullName() {
     return descriptor.fullName() + "." + name;
   }
 
@@ -934,7 +934,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   @Override
   @SuppressWarnings(value = "unchecked")
-  public ScalarType<Object> getScalarType() {
+  public ScalarType<Object> scalarType() {
     return scalarType;
   }
 
@@ -1117,7 +1117,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * The database column name this is mapped to.
    */
   @Override
-  public String getDbColumn() {
+  public String dbColumn() {
     return dbColumn;
   }
 
@@ -1411,7 +1411,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
           // change in behavior for #318
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
-            + getFullBeanName() + " - consider marking this property with @JsonIgnore";
+            + fullName() + " - consider marking this property with @JsonIgnore";
           logger.error(msg, e);
         }
       }

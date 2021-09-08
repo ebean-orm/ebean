@@ -680,9 +680,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private ExportedProperty findMatch(boolean embedded, BeanProperty prop) {
     if (hasJoinTable()) {
       // look for column going to intersection
-      return findMatch(embedded, prop, prop.getDbColumn(), intersectionJoin);
+      return findMatch(embedded, prop, prop.dbColumn(), intersectionJoin);
     } else {
-      return findMatch(embedded, prop, prop.getDbColumn(), tableJoin);
+      return findMatch(embedded, prop, prop.dbColumn(), tableJoin);
     }
   }
 

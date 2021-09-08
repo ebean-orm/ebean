@@ -63,7 +63,7 @@ public final class SqlBeanLoad {
       return prop.readSet(ctx, bean);
     } catch (Exception e) {
       bean._ebean_getIntercept().setLoadError(prop.getPropertyIndex(), e);
-      ctx.handleLoadError(prop.getFullBeanName(), e);
+      ctx.handleLoadError(prop.fullName(), e);
       return prop.getValue(bean);
     }
   }

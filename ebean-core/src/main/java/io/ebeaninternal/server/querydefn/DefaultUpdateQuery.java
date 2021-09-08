@@ -28,7 +28,7 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
       values.setNull(property);
     } else {
       final BeanProperty beanProperty = descriptor.getBeanProperty(property);
-      final ScalarType<Object> scalarType = (beanProperty == null) ? null: beanProperty.getScalarType();
+      final ScalarType<Object> scalarType = (beanProperty == null) ? null: beanProperty.scalarType();
       values.set(property, value, scalarType);
     }
     return this;

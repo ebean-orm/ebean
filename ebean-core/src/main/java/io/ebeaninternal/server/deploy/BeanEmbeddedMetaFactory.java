@@ -49,7 +49,7 @@ final class BeanEmbeddedMetaFactory {
   }
 
   private static String dbColumn(String prefix, Column override, BeanProperty source) {
-    String dbCol = (override != null && !override.name().isEmpty()) ? override.name() : source.getDbColumn();
+    String dbCol = (override != null && !override.name().isEmpty()) ? override.name() : source.dbColumn();
     return prefix == null ? dbCol : prefix + dbCol;
   }
 

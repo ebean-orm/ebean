@@ -83,7 +83,7 @@ public final class SimpleExpression extends AbstractValueExpression {
       }
       if (prop.isDbEncrypted()) {
         // bind the key as well as the value
-        String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
+        String encryptKey = prop.beanProperty().getEncryptKey().getStringValue();
         request.addBindEncryptKey(encryptKey);
       } else if (prop.isLocalEncrypted()) {
         Object bindVal = prop.localEncrypt(value());
@@ -105,7 +105,7 @@ public final class SimpleExpression extends AbstractValueExpression {
         return;
       }
       if (prop.isDbEncrypted()) {
-        String dsql = prop.getBeanProperty().getDecryptProperty(propName);
+        String dsql = prop.beanProperty().getDecryptProperty(propName);
         request.append(dsql).append(type.bind());
         return;
       }

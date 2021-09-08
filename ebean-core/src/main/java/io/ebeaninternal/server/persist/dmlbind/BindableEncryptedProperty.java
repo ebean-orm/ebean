@@ -44,7 +44,7 @@ final class BindableEncryptedProperty implements Bindable {
   public void dmlAppend(GenerateDmlRequest request) {
 
     // columnName = AES_ENCRYPT(?,?)
-    request.appendColumn(prop.getDbColumn(), prop.getDbBind());
+    request.appendColumn(prop.dbColumn(), prop.getDbBind());
   }
 
 

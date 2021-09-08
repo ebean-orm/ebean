@@ -40,7 +40,7 @@ public interface ElPropertyDeploy {
    * this property.
    * </p>
    */
-  String getElPrefix();
+  String elPrefix();
 
   /**
    * Return the place holder in the form of ${elPrefix}dbColumn.
@@ -48,7 +48,7 @@ public interface ElPropertyDeploy {
    * The ${elPrefix} is replaced by the appropriate table alias.
    * </p>
    */
-  String getElPlaceholder(boolean encrypted);
+  String elPlaceholder(boolean encrypted);
 
   /**
    * Return the name of the property.
@@ -63,12 +63,12 @@ public interface ElPropertyDeploy {
   /**
    * Return the deployment db column for this property.
    */
-  String getDbColumn();
+  String dbColumn();
 
   /**
    * Return the underlying bean property.
    */
-  BeanProperty getBeanProperty();
+  BeanProperty beanProperty();
 
   /**
    * Return true if this is an aggregation property.
@@ -79,5 +79,5 @@ public interface ElPropertyDeploy {
    * Return the fetch preference. This can be used to control which ToMany relationship
    * is left as a 'join' and which get converted to query join.
    */
-  int getFetchPreference();
+  int fetchPreference();
 }

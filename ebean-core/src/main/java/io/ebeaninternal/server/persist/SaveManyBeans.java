@@ -277,7 +277,7 @@ public final class SaveManyBeans extends SaveManyBase {
       } else if (value instanceof Collection<?>) {
         additions = (Collection<?>) value;
       } else {
-        throw new PersistenceException("Unhandled ManyToMany type " + value.getClass().getName() + " for " + many.getFullBeanName());
+        throw new PersistenceException("Unhandled ManyToMany type " + value.getClass().getName() + " for " + many.fullName());
       }
       if (!vanillaCollection) {
         BeanCollection<?> manyValue = (BeanCollection<?>) value;

@@ -24,7 +24,7 @@ final class MatchedImportedFactory {
 
   private static MatchedImportedProperty findMatch(BeanProperty prop, BeanDescriptor<?> desc) {
     // find matching against the local database column
-    String dbColumn = prop.getDbColumn();
+    String dbColumn = prop.dbColumn();
     for (BeanPropertyAssocOne<?> assocOne1 : desc.propertiesOne()) {
       if (assocOne1.isImportedPrimaryKey()) {
         // search using the ImportedId from the assoc one
@@ -35,7 +35,7 @@ final class MatchedImportedFactory {
       }
     }
     for (BeanProperty beanProperty : desc.propertiesBaseScalar()) {
-      if (dbColumn.equals(beanProperty.getDbColumn())) {
+      if (dbColumn.equals(beanProperty.dbColumn())) {
         return new MatchedImportedScalar(prop, beanProperty);
       }
     }

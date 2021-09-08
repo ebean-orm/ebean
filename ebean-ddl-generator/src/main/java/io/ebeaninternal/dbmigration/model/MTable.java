@@ -98,7 +98,7 @@ public class MTable {
       withHistory = true;
       BeanProperty whenCreated = descriptor.whenCreatedProperty();
       if (whenCreated != null) {
-        whenCreatedColumn = whenCreated.getDbColumn();
+        whenCreatedColumn = whenCreated.dbColumn();
       }
     }
   }

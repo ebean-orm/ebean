@@ -76,7 +76,7 @@ final class BindableIdEmbedded implements BindableId {
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
     for (BeanProperty prop : props) {
-      request.appendColumn(prop.getDbColumn());
+      request.appendColumn(prop.dbColumn());
     }
   }
 
@@ -84,7 +84,7 @@ final class BindableIdEmbedded implements BindableId {
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
 
     if (matches == null) {
-      String m = "No matches for " + embId.getFullBeanName() + " the concatenated key columns where not found?"
+      String m = "No matches for " + embId.fullName() + " the concatenated key columns where not found?"
         + " I expect that the concatenated key was null, and this bean does"
         + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);

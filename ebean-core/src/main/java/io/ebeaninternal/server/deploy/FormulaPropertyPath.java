@@ -113,9 +113,9 @@ final class FormulaPropertyPath {
       throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor + " - maybe use a cast like ::String ?");
     }
     // determine scalarType based on first property found by parser
-    final BeanProperty property = firstProp.getBeanProperty();
+    final BeanProperty property = firstProp.beanProperty();
     if (!property.isAssocId()) {
-      return create(property.getScalarType());
+      return create(property.scalarType());
     } else {
       return createManyToOne(property);
     }

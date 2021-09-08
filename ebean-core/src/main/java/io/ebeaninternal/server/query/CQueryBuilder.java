@@ -488,7 +488,7 @@ final class CQueryBuilder {
   }
 
   private void addRawColumnMapping(PathProperties pathProps, Column column, String propertyName, ElPropertyValue el) {
-    BeanProperty beanProperty = el.getBeanProperty();
+    BeanProperty beanProperty = el.beanProperty();
     if (beanProperty.isId()) {
       if (propertyName.contains(".")) {
         // For @Id properties we chop off the last part of the path
@@ -583,7 +583,7 @@ final class CQueryBuilder {
           sb.append("r1.attribute_, count(*) from (select ");
           if (distinct) {
             sb.append("distinct t0.");
-            sb.append(request.descriptor().idProperty().getDbColumn()).append(", ");
+            sb.append(request.descriptor().idProperty().dbColumn()).append(", ");
           }
           sb.append(select.getSelectSql()).append(" as attribute_");
         } else {

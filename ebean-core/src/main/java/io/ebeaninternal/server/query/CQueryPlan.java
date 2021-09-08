@@ -221,7 +221,7 @@ public class CQueryPlan implements SpiQueryPlan {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
-        dataBind.setString(encryptedProp.getEncryptKeyAsString());
+        dataBind.setString(encryptedProp.encryptKeyAsString());
       }
     }
     return dataBind;
@@ -231,7 +231,7 @@ public class CQueryPlan implements SpiQueryPlan {
     DataBindCapture dataBind = DataBindCapture.of(dataTimeZone);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
-        dataBind.setString(encryptedProp.getEncryptKeyAsString());
+        dataBind.setString(encryptedProp.encryptKeyAsString());
       }
     }
     return dataBind;

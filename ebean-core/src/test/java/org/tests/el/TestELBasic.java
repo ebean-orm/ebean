@@ -31,17 +31,17 @@ public class TestELBasic extends BaseTestCase {
 
     ElPropertyDeploy elBillAddressId = descriptor.getElPropertyDeploy("billingAddress.id");
     assertTrue(elBillAddressId instanceof BeanFkeyProperty);
-    assertEquals("billing_address_id", elBillAddressId.getDbColumn());
+    assertEquals("billing_address_id", elBillAddressId.dbColumn());
     assertEquals("billingAddress.id", elBillAddressId.name());
-    assertNull(elBillAddressId.getElPrefix());
+    assertNull(elBillAddressId.elPrefix());
 
 
     ElPropertyDeploy elBillAddressCity = descriptor.getElPropertyDeploy("billingAddress.city");
     assertTrue(elBillAddressCity instanceof ElPropertyChain);
-    assertEquals("billingAddress", elBillAddressCity.getElPrefix());
+    assertEquals("billingAddress", elBillAddressCity.elPrefix());
     assertEquals("city", elBillAddressCity.name());
-    assertEquals("${billingAddress}city", elBillAddressCity.getElPlaceholder(false));
-    assertEquals("city", elBillAddressCity.getDbColumn());
+    assertEquals("${billingAddress}city", elBillAddressCity.elPlaceholder(false));
+    assertEquals("city", elBillAddressCity.dbColumn());
 
 //		ElPropertyDeploy elBillAddressCountry = descriptor.getElPropertyDeploy("billingAddress.country");
 
@@ -51,10 +51,10 @@ public class TestELBasic extends BaseTestCase {
 
     ElPropertyDeploy elOrderStatus = descriptor.getElPropertyDeploy("orders.status");
     assertTrue(elOrderStatus instanceof ElPropertyChain);
-    assertEquals("orders", elOrderStatus.getElPrefix());
+    assertEquals("orders", elOrderStatus.elPrefix());
     assertEquals("status", elOrderStatus.name());
-    assertEquals("${orders}status", elOrderStatus.getElPlaceholder(false));
-    assertEquals("status", elOrderStatus.getDbColumn());
+    assertEquals("${orders}status", elOrderStatus.elPlaceholder(false));
+    assertEquals("status", elOrderStatus.dbColumn());
 
     ElPropertyDeploy elOrderCust = descriptor.getElPropertyDeploy("orders.customer");
     assertTrue(elOrderCust instanceof ElPropertyChain);

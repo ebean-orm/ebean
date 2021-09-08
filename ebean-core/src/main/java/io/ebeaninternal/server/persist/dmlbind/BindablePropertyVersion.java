@@ -38,7 +38,7 @@ final class BindablePropertyVersion implements Bindable {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-    request.appendColumn(prop.getDbColumn());
+    request.appendColumn(prop.dbColumn());
   }
 
   /**

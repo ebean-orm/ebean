@@ -59,9 +59,9 @@ public final class ElPropertyChain implements ElPropertyValue {
     this.assocId = chain[chain.length - 1].isAssocId();
 
     this.last = chain.length - 1;
-    this.lastBeanProperty = chain[chain.length - 1].getBeanProperty();
+    this.lastBeanProperty = chain[chain.length - 1].beanProperty();
     if (lastBeanProperty != null) {
-      this.scalarType = lastBeanProperty.getScalarType();
+      this.scalarType = lastBeanProperty.scalarType();
     } else {
       // case for nested compound type (non-scalar)
       this.scalarType = null;
@@ -77,8 +77,8 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public int getFetchPreference() {
-    return chain[0].getFetchPreference();
+  public int fetchPreference() {
+    return chain[0].fetchPreference();
   }
 
   @Override
@@ -88,9 +88,9 @@ public final class ElPropertyChain implements ElPropertyValue {
 
   private String getElPlaceHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
     if (prefix == null) {
-      return lastElPropertyValue.getElPlaceholder(encrypted);
+      return lastElPropertyValue.elPlaceholder(encrypted);
     }
-    String el = lastElPropertyValue.getElPlaceholder(encrypted);
+    String el = lastElPropertyValue.elPlaceholder(encrypted);
     if (!el.contains("${}")) {
       // typically a secondary table property
       return el.replace("${", "${" + prefix + ".");
@@ -113,7 +113,7 @@ public final class ElPropertyChain implements ElPropertyValue {
     }
     int i = 1 + SplitName.count(sinceProperty);
     for (; i < chain.length; i++) {
-      if (chain[i].getBeanProperty().containsMany()) {
+      if (chain[i].beanProperty().containsMany()) {
         return true;
       }
     }
@@ -131,7 +131,7 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getElPrefix() {
+  public String elPrefix() {
     return prefix;
   }
 
@@ -146,7 +146,7 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getElPlaceholder(boolean encrypted) {
+  public String elPlaceholder(boolean encrypted) {
     return encrypted ? placeHolderEncrypted : placeHolder;
   }
 
@@ -218,12 +218,12 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getDbColumn() {
-    return lastElPropertyValue.getDbColumn();
+  public String dbColumn() {
+    return lastElPropertyValue.dbColumn();
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
+  public BeanProperty beanProperty() {
     return lastBeanProperty;
   }
 

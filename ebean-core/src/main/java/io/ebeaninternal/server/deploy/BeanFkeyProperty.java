@@ -42,7 +42,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public int getFetchPreference() {
+  public int fetchPreference() {
     // return some decently high value
     return 1000;
   }
@@ -101,7 +101,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public String getDbColumn() {
+  public String dbColumn() {
     return dbColumn;
   }
 
@@ -171,12 +171,12 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public String getElPlaceholder(boolean encrypted) {
+  public String elPlaceholder(boolean encrypted) {
     return placeHolder;
   }
 
   @Override
-  public String getElPrefix() {
+  public String elPrefix() {
     return prefix;
   }
 
@@ -191,7 +191,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
+  public BeanProperty beanProperty() {
     return null;
   }
 

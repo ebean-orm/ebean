@@ -129,9 +129,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
           // limit JoinColumn mapping to the @Id / primary key
           TableJoinColumn[] columns = tableJoin.columns();
           String foreignJoinColumn = columns[0].getForeignDbColumn();
-          String foreignIdColumn = targetDescriptor.idProperty().getDbColumn();
+          String foreignIdColumn = targetDescriptor.idProperty().dbColumn();
           if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
-            throw new PersistenceException("Mapping limitation - @JoinColumn on " + getFullBeanName() + " needs to map to a primary key as per Issue #529 "
+            throw new PersistenceException("Mapping limitation - @JoinColumn on " + fullName() + " needs to map to a primary key as per Issue #529 "
               + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
           }
         }
@@ -218,7 +218,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     if (embedded) {
       BeanProperty embProp = embeddedPropsMap.get(remainder);
       if (embProp == null) {
-        String msg = "Embedded Property " + remainder + " not found in " + getFullBeanName();
+        String msg = "Embedded Property " + remainder + " not found in " + fullName();
         throw new PersistenceException(msg);
       }
       if (chain == null) {
@@ -232,7 +232,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
-  public String getElPlaceholder(boolean encrypted) {
+  public String elPlaceholder(boolean encrypted) {
     return encrypted ? elPlaceHolderEncrypted : elPlaceHolder;
   }
 
@@ -330,7 +330,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         selectChain.add(discProperty);
       }
       if (targetIdBinder == null) {
-        throw new IllegalStateException("No Id binding property for " + getFullBeanName()
+        throw new IllegalStateException("No Id binding property for " + fullName()
           + ". Probably a missing @OneToOne mapping annotation on this relationship?");
       }
       targetIdBinder.buildRawSqlSelectChain(prefix, selectChain);
@@ -591,7 +591,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Find the matching foreignDbColumn for a given local property.
    */
   private ExportedProperty findMatch(boolean embeddedProp, BeanProperty prop) {
-    return findMatch(embeddedProp, prop, prop.getDbColumn(), tableJoin);
+    return findMatch(embeddedProp, prop, prop.dbColumn(), tableJoin);
   }
 
   @Override

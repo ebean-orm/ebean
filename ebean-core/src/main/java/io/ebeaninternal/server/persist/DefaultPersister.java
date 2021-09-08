@@ -783,7 +783,7 @@ public final class DefaultPersister implements Persister {
       for (BeanPropertyAssocMany<?> many : manys) {
         SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
         if (t.isLogSummary()) {
-          t.logSummary("-- Deleting intersection table entries: " + many.getFullBeanName());
+          t.logSummary("-- Deleting intersection table entries: " + many.fullName());
         }
         executeSqlUpdate(sqlDelete, t);
       }

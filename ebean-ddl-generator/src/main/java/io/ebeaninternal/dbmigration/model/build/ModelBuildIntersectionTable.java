@@ -5,7 +5,6 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 
@@ -34,7 +33,7 @@ class ModelBuildIntersectionTable {
     intersectionTable = createTable();
     MTable existingTable = ctx.addTable(intersectionTable);
     if (existingTable != null) {
-      throw new IllegalStateException("Property " + manyProp.getFullBeanName() + " has duplicate ManyToMany intersection table " + intersectionTable.getName()
+      throw new IllegalStateException("Property " + manyProp.fullName() + " has duplicate ManyToMany intersection table " + intersectionTable.getName()
         + ". Please use @JoinTable to define unique table to use");
     }
 

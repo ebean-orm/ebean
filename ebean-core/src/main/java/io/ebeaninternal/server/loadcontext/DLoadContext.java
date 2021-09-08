@@ -162,7 +162,7 @@ public final class DLoadContext implements LoadContext {
    */
   private void registerSecondaryQuery(OrmQueryProperties props) {
     ElPropertyValue elGetValue = rootDescriptor.getElGetValue(props.getPath());
-    boolean many = elGetValue.getBeanProperty().containsMany();
+    boolean many = elGetValue.beanProperty().containsMany();
     registerSecondaryNode(many, props);
   }
 

@@ -29,7 +29,7 @@ abstract class DynamicPropertyBase implements STreeProperty {
   }
 
   @Override
-  public String getFullBeanName() {
+  public String fullName() {
     return fullName;
   }
 
@@ -49,12 +49,12 @@ abstract class DynamicPropertyBase implements STreeProperty {
   }
 
   @Override
-  public String getElPrefix() {
+  public String elPrefix() {
     return elPrefix;
   }
 
   @Override
-  public ScalarType<?> getScalarType() {
+  public ScalarType<?> scalarType() {
     return scalarType;
   }
 
@@ -74,7 +74,7 @@ abstract class DynamicPropertyBase implements STreeProperty {
   }
 
   @Override
-  public String getEncryptKeyAsString() {
+  public String encryptKeyAsString() {
     return null;
   }
 }

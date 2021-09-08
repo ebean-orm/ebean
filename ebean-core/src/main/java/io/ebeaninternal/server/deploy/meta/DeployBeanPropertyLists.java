@@ -225,7 +225,7 @@ public final class DeployBeanPropertyLists {
           if (versionProperty == null) {
             versionProperty = prop;
           } else {
-            logger.warn("Multiple @Version properties - property " + prop.getFullBeanName() + " not treated as a version property");
+            logger.warn("Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;

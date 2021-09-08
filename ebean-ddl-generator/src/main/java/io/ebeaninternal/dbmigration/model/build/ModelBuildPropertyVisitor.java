@@ -189,7 +189,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     TableJoinColumn[] columns = p.getTableJoin().columns();
     if (columns.length == 0) {
-      throw new RuntimeException("No join columns for " + p.getFullBeanName());
+      throw new RuntimeException("No join columns for " + p.fullName());
     }
 
     ImportedId importedId = p.getImportedId();
@@ -214,7 +214,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         throw new RuntimeException("Imported BeanProperty not found?");
       }
       String columnDefn = ctx.getColumnDefn(importedProperty, true);
-      String refColumn = importedProperty.getDbColumn();
+      String refColumn = importedProperty.dbColumn();
 
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
       col.setDbMigrationInfos(p.getDbMigrationInfos());
@@ -268,7 +268,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     // using non-strict mode to render the DB type such that we have a
     // "logical" type like jsonb(200) that can map to JSONB or VARCHAR(200)
-    MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p, false));
+    MColumn col = new MColumn(p.dbColumn(), ctx.getColumnDefn(p, false));
     col.setComment(p.getDbComment());
     col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
@@ -309,7 +309,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         InheritInfo inheritInfo = beanDescriptor.getInheritInfo();
         inheritInfo.appendCheckConstraintValues(p.name(), checkConstraintValues);
       }
-      col.setCheckConstraint(buildCheckConstraint(p.getDbColumn(), checkConstraintValues));
+      col.setCheckConstraint(buildCheckConstraint(p.dbColumn(), checkConstraintValues));
       col.setCheckConstraintName(checkConstraintName(col.getName()));
     }
 

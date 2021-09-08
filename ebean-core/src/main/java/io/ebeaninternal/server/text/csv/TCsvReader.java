@@ -247,7 +247,7 @@ public class TCsvReader<T> implements CsvReader<T> {
         addDateTime(aLine, null, null);
 
       } else if (elProp.isAssocProperty()) {
-        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.getBeanProperty();
+        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.beanProperty();
         String idProp = assocOne.getBeanDescriptor().getIdBinder().getIdProperty();
         addProperty(aLine + "." + idProp);
       } else {

@@ -417,7 +417,7 @@ public final class SqlTreeBuilder {
           // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
         } else {
-          logger.error("property [" + p.getFullBeanName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
+          logger.error("property [" + p.fullName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
         }
       }
 

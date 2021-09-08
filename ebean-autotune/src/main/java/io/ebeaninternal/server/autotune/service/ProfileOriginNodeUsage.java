@@ -48,7 +48,7 @@ public class ProfileOriginNodeUsage {
           logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
           return;
         } else {
-          BeanProperty beanProperty = elGetValue.getBeanProperty();
+          BeanProperty beanProperty = elGetValue.beanProperty();
           if (beanProperty instanceof BeanPropertyAssoc<?>) {
             desc = ((BeanPropertyAssoc<?>) beanProperty).getTargetDescriptor();
           }

@@ -100,7 +100,7 @@ public final class BeanTable {
   }
 
   private void addToJoin(String foreignKeyPrefix, DeployTableJoin join, boolean reverse, String sqlFormulaSelect, boolean complexKey, BeanProperty prop) {
-    String lc = prop.getDbColumn();
+    String lc = prop.dbColumn();
     String fk = lc;
     if (foreignKeyPrefix != null) {
       fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);

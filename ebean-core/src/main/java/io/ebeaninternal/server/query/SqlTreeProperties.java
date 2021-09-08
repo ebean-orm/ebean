@@ -39,7 +39,7 @@ public final class SqlTreeProperties {
     if (prop.isAggregation()) {
       if (!aggregation) {
         aggregation = true;
-        aggregationPath = prop.getElPrefix();
+        aggregationPath = prop.elPrefix();
       }
       if (prop.isAggregationManyToOne()) {
         aggregationManyToOne = true;

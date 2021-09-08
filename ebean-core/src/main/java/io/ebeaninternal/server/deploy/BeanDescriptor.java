@@ -935,7 +935,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the Encrypt key given the BeanProperty.
    */
   public EncryptKey getEncryptKey(BeanProperty p) {
-    return owner.getEncryptKey(baseTable, p.getDbColumn());
+    return owner.getEncryptKey(baseTable, p.dbColumn());
   }
 
   /**
@@ -2805,14 +2805,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (elProp == null) {
       throw new PersistenceException("Invalid path " + propertyPath + " from " + fullName());
     }
-    return elProp.getBeanProperty().isEmbedded();
+    return elProp.beanProperty().isEmbedded();
   }
 
   @Override
   public ExtraJoin extraJoin(String propertyPath) {
     ElPropertyValue elGetValue = getElGetValue(propertyPath);
     if (elGetValue != null) {
-      BeanProperty beanProperty = elGetValue.getBeanProperty();
+      BeanProperty beanProperty = elGetValue.beanProperty();
       if (beanProperty instanceof BeanPropertyAssoc<?>) {
         BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
         if (!assocProp.isEmbedded()) {

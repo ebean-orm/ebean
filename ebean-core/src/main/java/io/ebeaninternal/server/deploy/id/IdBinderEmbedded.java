@@ -57,7 +57,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(idDesc.getBaseTableAlias()).append(".").append(props[i].getDbColumn()).append("=?");
+      sb.append(idDesc.getBaseTableAlias()).append(".").append(props[i].dbColumn()).append("=?");
     }
     sb.append(")");
     return sb.toString();
@@ -123,7 +123,7 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
     for (BeanProperty prop : props) {
-      if (dbColumnName.equalsIgnoreCase(prop.getDbColumn())) {
+      if (dbColumnName.equalsIgnoreCase(prop.dbColumn())) {
         return prop;
       }
     }
@@ -173,7 +173,7 @@ public final class IdBinderEmbedded implements IdBinder {
         if (i > 0) {
           sb.append(" and ");
         }
-        sb.append(props[i].getDbColumn()).append("=?");
+        sb.append(props[i].dbColumn()).append("=?");
       }
       sb.append(")");
     }
@@ -392,7 +392,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (baseTableAlias != null) {
         sb.append(baseTableAlias).append(".");
       }
-      sb.append(props[i].getDbColumn()).append("=?");
+      sb.append(props[i].dbColumn()).append("=?");
     }
     return sb.toString();
   }
@@ -411,7 +411,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (baseTableAlias != null) {
         sb.append(baseTableAlias).append(".");
       }
-      sb.append(props[i].getDbColumn());
+      sb.append(props[i].dbColumn());
     }
     sb.append(")");
     return sb.toString();

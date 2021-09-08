@@ -34,9 +34,9 @@ public final class IdBinderSimple implements IdBinder {
 
   public IdBinderSimple(BeanProperty idProperty, MultiValueBind multiValueBind) {
     this.idProperty = idProperty;
-    this.scalarType = idProperty.getScalarType();
+    this.scalarType = idProperty.scalarType();
     this.expectedType = idProperty.type();
-    bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
+    bindIdSql = InternString.intern(idProperty.dbColumn() + " = ? ");
     this.multiValueBind = multiValueBind;
   }
 
@@ -80,7 +80,7 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
-    if (dbColumnName.equalsIgnoreCase(idProperty.getDbColumn())) {
+    if (dbColumnName.equalsIgnoreCase(idProperty.dbColumn())) {
       return idProperty;
     }
     return null;
@@ -99,9 +99,9 @@ public final class IdBinderSimple implements IdBinder {
   @Override
   public String getBindIdInSql(String baseTableAlias) {
     if (baseTableAlias == null) {
-      return idProperty.getDbColumn();
+      return idProperty.dbColumn();
     } else {
-      return baseTableAlias + "." + idProperty.getDbColumn();
+      return baseTableAlias + "." + idProperty.dbColumn();
     }
   }
 

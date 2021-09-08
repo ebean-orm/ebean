@@ -63,8 +63,8 @@ public final class DeployPropertyParser extends DeployParser {
       if (catchFirst && firstProp == null) {
         firstProp = elProp;
       }
-      addIncludes(elProp.getElPrefix());
-      return elProp.getElPlaceholder(encrypted);
+      addIncludes(elProp.elPrefix());
+      return elProp.elPlaceholder(encrypted);
     }
   }
 

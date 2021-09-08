@@ -199,7 +199,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       if (localId != null) {
         // add foreign key based on convention
         String fkColName = namingConvention.getForeignKey(descriptor.getBaseTable(), localId.name());
-        prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkColName));
+        prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localId.dbColumn(), fkColName));
       }
     }
 
@@ -386,8 +386,8 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty localId = localTable.getIdProperty();
       if (localId != null) {
         // add the source to intersection join columns
-        String fkCol = namingConvention.deriveM2MColumn(localTableName, localId.getDbColumn());
-        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkCol));
+        String fkCol = namingConvention.deriveM2MColumn(localTableName, localId.dbColumn());
+        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.dbColumn(), fkCol));
       }
     }
 
@@ -396,8 +396,8 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty otherId = otherTable.getIdProperty();
       if (otherId != null) {
         // set the intersection to dest table join columns
-        String fkCol = namingConvention.deriveM2MColumn(otherTableName, otherId.getDbColumn());
-        destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherId.getDbColumn()));
+        String fkCol = namingConvention.deriveM2MColumn(otherTableName, otherId.dbColumn());
+        destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherId.dbColumn()));
       }
     }
 
