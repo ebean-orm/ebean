@@ -2,7 +2,6 @@ package org.tests.rawsql;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.FetchConfig;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.Transaction;
@@ -29,7 +28,7 @@ public class TestRawSqlWithResultSet extends BaseTestCase {
     // Transaction supplies our jdbc Connection
     Transaction txn = DB.beginTransaction();
     try {
-      pstmt = txn.getConnection().prepareStatement("select id, name, billing_address_id from o_customer");
+      pstmt = txn.connection().prepareStatement("select id, name, billing_address_id from o_customer");
 
       // ResultSet will be closed by Ebean
       ResultSet resultSet = pstmt.executeQuery();

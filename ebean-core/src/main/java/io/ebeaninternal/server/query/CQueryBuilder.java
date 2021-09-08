@@ -409,7 +409,7 @@ final class CQueryBuilder {
     }
     query.setGeneratedSql(sql);
 
-    Connection connection = request.transaction().getConnection();
+    Connection connection = request.transaction().connection();
 
     BeanDescriptor<?> desc = request.descriptor();
     try {

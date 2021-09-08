@@ -31,11 +31,11 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     try {
       EBasicWithUniqueCon v2 = createEntityWithName("conflict", "after");
       txn.flush();
-      Savepoint sp = txn.getConnection().setSavepoint();
+      Savepoint sp = txn.connection().setSavepoint();
       try {
         server().save(v2); // unique key violation
       } catch (PersistenceException e) {
-        txn.getConnection().rollback(sp);
+        txn.connection().rollback(sp);
 
         EBasicWithUniqueCon conflicting = server().find(EBasicWithUniqueCon.class).where().eq("name", "conflict").findOne();
         assertThat(conflicting).isNotNull();

@@ -47,7 +47,7 @@ public class SlowDownEBasic implements Trigger {
       return;
     }
     triggerInstalled = true;
-    try (Transaction txn = DB.beginTransaction(); Statement stmt = txn.getConnection().createStatement()) {
+    try (Transaction txn = DB.beginTransaction(); Statement stmt = txn.connection().createStatement()) {
 
       stmt.execute("CREATE TRIGGER SLOW_DOWN_E_BASIC BEFORE SELECT ON e_basic " + "CALL \""
           + SlowDownEBasic.class.getName() + "\"");

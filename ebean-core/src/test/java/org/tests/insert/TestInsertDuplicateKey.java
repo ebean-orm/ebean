@@ -97,7 +97,7 @@ public class TestInsertDuplicateKey extends BaseTestCase {
         // typically we would use transaction.commitAndContinue()
         // ... this is a rollback and continue type scenario
         // ... more sensible to use a second transaction that do this
-        DB.getDefault().currentTransaction().getConnection().rollback();
+        DB.getDefault().currentTransaction().connection().rollback();
       } catch (SQLException e1) {
         e1.printStackTrace();
       }

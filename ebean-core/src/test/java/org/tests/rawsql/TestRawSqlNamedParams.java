@@ -51,7 +51,7 @@ public class TestRawSqlNamedParams extends BaseTestCase {
     Transaction transaction = DB.beginTransaction();
 
     try {
-      if ("MariaDB connector/J".equals(transaction.getConnection().getMetaData().getDriverName())) {
+      if ("MariaDB connector/J".equals(transaction.connection().getMetaData().getDriverName())) {
         return; // MariaDb only supports callable statements in the form "? = call function x(?)"
       }
       CallableSql callableSql = DB.createCallableSql("set @total = 0");

@@ -148,7 +148,7 @@ public final class InsertHandler extends DmlHandler {
     PreparedStatement stmt = null;
     ResultSet rset = null;
     try {
-      stmt = transaction.getConnection().prepareStatement(persistRequest.getSelectLastInsertedId());
+      stmt = transaction.connection().prepareStatement(persistRequest.getSelectLastInsertedId());
       rset = stmt.executeQuery();
       setGeneratedKey(rset);
     } finally {

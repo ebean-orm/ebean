@@ -26,7 +26,7 @@ public class TestSavepoint extends BaseTestCase {
 
     try (Transaction transaction = DB.beginTransaction()) {
 
-      Connection connection = transaction.getConnection();
+      Connection connection = transaction.connection();
       Savepoint savepoint = connection.setSavepoint();
 
       basicVer.setOther("changeOther");

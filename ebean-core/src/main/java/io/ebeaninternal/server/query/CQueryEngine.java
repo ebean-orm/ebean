@@ -132,7 +132,7 @@ public final class CQueryEngine {
       t.logSummary(msg);
     }
     // ensure 'rollback' is logged if queryOnly transaction
-    t.getConnection();
+    t.connection();
     // build a decent error message for the exception
     String m = "Query threw SQLException:" + e.getMessage() + " Bind values:[" + bindLog + "] Query was:" + sql;
     return dbPlatform.translate(m, e);

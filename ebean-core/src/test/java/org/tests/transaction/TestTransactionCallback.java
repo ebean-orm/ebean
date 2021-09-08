@@ -22,7 +22,7 @@ public class TestTransactionCallback extends BaseTestCase {
   public void test_commitAndRollback() {
     try (Transaction txn = DB.beginTransaction()) {
       DB.register(new MyCallback());
-      txn.getConnection(); // Ebean assumes writes have occurred
+      txn.connection(); // Ebean assumes writes have occurred
       txn.commit();
     }
 

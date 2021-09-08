@@ -51,7 +51,7 @@ public class TestGeneratedKeys extends BaseTestCase {
   private long readSequenceValue(Transaction tx, String sequence) throws SQLException {
     Statement stm = null;
     try {
-      stm = tx.getConnection().createStatement();
+      stm = tx.connection().createStatement();
       ResultSet rs = stm.executeQuery("select currval('" + sequence + "')");
       rs.next();
 

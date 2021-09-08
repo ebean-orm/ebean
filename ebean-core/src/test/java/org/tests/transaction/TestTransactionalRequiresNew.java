@@ -45,14 +45,14 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
     void doOuter() {
       outerTxn = DB.currentTransaction();
       log.info("outer before ...{}", outerTxn);
-      outerConn = outerTxn.getConnection();
+      outerConn = outerTxn.connection();
 
       new InTransactionalWithRequiresNew().doInner();
 
       // restore the outerTxn
       Transaction current = DB.currentTransaction();
       log.info("outer after ...{}", current);
-      assertSame(outerConn, current.getConnection());
+      assertSame(outerConn, current.connection());
     }
 
   }
@@ -64,7 +64,7 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
       Transaction innerTxn = DB.currentTransaction();
       log.info("inner ...{} {}", innerTxn);
 
-      Connection connection = innerTxn.getConnection();
+      Connection connection = innerTxn.connection();
       assertNotSame(connection, outerConn);
     }
   }

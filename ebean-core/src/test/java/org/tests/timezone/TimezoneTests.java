@@ -45,10 +45,10 @@ public class TimezoneTests {
 
   private void fetch() throws SQLException {
     try (
-        Transaction transaction = DB.beginTransaction();
-        Connection connection = transaction.getConnection();
-        PreparedStatement statement = connection.prepareStatement("select * from tztest");
-        ResultSet resultSet = statement.executeQuery()) {
+      Transaction transaction = DB.beginTransaction();
+      Connection connection = transaction.connection();
+      PreparedStatement statement = connection.prepareStatement("select * from tztest");
+      ResultSet resultSet = statement.executeQuery()) {
 
       while (resultSet.next()) {
         System.out.println(" zone:" + resultSet.getString("zone"));
@@ -79,9 +79,9 @@ public class TimezoneTests {
     }
 
     try (
-        Transaction transaction = DB.beginTransaction();
-        Connection connection = transaction.getConnection();
-        PreparedStatement statement = connection.prepareStatement(insert)) {
+      Transaction transaction = DB.beginTransaction();
+      Connection connection = transaction.connection();
+      PreparedStatement statement = connection.prepareStatement(insert)) {
       statement.setString(1, zone);
       statement.setTimestamp(2, nowTs);
       statement.setTimestamp(3, nowTs);
